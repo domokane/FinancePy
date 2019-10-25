@@ -1,0 +1,5870 @@
+\documentclass[twoside,11pt]{book} 
+
+\usepackage{bibentry}
+
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{a4wide} %THIS ONE
+\usepackage{color}
+\usepackage{ebezier}
+\usepackage{graphicx,pstricks}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{framed}
+\usepackage[light,all,bottomafter]{draftcopy} 
+\usepackage{sectsty} 
+\usepackage{index}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{tocloft}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\lstset{language=Python}
+ 
+\makeindex
+
+\renewcommand{\baselinestretch}{1.1}
+
+%\sectionfont{\Large \bf}
+%\subsectionfont{\large \bf}
+
+\headheight=16pt
+\topskip=0pt
+
+\newenvironment{itemize*}%
+{\begin{itemize}%
+\setlength{\leftmargin}{0pt}
+\setlength{\itemindent}{0pt}%
+\setlength{\itemsep}{2pt}%
+\setlength{\parskip}{2pt}}%
+{\end{itemize}}
+
+\newenvironment{enumerate*}%
+{\begin{enumerate}%
+\setlength{\leftmargini}{0pt}
+\setlength{\itemindent}{0pt}%
+\setlength{\itemsep}{2pt}%
+\setlength{\parskip}{2pt}}%
+{\end{enumerate}}
+
+\newcommand{\figsize}{0.55}
+\newcommand{\twofigsize}{0.4}
+
+\newenvironment{example}{
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.8}
+\begin{shaded}
+\vspace{0.2cm} \bf \noindent Example:\normalfont  }
+{
+\end{shaded}
+}
+
+\newenvironment{new}{
+\definecolor{shadecolor}{rgb}{0.9,1,1}
+\begin{shaded}
+\vspace{0.0cm} \noindent }
+{
+\end{shaded}
+\black 
+}
+
+\newenvironment{cut}{
+\definecolor{shadecolor}{rgb}{1.0,0.6,0.6}
+\begin{shaded}
+\vspace{0.0cm} \noindent }
+{
+\end{shaded}
+\black 
+}
+
+\newenvironment{status}{
+\definecolor{shadecolor}{rgb}{0.95,0.5,0.85}
+\begin{shaded}
+\vspace{0.0cm} \bf \noindent To do:\normalfont}{\end{shaded}}
+
+\leftmargin=0pt
+\itemindent=0pt
+
+\usepackage{courier}
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+
+\begin{document}
+
+\title{{\Huge \bf FinancePy}}
+\author{Dominic O'Kane}
+
+\maketitle 
+
+\cleardoublepage
+
+\cftsetindents{section}{1em}{3em}
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter{FinancePy}
+
+\section{Introduction}
+The aim of FinancePY is to provide an single, fast and easy-to-use Python library for all financial calculations. As a result, the library has been developed with the following secondary goals
+\begin{itemize}
+\item To begin by focusing on derivative valuation
+\item To then extend to asset selection 
+\item To provide a simple and easily learnable interface
+\item To be product focused so that users can find what they need quickly
+\item To provide users with the ability to look into the code for transparency
+\item To make the code as simple to comprehend consistent with other constraints
+\item To leverage Numpy and Numba in order to keep the code transparent but also to make it as fast to compute as possible.
+\end{itemize}
+
+\section{Contributors}
+Only me so far.
+
+\section{Coding Style}
+In terms of coding style, I followed the following rules:
+\begin{itemize}
+\item- Camel case for everything. This is a personal choice. I think it makes the code easier to read and shortens function names.
+\item- Use === separators to show where classes and functions start and end.
+\item- Split complex calculations into steps rather than do too much on one line
+\item- Minimise dependencies on libraries other than Numpy and Numba.
+\item- Avoid complex design patterns in favour of maximum simplicity.
+\end{itemize}
+
+\section{Speed}
+I have sought to use Numba to make the code as fast as possible without going down the path of Cython. This seems to be very effective. Because of Numba's current capabilitiues I have had to move some of the key computation functions out of classes.
+
+\section{Progress Update}
+PLEASE KEEP THIS UPDATED.
+
+\subsection{Known Bugs and things to Check}
+\begin{itemize}
+\item BOND ACCRUED - double check this.
+\end{itemize}
+
+\subsection{Things to complete}
+Things that have been started but need to be checked and/or completed.
+\begin{itemize}
+\item FINPIECE CURVE
+\item Fix HESTON PROCESS
+\item FINCURVE TERM STRUCTURE FOR ALL OPTION PRICING
+\item GENERIC OPTION TYPES TO SHARE CODE FOR EQUITY AND FX
+\item BOND OAS
+\item LIBOR CURVE BUILDING: ADD FUTURES AND OIS
+\item SPEED UP CDS PORTFOLIO HAZARD RATE FIT
+\item CONSISTENT USE OF NUMBA
+\item USE OF NUMPY AND AVOID PYTHON LISTS
+\item FINCDSINDEXOPTION NUMBA SPEED UP
+\end{itemize}
+
+\subsection{Major things to do}
+Things that have not yet been started
+\begin{itemize}
+\item Convertible bond
+\item Trinomial Tree
+\item Hull White Tree Bond Option
+\item Ho Lee bond price
+\item BGM - MARKET MODELS
+\item Model Calibration - fitting market prices
+\item AMERICAN OPTIONS VIA MONTE CARLO
+\item Finite difference grids ?
+\item FX OPTIONS
+\item INFLATION DERIVATIVES
+\end{itemize}
+
+\subsection{DONE}
+
+\chapter{..//finutils}
+\section{Introduction}
+This is a collection of modules used across a wide range of FinancePy functions. Examples include date generation, special mathematical functions.
+\newpage
+\section{FinCalendar}
+
+\subsubsection{Enumerated Type: FinBusDayConventionTypes}
+\begin{itemize}
+\item{NONE}
+\item{FOLLOWING}
+\item{MODIFIED\_FOLLOWING}
+\item{PRECEDING}
+\item{MODIFIED\_PRECEDING}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinCalendarTypes}
+\begin{itemize}
+\item{TARGET}
+\item{US}
+\item{UK}
+\item{NONE}
+\item{WEEKEND}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinDateGenRuleTypes}
+\begin{itemize}
+\item{FORWARD}
+\item{BACKWARD}
+\end{itemize}
+
+\subsection{Class: FinCalendar(object)}
+Class to manage designation of payment dates as holidays according to a calendar convention specified by the user. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_type}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create a calendar based on a specified calendar type. 
+
+\begin{lstlisting}
+    def __init__(self, calendarType):
+\end{lstlisting}
+
+\subsection{Class Method {\it adjust}}
+Adjust a payment date if it falls on a holiday according to the specified business day convention. 
+
+\begin{lstlisting}
+    def adjust(self, dt, busDayConventionType ):
+\end{lstlisting}
+
+\subsection{Class Method {\it isBusinessDay}}
+Determines if a date is a business day according to the calendar. 
+
+\begin{lstlisting}
+    def isBusinessDay(self, dt):
+\end{lstlisting}
+
+\subsection{Class Method {\it easterMonday}}
+Get the day in a givenm year that is Easter Monday. This is not easy to compute so we rely on a pre-calculated array. 
+
+\begin{lstlisting}
+    def easterMonday(self, y):
+\end{lstlisting}
+
+\subsection{Class Method {\it str}}
+
+
+\begin{lstlisting}
+    def str(self):
+\end{lstlisting}
+
+\newpage
+\section{FinCurve}
+
+\subsection{Class: FinCurve()}
+Class to manage curves from which other curve class inherit. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_times}
+\item{self.\_values}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create curve as a vector of times and values of the same length. 
+
+\begin{lstlisting}
+    def __init__(self, times, values):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+get the value (in this context it is a discount factor) by interpolating according to a specified interpolation method. 
+
+\begin{lstlisting}
+    def value(self, t):
+\end{lstlisting}
+
+\newpage
+\section{FinDate}
+
+\subsection{Class: FinDate()}
+Date class that is simple to use and includes a number of useful date functions used frequently in Finance. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_y}
+\item{self.\_weekday}
+\item{self.\_m}
+\item{self.\_excelDate}
+\item{self.\_d}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create a date given year, month and day of month. 
+
+\begin{lstlisting}
+    def __init__(self, 
+                 y, # Year (1900-2100)
+                 m, # Month (1-12)
+                 d):# Day of Month (1-31 depending on month)
+\end{lstlisting}
+
+\subsection{Class Method {\it refresh}}
+Update internal representation of date as number of days since the 1st Jan 1900. This is same as Excel convention. 
+
+\begin{lstlisting}
+    def refresh(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_lt\_\_}}
+
+
+\begin{lstlisting}
+    def __lt__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_gt\_\_}}
+
+
+\begin{lstlisting}
+    def __gt__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_le\_\_}}
+
+
+\begin{lstlisting}
+    def __le__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_ge\_\_}}
+
+
+\begin{lstlisting}
+    def __ge__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_sub\_\_}}
+
+
+\begin{lstlisting}
+    def __sub__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_eq\_\_}}
+
+
+\begin{lstlisting}
+    def __eq__(self, other):
+\end{lstlisting}
+
+\subsection{Class Method {\it isWeekend}}
+returns True if the date falls on a weekend. 
+
+\begin{lstlisting}
+    def isWeekend(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it addDays}}
+Returns a new date that is numDays after the FinDate. 
+
+\begin{lstlisting}
+    def addDays(self, numDays):
+\end{lstlisting}
+
+\subsection{Class Method {\it addWorkDays}}
+Returns a new date that is numDays working days after the FinDate. 
+
+\begin{lstlisting}
+    def addWorkDays(self, numDays):
+\end{lstlisting}
+
+\subsection{Class Method {\it addMonths}}
+Returns a new date that is mm months after the FinDate. 
+
+\begin{lstlisting}
+    def addMonths(self, mm):
+\end{lstlisting}
+
+\subsection{Class Method {\it nextCDSDate}}
+Returns a CDS date that is mm months after the FinDate. 
+
+\begin{lstlisting}
+    def nextCDSDate(self, mm):
+\end{lstlisting}
+
+\subsection{Class Method {\it thirdWednesdayOfMonth}}
+For a specific month and year this returns the day number of the 3rd Wednesday by scanning through dates in the third week 
+
+\begin{lstlisting}
+    def thirdWednesdayOfMonth(self,m,y):
+\end{lstlisting}
+
+\subsection{Class Method {\it nextIMMDate}}
+This function returns the next IMM date after the current date This is a 3rd Wednesday of Jun, March, Sep or December 
+
+\begin{lstlisting}
+    def nextIMMDate(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it datediff}}
+Calculate the number of dates between two dates. 
+
+\begin{lstlisting}
+    def datediff(d1,d2):
+\end{lstlisting}
+
+\subsection{Class Method {\it date}}
+
+
+\begin{lstlisting}
+    def date(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_str\_\_}}
+
+
+\begin{lstlisting}
+    def __str__(self):
+\end{lstlisting}
+
+\newpage
+\section{FinDayCount}
+
+\subsubsection{Enumerated Type: FinDayCountTypes}
+\begin{itemize}
+\item{THIRTY\_E\_360\_ISDA}
+\item{THIRTY\_E\_360\_PLUS\_ISDA}
+\item{ACT\_ACT\_ISDA}
+\item{ACT\_365\_ISDA}
+\item{THIRTY\_360}
+\item{THIRTY\_360\_BOND}
+\item{THIRTY\_E\_360}
+\item{ACT\_360}
+\item{ACT\_365\_FIXED}
+\item{ACT\_365\_LEAP}
+\end{itemize}
+
+\subsection{Class: FinDayCount(object)}
+Calculate the fractional day count between two dates according to a specified convention. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_type}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create Day Count convention by passing in the Day Count Type. 
+
+\begin{lstlisting}
+    def __init__(self,dccType):
+\end{lstlisting}
+
+\subsection{Class Method {\it yearFrac}}
+Calculate the year fraction between dates dt1 and dt2 using the specified day count convention. 
+
+\begin{lstlisting}
+    def yearFrac(self, dt1, dt2):
+\end{lstlisting}
+
+\subsection{Class Method {\it \_\_str\_\_}}
+
+
+\begin{lstlisting}
+    def __str__(self):
+\end{lstlisting}
+
+\newpage
+\section{FinError}
+
+\subsection{Class: FinError(Exception)}
+Simple error class specific to FinPy. Need to decide how to handle FinancePy errors. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_message}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, message):
+\end{lstlisting}
+
+\subsection{Class Method {\it printMessage}}
+
+
+\begin{lstlisting}
+    def printMessage(self):
+\end{lstlisting}
+
+\subsection{Function {\it func\_name}}
+
+
+\begin{lstlisting}
+def func_name():
+\end{lstlisting}
+
+\subsection{Function {\it isNotEqual}}
+
+
+\begin{lstlisting}
+def isNotEqual(x,y,tol=1e-6):
+\end{lstlisting}
+
+\newpage
+\section{FinFrequency}
+
+\subsubsection{Enumerated Type: FinFrequencyTypes}
+\begin{itemize}
+\item{ANNUAL}
+\item{SEMI\_ANNUAL}
+\item{QUARTERLY}
+\item{MONTHLY}
+\end{itemize}
+
+\subsection{Function {\it FinFrequency}}
+
+
+\begin{lstlisting}
+def FinFrequency(frequencyType):
+\end{lstlisting}
+
+\newpage
+\section{FinGlobalVariables}
+
+\newpage
+\section{FinHelperFunctions}
+
+\subsection{Function {\it listdiff}}
+Calculate a vector of differences between two equal sized vectors. 
+
+\begin{lstlisting}
+def listdiff(a,b):
+\end{lstlisting}
+
+\subsection{Function {\it dotproduct}}
+
+
+\begin{lstlisting}
+def dotproduct(xVector,yVector):
+\end{lstlisting}
+
+\subsection{Function {\it frange}}
+
+
+\begin{lstlisting}
+def frange(start, stop, step):
+\end{lstlisting}
+
+\newpage
+\section{FinInterpolate}
+
+\subsubsection{Enumerated Type: FinInterpMethods}
+\begin{itemize}
+\item{PIECEWISE\_LINEAR}
+\item{PIECEWISE\_LOG\_LINEAR}
+\item{FLAT\_FORWARDS}
+\end{itemize}
+
+\subsection{Function {\it interpolate}}
+Return the interpolated value of y given x and a vector of x and y. The values of x must be monotonic and increasing. The different schemes for interpolation are linear in y (as a function of x), linear in log(y) and piecewise flat in the continuously compounded forward y rate. 
+
+\begin{lstlisting}
+def interpolate(xValue, 
+                xvector, 
+                yvector, 
+                method):
+\end{lstlisting}
+
+\newpage
+\section{FinMath}
+
+\subsection{Function {\it isLeapYear}}
+Test whether year y is a leap year and if so return True, else False 
+
+\begin{lstlisting}
+def isLeapYear(y):
+\end{lstlisting}
+
+\subsection{Function {\it scale}}
+Scale all of the elements of an array by the same amount factor. 
+
+\begin{lstlisting}
+def scale(x,factor):
+\end{lstlisting}
+
+\subsection{Function {\it maximum}}
+Determine the maximum of two values a and b. TODO: Add Numba function signature and test speed versus Numpy. 
+
+\begin{lstlisting}
+def maximum(a,b):
+\end{lstlisting}
+
+\subsection{Function {\it maxaxis}}
+Perform a search for the vector of maximum values over an axis of a 2D Numpy Array 
+
+\begin{lstlisting}
+def maxaxis(s):
+\end{lstlisting}
+
+\subsection{Function {\it minaxis}}
+Perform a search for the vector of minimum values over an axis of a 2D Numpy Array 
+
+\begin{lstlisting}
+def minaxis(s):
+\end{lstlisting}
+
+\subsection{Function {\it covar}}
+Calculate the Covariance of two arrays of numbers. TODO: check that this works well for Numpy Arrays and add NUMBA function signature to code. Do test of timings against Numpy. 
+
+\begin{lstlisting}
+def covar(a,b):
+\end{lstlisting}
+
+\subsection{Function {\it pairGCD}}
+Determine the Greatest Common Divisor of two integers using Euclidsalgorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine to see if I should not be declaring inputs as integers for NUMBA. 
+
+\begin{lstlisting}
+def pairGCD(v1,v2):
+\end{lstlisting}
+
+\subsection{Function {\it nprime}}
+Calculate the first derivative of the Cumulative Normal CDF which is simply the PDF of the Normal Distribution 
+
+\begin{lstlisting}
+def nprime(x):
+\end{lstlisting}
+
+\subsection{Function {\it heaviside}}
+Calculate the Heaviside function for x 
+
+\begin{lstlisting}
+def heaviside(x):
+\end{lstlisting}
+
+\subsection{Function {\it frange}}
+
+
+\begin{lstlisting}
+def frange(start, stop, step):
+\end{lstlisting}
+
+\subsection{Function {\it normpdf}}
+Normal Density function at value x
+
+\begin{lstlisting}
+def normpdf(x):
+\end{lstlisting}
+
+\subsection{Function {\it normcdf\_fast}}
+Fast Normal CDF function based on XXX 
+
+\begin{lstlisting}
+def normcdf_fast(x):
+\end{lstlisting}
+
+\subsection{Function {\it normcdf\_integrate}}
+Calculation of Normal Distribution CDF by simple integrationwhich can become exact in the limit of the number of steps tending towards infinity. This function is used for checking as it is slow since the number of integration steps is currently hardcoded to 10,000.
+
+\begin{lstlisting}
+def normcdf_integrate(x):
+\end{lstlisting}
+
+\subsection{Function {\it normcdf\_slow}}
+Calculation of Normal Distribution CDF accurate to 1d-15.This method is faster than integration but slower than other approximations.Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. 
+
+\begin{lstlisting}
+def normcdf_slow(z):
+\end{lstlisting}
+
+\subsection{Function {\it normcdf}}
+This is the Normal CDF function which forks to one of three of the implemented approximations. This is based on the choice of the fast flag variable. A value of 1 is the fast routine, 2 is the slow and 3 is the even slower integration scheme. 
+
+\begin{lstlisting}
+def normcdf(x, fastFlag):
+\end{lstlisting}
+
+\subsection{Function {\it N}}
+This is the shortcut to the default Normal CDF function and is currentlyhardcoded to the fastest of the implemented routines. This is the most widely used way to access the Normal CDF. 
+
+\begin{lstlisting}
+def N(x):
+\end{lstlisting}
+
+\subsection{Function {\it phi3}}
+Bivariate Normal CDF function to upper limits $b1$ and $b2$ which uses integration to perform the innermost integral. This may need further refinement to ensure it is optimal as the current range of integration isfrom -7 and the integration steps are dx = 0.001. This may be excessive. 
+
+\begin{lstlisting}
+def phi3(b1, b2, b3, r12, r13, r23):
+\end{lstlisting}
+
+\subsection{Function {\it norminvcdf}}
+This algorithm computes the inverse Normal CDF and is based on the algorithm found at (http:\#home.online.no/~pjacklam/notes/invnorm/)which is by John Herrero (3-Jan-03) 
+
+\begin{lstlisting}
+def norminvcdf(p):
+\end{lstlisting}
+
+\subsection{Function {\it M}}
+
+
+\begin{lstlisting}
+def M(a,b,c):
+\end{lstlisting}
+
+\subsection{Function {\it phi2}}
+Drezner and Wesolowsky implementation of bi-variate normal 
+
+\begin{lstlisting}
+def phi2( h1, hk, r ):
+\end{lstlisting}
+
+\subsection{Function {\it corrMatrixGenerator}}
+Utility function to generate a full rank n x n correlation matrix with a flat correlation structure and value rho. 
+
+\begin{lstlisting}
+def corrMatrixGenerator(rho,n):
+\end{lstlisting}
+
+\newpage
+\section{FinRateConverter}
+
+\subsection{Class: FinRateConverter(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.months}
+\item{self.name}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it str}}
+
+
+\begin{lstlisting}
+    def str(self):
+\end{lstlisting}
+
+\newpage
+\section{FinSchedule}
+
+\subsection{Class: FinSchedule(object)}
+A Schedule is a vector of dates generated according to ISDA standard rules which starts on the next date after the start date and runs up to an end date. Dates are adjusted to a provided calendar. The zeroth element is the PCD and the first element is the NCD 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_adjustedDates}
+\item{self.\_startDate}
+\item{self.\_frequencyType}
+\item{self.\_endDate}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 startDate,
+                 endDate,
+                 frequencyType = FinFrequencyTypes.ANNUAL,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it generate}}
+Generate schedule of dates according to specified date generation rules and also adjust these dates for holidays according to the business day convention and the specified calendar. 
+
+\begin{lstlisting}
+    def generate(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+Print out the details of the schedule and the actual dates. This can be used for providing transparency on schedule calculations. 
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+\newpage
+\section{FinStats}
+
+\subsection{Function {\it mean}}
+Calculate the arithmetic mean of a vector of numbers x. 
+
+\begin{lstlisting}
+def mean(x):
+\end{lstlisting}
+
+\subsection{Function {\it stdev}}
+Calculate the standard deviation of a vector of numbers x. 
+
+\begin{lstlisting}
+def stdev(x):
+\end{lstlisting}
+
+\subsection{Function {\it stderr}}
+Calculate the standard error estimate of a vector of numbers x. 
+
+\begin{lstlisting}
+def stderr(x):
+\end{lstlisting}
+
+\subsection{Function {\it var}}
+Calculate the variance of a vector of numbers x. 
+
+\begin{lstlisting}
+def var(x):
+\end{lstlisting}
+
+\subsection{Function {\it moment}}
+Calculate the m-th moment of a vector of numbers x. 
+
+\begin{lstlisting}
+def moment(x,m):
+\end{lstlisting}
+
+\subsection{Function {\it correlation}}
+Calculate the correlation between two series x1 and x2. 
+
+\begin{lstlisting}
+def correlation(x1,x2):
+\end{lstlisting}
+
+\newpage
+\section{FinTestCases}
+
+\subsubsection{Enumerated Type: FinTestCaseMode}
+\begin{itemize}
+\item{SAVE\_TEST\_CASES}
+\item{ANALYSE\_TEST\_CASES}
+\end{itemize}
+
+\subsection{Class: FinTestCases()}
+Test case framework for FinancePy.- The basic step is that we generate a GOLDEN folder that creates an output file for each testcase which is assumed to be correct. This can be done by running the test cases Python file with the globalTestCaseMode set to FinTestCaseMode.SAVE\_TEST\_CASES.- The second step is that we change the value of globalTestCaseMode to FinTestCaseMode.ANALYSE\_TEST\_CASES and then run the test scripts. This time they save a copy of the output to the COMPARE folder. Finally, a function called compareTestCases() is used to compare the new output with the GOLDENoutput and states whether anything has changed. - The output of a test case has three forms 1) print - this outputs comma separated values 2) header - this must precede any print statement and labels the output columns3) banner - this is any single string line separatorNote that the header TIME is special as it tells the analysis that the value in the corresponding column is a timing and so its value is allowed to change without triggering an error. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_carefulMode}
+\item{self.\_headerFields[colNum]}
+\item{self.\_foldersExist}
+\item{self.\_compareFilename)andself.\_carefulMode}
+\item{self.\_rootFolder}
+\item{self.\_mode}
+\item{self.\_moduleName}
+\item{self.\_compareFolder}
+\item{self.\_goldenFolder}
+\item{self.\_headerFields}
+\item{self.\_goldenFilename}
+\item{self.\_goldenFilename)andself.\_carefulMode}
+\item{self.\_compareFilename}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create the TestCase given the module name and whether we are in GOLDEN or COMPARE mode. 
+
+\begin{lstlisting}
+    def __init__(self, moduleName, mode):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+Print comma separated output to the GOLDEN or COMPARE directory. 
+
+\begin{lstlisting}
+    def print(self,*args):
+\end{lstlisting}
+
+\subsection{Class Method {\it banner}}
+Print a banner on a line to the GOLDEN or COMPARE directory. 
+
+\begin{lstlisting}
+    def banner(self,txt):
+\end{lstlisting}
+
+\subsection{Class Method {\it header}}
+Print a header on a line to the GOLDEN or COMPARE directory. 
+
+\begin{lstlisting}
+    def header(self,*args):
+\end{lstlisting}
+
+\subsection{Class Method {\it compareRows}}
+Compare the contents of two rows in GOLDEN and COMPARE folders.
+
+\begin{lstlisting}
+    def compareRows(self,goldenRow,compareRow,rowNum):
+\end{lstlisting}
+
+\subsection{Class Method {\it compareTestCases}}
+Compare output of COMPARE mode to GOLDEN output 
+
+\begin{lstlisting}
+    def compareTestCases(self):
+\end{lstlisting}
+
+
+\chapter{..//products//equities}
+\section{Introduction}
+This folder covers a range of equity derivative products. These range from simple Vanilla-style options to more complex payoffs and path-dependent options. 
+\newpage
+\section{FinAmericanOption}
+
+\subsection{Class: FinAmericanOption()}
+Class that performs the valuation of an American style option on a dividend paying stock. Can easily be extended to price American style FX options. The dividend is assumed to be continuous. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+             expiryDate,
+             strikePrice,
+             optionType):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              numSteps = 100):
+\end{lstlisting}
+
+\subsection{Function {\it valueOnce}}
+Value an American option using a Binomial Treee 
+
+\begin{lstlisting}
+def valueOnce(stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              numSteps,
+              timeToExpiry,
+              optionType,
+              strikePrice):
+\end{lstlisting}
+
+\newpage
+\section{FinAsianOption}
+
+\subsection{Class: FinAsianOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\item{self.\_numObservations}
+\item{self.\_startAveragingDate}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+   def __init__(self,
+                 startAveragingDate,
+                 expiryDate,
+                 strikePrice,
+                 optionType,
+                 numberOfObservations = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+   def value(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              valuationMethod,
+              accruedAverage = None):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueGeometric}}
+
+
+\begin{lstlisting}
+   def valueGeometric(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueCurran}}
+
+
+\begin{lstlisting}
+   def valueCurran(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMilevskyPosner}}
+
+
+\begin{lstlisting}
+#    def valueMilevskyPosner(self,
+#               valueDate,
+#               stockPrice,
+#               dividendYield,
+#               volatility,
+#               interestRate,
+#               accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueTurnbullWakeman}}
+
+
+\begin{lstlisting}
+   def valueTurnbullWakeman(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueLevy}}
+
+
+\begin{lstlisting}
+#    def valueLevy(self,
+#               valueDate,
+#               stockPrice,
+#               dividendYield,
+#               volatility,
+#               interestRate,
+#               accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+   def valueMC(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              numPaths,
+              seed,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC\_fast}}
+
+
+\begin{lstlisting}
+   def valueMC_fast(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              numPaths,
+              seed,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC\_fast\_CV}}
+
+
+\begin{lstlisting}
+   def valueMC_fast_CV(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              numPaths,
+              seed,
+              accruedAverage):
+\end{lstlisting}
+
+\subsection{Function {\it valueMC\_NUMBA}}
+
+
+\begin{lstlisting}
+def valueMC_NUMBA(t0,t,tau, K,n, optionType,
+      stockPrice,
+      dividendYield,
+      volatility,
+      interestRate,
+      numPaths,
+      seed,
+      accruedAverage):
+\end{lstlisting}
+
+\subsection{Function {\it valueMC\_fast\_NUMBA}}
+
+
+\begin{lstlisting}
+def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
+      stockPrice,
+      dividendYield,
+      volatility,
+      interestRate,
+      numPaths,
+      seed,
+      accruedAverage):
+\end{lstlisting}
+
+\subsection{Function {\it valueMC\_fast\_CV\_NUMBA}}
+
+
+\begin{lstlisting}
+def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
+      stockPrice,
+      dividendYield,
+      volatility,
+      interestRate,
+      numPaths,
+      seed,
+      accruedAverage, 
+      v_g_exact):
+\end{lstlisting}
+
+\newpage
+\section{FinBarrierOption}
+
+\subsubsection{Enumerated Type: FinBarrierTypes}
+\begin{itemize}
+\item{DOWN\_AND\_OUT\_CALL}
+\item{DOWN\_AND\_IN\_CALL}
+\item{UP\_AND\_OUT\_CALL}
+\item{UP\_AND\_IN\_CALL}
+\item{UP\_AND\_OUT\_PUT}
+\item{UP\_AND\_IN\_PUT}
+\item{DOWN\_AND\_OUT\_PUT}
+\item{DOWN\_AND\_IN\_PUT}
+\end{itemize}
+
+\subsection{Class: FinBarrierOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_numObservationsPerYear}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\item{self.\_barrierLevel}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self, expiryDate, strikePrice, optionType, 
+                  barrierLevel, numObservationsPerYear ):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, stockPrice, interestRate, dividendYield, volatility ):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self, valueDate, stockPrice, interestRate, processType, modelParams, 
+                numAnnSteps = 252, numPaths = 10000, seed = 4242 ):
+\end{lstlisting}
+
+\newpage
+\section{FinBasketOption}
+
+\subsection{Class: FinBasketOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_numAssets}
+\item{self.\_strikePrice}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate,
+                  strikePrice,
+                  optionType,
+                  numAssets ):
+\end{lstlisting}
+
+\subsection{Class Method {\it validate}}
+
+
+\begin{lstlisting}
+    def validate(self, 
+                 stockPrices,
+                 dividendYields,
+                 volatilities, 
+                 betas):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrices,
+              interestRate,
+              dividendYields,
+              volatilities, 
+              betas):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self,
+              valueDate,
+              stockPrices,
+              interestRate,
+              dividendYields,
+              volatilities,
+              betas,
+              numPaths = 10000,
+              seed = 4242):
+\end{lstlisting}
+
+\newpage
+\section{FinBinomialTree}
+
+\subsubsection{Enumerated Type: FinTreePayoffTypes}
+\begin{itemize}
+\item{FWD\_CONTRACT}
+\item{VANILLA\_OPTION}
+\item{DIGITAL\_OPTION}
+\item{POWER\_CONTRACT}
+\item{POWER\_OPTION}
+\item{LOG\_CONTRACT}
+\item{LOG\_OPTION}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinTreeExerciseTypes}
+\begin{itemize}
+\item{EUROPEAN}
+\item{AMERICAN}
+\end{itemize}
+
+\subsection{Class: FinBinomialTree()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.m\_numSteps}
+\item{self.m\_stockValues}
+\item{self.m\_numNodes}
+\item{self.m\_optionValues}
+\item{self.m\_upProbabilities}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              numSteps,
+              valueDate,
+              payoff,
+              expiryDate,
+              payoffType,
+              exerciseType,
+              payoffParams):
+\end{lstlisting}
+
+\subsection{Function {\it validatePayoff}}
+
+
+\begin{lstlisting}
+def validatePayoff(payoffType,payoffParams):
+\end{lstlisting}
+
+\subsection{Function {\it payoffValue}}
+
+
+\begin{lstlisting}
+def payoffValue(s,payoffType,payoffParams):
+\end{lstlisting}
+
+\subsection{Function {\it valueOnce}}
+
+
+\begin{lstlisting}
+def valueOnce(stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              numSteps,
+              timeToExpiry,
+              payoffType,
+              exerciseType,
+              payoffParams):
+\end{lstlisting}
+
+\newpage
+\section{FinBlack}
+
+\subsection{Class: BlackModel()}
+
+
+\subsubsection{Class Data Members}
+No data members found.
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(forwardRate,
+              strikeRate,
+              timeToExpiry,
+              sigma,
+              callOrPut):
+\end{lstlisting}
+
+\newpage
+\section{FinCompoundOption}
+
+\subsection{Class: FinCompoundOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType2}
+\item{self.\_optionType1}
+\item{self.\_expiryDate1}
+\item{self.\_strikePrice2}
+\item{self.\_strikePrice1}
+\item{self.\_expiryDate2}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate1,
+                  expiryDate2,
+                  strikePrice1,
+                  strikePrice2,
+                  optionType1,
+                  optionType2 ):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              volatility):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueTree}}
+
+
+\begin{lstlisting}
+    def valueTree(self,
+              valueDate,
+              stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              numSteps = 200):
+\end{lstlisting}
+
+\subsection{Class Method {\it impliedStockPrice}}
+
+
+\begin{lstlisting}
+    def impliedStockPrice(self,
+              stockPrice,
+              expiryDate1,
+              expiryDate2,
+              strikePrice1, 
+              strikePrice2, 
+              optionType2,
+              interestRate, 
+              dividendYield, 
+              volatility):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+
+
+\begin{lstlisting}
+def f(s0, *args):
+\end{lstlisting}
+
+\subsection{Function {\it valueOnce}}
+
+
+\begin{lstlisting}
+def valueOnce(stockPrice,
+              riskFreeRate,
+              dividendYield,
+              volatility,
+              t1,
+              t2,
+              optionType1,
+              optionType2,
+              k1,
+              k2,
+              numSteps):
+\end{lstlisting}
+
+\newpage
+\section{FinDigitalOption}
+
+\subsection{Class: FinDigitalOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate,
+                  strikePrice,
+                  optionType ):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self,
+              valueDate,
+              stockPrice,
+              dividendYield,
+              volatility,
+              interestRate,
+              numPaths = 10000,
+              seed = 4242):
+\end{lstlisting}
+
+\newpage
+\section{FinFixedStrikeLookbackOption}
+
+\subsubsection{Enumerated Type: FinFixedStrikeLookbackOptionTypes}
+\begin{itemize}
+\item{FIXED\_CALL}
+\item{FIXED\_PUT}
+\end{itemize}
+
+\subsection{Class: FinFixedStrikeLookbackOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_optionStrike}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate,
+                  optionType, 
+                  optionStrike):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              volatility, 
+              stockMinMax):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self, valueDate, stockPrice, interestRate, dividendYield, volatility, 
+                stockMinMax, numPaths = 10000, numStepsPerYear = 252, seed = 4242 ):
+\end{lstlisting}
+
+\newpage
+\section{FinFloatStrikeLookbackOption}
+
+\subsubsection{Enumerated Type: FinFloatStrikeLookbackOptionTypes}
+\begin{itemize}
+\item{FLOATING\_CALL}
+\item{FLOATING\_PUT}
+\end{itemize}
+
+\subsection{Class: FinFloatStrikeLookbackOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate,
+                  optionType ):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              volatility, 
+              stockMinMax):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self, valueDate, stockPrice, interestRate, dividendYield, volatility, 
+                stockMinMax, numPaths = 10000, numStepsPerYear = 252, seed = 4242 ):
+\end{lstlisting}
+
+\newpage
+\section{FinOption}
+
+\subsubsection{Enumerated Type: FinOptionTypes}
+\begin{itemize}
+\item{EUROPEAN\_CALL}
+\item{EUROPEAN\_PUT}
+\item{AMERICAN\_CALL}
+\item{AMERICAN\_PUT}
+\item{DIGITAL\_CALL}
+\item{DIGITAL\_PUT}
+\item{ASIAN\_CALL}
+\item{ASIAN\_PUT}
+\item{COMPOUND\_CALL}
+\item{COMPOUND\_PUT}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinOptionModelTypes}
+\begin{itemize}
+\item{BLACKSCHOLES}
+\item{ANOTHER}
+\end{itemize}
+
+\subsection{Class: FinOption(object)}
+
+
+\subsubsection{Class Data Members}
+No data members found.
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it delta}}
+
+
+\begin{lstlisting}
+    def delta(self, valueDate, stockPrice, interestRate, dividendYield, volatility ):
+\end{lstlisting}
+
+\subsection{Class Method {\it gamma}}
+
+
+\begin{lstlisting}
+    def gamma(self, valueDate, stockPrice, interestRate, dividendYield, volatility ):
+\end{lstlisting}
+
+\subsection{Class Method {\it vega}}
+
+
+\begin{lstlisting}
+    def vega(self, valueDate, stockPrice, interestRate, dividendYield, volatility):
+\end{lstlisting}
+
+\subsection{Class Method {\it theta}}
+
+
+\begin{lstlisting}
+    def theta(self, valueDate, stockPrice, interestRate, dividendYield, volatility ):
+\end{lstlisting}
+
+\subsection{Class Method {\it rho}}
+
+
+\begin{lstlisting}
+    def rho(self, valueDate, stockPrice, interestRate, dividendYield, volatility):
+\end{lstlisting}
+
+\newpage
+\section{FinRainbowOption}
+
+\subsubsection{Enumerated Type: FinRainbowOptionTypes}
+\begin{itemize}
+\item{CALL\_ON\_MAXIMUM}
+\item{PUT\_ON\_MAXIMUM}
+\item{CALL\_ON\_MINIMUM}
+\item{PUT\_ON\_MINIMUM}
+\item{CALL\_ON\_NTH}
+\item{PUT\_ON\_NTH}
+\end{itemize}
+
+\subsection{Class: FinRainbowOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_payoffType}
+\item{self.\_expiryDate}
+\item{self.\_payoffParams}
+\item{self.\_numAssets}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_ }}
+
+
+\begin{lstlisting}
+    def __init__ (self,
+                  expiryDate,
+                  payoffType,
+                  payoffParams,
+                  numAssets ):
+\end{lstlisting}
+
+\subsection{Class Method {\it validate}}
+
+
+\begin{lstlisting}
+    def validate(self, 
+                 stockPrices,
+                 dividendYields,
+                 volatilities, 
+                 betas):
+\end{lstlisting}
+
+\subsection{Class Method {\it validatePayoff}}
+
+
+\begin{lstlisting}
+    def validatePayoff(self,payoffType,payoffParams,numAssets):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, expiryDate, stockPrices, interestRate,
+              dividendYields, volatilities, betas):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self, 
+                valueDate,
+                expiryDate,
+                stockPrices,
+                interestRate,
+                dividendYields,
+                volatilities,
+                betas,
+                numPaths = 10000,
+                seed = 4242):
+\end{lstlisting}
+
+\subsection{Function {\it payoffValue}}
+
+
+\begin{lstlisting}
+def payoffValue(s,payoffTypeValue,payoffParams):
+\end{lstlisting}
+
+\subsection{Function {\it valueMCFast}}
+
+
+\begin{lstlisting}
+def valueMCFast(t,
+          stockPrices,
+          interestRate,
+          dividendYields,
+          volatilities,
+          betas,
+          numAssets,
+          payoffType,
+          payoffParams,
+          numPaths = 10000,
+          seed = 4242):
+\end{lstlisting}
+
+\newpage
+\section{FinVanillaOption}
+
+\subsection{Class: FinVanillaOption(FinOption)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 expiryDate,
+                 strikePrice,
+                 optionType):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType,
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it delta}}
+
+
+\begin{lstlisting}
+    def delta(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType,
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it gamma}}
+
+
+\begin{lstlisting}
+    def gamma(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType,
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it vega}}
+
+
+\begin{lstlisting}
+    def vega(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType,
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it theta}}
+
+
+\begin{lstlisting}
+    def theta(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType,
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it impliedVolatility}}
+
+
+\begin{lstlisting}
+    def impliedVolatility(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              price):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueMC}}
+
+
+\begin{lstlisting}
+    def valueMC(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              modelType, 
+              modelParams,
+              numPaths = 10000,
+              seed = 4242):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_MC\_OLD}}
+
+
+\begin{lstlisting}
+    def value_MC_OLD(self,
+              valueDate,
+              stockPrice,
+              interestRate,
+              dividendYield,
+              terminalS,
+              seed = 4242):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+
+
+\begin{lstlisting}
+def f(volatility, *args):
+\end{lstlisting}
+
+\subsection{Function {\it fvega}}
+
+
+\begin{lstlisting}
+def fvega(volatility, *args):
+\end{lstlisting}
+
+\newpage
+\section{FinVarianceSwap}
+
+
+\chapter{..//products//credit}
+\section{Introduction}
+This folder contains a set of credit-related assets ranging from CDS to CDS options, to CDS indices, CDS index options and then to CDS tranches. 
+\newpage
+\section{FinCDS}
+
+\subsection{Class: FinCDS(object)}
+A class which manages Credit Default Swap. It performs schedule generation and the valuation and risk management of CDS. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_coupon}
+\item{self.\_stepInDate}
+\item{self.\_maturityDate}
+\item{self.\_notional}
+\item{self.\_adjustedDates[i]}
+\item{self.\_longProtection}
+\item{self.\_adjustedDates[flowNum-1]}
+\item{self.\_accrualFactors}
+\item{self.\_frequencyType}
+\item{self.\_flows}
+\item{self.\_dateGenRuleType}
+\item{self.\_adjustedDates}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+stepInDate - FinDate that is the date protection starts (usually T+1) runningCoupon - Size of coupon on premium leg 
+
+\begin{lstlisting}
+    def __init__(self,
+                 stepInDate,
+                 maturityDate,
+                 runningCoupon,
+                 notional = ONE_MILLION,
+                 longProtection = True,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it generateAdjustedCDSPaymentDates}}
+Generate CDS payment dates which have been holiday adjusted.
+
+\begin{lstlisting}
+    def generateAdjustedCDSPaymentDates(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it calcFlows}}
+Calculate cash flow amounts on premium leg. 
+
+\begin{lstlisting}
+    def calcFlows(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+Valuation of a CDS contract 
+
+\begin{lstlisting}
+    def value(self,
+              valuationDate,
+              issuerCurve,
+              contractRecovery = standardRecovery,
+              pv01Method = 0,
+              prot_method = 0,
+              numStepsPerYear = 25):
+\end{lstlisting}
+
+\subsection{Class Method {\it cashSettlementAmount}}
+
+
+\begin{lstlisting}
+    def cashSettlementAmount(self,
+                             valuationDate,
+                             settlementDate,
+                             issuerCurve,
+                             contractRecovery = standardRecovery,
+                             pv01Method = 0,
+                             prot_method = 0,
+                             numStepsPerYear = 25):
+\end{lstlisting}
+
+\subsection{Class Method {\it cleanPrice}}
+
+
+\begin{lstlisting}
+    def cleanPrice(self,
+                   valuationDate,
+                   issuerCurve,
+                   contractRecovery = standardRecovery,
+                   pv01Method = 0,
+                   prot_method = 0,
+                   numStepsPerYear = 52):
+\end{lstlisting}
+
+\subsection{Class Method {\it riskyPV01\_OLD}}
+
+
+\begin{lstlisting}
+    def riskyPV01_OLD(self,
+                  valuationDate,
+                  issuerCurve,
+                  pv01Method = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedDays}}
+
+
+\begin{lstlisting}
+    def accruedDays(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedInterest}}
+Calculate the amount of accrued interest that has accrued from the previous coupon date (PCD) to the stepInDate of the CDS contract. 
+
+\begin{lstlisting}
+    def accruedInterest(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it protectionLegPV}}
+Calculates the protection leg PV of the CDS by calling into the fast NUMBA code that has been defined above. 
+
+\begin{lstlisting}
+    def protectionLegPV(self,
+                        valuationDate,
+                        issuerCurve,
+                        contractRecovery = standardRecovery,
+                        numStepsPerYear = 25,
+                        protMethod = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it riskyPV01}}
+
+
+\begin{lstlisting}
+    def riskyPV01(self,
+                     valuationDate,
+                     issuerCurve,
+                     pv01Method = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it premiumLegPV}}
+
+
+\begin{lstlisting}
+    def premiumLegPV(self,
+                     valuationDate,
+                     issuerCurve,
+                     pv01Method = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it parSpread}}
+
+
+\begin{lstlisting}
+    def parSpread(self,
+                  valuationDate,
+                  issuerCurve,
+                  contractRecovery = standardRecovery,
+                  numStepsPerYear = 25,
+                  pv01Method = 0,
+                  protMethod = 0):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueFastApprox}}
+Implementation of fast valuation of the CDS contract using an accurate approximation that avoids curve building. 
+
+\begin{lstlisting}
+    def valueFastApprox(self,
+                        valuationDate,
+                        flatContinuousInterestRate,
+                        flatCDSCurveSpread,
+                        curveRecovery = standardRecovery,
+                        contractRecovery = standardRecovery):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+print out details of the CDS contract and all of the calculated cashflows 
+
+\begin{lstlisting}
+    def print(self, valuationDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it printFlows}}
+
+
+\begin{lstlisting}
+    def printFlows(self, issuerCurve):
+\end{lstlisting}
+
+\subsection{Function {\it riskyPV01\_NUMBA}}
+Fast calculation of the risky PV01 of a CDS using NUMBA. The output is anumpy array of the full and clean risky PV01.
+
+\begin{lstlisting}
+def riskyPV01_NUMBA(teff, 
+                    accrualFactorPCDToNow,
+                    paymentTimes,
+                    yearFracs,
+                    npLiborTimes,
+                    npLiborValues,
+                    npSurvTimes,
+                    npSurvValues,
+                    pv01Method):
+\end{lstlisting}
+
+\subsection{Function {\it protectionLegPV\_NUMBA}}
+Fast calculation of the CDS protection leg PV using NUMBA to speed up the numerical integration over time. 
+
+\begin{lstlisting}
+def protectionLegPV_NUMBA(teff,
+                          tmat,
+                          npLiborTimes,
+                          npLiborValues,
+                          npSurvTimes,
+                          npSurvValues,
+                          contractRecovery,
+                          numStepsPerYear,
+                          protMethod):
+\end{lstlisting}
+
+\newpage
+\section{FinCDSBasket}
+
+\subsection{Class: FinCDSBasket(object)}
+Class to deal with n-to-default CDS baskets. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_coupon}
+\item{self.\_notional}
+\item{self.\_stepInDate}
+\item{self.\_maturityDate}
+\item{self.\_cdsContract}
+\item{self.\_longProtection}
+\item{self.\_frequencyType}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 stepInDate,
+                 maturityDate, 
+                 notional = ONE_MILLION, 
+                 coupon = 0.0, 
+                 longProtection = True,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueLegs\_MC}}
+Value the legs of the default basket using Monte Carlo. The default times are an input so this valuation is not model dependent. 
+
+\begin{lstlisting}
+    def valueLegs_MC(self, 
+                     valuationDate,
+                     nToDefault,
+                     defaultTimes, 
+                     issuerCurves,
+                     liborCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueGaussian\_MC}}
+Value the default basket using a Gaussian copula model. 
+
+\begin{lstlisting}
+    def valueGaussian_MC(self, 
+                      valuationDate,
+                      nToDefault,
+                      issuerCurves,
+                      correlationMatrix,
+                      liborCurve,
+                      numTrials,
+                      seed):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueStudentT\_MC}}
+Value the default basket using the Student-T copula. 
+
+\begin{lstlisting}
+    def valueStudentT_MC(self, 
+                      valuationDate,
+                      nToDefault,
+                      issuerCurves,
+                      correlationMatrix,
+                      degreesOfFreedom,
+                      liborCurve,
+                      numTrials,
+                      seed):
+\end{lstlisting}
+
+\subsection{Class Method {\it value1FGaussian\_Homo}}
+Value default basket using 1 factor Gaussian copula and analytical approach which is only exact when all recovery rates are the same. 
+
+\begin{lstlisting}
+    def value1FGaussian_Homo(self, 
+                             valuationDate,
+                             nToDefault,
+                             issuerCurves, 
+                             betaVector, 
+                             liborCurve,
+                             numPoints = 50):
+\end{lstlisting}
+
+\newpage
+\section{FinCDSIndexOption}
+
+\subsection{Class: FinCDSIndexOption(object)}
+Class to manage the pricing and risk management of an option to enter into a CDS index. Different pricing algorithms are presented. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_expiryDate}
+\item{self.\_notional}
+\item{self.\_maturityDate}
+\item{self.\_cdsContract}
+\item{self.\_longProtection}
+\item{self.\_strikeCoupon}
+\item{self.\_indexCoupon}
+\item{self.\_frequencyType}
+\item{self.\_businessDateAdjustType}
+\item{self.\_dateGenRuleType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 expiryDate,
+                 maturityDate,
+                 indexCoupon,
+                 strikeCoupon,
+                 notional = ONE_MILLION,
+                 longProtection = True,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueAdjustedBlack}}
+This approach uses two adjustments to Blacks option pricing model to value an option on a CDS index. 
+
+\begin{lstlisting}
+    def valueAdjustedBlack(self, 
+                           valuationDate, 
+                           indexCurve, 
+                           indexRecovery,
+                           liborCurve,
+                           sigma):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueAnderson}}
+This function values a CDS index option following approach by Anderson (2006). This ensures that the no-arbitrage relationship between the consituent CDS contract and the CDS index is enforced. It models the forward spread as a log-normally distributed quantity and uses the credit triangle to compute the forward RPV01. 
+
+\begin{lstlisting}
+    def valueAnderson(self,
+                      valuationDate,
+                      issuerCurves,
+                      indexRecovery,
+                      sigma):
+\end{lstlisting}
+
+\subsection{Class Method {\it solveForX}}
+Function to solve for the arbitrage free 
+
+\begin{lstlisting}
+    def solveForX(self,
+                   valuationDate,
+                   sigma,
+                   indexCoupon,
+                   indexRecovery,
+                   liborCurve,
+                   expH):
+\end{lstlisting}
+
+\subsection{Class Method {\it calcObjFunc}}
+An internal function used in the Anderson valuation. 
+
+\begin{lstlisting}
+    def calcObjFunc(self,
+                    x,
+                    valuationDate,
+                    sigma,
+                    indexCoupon,
+                    indexRecovery,
+                    liborCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it calcIndexPayerOptionPrice}}
+Calculates the intrinsic value of the index payer swap and the value of the index payer option which are both returned in an array. 
+
+\begin{lstlisting}
+    def calcIndexPayerOptionPrice(self, 
+                                  valuationDate,
+                                  x,
+                                  sigma,
+                                  indexCoupon,
+                                  strikeValue,
+                                  liborCurve,
+                                  indexRecovery):
+\end{lstlisting}
+
+\newpage
+\section{FinCDSIndexPortfolio}
+
+\subsection{Class: FinCDSIndexPortfolio()}
+This class manages the calculations associated with an equally weighted portfolio of CDS contracts with the same maturity date. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_dayCountType}
+\item{self.\_frequencyType}
+\item{self.\_dateGenRuleType}
+\item{self.\_calendarType}
+\item{self.\_businessDateAdjustType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it intrinsicRPV01}}
+Calculation of the risky PV01 of the CDS porfolio by taking the average of the risky PV01s of each contract. 
+
+\begin{lstlisting}
+    def intrinsicRPV01(self,
+                       valuationDate,
+                       stepInDate,
+                       maturityDate,
+                       issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it intrinsicProtectionLegPV}}
+Calculation of the intrinsic protection leg value of the CDS porfolio by taking the average sum the protection legs of each contract. 
+
+\begin{lstlisting}
+    def intrinsicProtectionLegPV(self,
+                                 valuationDate,
+                                 stepInDate,
+                                 maturityDate,
+                                 issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it intrinsicSpread}}
+Calculation of the intrinsic spread of the CDS portfolio as the one which would make the value of the protection legs equal to the value of the premium legs if all premium legs paid the same spread. 
+
+\begin{lstlisting}
+    def intrinsicSpread(self, 
+                        valuationDate,
+                        stepInDate,
+                        maturityDate,
+                        issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it averageSpread}}
+Calculates the average par CDS spread of the CDS portfolio. 
+
+\begin{lstlisting}
+    def averageSpread(self, 
+                      valuationDate,
+                      stepInDate,
+                      maturityDate,
+                      issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it totalSpread}}
+Calculates the total CDS spread of the CDS portfolio. TODO: DO I NEED THIS ? 
+
+\begin{lstlisting}
+    def totalSpread(self, 
+                      valuationDate,
+                      stepInDate,
+                      maturityDate,
+                      issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it minSpread}}
+Calculates the MINIMUM par CDS spread of the CDS portfolio. 
+
+\begin{lstlisting}
+    def minSpread(self, 
+                      valuationDate,
+                      stepInDate,
+                      maturityDate,
+                      issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it maxSpread}}
+Calculates the MAXIMUM par CDS spread of the CDS portfolio. 
+
+\begin{lstlisting}
+    def maxSpread(self, 
+                      valuationDate,
+                      stepInDate,
+                      maturityDate,
+                      issuerCurves):
+\end{lstlisting}
+
+\subsection{Class Method {\it spreadAdjustIntrinsic}}
+Adjust individual CDS curves to reprice CDS index prices. This approach uses an iterative scheme but is slow as it has to use aCDS curve bootstrap required when each trial spread adjustment is made.
+
+\begin{lstlisting}
+    def spreadAdjustIntrinsic(valuationDate,
+                              issuerCurves,
+                              indexCoupons,
+                              indexUpfronts,
+                              indexMaturityDates,
+                              indexRecoveryRate,
+                              tolerance):
+\end{lstlisting}
+
+\subsection{Class Method {\it hazardRateAdjustIntrinsic}}
+Adjust individual CDS curves to reprice CDS index prices. This approach adjusts the hazard rates and so avoids the slowish CDS curve bootstrap required when a spread adjustment is made.
+
+\begin{lstlisting}
+    def hazardRateAdjustIntrinsic(valuationDate, 
+                                  issuerCurves,
+                                  indexCoupons,
+                                  indexUpfronts,
+                                  indexMaturityDates,
+                                  indexRecoveryRate,
+                                  tolerance,
+                                  maxIterations = 100):
+\end{lstlisting}
+
+\newpage
+\section{FinCDSOption}
+
+\subsection{Class: FinCDSOption()}
+Class to manage the pricing and risk-management of options on a CDS. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_expiryDate}
+\item{self.\_notional}
+\item{self.\_maturityDate}
+\item{self.\_longProtection}
+\item{self.\_strikeCoupon}
+\item{self.\_frequencyType}
+\item{self.\_businessDateAdjustType}
+\item{self.\_knockoutFlag}
+\item{self.\_dateGenRuleType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 expiryDate,
+                 maturityDate,
+                 strikeCoupon,
+                 notional = ONE_MILLION,
+                 longProtection = True,
+                 knockoutFlag = True,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+Value the CDS option using Blacks model with an adjustment for any Front End Protection. TODO - Should the CDS be created in the init method ? 
+
+\begin{lstlisting}
+    def value(self, 
+              valuationDate,
+              issuerCurve,
+              volatility):
+\end{lstlisting}
+
+\subsection{Class Method {\it impliedVolatility}}
+Calculate the implied CDS option volatility from a price. 
+
+\begin{lstlisting}
+    def impliedVolatility(self,
+              valuationDate,
+              issuerCurve,
+              optionValue):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+Root searching function in the calculation of the CDS implied volatility. 
+
+\begin{lstlisting}
+def f(volatility, *args):
+\end{lstlisting}
+
+\newpage
+\section{FinCDSTranche}
+
+\subsubsection{Enumerated Type: FinLossDistributionBuilder}
+\begin{itemize}
+\item{RECURSION}
+\item{ADJUSTED\_BINOMIAL}
+\item{GAUSSIAN}
+\item{LHP}
+\end{itemize}
+
+\subsection{Class: FinCDSTranche(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_notional}
+\item{self.\_stepInDate}
+\item{self.\_maturityDate}
+\item{self.\_coupon}
+\item{self.\_cdsContract}
+\item{self.\_longProtection}
+\item{self.\_k2}
+\item{self.\_frequencyType}
+\item{self.\_k1}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 stepInDate,
+                 maturityDate, 
+                 k1, 
+                 k2, 
+                 notional = ONE_MILLION, 
+                 coupon = 0.0, 
+                 longProtection = True,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.ACT_360,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueBC}}
+
+
+\begin{lstlisting}
+    def valueBC(self, 
+                valuationDate,
+                issuerCurves,
+                upfront,
+                coupon,
+                corr1,
+                corr2,
+                numPoints = 50,
+                model = FinLossDistributionBuilder.RECURSION ):
+\end{lstlisting}
+
+
+\chapter{..//products//bonds}
+\section{Introduction}
+This folder contains a suite of bond-related functionality. It includes a basic fixed coupon bond with all of the associated duration and convexity measures. In addition it includes floating rate bonds and credit risky bonds. There will also be coverage for convertible bonds although this has not been implemented as yet.
+
+\newpage
+\section{FinAnnuity}
+
+\subsection{Class: FinAnnuity(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_schedule}
+\item{self.\_yearFractions}
+\item{self.\_dayCountConventionType}
+\item{self.\_startDate}
+\item{self.\_frequencyType}
+\item{self.\_flows}
+\item{self.\_endDate}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 startDate,
+                 endDate,
+                 frequencyType = FinFrequencyTypes.ANNUAL,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD, 
+                 dayCountConventionType = FinDayCountTypes.ACT_360):
+\end{lstlisting}
+
+\subsection{Class Method {\it generate}}
+
+
+\begin{lstlisting}
+    def generate(self,startDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\newpage
+\section{FinBond}
+
+\subsubsection{Enumerated Type: FinBondAccruedTypes}
+\begin{itemize}
+\item{THIRTY\_360}
+\item{THIRTY\_360\_BOND}
+\item{ACT\_360}
+\item{ACT\_365}
+\item{ACT\_ACT}
+\end{itemize}
+
+\subsection{Class: FinBond(object)}
+Class for managing fixed coupon bonds and performing related analytics. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_coupon}
+\item{self.\_maturityDate}
+\item{self.\_flowDates}
+\item{self.\_redemption}
+\item{self.\_settlementDate}
+\item{self.\_frequencyType}
+\item{self.\_accrualType}
+\item{self.\_frequency}
+\item{self.\_face}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create FinBond object by providing Maturity Date, Frequency, coupon and the accrual convention type. 
+
+\begin{lstlisting}
+    def __init__(self, 
+                 maturityDate, 
+                 coupon, 
+                 frequencyType, 
+                 accrualType,
+                 face = 100.0,
+                 redemption = 1.0):
+\end{lstlisting}
+
+\subsection{Class Method {\it calculateFlowDates}}
+Determine the bond cashflow payment dates. 
+
+\begin{lstlisting}
+    def calculateFlowDates(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it fullPriceFromYield}}
+Calculate the full price of the bond from its yield to maturity. 
+
+\begin{lstlisting}
+    def fullPriceFromYield(self, settlementDate, ytm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it dollarDuration}}
+Calculate the risk or dP/dy of the bond by bumping. 
+
+\begin{lstlisting}
+    def dollarDuration(self, settlementDate, ytm):
+\end{lstlisting}
+
+\subsection{Class Method {\it macauleyDuration}}
+Calculate the Macauley duration of the bond on a settlement date given its yield to maturity. 
+
+\begin{lstlisting}
+    def macauleyDuration(self,settlementDate,ytm):
+\end{lstlisting}
+
+\subsection{Class Method {\it modifiedDuration}}
+Calculate the modified duration of the bondon a settlement date given its yield to maturity. 
+
+\begin{lstlisting}
+    def modifiedDuration(self,settlementDate,ytm):
+\end{lstlisting}
+
+\subsection{Class Method {\it convexityFromYield}}
+Calculate the bond convexity from the yield to maturity. 
+
+\begin{lstlisting}
+    def convexityFromYield(self, settlementDate, ytm):
+\end{lstlisting}
+
+\subsection{Class Method {\it cleanPriceFromYield}}
+Calculate the bond clean price from the yield to maturity. 
+
+\begin{lstlisting}
+    def cleanPriceFromYield(self, settlementDate, ytm):
+\end{lstlisting}
+
+\subsection{Class Method {\it fullPriceFromDiscountCurve}}
+Calculate the bond price using some discount curve to present-value the bonds cashflows. 
+
+\begin{lstlisting}
+    def fullPriceFromDiscountCurve( self, settlementDate, discountCurve ):
+\end{lstlisting}
+
+\subsection{Class Method {\it currentYield}}
+Calculate the current yield of the bond which is the coupon divided by the clean price (not the full price)
+
+\begin{lstlisting}
+    def currentYield(self, cleanPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it yieldToMaturity}}
+Calculate the bonds yield to maturity by solving the price yield relationship using a one-dimensional root solver. 
+
+\begin{lstlisting}
+    def yieldToMaturity(self, settlementDate, cleanPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedDays}}
+Calculate number of days from previous coupon date to settlement.
+
+\begin{lstlisting}
+    def accruedDays(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it pcd}}
+Determine the previous coupon date before the settlement date. 
+
+\begin{lstlisting}
+    def pcd(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedInterest}}
+Calculate the amount of coupon that has accrued between the previous coupon date and the settlement date. 
+
+\begin{lstlisting}
+    def accruedInterest(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it initialPeriodFraction}}
+Calculate the amount of coupon that has accrued between the previous coupon date and the settlement date. 
+
+\begin{lstlisting}
+    def initialPeriodFraction(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it assetSwapSpread}}
+Calculate the par asset swap spread of the bond. The discount curve is a Libor quality curve that is passed in. The price is the clean price. TODO - Check how first coupon on floating leg is sized. 
+
+\begin{lstlisting}
+    def assetSwapSpread(self, 
+                        settlementDate, 
+                        cleanPrice, 
+                        discountCurve, 
+                        swapFloatDayCountConventionType = FinDayCountTypes.ACT_360, 
+                        swapFloatFrequencyType = FinFrequencyTypes.SEMI_ANNUAL,
+                        swapFloatCalendarType = FinCalendarTypes.WEEKEND,
+                        swapFloatBusDayAdjustRuleType = FinBusDayConventionTypes.FOLLOWING,
+                        swapFloatDateGenRuleType = FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it fullPriceFromOAS}}
+Calculate the full price of the bond from its OAS given the bond settlement date, a discount curve and the oas as a number. 
+
+\begin{lstlisting}
+    def fullPriceFromOAS(self, 
+                         settlementDate, 
+                         discountCurve, 
+                         oas):
+\end{lstlisting}
+
+\subsection{Class Method {\it optionAdjustedSpread}}
+Return OAS for bullet bond given settlement date, clean bond price and the discount relative to which the spread is to be computed. 
+
+\begin{lstlisting}
+    def optionAdjustedSpread(self, 
+                             settlementDate, 
+                             cleanPrice, 
+                             discountCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it printFlows}}
+Print a list of the unadjusted coupon payment dates used in analytic calculations for the bond. 
+
+\begin{lstlisting}
+    def printFlows(self,settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it priceFromSurvivalCurve}}
+Calculate discounted present value of flows assuming default model. This has not been completed. 
+
+\begin{lstlisting}
+    def priceFromSurvivalCurve(self, 
+                               discountCurve, 
+                               survivalCurve, 
+                               recoveryRate):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+Print a list of the unadjusted coupon payment dates used in analytic calculations for the bond. 
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+Function used to do solve root search in price to yield calculation. 
+
+\begin{lstlisting}
+def f(y, *args):
+\end{lstlisting}
+
+\subsection{Function {\it g}}
+Function used to do solve root search in price to yield calculation. 
+
+\begin{lstlisting}
+def g(oas, *args):
+\end{lstlisting}
+
+\newpage
+\section{FinBondCallable}
+
+\newpage
+\section{FinBondConvertible}
+
+\newpage
+\section{FinBondFuture}
+
+\subsection{Class: FinBondFuture(object)}
+Class for managing futures contracts on government bonds that follows CME conventions and related analytics. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_tickerName}
+\item{self.\_coupon}
+\item{self.\_lastDeliveryDate}
+\item{self.\_firstDeliveryDate}
+\item{self.\_contractSize}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 tickerName,
+                 firstDeliveryDate, 
+                 lastDeliveryDate, 
+                 contractSize, 
+                 coupon):
+\end{lstlisting}
+
+\subsection{Class Method {\it conversionFactor}}
+Determine the conversion factor for a specific bond using CME convention. To do this we need to know the contract standard coupon and must round the bond maturity (starting its life on the first delivery date) to the nearest 3 month multiple and then calculate the bond clean price.  
+
+\begin{lstlisting}
+    def conversionFactor(self, bond):
+\end{lstlisting}
+
+\subsection{Class Method {\it principalInvoicePrice}}
+The principal invoice price as defined by the CME.
+
+\begin{lstlisting}
+    def principalInvoicePrice(self,
+                              bond,
+                              futuresPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it totalInvoiceAmount}}
+
+
+\begin{lstlisting}
+    def totalInvoiceAmount(self,
+                     settlementDate,
+                     bond,
+                     futuresPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it cheapestToDeliver}}
+Determination of CTD as deliverable bond with lowest cost to buy versus what is received when the bond is delivered. 
+
+\begin{lstlisting}
+    def cheapestToDeliver(self, 
+                          bonds,
+                          bondCleanPrices,
+                          futuresPrice):
+\end{lstlisting}
+
+\newpage
+\section{FinBondOption}
+
+\subsubsection{Enumerated Type: FinBondOptionModel}
+\begin{itemize}
+\item{HO\_LEE}
+\item{HULL\_WHITE}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinBondOptionTypes}
+\begin{itemize}
+\item{EUROPEAN\_CALL}
+\item{EUROPEAN\_PUT}
+\end{itemize}
+
+\subsection{Class: FinBondOption()}
+Class for options on fixed coupon bonds. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_bond}
+\item{self.\_expiryDate}
+\item{self.\_strikePrice}
+\item{self.\_bond.\_coupon}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 maturityDate, 
+                 coupon,
+                 frequencyType,
+                 accrualType,
+                 expiryDate, 
+                 strikePrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+Value the bond option using the specified model. 
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              discountCurve,
+              modelType,
+              modelParams,
+              optionType):
+\end{lstlisting}
+
+\newpage
+\section{FinFloatingRateNote}
+
+\subsection{Class: FinFloatingRateNote(object)}
+Class for managing floating rate notes that pay a floating index plus a quoted margin.
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_maturityDate}
+\item{self.\_flowDates}
+\item{self.\_redemption}
+\item{self.\_settlementDate}
+\item{self.\_frequencyType}
+\item{self.\_quotedMargin}
+\item{self.\_accrualType}
+\item{self.\_frequency}
+\item{self.\_face}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create FinFloatingRateNote object. if frequencyType not in FinFrequencyTypes:raise FinError("Invalid Frequency:" + str(frequencyType))returnif accrualType not in FinDayCountTypes:raise FinError("Unknown Bond Accrued Convention type " + str(accrualType))self.\_maturityDate = maturityDateself.\_quotedMargin = quotedMarginself.\_frequencyType = frequencyTypeself.\_accrualType = accrualTypeself.\_flowDates = []self.\_frequency = FinFrequency(frequencyType)self.\_face = faceself.\_redemption = redemptionI do not determine cashflow dates as I do not want to require
+
+\begin{lstlisting}
+    def __init__(self, 
+                 maturityDate,
+                 quotedMargin,
+                 frequencyType, 
+                 accrualType,
+                 face = 100.0, 
+                 redemption = 1.0):
+\end{lstlisting}
+
+\subsection{Class Method {\it calculateFlowDates}}
+Determine the bond cashflow payment dates. 
+
+\begin{lstlisting}
+    def calculateFlowDates(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it fullPriceFromDiscountMargin}}
+Calculate the full price of the bond from its discount margin and \#making assumptions about the future Libor rates. 
+
+\begin{lstlisting}
+    def fullPriceFromDiscountMargin(self, 
+                                    settlementDate,
+                                    nextCoupon,
+                                    futureLibor,
+                                    dm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it dollarDuration}}
+Calculate the risk or dP/dy of the bond by bumping. 
+
+\begin{lstlisting}
+    def dollarDuration(self, 
+                       settlementDate, 
+                       nextCoupon,
+                       futureLibor,
+                       dm):
+\end{lstlisting}
+
+\subsection{Class Method {\it macauleyDuration}}
+Calculate the Macauley duration of the bond on a settlement date given its yield to maturity. 
+
+\begin{lstlisting}
+    def macauleyDuration(self,
+                         settlementDate,
+                         nextCoupon,
+                         futureLibor,
+                         dm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it modifiedDuration}}
+Calculate the modified duration of the bondon a settlement date given its yield to maturity. 
+
+\begin{lstlisting}
+    def modifiedDuration(self,
+                         settlementDate,
+                         nextCoupon,
+                         futureLibor,
+                         dm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it convexityFromDiscountMargin}}
+Calculate the bond convexity from the yield to maturity. 
+
+\begin{lstlisting}
+    def convexityFromDiscountMargin(self, 
+                                    settlementDate,
+                                    nextCoupon,
+                                    futureLibor,
+                                    dm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it cleanPriceFromDiscountMargin}}
+Calculate the bond clean price from the yield. 
+
+\begin{lstlisting}
+    def cleanPriceFromDiscountMargin(self, 
+                                     settlementDate,
+                                     nextCoupon,
+                                     futureLibor,
+                                     dm ):
+\end{lstlisting}
+
+\subsection{Class Method {\it fullPriceFromDiscountCurve}}
+Calculate the bond price using some discount curve to present-value the bonds cashflows. 
+
+\begin{lstlisting}
+    def fullPriceFromDiscountCurve(self, 
+                                   settlementDate,
+                                   indexCurve,
+                                   discountCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it discountMargin}}
+Calculate the bonds yield to maturity by solving the price yield relationship using a one-dimensional root solver. 
+
+\begin{lstlisting}
+    def discountMargin(self, 
+                       settlementDate,
+                       nextCoupon, 
+                       futureLibor,
+                       cleanPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedDays}}
+Calculate number of days from previous coupon date to settlement.
+
+\begin{lstlisting}
+    def accruedDays(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it pcd}}
+Determine the previous coupon date before the settlement date. 
+
+\begin{lstlisting}
+    def pcd(self, settlementDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it accruedInterest}}
+Calculate the amount of coupon that has accrued between the previous coupon date and the settlement date. 
+
+\begin{lstlisting}
+    def accruedInterest(self, 
+                        settlementDate, 
+                        nextCoupon):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+Function used to do solve root search in discount margin calculation. 
+
+\begin{lstlisting}
+def f(dm, *args):
+\end{lstlisting}
+
+
+\chapter{..//products//libor}
+\section{Introduction}
+This folder contains a set of Libor-related products.
+\newpage
+\section{FinInterestRateFuture}
+
+\subsection{Class: FinInterestRateFuture(object)}
+Class for managing short term interest rate futures contracts. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_dayCountType}
+\item{self.\_endOfInterestRatePeriod}
+\item{self.\_lastSettlementDate}
+\item{self.\_lastTradingDate}
+\item{self.\_contractSize}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create an interest rate futures contract.
+
+\begin{lstlisting}
+    def __init__(self, 
+                 lastTradingDate,
+                 dayCountType,
+                 contractSize):
+\end{lstlisting}
+
+\subsection{Class Method {\it futuresRate}}
+Calculate implied futures rate from the futures price.
+
+\begin{lstlisting}
+    def futuresRate(settlementDate,
+                    futuresPrice):
+\end{lstlisting}
+
+\subsection{Class Method {\it convexity}}
+Calculation of the convexity adjustment between FRAs and interest rate futures using the Hull-White model as described in technical note. 
+
+\begin{lstlisting}
+    def convexity(self, 
+                  settlementDate,
+                  volatility, 
+                  a):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborCapFloor}
+
+\subsubsection{Enumerated Type: FinLiborCapFloorType}
+\begin{itemize}
+\item{CAP}
+\item{FLOOR}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinLiborCapFloorModelTypes}
+\begin{itemize}
+\item{BLACK}
+\item{SHIFTED\_BLACK}
+\item{SABR}
+\end{itemize}
+
+\subsection{Class: FinLiborCapFloor()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_optionType}
+\item{self.\_notional}
+\item{self.\_maturityDate}
+\item{self.\_lastFixing}
+\item{self.\_startDate}
+\item{self.\_frequencyType}
+\item{self.\_capFloorDates}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\item{self.\_strikeRate}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 startDate,
+                 maturityDate,
+                 optionType,
+                 strikeRate,
+                 lastFixing = None,
+                 frequencyType = FinFrequencyTypes.QUARTERLY,
+                 dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA,
+                 notional = ONE_MILLION, 
+                 calendarType = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType = FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType = FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, 
+              valuationDate,
+              liborCurve, 
+              modelType, 
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it valueCapletFloorlet}}
+
+
+\begin{lstlisting}
+    def valueCapletFloorlet(self,
+                            valuationDate,
+                            startDate, 
+                            endDate, 
+                            liborCurve, 
+                            modelType, 
+                            modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborDeposit}
+
+\subsection{Class: FinLiborDeposit(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_maturityDate}
+\item{self.\_settlementDate}
+\item{self.\_depositRate}
+\item{self.\_calendarType}
+\item{self.\_dayCountType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, settlementDate, 
+                 maturityDate, 
+                 depositRate, 
+                 dayCountType, 
+                 calendarType = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.MODIFIED_FOLLOWING):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+
+
+\begin{lstlisting}
+    def df(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, rate):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborFRA}
+
+\subsection{Class: FinLiborFRA(object)}
+Class for managing LIBOR forward rate agreements. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_startDate}
+\item{self.\_fraRate}
+\item{self.\_dayCountType}
+\item{self.\_endDate}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create FRA object. 
+
+\begin{lstlisting}
+    def __init__(self, 
+                 startDate, 
+                 endDate, 
+                 fraRate, 
+                 dayCountType ):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwdDf}}
+Calculate the FRA rate implied forward discount factor. 
+
+\begin{lstlisting}
+    def fwdDf(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+Determine value of a FRA contract based on the market FRA rate. 
+
+\begin{lstlisting}
+    def value(self, valueDate, rate):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborProducts}
+
+\subsection{Class: FinLiborSwap(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.payFixedLeg}
+\item{self.payFixedFlag}
+\item{self.fixedLeg}
+\item{self.floatLeg}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, startDate, endDate,
+                 fixedCoupon, fixedFreq, fixedBasis,
+                 floatSpread, floatFreq, floatBasis,
+                 firstFixing=None,
+                 payFixedFlag=True,
+                 calendarName="WEEKEND",
+                 businessDateAdjust="FOLLOWING",
+                 dateGenRule="BACKWARD"):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, discountCurve, indexCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\subsection{Class: FinLiborSwapFixedLeg(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.flows[numFlows-1].amount+}
+\item{self.coupon}
+\item{self.flows}
+\item{self.freq}
+\item{self.startDate}
+\item{self.basis}
+\item{self.maturityDate}
+\item{self.schedule}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 startDate,
+                 maturityDate,
+                 coupon,
+                 freq,
+                 basis,
+                 calendarName="WEEKEND",
+                 businessDateAdjust="MODIFIED_FOLLOWING",
+                 dateGenRule="BACKWARD"):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, discountCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it generateFlows}}
+
+
+\begin{lstlisting}
+    def generateFlows(self, fixedBasis):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\subsection{Class: FinLiborSwapFloatLeg(object)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.flows[numFlows-1].amount+}
+\item{self.endDate}
+\item{self.flows}
+\item{self.firstFixing}
+\item{self.freq}
+\item{self.startDate}
+\item{self.basis}
+\item{self.schedule}
+\item{self.floatSpread}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 startDate,
+                 endDate,
+                 floatSpread,
+                 floatFreq,
+                 floatBasis,
+                 firstFixing,
+                 calendarName,
+                 businessDateAdjust,
+                 dateGenRule):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, valueDate, discountCurve, indexCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it generateFlows}}
+
+
+\begin{lstlisting}
+    def generateFlows(self, indexCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborSwap}
+
+\subsection{Class: FinLiborSwap(object)}
+Class for managing an interest rate swap contract. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_adjustedFloatingDates}
+\item{self.\_startDate}
+\item{self.\_floatDayCountType}
+\item{self.\_fixedFlows}
+\item{self.\_payFixedLeg}
+\item{self.\_floatSpread}
+\item{self.\_adjustedFixedDates}
+\item{self.\_adjustedFloatDates}
+\item{self.\_floatFrequencyType}
+\item{self.\_fixedFrequencyType}
+\item{self.\_notional}
+\item{self.\_maturityDate}
+\item{self.\_payFixedFlag}
+\item{self.\_floatingFlows}
+\item{self.\_fixedCoupon}
+\item{self.\_calendarType}
+\item{self.\_fixedDayCountType}
+\item{self.\_dateGenRuleType}
+\item{self.\_busDayAdjustType}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create an interest rate swap contract. 
+
+\begin{lstlisting}
+    def __init__(self, 
+                 startDate, 
+                 maturityDate,
+                 fixedCoupon, 
+                 fixedFreqType, 
+                 fixedDayCountType,
+                 notional = ONE_MILLION,
+                 floatSpread = 0.0, 
+                 floatFreqType = FinFrequencyTypes.QUARTERLY, 
+                 floatDayCountType = FinDayCountTypes.THIRTY_360,
+                 firstFixing = 0.0,
+                 payFixedFlag=True,
+                 calendarType = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType = FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+Value the interest rate swap on a value date given a single Libor discount curve. 
+
+\begin{lstlisting}
+    def value(self, valueDate, discountCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it generateFixedLegFlows}}
+
+
+\begin{lstlisting}
+    def generateFixedLegFlows(self, valueDate):
+\end{lstlisting}
+
+\subsection{Class Method {\it fixedLegValue}}
+
+
+\begin{lstlisting}
+    def fixedLegValue(self, valueDate, discountCurve, principal = 0.0):
+\end{lstlisting}
+
+\subsection{Class Method {\it pv01}}
+
+
+\begin{lstlisting}
+    def pv01(self, valueDate, discountCurve, principal = 0.0):
+\end{lstlisting}
+
+\subsection{Class Method {\it parCoupon}}
+
+
+\begin{lstlisting}
+    def parCoupon(self, valueDate, discountCurve, principal = 0.0):
+\end{lstlisting}
+
+\subsection{Class Method {\it printFixedLeg}}
+Prints the fixed leg amounts. 
+
+\begin{lstlisting}
+    def printFixedLeg(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it generateFloatingLegFlows}}
+Generate the payment amounts on floating leg implied by index curve 
+
+\begin{lstlisting}
+    def generateFloatingLegFlows(self, valueDate, indexCurve):
+\end{lstlisting}
+
+\subsection{Class Method {\it floatLegValue}}
+Value the floating leg with payments from an index curve and discounting based on a supplied discount curve. 
+
+\begin{lstlisting}
+    def floatLegValue(self, 
+                          valueDate, 
+                          discountCurve, 
+                          indexCurve, 
+                          principal = 0.0 ):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborSwaption}
+
+\subsubsection{Enumerated Type: FinLiborSwaptionType}
+\begin{itemize}
+\item{PAYER}
+\item{RECEIVER}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinLiborSwaptionModelTypes}
+\begin{itemize}
+\item{BLACK}
+\item{SABR}
+\end{itemize}
+
+\subsection{Class: FinLiborSwaption()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_swapFixedFrequencyType}
+\item{self.\_pv01}
+\item{self.\_maturityDate}
+\item{self.\_fwdSwapRate}
+\item{self.\_swapNotional}
+\item{self.\_swapFixedDayCountType}
+\item{self.\_forwardDf}
+\item{self.\_dateGenRuleType}
+\item{self.\_swaptionType}
+\item{self.\_busDayAdjustType}
+\item{self.\_exerciseDate}
+\item{self.\_calendarType}
+\item{self.\_swapFixedCoupon}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 exerciseDate,
+                 swapMaturityDate,
+                 swaptionType,
+                 swapFixedCoupon,
+                 swapFixedFrequencyType,
+                 swapFixedDayCountType,
+                 swapNotional = ONE_MILLION, 
+                 calendarType = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType = FinBusDayConventionTypes.FOLLOWING,
+                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+\end{lstlisting}
+
+\subsection{Class Method {\it value}}
+
+
+\begin{lstlisting}
+    def value(self, 
+              valuationDate,
+              liborCurve, 
+              modelType, 
+              modelParams):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+
+\chapter{..//products//fx}
+\section{Introduction}
+This is where FX derivatives will be found.
+
+\chapter{..//models}
+\section{Introduction}
+This folder contains a range of models used in the various derivative prices implemented. These include credit models for valuing portfolio credit products such as CDS Tranches, Monte-Carlo based models of stochastics processes used to value equity, FX and interest rate derivatives, and some generic implementations of models such as a tree based Hull White model. Because the models are useful across a range of products, it is better to factor them out of the product/asset class categorisation as it avoids any unnecessary duplication.
+
+\newpage
+\section{FinCIRRateModel}
+
+\subsubsection{Enumerated Type: FinCIRNumericalScheme}
+\begin{itemize}
+\item{EULER}
+\item{LOGNORMAL}
+\item{MILSTEIN}
+\item{KAHLJACKEL}
+\item{EXACT}
+\end{itemize}
+
+\subsection{Class: FinCIRRateModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_sigma}
+\item{self.\_a}
+\item{self.\_b}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,a,b,sigma):
+\end{lstlisting}
+
+\subsection{Function {\it meanr}}
+Mean value of a CIR process after time t 
+
+\begin{lstlisting}
+def meanr(r0,a,b,t):
+\end{lstlisting}
+
+\subsection{Function {\it variancer}}
+Variance of a CIR process after time t 
+
+\begin{lstlisting}
+def variancer(r0,a,b,sigma,t):
+\end{lstlisting}
+
+\subsection{Function {\it zeroPrice}}
+Price of a zero coupon bond in CIR model. 
+
+\begin{lstlisting}
+def zeroPrice(r0,a,b,sigma,t):
+\end{lstlisting}
+
+\subsection{Function {\it draw}}
+Draw a next rate from the CIR model in Monte Carlo. 
+
+\begin{lstlisting}
+def draw(rt,a,b,sigma,dt):
+\end{lstlisting}
+
+\subsection{Function {\it ratePath\_MC}}
+Generate a path of CIR rates using a number of numerical schemes. 
+
+\begin{lstlisting}
+def ratePath_MC(r0,a,b,sigma,t,dt,seed,scheme):
+\end{lstlisting}
+
+\subsection{Function {\it zeroPrice\_MC}}
+Determine the CIR zero price using Monte Carlo. 
+
+\begin{lstlisting}
+def zeroPrice_MC(r0,a,b,sigma,t,dt,numPaths,seed,scheme):
+\end{lstlisting}
+
+\newpage
+\section{FinGaussianCopula1FModel}
+
+\subsection{Function {\it lossDbnRecursionGCD}}
+Full construction of the loss distribution of a portfolio of credits where losses have been calculate as number of units based on the GCD. 
+
+\begin{lstlisting}
+def lossDbnRecursionGCD(numCredits, 
+                        defaultProbs, 
+                        lossUnits,
+                        betaVector,
+                        numIntegrationSteps):
+\end{lstlisting}
+
+\subsection{Function {\it homogeneousBasketLossDbn}}
+Calculate the loss distribution of a CDS default basket where the portfolio is equally weighted and the losses in the portfolio are homo-geneous i.e. the credits have the same recovery rates. 
+
+\begin{lstlisting}
+def homogeneousBasketLossDbn(survivalProbabilities,
+                             recoveryRates,
+                             betaVector,
+                             numIntegrationSteps):
+\end{lstlisting}
+
+\subsection{Function {\it trSurvProbRecursion}}
+Get the tranche survival probability of a portfolio of credits in the one-factor GC model using a full recursion calculation of the loss distribution and survival probabilities to some time horizon. 
+
+\begin{lstlisting}
+def trSurvProbRecursion(k1,
+                                        k2,
+                                        numCredits,
+                                        survivalProbabilities,
+                                        recoveryRates,
+                                        betaVector,
+                                        numIntegrationSteps):
+\end{lstlisting}
+
+\subsection{Function {\it gaussApproxTrancheLoss}}
+
+
+\begin{lstlisting}
+def gaussApproxTrancheLoss(k1,k2,mu,sigma):
+\end{lstlisting}
+
+\subsection{Function {\it trSurvProbGaussian}}
+Get the approximated tranche survival probability of a portfolio of credits in the one-factor GC model using a Gaussian fit of the conditional loss distribution and survival probabilities to some time horizon. Note that the losses in this fit are allowed to be negative. 
+
+\begin{lstlisting}
+def trSurvProbGaussian(k1,
+                                       k2,
+                                       numCredits,
+                                       survivalProbabilities,
+                                       recoveryRates,
+                                       betaVector,
+                                       numIntegrationSteps):
+\end{lstlisting}
+
+\subsection{Function {\it lossDbnHeterogeneousAdjBinomial}}
+Get the portfolio loss distribution using the adjusted binomial approximation to the conditional loss distribution. 
+
+\begin{lstlisting}
+def lossDbnHeterogeneousAdjBinomial(numCredits, 
+                                    defaultProbs, 
+                                    lossRatio,
+                                    betaVector,
+                                    numIntegrationSteps):
+\end{lstlisting}
+
+\subsection{Function {\it trSurvProbAdjBinomial}}
+Get the approximated tranche survival probability of a portfolio ofcredits in the one-factor GC model using the adjusted binomial fit of the conditional loss distribution and survival probabilities to some time horizon. This approach is both fast and highly accurate. 
+
+\begin{lstlisting}
+def trSurvProbAdjBinomial(k1, 
+                                          k2, 
+                                          numCredits,
+                                          survivalProbabilities, 
+                                          recoveryRates, 
+                                          betaVector,
+                                          numIntegrationSteps):
+\end{lstlisting}
+
+\newpage
+\section{FinGaussianCopulaLHPModel}
+
+\subsection{Function {\it trSurvProbLHP}}
+Get the approximated tranche survival probability of a portfolio ofcredits in the one-factor GC model using the large portfolio limit which assumes a homogenous portfolio with an infinite number of credits. This approach is very fast but not so as accurate as the adjusted binomial. 
+
+\begin{lstlisting}
+def trSurvProbLHP(k1, 
+                                  k2, 
+                                  numCredits, 
+                                  survivalProbabilities, 
+                                  recoveryRates, 
+                                  beta):
+\end{lstlisting}
+
+\subsection{Function {\it portfolioCDF\_LHP}}
+
+
+\begin{lstlisting}
+def portfolioCDF_LHP(k, numCredits, qvector, recoveryRates, beta, numPoints):
+\end{lstlisting}
+
+\subsection{Function {\it expMinLK}}
+
+
+\begin{lstlisting}
+def expMinLK(k, p, r, n, beta ):
+\end{lstlisting}
+
+\subsection{Function {\it LHPDensity}}
+
+
+\begin{lstlisting}
+def LHPDensity(k, p, r, beta):
+\end{lstlisting}
+
+\subsection{Function {\it LHPAnalyticalDensityBaseCorr}}
+
+
+\begin{lstlisting}
+def LHPAnalyticalDensityBaseCorr(k, p, r, beta, dbeta_dk):
+\end{lstlisting}
+
+\subsection{Function {\it LHPAnalyticalDensity}}
+
+
+\begin{lstlisting}
+def LHPAnalyticalDensity(k, p, r, beta ):
+\end{lstlisting}
+
+\subsection{Function {\it ExpMinLK}}
+
+
+\begin{lstlisting}
+def ExpMinLK(k, p, r, n, beta):
+\end{lstlisting}
+
+\subsection{Function {\it probLGreaterThanK}}
+
+
+\begin{lstlisting}
+def probLGreaterThanK( K,  P,  R,  beta):
+\end{lstlisting}
+
+\newpage
+\section{FinGaussianCopulaModel}
+
+\subsection{Function {\it defaultTimesGC}}
+
+
+\begin{lstlisting}
+def defaultTimesGC(issuerCurves, 
+                   correlationMatrix, 
+                   numTrials, 
+                   seed):
+\end{lstlisting}
+
+\newpage
+\section{FinGBMProcess}
+
+\subsection{Class: FinGBMProcess()}
+
+
+\subsubsection{Class Data Members}
+No data members found.
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it getPaths}}
+
+
+\begin{lstlisting}
+    def getPaths(self, numPaths, numTimeSteps, t, mu, stockPrice, volatility, seed):    
+\end{lstlisting}
+
+\subsection{Class Method {\it getPathsAssets}}
+
+
+\begin{lstlisting}
+    def getPathsAssets(self, numAssets, numPaths, numTimeSteps, 
+                       t, mus, stockPrices, volatilities, betas, seed):    
+\end{lstlisting}
+
+\subsection{Function {\it getPaths}}
+
+
+\begin{lstlisting}
+def getPaths(numPaths,
+             numTimeSteps,
+             t,
+             mu,
+             stockPrice,
+             volatility,
+             seed):
+\end{lstlisting}
+
+\subsection{Function {\it getPathsAssets}}
+
+
+\begin{lstlisting}
+def getPathsAssets(numAssets,
+                           numPaths,
+                           numTimeSteps,
+                           t,
+                           mus,
+                           stockPrices,
+                           volatilities,
+                           betas,
+                           seed):    
+\end{lstlisting}
+
+\subsection{Function {\it getAssets}}
+
+
+\begin{lstlisting}
+def getAssets(numAssets,
+                      numPaths,
+                      t,
+                      mus,
+                      stockPrices,
+                      volatilities,
+                      betas,
+                      seed):    
+\end{lstlisting}
+
+\newpage
+\section{FinHestonModel}
+
+\subsubsection{Enumerated Type: FinHestonNumericalScheme}
+\begin{itemize}
+\item{EULER}
+\item{EULERLOG}
+\item{QUADEXP}
+\end{itemize}
+
+\subsection{Class: FinHestonModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_sigma}
+\item{self.\_theta}
+\item{self.\_v0}
+\item{self.\_rho}
+\item{self.\_kappa}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,v0,kappa,theta,sigma,rho):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_MC}}
+
+
+\begin{lstlisting}
+    def value_MC(self,
+                  valueDate,
+                  option,
+                  stockPrice,
+                  interestRate,
+                  dividendYield,
+                  numPaths,
+                  numStepsPerYear,
+                  seed, 
+                  scheme = FinHestonNumericalScheme.EULERLOG):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_Lewis}}
+
+
+\begin{lstlisting}
+    def value_Lewis(self,
+                       valueDate,
+                       option,
+                       stockPrice,
+                       interestRate,
+                       dividendYield):
+\end{lstlisting}
+
+\subsection{Class Method {\it phi}}
+
+
+\begin{lstlisting}
+        def phi(k_in,):
+\end{lstlisting}
+
+\subsection{Class Method {\it phi\_transform}}
+
+
+\begin{lstlisting}
+        def phi_transform(x):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_Lewis\_Rouah}}
+
+
+\begin{lstlisting}
+    def value_Lewis_Rouah(self,
+                           valueDate,
+                           option,
+                           stockPrice,
+                           interestRate,
+                           dividendYield):
+\end{lstlisting}
+
+\subsection{Class Method {\it f}}
+
+
+\begin{lstlisting}
+        def f(k_in):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_Weber}}
+
+
+\begin{lstlisting}
+    def value_Weber(self,
+                       valueDate,
+                       option,
+                       stockPrice,
+                       interestRate,
+                       dividendYield):
+\end{lstlisting}
+
+\subsection{Class Method {\it F}}
+
+
+\begin{lstlisting}
+        def F(s,b):
+\end{lstlisting}
+
+\subsection{Class Method {\it integrand}}
+
+
+\begin{lstlisting}
+            def integrand(u):
+\end{lstlisting}
+
+\subsection{Class Method {\it value\_Gatheral}}
+
+
+\begin{lstlisting}
+    def value_Gatheral(self,
+                       valueDate,
+                       option,
+                       stockPrice,
+                       interestRate,
+                       dividendYield):
+\end{lstlisting}
+
+\subsection{Class Method {\it F}}
+
+
+\begin{lstlisting}
+        def F(j):
+\end{lstlisting}
+
+\subsection{Class Method {\it integrand}}
+
+
+\begin{lstlisting}
+            def integrand(u):
+\end{lstlisting}
+
+\subsection{Function {\it getPaths}}
+
+
+\begin{lstlisting}
+def getPaths(s0,r,q,v0,kappa,theta,sigma,rho,t,dt,numPaths,seed,scheme):
+\end{lstlisting}
+
+\newpage
+\section{FinHestonProcess}
+
+\subsubsection{Enumerated Type: FinHestonScheme}
+\begin{itemize}
+\item{EULER}
+\item{EULERLOG}
+\item{QUADEXP}
+\end{itemize}
+
+\subsection{Class: FinHestonProcess(FinProcess)}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_numTimeSteps}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it getPathsAssets}}
+
+
+\begin{lstlisting}
+    def getPathsAssets(self, 
+                 t,
+                 mus,
+                 stockPrices,
+                 volatilities,
+                 betas,
+                 seed, 
+                 fast = FinFastNumericalApproach.NUMBA):
+\end{lstlisting}
+
+\subsection{Function {\it getPaths}}
+
+
+\begin{lstlisting}
+def getPaths(s0,r,q,v0,kappa,theta,sigma,rho,t,dt,numPaths,seed,scheme):
+\end{lstlisting}
+
+\newpage
+\section{FinHoLeeRateModel}
+
+\subsection{Class: FinHoLeeModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_discountCurve}
+\item{self.\_sigma}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,discountCurve,sigma):
+\end{lstlisting}
+
+\subsection{Class Method {\it P}}
+
+
+\begin{lstlisting}
+    def P(self,
+          r1, # short rate at time t1
+          t1, # foward start time t1
+          t2): # forward maturity t2
+\end{lstlisting}
+
+\newpage
+\section{FinHullWhiteRateModel}
+
+\subsection{Class: FinHullWhiteRateModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_discountCurve}
+\item{self.\_a}
+\item{self.\_sigma}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create Hull White Model from time zero discount curve. 
+
+\begin{lstlisting}
+    def __init__(self,discountCurve,
+                 a,
+                 sigma):
+\end{lstlisting}
+
+\subsection{Class Method {\it P}}
+From discount curve at time 0 get price of 1 dollar at time t2 as of t1 
+
+\begin{lstlisting}
+    def P(self,
+          r1, # short rate at time t1
+          t1, # forward start time t1
+          t2): # forward maturity t2
+\end{lstlisting}
+
+\newpage
+\section{FinLHPlusModel}
+
+\subsection{Class: LHPlusModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_H0}
+\item{self.\_R0}
+\item{self.\_P}
+\item{self.\_beta0}
+\item{self.\_P0}
+\item{self.\_R}
+\item{self.\_H}
+\item{self.\_beta}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__( self, P, R, H, beta, P0, R0, H0, beta0):
+\end{lstlisting}
+
+\subsection{Class Method {\it probLossGreaterThanK}}
+
+
+\begin{lstlisting}
+    def probLossGreaterThanK( self, K ):
+\end{lstlisting}
+
+\subsection{Class Method {\it expMinLKIntegral}}
+
+
+\begin{lstlisting}
+    def expMinLKIntegral(self, K, dK):
+\end{lstlisting}
+
+\subsection{Class Method {\it expMinLK}}
+
+
+\begin{lstlisting}
+    def expMinLK(self, K):
+\end{lstlisting}
+
+\subsection{Class Method {\it expMinLK2}}
+
+
+\begin{lstlisting}
+    def expMinLK2(self, K):
+\end{lstlisting}
+
+\subsection{Class Method {\it trancheSurvivalProbability}}
+
+
+\begin{lstlisting}
+    def trancheSurvivalProbability(self, k1, k2):
+\end{lstlisting}
+
+\newpage
+\section{FinLossDbnBuilder}
+
+\subsection{Function {\it indepLossDbnHeterogeneousAdjBinomial}}
+
+
+\begin{lstlisting}
+def indepLossDbnHeterogeneousAdjBinomial(numCredits,
+                                         condDefaultProbs,
+                                         lossRatio):
+\end{lstlisting}
+
+\subsection{Function {\it portfolioGCD}}
+
+
+\begin{lstlisting}
+def portfolioGCD(actualLosses):
+\end{lstlisting}
+
+\subsection{Function {\it indepLossDbnRecursionGCD}}
+
+
+\begin{lstlisting}
+def indepLossDbnRecursionGCD(numCredits, 
+                             condDefaultProbs,
+                             lossUnits):
+\end{lstlisting}
+
+\newpage
+\section{FinMertonModel}
+
+\subsection{Function {\it MertonModelValues}}
+
+
+\begin{lstlisting}
+def MertonModelValues(assetValue, 
+                      bondFace, 
+                      timeToMaturity, 
+                      volatility, 
+                      riskFreeRate):
+\end{lstlisting}
+
+\newpage
+\section{FinProcessSimulator}
+
+\subsubsection{Enumerated Type: FinProcessTypes}
+\begin{itemize}
+\item{GBM}
+\item{CIR}
+\item{HESTON}
+\item{VASICEK}
+\item{CEV}
+\item{JUMP\_DIFFUSION}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinHestonNumericalScheme}
+\begin{itemize}
+\item{EULER}
+\item{EULERLOG}
+\item{QUADEXP}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinGBMNumericalScheme}
+\begin{itemize}
+\item{NORMAL}
+\item{ANTITHETIC}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinVasicekNumericalScheme}
+\begin{itemize}
+\item{NORMAL}
+\item{ANTITHETIC}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinCIRNumericalScheme}
+\begin{itemize}
+\item{EULER}
+\item{LOGNORMAL}
+\item{MILSTEIN}
+\item{KAHLJACKEL}
+\item{EXACT}
+\end{itemize}
+
+\subsection{Class: FinProcessSimulator()}
+
+
+\subsubsection{Class Data Members}
+No data members found.
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it getProcess}}
+
+
+\begin{lstlisting}
+    def getProcess(self, processType, t, modelParams, numAnnSteps,numPaths, seed):
+\end{lstlisting}
+
+\subsection{Function {\it getHestonPaths}}
+
+
+\begin{lstlisting}
+def getHestonPaths(numPaths,numAnnSteps,t,drift,s0,v0,kappa,theta,sigma,rho,scheme,seed):
+\end{lstlisting}
+
+\subsection{Function {\it getGBMPaths}}
+
+
+\begin{lstlisting}
+def getGBMPaths(numPaths,numAnnSteps,t,mu,stockPrice,sigma,scheme,seed):
+\end{lstlisting}
+
+\subsection{Function {\it getVasicekPaths}}
+
+
+\begin{lstlisting}
+def getVasicekPaths(numPaths,numAnnSteps,t,r0,kappa,theta,sigma,scheme,seed):
+\end{lstlisting}
+
+\subsection{Function {\it getCIRPaths}}
+
+
+\begin{lstlisting}
+def getCIRPaths(numPaths,numAnnSteps,t,r0,kappa,theta,sigma,scheme,seed):
+\end{lstlisting}
+
+\newpage
+\section{FinSABRModel}
+
+\subsection{Function {\it blackVolFromSABR}}
+
+
+\begin{lstlisting}
+def blackVolFromSABR(alpha,beta,rho,nu,f,k,t): 
+\end{lstlisting}
+
+\newpage
+\section{FinStudentTCopulaModel}
+
+\subsection{Class: FinStudentTCopulaModel()}
+
+
+\subsubsection{Class Data Members}
+No data members found.
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it defaultTimes}}
+
+
+\begin{lstlisting}
+    def defaultTimes(self, 
+                     issuerCurves, 
+                     correlationMatrix, 
+                     degreesOfFreedom,
+                     numTrials, 
+                     seed):
+\end{lstlisting}
+
+\newpage
+\section{FinVasicekRateModel}
+
+\subsection{Class: FinVasicekModel()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_sigma}
+\item{self.\_a}
+\item{self.\_b}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(a,b,sigma):
+\end{lstlisting}
+
+\subsection{Function {\it meanr}}
+
+
+\begin{lstlisting}
+def meanr(r0,a,b,t):
+\end{lstlisting}
+
+\subsection{Function {\it variancer}}
+
+
+\begin{lstlisting}
+def variancer(a,b,sigma,t):
+\end{lstlisting}
+
+\subsection{Function {\it zeroPrice}}
+
+
+\begin{lstlisting}
+def zeroPrice(r0,a,b,sigma,t):
+\end{lstlisting}
+
+\subsection{Function {\it ratePath\_MC}}
+
+
+\begin{lstlisting}
+def ratePath_MC(r0,a,b,sigma,t,dt,seed):
+\end{lstlisting}
+
+\subsection{Function {\it zeroPrice\_MC}}
+
+
+\begin{lstlisting}
+def zeroPrice_MC(r0,a,b,sigma,t,dt,numPaths,seed):
+\end{lstlisting}
+
+
+\chapter{..//market//curves}
+\section{Introduction}
+These modules create a family of curve types which inherit from the FinCurve class. They all provide a discount factor function which can be used to present value a future cash flow. 
+
+Included in the classes is a credit risky curve which builds a survival probability curve on top of a risk-free curve They also rely heavily on the FinInterpolate module which provides fast interpolation.
+
+It also includes a number of parametric curves that can be used to fit yield curves such as Nelson-Siegel.
+\newpage
+\section{FinCDSCurve}
+
+\subsection{Class: FinCDSCurve(FinDiscountCurve)}
+Generate a survival probability curve implied by the value of CDS contracts given a Libor curve and an assumed recovery rate. And interpolation scheme for the survival probabilities is also required. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_useCache}
+\item{self.\_cachedDailySurvivalProbs[i]}
+\item{self.\_cdsContracts}
+\item{self.\_values}
+\item{self.\_times}
+\item{self.\_recoveryRate}
+\item{self.\_UseCache}
+\item{self.\_curveDate}
+\item{self.\_cachedDailySurvivalProbs}
+\item{self.\_interpolationMethod}
+\item{self.\_builtOK}
+\item{self.m\_CachedTimeLimit}
+\item{self.\_liborCurve}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,
+                 curveDate,
+                 cdsContracts,
+                 liborCurve,
+                 recoveryRate = 0.40,
+                 useCache = False,
+                 interpolationMethod =  FinInterpMethods.FLAT_FORWARDS):
+\end{lstlisting}
+
+\subsection{Class Method {\it validate}}
+Ensure that contracts are in increasinbg maturity. 
+
+\begin{lstlisting}
+    def validate(self,cdsContracts):
+\end{lstlisting}
+
+\subsection{Class Method {\it survivalProbability}}
+Extract the survival proibability to date dt. 
+
+\begin{lstlisting}
+    def survivalProbability(self,dt):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+Extract the discount factor from the underlying Liubor curve. 
+
+\begin{lstlisting}
+    def df(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it buildCurve}}
+
+
+\begin{lstlisting}
+    def buildCurve(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it buildCachedIssuerCurve}}
+
+
+\begin{lstlisting}
+    def buildCachedIssuerCurve(self):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\subsection{Function {\it uniformToDefaultTime}}
+
+
+\begin{lstlisting}
+def uniformToDefaultTime(u, t, v):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+
+
+\begin{lstlisting}
+def f(q, *args):
+\end{lstlisting}
+
+\newpage
+\section{FinCurve}
+
+\subsubsection{Enumerated Type: FinCompoundingMethods}
+\begin{itemize}
+\item{CONTINUOUS}
+\item{ANNUAL}
+\item{SEMI\_ANNUAL}
+\item{QUARTERLY}
+\item{MONTHLY}
+\item{MONEY\_MARKET}
+\end{itemize}
+
+\subsection{Class: FinCurve()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_type}
+\item{self.\_curveDate}
+\item{self.\_times}
+\item{self.\_values}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,curveDate, interpolationMethod, type):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+
+
+\begin{lstlisting}
+    def df(self,t, interpolationMethod = FinInterpMethods.FLAT_FORWARDS):
+\end{lstlisting}
+
+\newpage
+\section{FinDiscountCurve}
+
+\subsection{Class: FinDiscountCurve()}
+
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_times}
+\item{self.\_method}
+\item{self.\_curveDate}
+\item{self.\_values}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, curveDate, times, values, method):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+
+
+\begin{lstlisting}
+    def df(self, time):
+\end{lstlisting}
+
+\subsection{Class Method {\it survivalProbability}}
+
+
+\begin{lstlisting}
+    def survivalProbability(self, time):
+\end{lstlisting}
+
+\subsection{Class Method {\it dump}}
+
+
+\begin{lstlisting}
+    def dump(self):
+\end{lstlisting}
+
+\newpage
+\section{FinFlatCurve}
+
+\subsection{Class: FinFlatCurve(FinCurve)}
+A simple discount curve based on a single zero rate with its own specified compounding method. Hence the curve is assumed to be flat. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_curveDate}
+\item{self.\_compoundingType}
+\item{self.\_rate}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, curveDate, rate, compoundingType):
+\end{lstlisting}
+
+\subsection{Class Method {\it zero}}
+Return the zero rate which is simply the curve rate. 
+
+\begin{lstlisting}
+    def zero(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+Return the fwd rate which is simply the zero rate. 
+
+\begin{lstlisting}
+    def fwd(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+Return the discount factor based on the compounding approach. 
+
+\begin{lstlisting}
+    def df(self, time):
+\end{lstlisting}
+
+\newpage
+\section{FinLiborOneCurve}
+
+\subsection{Class: FinLiborOneCurve(FinDiscountCurve)}
+Constructs a discount curve as implied by the prices of Libor deposits, futures and interest rate swaps. TODO: Complete the addition of interest rate futures and add OIS 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_name}
+\item{self.\_values}
+\item{self.\_times}
+\item{self.\_curveDate}
+\item{self.\_interpolationMethod}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self, 
+                 name, 
+                 curveDate, 
+                 liborDeposits,
+                 liborFRAs,
+                 liborSwaps,
+                 interpolationMethod = FinInterpMethods.FLAT_FORWARDS ):
+\end{lstlisting}
+
+\subsection{Class Method {\it buildCurve}}
+Construct the discount curve using a bootstrap approach. 
+
+\begin{lstlisting}
+    def buildCurve(self,
+                  liborDeposits,
+                  liborFRAs,
+                  liborSwaps):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+Calculate the forward rate according to the corresponding day count convention. 
+
+\begin{lstlisting}
+    def fwd(self, date1, date2, dayCountType):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+Determine the discount factor by interpolation. 
+
+\begin{lstlisting}
+    def df(self, t):
+\end{lstlisting}
+
+\subsection{Class Method {\it print}}
+Print the details 
+
+\begin{lstlisting}
+    def print(self):
+\end{lstlisting}
+
+\subsection{Function {\it f}}
+
+
+\begin{lstlisting}
+def f(df, *args):
+\end{lstlisting}
+
+\newpage
+\section{FinNelsonSiegelCurve}
+
+\subsection{Class: FinNelsonSiegelCurve(FinCurve)}
+Implementation of Nelson-Siegel parametrisation of the zero rate curve 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_tau}
+\item{self.\_beta2}
+\item{self.\_beta3}
+\item{self.\_beta1}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,beta1,beta2,beta3,tau):
+\end{lstlisting}
+
+\subsection{Class Method {\it zero}}
+Calculation of zero rates. This function can return a vector of zero rates given a vector of times. 
+
+\begin{lstlisting}
+    def zero(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+Calculation of forward rates. This function can return a vector of forward rates given a vector of times. 
+
+\begin{lstlisting}
+    def fwd(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+Discount factor for Nelson-Siegel curve parametrisation. 
+
+\begin{lstlisting}
+    def df(self,t):
+\end{lstlisting}
+
+\newpage
+\section{FinNelsonSiegelSvenssonCurve}
+
+\subsection{Class: FinNelsonSiegelSvenssonCurve(FinCurve)}
+Implementation of Nelson-Siegel-Svensson parametrisation of the zero rate curve 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_tau1}
+\item{self.\_beta2}
+\item{self.\_tau2}
+\item{self.\_beta3}
+\item{self.\_beta4}
+\item{self.\_beta1}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+
+
+\begin{lstlisting}
+    def __init__(self,beta1,beta2,beta3,beta4,tau1,tau2):
+\end{lstlisting}
+
+\subsection{Class Method {\it zero}}
+Calculation of zero rates. This function can return a vector of zero rates given a vector of times. 
+
+\begin{lstlisting}
+    def zero(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+Calculation of forward rates. This function uses Numpy so can return a vector of forward rates given a Numpy array vector of times. 
+
+\begin{lstlisting}
+    def fwd(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+Discount factor for Nelson-Siegel-Svensson curve parametrisation. 
+
+\begin{lstlisting}
+    def df(self,t):
+\end{lstlisting}
+
+\newpage
+\section{FinPieceCurve}
+
+\subsection{Class: FinPieceCurve(FinCurve)}
+Curve is made up of a series of sections assumed to each have a constant forward rate. This class needs to be checked carefully. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.\_times}
+\item{self.\_values}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Curve is defined by a vector of increasing times and zero rates. 
+
+\begin{lstlisting}
+    def __init__(self,times,values):
+\end{lstlisting}
+
+\subsection{Class Method {\it zero}}
+
+
+\begin{lstlisting}
+    def zero(self,t,interpolationMethod=FinInterpMethods.LINEAR):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+
+
+\begin{lstlisting}
+    def fwd(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+
+
+\begin{lstlisting}
+    def df(self,
+           t, 
+           freq=0, # This corresponds to continuous compounding
+           interpolationMethod=FinInterpMethods.LINEAR):
+\end{lstlisting}
+
+\newpage
+\section{FinPolynomialCurve}
+
+\subsection{Class: FinPolynomialCurve(FinCurve)}
+Curve with zero rate parametrised as a cubic polynomial. 
+
+\subsubsection{Class Data Members}
+\begin{itemize}
+\item{self.c2}
+\item{self.c0}
+\item{self.c1}
+\item{self.c3}
+\end{itemize}
+
+\subsubsection{Class Functions}
+
+\subsection{Class Method {\it \_\_init\_\_}}
+Create cubic curve from coefficients. 
+
+\begin{lstlisting}
+    def __init__(self,a=0,b=0,c=0,d=0):
+\end{lstlisting}
+
+\subsection{Class Method {\it zero}}
+
+
+\begin{lstlisting}
+    def zero(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it fwd}}
+
+
+\begin{lstlisting}
+    def fwd(self,t):
+\end{lstlisting}
+
+\subsection{Class Method {\it df}}
+
+
+\begin{lstlisting}
+    def df(self,t):
+\end{lstlisting}
+
+
+\chapter{..//test}
+\section{Introduction}
+This folder contains the logic for performing comparison testing of code to ensure that it does not inadvertantly get broken. 
+
+\newpage
+\section{TestFinAmericanOption}
+
+\subsection{Function {\it testFinAmericanOption}}
+
+
+\begin{lstlisting}
+def testFinAmericanOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinAnnuity}
+
+\subsection{Function {\it test\_FinAnnuity}}
+
+
+\begin{lstlisting}
+def test_FinAnnuity():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinAsianOption}
+
+\subsection{Function {\it testConvergence}}
+
+
+\begin{lstlisting}
+def testConvergence():
+\end{lstlisting}
+
+\subsection{Function {\it testTimeEvolution}}
+
+
+\begin{lstlisting}
+def testTimeEvolution():
+\end{lstlisting}
+
+\subsection{Function {\it testMCTimings}}
+
+
+\begin{lstlisting}
+def testMCTimings():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinBarrierOption}
+
+\subsection{Function {\it test\_FinBarrierOption}}
+
+
+\begin{lstlisting}
+def test_FinBarrierOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinBasketOption}
+
+\subsection{Function {\it test\_FinBasketOption}}
+
+
+\begin{lstlisting}
+def test_FinBasketOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinBinomialTree}
+
+\subsection{Function {\it test\_FinBinomialTree}}
+
+
+\begin{lstlisting}
+def test_FinBinomialTree():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinBond}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(valuationDate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinBond}}
+
+
+\begin{lstlisting}
+def test_FinBond():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinBondFutures}
+
+\subsection{Function {\it test\_FinBondFuture}}
+
+
+\begin{lstlisting}
+def test_FinBondFuture():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDS}
+
+\subsection{Function {\it test\_CDSFastApproximation}}
+
+
+\begin{lstlisting}
+def test_CDSFastApproximation():
+\end{lstlisting}
+
+\subsection{Function {\it test\_CDSCurveRepricing}}
+
+
+\begin{lstlisting}
+def test_CDSCurveRepricing():
+\end{lstlisting}
+
+\subsection{Function {\it test\_CDSCurveBuildTiming}}
+
+
+\begin{lstlisting}
+def test_CDSCurveBuildTiming():
+\end{lstlisting}
+
+\subsection{Function {\it test\_CurveBuild}}
+
+
+\begin{lstlisting}
+def test_CurveBuild():
+\end{lstlisting}
+
+\subsection{Function {\it buildFullIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildFullIssuerCurve(mktSpreadBump,irBump):
+\end{lstlisting}
+
+\subsection{Function {\it test\_fullPriceCDS}}
+
+
+\begin{lstlisting}
+def test_fullPriceCDS():
+\end{lstlisting}
+
+\subsection{Function {\it test\_fullPriceCDSConvergence}}
+
+
+\begin{lstlisting}
+def test_fullPriceCDSConvergence():
+\end{lstlisting}
+
+\subsection{Function {\it test\_CDSDateGeneration}}
+
+
+\begin{lstlisting}
+def test_CDSDateGeneration():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSBasket}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it loadHomogeneousSpreadCurves}}
+
+
+\begin{lstlisting}
+def loadHomogeneousSpreadCurves(valuationDate,
+                      liborCurve,
+                      cdsSpread3Y,
+                      cdsSpread5Y,
+                      cdsSpread7Y,
+                      cdsSpread10Y,
+                      numCredits):
+\end{lstlisting}
+
+\subsection{Function {\it loadHeterogeneousSpreadCurves}}
+
+
+\begin{lstlisting}
+def loadHeterogeneousSpreadCurves(valuationDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinCDSBasket}}
+
+
+\begin{lstlisting}
+def test_FinCDSBasket():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSCurve}
+
+\subsection{Function {\it test\_FinCDSCurve}}
+
+
+\begin{lstlisting}
+def test_FinCDSCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSIndex}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it buildIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildIssuerCurve(tradeDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_valueCDSIndex}}
+
+
+\begin{lstlisting}
+def test_valueCDSIndex():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSIndexAdjustHazards}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it buildIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildIssuerCurve(tradeDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_performCDSIndexHazardRateAdjustment}}
+
+
+\begin{lstlisting}
+def test_performCDSIndexHazardRateAdjustment():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSIndexAdjustSpreads}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it buildIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildIssuerCurve(tradeDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_CDSIndexAdjustSpreads}}
+
+
+\begin{lstlisting}
+def test_CDSIndexAdjustSpreads():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSIndexOption}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it buildFlatIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildFlatIssuerCurve(tradeDate,liborCurve,spread, recoveryRate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_fullPriceCDSIndexOption}}
+
+
+\begin{lstlisting}
+def test_fullPriceCDSIndexOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSIndexPortfolio}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it buildIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildIssuerCurve(tradeDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_CDSIndexPortfolio}}
+
+
+\begin{lstlisting}
+def test_CDSIndexPortfolio():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSOption}
+
+\subsection{Function {\it buildFullIssuerCurve}}
+
+
+\begin{lstlisting}
+def buildFullIssuerCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_fullPriceCDSwaption}}
+
+
+\begin{lstlisting}
+def test_fullPriceCDSwaption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCDSTranche}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(tradeDate):
+\end{lstlisting}
+
+\subsection{Function {\it loadHomogeneousCDSCurves}}
+
+
+\begin{lstlisting}
+def loadHomogeneousCDSCurves(valuationDate,
+                      liborCurve,
+                      cdsSpread3Y,
+                      cdsSpread5Y,
+                      cdsSpread7Y,
+                      cdsSpread10Y,
+                      numCredits):
+\end{lstlisting}
+
+\subsection{Function {\it loadHeterogeneousSpreadCurves}}
+
+
+\begin{lstlisting}
+def loadHeterogeneousSpreadCurves(valuationDate,liborCurve):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinCDSTranche}}
+
+
+\begin{lstlisting}
+def test_FinCDSTranche():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCIRRateModel}
+
+\subsection{Function {\it test\_FinCIRRateModel}}
+
+
+\begin{lstlisting}
+def test_FinCIRRateModel():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinCompoundOption}
+
+\subsection{Function {\it test\_FinCompoundOption}}
+
+
+\begin{lstlisting}
+def test_FinCompoundOption():    
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinDate}
+
+\subsection{Function {\it test\_FinDate}}
+
+
+\begin{lstlisting}
+def test_FinDate():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinDayCount}
+
+\subsection{Function {\it test\_FinDayCount}}
+
+
+\begin{lstlisting}
+def test_FinDayCount():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinDigitalOption}
+
+\subsection{Function {\it test\_FinDigitalOption}}
+
+
+\begin{lstlisting}
+def test_FinDigitalOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinDiscountCurve}
+
+\subsection{Function {\it test\_FinDiscountCurve}}
+
+
+\begin{lstlisting}
+def test_FinDiscountCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinFlatCurve}
+
+\subsection{Function {\it test\_FinFlatCurve}}
+
+
+\begin{lstlisting}
+def test_FinFlatCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinFloatingRateNote}
+
+\subsection{Function {\it buildLiborCurve}}
+
+
+\begin{lstlisting}
+def buildLiborCurve(valuationDate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinFloatingRateNote}}
+
+
+\begin{lstlisting}
+def test_FinFloatingRateNote():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinHestonModel}
+
+\subsection{Function {\it testAnalyticalModels}}
+
+
+\begin{lstlisting}
+def testAnalyticalModels():
+\end{lstlisting}
+
+\subsection{Function {\it testMonteCarlo}}
+
+
+\begin{lstlisting}
+def testMonteCarlo():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinInterpolate}
+
+\subsection{Function {\it test\_FinInterpolate}}
+
+
+\begin{lstlisting}
+def test_FinInterpolate():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLiborCapFloor}
+
+\subsection{Function {\it test\_FinLiborDepositsAndSwaps}}
+
+
+\begin{lstlisting}
+def test_FinLiborDepositsAndSwaps(valuationDate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinLiborCapFloor}}
+
+
+\begin{lstlisting}
+def test_FinLiborCapFloor():       
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLiborOneCurve}
+
+\subsection{Function {\it test\_FinLiborDepositsOnly}}
+
+
+\begin{lstlisting}
+def test_FinLiborDepositsOnly(depoDCCType):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinLiborDepositsAndSwaps}}
+
+
+\begin{lstlisting}
+def test_FinLiborDepositsAndSwaps():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLiborSwap}
+
+\subsection{Function {\it test\_LiborSwap}}
+
+
+\begin{lstlisting}
+def test_LiborSwap(): 
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLiborSwaption}
+
+\subsection{Function {\it test\_FinLiborDepositsAndSwaps}}
+
+
+\begin{lstlisting}
+def test_FinLiborDepositsAndSwaps(valuationDate):
+\end{lstlisting}
+
+\subsection{Function {\it test\_FinLiborSwaption}}
+
+
+\begin{lstlisting}
+def test_FinLiborSwaption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLookbackOption}
+
+\subsection{Function {\it test\_FinLookBackOption}}
+
+
+\begin{lstlisting}
+def test_FinLookBackOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinLossDbnBuilder}
+
+\subsection{Function {\it test\_FinLossDbnBuilder}}
+
+
+\begin{lstlisting}
+def test_FinLossDbnBuilder():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinMath}
+
+\subsection{Function {\it test\_FinMath}}
+
+
+\begin{lstlisting}
+def test_FinMath():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinNelsonSiegelCurve}
+
+\subsection{Function {\it test\_FinNelsonSiegelCurve}}
+
+
+\begin{lstlisting}
+def test_FinNelsonSiegelCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinNelsonSiegelSvenssonCurve}
+
+\subsection{Function {\it test\_FinNelsonSiegelSvenssonCurve}}
+
+
+\begin{lstlisting}
+def test_FinNelsonSiegelSvenssonCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinPieceCurve}
+
+\subsection{Function {\it test\_FinPieceCurve}}
+
+
+\begin{lstlisting}
+#def test_FinPieceCurve():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinPolynomialCurve}
+
+\subsection{Function {\it test\_FinPolynomialCurve}}
+
+
+\begin{lstlisting}
+def test_FinPolynomialCurve(): 
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinProcessSimulator}
+
+\subsection{Function {\it test\_FinProcessSimulator}}
+
+
+\begin{lstlisting}
+def test_FinProcessSimulator():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinRainbowOption}
+
+\subsection{Function {\it test\_FinRainbowOption}}
+
+
+\begin{lstlisting}
+def test_FinRainbowOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinSABRModel}
+
+\subsection{Function {\it test\_SABR}}
+
+
+\begin{lstlisting}
+def test_SABR():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinSchedule}
+
+\subsection{Function {\it test\_FinSchedule}}
+
+
+\begin{lstlisting}
+def test_FinSchedule():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinStats}
+
+\subsection{Function {\it test\_FinStats}}
+
+
+\begin{lstlisting}
+def test_FinStats():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinVanillaOption}
+
+\subsection{Function {\it test\_FinVanillaOption}}
+
+
+\begin{lstlisting}
+def test_FinVanillaOption():
+\end{lstlisting}
+
+
+\newpage
+\section{TestFinVasicekRateModel}
+
+\subsection{Function {\it test\_FinVasicekRateModel}}
+
+
+\begin{lstlisting}
+def test_FinVasicekRateModel():
+\end{lstlisting}
+
+
+\chapter{..//docs}
+\section{Introduction}
+This folder is where the project documentation is generated. This is done in Latex.
+\end{document}

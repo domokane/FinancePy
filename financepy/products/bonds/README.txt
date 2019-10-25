@@ -1,0 +1,1 @@
+This folder contains a suite of bond-related functionality. It includes a basic fixed coupon bond with all of the associated duration and convexity measures. In addition it includes floating rate bonds and credit risky bonds. There will also be coverage for convertible bonds although this has not been implemented as yet.

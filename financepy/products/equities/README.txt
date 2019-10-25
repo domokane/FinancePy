@@ -1,0 +1,1 @@
+This folder covers a range of equity derivative products. These range from simple Vanilla-style options to more complex payoffs and path-dependent options. 

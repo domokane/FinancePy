@@ -1,0 +1,313 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Feb 12 16:51:05 2016
+
+@author: Dominic O'Kane
+"""
+# 
+from math import exp, log, sqrt
+import numpy as np
+from enum import Enum
+
+from ...finutils.FinError import FinError
+from ...finutils.FinDate import FinDate
+from ...finutils.FinMath import N
+from ...finutils.FinGlobalVariables import gDaysInYear
+from ...products.equities.FinOption import FinOption
+from ...models.FinProcessSimulator import FinProcessSimulator
+
+class FinBarrierTypes(Enum):
+    DOWN_AND_OUT_CALL=1
+    DOWN_AND_IN_CALL=2
+    UP_AND_OUT_CALL=3
+    UP_AND_IN_CALL=4
+    UP_AND_OUT_PUT=5
+    UP_AND_IN_PUT=6
+    DOWN_AND_OUT_PUT=7
+    DOWN_AND_IN_PUT=8
+
+
+###############################################################################
+################################################################################
+    
+class FinBarrierOption(FinOption):
+
+    def __init__ (self, expiryDate, strikePrice, optionType, 
+                  barrierLevel, numObservationsPerYear ):
+
+        self._expiryDate = expiryDate
+        self._strikePrice = float(strikePrice)
+        self._barrierLevel = float(barrierLevel)
+        self._numObservationsPerYear = int(numObservationsPerYear)
+        
+        if optionType not in FinBarrierTypes:
+            raise FinError("Option Type ",optionType," unknown.")
+
+        self._optionType = optionType
+
+################################################################################
+        
+    def value(self, valueDate, stockPrice, interestRate, dividendYield, volatility ):
+
+        # This prices the option using the formulae given in the paper 
+        # by Clewlow, Llanos and Strickland December 1994 which can be found at
+        # https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
+                
+        t = FinDate.datediff(valueDate,self._expiryDate)/gDaysInYear
+        lnS0k = log(float(stockPrice) / self._strikePrice)
+        sqrtT = sqrt(t)
+
+        k = self._strikePrice
+        s = stockPrice
+        h = self._barrierLevel
+
+        sigmaRootT = volatility * sqrtT
+        v2 = volatility * volatility
+        mu = interestRate - dividendYield
+        d1 = (lnS0k + (mu + v2 / 2.0) * t)/sigmaRootT
+        d2 = (lnS0k + (mu - v2 / 2.0) * t)/sigmaRootT
+        df = exp(-interestRate * t)
+        dq = exp(-dividendYield * t)
+
+        c = s * dq * N(d1) - k * df * N(d2)
+        p = k * df * N(-d2) - s * dq * N(-d1)
+#        print("CALL:",c,"PUT:",p)
+        
+        if self._optionType == FinBarrierTypes.DOWN_AND_OUT_CALL and s <= h:
+            return 0.0
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_CALL and s >= h:
+            return 0.0
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_PUT and s >= h:
+            return 0.0
+        elif self._optionType == FinBarrierTypes.DOWN_AND_OUT_PUT and s <= h:
+            return 0.0
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_CALL and s <= h:
+            return c
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_CALL and s >= h:
+            return c
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_PUT and s >= h:
+            return p
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_PUT and s <= h:
+            return p
+            
+        numObservations = t * self._numObservationsPerYear
+
+        # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
+        # Adjusts the barrier for discrete and not continuous observations
+        h_adj = h        
+        if self._optionType == FinBarrierTypes.DOWN_AND_OUT_CALL:
+            h_adj = h *exp(-0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_CALL:
+            h_adj = h *exp(-0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_CALL:
+            h_adj = h *exp(0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_CALL:
+            h_adj = h *exp(0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_PUT:
+            h_adj = h *exp(0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_PUT:
+            h_adj = h *exp(0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.DOWN_AND_OUT_PUT:
+            h_adj = h *exp(-0.5826 * volatility * sqrt(t/numObservations))
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_PUT:
+            h_adj = h *exp(-0.5826 * volatility * sqrt(t/numObservations))
+        else:
+            raise FinError("Unknown barrier option type." + str(self._optionType))
+
+        h = h_adj
+        
+        if abs(volatility) < 1e-5:
+            volatility = 1e-5
+        
+        l = (mu + v2/2.0)/v2
+        y = log(h*h/(s*k))/sigmaRootT + l * sigmaRootT
+        x1 = log(s/h)/sigmaRootT + l * sigmaRootT
+        y1 = log(h/s)/sigmaRootT + l * sigmaRootT
+        hOverS = h/s
+
+        if self._optionType == FinBarrierTypes.DOWN_AND_OUT_CALL:
+            if h >= k:
+                c_do = s * dq * N(x1) - k * df * N(x1-sigmaRootT) \
+                - s * dq * pow(hOverS, 2.0*l ) * N(y1) \
+                + k * df * pow(hOverS, 2.0*l - 2.0) * N(y1-sigmaRootT) 
+                price = c_do
+            else:
+                c_di = s * dq * pow(hOverS, 2.0*l ) * N(y) \
+                - k * df * pow(hOverS, 2.0*l - 2.0 ) * N(y-sigmaRootT)
+                price = c - c_di
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_CALL:
+            if h <= k:
+                c_di = s * dq * pow(hOverS, 2.0*l ) * N(y) \
+                - k * df * pow(hOverS, 2.0*l - 2.0 ) * N(y-sigmaRootT)
+                price = c_di
+            else:
+                c_do = s * dq * N(x1) \
+                - k * df * N(x1-sigmaRootT) \
+                - s * dq * pow(hOverS, 2.0*l ) * N(y1) \
+                + k * df * pow(hOverS, 2.0*l - 2.0) * N(y1-sigmaRootT)
+                price = c - c_do
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_CALL:
+            if h >= k:
+                c_ui = s * dq * N(x1) \
+                - k * df * N(x1-sigmaRootT) \
+                - s * dq * pow(hOverS, 2.0*l ) * ( N(-y) - N(-y1)) \
+                + k * df * pow(hOverS, 2.0*l - 2.0) * ( N(-y+sigmaRootT) - N(-y1+sigmaRootT))
+                price = c_ui
+            else:
+                price = c
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_CALL:
+            if h > k:
+                c_ui = s * dq * N(x1) \
+                - k * df * N(x1-sigmaRootT) \
+                - s * dq * pow(hOverS, 2.0*l ) * ( N(-y) - N(-y1)) \
+                + k * df * pow(hOverS, 2.0*l - 2.0) * ( N(-y+sigmaRootT) - N(-y1+sigmaRootT)) 
+                price = c - c_ui
+            else:
+                price = 0.0
+        elif self._optionType == FinBarrierTypes.UP_AND_IN_PUT:
+            if h > k:
+                 p_ui = -s * dq * pow(hOverS,2.0*l) * N(-y) \
+                 + k * df * pow(hOverS, 2.0*l - 2.0) * N(-y+sigmaRootT)
+                 price = p_ui
+            else:
+                 p_uo = -s * dq * N(-x1) \
+                 + k * df * N(-x1 + sigmaRootT) \
+                 + s * dq * pow(hOverS, 2.0*l) * N(-y1) \
+                 - k * df * pow(hOverS, 2.0*l - 2.0) * N(-y1+sigmaRootT)
+                 price = p - p_uo
+        elif self._optionType == FinBarrierTypes.UP_AND_OUT_PUT:
+            if h >= k:
+                p_ui = -s * dq * pow(hOverS,2.0*l) * N(-y) \
+                + k * df * pow(hOverS, 2.0*l - 2.0) * N(-y+sigmaRootT)
+                price = p - p_ui
+            else:
+                p_uo = -s * dq * N(-x1) \
+                + k * df * N(-x1+sigmaRootT) \
+                + s * dq * pow(hOverS, 2.0*l ) * N(-y1) \
+                - k * df * pow(hOverS, 2.0*l - 2.0) * N(-y1+sigmaRootT)
+                price = p_uo
+        elif self._optionType == FinBarrierTypes.DOWN_AND_OUT_PUT:
+            if h >= k:
+                price = 0.0
+            else:
+                p_di = -s * dq * N(-x1) \
+                + k * df * N(-x1+sigmaRootT) \
+                + s * dq * pow(hOverS, 2.0*l ) * (N(y) - N(y1)) \
+                - k * df * pow(hOverS, 2.0*l - 2.0) * (N(y-sigmaRootT)-N(y1-sigmaRootT))
+                price = p - p_di
+        elif self._optionType == FinBarrierTypes.DOWN_AND_IN_PUT:
+            if h >= k:
+                price = p
+            else:
+                p_di = -s * dq * N(-x1) \
+                + k * df * N(-x1+sigmaRootT) \
+                + s * dq * pow(hOverS, 2.0*l ) * (N(y) - N(y1)) \
+                - k * df * pow(hOverS, 2.0*l - 2.0) * (N(y-sigmaRootT)-N(y1-sigmaRootT))
+                price = p_di
+        else:
+            raise FinError("Unknown barrier option type." + str(self._optionType))
+
+        return price
+
+###############################################################################
+        
+    def valueMC(self, valueDate, stockPrice, interestRate, processType, modelParams, 
+                numAnnSteps = 252, numPaths = 10000, seed = 4242 ):
+
+        t = FinDate.datediff(valueDate,self._expiryDate)/gDaysInYear
+        numTimeSteps = int(t * numAnnSteps)
+        r = interestRate
+        K = self._strikePrice
+        B = self._barrierLevel
+        optionType = self._optionType
+
+        process = FinProcessSimulator()
+                    
+        ########################################################################
+
+        if optionType == FinBarrierTypes.DOWN_AND_OUT_CALL and stockPrice <= B:
+            return 0.0
+        elif optionType == FinBarrierTypes.UP_AND_OUT_CALL and stockPrice >= B:
+            return 0.0
+        elif optionType == FinBarrierTypes.DOWN_AND_OUT_PUT and stockPrice <= B:
+            return 0.0
+        elif optionType == FinBarrierTypes.UP_AND_OUT_PUT and stockPrice >= B:
+            return 0.0
+        
+        #######################################################################
+        
+        simpleCall = False 
+        simplePut = False
+
+        if optionType == FinBarrierTypes.DOWN_AND_IN_CALL and stockPrice <= B:
+            simpleCall = True
+        elif optionType == FinBarrierTypes.UP_AND_IN_CALL and stockPrice >= B:
+            simpleCall = True
+        elif optionType == FinBarrierTypes.UP_AND_IN_PUT and stockPrice >= B:
+            simplePut = True
+        elif optionType == FinBarrierTypes.DOWN_AND_IN_PUT and stockPrice <= B:
+            simplePut = True
+
+        if simplePut == True or simpleCall == True:
+            Sall = process.getProcess(processType, t, modelParams, 2, numPaths, seed)
+            
+        if simpleCall == True:
+            c = (np.maximum(Sall[:,-1] - K,0)).mean()
+            c = c * exp(-interestRate *t)
+            return c
+ 
+        if simplePut == True:
+            p = (np.maximum(K - Sall[:,-1],0)).mean()
+            p = p * exp(-interestRate *t)
+            return p
+        
+        # Get full set of paths 
+        Sall = process.getProcess(processType, t, modelParams, numTimeSteps, numPaths, seed)       
+        (numPaths, numTimeSteps) = Sall.shape
+        
+        if optionType == FinBarrierTypes.DOWN_AND_IN_CALL or \
+           optionType == FinBarrierTypes.DOWN_AND_OUT_CALL or \
+           optionType == FinBarrierTypes.DOWN_AND_IN_PUT or \
+           optionType == FinBarrierTypes.DOWN_AND_OUT_PUT:
+               
+            barrierCrossedFromAbove = [False] * numPaths
+
+            for p in range(0,numPaths):
+                barrierCrossedFromAbove[p] = np.any(Sall[p] <= B)        
+    
+        if optionType == FinBarrierTypes.UP_AND_IN_CALL or \
+           optionType == FinBarrierTypes.UP_AND_OUT_CALL or \
+           optionType == FinBarrierTypes.UP_AND_IN_PUT or \
+           optionType == FinBarrierTypes.UP_AND_OUT_PUT:
+    
+            barrierCrossedFromBelow = [False] * numPaths
+            for p in range(0,numPaths):
+                barrierCrossedFromBelow[p] = np.any(Sall[p] >= B)        
+
+        payoff = np.zeros(numPaths)
+        ones = np.ones(numPaths)
+
+        if optionType == FinBarrierTypes.DOWN_AND_OUT_CALL:
+            payoff = np.maximum(Sall[:,-1]-K,0) * (ones-barrierCrossedFromAbove)
+        elif optionType == FinBarrierTypes.DOWN_AND_IN_CALL:
+            payoff = np.maximum(Sall[:,-1]-K,0) * barrierCrossedFromAbove
+        elif optionType == FinBarrierTypes.UP_AND_IN_CALL:
+            payoff = np.maximum(Sall[:,-1]-K,0) * barrierCrossedFromBelow
+        elif optionType == FinBarrierTypes.UP_AND_OUT_CALL:
+            payoff = np.maximum(Sall[:,-1]-K,0) * (ones-barrierCrossedFromBelow)
+        elif optionType == FinBarrierTypes.UP_AND_IN_PUT:
+            payoff = np.maximum(K-Sall[:,-1],0) * barrierCrossedFromBelow
+        elif optionType == FinBarrierTypes.UP_AND_OUT_PUT:
+            payoff = np.maximum(K-Sall[:,-1],0) * (ones-barrierCrossedFromBelow)
+        elif optionType == FinBarrierTypes.DOWN_AND_OUT_PUT:
+            payoff = np.maximum(K-Sall[:,-1],0) * (ones-barrierCrossedFromAbove)
+        elif optionType == FinBarrierTypes.DOWN_AND_IN_PUT:
+            payoff = np.maximum(K - Sall[:,-1],0) * barrierCrossedFromAbove
+        else:
+            raise FinError("Unknown barrier option type." + str(self._optionType))
+                
+        v = payoff.mean() * exp(- r * t)
+        
+        return v
+    
+################################################################################
