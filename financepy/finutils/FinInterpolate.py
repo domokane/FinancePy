@@ -18,7 +18,8 @@ class FinInterpMethods(Enum):
 
 ################################################################################
 
-@njit(float64(float64,float64[:],float64[:],int64),fastmath=True,cache=True,nogil=True)
+@njit(float64(float64,float64[:],float64[:],int64),
+      fastmath=True,cache=True,nogil=True)
 def interpolate(xValue,
                 xvector,
                 yvector,
