@@ -8,3 +8,4 @@ financepy.egg-info
 *.toc
 *.out
 *.pdf
+build
