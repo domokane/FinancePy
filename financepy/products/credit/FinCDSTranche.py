@@ -8,24 +8,24 @@ Created on Wed Jan 16 17:56:21 2019
 import numpy as np
 from math import sqrt
 
-from financepy.models.FinGaussianCopula1FModel import trSurvProbGaussian
-from financepy.models.FinGaussianCopula1FModel import trSurvProbAdjBinomial
-from financepy.models.FinGaussianCopula1FModel import trSurvProbRecursion
-from financepy.models.FinGaussianCopulaLHPModel import trSurvProbLHP
+from ...models.FinGaussianCopula1FModel import trSurvProbGaussian
+from ...models.FinGaussianCopula1FModel import trSurvProbAdjBinomial
+from ...models.FinGaussianCopula1FModel import trSurvProbRecursion
+from ...models.FinGaussianCopulaLHPModel import trSurvProbLHP
 
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinFrequency import FinFrequencyTypes
+from ...finutils.FinCalendar import FinCalendarTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
 
-from financepy.products.credit.FinCDS import FinCDS
+from ...products.credit.FinCDS import FinCDS
 
-from financepy.market.curves.FinCDSCurve import FinCDSCurve
+from ...market.curves.FinCDSCurve import FinCDSCurve
 
-from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinInterpolate import interpolate, FinInterpMethods
-from financepy.finutils.FinError import FinError
+from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinInterpolate import interpolate, FinInterpMethods
+from ...finutils.FinError import FinError
 
 ################################################################################
 

@@ -5,11 +5,11 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinCalendar import FinCalendar
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes
-from financepy.finutils.FinDayCount import FinDayCount
-from financepy.finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinCalendar import FinCalendar
+from ...finutils.FinCalendar import FinCalendarTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinDayCount import FinDayCountTypes
 
 ###############################################################################
 

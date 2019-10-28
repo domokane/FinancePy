@@ -1,1 +1,1 @@
-The folder contains a set of sub-folders, one for a specific category of financial derivative.
+The folder contains a set of sub-folders, one for each specific category of financial derivative.

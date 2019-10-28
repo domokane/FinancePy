@@ -5,11 +5,8 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-import sys
-sys.path.append("..")
-
-from finutils.FinDate import FinDate
-from FinSchedule import schedule
+from ...finutils.FinDate import FinDate
+from ...finutils.FinSchedule import schedule
 
 ###############################################################################
 

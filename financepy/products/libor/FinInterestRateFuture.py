@@ -8,10 +8,11 @@ Created on Sun Feb 07 14:23:13 2016
 # TODO: Add functionality around settlement
 # TODO: Write test function
 
-from financepy.finutils.FinError import FinError
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinGlobalVariables import gDaysInYear
 from math import exp
+
+from ...finutils.FinError import FinError
+from ...finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinGlobalVariables import gDaysInYear
 
 ###############################################################################
 
@@ -40,7 +41,8 @@ class FinInterestRateFuture(object):
 
 ################################################################################
 
-    def futuresRate(settlementDate,
+    def futuresRate(self,
+                    settlementDate,
                     futuresPrice):
         ''' Calculate implied futures rate from the futures price.'''
         futuresRate = (100.0 - futuresPrice)/100.0

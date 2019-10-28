@@ -4,6 +4,7 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
+from os.path import dirname, join
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -100,7 +101,12 @@ def test_performCDSIndexHazardRateAdjustment():
     maturity7Y = tradeDate.nextCDSDate(84)
     maturity10Y = tradeDate.nextCDSDate(120)
 
-    f = open('.//data//CDX_NA_IG_S7_SPREADS.csv','r')
+    path = dirname(__file__)
+    filename = "CDX_NA_IG_S7_SPREADS.csv"
+    full_filename_path = join(path, "data", filename)
+    print(full_filename_path)
+    f = open(full_filename_path,'r')
+
     data = f.readlines()
     issuerCurves = []
 

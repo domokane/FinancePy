@@ -5,11 +5,8 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-import sys
-sys.path.append("..")
-
-from finutils.FinError import FinError
-from finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinError import FinError
+from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
 ###############################################################################
 
