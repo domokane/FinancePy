@@ -4,6 +4,10 @@ Created on Sun Jul 21 10:04:57 2019
 
 @author: Dominic
 """
+
+import sys
+sys.path.append("..//..")
+
 import time
 import numpy as np
 

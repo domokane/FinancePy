@@ -1,3 +1,9 @@
 {
-    "python.pythonPath": "C:\\Users\\Dominic\\Anaconda\\python.exe"
+    "python.pythonPath": "C:\\Users\\Dominic\\Anaconda\\python.exe",
+    "code-runner.runInTerminal": true,
+    "code-runner.executorMap": { "python":"$pythonPath -u $fullFileName" },
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.showExecutionMessage": false, 
+    "code-runner.fileDirectoryAsCwd": true,  
+    "code-runner.saveAllFilesBeforeRun": true,
 }

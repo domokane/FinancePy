@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Aug  3 14:10:12 2019
-
-@author: Dominic
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Mon Sep 09 14:31:53 2019
 
 @author: Dominic O'Kane
 """
+
+import sys
+sys.path.append("..//..")
+
 import time
 import numpy as np
 

@@ -5,6 +5,9 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 
+import sys
+sys.path.append("..//..")
+
 import numpy as np
 
 from financepy.finutils.FinDate import FinDate

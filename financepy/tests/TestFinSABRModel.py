@@ -4,6 +4,10 @@ Created on Sat Aug  3 14:10:12 2019
 
 @author: Dominic
 """
+
+import sys
+sys.path.append("..//..")
+
 from financepy.models.FinSABRModel import blackVolFromSABR
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__,globalTestCaseMode)

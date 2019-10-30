@@ -5,8 +5,10 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 
-import time
+import sys
+sys.path.append("..//..")
 
+import time
 import numpy as np
 
 from financepy.finutils.FinMath import normcdf, norminvcdf

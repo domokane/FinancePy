@@ -5,6 +5,8 @@ Created on Sun Jul 21 10:04:57 2019
 @author: Dominic
 """
 
+import sys
+sys.path.append("..//..")
 
 from financepy.finutils.FinDate import FinDate
 from financepy.products.equities.FinVanillaOption import FinVanillaOption, FinOptionTypes 

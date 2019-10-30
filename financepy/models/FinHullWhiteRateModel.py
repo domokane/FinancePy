@@ -14,6 +14,17 @@ from math import log, exp
 
 # TO DO - DECIDE WHETHER TO OO MODEL
 
+class FinHullWhiteTree():
+
+  def __init__(self,
+               discountCurve,
+               a,
+               sigma):
+        self._discountCurve = discountCurve
+        self._a = a
+        self._sigma = sigma
+
+        
 class FinHullWhiteRateModel():
 
     def __init__(self,discountCurve,

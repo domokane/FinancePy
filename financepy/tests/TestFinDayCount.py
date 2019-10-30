@@ -4,6 +4,8 @@ Created on Fri Nov 30 10:10:19 2018
 
 @author: Dominic O'Kane
 """
+import sys
+sys.path.append("..//..")
 
 from financepy.finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from financepy.finutils.FinDate import FinDate

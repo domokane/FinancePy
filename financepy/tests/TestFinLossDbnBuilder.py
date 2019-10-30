@@ -5,6 +5,9 @@ Created on Wed Jan 16 17:54:58 2019
 @author: Dominic O'Kane
 """
 
+import sys
+sys.path.append("..//..")
+
 import time
 import numpy as np
 import matplotlib.pyplot as plt

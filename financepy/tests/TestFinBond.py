@@ -5,6 +5,9 @@ Created on Mon Aug  5 09:43:40 2019
 @author: Dominic
 """
 
+import sys
+sys.path.append("..//..")
+
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 

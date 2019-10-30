@@ -4,6 +4,10 @@ Created on Fri Apr 08 09:26:27 2016
 
 @author: Dominic O'Kane
 """
+
+import sys
+sys.path.append("..//..")
+
 ################################################################################
 # TODO
 # Inherit from FinCurve and add df method

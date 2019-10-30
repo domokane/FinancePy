@@ -4,6 +4,8 @@ Created on Sun Feb 07 14:31:53 2016
 
 @author: Dominic O'Kane
 """
+import sys
+sys.path.append("..//..")
 
 import math
 import numpy as np

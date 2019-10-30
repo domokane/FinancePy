@@ -5,6 +5,9 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 
+import sys
+sys.path.append("..//..")
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes

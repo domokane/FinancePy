@@ -11,6 +11,7 @@ from enum import Enum
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
     ANALYSE_TEST_CASES = 2
+    DEBUG_TEST_CASES = 3
 
 verbose = False
 
@@ -18,11 +19,13 @@ verbose = False
 ################################################################################
 
 # THIS IS WHERE YOU CHANGE THE SETTING FOR RUNNING TEST CASES
-# To SAVE A GOLDEN FILE JUST COMMENT OUT SECOND LINE THEN UNCOMMENT IT FOR 
+# TO SAVE A GOLDEN FILE JUST COMMENT OUT SECOND LINE THEN UNCOMMENT IT FOR 
 # TESTING
 
+
 #globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
-globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
+#globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
+globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
 ################################################################################
 ################################################################################
@@ -59,11 +62,17 @@ class FinTestCases():
         rootFolder, moduleFilename = split(moduleName)
 
         self._carefulMode = False
+        self._verbose = False
 
         if mode in FinTestCaseMode:
             self._mode = mode
         else:
             raise ValueError("Unknown TestCase Mode")
+
+        if mode == FinTestCaseMode.DEBUG_TEST_CASES:
+            # Don't do anything
+            self._verbose = True
+            return
 
         self._moduleName = moduleFilename[0:-3]
         self._foldersExist = True
@@ -139,6 +148,10 @@ class FinTestCases():
     def print(self,*args):
         ''' Print comma separated output to the GOLDEN or COMPARE directory. '''
 
+        if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
+            print(args)
+            return
+
         if self._foldersExist == False:
             print("Cannot print as both GOLDEN and COMPARE folders do not exist")
             return
@@ -147,9 +160,6 @@ class FinTestCases():
             print("ERROR: Need to set header fields before printing results")
         elif len(self._headerFields) != len(args):
             print("ERROR: Number of headers must be the same as number of arguments")
-
-        if verbose:
-            print(args)
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename
@@ -171,12 +181,13 @@ class FinTestCases():
     def banner(self,txt):
         ''' Print a banner on a line to the GOLDEN or COMPARE directory. '''
 
+        if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
+            print(txt)
+            return
+
         if self._foldersExist == False:
             print("Cannot print as both GOLDEN and COMPARE folders do not exist")
             return
-
-        if verbose:
-            print(txt)
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename
@@ -196,14 +207,15 @@ class FinTestCases():
     def header(self,*args):
         ''' Print a header on a line to the GOLDEN or COMPARE directory. '''
 
+        if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
+            print(args)
+            return
+
         if self._foldersExist == False:
             print("Cannot print as both GOLDEN and COMPARE folders do not exist")
             return
 
         self._headerFields = args
-
-        if verbose:
-            print(args)
 
         if len(self._headerFields) == 0:
             print("ERROR: Number of header fields must be greater than 0")
@@ -304,6 +316,10 @@ class FinTestCases():
         ''' Compare output of COMPARE mode to GOLDEN output '''
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
+            # Do nothing 
+            return
+
+        if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
             # Do nothing 
             return
 

@@ -6,6 +6,9 @@ Created on Fri Nov 30 10:52:29 2018
 """
 # TODO Set up test cases correctly
 
+import sys
+sys.path.append("..//..")
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes

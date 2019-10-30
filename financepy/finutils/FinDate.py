@@ -18,6 +18,22 @@ monthDaysNotLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31]
 monthDaysLeapYear=[31,29,31,30,31,30,31,31,30,31,30,31]
 
 ###############################################################################
+# Date functions that are not class members but are useful
+###############################################################################
+
+
+def dailyWorkingDaySchedule(self,startDate,endDate):
+    dateList = []
+
+    dt = startDate
+    dateList.append(dt)
+    while dt < endDate:
+        dt = dt.addWorkDays(1)
+        dateList.append(dt)
+
+    return dateList
+
+###############################################################################
 
 class FinDate():
 
@@ -260,8 +276,9 @@ class FinDate():
 
         immDate = FinDate(y_imm, m_imm, d_imm)
         return immDate
-    
+
     ###########################################################################
+    # This should be moved out of the class
 
     def datediff(d1,d2):
         ''' Calculate the number of dates between two dates. '''
@@ -283,3 +300,5 @@ class FinDate():
         return dateStr
 
     ###########################################################################
+    ###########################################################################
+

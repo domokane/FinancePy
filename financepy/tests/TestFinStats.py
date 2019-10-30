@@ -5,6 +5,9 @@ Created on Mon Sep 09 14:31:53 2019
 @author: Dominic O'Kane
 """
 
+import sys
+sys.path.append("..//..")
+
 import time
 import numpy as np
 from math import sqrt

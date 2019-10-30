@@ -4,18 +4,16 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
+import sys
+sys.path.append("..//..")
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
 from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
-
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-
 from financepy.finutils.FinMath import ONE_MILLION
-
 from financepy.products.credit.FinCDS import FinCDS
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode

@@ -4,10 +4,10 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-# 
+import sys
+sys.path.append("..//..")
 
 from financepy.finutils.FinDate import FinDate
-
 from financepy.products.equities.FinBarrierOption import FinBarrierOption
 from financepy.products.equities.FinBarrierOption import FinBarrierTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
