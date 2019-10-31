@@ -89,7 +89,6 @@ class FinLiborSwaption():
         floatSpread = 0.0
         floatFreqType = FinFrequencyTypes.QUARTERLY
         floatDayCountType = FinDayCountTypes.THIRTY_360
-        firstFixing = 0.0
         payFixedFlag=True
 
         swap = FinLiborSwap(self._exerciseDate,
@@ -101,7 +100,6 @@ class FinLiborSwaption():
                             floatSpread, 
                             floatFreqType, 
                             floatDayCountType,
-                            firstFixing,
                             payFixedFlag,
                             self._calendarType,
                             self._busDayAdjustType,

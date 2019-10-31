@@ -39,7 +39,7 @@ class FinInterestRateFuture(object):
         self._lastSettlementDate = lastTradingDate.addDays(2)
         self._endOfInterestRatePeriod = lastTradingDate.addMonths(3)
 
-################################################################################
+###############################################################################
 
     def futuresRate(self,
                     settlementDate,
@@ -48,7 +48,7 @@ class FinInterestRateFuture(object):
         futuresRate = (100.0 - futuresPrice)/100.0
         return futuresRate
 
-################################################################################
+###############################################################################
 
     def convexity(self, 
                   settlementDate,

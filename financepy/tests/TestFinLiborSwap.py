@@ -175,17 +175,17 @@ def test_LiborSwap():
     swap.printFixedLeg(valuationDate)
     swap.printFloatLeg(valuationDate)
 
-    v_bbg = 388147
+    v_bbg = 388147.0
     testCases.header("LABEL","VALUE")
     testCases.print("SWAP_VALUE USING ONE_CURVE",v)
     testCases.print("BLOOMBERG VALUE",v_bbg)
     testCases.print("DIFFERENCE VALUE",v_bbg-v)
-    
 
     ''' Check calibration '''
     for swap in marketSwaps:
         v = swap.value(valuationDate,liborCurve,liborCurve,None)
         print(swap._maturityDate,v) 
+
 
 test_LiborSwap()
 testCases.compareTestCases()

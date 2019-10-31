@@ -24,8 +24,8 @@ verbose = False
 
 
 #globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
-#globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
-globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
+globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
+#globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
 ################################################################################
 ################################################################################

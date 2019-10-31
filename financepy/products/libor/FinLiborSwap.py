@@ -146,10 +146,10 @@ class FinLiborSwap(object):
 
 ################################################################################
 
-    def parCoupon(self, valuationDate, discountCurve ):
+    def parCoupon(self, valuationDate, discountCurve):
         ''' Calculate the fixed leg coupon that makes the swap worth zero. '''
 
-        pv01 = self.pv01(valuationDate,discountCurve,principal)
+        pv01 = self.pv01(valuationDate,discountCurve)
         df0 = discountCurve.df(valuationDate)
         dfT = discountCurve.df(self._maturityDate)        
         cpn = (df0 - dfT) / pv01 
@@ -228,6 +228,11 @@ class FinLiborSwap(object):
         while self._adjustedFloatDates[startIndex] < valuationDate:
             startIndex += 1
         
+        ''' If the swap has yet to settle then we do not include the 
+        start date of the swap as a coupon payment date. '''
+        if valuationDate <= self._startDate:
+            startIndex = 1
+
         self._floatStartIndex = startIndex
 
         ''' The first floating payment is usually already fixed so is 

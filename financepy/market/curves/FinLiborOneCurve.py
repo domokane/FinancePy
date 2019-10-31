@@ -110,6 +110,64 @@ class FinLiborOneCurve(FinDiscountCurve):
 
 #######################################################################
 
+    def buildCurve2(self,
+                  liborDeposits,
+                  liborFRAs,
+                  liborSwaps):
+        ''' Construct the discount curve using a bootstrap approach. '''
+
+        self._times = np.array([])
+        self._values = np.array([])
+
+        self._times = np.append(self._times,0.0)
+        self._values = np.append(self._values,1.0)
+
+        df = 1.0
+
+        for depo in liborDeposits:
+
+            tmat = (depo._maturityDate - depo._settlementDate) / gDaysInYear
+            dcc = FinDayCount(depo._dayCountType)
+            acc = dcc.yearFrac(depo._settlementDate,depo._maturityDate)
+            df = 1.0/(1.0 + acc * depo._depositRate)  # this is the interest x accrual
+
+            self._times = np.append(self._times,tmat)
+            self._values = np.append(self._values,df)
+            
+        for fra in liborFRAs:
+            pass
+
+        # calculate a grid of cashflow dates for all swaps
+        # they should lie on a regular grid with overlapping flow dates
+        # use linear interpolation of the swap rates to populate all maturity points
+        # build curve by iterating over maturity dates
+        for swap in liborSwaps:
+
+            swapRate = swap._fixedCoupon
+            maturityDate = swap._maturityDate
+            swapFrequencyType = swap._fixedFrequencyType
+            swapBasisType = swap._fixedDayCountType
+
+            liborSwapFixedLeg = FinLiborSwap(self._curveDate,
+                                             maturityDate,
+                                             swapRate,
+                                             swapFrequencyType,
+                                             swapBasisType)
+
+            argtuple = (self, self._curveDate, liborSwapFixedLeg)
+
+            tmat = (maturityDate - self._curveDate) / gDaysInYear
+
+            self._times = np.append(self._times,tmat)
+            self._values = np.append(self._values,df)
+
+            optimize.newton(f, x0=df, fprime=None, args=argtuple, 
+                            tol=1e-8, maxiter=100, fprime2=None)
+
+            df = self._values[-1]
+
+#######################################################################
+
     def fwd(self, date1, date2, dayCountType):
         ''' Calculate the forward rate according to the corresponding day count 
         convention. '''
