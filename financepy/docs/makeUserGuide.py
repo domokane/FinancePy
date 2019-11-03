@@ -5,6 +5,8 @@ Created on Tue Oct  3 15:55:21 2017
 @author: Dominic
 """
 
+import os, sys, subprocess
+
 VERSION=0.15
 
 fileName = "FinPyManualV_" + str(VERSION)
@@ -13,6 +15,15 @@ headFile = "./head.tex"
 tailFile = "./tail.tex"
 introFile = "./intro.tex"
 import glob
+
+################################################################################
+
+def open_file(filename):
+    if sys.platform == "win32":
+        os.startfile(filename)
+    else:
+        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.call([opener, filename])
 
 ################################################################################
 
@@ -444,4 +455,4 @@ if 1==1:
     os.system("pdflatex " + userGuideFileName)
     os.system("pdflatex " + userGuideFileName)
     
-    os.startfile(fileName+".pdf")
+    open_file(fileName+".pdf")
