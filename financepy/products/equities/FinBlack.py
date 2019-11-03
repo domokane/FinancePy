@@ -10,10 +10,11 @@ from scipy.stats import norm
 
 from ...finutils.FinMath import N
 
+
 class BlackModel():
 
-###############################################################################
-    
+    ##########################################################################
+
     def value(forwardRate,
               strikeRate,
               timeToExpiry,
@@ -21,27 +22,27 @@ class BlackModel():
               callOrPut):
 
         if strikeRate < 0:
-          raise Exception("Error: Negative strike")
+            raise Exception("Error: Negative strike")
 
         if strikeRate == 0.0:
-          strike = 1e-16;
+            strike = 1e-16
 
-        sqrtT = np.sqrt(timeToExpiry);
+        sqrtT = np.sqrt(timeToExpiry)
 
         d1 = np.log(forwardRate / strike) + sigma * sigma * timeToExpiry / 2
         d1 = d1 / (sigma * sqrtT)
         d2 = d1 - sigma * sqrtT
 
-        returnValue = 0.0;
+        returnValue = 0.0
 
         if callOrPut == "C":
-            returnValue = forwardRate * norm.cdf(d1) - strike * N(d2);
+            returnValue = forwardRate * norm.cdf(d1) - strike * N(d2)
         elif callOrPut == "P":
-            returnValue = strike * norm.cdf - forwardRate * N(-d1);
+            returnValue = strike * norm.cdf - forwardRate * N(-d1)
         else:
-          raise Exception("Option type must be a Call(C) or a Put(P)");
- 
-        return returnValue;
+            raise Exception("Option type must be a Call(C) or a Put(P)")
+
+        return returnValue
 
 ###############################################################################
 

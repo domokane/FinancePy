@@ -4,50 +4,47 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-from math import log
+
 import numpy as np
 from scipy import optimize
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDate import FinDate
-from ...finutils.FinInterpolate import interpolate, FinInterpMethods
+from ...finutils.FinInterpolate import FinInterpMethods
 from ...finutils.FinError import FinError
-from ...finutils.FinDayCount import FinDayCount
-
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from ...products.libor.FinLiborSwap import FinLiborSwap
-
 #######################################################################
+
 
 def f(df, *args):
     curve = args[0]
     valueDate = args[1]
     liborSwap = args[2]
-    numPoints = len(curve._times)    
-    curve._values[numPoints-1] = df
-    objFn = liborSwap.fixedLegValue(valueDate, curve, principal = 1.0) - 1.0
+    numPoints = len(curve._times)
+    curve._values[numPoints - 1] = df
+    objFn = liborSwap.fixedLegValue(valueDate, curve, principal=1.0) - 1.0
     return objFn
 
 ###############################################################################
 
+
 class FinLiborOneCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Libor deposits, 
-    FRAs and interest rate swaps. The curve date is the date on which we 
-    are performing the valuation based on the information available on the 
-    curve date. Typically it is the date on which an amount of $1 paid 
-    has a present value of $1. 
-    
-    This class inherits from FinDiscountCurve so has all of the methods 
+    ''' Constructs a discount curve as implied by the prices of Libor deposits,
+    FRAs and interest rate swaps. The curve date is the date on which we
+    are performing the valuation based on the information available on the
+    curve date. Typically it is the date on which an amount of $1 paid
+    has a present value of $1.
+
+    This class inherits from FinDiscountCurve so has all of the methods
     that class has. '''
 
-    def __init__(self, 
-                 name, 
-                 curveDate, 
+    def __init__(self,
+                 name,
+                 curveDate,
                  liborDeposits,
                  liborFRAs,
                  liborSwaps,
-                 interpMethod = FinInterpMethods.FLAT_FORWARDS ):
+                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
 
         self._name = name
         self._times = []
@@ -55,14 +52,14 @@ class FinLiborOneCurve(FinDiscountCurve):
         self._curveDate = curveDate
         self._interpMethod = interpMethod
 
-        self.buildCurve(liborDeposits,liborFRAs,liborSwaps)
+        self.buildCurve(liborDeposits, liborFRAs, liborSwaps)
 
     ######################################################################
 
     def validateInputs(self,
-                  liborDeposits,
-                  liborFRAs,
-                  liborSwaps):
+                       liborDeposits,
+                       liborFRAs,
+                       liborSwaps):
         ''' Construct the discount curve using a bootstrap approach. '''
 
         numDepos = len(liborDeposits)
@@ -93,7 +90,6 @@ class FinLiborOneCurve(FinDiscountCurve):
                 nextDt = swap._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Swaps must be in increasing maturity")
-
 
         # Now we have ensure they are in order check for overlaps and the like
 
@@ -126,48 +122,45 @@ class FinLiborOneCurve(FinDiscountCurve):
     #######################################################################
 
     def buildCurve(self,
-                  liborDeposits,
-                  liborFRAs,
-                  liborSwaps):
+                   liborDeposits,
+                   liborFRAs,
+                   liborSwaps):
         ''' Construct the discount curve using a bootstrap approach. '''
 
-        self.validateInputs(liborDeposits,liborFRAs,liborSwaps)
+        self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
 
         self._times = np.array([])
         self._values = np.array([])
 
-        # time zero is now. 
+        # time zero is now.
         df = 1.0
-        self._times = np.append(self._times,0.0)
-        self._values = np.append(self._values,df)
+        self._times = np.append(self._times, 0.0)
+        self._values = np.append(self._values, df)
 
         for depo in self._usedDeposits:
             tmat = (depo._maturityDate - self._curveDate) / gDaysInYear
             df = depo.df()
-            self._times = np.append(self._times,tmat)
-            self._values = np.append(self._values,df)
+            self._times = np.append(self._times, tmat)
+            self._values = np.append(self._values, df)
 
         for fra in self._usedFRAs:
             tMat = (fra._maturityDate - self._curveDate) / gDaysInYear
             dfMat = fra.maturityDf(self)
-            self._times = np.append(self._times,tMat)
-            self._values = np.append(self._values,dfMat)
+            self._times = np.append(self._times, tMat)
+            self._values = np.append(self._values, dfMat)
 
         for swap in self._usedSwaps:
-            swapRate = swap._fixedCoupon
             maturityDate = swap._maturityDate
-            swapFrequencyType = swap._fixedFrequencyType
-            swapBasisType = swap._fixedDayCountType
 
             argtuple = (self, self._curveDate, swap)
             tmat = (maturityDate - self._curveDate) / gDaysInYear
-            self._times = np.append(self._times,tmat)
-            self._values = np.append(self._values,df)
+            self._times = np.append(self._times, tmat)
+            self._values = np.append(self._values, df)
 
-            optimize.newton(f, x0=df, fprime=None, args=argtuple, 
+            optimize.newton(f, x0=df, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
 
             df = self._values[-1]
 
 
-################################################################################
+##########################################################################
