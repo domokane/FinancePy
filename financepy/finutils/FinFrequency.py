@@ -9,13 +9,15 @@ from . import FinError
 
 from enum import Enum
 
+
 class FinFrequencyTypes(Enum):
-    ANNUAL=1
+    ANNUAL = 1
     SEMI_ANNUAL = 2
     QUARTERLY = 3
-    MONTHLY=4
-    
+    MONTHLY = 4
+
 ###############################################################################
+
 
 def FinFrequency(frequencyType):
 

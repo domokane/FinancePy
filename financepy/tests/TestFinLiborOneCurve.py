@@ -13,50 +13,60 @@ import numpy as np
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+
+from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
+
+from financepy.finutils.FinGlobalVariables import gDaysInYear
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__,globalTestCaseMode)
 
-def test_FinLiborDepositsOnly(depoDCCType):
+def test_FinLiborDepositsOnly():
     
-    testCases.header("DEPO CONVENTION")
-    testCases.print(str(depoDCCType))
+    # I have used the following useful blog post by Ioannis Rigopoulos for this
+    # https://blog.deriscope.com/index.php/en/yield-curve-excel-quantlib-deposit
 
-    valuationDate = FinDate(2019,9,18)
+    valuationDate = FinDate(2018,2,23)
 
-    spotDays = 2
+    spotDays = 0
     settlementDate = valuationDate.addWorkDays(spotDays)
 
-    depositRate = 0.050
-
-    maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    maturityDate = settlementDate.addMonths(9)
-    depo5 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    maturityDate = settlementDate.addMonths(12)
-    depo6 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
+    depoDCCType = FinDayCountTypes.ACT_360
+    notional = 100.0
+    calendarType = FinCalendarTypes.TARGET
     depos = []
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-    depos.append(depo6)
+
+    # 1 month
+    depositRate = 0.04
+    maturityDate = settlementDate.addMonths(1)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, 
+                           depoDCCType, notional, calendarType)
+    depos.append(depo)
+
+    # 2 months
+    depositRate = 0.04
+    maturityDate = settlementDate.addMonths(2)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, 
+                           depoDCCType, notional, calendarType)
+    depos.append(depo)
+
+    # 6 months
+    depositRate = 0.04
+    maturityDate = settlementDate.addMonths(6)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, 
+                           depoDCCType, notional, calendarType)
+    depos.append(depo)
+
+    # 1 year
+    depositRate = 0.04
+    maturityDate = settlementDate.addMonths(12)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, 
+                           depoDCCType, notional, calendarType)
+    depos.append(depo)
 
     fras = []
     swaps = []
@@ -67,25 +77,87 @@ def test_FinLiborDepositsOnly(depoDCCType):
                                   fras, 
                                   swaps) 
 
+    liborCurve.print()
+
     testCases.header("DATE","DF")
 
-    for deposit in depos:
-        df = liborCurve.df(deposit._maturityDate)
-        testCases.print(str(deposit._maturityDate),df)
+    ''' Check calibration '''
+    for depo in depos:
+        v = depo.value(settlementDate, liborCurve )
+        print("DEPO:",depo._maturityDate,v) 
 
-    numSteps = 40
-    dt = 10/numSteps
-    times = np.linspace(0.0,10.0,numSteps+1)
+    times = []
+    dfs = []
 
-    testCases.header("DATE","DF","FWD")
+    dt = settlementDate
+    for i in range(0,11):
+        df = liborCurve.df(dt)
+        zero = liborCurve.zeroContinuous(dt)
+        fwd = liborCurve.fwdContinuous(dt)
+        t = (dt - settlementDate) / gDaysInYear
+        print(dt,"%10.7f"%t,"%10.7f"%df,"%10.7f"%zero,"%10.7f"%fwd)
+        dt = dt.addMonths(1)
 
-    df0 = 1.0
-    for t in times[1:]:
-        df1 = liborCurve.df(t)
-        fwd = (df0/df1-1.0)/dt
-        testCases.print(t,df1,fwd)
-        df0 = df1
-   
+###############################################################################
+
+def test_FinLiborFRAsOnly():
+    
+    valuationDate = FinDate(2018,2,23)
+
+    spotDays = 0
+    settlementDate = valuationDate.addWorkDays(spotDays)
+
+    depoDCCType = FinDayCountTypes.ACT_360
+    notional = 100.0
+
+    payFixed = True
+
+    calendarType = FinCalendarTypes.TARGET
+    fras = []
+
+    # 1 x 4 FRA
+    fraRate = 0.04
+    fraSettlementDate = settlementDate.addMonths(1)
+    fraMaturityDate = settlementDate.addMonths(4)
+    fra = FinLiborFRA(settlementDate, fraMaturityDate, fraRate, payFixed, 
+                           depoDCCType, notional, calendarType)
+    fras.append(fra)
+
+    # 4 x 7 FRA
+    fraRate = 0.04
+    fraSettlementDate = settlementDate.addMonths(4)
+    fraMaturityDate = settlementDate.addMonths(7)
+    fra = FinLiborFRA(settlementDate, fraMaturityDate, fraRate, payFixed,
+                           depoDCCType, notional, calendarType)
+    fras.append(fra)
+
+    depos = []
+    swaps = []
+
+    liborCurve = FinLiborOneCurve("USD_LIBOR", 
+                                  settlementDate, 
+                                  depos, 
+                                  fras, 
+                                  swaps) 
+
+    liborCurve.print()
+
+    testCases.header("DATE","DF")
+
+    ''' Check calibration '''
+    for fra in fras:
+        v = fra.value(settlementDate, liborCurve)
+        print("FRA:",fra._maturityDate,v) 
+
+    dt = settlementDate
+    for i in range(0,11):
+        df = liborCurve.df(dt)
+        zero = liborCurve.zeroContinuous(dt)
+        fwd = liborCurve.fwdContinuous(dt)
+        t = (dt - settlementDate) / gDaysInYear
+        print(dt,"%10.7f"%t,"%10.7f"%df,"%10.7f"%zero,"%10.7f"%fwd)
+        dt = dt.addMonths(1)
+
 ################################################################################
 
 def test_FinLiborDepositsAndSwaps():
@@ -100,29 +172,28 @@ def test_FinLiborDepositsAndSwaps():
  
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     maturityDate = settlementDate.addMonths(9)
-    depo5 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     maturityDate = settlementDate.addMonths(12)
-    depo6 = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
-
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-    depos.append(depo6)
+    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, depoDCCType)
+    depos.append(depo)
 
     fras = []
     
@@ -132,64 +203,64 @@ def test_FinLiborDepositsAndSwaps():
 
     swapRate = 0.05        
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap1)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap2)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(48)
-    swap3 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap3)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(60)
-    swap4 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap4)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(72)
-    swap5 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap5)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(84)
-    swap6 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap6)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(96)
-    swap7 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap7)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(108)
-    swap8 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap8)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
         
     maturityDate = settlementDate.addMonths(120)
-    swap9 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap9)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(132)
-    swap10 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap10)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(144)
-    swap11 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap11)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(180)
-    swap12 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap12)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(240)
-    swap13 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap13)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(300)
-    swap14 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap14)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(360)
-    swap15 = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
-    swaps.append(swap15)
+    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
+    swaps.append(swap)
     
     liborCurve = FinLiborOneCurve("USD_LIBOR", 
                                   settlementDate, 
@@ -208,18 +279,15 @@ def test_FinLiborDepositsAndSwaps():
         df = liborCurve.df(deposit._maturityDate)
         testCases.print(str(deposit._maturityDate),df)
 
-################################################################################
-
-depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
-test_FinLiborDepositsOnly(depoDCCType)
-
-depoDCCType = FinDayCountTypes.ACT_365_ISDA
-test_FinLiborDepositsOnly(depoDCCType)
-
-depoDCCType = FinDayCountTypes.ACT_ACT_ISDA
-test_FinLiborDepositsOnly(depoDCCType)
+    for swap in swaps:
+        df = liborCurve.df(deposit._maturityDate)
+        testCases.print(str(deposit._maturityDate),df)
 
 ################################################################################
+
+test_FinLiborDepositsOnly()
+test_FinLiborFRAsOnly()
 
 test_FinLiborDepositsAndSwaps()
+
 testCases.compareTestCases()

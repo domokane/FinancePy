@@ -16,40 +16,41 @@ from ...finutils.FinDate import dailyWorkingDaySchedule
 ###############################################################################
 ###############################################################################
 
+
 class FinOIS(object):
-    ''' Class for managing overnight index swaps. This is a swap contract in 
-    which a fixed payment leg is exchanged for a floating coupon leg. There 
-    is no exchange of par. 
-    
-    The contract lasts from a start date to a specified maturity date. The fixed coupon is 
-    the OIS fixed rate which is set at contract initiation. 
-    
-    The floating rate is not known until the end of each payment period. It is 
-    calculated at the end of the period as it is based on daily observations 
-    of the overnight index rate which are compounded according to a specific 
-    convention. Hence the OIS floating rate is determined by the history of the 
-    OIS rates. 
-    
-    In its simplest form, there is just one fixed rate payment and one floating 
-    rate payment at contract maturity. However when the contract becomes longer 
+    ''' Class for managing overnight index swaps. This is a swap contract in
+    which a fixed payment leg is exchanged for a floating coupon leg. There
+    is no exchange of par.
+
+    The contract lasts from a start date to a specified maturity date. The fixed coupon is
+    the OIS fixed rate which is set at contract initiation.
+
+    The floating rate is not known until the end of each payment period. It is
+    calculated at the end of the period as it is based on daily observations
+    of the overnight index rate which are compounded according to a specific
+    convention. Hence the OIS floating rate is determined by the history of the
+    OIS rates.
+
+    In its simplest form, there is just one fixed rate payment and one floating
+    rate payment at contract maturity. However when the contract becomes longer
     than one year the floating and fixed payments become periodic.
 
-    The value of the contract is the NPV of the two coupon streams. 
-    Discounting is done on a supplied OIS curve which is itself implied by 
+    The value of the contract is the NPV of the two coupon streams.
+    Discounting is done on a supplied OIS curve which is itself implied by
     the term structure of market OIS rates. '''
 
-    def __init__(self, 
-                 startDate, 
-                 maturityDate, 
+    def __init__(self,
+                 startDate,
+                 maturityDate,
                  fixedRate,
                  fixedFrequencyType,
                  fixedDayCountType,
-                 floatFrequencyType = FinFrequencyTypes.ANNUAL,
-                 floatDayCountType = FinDayCountTypes.ACT_360, 
-                 payFixedLeg = True, 
-                 notional = ONE_MILLION,
-                 calendarType = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType = FinBusDayConventionTypes.FOLLOWING,
+                 floatFrequencyType=FinFrequencyTypes.ANNUAL,
+                 floatDayCountType=FinDayCountTypes.ACT_360,
+                 payFixedLeg=True,
+                 notional=ONE_MILLION,
+                 calendarType=FinCalendarTypes.WEEKEND,
+                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create OIS object. '''
 
@@ -57,25 +58,37 @@ class FinOIS(object):
             raise ValueError("Start date after maturity date")
 
         if fixedDayCountType not in FinDayCountTypes:
-            raise ValueError("Unknown Fixed Day Count Rule type " + str(fixedDayCountType))
+            raise ValueError(
+                "Unknown Fixed Day Count Rule type " +
+                str(fixedDayCountType))
 
         if floatDayCountType not in FinDayCountTypes:
-            raise ValueError("Unknown Float Day Count Rule type " + str(floatDayCountType))
+            raise ValueError(
+                "Unknown Float Day Count Rule type " +
+                str(floatDayCountType))
 
         if fixedFrequencyType not in FinFrequencyTypes:
-            raise ValueError("Unknown Fixed Frequency type " + str(fixedFrequencyType))
+            raise ValueError(
+                "Unknown Fixed Frequency type " +
+                str(fixedFrequencyType))
 
         if floatFrequencyType not in FinFrequencyTypes:
-            raise ValueError("Unknown Float Frequency type " + str(fixedFrequencyType))
+            raise ValueError(
+                "Unknown Float Frequency type " +
+                str(fixedFrequencyType))
 
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
         if busDayAdjustType not in FinBusDayConventionTypes:
-            raise ValueError("Unknown Business Day Adjust type " + str(busDayAdjustType))
+            raise ValueError(
+                "Unknown Business Day Adjust type " +
+                str(busDayAdjustType))
 
         if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError("Unknown Date Gen Rule type " + str(dateGenRuleType))
+            raise ValueError(
+                "Unknown Date Gen Rule type " +
+                str(dateGenRuleType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate
@@ -108,19 +121,21 @@ class FinOIS(object):
 
     def generatePaymentDates(self, valueDate):
 
-        self._adjustedFixedDates = FinSchedule(self._startDate,
-                                               self._maturityDate,
-                                               self._fixedFrequencyType,
-                                               self._calendarType,
-                                               self._busDayAdjustType,
-                                               self._dateGenRuleType).generate()
+        self._adjustedFixedDates = FinSchedule(
+            self._startDate,
+            self._maturityDate,
+            self._fixedFrequencyType,
+            self._calendarType,
+            self._busDayAdjustType,
+            self._dateGenRuleType).generate()
 
-        self._adjustedFloatDates = FinSchedule(self._startDate,
-                                               self._maturityDate,
-                                               self._floatFrequencyType,
-                                               self._calendarType,
-                                               self._busDayAdjustType,
-                                               self._dateGenRuleType).generate()
+        self._adjustedFloatDates = FinSchedule(
+            self._startDate,
+            self._maturityDate,
+            self._floatFrequencyType,
+            self._calendarType,
+            self._busDayAdjustType,
+            self._dateGenRuleType).generate()
 
     ###########################################################################
 
@@ -132,7 +147,7 @@ class FinOIS(object):
         self._fixedFlows = []
         prevDt = valueDate
         for dt in self._adjustedFixedDates:
-            flow = dayCounter.yearFrac(prevDt,dt) * self._fixedRate
+            flow = dayCounter.yearFrac(prevDt, dt) * self._fixedRate
             self._fixedFlows.append(flow)
             prevDt = dt
 
@@ -151,9 +166,9 @@ class FinOIS(object):
         prevDt = valueDate
 
         for dt in self._adjustedFloatDates[1:]:
-            alpha = dayCounter.yearFrac(prevDt,dt)
+            alpha = dayCounter.yearFrac(prevDt, dt)
             df2 = indexCurve.df(dt)
-            flow =  (df1/df2-1.0) / alpha
+            flow = (df1 / df2 - 1.0) / alpha
             self._floatFlows.append(flow)
             prevDt = dt
 
@@ -169,29 +184,29 @@ class FinOIS(object):
         cmpd = 1.0
         dayCounter = FinDayCount(self._dayCountType)
 
-        for dt, fixing in zip(oisDates[1:],oisFixings[1:]):
-            alpha = dayCounter.yearFrac(prevDt,dt)
+        for dt, fixing in zip(oisDates[1:], oisFixings[1:]):
+            alpha = dayCounter.yearFrac(prevDt, dt)
             cmpd *= (1.0 + fixing * alpha)
 
-        alpha = dayCounter.yearFrac(oisDates[0],oisDates[-1])
+        alpha = dayCounter.yearFrac(oisDates[0], oisDates[-1])
         rate = (cmpd - 1.0) / alpha
         return rate
 
     ###########################################################################
 
     def value(self, valueDate, discountCurve):
-        ''' Value the interest rate swap on a value date given a single Libor 
+        ''' Value the interest rate swap on a value date given a single Libor
         discount curve. '''
         principal = 1.0
 
         fixedLegValue = self.fixedLegValue(valueDate,
-                                            discountCurve, 
-                                            principal)
+                                           discountCurve,
+                                           principal)
 
         floatLegValue = self.floatLegValue(valueDate,
-                                            discountCurve, 
-                                            discountCurve, 
-                                            principal)
+                                           discountCurve,
+                                           discountCurve,
+                                           principal)
 
         value = fixedLegValue - floatLegValue
 
@@ -202,10 +217,10 @@ class FinOIS(object):
 
     ###########################################################################
 
-    def fixedLegValue(self, valueDate, discountCurve, principal = 0.0):
+    def fixedLegValue(self, valueDate, discountCurve, principal=0.0):
 
         self.generateFixedLegFlows(self._startDate)
-        
+
         pv = 0.0
         df = 1.0
 
@@ -220,24 +235,24 @@ class FinOIS(object):
 
     ###########################################################################
 
-    def floatLegValue(self, 
-                          valueDate, 
-                          discountCurve, 
-                          indexCurve, 
-                          principal = 0.0 ):
-        ''' Value the floating leg with payments from an index curve and 
+    def floatLegValue(self,
+                      valueDate,
+                      discountCurve,
+                      indexCurve,
+                      principal=0.0):
+        ''' Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve. '''
         basis = FinDayCount(self._floatDayCountType)
 
         if self._floatFlows == []:
-            self.generateFloatLegFlows(valueDate,indexCurve)
+            self.generateFloatLegFlows(valueDate, indexCurve)
 
         dt1 = valueDate
         pv = 0.0
 
-        for dt2, flow in zip(self._adjustedFloatDates,self._floatFlows):
+        for dt2, flow in zip(self._adjustedFloatDates, self._floatFlows):
             df = discountCurve.df(dt2)
-            alpha = basis.yearFrac(dt1,dt2)
+            alpha = basis.yearFrac(dt1, dt2)
             pv += df * flow * alpha
             dt1 = dt2
 
@@ -246,14 +261,14 @@ class FinOIS(object):
 
     ########################################################################
 
-    def df(self, 
-           oisRate, 
-           startDate, 
+    def df(self,
+           oisRate,
+           startDate,
            endDate):
         ''' Calculate the OIS rate implied discount factor. '''
 
         df = 1.0
-        compoundingDates = dailyWorkingDaySchedule(startDate,endDate)
+        compoundingDates = dailyWorkingDaySchedule(startDate, endDate)
         prevDt = startDate
         for dt in compoundingDates[1:]:
             dayCount = dt - prevDt
@@ -264,25 +279,25 @@ class FinOIS(object):
     ###########################################################################
 
     def print(self, valueDate, indexCurve):
-        print("StartDate:",self._startDate)
-        print("MaturityDate:",self._maturityDate)
-        print("OISFixedRate:",self._fixedRate)
-        print("PayFixedLeg:",self._payFixedLeg)
-        print("Notional:",self._notional)
-        print("FixedDayCountType:",self._fixedDayCountType)
-        print("FixedFrequencyType:",self._fixedFrequencyType)
-        print("FloatDayCountType:",self._floatDayCountType)
-        print("FloatFrequencyType:",self._floatFrequencyType)
+        print("StartDate:", self._startDate)
+        print("MaturityDate:", self._maturityDate)
+        print("OISFixedRate:", self._fixedRate)
+        print("PayFixedLeg:", self._payFixedLeg)
+        print("Notional:", self._notional)
+        print("FixedDayCountType:", self._fixedDayCountType)
+        print("FixedFrequencyType:", self._fixedFrequencyType)
+        print("FloatDayCountType:", self._floatDayCountType)
+        print("FloatFrequencyType:", self._floatFrequencyType)
 
         self.generateFixedLegFlows(valueDate)
-        self.generateFloatLegFlows(valueDate,indexCurve)
+        self.generateFloatLegFlows(valueDate, indexCurve)
 
         print("Fixed Leg Flows")
         for dt in self._adjustedFixedDates:
             print(dt)
- 
+
         print("Floating Leg Flows")
         for dt in self._adjustedFloatDates:
             print(dt)
- 
-    ############################################################################
+
+    ##########################################################################

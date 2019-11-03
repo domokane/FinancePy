@@ -16,12 +16,14 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 
 ###############################################################################
 
+
 class FinInterestRateFuture(object):
     ''' Class for managing short term interest rate futures contracts. '''
 
-    # Reference https://www.cmegroup.com/education/files/eurodollar-futures-the-basics-file01.pdf
+    # Reference
+    # https://www.cmegroup.com/education/files/eurodollar-futures-the-basics-file01.pdf
 
-    def __init__(self, 
+    def __init__(self,
                  lastTradingDate,
                  dayCountType,
                  contractSize):
@@ -45,43 +47,43 @@ class FinInterestRateFuture(object):
                     settlementDate,
                     futuresPrice):
         ''' Calculate implied futures rate from the futures price.'''
-        futuresRate = (100.0 - futuresPrice)/100.0
+        futuresRate = (100.0 - futuresPrice) / 100.0
         return futuresRate
 
 ###############################################################################
 
-    def convexity(self, 
+    def convexity(self,
                   settlementDate,
-                  volatility, 
+                  volatility,
                   a):
-        ''' Calculation of the convexity adjustment between FRAs and interest 
+        ''' Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note. '''
 
         # Technical note
         # http://www-2.rotman.utoronto.ca/~hull/TechnicalNotes/TechnicalNote1.pdf
 
-        t1 = (self._lastTradingDate - settlementDate)/gDaysInYear
-        t2 = (self._endOfInterestRatePeriod - settlementDate)/gDaysInYear
+        t1 = (self._lastTradingDate - settlementDate) / gDaysInYear
+        t2 = (self._endOfInterestRatePeriod - settlementDate) / gDaysInYear
 
         # Hull White model for short rate dr = (theta(t)-ar) dt + sigma * dz
-        # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide 
+        # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide
         # this numnerical limit
         if abs(a) > 1e-10:
-            bt1t2 = (1.0-exp(-a*(t2-t1)))/a
-            b0t1 = (1.0-exp(-a*t1))/a
-            term = bt1t2 * (1.0-exp(-2.0*a*t1)) + 2.0 * a * (b0t1**2)
-            c = bt1t2 * term * (volatility**2) /(t2-t1) / 4.0 / a
-            
-            term = (t2-t1)*2.0*a*t1+2.0*a*t1
-            c = (t2-t1)*term*(volatility**2)/(t2-t1)/4.0/a
+            bt1t2 = (1.0 - exp(-a * (t2 - t1))) / a
+            b0t1 = (1.0 - exp(-a * t1)) / a
+            term = bt1t2 * (1.0 - exp(-2.0 * a * t1)) + 2.0 * a * (b0t1**2)
+            c = bt1t2 * term * (volatility**2) / (t2 - t1) / 4.0 / a
+
+            term = (t2 - t1) * 2.0 * a * t1 + 2.0 * a * t1
+            c = (t2 - t1) * term * (volatility**2) / (t2 - t1) / 4.0 / a
         else:
-            c = t1 * t2 * (volatility**2)/2.0
+            c = t1 * t2 * (volatility**2) / 2.0
 
         return c
 
-################################################################################
+##########################################################################
 
     def print(self):
         print("")
 
-################################################################################
+##########################################################################

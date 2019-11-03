@@ -10,6 +10,7 @@ from ...finutils.FinSchedule import schedule
 
 ###############################################################################
 
+
 class FinLiborSwap(object):
 
     def __init__(self, startDate, endDate,
@@ -22,7 +23,7 @@ class FinLiborSwap(object):
                  dateGenRule="BACKWARD"):
 
         self.payFixedLeg = payFixedFlag
-                
+
         self.fixedLeg = FinLiborSwapFixedLeg(startDate,
                                              endDate,
                                              fixedCoupon,
@@ -64,11 +65,10 @@ class FinLiborSwap(object):
 
 ###############################################################################
 
-
     def dump(self):
         self.fixedLeg.dump()
 #        self.floatLeg.dump()
-                
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -102,11 +102,11 @@ class FinLiborSwapFixedLeg(object):
                                  dateGenRule)
 
         self.generateFlows(self.basis)
-        
+
 ###############################################################################
 
     def value(self, valueDate, discountCurve):
-        
+
         df = discountCurve.df(valueDate)
 
         pv = 0.0
@@ -137,28 +137,28 @@ class FinLiborSwapFixedLeg(object):
 
         numFlows = len(self.flows)
 
-        self.flows[numFlows-1].amount += 1.0
-                
+        self.flows[numFlows - 1].amount += 1.0
+
         self.dump()
 
 ########################################################################
 
     def dump(self):
 
-#        print "###################################################"
+        #        print "###################################################"
 
-#        print "Swap Fixed Leg DUMP"
-        
+        #        print "Swap Fixed Leg DUMP"
+
         if len(self.flows) < 1:
             print("Flows not calculated")
             return
-        
+
         for flow in self.flows:
 
             flow.dump()
 
 #        print "###################################################"
-            
+
 ###############################################################################
 ########################################################################
 ########################################################################
@@ -185,14 +185,14 @@ class FinLiborSwapFloatLeg(object):
         self.firstFixing = firstFixing
 
         self.schedule = schedule(startDate,
-                                  endDate,
-                                  floatFreq,
-                                  calendarName,
-                                  businessDateAdjust,
-                                  dateGenRule)
-        
+                                 endDate,
+                                 floatFreq,
+                                 calendarName,
+                                 businessDateAdjust,
+                                 dateGenRule)
+
         self.flows = []
-        
+
 ######################################################################
 
     def value(self, valueDate, discountCurve, indexCurve):
@@ -207,7 +207,7 @@ class FinLiborSwapFloatLeg(object):
             pv += df * flow.amount
 
         self.dump()
-        
+
         pv = pv / z0
         return pv
 
@@ -222,53 +222,53 @@ class FinLiborSwapFloatLeg(object):
         prevCpnDate = self.schedule[0]
 
         df1 = 1.0
-        
+
         for dt in self.schedule[1:]:
 
             accruedPeriod = yearfrac(prevCpnDate, dt, self.basis)
 
             df2 = indexCurve.df(dt)
 
-            liborFwd = (df1/df2-1.0) / accruedPeriod
-            amount = accruedPeriod * liborFwd 
+            liborFwd = (df1 / df2 - 1.0) / accruedPeriod
+            amount = accruedPeriod * liborFwd
             flow = FinFlow(dt, amount)
             self.flows.append(flow)
-            
+
             prevCpnDate = dt
- 
+
             df1 = df2
 
         numFlows = len(self.flows)
 
-        self.flows[numFlows-1].amount += 1.0
+        self.flows[numFlows - 1].amount += 1.0
 
 ###############################################################################
 
     def dump(self):
 
-#        print "###################################################")
-        
+        #        print "###################################################")
+
         if len(self.flows) < 2:
             print("Flows not calculated")
             return
-        
+
         for flow in self.flows:
 
             flow.dump()
-                        
+
 ########################################################################
 ########################################################################
+
 
 if __name__ == '__main__':
 
-    print("==================================================================")    
+    print("==================================================================")
     print("SEMI-ANNUAL FREQUENCY")
-    print("==================================================================")    
+    print("==================================================================")
 
-    d1 = FinDate(20,6,2018)
-    d2 = FinDate(20,6,2028)
+    d1 = FinDate(20, 6, 2018)
+    d2 = FinDate(20, 6, 2028)
     frequency = FinFrequency(2)
     calendar = FinCalendar("WEEKEND")
     businessDateAdjust = "FOLLOWING"
     dateGenRule = "BACKWARD"
-    

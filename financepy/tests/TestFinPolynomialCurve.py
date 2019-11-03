@@ -5,35 +5,36 @@ Created on Fri Apr 08 09:26:27 2016
 @author: Dominic O'Kane
 """
 
+from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.FinPolynomialCurve import FinPolynomialCurve
+import numpy as np
 import sys
 sys.path.append("..//..")
 
-################################################################################
+##########################################################################
 # TODO
 # Inherit from FinCurve and add df method
 # Put in a convention for the rate
 # Use Frequency object
-################################################################################
+##########################################################################
 
 
-import numpy as np
 #import matplotlib.pyplot as plt
 
-from financepy.market.curves.FinPolynomialCurve import FinPolynomialCurve
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-testCases = FinTestCases(__file__,globalTestCaseMode)
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
-def test_FinPolynomialCurve(): 
-    
-    times = np.linspace(0.0,10.0,5)
 
-    curve1 = FinPolynomialCurve(1.,0.,0.,0.)
+def test_FinPolynomialCurve():
+
+    times = np.linspace(0.0, 10.0, 5)
+
+    curve1 = FinPolynomialCurve(1., 0., 0., 0.)
     factor1loading = curve1.zero(times)
-    curve2 = FinPolynomialCurve(1.,1.,0.,0.)
+    curve2 = FinPolynomialCurve(1., 1., 0., 0.)
     factor2loading = curve2.zero(times)
-    curve3 = FinPolynomialCurve(1.,1.,1.,0)
+    curve3 = FinPolynomialCurve(1., 1., 1., 0)
     factor3loading = curve3.zero(times)
-    curve4 = FinPolynomialCurve(1.,1.,1.,1.)
+    curve4 = FinPolynomialCurve(1., 1., 1., 1.)
     factor4loading = curve4.zero(times)
 
     testCases.header("FACTOR LOADING")

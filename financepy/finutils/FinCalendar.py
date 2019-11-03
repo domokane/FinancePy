@@ -6,6 +6,7 @@ Created on Sat Feb 06 07:26:46 2016
 """
 
 #from .FinMath import FinMath
+from enum import Enum
 from .FinDate import FinDate
 from .FinError import FinError
 
@@ -40,53 +41,57 @@ easterMondayDay = [98, 90, 103, 95, 114, 106, 91, 111, 102, 87,
                    108, 92, 112, 104, 89, 108, 100, 85, 105, 96,
                    116, 101, 93, 112, 97, 89, 109, 100, 85, 105]
 
-from enum import Enum
 
 class FinBusDayConventionTypes(Enum):
-    NONE=1
-    FOLLOWING=2
-    MODIFIED_FOLLOWING=3
-    PRECEDING=4
-    MODIFIED_PRECEDING=5
-    
+    NONE = 1
+    FOLLOWING = 2
+    MODIFIED_FOLLOWING = 3
+    PRECEDING = 4
+    MODIFIED_PRECEDING = 5
+
+
 class FinCalendarTypes(Enum):
-    TARGET=1
-    US=2
-    UK=3
-    NONE=4
-    WEEKEND=5
-    
+    TARGET = 1
+    US = 2
+    UK = 3
+    NONE = 4
+    WEEKEND = 5
+
+
 class FinDateGenRuleTypes(Enum):
-    FORWARD=1
-    BACKWARD=2
-    
-################################################################################
-    
+    FORWARD = 1
+    BACKWARD = 2
+
+##########################################################################
+
+
 class FinCalendar(object):
 
-    ''' Class to manage designation of payment dates as holidays according to a 
+    ''' Class to manage designation of payment dates as holidays according to a
     calendar convention specified by the user. '''
 
     def __init__(self, calendarType):
         ''' Create a calendar based on a specified calendar type. '''
 
         if calendarType not in FinCalendarTypes:
-            raise FinError("Need to pass FinCalendarType and not " + str(calendarType))
+            raise FinError(
+                "Need to pass FinCalendarType and not " +
+                str(calendarType))
 
         self._type = calendarType
 
     ###########################################################################
-    
-    def adjust(self, dt, busDayConventionType ):
-        ''' Adjust a payment date if it falls on a holiday according to the 
+
+    def adjust(self, dt, busDayConventionType):
+        ''' Adjust a payment date if it falls on a holiday according to the
         specified business day convention. '''
 
         m = dt._m
 
         if busDayConventionType == FinBusDayConventionTypes.NONE:
-        
+
             return dt
-        
+
         elif busDayConventionType == FinBusDayConventionTypes.FOLLOWING:
 
             # step forward until we find a business day
@@ -101,7 +106,7 @@ class FinCalendar(object):
             while self.isBusinessDay(dt) is False:
                 dt = dt.addDays(1)
 
-            # if the business day is in a different month look back 
+            # if the business day is in a different month look back
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
             if dt._m != m:
@@ -112,7 +117,7 @@ class FinCalendar(object):
 
         elif busDayConventionType == FinBusDayConventionTypes.PRECEDING:
 
-            # if the business day is in the next month look back 
+            # if the business day is in the next month look back
             # for previous first business day one day at a time
             while self.isBusinessDay(dt) is False:
                 dt.addDays(-1)
@@ -125,7 +130,7 @@ class FinCalendar(object):
             while self.isBusinessDay(dt) is False:
                 dt.addDays(-1)
 
-            # if the business day is in a different month look forward 
+            # if the business day is in a different month look forward
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
             if dt._m != m:
@@ -134,14 +139,16 @@ class FinCalendar(object):
 
             return dt
         else:
-            raise FinError("Unknown adjustment convention",str(busDayConventionType))
+            raise FinError(
+                "Unknown adjustment convention",
+                str(busDayConventionType))
 
         return dt
 
 ###############################################################################
 
     def isBusinessDay(self, dt):
-        ''' Determines if a date is a business day according to the calendar. '''
+        ''' Determines if a date is a business day according to calendar. '''
 
         y = dt._y
         m = dt._m
@@ -153,14 +160,14 @@ class FinCalendar(object):
 
         weekday = dt._weekday
 
-        em = easterMondayDay[y-1901]
+        em = easterMondayDay[y - 1901]
 
         if dt.isWeekend() is True:
             return False
 
         if self._type == FinCalendarTypes.NONE:
             return True
-        
+
         if self._type == FinCalendarTypes.WEEKEND:
             return True
 
@@ -287,11 +294,12 @@ class FinCalendar(object):
 ###############################################################################
 
     def easterMonday(self, y):
-        ''' Get the day in a givenm year that is Easter Monday. This is not easy 
-        to compute so we rely on a pre-calculated array. '''
+        ''' Get the day in a givenm year that is Easter Monday. This is not
+        easy to compute so we rely on a pre-calculated array. '''
 
         if y > 2100:
-            raise FinError("Unable to determine Easter monday in year " + str(y))
+            raise FinError(
+                "Unable to determine Easter monday in year " + str(y))
 
         easterMonday = easterMondayDay[y - 1901]
         return easterMonday

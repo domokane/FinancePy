@@ -59,8 +59,8 @@ def f(q, *args):
     self = args[0]
     valueDate = args[1]
     cds = args[2]
-    numPoints = len(self._times)    
-    self._values[numPoints-1] = q  
+    numPoints = len(self._times)
+    self._values[numPoints-1] = q
     # This is important - we calibrate a curve that makes the clean PV of the 
     # CDS equal to zero and so we select the second element of the value tuple
     objFn = cds.value(valueDate, self)[1]    

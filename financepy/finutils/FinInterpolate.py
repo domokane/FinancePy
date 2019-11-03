@@ -7,27 +7,27 @@ Created on Sun Feb 07 14:31:53 2016
 from math import exp, log, fabs
 from numba import njit, float64, int64
 
-################################################################################
+###############################################################################
 
 from enum import Enum
 
+
 class FinInterpMethods(Enum):
-    PIECEWISE_LINEAR=1
-    PIECEWISE_LOG_LINEAR=2
-    FLAT_FORWARDS=3
+    PIECEWISE_LINEAR = 1
+    PIECEWISE_LOG_LINEAR = 2
+    FLAT_FORWARDS = 3
 
-################################################################################
+###############################################################################
 
-@njit(float64(float64,float64[:],float64[:],int64),
-      fastmath=True,cache=True,nogil=True)
+@njit(float64(float64, float64[:], float64[:], int64),
+      fastmath=True, cache=True, nogil=True)
 def interpolate(xValue,
                 xvector,
                 yvector,
                 method):
-
-    ''' Return the interpolated value of y given x and a vector of x and y. 
-    The values of x must be monotonic and increasing. The different schemes for 
-    interpolation are linear in y (as a function of x), linear in log(y) and 
+    ''' Return the interpolated value of y given x and a vector of x and y.
+    The values of x must be monotonic and increasing. The different schemes for
+    interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. '''
 
     small = 1e-10
@@ -37,7 +37,7 @@ def interpolate(xValue,
         return yvector[0]
 
     i = 0
-    while xvector[i] < xValue and i < numPoints-1:
+    while xvector[i] < xValue and i < numPoints - 1:
         i = i + 1
 
     if xValue > xvector[i]:
@@ -48,7 +48,7 @@ def interpolate(xValue,
     ###########################################################################
     # linear interpolation of y(x)
     ###########################################################################
-    
+
     if method == FinInterpMethods.PIECEWISE_LINEAR.value:
 
         if i == 0:
@@ -56,14 +56,15 @@ def interpolate(xValue,
         elif i < numPoints:
             y1 = yvector[i - 1]
             y2 = yvector[i]
-            yvalue = (xvector[i] - xValue) * y1 + (xValue - xvector[i - 1]) * y2
-            yvalue = yvalue / (xvector[i]-xvector[i - 1])
+            yvalue = (xvector[i] - xValue) * y1 + \
+                (xValue - xvector[i - 1]) * y2
+            yvalue = yvalue / (xvector[i] - xvector[i - 1])
         else:
             y1 = yvector[i - 2]
             y2 = yvector[i - 1]
-            slope = (y2-y1)/(xvector[i-1] - xvector[i-2])
-            yvalue = yvector[i-1] + slope * (xValue - xvector[i-1])
-        
+            slope = (y2 - y1) / (xvector[i - 1] - xvector[i - 2])
+            yvalue = yvector[i - 1] + slope * (xValue - xvector[i - 1])
+
         return yvalue
 
     ###########################################################################
@@ -80,7 +81,8 @@ def interpolate(xValue,
         elif i < numPoints:
             y1 = -log(yvector[i - 1] + small)
             y2 = -log(yvector[i] + small)
-            yvalue = (xvector[i] - xValue) * y1 + (xValue - xvector[i - 1]) * y2
+            yvalue = (xvector[i] - xValue) * y1 + \
+                (xValue - xvector[i - 1]) * y2
             yvalue = yvalue / (xvector[i] - xvector[i - 1])
             yvalue = exp(-yvalue)
         else:
@@ -88,7 +90,7 @@ def interpolate(xValue,
             y2 = yvector[i - 1]
             yvalue = -log(y2 / y1) / (xvector[i - 1] - xvector[i - 2])
             yvalue = y2 * exp(-(xValue - xvector[i - 1]) * yvalue)
-    
+
         return yvalue
 
     elif method == FinInterpMethods.FLAT_FORWARDS.value:
@@ -99,15 +101,15 @@ def interpolate(xValue,
             yvalue = exp(-yvalue)
         elif i < numPoints:
             # If you get a math domain error it is because you need negativ
-            fwd = log(yvector[i-1]/(yvector[i]+small))
-            fwd = fwd /(xvector[i] - xvector[i-1]) 
-            yvalue = yvector[i-1] * exp( - fwd * (xValue - xvector[i-1]))
+            fwd = log(yvector[i - 1] / (yvector[i] + small))
+            fwd = fwd / (xvector[i] - xvector[i - 1])
+            yvalue = yvector[i - 1] * exp(-fwd * (xValue - xvector[i - 1]))
         else:
             y1 = yvector[i - 2]
             y2 = yvector[i - 1]
-            fwd = -log(y1/y2)
-            fwd = fwd /(xvector[i-2] - xvector[i-1]) 
-            yvalue = y2 * exp( - fwd * (xValue - xvector[i-1]))
+            fwd = -log(y1 / y2)
+            fwd = fwd / (xvector[i - 2] - xvector[i - 1])
+            yvalue = y2 * exp(-fwd * (xValue - xvector[i - 1]))
 
         return yvalue
 
@@ -115,4 +117,3 @@ def interpolate(xValue,
         return 0.0
 
 ###############################################################################
-

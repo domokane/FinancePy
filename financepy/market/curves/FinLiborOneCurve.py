@@ -4,36 +4,42 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-
+from math import log
 import numpy as np
 from scipy import optimize
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDate import FinDate
-from ...finutils.FinInterpolate import interpolate
-from ...finutils.FinInterpolate import FinInterpMethods
+from ...finutils.FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
+
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+
 from ...products.libor.FinLiborSwap import FinLiborSwap
 
 #######################################################################
 
 def f(df, *args):
-    self = args[0]
+    curve = args[0]
     valueDate = args[1]
     liborSwap = args[2]
-    numPoints = len(self._times)    
-    self._values[numPoints-1] = df
-    objFn = liborSwap.fixedLegValue(valueDate, self, principal = 1.0) - 1.0
+    numPoints = len(curve._times)    
+    curve._values[numPoints-1] = df
+    objFn = liborSwap.fixedLegValue(valueDate, curve, principal = 1.0) - 1.0
     return objFn
 
 ###############################################################################
 
 class FinLiborOneCurve(FinDiscountCurve):
     ''' Constructs a discount curve as implied by the prices of Libor deposits, 
-    futures and interest rate swaps. 
-    TODO: Complete the addition of interest rate futures and add OIS '''
+    FRAs and interest rate swaps. The curve date is the date on which we 
+    are performing the valuation based on the information available on the 
+    curve date. Typically it is the date on which an amount of $1 paid 
+    has a present value of $1. 
+    
+    This class inherits from FinDiscountCurve so has all of the methods 
+    that class has. '''
 
     def __init__(self, 
                  name, 
@@ -41,20 +47,83 @@ class FinLiborOneCurve(FinDiscountCurve):
                  liborDeposits,
                  liborFRAs,
                  liborSwaps,
-                 interpolationMethod = FinInterpMethods.FLAT_FORWARDS ):
+                 interpMethod = FinInterpMethods.FLAT_FORWARDS ):
 
         self._name = name
         self._times = []
         self._values = []
         self._curveDate = curveDate
-        self._interpolationMethod = interpolationMethod
+        self._interpMethod = interpMethod
 
-        self.buildCurve(
+        self.buildCurve(liborDeposits,liborFRAs,liborSwaps)
+
+    ######################################################################
+
+    def validateInputs(self,
                   liborDeposits,
                   liborFRAs,
-                  liborSwaps)
+                  liborSwaps):
+        ''' Construct the discount curve using a bootstrap approach. '''
 
-######################################################################
+        numDepos = len(liborDeposits)
+        numFRAs = len(liborFRAs)
+        numSwaps = len(liborSwaps)
+
+        if numDepos + numFRAs + numSwaps == 0:
+            raise FinError("No calibration instruments.")
+
+        # Validation of the inputs.
+        if numDepos != 0:
+            prevDt = liborDeposits[0]._maturityDate
+            for depo in liborDeposits[1:]:
+                nextDt = depo._maturityDate
+                if nextDt <= prevDt:
+                    raise FinError("Deposits must be in increasing maturity")
+
+        if numFRAs != 0:
+            prevDt = liborFRAs[0]._maturityDate
+            for fra in liborFRAs[1:]:
+                nextDt = fra._maturityDate
+                if nextDt <= prevDt:
+                    raise FinError("FRAs must be in increasing maturity")
+
+        if numSwaps != 0:
+            prevDt = liborSwaps[0]._maturityDate
+            for swap in liborSwaps[1:]:
+                nextDt = swap._maturityDate
+                if nextDt <= prevDt:
+                    raise FinError("Swaps must be in increasing maturity")
+
+
+        # Now we have ensure they are in order check for overlaps and the like
+
+        if numDepos > 0:
+            firstDepositMaturityDate = liborDeposits[0]._maturityDate
+            lastDepositMaturityDate = liborDeposits[-1]._maturityDate
+        else:
+            firstDepositMaturityDate = self._curveDate
+            lastDepositMaturityDate = self._curveDate
+
+        if numFRAs > 0:
+            firstFRAMaturityDate = liborFRAs[0]._maturityDate
+            lastFRAMaturityDate = liborFRAs[-1]._maturityDate
+        else:
+            firstFRAMaturityDate = self._curveDate
+            lastFRAMaturityDate = self._curveDate
+
+        if numSwaps > 0:
+            firstSwapMaturityDate = liborSwaps[0]._maturityDate
+            lastSwapMaturityDate = liborSwaps[-1]._maturityDate
+        else:
+            firstSwapMaturityDate = self._curveDate
+            lastSwapMaturityDate = self._curveDate
+
+        # Now determine which instruments are used
+        self._usedDeposits = liborDeposits
+        self._usedFRAs = liborFRAs
+        self._usedSwaps = liborSwaps
+
+    #######################################################################
 
     def buildCurve(self,
                   liborDeposits,
@@ -62,44 +131,36 @@ class FinLiborOneCurve(FinDiscountCurve):
                   liborSwaps):
         ''' Construct the discount curve using a bootstrap approach. '''
 
+        self.validateInputs(liborDeposits,liborFRAs,liborSwaps)
+
         self._times = np.array([])
         self._values = np.array([])
 
-        self._times = np.append(self._times,0.0)
-        self._values = np.append(self._values,1.0)
-
+        # time zero is now. 
         df = 1.0
+        self._times = np.append(self._times,0.0)
+        self._values = np.append(self._values,df)
 
-        for depo in liborDeposits:
-
-            tmat = (depo._maturityDate - depo._settlementDate) / gDaysInYear
-            dcc = FinDayCount(depo._dayCountType)
-            acc = dcc.yearFrac(depo._settlementDate,depo._maturityDate)
-            df = 1.0/(1.0 + acc * depo._depositRate)  # this is the interest x accrual
-
+        for depo in self._usedDeposits:
+            tmat = (depo._maturityDate - self._curveDate) / gDaysInYear
+            df = depo.df()
             self._times = np.append(self._times,tmat)
             self._values = np.append(self._values,df)
-            
-        for fra in liborFRAs:
-            pass
 
-        for swap in liborSwaps:
+        for fra in self._usedFRAs:
+            tMat = (fra._maturityDate - self._curveDate) / gDaysInYear
+            dfMat = fra.maturityDf(self)
+            self._times = np.append(self._times,tMat)
+            self._values = np.append(self._values,dfMat)
 
+        for swap in self._usedSwaps:
             swapRate = swap._fixedCoupon
             maturityDate = swap._maturityDate
             swapFrequencyType = swap._fixedFrequencyType
             swapBasisType = swap._fixedDayCountType
 
-            liborSwapFixedLeg = FinLiborSwap(self._curveDate,
-                                             maturityDate,
-                                             swapRate,
-                                             swapFrequencyType,
-                                             swapBasisType)
-
-            argtuple = (self, self._curveDate, liborSwapFixedLeg)
-
+            argtuple = (self, self._curveDate, swap)
             tmat = (maturityDate - self._curveDate) / gDaysInYear
-
             self._times = np.append(self._times,tmat)
             self._values = np.append(self._values,df)
 
@@ -108,107 +169,5 @@ class FinLiborOneCurve(FinDiscountCurve):
 
             df = self._values[-1]
 
-#######################################################################
-
-    def buildCurve2(self,
-                  liborDeposits,
-                  liborFRAs,
-                  liborSwaps):
-        ''' Construct the discount curve using a bootstrap approach. '''
-
-        self._times = np.array([])
-        self._values = np.array([])
-
-        self._times = np.append(self._times,0.0)
-        self._values = np.append(self._values,1.0)
-
-        df = 1.0
-
-        for depo in liborDeposits:
-
-            tmat = (depo._maturityDate - depo._settlementDate) / gDaysInYear
-            dcc = FinDayCount(depo._dayCountType)
-            acc = dcc.yearFrac(depo._settlementDate,depo._maturityDate)
-            df = 1.0/(1.0 + acc * depo._depositRate)  # this is the interest x accrual
-
-            self._times = np.append(self._times,tmat)
-            self._values = np.append(self._values,df)
-            
-        for fra in liborFRAs:
-            pass
-
-        # calculate a grid of cashflow dates for all swaps
-        # they should lie on a regular grid with overlapping flow dates
-        # use linear interpolation of the swap rates to populate all maturity points
-        # build curve by iterating over maturity dates
-        for swap in liborSwaps:
-
-            swapRate = swap._fixedCoupon
-            maturityDate = swap._maturityDate
-            swapFrequencyType = swap._fixedFrequencyType
-            swapBasisType = swap._fixedDayCountType
-
-            liborSwapFixedLeg = FinLiborSwap(self._curveDate,
-                                             maturityDate,
-                                             swapRate,
-                                             swapFrequencyType,
-                                             swapBasisType)
-
-            argtuple = (self, self._curveDate, liborSwapFixedLeg)
-
-            tmat = (maturityDate - self._curveDate) / gDaysInYear
-
-            self._times = np.append(self._times,tmat)
-            self._values = np.append(self._values,df)
-
-            optimize.newton(f, x0=df, fprime=None, args=argtuple, 
-                            tol=1e-8, maxiter=100, fprime2=None)
-
-            df = self._values[-1]
-
-#######################################################################
-
-    def fwd(self, date1, date2, dayCountType):
-        ''' Calculate the forward rate according to the corresponding day count 
-        convention. '''
-
-        if date1 < self._curveDate:
-            raise FinError("Date " + str(date1) + " before curve value date " + str(self._curveDate))
-
-        if date2 < date1:
-            raise FinError("Date2 before Date1")
-
-        dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1,date2)
-
-        df1 = self.df(date1)
-        df2 = self.df(date2)
-        
-        fwd = (df1/df2-1.0)/yearFrac
-
-        return fwd
-
-################################################################################
-
-    def df(self, t):
-        ''' Determine the discount factor by interpolation. '''
-
-        if type(t) is FinDate:
-            t = (t - self._curveDate)/gDaysInYear
-
-        df = interpolate(t, 
-                         self._times,
-                         self._values,
-                         self._interpolationMethod.value)
-        return df
-
-################################################################################
-
-    def print(self):
-        ''' Print the details '''
-        numPoints = len(self._times)
-        
-        for i in range(0,numPoints):
-            print(self._times[i], self._values[i])
 
 ################################################################################

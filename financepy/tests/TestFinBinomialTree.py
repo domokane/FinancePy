@@ -5,18 +5,18 @@ Created on Sun Jul 21 10:04:57 2019
 @author: Dominic
 """
 
+from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.equities.FinBinomialTree import FinBinomialTree, FinTreeExerciseTypes, FinTreePayoffTypes
+from financepy.products.equities.FinVanillaOption import FinVanillaOption
+from financepy.products.equities.FinOption import FinOptionTypes, FinOptionModelTypes
+from financepy.finutils.FinDate import FinDate
+import numpy as np
+import time
 import sys
 sys.path.append("..//..")
 
-import time
-import numpy as np
 
-from financepy.finutils.FinDate import FinDate
-from financepy.products.equities.FinOption import FinOptionTypes, FinOptionModelTypes
-from financepy.products.equities.FinVanillaOption import FinVanillaOption
-from financepy.products.equities.FinBinomialTree import FinBinomialTree, FinTreeExerciseTypes, FinTreePayoffTypes
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-testCases = FinTestCases(__file__,globalTestCaseMode)
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_FinBinomialTree():
@@ -25,101 +25,198 @@ def test_FinBinomialTree():
     riskFreeRate = 0.06
     dividendYield = 0.04
     volatility = 0.40
-                
+
     strikePrice = 50.0
-    valueDate = FinDate(2016,1,1)
-    expiryDate = FinDate(2017,1,1)
-    
-    numStepsList = [100,500,1000,2000,5000]
-    
+    valueDate = FinDate(2016, 1, 1)
+    expiryDate = FinDate(2017, 1, 1)
+
+    numStepsList = [100, 500, 1000, 2000, 5000]
+
     modelType = FinOptionModelTypes.BLACKSCHOLES
     modelParams = (volatility)
 
     testCases.banner("================== EUROPEAN PUT =======================")
-    
-    putOption = FinVanillaOption(expiryDate, strikePrice, FinOptionTypes.EUROPEAN_PUT)
-    value = putOption.value(valueDate, stockPrice,  riskFreeRate, dividendYield, modelType, modelParams)
-    delta = putOption.delta(valueDate, stockPrice,  riskFreeRate, dividendYield, modelType, modelParams)
-    gamma = putOption.gamma(valueDate, stockPrice,  riskFreeRate, dividendYield, modelType, modelParams)
-    theta = putOption.theta(valueDate, stockPrice,  riskFreeRate, dividendYield, modelType, modelParams)
-    testCases.header("BS Value","BS Delta","BS Gamma","BS Theta")
-    testCases.print(value,delta,gamma,theta)
-    
+
+    putOption = FinVanillaOption(
+        expiryDate,
+        strikePrice,
+        FinOptionTypes.EUROPEAN_PUT)
+    value = putOption.value(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    delta = putOption.delta(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    gamma = putOption.gamma(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    theta = putOption.theta(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
+    testCases.print(value, delta, gamma, theta)
+
     payoff = FinTreePayoffTypes.VANILLA_OPTION
     exercise = FinTreeExerciseTypes.EUROPEAN
-    params = np.array([-1,strikePrice])
+    params = np.array([-1, strikePrice])
 
-    testCases.header("NumSteps","Results","TIME")
-    
+    testCases.header("NumSteps", "Results", "TIME")
+
     for numSteps in numStepsList:
         start = time.time()
         tree = FinBinomialTree()
-        results = tree.value(stockPrice, riskFreeRate, dividendYield, volatility,
-                             numSteps, valueDate, payoff, expiryDate, payoff, exercise, params)    
+        results = tree.value(
+            stockPrice,
+            riskFreeRate,
+            dividendYield,
+            volatility,
+            numSteps,
+            valueDate,
+            payoff,
+            expiryDate,
+            payoff,
+            exercise,
+            params)
         end = time.time()
-        duration = end-start
-        testCases.print(numSteps,results,duration)
-    
+        duration = end - start
+        testCases.print(numSteps, results, duration)
+
     testCases.banner("================== AMERICAN PUT =======================")
-    
+
     payoff = FinTreePayoffTypes.VANILLA_OPTION
     exercise = FinTreeExerciseTypes.AMERICAN
-    params = np.array([-1,strikePrice])
-    
-    testCases.header("NumSteps","Results","TIME")
+    params = np.array([-1, strikePrice])
+
+    testCases.header("NumSteps", "Results", "TIME")
 
     for numSteps in numStepsList:
         start = time.time()
         tree = FinBinomialTree()
-        results = tree.value(stockPrice, riskFreeRate, dividendYield, volatility,
-                             numSteps, valueDate, payoff, expiryDate, payoff, exercise, params)    
+        results = tree.value(
+            stockPrice,
+            riskFreeRate,
+            dividendYield,
+            volatility,
+            numSteps,
+            valueDate,
+            payoff,
+            expiryDate,
+            payoff,
+            exercise,
+            params)
         end = time.time()
-        duration = end-start
-        testCases.print(numSteps,results,duration)
-        
-    testCases.banner("================== EUROPEAN CALL =======================")
-    
-    callOption = FinVanillaOption(expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valueDate, stockPrice, riskFreeRate, dividendYield, modelType, modelParams)
-    delta = callOption.delta(valueDate, stockPrice, riskFreeRate, dividendYield, modelType, modelParams)
-    gamma = callOption.gamma(valueDate, stockPrice, riskFreeRate, dividendYield, modelType, modelParams)
-    theta = callOption.theta(valueDate, stockPrice, riskFreeRate, dividendYield, modelType, modelParams)
-    testCases.header("BS Value","BS Delta","BS Gamma","BS Theta")
-    testCases.print(value,delta,gamma,theta)
-    
+        duration = end - start
+        testCases.print(numSteps, results, duration)
+
+    testCases.banner(
+        "================== EUROPEAN CALL =======================")
+
+    callOption = FinVanillaOption(
+        expiryDate,
+        strikePrice,
+        FinOptionTypes.EUROPEAN_CALL)
+    value = callOption.value(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    delta = callOption.delta(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    gamma = callOption.gamma(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    theta = callOption.theta(
+        valueDate,
+        stockPrice,
+        riskFreeRate,
+        dividendYield,
+        modelType,
+        modelParams)
+    testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
+    testCases.print(value, delta, gamma, theta)
+
     payoff = FinTreePayoffTypes.VANILLA_OPTION
     exercise = FinTreeExerciseTypes.EUROPEAN
-    params = np.array([1.0,strikePrice])
-    
-    testCases.header("NumSteps","Results","TIME")
+    params = np.array([1.0, strikePrice])
+
+    testCases.header("NumSteps", "Results", "TIME")
     for numSteps in numStepsList:
         start = time.time()
         tree = FinBinomialTree()
-    
-        results = tree.value(stockPrice, riskFreeRate, dividendYield, volatility,
-                             numSteps, valueDate, payoff, expiryDate, payoff, exercise, params)    
-        
+
+        results = tree.value(
+            stockPrice,
+            riskFreeRate,
+            dividendYield,
+            volatility,
+            numSteps,
+            valueDate,
+            payoff,
+            expiryDate,
+            payoff,
+            exercise,
+            params)
+
         end = time.time()
-        duration = end-start
-        testCases.print(numSteps,results,duration)
-    
-    testCases.banner("================== AMERICAN CALL =======================")
-    
+        duration = end - start
+        testCases.print(numSteps, results, duration)
+
+    testCases.banner(
+        "================== AMERICAN CALL =======================")
+
     payoff = FinTreePayoffTypes.VANILLA_OPTION
     exercise = FinTreeExerciseTypes.AMERICAN
-    params = np.array([1.0,strikePrice])
-    
-    testCases.header("NumSteps","Results","TIME")
+    params = np.array([1.0, strikePrice])
+
+    testCases.header("NumSteps", "Results", "TIME")
     for numSteps in numStepsList:
         start = time.time()
         tree = FinBinomialTree()
-    
-        results = tree.value(stockPrice, riskFreeRate, dividendYield, volatility,
-                             numSteps, valueDate, payoff, expiryDate, payoff, exercise, params)    
-        
+
+        results = tree.value(
+            stockPrice,
+            riskFreeRate,
+            dividendYield,
+            volatility,
+            numSteps,
+            valueDate,
+            payoff,
+            expiryDate,
+            payoff,
+            exercise,
+            params)
+
         end = time.time()
-        duration = end-start
-        testCases.print(numSteps,results,duration)
- 
+        duration = end - start
+        testCases.print(numSteps, results, duration)
+
+
 test_FinBinomialTree()
 testCases.compareTestCases()

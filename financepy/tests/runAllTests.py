@@ -10,8 +10,8 @@ modules = glob.glob(join(dirname(__file__), "TestFin*.py"))
 for moduleFileName in modules:
 
     l = moduleFileName.find("\\TestFin")
-    moduleTextName = moduleFileName[l+1:-3]
+    moduleTextName = moduleFileName[l + 1:-3]
 
     print("====================================================================")
-    print("TEST CASE ANALYSIS OF MODULE: ",moduleTextName)
+    print("TEST CASE ANALYSIS OF MODULE: ", moduleTextName)
     moduleName = __import__(moduleTextName)

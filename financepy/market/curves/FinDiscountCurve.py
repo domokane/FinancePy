@@ -12,15 +12,17 @@ from ...finutils.FinInterpolate import interpolate
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
+from ...finutils.FinDayCount import FinDayCount
 
-################################################################################
+##########################################################################
+
 
 class FinDiscountCurve():
 
-    def __init__(self, 
-                 curveDate, 
-                 times, 
-                 values, 
+    def __init__(self,
+                 curveDate,
+                 times,
+                 values,
                  interpMethod):
 
         # Validate curve
@@ -31,21 +33,21 @@ class FinDiscountCurve():
             raise FinError("Times and Values are not the same")
 
         num_times = len(times)
-        
+
         if times[0] < 0.0:
             raise FinError("First time is negative")
 
-        for i in range(1,num_times):
+        for i in range(1, num_times):
 
-            if times[i] <= times[i-1]:
+            if times[i] <= times[i - 1]:
                 raise FinError("Times are not sorted in increasing order")
-            
+
         self._curveDate = curveDate
         self._times = np.array(times)
         self._values = np.array(values)
         self._interpMethod = interpMethod
 
-################################################################################
+##########################################################################
 
     def df(self, time):
 
@@ -54,18 +56,26 @@ class FinDiscountCurve():
         else:
             t = time
 
-        return interpolate(t, self._times, self._values, self._interpMethod.value)
+        return interpolate(
+            t,
+            self._times,
+            self._values,
+            self._interpMethod.value)
 
-################################################################################
-        
+##########################################################################
+
     def survivalProbability(self, time):
-        
+
         if type(time) is FinDate:
             t = (time._excelDate - self._curveDate._excelDate) / gDaysInYear
-        else: 
+        else:
             t = time
-            
-        return interpolate(t, self._times, self._values, self._interpMethod.value)
+
+        return interpolate(
+            t,
+            self._times,
+            self._values,
+            self._interpMethod.value)
 
 ###############################################################################
 
@@ -76,12 +86,12 @@ class FinDiscountCurve():
             raise FinError("Date is before curve value date.")
 
         # I add on a tiny amount just in case maturity = curve date
-        tau = (maturityDate - self._curveDate)/gDaysInYear + 0.00000001
+        tau = (maturityDate - self._curveDate) / gDaysInYear + 0.00000001
         df = self.df(maturityDate)
-        zeroRate = -log(df)/tau
+        zeroRate = -log(df) / tau
         return zeroRate
 
-################################################################################
+##########################################################################
 
     def fwdContinuous(self, forwardDate):
         ''' Calculate the continuous forward rate at the forward date. '''
@@ -92,27 +102,30 @@ class FinDiscountCurve():
         tau = (forwardDate - self._curveDate)
         dt = 0.000001
         df1 = self.df(tau)
-        df2 = self.df(tau+dt)
-        fwd = log(df1/df2)/dt
+        df2 = self.df(tau + dt)
+        fwd = log(df1 / df2) / dt
         return fwd
 
-################################################################################
+##########################################################################
 
     def fwdLibor(self, date1, date2, dayCountType):
-        ''' Calculate the Libor forward rate according to the corresponding 
+        ''' Calculate the Libor forward rate according to the corresponding
         day count convention. '''
 
         if date1 < self._curveDate:
-            raise FinError("Date " + str(date1) + " before curve value date " + str(self._curveDate))
+            raise FinError("Date " +
+                           str(date1) +
+                           " before curve value date " +
+                           str(self._curveDate))
 
         if date2 < date1:
             raise FinError("Date2 before Date1")
 
         dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1,date2)
+        yearFrac = dayCount.yearFrac(date1, date2)
         df1 = self.df(date1)
         df2 = self.df(date2)
-        fwd = (df1/df2-1.0)/yearFrac
+        fwd = (df1 / df2 - 1.0) / yearFrac
         return fwd
 
 #######################################################################
@@ -124,5 +137,5 @@ class FinDiscountCurve():
 
         print("TIMES", "DISCOUNT FACTORS")
 
-        for i in range(0,numPoints):
-            print("%10.7f"%self._times[i], "%10.7f"% self._values[i])
+        for i in range(0, numPoints):
+            print("%10.7f" % self._times[i], "%10.7f" % self._values[i])

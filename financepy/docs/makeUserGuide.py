@@ -5,76 +5,83 @@ Created on Tue Oct  3 15:55:21 2017
 @author: Dominic
 """
 
-import os, sys, subprocess
+import glob
+import os
+import sys
+import subprocess
 
-VERSION=0.15
+VERSION = 0.15
 
-fileName = "FinPyManualV_" + str(VERSION)
+fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
 introFile = "./intro.tex"
-import glob
 
-################################################################################
+##########################################################################
+
 
 def open_file(filename):
     if sys.platform == "win32":
         os.startfile(filename)
     else:
-        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
-################################################################################
+##########################################################################
+
 
 def buildHead():
-    ''' Start latex file with a header that sets all of the document 
+    ''' Start latex file with a header that sets all of the document
     properties. '''
 
-    f = open(headFile,'r')
+    f = open(headFile, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName,'w')
+    f = open(userGuideFileName, 'w')
     f.writelines(lines)
     f.close()
 
-################################################################################
+##########################################################################
+
 
 def buildTail():
     ''' Add on end latex to close document. '''
-    f = open(tailFile,'r')
+    f = open(tailFile, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName,'a')
+    f = open(userGuideFileName, 'a')
     f.writelines(lines)
     f.close()
 
-################################################################################
+##########################################################################
+
 
 def buildIntro():
     ''' Add on end latex to close document. '''
-    f = open(introFile,'r')
+    f = open(introFile, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName,'a')
+    f = open(userGuideFileName, 'a')
     f.writelines(lines)
     f.close()
 
-################################################################################
+##########################################################################
+
 
 def buildChapter(foldername):
-    ''' Parse a folder by loading up all of the modules in that folder that 
+    ''' Parse a folder by loading up all of the modules in that folder that
     start with Fin. '''
 
     readMeFile = foldername + "//" + "README.txt"
-    f = open(readMeFile,'r')
+    f = open(readMeFile, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName,'a')
+    f = open(userGuideFileName, 'a')
     f.write("\n")
     f.writelines("\\chapter{" + foldername + "}")
     f.write("\n")
@@ -88,7 +95,7 @@ def buildChapter(foldername):
 
     for module in modules:
         moduleName = module.split("\\")[-1]
-        f = open(userGuideFileName,'a')
+        f = open(userGuideFileName, 'a')
         f.write("\\newpage\n")
         f.write("\\section{" + moduleName[0:-3] + "}\n")
         f.write("\n")
@@ -99,7 +106,7 @@ def buildChapter(foldername):
 
     for module in modules:
         moduleName = module.split("\\")[-1]
-        f = open(userGuideFileName,'a')
+        f = open(userGuideFileName, 'a')
         f.write("\n")
         f.write("\\newpage\n")
         f.write("\\section{" + moduleName[0:-3] + "}\n")
@@ -107,21 +114,21 @@ def buildChapter(foldername):
         f.close()
         parseModule(module)
 
-################################################################################
+##########################################################################
+
 
 def parseModule(moduleName):
-
-    ''' Parse a module looking for classes, functions and classes for 
+    ''' Parse a module looking for classes, functions and classes for
     enumerated types. Functions inside classes are parsed inside the class. '''
 
-    f = open(moduleName,'r')
+    f = open(moduleName, 'r')
     lines = f.readlines()
     f.close()
 
     numEnums = 0
     numClasses = 0
     numFunctions = 0
-    
+
     startEnumLines = []
     startClassLines = []
     startFunctionLines = []
@@ -129,19 +136,19 @@ def parseModule(moduleName):
     # Module level classes and functions
     numRows = len(lines)
 
-    for rowNum in range(0,numRows):
+    for rowNum in range(0, numRows):
 
         line = lines[rowNum]
 
-        if line.find("class",0,5) != -1 and line.find("Enum") != -1:
+        if line.find("class", 0, 5) != -1 and line.find("Enum") != -1:
             numEnums += 1
             startEnumLines.append(rowNum)
 
-        if line.find("class",0,5) != -1 and line.find("Enum") == -1:
+        if line.find("class", 0, 5) != -1 and line.find("Enum") == -1:
             numClasses += 1
             startClassLines.append(rowNum)
 
-        if line.find("def",0,4) != -1:
+        if line.find("def", 0, 4) != -1:
             numFunctions += 1
             startFunctionLines.append(rowNum)
 
@@ -149,24 +156,27 @@ def parseModule(moduleName):
     startClassLines.append(numRows)
     startFunctionLines.append(numRows)
 
-    print("startClassLines",startClassLines)
+    print("startClassLines", startClassLines)
 
-    f = open(userGuideFileName,'a')
+    f = open(userGuideFileName, 'a')
 
-    for c in range(0,numEnums):
-        newLines = parseEnum(lines,startEnumLines[c],startEnumLines[c+1])
-
-        for newLine in newLines:
-            f.writelines(newLine)
-
-    for c in range(0,numClasses):
-        newLines = parseClass(lines,startClassLines[c],startClassLines[c+1])
+    for c in range(0, numEnums):
+        newLines = parseEnum(lines, startEnumLines[c], startEnumLines[c + 1])
 
         for newLine in newLines:
             f.writelines(newLine)
 
-    for c in range(0,numFunctions):
-        newLines = parseFunction(lines,startFunctionLines[c],startFunctionLines[c+1],False)
+    for c in range(0, numClasses):
+        newLines = parseClass(lines,
+                              startClassLines[c],
+                              startClassLines[c + 1])
+
+        for newLine in newLines:
+            f.writelines(newLine)
+
+    for c in range(0, numFunctions):
+        newLines = parseFunction(
+            lines, startFunctionLines[c], startFunctionLines[c + 1], False)
 
         for newLine in newLines:
             f.writelines(newLine)
@@ -175,20 +185,21 @@ def parseModule(moduleName):
 
     f.close()
 
-################################################################################
+##########################################################################
 
-def parseClass(lines,startLine,endLine):
-    ''' Parse a Python class consisting of data members and function methods. '''
+
+def parseClass(lines, startLine, endLine):
+    ''' Parse a Python class consisting of data members and functions. '''
 
     n1 = lines[startLine].find("class")
 
     newLines = []
-       
-    className = lines[startLine].split(" ")[1]
-    className = className.replace(":","")
-    className = className.replace("\n","")
 
-    print(className,startLine,endLine)
+    className = lines[startLine].split(" ")[1]
+    className = className.replace(":", "")
+    className = className.replace("\n", "")
+
+    print(className, startLine, endLine)
 
     newLines.append("\\subsection{Class: " + className + "}")
     newLines.append("\n")
@@ -201,45 +212,45 @@ def parseClass(lines,startLine,endLine):
     endCommentRow = endLine
     commentEndLine = endLine
 
-    for rowNum in range(startLine,endLine):
+    for rowNum in range(startLine, endLine):
         line = lines[rowNum]
         if line.find(" def ") > 0:
             commentEndLine = rowNum
-            print("End Comment Row",rowNum)
+            print("End Comment Row", rowNum)
             break
 
     classComment = ""
     startComment = False
     endComment = False
 
-    for rowNum in range(startLine,commentEndLine):
+    for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
         if line.find("'''") > 0:
             startCommentRow = rowNum
             startComment = True
-            startLine = rowNum+1
+            startLine = rowNum + 1
             break
 
-    for rowNum in range(startLine,commentEndLine):
+    for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
         if line.find("'''") > 0:
             endCommentRow = rowNum
             endComment = True
             break
 
-    if startComment == True and endComment == False:
+    if startComment is False and endComment is False:
         # assume it's a one-line comment
         endCommentRow = startCommentRow
         endComment = True
 
-    if endComment == True:
-        print(startCommentRow,endCommentRow)
-        for rowNum in range(startCommentRow,endCommentRow+1):
+    if endComment:
+        print(startCommentRow, endCommentRow)
+        for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
-            line = line.replace("'","")
-            line = line.replace("_","\_")
-            line = line.replace("\n","")
-            line = line.replace("#","\#")
+            line = line.replace("'", "")
+            line = line.replace("_", r"\_")
+            line = line.replace("\n", "")
+            line = line.replace("#", r"\#")
             line = line.lstrip()
             classComment += line
 
@@ -254,13 +265,13 @@ def parseClass(lines,startLine,endLine):
 
     dataMembers = set()
 
-    for rowNum in range(startLine,endLine):
+    for rowNum in range(startLine, endLine):
         row = lines[rowNum]
-        row = row.replace(" ","")
-        row = row.replace("_","\_")
-        row = row.replace("!","")
-        row = row.replace("<","")
-        row = row.replace(">","")
+        row = row.replace(" ", "")
+        row = row.replace("_", r"\_")
+        row = row.replace("!", "")
+        row = row.replace("<", "")
+        row = row.replace(">", "")
 
         n1 = row.find("self.")
         n2 = row.find("=")
@@ -291,56 +302,60 @@ def parseClass(lines,startLine,endLine):
     numClassFunctions = 0
     startClassFunctionLines = []
 
-    print(startLine,endLine)
-    for rowNum in range(startLine,endLine):
+    print(startLine, endLine)
+    for rowNum in range(startLine, endLine):
 
         line = lines[rowNum]
 
         if line.find(" def ") != -1:
-            numClassFunctions +=1
+            numClassFunctions += 1
             startClassFunctionLines.append(rowNum)
 
     startClassFunctionLines.append(endLine)
 
-    for c in range(0,numClassFunctions):
-        newLines += parseFunction(lines,startClassFunctionLines[c],startClassFunctionLines[c+1],True)
+    for c in range(0, numClassFunctions):
+        newLines += parseFunction(lines,
+                                  startClassFunctionLines[c],
+                                  startClassFunctionLines[c + 1],
+                                  True)
         newLines += "\n"
 
     return newLines
 
-################################################################################
+##########################################################################
 
-def parseFunction(lines,startLine,endLine,classFlag):
-    ''' Given a set of lines and a start line I extract the function definiton 
-    and any comment that goes below. 
+
+def parseFunction(lines, startLine, endLine, classFlag):
+    ''' Given a set of lines and a start line I extract the function definiton
+    and any comment that goes below.
     TODO: Add parsing of function arguments and any comments.'''
-    
+
     functionLine = lines[startLine]
     leftCol = functionLine.find("def ")
     n2 = functionLine.find("(")
-    functionName = functionLine[leftCol+4:n2]
-    functionName = functionName.replace("_","\_")
+    functionName = functionLine[leftCol + 4:n2]
+    functionName = functionName.replace("_", r"\_")
 
     # Ensure function stops before any class
-    for rowNum in range(startLine+1,endLine):
+    for rowNum in range(startLine + 1, endLine):
         line = lines[rowNum]
         if line.find("class ") >= 0:
-            endLine = rowNum #update start line to after function signature
+            endLine = rowNum  # update start line to after function signature
             break
 
     # Ensure function stops before any other function
-    for rowNum in range(startLine+1,endLine):
+    for rowNum in range(startLine + 1, endLine):
         line = lines[rowNum]
         if line.find("def ") >= 0:
-            endLine = rowNum #update start line to after function signature
+            endLine = rowNum  # update start line to after function signature
             break
 
     functionSignature = ""
-    for rowNum in range(startLine,endLine):
+    for rowNum in range(startLine, endLine):
         line = lines[rowNum]
         functionSignature += str(line)
         if line.find(":") >= 0:
-            startLine = rowNum #update start line to after function signature
+            startLine = rowNum  # update start line to after function signature
             break
 
     functionComment = ""
@@ -349,42 +364,44 @@ def parseFunction(lines,startLine,endLine,classFlag):
     startComment = False
     endComment = False
 
-    for rowNum in range(startLine,endLine):
+    for rowNum in range(startLine, endLine):
         line = lines[rowNum]
         if line.find("'''") > 0:
             startCommentRow = rowNum
             startComment = True
-            startLine = rowNum+1
+            startLine = rowNum + 1
             break
 
-    for rowNum in range(startLine,endLine):
+    for rowNum in range(startLine, endLine):
         line = lines[rowNum]
         if line.find("'''") > 0:
             endCommentRow = rowNum
             endComment = True
             break
 
-    if startComment == True and endComment == False:
+    if startComment is False and endComment is False:
         # assume it's a one-line comment
         endCommentRow = startCommentRow
         endComment = True
 
-    if endComment == True:
-        print(startCommentRow,endCommentRow)
-        for rowNum in range(startCommentRow,endCommentRow+1):
+    if endComment:
+        print(startCommentRow, endCommentRow)
+        for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
-            line = line.replace("_","\_")
-            line = line.replace("'","")
-            line = line.replace("\n","")
-            line = line.replace("#","\#")
+            line = line.replace("_", r"\_")
+            line = line.replace("'", "")
+            line = line.replace("\n", "")
+            line = line.replace("#", r"\#")
             line = line.lstrip()
             functionComment += line
 
     # LATEX FORMATTING
-    if classFlag == True:
-        functionDescription = "\\subsection{Class Method {\it " + functionName + "}}\n"
+    if classFlag:
+        functionDescription = r"\subsection{Class Method {\it " + \
+            functionName + "}}\n"
     else:
-        functionDescription = "\\subsection{Function {\it " + functionName + "}}\n"
+        functionDescription = r"\subsection{Function {\it " + \
+            functionName + "}}\n"
 
     functionDescription += functionComment + "\n"
     functionDescription += "\n"
@@ -395,25 +412,26 @@ def parseFunction(lines,startLine,endLine,classFlag):
     print(functionDescription)
     return functionDescription
 
-################################################################################
+##########################################################################
 
-def parseEnum(lines,startLine,endLine):
+
+def parseEnum(lines, startLine, endLine):
     ''' Parse a Class that implements an Enumerated type. '''
-    enumDescription = [] 
+    enumDescription = []
 
     enumLine = lines[startLine]
     n1 = enumLine.find("class")
     n2 = enumLine.find("(")
-    enumName = enumLine[n1+5:n2]
+    enumName = enumLine[n1 + 5:n2]
 
     enumTypes = []
-    for rowNum in range(startLine+1,endLine):
+    for rowNum in range(startLine + 1, endLine):
         line = lines[rowNum]
-        line = line.replace(" ","")
+        line = line.replace(" ", "")
         n = line.find("=")
         if n != -1:
             enumType = line[0:n]
-            enumType = enumType.replace("_","\_")
+            enumType = enumType.replace("_", r"\_")
             enumTypes.append(enumType)
         else:
             break
@@ -431,7 +449,8 @@ def parseEnum(lines,startLine,endLine):
 
     return enumDescription
 
-################################################################################
+##########################################################################
+
 
 buildHead()
 buildIntro()
@@ -449,10 +468,7 @@ buildChapter("..//tests")
 buildChapter("..//docs")
 buildTail()
 
-if 1==1:
-    import os
+if 1 == 1:
     # Do it twice for the TOC
     os.system("pdflatex " + userGuideFileName)
-    os.system("pdflatex " + userGuideFileName)
-    
-    open_file(fileName+".pdf")
+    open_file(fileName + ".pdf")

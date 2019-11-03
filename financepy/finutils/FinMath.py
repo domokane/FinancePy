@@ -16,33 +16,36 @@ ONE_MILLION = 1000000
 TEN_MILLION = 10000000
 ONE_BILLION = 1000000000
 
-################################################################################
+##########################################################################
 
-@njit(boolean(int64),fastmath=True, cache=True)
+
+@njit(boolean(int64), fastmath=True, cache=True)
 def isLeapYear(y):
     ''' Test whether year y is a leap year and if so return True, else False '''
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
     return leapYear
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
-def scale(x,factor):
+def scale(x, factor):
     ''' Scale all of the elements of an array by the same amount factor. '''
-    for i in range(0,len(x)):
-        x[i]=x[i] * factor
+    for i in range(0, len(x)):
+        x[i] = x[i] * factor
     return x
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
-def maximum(a,b):
-    ''' Determine the maximum of two values a and b. 
+def maximum(a, b):
+    ''' Determine the maximum of two values a and b.
     TODO: Add Numba function signature and test speed versus Numpy. '''
     n = len(a)
     out = [0.0] * n
 
-    for i in range(0,n):
+    for i in range(0, n):
         if a[i] > b[i]:
             out[i] = a[i]
         else:
@@ -52,19 +55,20 @@ def maximum(a,b):
 
 ###############################################################################
 
-@njit(float64[:](float64[:,:]),fastmath=True,cache=True)
+
+@njit(float64[:](float64[:, :]), fastmath=True, cache=True)
 def maxaxis(s):
-    ''' Perform a search for the vector of maximum values over an axis of a 
+    ''' Perform a search for the vector of maximum values over an axis of a
     2D Numpy Array '''
 
     shp = s.shape
 
     maxVector = np.empty(shp[0])
 
-    for i in range(0,shp[0]):
-        xmax = s[i,0]
-        for j in range(1,shp[1]):
-            x = s[i,j]
+    for i in range(0, shp[0]):
+        xmax = s[i, 0]
+        for j in range(1, shp[1]):
+            x = s[i, j]
             if x > xmax:
                 xmax = x
 
@@ -74,18 +78,19 @@ def maxaxis(s):
 
 ###############################################################################
 
-@njit(float64[:](float64[:,:]),fastmath=True,cache=True)
+
+@njit(float64[:](float64[:, :]), fastmath=True, cache=True)
 def minaxis(s):
-    ''' Perform a search for the vector of minimum values over an axis of a 
+    ''' Perform a search for the vector of minimum values over an axis of a
     2D Numpy Array '''
     shp = s.shape
 
     minVector = np.empty(shp[0])
 
-    for i in range(0,shp[0]):
-        xmin = s[i,0]
-        for j in range(1,shp[1]):
-            x = s[i,j]
+    for i in range(0, shp[0]):
+        xmin = s[i, 0]
+        for j in range(1, shp[1]):
+            x = s[i, j]
             if x < xmin:
                 xmin = x
 
@@ -93,12 +98,13 @@ def minaxis(s):
 
     return minVector
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
-def covar(a,b):
-    ''' Calculate the Covariance of two arrays of numbers. 
-    TODO: check that this works well for Numpy Arrays and add NUMBA function 
+def covar(a, b):
+    ''' Calculate the Covariance of two arrays of numbers.
+    TODO: check that this works well for Numpy Arrays and add NUMBA function
     signature to code. Do test of timings against Numpy. '''
 
     n = len(a)
@@ -107,38 +113,38 @@ def covar(a,b):
     mab = 0.0
     ma2 = 0.0
     mb2 = 0.0
-    
-    for i in range(0,n):
+
+    for i in range(0, n):
         ma = ma + a[i]
         mb = mb + b[i]
         ma2 = ma2 + a[i]**2
         mb2 = mb2 + b[i]**2
-        mab = mab + a[i]*b[i]
-        
+        mab = mab + a[i] * b[i]
+
     ma /= n
     mb /= n
     ma2 /= n
     mb2 /= n
     mab /= n
-    
-    caa = ma2 - ma*ma
-    cab = mab - ma*mb
-    cbb = mb2 - mb*mb
 
-    m = [[0.0,0.0],[0.0,0.0]]
+    caa = ma2 - ma * ma
+    cab = mab - ma * mb
+    cbb = mb2 - mb * mb
+
+    m = [[0.0, 0.0], [0.0, 0.0]]
     m[0][0] = caa
     m[1][0] = cab
     m[0][1] = cab
     m[1][1] = cbb
     return m
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64,float64),fastmath=True, cache=True)
-def pairGCD(v1,v2):
 
+@njit(float64(float64, float64), fastmath=True, cache=True)
+def pairGCD(v1, v2):
     ''' Determine the Greatest Common Divisor of two integers using Euclid's
-    algorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine 
+    algorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine
     to see if I should not be declaring inputs as integers for NUMBA. '''
 
     if v1 == 0 or v2 == 0:
@@ -153,24 +159,27 @@ def pairGCD(v1,v2):
     pairGCD = abs(v1)
     return pairGCD
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def nprime(x):
-    '''Calculate the first derivative of the Cumulative Normal CDF which is 
+    '''Calculate the first derivative of the Cumulative Normal CDF which is
     simply the PDF of the Normal Distribution '''
     return normpdf(x)
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def heaviside(x):
     ''' Calculate the Heaviside function for x '''
-    if x>=0.0:
+    if x >= 0.0:
         return 1.0
     return 0.0
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def frange(start, stop, step):
@@ -181,17 +190,19 @@ def frange(start, stop, step):
 
     return x
 
-################################################################################
-        
+##########################################################################
+
+
 @njit(fastmath=True, cache=True)
 def normpdf(x):
     ''' Normal Density function at value x'''
     InvRoot2Pi = 0.3989422804014327
-    return exp(-x*x/2.0) * InvRoot2Pi
+    return exp(-x * x / 2.0) * InvRoot2Pi
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64),fastmath=True, cache=True)
+
+@njit(float64(float64), fastmath=True, cache=True)
 def normcdf_fast(x):
     ''' Fast Normal CDF function based on XXX '''
     a1 = 0.319381530
@@ -215,46 +226,47 @@ def normcdf_fast(x):
 
     return phi
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64),fastmath=True, cache=True)
+
+@njit(float64(float64), fastmath=True, cache=True)
 def normcdf_integrate(x):
     ''' Calculation of Normal Distribution CDF by simple integration
-    which can become exact in the limit of the number of steps tending 
-    towards infinity. This function is used for checking as it is slow 
+    which can become exact in the limit of the number of steps tending
+    towards infinity. This function is used for checking as it is slow
     since the number of integration steps is currently hardcoded to 10,000.'''
     lower = -6.0
     upper = x
     numSteps = 10000
-    dx = (upper-lower)/numSteps
+    dx = (upper - lower) / numSteps
     InvRoot2Pi = 0.3989422804014327
-    
+
     x = lower
-    fx = exp(-x*x/2.0)
-    integral = fx/2.0
-    
-    for i in range(0,numSteps-1):
+    fx = exp(-x * x / 2.0)
+    integral = fx / 2.0
+
+    for i in range(0, numSteps - 1):
         x = x + dx
-        fx = exp(-x*x/2.0)
-        integral += fx  
+        fx = exp(-x * x / 2.0)
+        integral += fx
 
     x = x + dx
-    fx = exp(-x*x/2.0)
-    integral += fx/2.0  
+    fx = exp(-x * x / 2.0)
+    integral += fx / 2.0
 
     integral *= InvRoot2Pi * dx
     return integral
 
-################################################################################
-    
-@njit(float64(float64),fastmath=True, cache=True)
-def normcdf_slow(z):
+##########################################################################
 
+
+@njit(float64(float64), fastmath=True, cache=True)
+def normcdf_slow(z):
     '''  Calculation of Normal Distribution CDF accurate to 1d-15.
     This method is faster than integration but slower than other approximations.
     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. '''
 
-    a = [0.0]*25
+    a = [0.0] * 25
     bp = 0.0
 
     RTWO = 1.4142135623731
@@ -294,10 +306,10 @@ def normcdf_slow(z):
         bm = 0.0
         b = 0.0
 
-        for i in range(0,25):
+        for i in range(0, 25):
             bp = b
             b = bm
-            bm = t * b - bp + a[24-i]
+            bm = t * b - bp + a[24 - i]
 
         p = exp(-xa * xa) * (bm - bp) / 4
 
@@ -306,14 +318,14 @@ def normcdf_slow(z):
 
     return p
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64,int64),fastmath=True, cache=True)
+
+@njit(float64(float64, int64), fastmath=True, cache=True)
 def normcdf(x, fastFlag):
-
-    ''' This is the Normal CDF function which forks to one of three of the 
-    implemented approximations. This is based on the choice of the fast flag 
-    variable. A value of 1 is the fast routine, 2 is the slow and 3 is the 
+    ''' This is the Normal CDF function which forks to one of three of the
+    implemented approximations. This is based on the choice of the fast flag
+    variable. A value of 1 is the fast routine, 2 is the slow and 3 is the
     even slower integration scheme. '''
 
     if fastFlag == 1:
@@ -325,22 +337,23 @@ def normcdf(x, fastFlag):
     else:
         return 0.0
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64),fastmath=True, cache=True)
+
+@njit(float64(float64), fastmath=True, cache=True)
 def N(x):
     ''' This is the shortcut to the default Normal CDF function and is currently
-    hardcoded to the fastest of the implemented routines. This is the most 
+    hardcoded to the fastest of the implemented routines. This is the most
     widely used way to access the Normal CDF. '''
-    return normcdf(x,1)
+    return normcdf(x, 1)
 
-################################################################################
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def phi3(b1, b2, b3, r12, r13, r23):
-
-    ''' Bivariate Normal CDF function to upper limits $b1$ and $b2$ which uses 
-    integration to perform the innermost integral. This may need further 
+    ''' Bivariate Normal CDF function to upper limits $b1$ and $b2$ which uses
+    integration to perform the innermost integral. This may need further
     refinement to ensure it is optimal as the current range of integration is
     from -7 and the integration steps are dx = 0.001. This may be excessive. '''
 
@@ -349,7 +362,7 @@ def phi3(b1, b2, b3, r12, r13, r23):
     upperlimit = b1
     numPoints = int((b1 - lowerLimit) / dx)
     dx = (upperlimit - lowerLimit) / numPoints
-    x = lowerLimit;
+    x = lowerLimit
 
     r12p = sqrt(1.0 - r12 * r12)
     r13p = sqrt(1.0 - r13 * r13)
@@ -357,7 +370,7 @@ def phi3(b1, b2, b3, r12, r13, r23):
 
     v = 0.0
 
-    for i in range(1,numPoints+1):
+    for i in range(1, numPoints + 1):
         dp = N(x + dx) - N(x)
         h = (b2 - r12 * x) / r12p
         k = (b3 - r13 * x) / r13p
@@ -366,13 +379,13 @@ def phi3(b1, b2, b3, r12, r13, r23):
         x += dx
 
     return v
-        
-################################################################################
+
+##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def norminvcdf(p):
-
-    '''  This algorithm computes the inverse Normal CDF and is based on the 
+    '''  This algorithm computes the inverse Normal CDF and is based on the
     algorithm found at (http:#home.online.no/~pjacklam/notes/invnorm/)
     which is by John Herrero (3-Jan-03) '''
 
@@ -396,7 +409,7 @@ def norminvcdf(p):
     c4 = -2.54973253934373
     c5 = 4.37466414146497
     c6 = 2.93816398269878
-    
+
     d1 = 7.78469570904146E-03
     d2 = 0.32246712907004
     d3 = 2.445134137143
@@ -415,38 +428,41 @@ def norminvcdf(p):
     if p < p_low:
         # Rational approximation for lower region
         q = sqrt(-2.0 * log(p))
-        inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+        inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
+                      * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5
         r = q * q
-        inverseCDF = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q / (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1.0)
+        inverseCDF = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * \
+            q / (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1.0)
     elif p < 1.0:
         # Rational approximation for upper region
         q = sqrt(-2.0 * log(1 - p))
-        inverseCDF = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+        inverseCDF = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
+                       * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
 
     return inverseCDF
 
-################################################################################
+##########################################################################
 # This is used for consistency with Haug and its conciseness. Consider renaming
 # phi2 to M
 @njit(fastmath=True, cache=True)
-def M(a,b,c):
-    return phi2(a, b, c )
+def M(a, b, c):
+    return phi2(a, b, c)
 
-################################################################################
+##########################################################################
 
-@njit(float64(float64,float64,float64),fastmath=True, cache=True)
-def phi2( h1, hk, r ):
 
+@njit(float64(float64, float64, float64), fastmath=True, cache=True)
+def phi2(h1, hk, r):
     ''' Drezner and Wesolowsky implementation of bi-variate normal '''
 
 #    if abs(r) > 0.9999999:
 #        raise FinError("Phi2: |Correlation| > 1")
 
-    x = [0.0,0.0,0.0,0.0,0.0]
-    w = [0.0,0.0,0.0,0.0,0.0]
+    x = [0.0, 0.0, 0.0, 0.0, 0.0]
+    w = [0.0, 0.0, 0.0, 0.0, 0.0]
 
     x[0] = 0.04691008
     x[1] = 0.23076534
@@ -468,10 +484,10 @@ def phi2( h1, hk, r ):
 
         h3 = h1 * h2
 
-        for i in range(0,5):
+        for i in range(0, 5):
             r1 = r * x[i]
             rr2 = 1.0 - r1 * r1
-            bv = bv + w[i] * exp((r1*h3 - h12) / rr2) / sqrt(rr2)
+            bv = bv + w[i] * exp((r1 * h3 - h12) / rr2) / sqrt(rr2)
 
         bv = N(h1) * N(h2) + r * bv
     else:
@@ -482,7 +498,7 @@ def phi2( h1, hk, r ):
             h2 = -h2
 
         h3 = h1 * h2
-        h7 = exp(-h3*0.5)
+        h7 = exp(-h3 * 0.5)
 
         if r2 != 0.0:
             h6 = abs(h1 - h2)
@@ -490,38 +506,41 @@ def phi2( h1, hk, r ):
             h6 = h6 / r3
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
-            bv = 0.13298076 * h6 * ab * N(-h6) - exp(-h5/r2) * (ab + aa*r2) * 0.053051647
+            bv = 0.13298076 * h6 * ab * \
+                N(-h6) - exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
 
-            for i in range(0,5):
+            for i in range(0, 5):
                 r1 = r3 * x[i]
                 rr = r1 * r1
                 r2 = sqrt(1.0 - rr)
-                bv = bv - w[i] * exp(-h5/rr) * (exp(-h3/(1.0 + r2))/r2/h7 - 1.0 - aa*rr)
+                bv = bv - w[i] * exp(-h5 / rr) * \
+                    (exp(-h3 / (1.0 + r2)) / r2 / h7 - 1.0 - aa * rr)
 
         if r > 0.0:
             bv = bv * r3 * h7 + N(min(h1, h2))
         else:
             if h1 < h2:
-                bv = -bv*r3*h7
+                bv = -bv * r3 * h7
             else:
-                bv = -bv*r3*h7 + N(h1) + N(hk) - 1.0
+                bv = -bv * r3 * h7 + N(h1) + N(hk) - 1.0
 
     return bv
 
-################################################################################
+##########################################################################
 
-@njit(fastmath=True,cache=True)
-def corrMatrixGenerator(rho,n):
-    ''' Utility function to generate a full rank n x n correlation matrix with 
+
+@njit(fastmath=True, cache=True)
+def corrMatrixGenerator(rho, n):
+    ''' Utility function to generate a full rank n x n correlation matrix with
     a flat correlation structure and value rho. '''
 
-    corrMatrix = np.zeros(shape = (n,n))
-    for i in range(0,n):
-        corrMatrix[i,i] = 1.0
-        for j in range(0,i):
-            corrMatrix[i,j] = rho
-            corrMatrix[j,i] = rho
+    corrMatrix = np.zeros(shape=(n, n))
+    for i in range(0, n):
+        corrMatrix[i, i] = 1.0
+        for j in range(0, i):
+            corrMatrix[i, j] = rho
+            corrMatrix[j, i] = rho
 
     return corrMatrix
 
-################################################################################
+##########################################################################
