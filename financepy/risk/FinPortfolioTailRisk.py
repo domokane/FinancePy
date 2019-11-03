@@ -4,7 +4,7 @@ Created on Sat Aug  3 21:57:13 2019
 
 @author: Dominic
 """
-
+'''
 public static  portfolioTailRiskAdjBinomial( k1,
                                      k2,
                                      regretLevel,
@@ -105,3 +105,4 @@ public static  portfolioTailRiskAdjBinomial( k1,
         output[4] = tailProbabilityShortfall
 
         return output
+'''
