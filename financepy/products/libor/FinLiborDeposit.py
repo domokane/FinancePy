@@ -5,6 +5,7 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
+from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayConventionTypes
@@ -19,13 +20,23 @@ class FinLiborDeposit(object):
 
     def __init__(self,
                  settlementDate,
-                 maturityDate,
+                 maturityDateOrTenor,
                  depositRate,
                  dayCountType,
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinBusDayConventionTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
+
+        if type(settlementDate) != FinDate:
+            raise ValueError("Settlement date must be a FinDate.")
+
+        if type(maturityDateOrTenor) == FinDate:
+            maturityDate = maturityDateOrTenor
+        else:
+            maturityDate = settlementDate.addTenor(maturityDateOrTenor)
+            calendar = FinCalendar(self._calendarType)
+            maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
 
         if settlementDate > maturityDate:
             raise ValueError("Settlement date after maturity date")
@@ -48,17 +59,14 @@ class FinLiborDeposit(object):
         self._dayCountType = dayCountType
         self._depositRate = depositRate
         self._notional = notional
-
-        calendar = FinCalendar(self._calendarType)
-        maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
         self._maturityDate = maturityDate
 
     ###########################################################################
 
-    def df(self):
+    def maturityDf(self):
         ''' Returns the maturity date discount factor that would allow the
         Libor curve to reprice the contractual market deposit rate. Note that
-        this is a forward discount factor that starts on the settlement date.'''
+        this is a forward discount factor that starts on settlement date.'''
 
         dc = FinDayCount(self._dayCountType)
         accFactor = dc.yearFrac(self._settlementDate, self._maturityDate)

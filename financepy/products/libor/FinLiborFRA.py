@@ -5,6 +5,7 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
+from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayConventionTypes
@@ -43,14 +44,22 @@ class FinLiborFRA(object):
 
     def __init__(self,
                  settlementDate,  # The date on which the floating rate fixes
-                 maturityDate,  # The end of the Libor rate period
+                 maturityDateOrTenor,  # The end of the Libor rate period
                  fraRate,  # The fixed contractual FRA rate
                  payFixedRate,  # True if the FRA rate is being paid
-                 dayCountType,  # For interest period between the fixing and maturity dates
+                 dayCountType,  # For interest period
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinBusDayConventionTypes.MODIFIED_FOLLOWING):
         ''' Create FRA object. '''
+
+        if type(settlementDate) != FinDate:
+            raise ValueError("Settlement date must be a FinDate.")
+
+        if type(maturityDateOrTenor) == FinDate:
+            maturityDate = maturityDateOrTenor
+        else:
+            maturityDate = settlementDate.addTenor(maturityDateOrTenor)
 
         if settlementDate > maturityDate:
             raise ValueError("Settlement date after maturity date")

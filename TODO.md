@@ -4,7 +4,6 @@
 Equities - Add term structure of interest rates to all models so that full discount curve is respected.
 Equities - Discrete dividends 
 Equities - Log contracts using given skew curve
-Equities - Variance swaps using given skew curve
 Equities - Breedon-Litzenburger implied distribution of terminal stock price
 Equities - Fitting the skew parametrically
 Equities - Convertible bond model with credit, interest rate and equity dependence and discrete dividends
@@ -55,6 +54,7 @@ Models - Finite difference schemes ?
 Models - Sobol sequences implementation 
 
 ## IN PROGRESS
+Equities - Variance swaps using given skew curve
 
 ## DONE
 Items that have been completed are moved here.

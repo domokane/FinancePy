@@ -139,9 +139,9 @@ class FinLiborOneCurve(FinDiscountCurve):
 
         for depo in self._usedDeposits:
             tmat = (depo._maturityDate - self._curveDate) / gDaysInYear
-            df = depo.df()
+            dfMat = depo.maturityDf()
             self._times = np.append(self._times, tmat)
-            self._values = np.append(self._values, df)
+            self._values = np.append(self._values, dfMat)
 
         for fra in self._usedFRAs:
             tMat = (fra._maturityDate - self._curveDate) / gDaysInYear
@@ -159,8 +159,5 @@ class FinLiborOneCurve(FinDiscountCurve):
 
             optimize.newton(f, x0=df, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
-
-            df = self._values[-1]
-
 
 ##########################################################################

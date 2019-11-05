@@ -13,7 +13,8 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...products.equities.FinOption import FinOption, FinOptionTypes, FinOptionModelTypes
+from ...products.equities.FinOption import FinOption, FinOptionTypes
+from ...products.equities.FinOption import FinOptionModelTypes
 
 ###############################################################################
 
@@ -94,12 +95,24 @@ class FinVanillaOption(FinOption):
             raise FinError("Stock price must be greater than zero.")
 
         t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+
+        if t == 0.0:
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
+                return max(stockPrice - self._strikePrice, 0)
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
+                return max(self._strikePrice - stockPrice, 0)
+            else:
+                raise FinError("Unknown option type")
+
         lnS0k = log(stockPrice / self._strikePrice)
         sqrtT = sqrt(t)
 
         if modelType == FinOptionModelTypes.BLACKSCHOLES:
 
             (volatility) = modelParams
+
+            if volatility < 0.0:
+                raise FinError("Volatility is negative.")
 
             if abs(volatility) < 1e-5:
                 volatility = 1e-5

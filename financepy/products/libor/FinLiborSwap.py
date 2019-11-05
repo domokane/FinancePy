@@ -5,10 +5,11 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
+from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes,
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinMath import ONE_MILLION
 
@@ -20,7 +21,7 @@ class FinLiborSwap(object):
 
     def __init__(self,
                  startDate,
-                 maturityDate,
+                 maturityDateOrTenor,
                  fixedCoupon,
                  fixedFreqType,
                  fixedDayCountType,
@@ -33,6 +34,15 @@ class FinLiborSwap(object):
                  busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract. '''
+
+        if type(startDate) != FinDate:
+            raise ValueError("Settlement date must be a FinDate.")
+
+        if type(maturityDateOrTenor) == FinDate:
+            maturityDate = maturityDateOrTenor
+        else:
+            maturityDate = startDate.addTenor(maturityDateOrTenor)
+
         if startDate > maturityDate:
             raise ValueError("Start date after maturity date")
 

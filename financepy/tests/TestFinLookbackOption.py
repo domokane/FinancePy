@@ -5,10 +5,13 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.equities.FinFloatStrikeLookbackOption import FinFloatStrikeLookbackOption, FinFloatStrikeLookbackOptionTypes
-from financepy.products.equities.FinFixedStrikeLookbackOption import FinFixedStrikeLookbackOption, FinFixedStrikeLookbackOptionTypes
-from financepy.finutils.FinDate import FinDate
+import financepy as fp
+from fp.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from fp.products.equities.FinFloatLookbackOption import FinFloatLookbackOption
+from fp.products.equities.FinFloatLookbackOption import FinFloatLookbackOptionTypes
+from fp.products.equities.FinFixedLookbackOption import FinFixedLookbackOption
+from fp.products.equities.FinFixedLookbackOption import FinFixedLookbackOptionTypes
+from fp.finutils.FinDate import FinDate
 import time
 import sys
 sys.path.append("..//..")
@@ -40,10 +43,10 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFloatStrikeLookbackOptionTypes.FLOATING_CALL
+    optionType = FinFloatLookbackOptionTypes.FLOATING_CALL
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFloatStrikeLookbackOption(expiryDate, optionType)
+            option = FinFloatLookbackOption(expiryDate, optionType)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
@@ -85,10 +88,10 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFloatStrikeLookbackOptionTypes.FLOATING_CALL
+    optionType = FinFloatLookbackOptionTypes.FLOATING_CALL
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFloatStrikeLookbackOption(expiryDate, optionType)
+            option = FinFloatLookbackOption(expiryDate, optionType)
             stockMin = stockPrice - 10
             value = option.value(
                 valueDate,
@@ -130,10 +133,10 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFloatStrikeLookbackOptionTypes.FLOATING_PUT
+    optionType = FinFloatLookbackOptionTypes.FLOATING_PUT
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFloatStrikeLookbackOption(expiryDate, optionType)
+            option = FinFloatLookbackOption(expiryDate, optionType)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
@@ -175,10 +178,10 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFloatStrikeLookbackOptionTypes.FLOATING_PUT
+    optionType = FinFloatLookbackOptionTypes.FLOATING_PUT
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFloatStrikeLookbackOption(expiryDate, optionType)
+            option = FinFloatLookbackOption(expiryDate, optionType)
             stockMax = stockPrice + 10
             value = option.value(
                 valueDate,
@@ -227,11 +230,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_CALL
+    optionType = FinFixedLookbackOptionTypes.FIXED_CALL
     k = 95.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
@@ -275,11 +278,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_CALL
+    optionType = FinFixedLookbackOptionTypes.FIXED_CALL
     k = 100.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
@@ -323,11 +326,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_CALL
+    optionType = FinFixedLookbackOptionTypes.FIXED_CALL
     k = 105.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice + 10.0
             value = option.value(
                 valueDate,
@@ -371,11 +374,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_PUT
+    optionType = FinFixedLookbackOptionTypes.FIXED_PUT
     k = 95.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
@@ -419,11 +422,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_PUT
+    optionType = FinFixedLookbackOptionTypes.FIXED_PUT
     k = 100.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
@@ -467,11 +470,11 @@ def test_FinLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinFixedStrikeLookbackOptionTypes.FIXED_PUT
+    optionType = FinFixedLookbackOptionTypes.FIXED_PUT
     k = 105.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinFixedStrikeLookbackOption(expiryDate, optionType, k)
+            option = FinFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice - 10.0
             value = option.value(
                 valueDate,

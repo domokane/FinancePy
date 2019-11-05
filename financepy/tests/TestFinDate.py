@@ -34,5 +34,42 @@ def test_FinDate():
         testCases.print(numMonths, str(startDate), str(nextIMMDate))
 
 
+def test_FinDateTenors():
+
+    startDate = FinDate(2018, 2, 23)
+
+    tenor = "5d"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "7D"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "1W"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "4W"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "1M"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "24M"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "2Y"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "10y"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "0m"
+    print(tenor, startDate.addTenor(tenor))
+
+    tenor = "20Y"
+    print(tenor, startDate.addTenor(tenor))
+
+
 test_FinDate()
+test_FinDateTenors()
+
 testCases.compareTestCases()

@@ -5,7 +5,7 @@ Created on Fri Nov 30 10:10:19 2018
 @author: Dominic O'Kane
 """
 
-from .FinDate import (FinDate, monthDaysLeapYear, monthDaysNotLeapYear)
+from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear
 from .FinMath import isLeapYear
 
 from enum import Enum
@@ -88,7 +88,7 @@ class FinDayCount(object):
                 if d1 == monthDaysLeapYear[m1 - 1]:
                     d1 = 30
 
-            if isLeapYear(y1) == False:
+            if isLeapYear(y1) is False:
                 if d1 == monthDaysNotLeapYear[m1 - 1]:
                     d1 = 30
 
@@ -96,7 +96,7 @@ class FinDayCount(object):
                 if d2 == monthDaysLeapYear[m2 - 1] and m2 != 2:
                     d2 = 30
 
-            if isLeapYear(y2) == False:
+            if isLeapYear(y2) is False:
                 if d2 == monthDaysNotLeapYear[m2 - 1] and m2 != 2:
                     d2 = 30
 
@@ -153,8 +153,8 @@ class FinDayCount(object):
 
         elif self._type == FinDayCountTypes.ACT_365_LEAP:
 
-            # The ISDA calculator sheet appears to split this across the non-leap
-            # and the leap year which I do not see in any conventions.
+            # The ISDA calculator sheet appears to split this across the
+            # non-leap and the leap year which I do not see in any conventions.
 
             denom = 365.0
 
