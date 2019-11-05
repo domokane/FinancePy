@@ -312,6 +312,53 @@ class FinDate():
         return immDate
 
     ###########################################################################
+
+    def addTenor(self, tenor):
+        ''' Return the date based on the tenor. '''
+
+        if type(tenor) != str:
+            raise ValueError("Tenor must be a string e.g. '5Y'")
+
+        tenor = tenor.upper()
+        DAYS = 1
+        WEEKS = 2
+        MONTHS = 3
+        YEARS = 4
+
+        periodType = 0
+        numPeriods = 0
+
+        if tenor[-1] == "D":
+            periodType = DAYS
+        elif tenor[-1] == "W":
+            periodType = WEEKS
+        elif tenor[-1] == "M":
+            periodType = MONTHS
+        elif tenor[-1] == "Y":
+            periodType = YEARS
+        else:
+            raise ValueError("Unknown tenor type in " + tenor)
+
+        numPeriods = int(tenor[0:-1])
+
+        newDate = FinDate(self._y, self._m, self._d)
+
+        if periodType == DAYS:
+            for i in range(0, numPeriods):
+                newDate = newDate.addDays(1)
+        elif periodType == WEEKS:
+            for i in range(0, numPeriods):
+                newDate = newDate.addDays(7)
+        elif periodType == MONTHS:
+            for i in range(0, numPeriods):
+                newDate = newDate.addMonths(1)
+        elif periodType == YEARS:
+            for i in range(0, numPeriods):
+                newDate = newDate.addMonths(12)
+
+        return newDate
+
+    ###########################################################################
     # This should be moved out of the class
 
     def datediff(d1, d2):
