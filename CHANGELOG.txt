@@ -4,5 +4,11 @@ October 2019
 ============
 Updated FinLiborSwap to fix a bug in the coupon calculation on the fixed leg
 Updated FinLiborSwap to handle the first floating reset rate and to handle forward starting swaps
-Updated TestFinLiborSwap to test all of these
+Updated TestFinLiborSwap to test all of these cases
+
+November 2019
+=============
+Added futures to the Libor swap calibration and simplified code
+Added variance swaps to the equity products
+
 

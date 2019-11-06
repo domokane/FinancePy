@@ -21,7 +21,7 @@ ONE_BILLION = 1000000000
 
 @njit(boolean(int64), fastmath=True, cache=True)
 def isLeapYear(y):
-    ''' Test whether year y is a leap year and if so return True, else False '''
+    ''' Test whether year y is a leap year - if so return True, else False '''
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
     return leapYear
 
@@ -37,6 +37,26 @@ def scale(x, factor):
 
 ##########################################################################
 
+#@njit(boolean(float64[:]),fastmath=True, cache=True)
+def testMonotonicity(x):
+    ''' Scale all of the elements of an array by the same amount factor. '''
+    for i in range(1, len(x)):
+        if x[i] <= x[i-1]:
+            return False
+    return True
+
+##########################################################################
+
+@njit(fastmath=True, cache=True)
+def testRange(x, lower, upper):
+    ''' Scale all of the elements of an array by the same amount factor. '''
+    for i in range(0, len(x)):
+        if x[i] < lower:
+            raise ValueError("Value below lower.")
+        if x[i] > upper:
+            raise ValueError("Value above upper.")
+
+##########################################################################
 
 @njit(fastmath=True, cache=True)
 def maximum(a, b):

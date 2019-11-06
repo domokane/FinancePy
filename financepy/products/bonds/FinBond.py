@@ -15,7 +15,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 from math import pow
 
@@ -37,7 +38,7 @@ class FinBondAccruedTypes(Enum):
 
 
 def f(y, *args):
-    ''' Function used to do solve root search in price to yield calculation. '''
+    ''' Function used to do root search in price to yield calculation. '''
     self = args[0]
     settlementDate = args[1]
     price = args[2]
@@ -49,7 +50,7 @@ def f(y, *args):
 
 
 def g(oas, *args):
-    ''' Function used to do solve root search in price to yield calculation. '''
+    ''' Function used to do root search in price to OAS calculation. '''
     self = args[0]
     settlementDate = args[1]
     price = args[2]
@@ -62,8 +63,9 @@ def g(oas, *args):
 
 
 class FinBond(object):
-
-    ''' Class for managing fixed coupon bonds and performing related analytics. '''
+    ''' Class for fixed coupon bonds and performing related analytics. These
+    are bullet bonds which means they have regular coupon payments of a known
+    size that are paid on known dates plus a payment of par at maturity.'''
 
     def __init__(self,
                  maturityDate,
@@ -124,7 +126,7 @@ class FinBond(object):
 ###############################################################################
 
     def fullPriceFromYield(self, settlementDate, ytm):
-        ''' Calculate the full price of the bond from its yield to maturity. '''
+        ''' Calculate the full price of bond from its yield to maturity. '''
 
         self.calculateFlowDates(settlementDate)
 
@@ -255,7 +257,7 @@ class FinBond(object):
 ##########################################################################
 
     def accruedDays(self, settlementDate):
-        ''' Calculate number of days from previous coupon date to settlement.'''
+        ''' Calculate number days from previous coupon date to settlement.'''
         self.calculateFlowDates(settlementDate)
 
         if len(self._flowDates) <= 2:
@@ -396,7 +398,7 @@ class FinBond(object):
             swapFloatBusDayAdjustRuleType=FinBusDayConventionTypes.FOLLOWING,
             swapFloatDateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Calculate the par asset swap spread of the bond. The discount curve
-        is a Libor quality curve that is passed in. The price is the clean price.
+        is a Libor curve that is passed in. The price is the clean price.
         TODO - Check how first coupon on floating leg is sized. '''
 
         self.calculateFlowDates(settlementDate)

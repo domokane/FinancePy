@@ -44,7 +44,7 @@ class FinFlatCurve(FinCurve):
         elif compoundingType == FinCompoundingMethods.MONEY_MARKET:
             self._compoundingType = compoundingType
         else:
-            raise FinError("Unknown compounding method " + compoundingType)
+            raise FinError("Unknown compound method " + str(compoundingType))
 
 ##########################################################################
 

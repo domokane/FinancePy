@@ -5,13 +5,12 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-import financepy as fp
-from fp.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from fp.products.equities.FinFloatLookbackOption import FinFloatLookbackOption
-from fp.products.equities.FinFloatLookbackOption import FinFloatLookbackOptionTypes
-from fp.products.equities.FinFixedLookbackOption import FinFixedLookbackOption
-from fp.products.equities.FinFixedLookbackOption import FinFixedLookbackOptionTypes
-from fp.finutils.FinDate import FinDate
+from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.equities.FinFloatLookbackOption import FinFloatLookbackOption
+from financepy.products.equities.FinFloatLookbackOption import FinFloatLookbackOptionTypes
+from financepy.products.equities.FinFixedLookbackOption import FinFixedLookbackOption
+from financepy.products.equities.FinFixedLookbackOption import FinFixedLookbackOptionTypes
+from financepy.finutils.FinDate import FinDate
 import time
 import sys
 sys.path.append("..//..")
