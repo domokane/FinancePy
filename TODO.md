@@ -6,7 +6,7 @@ Equities - Discrete dividends
 Equities - Log contracts using given skew curve
 Equities - Breedon-Litzenburger implied distribution of terminal stock price
 Equities - Fitting the skew parametrically
-Equities - Convertible bond model with credit, interest rate and equity dependence and discrete dividends
+Equities - Add interest rate risk to the Convertible bond model.
 Equities - Cliquets
 Equities - Range Notes
 Equities - CPPI
@@ -55,8 +55,9 @@ Models - Sobol sequences implementation
 
 ## IN PROGRESS
 Equities - Variance swaps using given skew curve
+Equities - Convertible bond model with credit and equity dependence and discrete dividends
 
 ## DONE
-Items that have been completed are moved here.
+Items that have been completed and tested are moved here.
 
 
