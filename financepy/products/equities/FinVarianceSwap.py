@@ -214,7 +214,7 @@ class FinVarianceSwap(object):
 
 ##########################################################################
 
-    def realisedVol(self, closePrices, useLogs=True):
+    def realisedVariance(self, closePrices, useLogs=True):
 
         ''' Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns.'''
@@ -237,8 +237,7 @@ class FinVarianceSwap(object):
                 cumX2 += x*x
 
         var = cumX2 * 252.0 / numObservations
-        vol = sqrt(var)
-        return vol
+        return var
 
 
 ##########################################################################

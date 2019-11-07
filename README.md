@@ -1,7 +1,7 @@
 # FinancePy
-FinancePy is a library of functions for valuing, selecting and risk-managing financial assets. 
+FinancePy is a library of native Python functions for valuing, selecting and risk-managing financial assets. 
 
-The aim of this library for me has been to provide a comprehensive and accessible Python library for financial calculations that can be used by my students at EDHEC to learn about financial derivatives. I believe it can also be used by academics and practitioners to perform the pricing and risk-management of complex financial products. 
+The aim of this library for me has been to provide a comprehensive and accessible Python library for financial calculations that can be used by students to learn about financial derivatives. It can also be used by academics and practitioners to perform the pricing and risk-management of complex financial products. 
 
 I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. 
 
