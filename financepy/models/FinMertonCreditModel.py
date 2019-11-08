@@ -9,11 +9,12 @@ from finutils.FinMath import N
 from math import sqrt, log, exp
 
 
-def MertonModelValues(assetValue,
-                      bondFace,
-                      timeToMaturity,
-                      volatility,
-                      riskFreeRate):
+def mertonCreditModelValues(assetValue,
+                            bondFace,
+                            timeToMaturity,
+                            riskFreeRate,
+                            assetGrowthRate,
+                            volatility):
 
     lvg = assetValue / bondFace
 
@@ -27,4 +28,8 @@ def MertonModelValues(assetValue,
     dvalue = assetValue * N(-d1) + bondFace * \
         exp(-riskFreeRate * timeToMaturity) * N(d2)
     spd = -(1.0 / timeToMaturity) * log(dvalue / bondFace) - riskFreeRate
-    return (evalue, dvalue, spd)
+
+    dd = log(assetValue/bondFace)
+    dd += (assetGrowthRate - (volatility**2)/2.0) * timeToMaturity
+    pd = 1.0 - N(dd)
+    return (evalue, dvalue, spd, dd, pd)

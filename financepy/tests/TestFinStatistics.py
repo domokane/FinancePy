@@ -6,7 +6,7 @@ Created on Mon Sep 09 14:31:53 2019
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.finutils.FinStats import mean, stdev, correlation
+from financepy.finutils.FinStatistics import mean, stdev, correlation
 from math import sqrt
 import numpy as np
 import time
@@ -17,7 +17,7 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
-def test_FinStats():
+def test_FinStatistics():
     seed = 1972
     np.random.seed(seed)
 
@@ -89,5 +89,5 @@ def test_FinStats():
     ##########################################################################
 
 
-test_FinStats()
+test_FinStatistics()
 testCases.compareTestCases()
