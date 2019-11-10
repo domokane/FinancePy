@@ -10,12 +10,13 @@ from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinInterpolate import FinInterpMethods
 
-################################################################################
+###############################################################################
 # TO DO
 # Write interpolation scheme
-################################################################################
+###############################################################################
 
 from enum import Enum
+
 
 class FinCompoundingMethods(Enum):
     CONTINUOUS = 1
@@ -26,17 +27,18 @@ class FinCompoundingMethods(Enum):
     MONEY_MARKET = 6
 
 ################################################################################
-    
+
+
 class FinCurve():
 
-    def __init__(self,curveDate, interpolationMethod, type):
+    def __init__(self, curveDate, interpolationMethod, type):
 
         self._curveDate = curveDate
         self._type = None
         self._times = None
         self._values = None
 
-    def df(self,t, interpolationMethod = FinInterpMethods.FLAT_FORWARDS):
+    def df(self, t, interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
 
         if t < self._curveDate:
             raise FinError("FinCurve: time before curve date")
@@ -47,4 +49,3 @@ class FinCurve():
         return self.interpolate(t)
 
 ###############################################################################
-

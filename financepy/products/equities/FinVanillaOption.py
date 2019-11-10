@@ -15,6 +15,10 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...products.equities.FinOption import FinOption, FinOptionTypes
 from ...products.equities.FinOption import FinOptionModelTypes
+from ...products.equities.FinEquityModelTypes import FinEquityModel
+from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+from ...market.curves.FinCurve import FinCurve
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 
@@ -24,18 +28,17 @@ def f(volatility, *args):
     self = args[0]
     valueDate = args[1]
     stockPrice = args[2]
-    interestRate = args[3]
+    discountCurve = args[3]
     dividendYield = args[4]
-    modelType = args[5]
-    price = args[6]
-    modelParams = (volatility)
+    price = args[5]
+
+    model = FinEquityModelBlackScholes(volatility)
 
     objFn = self.value(valueDate,
                        stockPrice,
-                       interestRate,
+                       discountCurve,
                        dividendYield,
-                       modelType,
-                       modelParams) - price
+                       model) - price
 
 #    print(volatility, price, objFn)
     return objFn
@@ -48,17 +51,16 @@ def fvega(volatility, *args):
     self = args[0]
     valueDate = args[1]
     stockPrice = args[2]
-    interestRate = args[3]
+    discountCurve = args[3]
     dividendYield = args[4]
-    modelType = args[5]
 
+    model = FinEquityModelBlackScholes(volatility)
     fprime = self.vega(
         valueDate,
         stockPrice,
-        interestRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        volatility)
+        model)
     return fprime
 
 ###############################################################################
@@ -71,7 +73,8 @@ class FinVanillaOption(FinOption):
                  strikePrice,
                  optionType):
 
-        if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
+        if optionType != FinOptionTypes.EUROPEAN_CALL and \
+         optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type", optionType)
 
         self._expiryDate = expiryDate
@@ -83,16 +86,21 @@ class FinVanillaOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
-              modelType,
-              modelParams):
+              model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
+
+        if discountCurve._parentType != FinCurve:
+            raise FinError("Curve is not inherited off FinCurve.")
+
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
 
         t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
 
@@ -104,12 +112,15 @@ class FinVanillaOption(FinOption):
             else:
                 raise FinError("Unknown option type")
 
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
+
         lnS0k = log(stockPrice / self._strikePrice)
         sqrtT = sqrt(t)
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
+        if type(model) == FinEquityModelBlackScholes:
 
-            (volatility) = modelParams
+            volatility = model._volatility
 
             if volatility < 0.0:
                 raise FinError("Volatility is negative.")
@@ -139,10 +150,9 @@ class FinVanillaOption(FinOption):
     def delta(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
-              modelType,
-              modelParams):
+              model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -150,14 +160,20 @@ class FinVanillaOption(FinOption):
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
 
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
+
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
             t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
 
-            (volatility) = modelParams
+        if type(model) == FinEquityModelBlackScholes:
+
+            volatility = model._volatility
 
             if abs(volatility) < 1e-5:
                 volatility = 1e-5
@@ -183,10 +199,9 @@ class FinVanillaOption(FinOption):
     def gamma(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
-              modelType,
-              modelParams):
+              model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -194,14 +209,20 @@ class FinVanillaOption(FinOption):
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
 
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
+
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
             t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
 
-            (volatility) = modelParams
+        if type(model) == FinEquityModelBlackScholes:
+
+            volatility = model._volatility
 
             if abs(volatility) < 1e-5:
                 volatility = 1e-5
@@ -223,10 +244,9 @@ class FinVanillaOption(FinOption):
     def vega(self,
              valueDate,
              stockPrice,
-             interestRate,
+             discountCurve,
              dividendYield,
-             modelType,
-             modelParams):
+             model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -234,14 +254,20 @@ class FinVanillaOption(FinOption):
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
 
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
+
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
             t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
 
-            (volatility) = modelParams
+        if type(model) == FinEquityModelBlackScholes:
+
+            volatility = model._volatility
 
             if abs(volatility) < 1e-5:
                 volatility = 1e-5
@@ -262,10 +288,9 @@ class FinVanillaOption(FinOption):
     def theta(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
-              modelType,
-              modelParams):
+              model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -273,14 +298,20 @@ class FinVanillaOption(FinOption):
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
 
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
+
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
             t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
 
-            (volatility) = modelParams
+        if type(model) == FinEquityModelBlackScholes:
+
+            volatility = model._volatility
 
             if abs(volatility) < 1e-5:
                 volatility = 1e-5
@@ -318,13 +349,12 @@ class FinVanillaOption(FinOption):
     def impliedVolatility(self,
                           valueDate,
                           stockPrice,
-                          interestRate,
+                          discountCurve,
                           dividendYield,
                           price):
 
-        modelType = FinOptionModelTypes.BLACKSCHOLES
-        argtuple = (self, valueDate, stockPrice, interestRate, dividendYield,
-                    modelType, price)
+        argtuple = (self, valueDate, stockPrice,
+                    discountCurve, dividendYield, price)
 
         sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
                                 tol=1e-5, maxiter=50, fprime2=None)
@@ -335,20 +365,23 @@ class FinVanillaOption(FinOption):
     def valueMC(self,
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                modelType,
-                modelParams,
+                model,
                 numPaths=10000,
                 seed=4242):
 
-        if modelType == FinOptionModelTypes.BLACKSCHOLES:
-            (volatility) = modelParams
+        if model._parentType == FinEquityModel:
+            volatility = model._volatility
         else:
             raise FinError("Model Type invalid")
 
         np.random.seed(seed)
         t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+
+        df = discountCurve.df(self._expiryDate)
+        interestRate = -log(df)/t
+
         mu = interestRate - dividendYield
         v2 = volatility**2
         K = self._strikePrice
@@ -379,12 +412,12 @@ class FinVanillaOption(FinOption):
     def value_MC_OLD(self,
                      valueDate,
                      stockPrice,
-                     interestRate,
+                     discountCurve,
                      dividendYield,
                      terminalS,
                      seed=4242):
 
-        self.validate(valueDate, stockPrice, interestRate, dividendYield, 0.1)
+        self.validate(valueDate, stockPrice, discountCurve, dividendYield, 0.1)
 
         t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
         K = self._strikePrice

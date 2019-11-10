@@ -48,3 +48,16 @@ def frange(start, stop, step):
     return x
 
 ##########################################################################
+
+
+@njit(fastmath=True, cache=True)
+def normaliseWeights(wtVector):
+    n = len(wtVector)
+    sumWts = 0.0
+    for i in range(0, n):
+        sumWts += wtVector[i]
+    for i in range(0, n):
+        wtVector[i] = wtVector[i]/sumWts
+    return wtVector
+
+##########################################################################

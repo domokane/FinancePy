@@ -5,37 +5,39 @@ Created on Sun Jul 21 10:04:57 2019
 @author: Dominic
 """
 
+import time
+
 from financepy.products.equities.FinVanillaOption import FinVanillaOption
 from financepy.products.equities.FinVanillaOption import FinOptionTypes
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinAmericanOption import FinAmericanOption
-from financepy.products.equities.FinVanillaOption import FinOptionModelTypes
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def testFinAmericanOption():
 
-    import time
-
-    stockPrice = 50.0
-    riskFreeRate = 0.06
-    dividendYield = 0.04
-    volatility = 0.40
-
-    strikePrice = 50.0
     valueDate = FinDate(2016, 1, 1)
     expiryDate = FinDate(2017, 1, 1)
+    stockPrice = 50.0
+    interestRate = 0.06
+    dividendYield = 0.04
+    volatility = 0.40
+    strikePrice = 50.0
+
+    model = FinEquityModelBlackScholes(volatility)
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
     numStepsList = [1000, 2000]
 
     testCases.banner("================== EUROPEAN PUT =======================")
-    modelType = FinOptionModelTypes.BLACKSCHOLES
-    modelParams = (volatility)
+
     putOption = FinVanillaOption(
         expiryDate,
         strikePrice,
@@ -43,31 +45,27 @@ def testFinAmericanOption():
     value = putOption.value(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     delta = putOption.delta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     gamma = putOption.gamma(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     theta = putOption.theta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
@@ -88,9 +86,9 @@ def testFinAmericanOption():
         results = option.value(
             valueDate,
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
-            volatility,
+            model,
             numSteps)
         end = time.time()
         duration = end - start
@@ -114,9 +112,9 @@ def testFinAmericanOption():
         results = option.value(
             valueDate,
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
-            volatility,
+            model,
             numSteps)
         end = time.time()
         duration = end - start
@@ -132,31 +130,27 @@ def testFinAmericanOption():
     value = callOption.value(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     delta = callOption.delta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     gamma = callOption.gamma(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     theta = callOption.theta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
@@ -177,9 +171,9 @@ def testFinAmericanOption():
         results = option.value(
             valueDate,
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
-            volatility,
+            model,
             numSteps)
         end = time.time()
         duration = end - start
@@ -203,9 +197,9 @@ def testFinAmericanOption():
         results = option.value(
             valueDate,
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
-            volatility,
+            model,
             numSteps)
         end = time.time()
         duration = end - start

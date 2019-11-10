@@ -17,24 +17,6 @@ from .FinBond import FinBondAccruedTypes
 ###############################################################################
 
 
-''' A binomial tree valuation model for a convertible bond that captures the
-embedded equity option due to the existence of a conversion option which can
-be invoked after a specific date.
-
-The model allows the user to enter a schedule of dividend payment dates but
-the size of the payments must be in yield terms i.e. a known percentage of
-currently unknown future stock price is paid. Not a fixed amount. A fixed
-yield. Following this payment the stock is assumed to drop by the size of
-the dividend payment.
-
-The model also captures the stock dependent credit risk of the cash flows in
-which the bond price can default at any time with a hazard rate implied by
-the credit spread and an associated recovery rate.
-
-The model captures both the issuer's call schedule which is assumed to apply
-on a list of dates provided by the user, along with a call price. It also
-captures the embedded owner's put schedule of prices.
-'''
 
 
 @njit(fastmath=True, cache=True)
@@ -220,12 +202,13 @@ def valueConvertible(tmat,
         for iNode in range(0, iTime+1):
             futValueUp = treeConvBondValue[iTime+1, iNode+1]
             futValueDn = treeConvBondValue[iTime+1, iNode]
-            hold = df * (pUp * futValueUp + pDn * futValueDn + pDef * recRate)
+            hold = df * (pUp * futValueUp + pDn * futValueDn)
+            hold = hold + df * pDef * recRate * 100.0
             conv = treeConvBondValue[iTime][iNode]
             value = min(max(hold, conv, put), call) + flow
             treeConvBondValue[iTime][iNode] = value
 
-        bulletPV = bulletPV * df * survProb + (1.0 - survProb) * recRate
+        bulletPV = bulletPV * df * survProb + (1.0-survProb) * recRate * 100.0
         bulletPV += flow
 
     price = treeConvBondValue[0, 0]
@@ -252,17 +235,17 @@ class FinConvertibleBond(object):
     the credit quality of the issuer and the level of interest rates.'''
 
     def __init__(self,
-                 maturityDate, # bond maturity date
-                 coupon, # annual coupon
-                 frequencyType, # coupon frequency type
-                 startConvertDate, # date after which conversion is possible
+                 maturityDate,  # bond maturity date
+                 coupon,  # annual coupon
+                 frequencyType,  # coupon frequency type
+                 startConvertDate,  # date after which conversion is possible
                  conversionRatio,  # number of shares per face of notional
-                 callDates, # list of call dates
-                 callPrices, # list of call prices
-                 putDates, # list of put dates
-                 putPrices, # list of put prices
-                 accrualType, # day count type for accrued interest
-                 face=100.0 # face amount
+                 callDates,  # list of call dates
+                 callPrices,  # list of call prices
+                 putDates,  # list of put dates
+                 putPrices,  # list of put prices
+                 accrualType,  # day count type for accrued interest
+                 face=100.0  # face amount
                  ):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
@@ -321,8 +304,27 @@ class FinConvertibleBond(object):
               creditSpread,
               recoveryRate,
               numStepsPerYear):
-        ''' Valuation of a convertible bond using binomial tree model with a
-        credit spread component as proposed by Hull (6th edition,.page 522) '''
+
+        '''
+        A binomial tree valuation model for a convertible bond that captures 
+        the embedded equity option due to the existence of a conversion option 
+        which can be invoked after a specific date.
+
+        The model allows the user to enter a schedule of dividend payment 
+        dates but the size of the payments must be in yield terms i.e. a known 
+        percentage of currently unknown future stock price is paid. Not a 
+        fixed amount. A fixed yield. Following this payment the stock is 
+        assumed to drop by the size of the dividend payment.
+
+        The model also captures the stock dependent credit risk of the cash 
+        flows in which the bond price can default at any time with a hazard 
+        rate implied by the credit spread and an associated recovery rate. 
+        This is the model proposed by Hull (OFODS 6th edition,.page 522).
+
+        The model captures both the issuer's call schedule which is assumed 
+        to apply on a list of dates provided by the user, along with a call 
+        price. It also captures the embedded owner's put schedule of prices.
+        '''
 
         self.calculateFlowDates(settlementDate)
         tmat = (self._maturityDate - settlementDate) / gDaysInYear

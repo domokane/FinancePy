@@ -8,19 +8,18 @@ Created on Fri Nov 30 10:52:29 2018
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
 ###############################################################################
 
 
 class FinAnnuity(object):
-
-    """
-    An annuity is a vector of dates and flows generated according to ISDA standard
-    rules which starts on the next date after the start date (effective date) and
-    runs up to an end date. Dates are then adjusted according to a specified calendar.
-    """
+    ''' An annuity is a vector of dates and flows generated according to ISDA 
+    standard rules which starts on the next date after the start date 
+    (effective date) and runs up to an end date. Dates are then adjusted 
+    according to a specified calendar. '''
 
     def __init__(self,
                  startDate,

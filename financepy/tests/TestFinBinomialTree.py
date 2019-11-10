@@ -6,15 +6,20 @@ Created on Sun Jul 21 10:04:57 2019
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.equities.FinBinomialTree import FinBinomialTree, FinTreeExerciseTypes, FinTreePayoffTypes
+from financepy.products.equities.FinBinomialTree import FinBinomialTree
+from financepy.products.equities.FinBinomialTree import FinTreeExerciseTypes
+from financepy.products.equities.FinBinomialTree import FinTreePayoffTypes
 from financepy.products.equities.FinVanillaOption import FinVanillaOption
-from financepy.products.equities.FinOption import FinOptionTypes, FinOptionModelTypes
+from financepy.products.equities.FinOption import FinOptionTypes
 from financepy.finutils.FinDate import FinDate
+
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+
 import numpy as np
 import time
 import sys
 sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -26,14 +31,15 @@ def test_FinBinomialTree():
     dividendYield = 0.04
     volatility = 0.40
 
-    strikePrice = 50.0
     valueDate = FinDate(2016, 1, 1)
     expiryDate = FinDate(2017, 1, 1)
 
+    model = FinEquityModelBlackScholes(volatility)
+    discountCurve = FinFlatCurve(valueDate, riskFreeRate)
+
     numStepsList = [100, 500, 1000, 2000, 5000]
 
-    modelType = FinOptionModelTypes.BLACKSCHOLES
-    modelParams = (volatility)
+    strikePrice = 50.0
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
@@ -44,31 +50,27 @@ def test_FinBinomialTree():
     value = putOption.value(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     delta = putOption.delta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     gamma = putOption.gamma(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     theta = putOption.theta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -83,7 +85,7 @@ def test_FinBinomialTree():
         tree = FinBinomialTree()
         results = tree.value(
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
             volatility,
             numSteps,
@@ -110,7 +112,7 @@ def test_FinBinomialTree():
         tree = FinBinomialTree()
         results = tree.value(
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
             volatility,
             numSteps,
@@ -134,31 +136,27 @@ def test_FinBinomialTree():
     value = callOption.value(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     delta = callOption.delta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     gamma = callOption.gamma(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     theta = callOption.theta(
         valueDate,
         stockPrice,
-        riskFreeRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams)
+        model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -173,7 +171,7 @@ def test_FinBinomialTree():
 
         results = tree.value(
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
             volatility,
             numSteps,
@@ -202,7 +200,7 @@ def test_FinBinomialTree():
 
         results = tree.value(
             stockPrice,
-            riskFreeRate,
+            discountCurve,
             dividendYield,
             volatility,
             numSteps,

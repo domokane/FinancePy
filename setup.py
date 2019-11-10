@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/domokane/FinancePy",
     keywords=['FINANCE', 'OPTIONS', 'BONDS', 'VALUATION', 'DERIVATIVES'],
-    install_requires=['numpy','numba','scipy'],
+    install_requires=['numpy', 'numba', 'scipy'],
     packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

@@ -14,8 +14,17 @@ from ...finutils.FinDate import FinDate
 from ...products.equities.FinVanillaOption import FinOptionTypes
 
 ###############################################################################
+from enum import Enum
+
+
+class FinImplementations(Enum):
+    CRR_TREE = 1,
+    BARONE_ADESI_APPROX = 2
+
+###############################################################################
 # TODO
-#   Add term structure of rates
+#   Add term structure of rates inside code
+#   Implement some fast approximations like Barone Adesi
 ###############################################################################
 
 
@@ -31,14 +40,14 @@ from ...products.equities.FinVanillaOption import FinOptionTypes
         float64),
     fastmath=True,
     cache=True)
-def valueOnce(stockPrice,
-              riskFreeRate,
-              dividendYield,
-              volatility,
-              numSteps,
-              timeToExpiry,
-              optionType,
-              strikePrice):
+def crrTreeVal(stockPrice,
+               riskFreeRate,
+               dividendYield,
+               volatility,
+               numSteps,
+               timeToExpiry,
+               optionType,
+               strikePrice):
     ''' Value an American option using a Binomial Treee '''
     if numSteps < 3:
         numSteps = 3
@@ -143,13 +152,16 @@ def valueOnce(stockPrice,
     return results
 
 ###############################################################################
+###############################################################################
 
 
 class FinAmericanOption():
 
     ''' Class that performs the valuation of an American style option on a
     dividend paying stock. Can easily be extended to price American style FX
-    options. The dividend is assumed to be continuous. '''
+    options. '''
+
+###############################################################################
 
     def __init__(self,
                  expiryDate,
@@ -163,12 +175,14 @@ class FinAmericanOption():
         self._strikePrice = float(strikePrice)
         self._optionType = optionType
 
+###############################################################################
+
     def value(self,
               valueDate,
               stockPrice,
-              riskFreeRate,
+              discountCurve,
               dividendYield,
-              volatility,
+              model,
               numSteps=100):
 
         if valueDate > self._expiryDate:
@@ -181,25 +195,35 @@ class FinAmericanOption():
         # Convergence is improved if I take the average of an even and
         # odd number of steps in the Binomial Tree
 
-        value1 = valueOnce(stockPrice,
-                           riskFreeRate,
-                           dividendYield,
-                           volatility,
-                           numSteps,
-                           timeToExpiry,
-                           self._optionType.value,
-                           self._strikePrice)
+        volatility = model._volatility
+        df = discountCurve.df(self._expiryDate)
+        riskFreeRate = -np.log(df)/timeToExpiry
+        v = 0.0
 
-        value2 = valueOnce(stockPrice,
-                           riskFreeRate,
-                           dividendYield,
-                           volatility,
-                           numSteps + 1,
-                           timeToExpiry,
-                           self._optionType.value,
-                           self._strikePrice)
+        if model._implementation == FinImplementations.CRR_TREE:
 
-        v = (value1 + value2) / 2.0
+            value1 = crrTreeVal(stockPrice,
+                                riskFreeRate,
+                                dividendYield,
+                                volatility,
+                                numSteps,
+                                timeToExpiry,
+                                self._optionType.value,
+                                self._strikePrice)
+            value2 = crrTreeVal(stockPrice,
+                                riskFreeRate,
+                                dividendYield,
+                                volatility,
+                                numSteps + 1,
+                                timeToExpiry,
+                                self._optionType.value,
+                                self._strikePrice)
+
+            v = (value1 + value2) / 2.0
+
+        elif model._implementation == FinImplementations.BARONE_ADESI_APPROX:
+            v = 999
+
         return v
 
 ###############################################################################

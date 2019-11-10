@@ -7,7 +7,13 @@ Created on Fri Feb 12 16:51:05 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinOption import FinOptionTypes
-from financepy.products.equities.FinVanillaOption import FinVanillaOption, FinOptionModelTypes
+from financepy.products.equities.FinVanillaOption import FinVanillaOption
+from financepy.products.equities.FinVanillaOption import FinOptionModelTypes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+
+from financepy.products.equities.FinEquityModelTypes import FinEquityModel
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -17,6 +23,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
+import time
 
 def test_FinVanillaOption():
 
@@ -26,9 +33,9 @@ def test_FinVanillaOption():
     volatility = 0.30
     interestRate = 0.05
     dividendYield = 0.01
-    modelType = FinOptionModelTypes.BLACKSCHOLES
+    model = FinEquityModelBlackScholes(volatility)
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
-    import time
 
     numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 
@@ -38,22 +45,19 @@ def test_FinVanillaOption():
 
         callOption = FinVanillaOption(
             expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
-        modelParams = (volatility)
         value = callOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         start = time.time()
         valueMC = callOption.valueMC(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams,
+            model,
             numPaths)
         end = time.time()
         duration = end - start
@@ -73,18 +77,16 @@ def test_FinVanillaOption():
         value = callOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         start = time.time()
         valueMC = callOption.valueMC(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams,
+            model,
             numPaths)
         end = time.time()
         duration = end - start
@@ -104,18 +106,16 @@ def test_FinVanillaOption():
         value = putOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         start = time.time()
         valueMC = putOption.valueMC(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams,
+            model,
             numPaths)
         end = time.time()
         duration = end - start
@@ -139,31 +139,27 @@ def test_FinVanillaOption():
         value = callOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         delta = callOption.delta(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         vega = callOption.vega(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         theta = callOption.theta(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         # callOption.rho(valueDate,stockPrice, interestRate, dividendYield, modelType, modelParams)
         rho = 999
         testCases.print(stockPrice, value, delta, vega, theta, rho)
@@ -182,32 +178,29 @@ def test_FinVanillaOption():
         value = putOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         delta = putOption.delta(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         vega = putOption.vega(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         theta = putOption.theta(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
-        # putOption.rho(valueDate,stockPrice, interestRate, dividendYield, modelType, modelParams)
+            model)
+        # putOption.rho(valueDate,stockPrice, interestRate, dividendYield, 
+        # modelType, modelParams)
         rho = 999
         testCases.print(stockPrice, value, delta, vega, theta, rho)
 
@@ -223,12 +216,11 @@ def test_FinVanillaOption():
         value = callOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            modelType,
-            modelParams)
+            model)
         impliedVol = callOption.impliedVolatility(
-            valueDate, stockPrice, interestRate, dividendYield, value)
+            valueDate, stockPrice, discountCurve, dividendYield, value)
         testCases.print(stockPrice, value, volatility, impliedVol)
 
 

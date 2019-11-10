@@ -22,8 +22,12 @@ class FinFlatCurve(FinCurve):
     ''' A simple discount curve based on a single zero rate with its own
     specified compounding method. Hence the curve is assumed to be flat. '''
 
-    def __init__(self, curveDate, rate, compoundingType):
+    def __init__(self,
+                 curveDate,
+                 rate,
+                 compoundingType=FinCompoundingMethods.CONTINUOUS):
 
+        self._parentType = FinCurve
         self._rate = rate
 
         if not isinstance(curveDate, FinDate):

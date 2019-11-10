@@ -97,7 +97,7 @@ def payoffValue(s, payoffType, payoffParams):
 
 @njit(fastmath=True, cache=True)
 def valueOnce(stockPrice,
-              riskFreeRate,
+              interestRate,
               dividendYield,
               volatility,
               numSteps,
@@ -115,7 +115,7 @@ def valueOnce(stockPrice,
 
     # this is the size of the step
     dt = timeToExpiry / numSteps
-    r = riskFreeRate
+    r = interestRate
     q = dividendYield
 
     # the number of nodes on the tree
@@ -206,7 +206,7 @@ class FinBinomialTree():
 
     def value(self,
               stockPrice,
-              riskFreeRate,
+              discountCurve,
               dividendYield,
               volatility,
               numSteps,
@@ -219,6 +219,8 @@ class FinBinomialTree():
 
         # do some validation
         timeToExpiry = FinDate.datediff(valueDate, expiryDate) / gDaysInYear
+        df = discountCurve.df(timeToExpiry)
+        riskFreeRate = -log(df)/timeToExpiry
 
         price1 = valueOnce(stockPrice,
                            riskFreeRate,
