@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="financepy",
-    version="0.151",
+    version="0.152",
     author="Dominic O'Kane",
     author_email="okane.dominic@gmail.com",
     description="A Finance Library",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/domokane/FinancePy",
-    keywords=['FINANCE','OPTIONS','BONDS','VALUATION','DERIVATIVES'],
+    keywords=['FINANCE', 'OPTIONS', 'BONDS', 'VALUATION', 'DERIVATIVES'],
     install_requires=['numpy','numba','scipy'],
     packages=setuptools.find_packages(),
     classifiers=[

@@ -5,7 +5,7 @@ Created on Fri Jan 18 20:00:02 2019
 @author: Dominic O'Kane
 """
 
-from finutils.FinMath import N
+from ..finutils.FinMath import N
 from math import sqrt, log, exp
 
 
@@ -31,5 +31,6 @@ def mertonCreditModelValues(assetValue,
 
     dd = log(assetValue/bondFace)
     dd += (assetGrowthRate - (volatility**2)/2.0) * timeToMaturity
+    dd = dd / volatility / sqrt(timeToMaturity)
     pd = 1.0 - N(dd)
     return (evalue, dvalue, spd, dd, pd)
