@@ -20,14 +20,14 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinPortfolioRiskMetrics():
 
-    losses = np.array([2.0, 11.0, 15.0])
-    probabilities = np.array([0.35, 0.40, 0.25])
-    confidence = 0.95
-    el = expectedLoss(losses, probabilities)
-    var = valueAtRisk(losses, probabilities, confidence)
-    es = expectedShortfall(losses, probabilities, confidence)
+    losses = np.array([2.0, 11.0, 15.0, 20.0])
+    probabilities = np.array([0.32, 0.61, 0.04, 0.03])
 
-    print(el, var, es)
+    for confidence in np.linspace(0.01, 1.0, 100):
+        el = expectedLoss(losses, probabilities)
+        var = valueAtRisk(losses, probabilities, confidence)
+        es = expectedShortfall(losses, probabilities, confidence)
+        print("%10.6f %10.6f %10.6f %10.6f" % (confidence, el, var, es))
 
 
 test_FinPortfolioRiskMetrics()
