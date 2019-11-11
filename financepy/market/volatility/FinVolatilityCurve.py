@@ -11,61 +11,66 @@ import numpy as np
 
 from ...finutils.FinInterpolate import FinInterpMethods, interpolate
 from ...finutils.FinError import FinError
-
+from ...finutils.FinMath import testMonotonicity
 ##########################################################################
 # TODO: This is unfinished
 
 
 class FinVolatilityCurve():
+    ''' Class to manage a smile or skew in volatility at a single maturity 
+    horizon. It fits the volatility using a polynomial. Includes analytics to 
+    extract the implied pdf of the underyling at maturity. '''
 
     def __init__(self,
                  curveDate,
-                 strikeVector,
-                 volatilityVector):
+                 expiryDate,
+                 strikes,
+                 volatilities,
+                 polynomial=3):
 
-        if len(strikeVector) < 1:
-            raise FinError("Volatility grid has zero length")
+        if expiryDate <= curveDate:
+            raise FinError("Expiry date before curve date.")
 
-        numStrikes = len(strikeVector)
-        numVols = len(volatilityVector)
+        if len(strikes) < 1:
+            raise FinError("Volatility grid has zero length.")
+
+        if testMonotonicity(strikes) is False:
+            raise FinError("Strikes must be strictly monotonic.")
+
+        numStrikes = len(strikes)
+        numVols = len(volatilities)
 
         if numStrikes != numVols:
             raise FinError("Strike and volatility vectors not same length.")
 
         for i in range(1, numStrikes):
-            if strikeVector[i] <= strikeVector[i - 1]:
+            if strikes[i] <= strikes[i - 1]:
                 raise FinError("Grid Strikes are not in increasing order")
 
         self._curveDate = curveDate
-        self._strikeVector = np.array(strikeVector)
-        self._volatilityVector = np.array(volatilityVector)
+        self._strikes = np.array(strikes)
+        self._volatilities = np.array(volatilities)
+
+        self._z = np.polyfit(self._strikes, self._volatilities, polynomial)
+        self._f = np.poly1d(self._z)
 
 ###############################################################################
 
-    def volatility(self,
-                   strike,
-                   interpMethod=FinInterpMethods.PIECEWISE_LINEAR):
-        ''' Return the volatility for a strike using a given interpolation. '''
+    def volatility(self, strike):
+        ''' Return the volatility for a strike using a given polynomial 
+        interpolation. '''
 
-        vol = interpolate(strike,
-                          self._strikeVector,
-                          self._volatilityVector,
-                          interpMethod.value)
+        vol = self._f(strike)
 
-        if vol < 0.0:
-            raise ValueError("Negative volatility")
+        if vol.any() < 0.0:
+            raise ValueError("Negative volatility. Not permitted.")
 
         return vol
 
 ###############################################################################
 
-    def fitPolynomial(self,
-                      strike,
-                      interpMethod=FinInterpMethods.PIECEWISE_LINEAR):
-
-        vol = interpolate(strike,
-                          self._strikeVector,
-                          self._volsVector,
-                          interpMethod.value)
-
-        return vol
+    def calculatePDF():
+        ''' calculate the probability density function of the underlying using 
+        the volatility smile or skew curve following the approach set out in 
+        Breedon and Litzenberger. '''
+        pass

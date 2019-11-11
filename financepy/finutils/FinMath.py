@@ -37,7 +37,7 @@ def scale(x, factor):
 
 ##########################################################################
 
-#@njit(boolean(float64[:]),fastmath=True, cache=True)
+@njit(boolean(float64[:]),fastmath=True, cache=True)
 def testMonotonicity(x):
     ''' Scale all of the elements of an array by the same amount factor. '''
     for i in range(1, len(x)):

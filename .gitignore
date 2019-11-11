@@ -11,3 +11,4 @@ FinPyManual*.tex
 *.out
 *.pdf
 build
+financepy/docs/FinancePyManualV_0.15.tex
