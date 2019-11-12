@@ -90,9 +90,7 @@ class FinDate():
 
         if y < 1900 or y > 2100:
             raise ValueError(
-                "Date: year " +
-                str(y) +
-                " should be 1900 to 2100.")
+                "Date: year " + str(y) + " should be 1900 to 2100.")
 
         if m < 1 or m > 12:
             raise ValueError("Date: month " + str(m) + " should be 1 to 12.")
@@ -116,6 +114,13 @@ class FinDate():
 
         # update the excel date used for doing lots of financial calculations
         self.refresh()
+
+    ###########################################################################
+
+    def fromDatetime(dt):
+        ''' Construct a FinDate from a datetime '''
+        finDate = FinDate(dt.year, dt.month, dt.day)
+        return finDate
 
     ###########################################################################
 

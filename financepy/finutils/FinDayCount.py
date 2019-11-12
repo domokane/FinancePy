@@ -15,18 +15,20 @@ from enum import Enum
 # https://developers.opengamma.com/quantitative-research/Interest-Rate-Instruments-and-Market-Conventions.pdf
 # and https://en.wikipedia.org/wiki/Day_count_convention
 # http://www.fairmat.com/documentation/usermanual/topics/download/mediawiki/index.php/Day_Count_Conventions.htm
+# http://www.eclipsesoftware.biz/DayCountConventions.html
 
 class FinDayCountTypes(Enum):
     THIRTY_E_360_ISDA = 1  # AKA 30E/360 ISDA, EUROBOND (ISDA 2010)
     THIRTY_E_360_PLUS_ISDA = 2  # NEEDS SOURCE
     ACT_ACT_ISDA = 3  # DOES LEAP YEAR SPLIT
-    ACT_365_ISDA = 4  # SPLITS ACROSS LEAP YEAR
-    THIRTY_360 = 5
-    THIRTY_360_BOND = 6
-    THIRTY_E_360 = 7  # AKA 30/360 ICMA, EUROBOND (ISDA 2006)
-    ACT_360 = 8
-    ACT_365_FIXED = 9
-    ACT_365_LEAP = 10
+    ACT_ACT_ICMA = 4  # DOES LEAP YEAR SPLIT
+    ACT_365_ISDA = 5  # SPLITS ACROSS LEAP YEAR
+    THIRTY_360 = 6
+    THIRTY_360_BOND = 7
+    THIRTY_E_360 = 8  # AKA 30/360 ICMA, EUROBOND (ISDA 2006)
+    ACT_360 = 9
+    ACT_365_FIXED = 10
+    ACT_365_LEAP = 11
 
 ##########################################################################
 ##########################################################################
@@ -46,7 +48,7 @@ class FinDayCount(object):
 
 ##########################################################################
 
-    def yearFrac(self, dt1, dt2):
+    def yearFrac(self, dt1, dt2, dt3=None):
         ''' Calculate the year fraction between dates dt1 and dt2 using the
         specified day count convention. '''
 
@@ -139,6 +141,15 @@ class FinDayCount(object):
                 daysYear2 = FinDate.datediff(FinDate(y1 + 1, 1, 1), dt2)
                 accFactor = daysYear1 / denom1
                 accFactor += daysYear2 / denom2
+                return accFactor
+
+        elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
+                if dt3 is None:
+                    raise ValueError("ACT_ACT_ICMA requires three dates")
+
+                num = dt2 - dt1
+                den = dt3 - dt1
+                accFactor = num/den
                 return accFactor
 
         elif self._type == FinDayCountTypes.ACT_360:

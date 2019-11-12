@@ -5,8 +5,6 @@ Created on Fri Nov 30 10:52:29 2018
 @author: Dominic O'Kane
 """
 
-from . import FinError
-
 from enum import Enum
 
 
@@ -21,22 +19,18 @@ class FinFrequencyTypes(Enum):
 
 def FinFrequency(frequencyType):
 
-    if frequencyType == FinFrequencyTypes.ANNUAL:
-        frequency = 1
-    elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
-        frequency = 2
-    elif frequencyType == FinFrequencyTypes.QUARTERLY:
-        frequency = 4
-    elif frequencyType == FinFrequencyTypes.MONTHLY:
-        frequency = 12
+    if frequencyType in FinFrequencyTypes:
+        if frequencyType == FinFrequencyTypes.ANNUAL:
+            return 1
+        elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
+            return 2
+        elif frequencyType == FinFrequencyTypes.QUARTERLY:
+            return 4
+        elif frequencyType == FinFrequencyTypes.MONTHLY:
+            return 12
+    elif type(frequencyType) is int:
+        return frequencyType
     else:
-        raise FinError("Frequency Type not found:" + str(frequencyType))
-
-    return frequency
-
-###############################################################################
-
-    def __str__(self):
-        return str(self._name)
+        raise ValueError("Unknown frequency type")
 
 ###############################################################################

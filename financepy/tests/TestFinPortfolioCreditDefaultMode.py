@@ -65,5 +65,6 @@ def test_FinPortfolioCreditDefaultMode():
         es = expectedShortfall(support, dbn, confidence)
         print("%10.4f %10.7f %10.7f" % (confidence, var, es))
 
+
 test_FinPortfolioCreditDefaultMode()
 testCases.compareTestCases()

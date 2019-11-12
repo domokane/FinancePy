@@ -337,6 +337,11 @@ class FinTestCases():
         totalNumWarnings = 0
         totalNumErrors = 0
 
+        # check golden file exists
+        if exists(self._goldenFilename) is False:
+            print("No GOLDEN file exists. You need to change the mode to SAVE_TEST_CASES and then rerun.")
+            return
+
         # open golden file and load it up
         f = open(self._goldenFilename, 'r')
         goldenContents = f.readlines()

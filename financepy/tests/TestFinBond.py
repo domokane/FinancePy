@@ -5,15 +5,18 @@ Created on Mon Aug  5 09:43:40 2019
 @author: Dominic
 """
 
+import datetime as dt
+
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
 from financepy.market.curves.FinFlatCurve import FinFlatCurve, FinCompoundingMethods
-from financepy.products.bonds.FinBond import FinBond, FinBondAccruedTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+
 import sys
 sys.path.append("..//..")
 
@@ -187,22 +190,52 @@ def buildLiborCurve(valuationDate):
 
 def test_FinBond():
 
+    import pandas as pd
+    bondDataFrame = pd.read_csv('./data/giltbondprices.txt', sep='\t')
+    bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
+
+    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    settlement = FinDate(2012, 9, 19)
+
+    for accrualType in FinDayCountTypes:
+
+        testCases.header("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS",
+                         "ACCRUED", "YTM")
+
+        for index, bond in bondDataFrame.iterrows():
+
+            dateString = bond['maturity']
+            matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
+            maturityDt = FinDate.fromDatetime(matDatetime)
+            coupon = bond['coupon']/100.0
+            cleanPrice = bond['mid']
+            bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
+
+            ytm = bond.yieldToMaturity(settlement, cleanPrice)
+            accd = bond._accrued
+            accd_days = bond._accruedDays
+
+            testCases.print("%18s" % maturityDt, "%8.4f" % coupon,
+                            "%10.4f" % cleanPrice, "%6.0f" % accd_days,
+                            "%10.4f" % accd, "%8.4f" % ytm)
+
     # EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
 
-    accrualConvention = FinBondAccruedTypes.ACT_ACT
+    accrualConvention = FinDayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settlementDate = FinDate(1994, 4, 19)
     maturityDate = FinDate(1997, 7, 15)
     coupon = 0.085
+    face = 1.0
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    bond = FinBond(maturityDate, coupon, freqType, accrualConvention, 1.0)
+    bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
 
     testCases.header("FIELD", "VALUE")
     fullPrice = bond.fullPriceFromYield(settlementDate, y)
     testCases.print("Full Price = ", fullPrice)
     cleanPrice = bond.cleanPriceFromYield(settlementDate, y)
     testCases.print("Clean Price = ", cleanPrice)
-    accd = bond.accruedInterest(settlementDate)
+    accd = bond._accrued
     testCases.print("Accrued = ", accd)
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
     testCases.print("Yield to Maturity = ", ytm)
@@ -238,6 +271,8 @@ def test_FinBond():
                              ytm,
                              FinCompoundingMethods.SEMI_ANNUAL)
 
+    testCases.header("FIELD", "VALUE")
+
     cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
     asw = bond.assetSwapSpread(settlementDate, cleanPrice, flatCurve)
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
@@ -255,13 +290,13 @@ def test_FinBond():
     testCases.print("Deep discount bond at 90 ASW:", asw * 10000)
     testCases.print("Deep discount bond at 90 OAS:", oas * 10000)
 
-    p = 1.0
+    p = 1.00
     asw = bond.assetSwapSpread(settlementDate, p, liborCurve)
     oas = bond.optionAdjustedSpread(settlementDate, p, liborCurve)
     testCases.print("Par bond at 100 ASW:", asw * 10000)
     testCases.print("Par bond at 100 OAS:", oas * 10000)
 
-    p = 1.2
+    p = 1.20
     asw = bond.assetSwapSpread(settlementDate, p, liborCurve)
     oas = bond.optionAdjustedSpread(settlementDate, p, liborCurve)
     testCases.print("Above par bond at 120 ASW:", asw * 10000)
@@ -277,16 +312,14 @@ def test_FinBond():
     maturityDate = FinDate(2027, 5, 15)
     coupon = 0.02375
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinBondAccruedTypes.ACT_ACT
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
-    redemption = 1.0
 
     bond = FinBond(maturityDate,
                    coupon,
                    freqType,
                    accrualType,
-                   face,
-                   redemption)
+                   face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 99.780842
@@ -294,8 +327,17 @@ def test_FinBond():
     yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield = ", yld)
 
-    ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
-    testCases.print("Yield To Maturity = ", ytm)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.UK_DMO)
+    testCases.print("UK DMO Yield To Maturity = ", ytm)
+
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.US_STREET)
+    testCases.print("US STREET Yield To Maturity = ", ytm)
+
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.US_TREASURY)
+    testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
     fullPrice = bond.fullPriceFromYield(settlementDate, ytm)
     testCases.print("Full Price = ", fullPrice)
@@ -303,11 +345,11 @@ def test_FinBond():
     cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
     testCases.print("Clean Price = ", cleanPrice)
 
-    accddays = bond.accruedDays(settlementDate)
-    testCases.print("Accrued Days = ", accddays)
-
-    accd = bond.accruedInterest(settlementDate)
+    accd = bond._accrued
     testCases.print("Accrued = ", accd)
+
+    accddays = bond._accruedDays
+    testCases.print("Accrued Days = ", accddays)
 
     duration = bond.dollarDuration(settlementDate, ytm)
     testCases.print("Dollar Duration = ", duration)
@@ -330,16 +372,14 @@ def test_FinBond():
     maturityDate = FinDate(2022, 5, 13)
     coupon = 0.027
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinBondAccruedTypes.ACT_ACT
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
-    redemption = 1.0
 
     bond = FinBond(maturityDate,
                    coupon,
                    freqType,
                    accrualType,
-                   face,
-                   redemption)
+                   face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 101.581564
@@ -347,8 +387,17 @@ def test_FinBond():
     yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield = ", yld)
 
-    ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
-    testCases.print("Yield To Maturity = ", ytm)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.UK_DMO)
+    testCases.print("UK DMO Yield To Maturity = ", ytm)
+
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.US_STREET)
+    testCases.print("US STREET Yield To Maturity = ", ytm)
+
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYieldConventions.US_TREASURY)
+    testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
     fullPrice = bond.fullPriceFromYield(settlementDate, ytm)
     testCases.print("Full Price = ", fullPrice)
@@ -356,11 +405,11 @@ def test_FinBond():
     cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
     testCases.print("Clean Price = ", cleanPrice)
 
-    # I GET 69 BUT BBG GETS 68 - CANNOT EXPLAIN
-    accddays = bond.accruedDays(settlementDate)
+    # I GET 69 DAYS BUT BBG GETS 68 - CANNOT EXPLAIN!!
+    accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accd = bond.accruedInterest(settlementDate)
+    accd = bond._accrued
     testCases.print("Accrued = ", accd)
 
     duration = bond.dollarDuration(settlementDate, ytm)
