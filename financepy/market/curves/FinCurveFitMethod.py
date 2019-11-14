@@ -18,7 +18,7 @@ class FinCurveFitMethodPolynomial():
         self._power = power
         self._coeffs = []
 
-    def interpolatedYield(self, t):
+    def interpolateRate(self, t):
         yld = np.polyval(self._coeffs, t)
         return yld
 
@@ -34,8 +34,7 @@ class FinCurveFitMethodNelsonSiegel():
         self._beta3 = None
         self._tau = tau
 
-    def interpolatedYield(self, t,
-                          beta1=None, beta2=None, beta3=None, tau=None):
+    def interpolateRate(self, t, beta1=None, beta2=None, beta3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
@@ -72,9 +71,8 @@ class FinCurveFitMethodNelsonSiegelSvensson():
         self._tau1 = tau1
         self._tau2 = tau2
 
-    def interpolatedYield(self, t,
-                          beta1=None, beta2=None, beta3=None, beta4=None,
-                          tau1=None, tau2=None):
+    def interpolateRate(self, t, beta1=None, beta2=None, beta3=None,
+                        beta4=None, tau1=None, tau2=None):
 
         # Careful if we get a time zero point
         t = np.maximum(t, 1e-10)
@@ -109,14 +107,15 @@ class FinCurveFitMethodNelsonSiegelSvensson():
 
 ###############################################################################
 
+
 class FinCurveFitMethodBSpline():
 
-    def __init__(self, power=3, knots=[1,3,5,10]):
+    def __init__(self, power=3, knots=[1, 3, 5, 10]):
         self._parentType = FinCurveFitMethod
         self._power = power
         self._knots = knots
 
-    def interpolatedYield(self, t):
+    def interpolateRate(self, t):
         t = np.maximum(t, 1e-10)
         yld = splev(t, self._spline)
         return yld

@@ -28,16 +28,18 @@ def isLeapYear(y):
 ##########################################################################
 
 
-@njit(fastmath=True, cache=True)
+@njit(float64[:](float64[:], float64), fastmath=True, cache=True)
 def scale(x, factor):
     ''' Scale all of the elements of an array by the same amount factor. '''
+    x_scale = np.empty(len(x))
     for i in range(0, len(x)):
-        x[i] = x[i] * factor
-    return x
+        x_scale[i] = x[i] * factor
+    return x_scale
 
 ##########################################################################
 
-@njit(boolean(float64[:]),fastmath=True, cache=True)
+
+@njit(boolean(float64[:]), fastmath=True, cache=True)
 def testMonotonicity(x):
     ''' Scale all of the elements of an array by the same amount factor. '''
     for i in range(1, len(x)):
@@ -46,6 +48,7 @@ def testMonotonicity(x):
     return True
 
 ##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def testRange(x, lower, upper):
@@ -57,6 +60,7 @@ def testRange(x, lower, upper):
             raise ValueError("Value above upper.")
 
 ##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def maximum(a, b):

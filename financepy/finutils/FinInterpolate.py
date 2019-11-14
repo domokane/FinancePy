@@ -5,7 +5,8 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 from math import exp, log, fabs
-from numba import njit, float64, int64
+from numba import njit, float64, int64, jit
+import numpy as np
 
 ###############################################################################
 
@@ -19,19 +20,36 @@ class FinInterpMethods(Enum):
 
 ###############################################################################
 
-@njit(float64(float64, float64[:], float64[:], int64),
-      fastmath=True, cache=True, nogil=True)
+
 def interpolate(xValue,
                 xvector,
                 yvector,
                 method):
+
+    if type(xValue) is float or type(xValue) is np.float64:
+        u = uinterpolate(xValue, xvector, yvector, method)
+        return u
+    elif type(xValue) is np.ndarray:
+        v = vinterpolate(xValue, xvector, yvector, method)
+        return v
+    else:
+        raise ValueError("Unknown input type")
+
+###############################################################################
+
+@njit(float64(float64, float64[:], float64[:], int64),
+      fastmath=True, cache=True, nogil=True)
+def uinterpolate(xValue,
+                 xvector,
+                 yvector,
+                 method):
     ''' Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. '''
 
     small = 1e-10
-    numPoints = len(xvector)
+    numPoints = xvector.size
 
     if xValue == xvector[0]:
         return yvector[0]
@@ -115,5 +133,25 @@ def interpolate(xValue,
 
     else:
         return 0.0
+
+###############################################################################
+
+@njit(float64[:](float64[:], float64[:], float64[:], int64),
+      fastmath=True, cache=True, nogil=True)
+def vinterpolate(xValues,
+                 xvector,
+                 yvector,
+                 method):
+    ''' Return the interpolated values of y given x and a vector of x and y.
+    The values of x must be monotonic and increasing. The different schemes for
+    interpolation are linear in y (as a function of x), linear in log(y) and
+    piecewise flat in the continuously compounded forward y rate. '''
+
+    n = xValues.size
+    yvalues = np.empty(n)
+    for i in range(0, n):
+        yvalues[i] = uinterpolate(xValues[i], xvector, yvector, method)
+
+    return yvalues
 
 ###############################################################################

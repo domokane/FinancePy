@@ -51,8 +51,7 @@ class FinBondFuture(object):
                           bond._coupon,
                           bond._frequencyType,
                           bond._accrualType,
-                          face,
-                          bond._redemption)
+                          face)
 
         p = newBond.cleanPriceFromYield(self._firstDeliveryDate,
                                         self._coupon)
@@ -79,7 +78,7 @@ class FinBondFuture(object):
                            bond,
                            futuresPrice):
         ' The total invoice amount paid to take delivery of bond. '
-        accd = bond.accruedInterest(settlementDate)
+        accd = bond._accrued
         pip = self.principalInvoicePrice(bond, futuresPrice)
         accrued = accd * self._contractSize / 100.0
         tia = pip + accrued

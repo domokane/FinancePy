@@ -6,8 +6,9 @@ Created on Fri Feb 12 16:51:05 2019
 """
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondFuture import FinBondFuture
-from financepy.products.bonds.FinBond import FinBond, FinBondAccruedTypes
+from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -20,7 +21,7 @@ def test_FinBondFuture():
 
         # Example taken from Martellini and Priaulet page 360
     freq = FinFrequencyTypes.SEMI_ANNUAL
-    basis = FinBondAccruedTypes.ACT_ACT
+    basis = FinDayCountTypes.ACT_ACT_ICMA
 
     bond1 = FinBond(FinDate(2011, 8, 15), 0.0500, freq, basis)
     bond2 = FinBond(FinDate(2011, 2, 15), 0.0500, freq, basis)

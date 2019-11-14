@@ -60,7 +60,7 @@ class FinFitBondYieldCurve():
             xdata = self._yearsToMaturity
             ydata = self._ylds
 #            bnds = [(0.0, -1.0, -1.0, 0.0), (1.0, 1.0, 1.0, 100.0)]
-            popt, pcov = curve_fit(self._curveFitMethod.interpolatedYield,
+            popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
                                    xdata, ydata)
 
             self._curveFitMethod._beta1 = popt[0]
@@ -73,7 +73,7 @@ class FinFitBondYieldCurve():
             xdata = self._yearsToMaturity
             ydata = self._ylds
             bnds = [(0., -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]
-            popt, pcov = curve_fit(self._curveFitMethod.interpolatedYield,
+            popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
                                    xdata, ydata, bounds=bnds)
 
             self._curveFitMethod._beta1 = popt[0]
@@ -112,32 +112,32 @@ class FinFitBondYieldCurve():
         fit = self._curveFitMethod
 
         if type(fit) == FinCurveFitMethodPolynomial:
-            yld = np.polyval(fit._coeffs, t)
+#            yld = np.polyval(fit._coeffs, t)
+            yld = fit.interpolateRate(t)
         elif type(fit) == FinCurveFitMethodNelsonSiegel:
-            yld = fit.interpolatedYield(t,
-                                        self._curveFitMethod._beta1,
-                                        self._curveFitMethod._beta2,
-                                        self._curveFitMethod._beta3,
-                                        self._curveFitMethod._tau)
+            yld = fit.interpolateRate(t,
+                                      self._curveFitMethod._beta1,
+                                      self._curveFitMethod._beta2,
+                                      self._curveFitMethod._beta3,
+                                      self._curveFitMethod._tau)
 
         elif type(fit) == FinCurveFitMethodNelsonSiegelSvensson:
-            yld = fit.interpolatedYield(t,
-                                        self._curveFitMethod._beta1,
-                                        self._curveFitMethod._beta2,
-                                        self._curveFitMethod._beta3,
-                                        self._curveFitMethod._beta4,
-                                        self._curveFitMethod._tau1,
-                                        self._curveFitMethod._tau2)
+            yld = fit.interpolateRate(t,
+                                      self._curveFitMethod._beta1,
+                                      self._curveFitMethod._beta2,
+                                      self._curveFitMethod._beta3,
+                                      self._curveFitMethod._beta4,
+                                      self._curveFitMethod._tau1,
+                                      self._curveFitMethod._tau2)
         elif type(fit) == FinCurveFitMethodBSpline:
-            yld = fit.interpolatedYield(t)
+            yld = fit.interpolateRate(t)
 
         return yld
 
 ##########################################################################
 
     def display(self, title):
-        ''' Calculation of forward rates. This function can return a vector
-        of forward rates given a vector of times. '''
+        ''' Display yield curve. '''
 
         plt.figure(figsize=(12, 6))
         plt.title(title)

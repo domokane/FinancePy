@@ -251,6 +251,17 @@ class FinBond(object):
 
 ###############################################################################
 
+    def cleanPriceFromDiscountCurve(self, settlementDate, discountCurve):
+        ''' Calculate the bond price using some discount curve to present-value
+        the bond's cashflows. '''
+
+        fullPrice = self.fullPriceFromDiscountCurve(settlementDate,
+                                                    discountCurve)
+        cleanPrice = fullPrice - self._accrued
+        return cleanPrice
+
+###############################################################################
+
     def fullPriceFromDiscountCurve(self, settlementDate, discountCurve):
         ''' Calculate the bond price using some discount curve to present-value
         the bond's cashflows. '''

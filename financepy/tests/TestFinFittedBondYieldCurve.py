@@ -7,25 +7,20 @@ Created on Fri Apr 08 09:26:27 2016
 
 import datetime as dt
 
+import sys
+sys.path.append("..//..")
+
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBond import FinBond
 from financepy.market.curves.FinFitBondYieldCurve import FinFitBondYieldCurve
-
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodPolynomial
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegel
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegelSvensson
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodBSpline
-
-##########################################################################
-# TODO: Inherit from FinCurve and add df method
-# TODO: Add fitting optimiser to take in bonds and do a best fit
-##########################################################################
-
-import sys
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -56,39 +56,50 @@ class FinDiscountCurve():
         else:
             t = time
 
-        return interpolate(
-            t,
-            self._times,
-            self._values,
-            self._interpMethod.value)
+        if np.any(t) < 0:
+            raise FinError("Date is before curve value date.")
+
+        z = interpolate(t, self._times, self._values,
+                        self._interpMethod.value)
+
+        return z
 
 ##########################################################################
 
-    def survivalProbability(self, time):
-
-        if type(time) is FinDate:
-            t = (time._excelDate - self._curveDate._excelDate) / gDaysInYear
-        else:
-            t = time
-
-        return interpolate(
-            t,
-            self._times,
-            self._values,
-            self._interpMethod.value)
-
-###############################################################################
-
-    def zeroContinuous(self, maturityDate):
-        ''' Calculate the continuous compounded zero rate to maturity date. '''
+    def survivalProbability(self, maturityDate):
 
         if maturityDate < self._curveDate:
             raise FinError("Date is before curve value date.")
 
-        # I add on a tiny amount just in case maturity = curve date
-        tau = (maturityDate - self._curveDate) / gDaysInYear + 0.00000001
-        df = self.df(maturityDate)
-        zeroRate = -log(df) / tau
+        if type(maturityDate) is FinDate:
+            t = (maturityDate - self._curveDate) / gDaysInYear
+        else:
+            t = maturityDate
+
+        q = interpolate(t, self._times, self._values, self._interpMethod.value)
+        return q
+
+###############################################################################
+
+    def zeroRate(self, maturityDate, frequency=None):
+        ''' Calculate the continuous compounded zero rate to maturity date. '''
+
+        if type(maturityDate) is FinDate:
+            t = (maturityDate - self._curveDate) / gDaysInYear
+        else:
+            t = maturityDate
+
+        if np.any(t) < 0:
+            raise FinError("Date is before curve value date.")
+
+        t = np.maximum(t, 1e-10)
+        df = self.df(t)
+
+        if frequency is None:
+            zeroRate = -np.log(df) / t
+        else:
+            zeroRate = (df**(-1.0/t) - 1) * frequency
+
         return zeroRate
 
 ##########################################################################
