@@ -8,7 +8,10 @@ Created on Fri Feb 12 16:51:05 2016
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinCompoundOption import FinCompoundOption
 from financepy.products.equities.FinOption import FinOptionTypes
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
+
 import sys
 sys.path.append("..//..")
 
@@ -29,6 +32,9 @@ def test_FinCompoundOption():
     volatility = 0.15
     interestRate = 0.035
     dividendYield = 0.01
+
+    model = FinEquityModelBlackScholes(volatility)
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
     optionType1 = FinOptionTypes.EUROPEAN_CALL
     optionType2 = FinOptionTypes.EUROPEAN_PUT
@@ -71,15 +77,15 @@ def test_FinCompoundOption():
         value = cmpdOption.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            volatility)
+            model)
         values = cmpdOption.valueTree(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            volatility,
+            model,
             numSteps)
         testCases.print(
             optionType1,
@@ -120,31 +126,31 @@ def test_FinCompoundOption():
                 value = cmpdOption.value(
                     valueDate,
                     stockPrice,
-                    interestRate,
+                    discountCurve,
                     dividendYield,
-                    volatility)
+                    model)
                 delta = cmpdOption.delta(
                     valueDate,
                     stockPrice,
-                    interestRate,
+                    discountCurve,
                     dividendYield,
-                    volatility)
+                    model)
                 vega = cmpdOption.vega(
                     valueDate,
                     stockPrice,
-                    interestRate,
+                    discountCurve,
                     dividendYield,
-                    volatility)
+                    model)
                 theta = cmpdOption.theta(
                     valueDate,
                     stockPrice,
-                    interestRate,
+                    discountCurve,
                     dividendYield,
-                    volatility)
+                    model)
 
                 values = cmpdOption.valueTree(valueDate, stockPrice,
-                                              interestRate, dividendYield,
-                                              volatility)
+                                              discountCurve, dividendYield,
+                                              model)
 
                 diff = value - values[0]
 

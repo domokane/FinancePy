@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from enum import Enum
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-
+from .FinEquityModelTypes import FinEquityModelBlackScholes
 ##########################################################################
 
 bump = 1e-4
@@ -43,19 +43,19 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility):
+            model):
         v = self.value(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         vBumped = self.value(
             valueDate,
             stockPrice + bump,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         delta = (vBumped - v) / bump
         return delta
 
@@ -65,19 +65,19 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility):
+            model):
         v = self.delta(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         vBumped = self.delta(
             valueDate,
             stockPrice + bump,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         gamma = (vBumped - v) / bump
         return gamma
 
@@ -87,19 +87,19 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility):
+            model):
         v = self.value(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         vBumped = self.value(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility + bump)
+            FinEquityModelBlackScholes(model._volatility + bump))
         vega = (vBumped - v) / bump
         return vega
 
@@ -109,13 +109,13 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility):
+            model):
         v = self.value(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         nextDate = valueDate.addDays(1)
         bump = 1.0 / gDaysInYear
         vBumped = self.value(
@@ -123,7 +123,7 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         theta = (vBumped - v) / bump
         return theta
 
@@ -133,19 +133,20 @@ class FinOption(object):
             stockPrice,
             interestRate,
             dividendYield,
-            volatility):
+            model):
+
         v = self.value(
             valueDate,
             stockPrice,
             interestRate,
             dividendYield,
-            volatility)
+            model)
         vBumped = self.value(
             valueDate,
             stockPrice,
             interestRate + bump,
             dividendYield,
-            volatility)
+            model)
         rho = (vBumped - v) / bump
         return rho
 

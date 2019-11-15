@@ -18,7 +18,8 @@ from ...finutils.FinError import FinError
 
 from ...products.equities.FinOption import FinOption
 from ...products.equities.FinOption import FinOptionTypes
-from ...products.equities.FinVanillaOption import FinVanillaOption, FinOptionModelTypes
+from ...products.equities.FinVanillaOption import FinVanillaOption
+from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
 
 ###############################################################################
 
@@ -27,7 +28,7 @@ def f(s0, *args):
 
     self = args[0]
     valueDate = args[1]
-    interestRate = args[2]
+    discountCurve = args[2]
     dividendYield = args[3]
     volatility = args[4]
     value = args[5]
@@ -35,15 +36,13 @@ def f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits K1")
 
-    modelType = FinOptionModelTypes.BLACKSCHOLES
-    modelParams = (volatility)
+    model = FinEquityModelBlackScholes(volatility)
     objFn = self.value(
         valueDate,
         s0,
-        interestRate,
+        discountCurve,
         dividendYield,
-        modelType,
-        modelParams) - value
+        model) - value
 
     return objFn
 
@@ -163,7 +162,7 @@ def valueOnce(stockPrice,
         elif optionType1 == FinOptionTypes.EUROPEAN_PUT:
             optionValues[index + iNode] = max(k1 - holdValue, 0)
 
-   # begin backward steps from t1 expiry to value date
+    # begin backward steps from t1 expiry to value date
     for iTime in range(numSteps1 - 1, -1, -1):
         index = int(0.5 * iTime * (iTime + 1))
         for iNode in range(0, iTime + 1):
@@ -227,12 +226,15 @@ class FinCompoundOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
-              volatility):
+              model):
 
         t1 = FinDate.datediff(valueDate, self._expiryDate1) / gDaysInYear
         t2 = FinDate.datediff(valueDate, self._expiryDate2) / gDaysInYear
+
+        df2 = discountCurve.df(t2)
+        r = -log(df2)/t2
 
         if abs(t1) < gSmall:
             t1 = gSmall
@@ -240,13 +242,12 @@ class FinCompoundOption(FinOption):
         if abs(t2) < gSmall:
             t2 = gSmall
 
-        v = volatility
+        v = model._volatility
 
         if abs(v) < gSmall:
             v = gSmall
 
         s0 = stockPrice
-        r = interestRate
         q = dividendYield
         k1 = self._strikePrice1
         k2 = self._strikePrice2
@@ -258,7 +259,7 @@ class FinCompoundOption(FinOption):
             k1,
             k2,
             self._optionType2,
-            r,
+            discountCurve,
             q,
             v)
 
@@ -299,9 +300,9 @@ class FinCompoundOption(FinOption):
     def valueTree(self,
                   valueDate,
                   stockPrice,
-                  riskFreeRate,
+                  discountCurve,
                   dividendYield,
-                  volatility,
+                  model,
                   numSteps=200):
 
         if valueDate > self._expiryDate1:
@@ -309,6 +310,11 @@ class FinCompoundOption(FinOption):
 
         t1 = FinDate.datediff(valueDate, self._expiryDate1) / gDaysInYear
         t2 = FinDate.datediff(valueDate, self._expiryDate2) / gDaysInYear
+
+        df2 = discountCurve.df(t2)
+        riskFreeRate = -log(df2)/t2
+
+        volatility = model._volatility
 
         v1 = valueOnce(stockPrice,
                        riskFreeRate,
@@ -341,18 +347,20 @@ class FinCompoundOption(FinOption):
                           strikePrice1,
                           strikePrice2,
                           optionType2,
-                          interestRate,
+                          discountCurve,
                           dividendYield,
                           volatility):
 
         option = FinVanillaOption(expiryDate2, strikePrice2, optionType2)
+
         argtuple = (
             option,
             expiryDate1,
-            interestRate,
+            discountCurve,
             dividendYield,
             volatility,
             strikePrice1)
+
         sigma = optimize.newton(
             f,
             x0=stockPrice,

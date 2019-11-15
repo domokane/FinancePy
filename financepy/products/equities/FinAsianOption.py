@@ -51,9 +51,9 @@ from ...products.equities.FinOption import FinOptionTypes
 @njit(cache=True, fastmath=True)
 def valueMC_NUMBA(t0, t, tau, K, n, optionType,
                   stockPrice,
+                  interestRate,
                   dividendYield,
                   volatility,
-                  interestRate,
                   numPaths,
                   seed,
                   accruedAverage):
@@ -67,7 +67,7 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType,
 
         if accruedAverage is None:
             raise FinError(
-                "If you are in the averaging period you need to enter the accrued average")
+            "In the averaging period you need to enter the accrued average")
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -131,9 +131,9 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType,
 @njit(cache=True, fastmath=True)
 def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
                        stockPrice,
+                       interestRate,
                        dividendYield,
                        volatility,
-                       interestRate,
                        numPaths,
                        seed,
                        accruedAverage):
@@ -151,7 +151,7 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
 
         if accruedAverage is None:
             raise FinError(
-                "If you are in the averaging period you need to enter the accrued average")
+                "In the averaging period you need to enter the accrued average")
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -212,9 +212,9 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
 @njit(cache=True, fastmath=True)
 def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
                           stockPrice,
+                          interestRate,
                           dividendYield,
                           volatility,
-                          interestRate,
                           numPaths,
                           seed,
                           accruedAverage,
@@ -233,7 +233,7 @@ def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
 
         if accruedAverage is None:
             raise FinError(
-                "If you are in the averaging period you need to enter the accrued average")
+                "In averaging period you need to enter the accrued average")
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -341,9 +341,9 @@ class FinAsianOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
+              discountCurve,
               dividendYield,
-              volatility,
-              interestRate,
+              model,
               valuationMethod,
               accruedAverage=None):
 
@@ -354,27 +354,27 @@ class FinAsianOption(FinOption):
 
             v = self.valueGeometric(valueDate,
                                     stockPrice,
+                                    discountCurve,
                                     dividendYield,
-                                    volatility,
-                                    interestRate,
+                                    model,
                                     accruedAverage)
 
         elif valuationMethod == "TURNBULL_WAKEMAN":
 
             v = self.valueTurnbullWakeman(valueDate,
                                           stockPrice,
+                                          discountCurve,
                                           dividendYield,
-                                          volatility,
-                                          interestRate,
+                                          model,
                                           accruedAverage)
 
         elif valuationMethod == "CURRAN":
 
             v = self.valueCurran(valueDate,
                                  stockPrice,
+                                 discountCurve,
                                  dividendYield,
-                                 volatility,
-                                 interestRate,
+                                 model,
                                  accruedAverage)
 
 #        elif valuationMethod == "MILEVSKY_POSNER":
@@ -405,9 +405,9 @@ class FinAsianOption(FinOption):
     def valueGeometric(self,
                        valueDate,
                        stockPrice,
+                       discountCurve,
                        dividendYield,
-                       volatility,
-                       interestRate,
+                       model,
                        accruedAverage):
 
         # This is based on paper by Kemna and Vorst 1990. It calculates the
@@ -427,9 +427,12 @@ class FinAsianOption(FinOption):
             self._startAveragingDate,
             self._expiryDate) / gDaysInYear
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        volatility = model._volatility
+
         K = self._strikePrice
         n = self._numObservations
-        r = interestRate
         q = dividendYield
         S0 = stockPrice
 
@@ -439,7 +442,7 @@ class FinAsianOption(FinOption):
 
             if accruedAverage is None:
                 raise FinError(
-                    "If you are in the averaging period you need to enter the accrued average")
+                "In averaging period you need to enter the accrued average")
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -477,20 +480,14 @@ class FinAsianOption(FinOption):
     def valueCurran(self,
                     valueDate,
                     stockPrice,
+                    discountCurve,
                     dividendYield,
-                    volatility,
-                    interestRate,
+                    model,
                     accruedAverage):
 
         # This is based on paper by Vorst
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
-
-        S0 = stockPrice
-        b = interestRate - dividendYield
-        sigma2 = volatility**2
-        r = interestRate
-        K = self._strikePrice
 
         t0 = FinDate.datediff(
             valueDate, self._startAveragingDate) / gDaysInYear
@@ -500,13 +497,22 @@ class FinAsianOption(FinOption):
             self._expiryDate) / gDaysInYear
         multiplier = 1.0
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        volatility = model._volatility
+
+        S0 = stockPrice
+        b = r - dividendYield
+        sigma2 = volatility**2
+        K = self._strikePrice
+
         n = self._numObservations
 
         if t0 < 0:  # we are in the averaging period
 
             if accruedAverage is None:
                 raise FinError(
-                    "If you are in the averaging period you need to enter the accrued average")
+                "In averaging period you need to enter the accrued average")
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -609,9 +615,9 @@ class FinAsianOption(FinOption):
     def valueTurnbullWakeman(self,
                              valueDate,
                              stockPrice,
+                             discountCurve,
                              dividendYield,
-                             volatility,
-                             interestRate,
+                             model,
                              accruedAverage):
 
         # This is based on paper by Turnbull and Wakeman 1991 which uses
@@ -632,11 +638,16 @@ class FinAsianOption(FinOption):
         multiplier = 1.0
         n = self._numObservations
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+
+        volatility = model._volatility
+
         if t0 < 0:  # we are in the averaging period
 
             if accruedAverage is None:
                 raise FinError(
-                    "If you are in the averaging period you need to enter the accrued average")
+                "In averaging period you need to enter the accrued average")
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -648,22 +659,23 @@ class FinAsianOption(FinOption):
             n = int(n * t / tau + 0.5) + 1
 
         # need to handle this
-        b = interestRate - dividendYield
+        b = r - dividendYield
         sigma2 = volatility**2
         a1 = b + sigma2
         a2 = 2 * b + sigma2
         S0 = stockPrice
-        r = interestRate
+
+        dt = t - t0
 
         if b == 0:
             M1 = 1.0
             M2 = 2.0 * exp(sigma2 * t) - 2.0 * \
-                exp(sigma2 * t0) * (1.0 + sigma2 * (t - t0))
-            M2 = M2 / sigma2 / sigma2 / (t - t0) / (t - t0)
+                exp(sigma2 * t0) * (1.0 + sigma2 * dt)
+            M2 = M2 / sigma2 / sigma2 / dt / dt
         else:
-            M1 = S0 * (exp(b * t) - exp(b * t0)) / (b * (t - t0))
-            M2 = exp(a2 * t) / a1 / a2 / (t - t0) / (t - t0) + (exp(a2 * t0) /
-                                                                b / (t - t0) / (t - t0)) * (1.0 / a2 - exp(b * (t - t0)) / a1)
+            M1 = S0 * (exp(b * t) - exp(b * t0)) / (b * dt)
+            M2 = exp(a2 * t) / a1 / a2 / dt / dt + \
+                (exp(a2 * t0) / b / dt / dt) * (1.0 / a2 - exp(b * dt) / a1)
             M2 = 2.0 * M2 * S0 * S0
 
         F0 = M1
@@ -745,9 +757,9 @@ class FinAsianOption(FinOption):
     def valueMC(self,
                 valueDate,
                 stockPrice,
+                discountCurve,
                 dividendYield,
-                volatility,
-                interestRate,
+                model,
                 numPaths,
                 seed,
                 accruedAverage):
@@ -767,14 +779,18 @@ class FinAsianOption(FinOption):
             self._startAveragingDate,
             self._expiryDate) / gDaysInYear
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        volatility = model._volatility
+
         K = self._strikePrice
         n = self._numObservations
 
         v = valueMC_NUMBA(t0, t, tau, K, n, self._optionType,
                           stockPrice,
+                          r,
                           dividendYield,
                           volatility,
-                          interestRate,
                           numPaths,
                           seed,
                           accruedAverage)
@@ -786,9 +802,9 @@ class FinAsianOption(FinOption):
     def valueMC_fast(self,
                      valueDate,
                      stockPrice,
+                     discountCurve,
                      dividendYield,
-                     volatility,
-                     interestRate,
+                     model,
                      numPaths,
                      seed,
                      accruedAverage):
@@ -803,11 +819,15 @@ class FinAsianOption(FinOption):
         K = self._strikePrice
         n = self._numObservations
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        volatility = model._volatility
+
         v = valueMC_fast_NUMBA(t0, t, tau, K, n, self._optionType,
                                stockPrice,
+                               r,
                                dividendYield,
                                volatility,
-                               interestRate,
                                numPaths,
                                seed,
                                accruedAverage)
@@ -819,9 +839,9 @@ class FinAsianOption(FinOption):
     def valueMC_fast_CV(self,
                         valueDate,
                         stockPrice,
+                        discountCurve,
                         dividendYield,
-                        volatility,
-                        interestRate,
+                        model,
                         numPaths,
                         seed,
                         accruedAverage):
@@ -836,19 +856,23 @@ class FinAsianOption(FinOption):
         K = self._strikePrice
         n = self._numObservations
 
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        volatility = model._volatility
+
         # For control variate we price a Geometric average option exactly
         v_g_exact = self.valueGeometric(valueDate,
                                         stockPrice,
+                                        discountCurve,
                                         dividendYield,
-                                        volatility,
-                                        interestRate,
+                                        model,
                                         accruedAverage)
 
         v = valueMC_fast_CV_NUMBA(t0, t, tau, K, n, self._optionType,
                                   stockPrice,
+                                  r,
                                   dividendYield,
                                   volatility,
-                                  interestRate,
                                   numPaths,
                                   seed,
                                   accruedAverage,
