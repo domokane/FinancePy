@@ -73,11 +73,10 @@ class FinLiborFRA(object):
                 str(dayCountType))
 
         self._calendarType = calendarType
+        cal = FinCalendar(self._calendarType)
 
-        calendar = FinCalendar(self._calendarType)
-        self._settlementDate = calendar.adjust(
-            settlementDate, busDayAdjustType)
-        self._maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
+        self._settlementDate = cal.adjust(settlementDate, busDayAdjustType)
+        self._maturityDate = cal.adjust(maturityDate, busDayAdjustType)
 
         self._fraRate = fraRate
         self._payFixedRate = payFixedRate
@@ -93,9 +92,8 @@ class FinLiborFRA(object):
 
         dc = FinDayCount(self._dayCountType)
         accFactor0 = dc.yearFrac(self._settlementDate, self._maturityDate)
-        accFactor1 = dc.yearFrac(valueDate, self._maturityDate)
-        df2 = liborCurve.df(self._maturityDate)
         df1 = liborCurve.df(self._settlementDate)
+        df2 = liborCurve.df(self._maturityDate)
         liborFwd = (df1 / df2 - 1.0) / accFactor0
         v = accFactor0 * (liborFwd - self._fraRate) * df2
 
@@ -113,7 +111,10 @@ class FinLiborFRA(object):
         ''' Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate. '''
 
+        print("FRA CODE MATURITY DF")
+        liborCurve.print()
         df1 = liborCurve.df(self._settlementDate)
+        print(df1)
         dc = FinDayCount(self._dayCountType)
         accFactor = dc.yearFrac(self._settlementDate, self._maturityDate)
         df2 = df1 / (1.0 + accFactor * self._fraRate)

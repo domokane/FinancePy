@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from math import log
 import numpy as np
 
-from ...finutils.FinInterpolate import interpolate
+from ...finutils.FinInterpolate import uinterpolate, interpolate
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
@@ -110,7 +110,7 @@ class FinDiscountCurve():
         if forwardDate < self._curveDate:
             raise FinError("Forward Date before curve value date.")
 
-        tau = (forwardDate - self._curveDate)
+        tau = (forwardDate - self._curveDate) / gDaysInYear
         dt = 0.000001
         df1 = self.df(tau)
         df2 = self.df(tau + dt)

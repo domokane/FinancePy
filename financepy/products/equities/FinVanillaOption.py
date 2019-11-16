@@ -96,13 +96,13 @@ class FinVanillaOption(FinOption):
         if stockPrice <= 0.0:
             raise FinError("Stock price must be greater than zero.")
 
-        if discountCurve._parentType != FinCurve:
-            raise FinError("Curve is not inherited off FinCurve.")
+#        if discountCurve._parentType != FinCurve:
+#            raise FinError("Curve is not inherited off FinCurve.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
 
         if t == 0.0:
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
@@ -166,7 +166,7 @@ class FinVanillaOption(FinOption):
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
-            t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+            t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
         interestRate = -log(df)/t
@@ -215,10 +215,10 @@ class FinVanillaOption(FinOption):
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
-            t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+            t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
+        r = -log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
@@ -228,7 +228,7 @@ class FinVanillaOption(FinOption):
                 volatility = 1e-5
 
             lnS0k = log(float(stockPrice) / self._strikePrice)
-            mu = interestRate - dividendYield
+            mu = r - dividendYield
             d1 = (lnS0k + (mu + volatility * volatility / 2.0) * t) / \
                 volatility / sqrt(t)
             gamma = exp(-dividendYield * t) * nprime(d1) / \
@@ -260,10 +260,10 @@ class FinVanillaOption(FinOption):
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
-            t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+            t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
+        r = -log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
@@ -272,9 +272,10 @@ class FinVanillaOption(FinOption):
             if abs(volatility) < 1e-5:
                 volatility = 1e-5
 
+            v2 = volatility**2
+
             lnS0k = log(float(stockPrice) / self._strikePrice)
-            d1 = lnS0k + (interestRate - dividendYield +
-                          volatility * volatility / 2.0) * t
+            d1 = lnS0k + (r - dividendYield + v2 / 2.0) * t
             d1 = d1 / (volatility * sqrt(t))
             vega = stockPrice * sqrt(t) * exp(-dividendYield * t) * nprime(d1)
             return vega
@@ -304,10 +305,10 @@ class FinVanillaOption(FinOption):
         if valueDate == self._expiryDate:
             t = 1e-10
         else:
-            t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+            t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
+        r = -log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
@@ -319,7 +320,7 @@ class FinVanillaOption(FinOption):
             lnS0k = log(float(stockPrice) / self._strikePrice)
             den = volatility * sqrt(t)
             v2 = volatility * volatility
-            mu = interestRate - dividendYield
+            mu = r - dividendYield
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
             v = 0.0
@@ -327,15 +328,15 @@ class FinVanillaOption(FinOption):
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
                 v = - stockPrice * exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrt(t)
-                v = v - interestRate * self._strikePrice * \
-                    exp(-interestRate * t) * N(d2)
+                v = v - r * self._strikePrice * \
+                    exp(-r * t) * N(d2)
                 v = v + dividendYield * stockPrice * \
                     exp(-dividendYield * t) * N(d1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
                 v = - stockPrice * exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrt(t)
-                v = v + interestRate * self._strikePrice * \
-                    exp(-interestRate * t) * N(-d2)
+                v = v + r * self._strikePrice * \
+                    exp(-r * t) * N(-d2)
                 v = v - dividendYield * stockPrice * \
                     exp(-dividendYield * t) * N(-d1)
             else:
@@ -377,12 +378,12 @@ class FinVanillaOption(FinOption):
             raise FinError("Model Type invalid")
 
         np.random.seed(seed)
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
+        r = -log(df)/t
 
-        mu = interestRate - dividendYield
+        mu = r - dividendYield
         v2 = volatility**2
         K = self._strikePrice
         sqrtdt = np.sqrt(t)
@@ -404,7 +405,7 @@ class FinVanillaOption(FinOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * exp(-interestRate * t) / 2.0
+        v = payoff * exp(-r * t) / 2.0
         return v
 
 ##########################################################################
@@ -419,7 +420,11 @@ class FinVanillaOption(FinOption):
 
         self.validate(valueDate, stockPrice, discountCurve, dividendYield, 0.1)
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+
+        df = discountCurve.df(t)
+        r = -log(df)/t
+
         K = self._strikePrice
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
@@ -430,7 +435,7 @@ class FinVanillaOption(FinOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(path_payoff)
-        v = payoff * exp(-interestRate * t)
+        v = payoff * exp(-r * t)
         return v
 
 ##########################################################################

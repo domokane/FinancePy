@@ -10,6 +10,7 @@ from financepy.products.equities.FinFloatLookbackOption import FinFloatLookbackO
 from financepy.products.equities.FinFloatLookbackOption import FinFloatLookbackOptionTypes
 from financepy.products.equities.FinFixedLookbackOption import FinFixedLookbackOption
 from financepy.products.equities.FinFixedLookbackOption import FinFixedLookbackOptionTypes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import time
 import sys
@@ -29,6 +30,7 @@ def test_FinLookBackOption():
     numPathsRange = [10000]
     stockPriceRange = range(90, 110, 2)
     numStepsPerYear = 252
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
 ###############################################################################
 
@@ -50,7 +52,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin)
@@ -58,7 +60,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin,
@@ -95,7 +97,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin)
@@ -103,7 +105,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin,
@@ -140,7 +142,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax)
@@ -148,7 +150,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax,
@@ -185,7 +187,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax)
@@ -193,7 +195,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax,
@@ -238,7 +240,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax)
@@ -246,7 +248,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax,
@@ -286,7 +288,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax)
@@ -294,7 +296,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax,
@@ -334,7 +336,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax)
@@ -342,7 +344,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMax,
@@ -382,7 +384,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin)
@@ -390,7 +392,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin,
@@ -430,7 +432,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin)
@@ -438,7 +440,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin,
@@ -478,7 +480,7 @@ def test_FinLookBackOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin)
@@ -486,7 +488,7 @@ def test_FinLookBackOption():
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
                 volatility,
                 stockMin,

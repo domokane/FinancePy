@@ -133,9 +133,9 @@ class FinLiborOneCurve(FinDiscountCurve):
         self._values = np.array([])
 
         # time zero is now.
-        df = 1.0
+        dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._values = np.append(self._values, df)
+        self._values = np.append(self._values, dfMat)
 
         for depo in self._usedDeposits:
             tmat = (depo._maturityDate - self._curveDate) / gDaysInYear
@@ -144,9 +144,9 @@ class FinLiborOneCurve(FinDiscountCurve):
             self._values = np.append(self._values, dfMat)
 
         for fra in self._usedFRAs:
-            tMat = (fra._maturityDate - self._curveDate) / gDaysInYear
+            tmat = (fra._maturityDate - self._curveDate) / gDaysInYear
             dfMat = fra.maturityDf(self)
-            self._times = np.append(self._times, tMat)
+            self._times = np.append(self._times, tmat)
             self._values = np.append(self._values, dfMat)
 
         for swap in self._usedSwaps:
@@ -155,9 +155,9 @@ class FinLiborOneCurve(FinDiscountCurve):
             argtuple = (self, self._curveDate, swap)
             tmat = (maturityDate - self._curveDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._values = np.append(self._values, df)
+            self._values = np.append(self._values, dfMat)
 
-            optimize.newton(f, x0=df, fprime=None, args=argtuple,
+            optimize.newton(f, x0=dfMat, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
 
 ##########################################################################

@@ -65,7 +65,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
 def valueMCFast(t,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -76,8 +76,9 @@ def valueMCFast(t,
                 seed=4242):
 
     np.random.seed(seed)
-    mus = interestRate - dividendYields
-    r = interestRate
+    df = discountCurve.df(t)
+    r = -log(df)/t
+    mus = r - dividendYields
 
     model = FinGBMProcess()
 
@@ -168,8 +169,14 @@ class FinRainbowOption(FinOption):
 
 ##########################################################################
 
-    def value(self, valueDate, expiryDate, stockPrices, interestRate,
-              dividendYields, volatilities, betas):
+    def value(self, 
+              valueDate, 
+              expiryDate, 
+              stockPrices, 
+              discountCurve,
+              dividendYields, 
+              volatilities, 
+              betas):
 
         if self._numAssets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -183,9 +190,11 @@ class FinRainbowOption(FinOption):
                       betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
 
-        r = interestRate
+        df = discountCurve.df(t)
+        r = -log(df)/t
+
         q1 = dividendYields[0]
         q2 = dividendYields[1]
         rho = betas[0]**2
@@ -234,7 +243,7 @@ class FinRainbowOption(FinOption):
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -249,11 +258,11 @@ class FinRainbowOption(FinOption):
         if valueDate > expiryDate:
             raise FinError("Value date after expiry date.")
 
-        t = FinDate.datediff(valueDate, expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
 
         v = valueMCFast(t,
                         stockPrices,
-                        interestRate,
+                        discountCurve,
                         dividendYields,
                         volatilities,
                         betas,

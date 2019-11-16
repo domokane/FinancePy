@@ -188,7 +188,7 @@ class FinHestonModel():
                  seed,
                  scheme=FinHestonNumericalScheme.EULERLOG):
 
-        tau = FinDate.datediff(valueDate, option._expiryDate) / gDaysInYear
+        tau = (option._expiryDate - valueDate) / gDaysInYear
 
         K = option._strikePrice
         dt = 1.0 / numStepsPerYear
@@ -228,7 +228,7 @@ class FinHestonModel():
                     interestRate,
                     dividendYield):
 
-        tau = FinDate.datediff(valueDate, option._expiryDate) / gDaysInYear
+        tau = (option._expiryDate - valueDate) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -276,7 +276,7 @@ class FinHestonModel():
                           interestRate,
                           dividendYield):
 
-        tau = FinDate.datediff(valueDate, option._expiryDate) / gDaysInYear
+        tau = (option._expiryDate - valueDate) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -320,7 +320,7 @@ class FinHestonModel():
                     interestRate,
                     dividendYield):
 
-        tau = FinDate.datediff(valueDate, option._expiryDate) / gDaysInYear
+        tau = (option._expiryDate - valueDate) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -366,7 +366,7 @@ class FinHestonModel():
                        interestRate,
                        dividendYield):
 
-        tau = FinDate.datediff(valueDate, option._expiryDate) / gDaysInYear
+        tau = (option._expiryDate - valueDate) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma

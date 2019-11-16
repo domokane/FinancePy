@@ -33,7 +33,7 @@ def interpolate(xValue,
         v = vinterpolate(xValue, xvector, yvector, method)
         return v
     else:
-        raise ValueError("Unknown input type")
+        raise ValueError("Unknown input type", type(xValue))
 
 ###############################################################################
 

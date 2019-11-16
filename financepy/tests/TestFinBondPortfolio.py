@@ -5,41 +5,54 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
+from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
-from financepy.products.bonds.FinBond import FinBond, FinBondAccruedTypes
+from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinDayCount import FinDayCountTypes
 
 #  from scipy import optimize
 import datetime as dt
 
 ###############################################################################
 
-import pandas as pd
-bondDataFrame = pd.read_csv('./data/giltbondprices.txt', sep='\t')
-bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
-frequencyType = FinFrequencyTypes.SEMI_ANNUAL
-accrualType = FinBondAccruedTypes.ACT_365
+###############################################################################
 
-ytms = []
-yearsToMaturities = []
-fullPrices = []
 
-settlement = FinDate(2012, 9, 19)
+def test_FinBondPortfolio():
 
-for index, bond in bondDataFrame.iterrows():
+    import pandas as pd
+    bondDataFrame = pd.read_csv('./data/giltbondprices.txt', sep='\t')
+    bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    dateString = bond['maturity']
-    matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-    maturityDt = FinDate.fromDatetime(matDatetime)
-    coupon = bond['coupon']/100.0
-    cleanPrice = bond['mid']
-    bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
+    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
 
-    ytm = bond.yieldToMaturity(settlement, cleanPrice)
-    accd = bond.accruedInterest(settlement)
-    accd_days = bond.accruedDays(settlement)
+    settlement = FinDate(2012, 9, 19)
 
-    print("%5d %18s %8.4f %10.4f %6.0f %10.4f %8.4f" %
-          (index, maturityDt, coupon*100.0,
-           cleanPrice, accd_days, accd, ytm*100.0))
+    testCases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
+
+    for accrualType in FinDayCountTypes:
+
+        for index, bond in bondDataFrame.iterrows():
+
+            dateString = bond['maturity']
+            matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
+            maturityDt = FinDate.fromDatetime(matDatetime)
+            coupon = bond['coupon']/100.0
+            cleanPrice = bond['mid']
+            bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
+
+            ytm = bond.yieldToMaturity(settlement, cleanPrice)
+            accd = bond._accrued
+
+            testCases.print(accrualType, maturityDt, coupon*100.0,
+                            cleanPrice, accd, ytm*100.0)
+
+##########################################################################
+
+
+test_FinBondPortfolio()
+testCases.compareTestCases()

@@ -171,12 +171,23 @@ class FinLiborSwap(object):
 ##########################################################################
 
     def parCoupon(self, valuationDate, discountCurve):
-        ''' Calculate the fixed leg coupon that makes the swap worth zero. '''
+        ''' Calculate the fixed leg coupon that makes the swap worth zero. 
+        If the valuation date is before the swap payments start then this 
+        is the forward swap rate as it starts in the future. The swap rate 
+        is then a forward swap rate and so we use a forward discount 
+        factor. If the swap fixed leg has begun then we have a spot 
+        starting swap. '''
 
         pv01 = self.pv01(valuationDate, discountCurve)
-        df0 = discountCurve.df(valuationDate)
+
+        if valuationDate < self._startDate:
+            df0 = discountCurve.df(self._startDate)
+        else:
+            df0 = discountCurve.df(valuationDate)
+
         dfT = discountCurve.df(self._maturityDate)
         cpn = (df0 - dfT) / pv01
+#         print(pv01, df0, dfT)
         return cpn
 
 ##########################################################################
@@ -211,7 +222,8 @@ class FinLiborSwap(object):
             alpha = basis.yearFrac(prevDt, nextDt)
             df_discount = discountCurve.df(nextDt)
             flow = self._fixedCoupon * alpha
-            pv += flow * df_discount
+            flowPV = flow * df_discount
+            pv += flowPV
             prevDt = nextDt
 
             self._fixedYearFracs.append(alpha)

@@ -62,4 +62,4 @@ def test_FinMeanVarPortfolio():
     portfolio.setReturns(returns)
 
 
-test_FinMeanVarPortfolio()
+#test_FinMeanVarPortfolio()

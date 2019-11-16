@@ -7,6 +7,7 @@ Created on Fri Feb 12 16:51:05 2016
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinBasketOption import FinBasketOption
 from financepy.products.equities.FinOption import FinOptionTypes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
@@ -26,6 +27,7 @@ def test_FinBasketOption():
     expiryDate = FinDate(2016, 1, 1)
     volatility = 0.30
     interestRate = 0.05
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
     ##########################################################################
     # Homogeneous Basket
@@ -49,14 +51,14 @@ def test_FinBasketOption():
             v = callOption.value(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -89,14 +91,14 @@ def test_FinBasketOption():
             v = callOption.value(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -126,14 +128,14 @@ def test_FinBasketOption():
             v = callOption.value(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -165,14 +167,14 @@ def test_FinBasketOption():
             v = callOption.value(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,

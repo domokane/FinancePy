@@ -12,7 +12,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinInterpolate import FinInterpMethods, interpolate
-from .FinOption import FinOptionModelTypes
+from .FinOption import FinEquityModelBlackScholes
 from .FinVanillaOption import FinVanillaOption, FinOptionTypes
 
 ##########################################################################
@@ -56,7 +56,11 @@ class FinVarianceSwap(object):
 
 ##########################################################################
 
-    def value(self, valuationDate, realisedVar, fairStrikeVar, liborCurve):
+    def value(self, 
+              valuationDate, 
+              realisedVar, 
+              fairStrikeVar, 
+              liborCurve):
         ''' Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. '''
@@ -109,7 +113,7 @@ class FinVarianceSwap(object):
                    numCallOptions,
                    numPutOptions,
                    strikeSpacing,
-                   r,
+                   discountCurve,
                    useForward=True):
         ''' Calculate the implied variance according to the volatility surface
         using a static replication methodology with a specially weighted
@@ -119,11 +123,13 @@ class FinVarianceSwap(object):
         self._numPutOptions = numPutOptions
         self._numCallOptions = numCallOptions
 
-        modelType = FinOptionModelTypes.BLACKSCHOLES
         callType = FinOptionTypes.EUROPEAN_CALL
         putType = FinOptionTypes.EUROPEAN_PUT
 
         tmat = (self._maturityDate - valuationDate)/gDaysInYear
+
+        df = discountCurve.df(tmat)
+        r = - log(df)/tmat
 
         s0 = stockPrice
         g = exp(r*tmat)
@@ -191,9 +197,9 @@ class FinVarianceSwap(object):
             k = putK[n]
             vol = volatilityCurve.volatility(k)
             opt = FinVanillaOption(self._maturityDate, k, putType)
-            modelParams = vol
-            v = opt.value(valuationDate, s0, r,
-                          dividendYield, modelType, modelParams)
+            model = FinEquityModelBlackScholes(vol)
+            v = opt.value(valuationDate, s0, discountCurve,
+                          dividendYield, model)
             piPut += v * self._putWts[n]
 
         piCall = 0.0
@@ -201,9 +207,9 @@ class FinVarianceSwap(object):
             k = callK[n]
             vol = volatilityCurve.volatility(k)
             opt = FinVanillaOption(self._maturityDate, k, callType)
-            modelParams = vol
-            v = opt.value(valuationDate, s0, r,
-                          dividendYield, modelType, modelParams)
+            model = FinEquityModelBlackScholes(vol)
+            v = opt.value(valuationDate, s0, discountCurve,
+                          dividendYield, model)
             piCall += v * self._callWts[n]
 
         pi = piCall + piPut
@@ -257,41 +263,3 @@ class FinVarianceSwap(object):
             k = self._callStrikes[n]
             wt = self._callWts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))
-
-
-########################################################################
-# Method I - direct approach
-# var1 = 0.0
-# if 1 == 1:
-#    minStrike = sstar - (numPutOptions-1) * strikeSpacing
-#
-#    if minStrike < strikeSpacing:
-#        minStrike = strikeSpacing
-#
-#    dKput = (sstar - minStrike)/(numPutOptions-1)
-#    putK = np.linspace(minStrike, sstar, numPutOptions)
-#
-#    maxStrike = sstar + (numCallOptions-1) * strikeSpacing
-#    dKcall = (maxStrike - sstar)/(numCallOptions-1)
-#    callK = np.linspace(sstar, maxStrike, numCallOptions)
-#
-#    optionTotal = r*tmat - (s0*g/sstar-1.0) - log(sstar/s0)
-#
-#    for k in putK:
-#        vol = interpolate(k, strikesVector, volsVector, interpMethod)
-#        opt = FinVanillaOption(self._maturityDate, k, putType)
-#        modelParams = vol
-#        v = opt.value(valuationDate, s0, r,
-#                      dividendYield, modelType, modelParams)
-#        optionTotal += g * v * dKput / (k*k)
-#
-#    for k in callK:
-#        vol = interpolate(k, strikesVector, volsVector, interpMethod)
-#        opt = FinVanillaOption(self._maturityDate, k, callType)
-#        modelParams = vol
-#        v = opt.value(valuationDate, s0, r,
-#                      dividendYield, modelType, modelParams)
-#        optionTotal += g * v * dKcall / (k*k)
-#
-#    optionTotal = 2.0 / tmat * optionTotal
-#    var1 = optionTotal

@@ -13,7 +13,6 @@ from numba import jit, njit, float64, int64
 
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import heaviside
 
 
@@ -97,7 +96,7 @@ def payoffValue(s, payoffType, payoffParams):
 
 @njit(fastmath=True, cache=True)
 def valueOnce(stockPrice,
-              interestRate,
+              r,
               dividendYield,
               volatility,
               numSteps,
@@ -115,7 +114,6 @@ def valueOnce(stockPrice,
 
     # this is the size of the step
     dt = timeToExpiry / numSteps
-    r = interestRate
     q = dividendYield
 
     # the number of nodes on the tree
@@ -218,12 +216,12 @@ class FinBinomialTree():
               payoffParams):
 
         # do some validation
-        timeToExpiry = FinDate.datediff(valueDate, expiryDate) / gDaysInYear
+        timeToExpiry = (expiryDate - valueDate) / gDaysInYear
         df = discountCurve.df(timeToExpiry)
-        riskFreeRate = -log(df)/timeToExpiry
+        r = -log(df)/timeToExpiry
 
         price1 = valueOnce(stockPrice,
-                           riskFreeRate,
+                           r,
                            dividendYield,
                            volatility,
                            numSteps,
@@ -234,7 +232,7 @@ class FinBinomialTree():
 
         # Can I reuse the same tree ?
         price2 = valueOnce(stockPrice,
-                           riskFreeRate,
+                           r,
                            dividendYield,
                            volatility,
                            numSteps + 1,

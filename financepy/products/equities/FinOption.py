@@ -41,19 +41,19 @@ class FinOption(object):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model):
         v = self.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         vBumped = self.value(
             valueDate,
             stockPrice + bump,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         delta = (vBumped - v) / bump
@@ -63,19 +63,19 @@ class FinOption(object):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model):
         v = self.delta(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         vBumped = self.delta(
             valueDate,
             stockPrice + bump,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         gamma = (vBumped - v) / bump
@@ -85,19 +85,19 @@ class FinOption(object):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model):
         v = self.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         vBumped = self.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             FinEquityModelBlackScholes(model._volatility + bump))
         vega = (vBumped - v) / bump
@@ -107,13 +107,13 @@ class FinOption(object):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model):
         v = self.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         nextDate = valueDate.addDays(1)
@@ -121,7 +121,7 @@ class FinOption(object):
         vBumped = self.value(
             nextDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         theta = (vBumped - v) / bump
@@ -131,20 +131,20 @@ class FinOption(object):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model):
 
         v = self.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             model)
         vBumped = self.value(
             valueDate,
             stockPrice,
-            interestRate + bump,
+            discountCurve.bump(bump),
             dividendYield,
             model)
         rho = (vBumped - v) / bump

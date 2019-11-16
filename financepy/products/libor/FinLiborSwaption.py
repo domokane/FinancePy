@@ -8,7 +8,8 @@ Created on Fri Feb 12 16:51:05 2016
 from math import log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -16,6 +17,9 @@ from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
 from ...products.libor.FinLiborSwap import FinLiborSwap
 from ...models.FinSABRModel import blackVolFromSABR
+
+from .FinLiborModelTypes import FinLiborModelBlack
+from .FinLiborModelTypes import FinLiborModelSABR
 
 ##########################################################################
 
@@ -94,8 +98,7 @@ class FinLiborSwaption():
     def value(self,
               valuationDate,
               liborCurve,
-              modelType,
-              modelParams):
+              model):
 
         floatSpread = 0.0
         floatFreqType = FinFrequencyTypes.QUARTERLY
@@ -121,10 +124,11 @@ class FinLiborSwaption():
         f = swap.parCoupon(valuationDate, liborCurve)
         t = (self._exerciseDate - liborCurve._curveDate) / gDaysInYear
         forwardDf = liborCurve.df(t)
+        swap.printFixedLeg(valuationDate)
 
-        if modelType == FinLiborSwaptionModelTypes.BLACK:
+        if type(model) == FinLiborModelBlack:
 
-            v = modelParams["volatility"]
+            v = model._volatility
             d1 = (log(f / k) + v * v * t / 2.0) / v / sqrt(t)
             d2 = d1 - v * sqrt(t)
 
@@ -136,15 +140,14 @@ class FinLiborSwaption():
                 raise FinError("Unknown swaption option type" +
                                str(self._optionType))
 
-        elif modelType == FinLiborSwaptionModelTypes.SABR:
+        elif type(model) == FinLiborModelSABR:
 
-            alpha = modelParams["alpha"]
-            beta = modelParams["beta"]
-            rho = modelParams["rho"]
-            nu = modelParams["nu"]
+            alpha = model._alpha
+            beta = model._beta
+            rho = model._rho
+            nu = model._nu
 
             v = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
-
             d1 = (log(f / k) + v * v * t / 2.0) / v / sqrt(t)
             d2 = d1 - v * sqrt(t)
 
@@ -158,7 +161,7 @@ class FinLiborSwaption():
 
         else:
 
-            raise FinError("Unknown swaption model " + str(modelType))
+            raise FinError("Unknown swaption model " + str(model))
 
         self._pv01 = pv01
         self._fwdSwapRate = f

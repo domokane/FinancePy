@@ -5,7 +5,6 @@ Created on Mon Aug  5 16:23:12 2019
 @author: Dominic
 """
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorModelTypes
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorType
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -14,6 +13,11 @@ from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+
+from financepy.products.libor.FinLiborModelTypes import FinLiborModelBlack
+from financepy.products.libor.FinLiborModelTypes import FinLiborModelShiftedBlack
+from financepy.products.libor.FinLiborModelTypes import FinLiborModelSABR
+
 import sys
 sys.path.append("..//..")
 
@@ -210,8 +214,7 @@ def test_FinLiborCapFloor():
     testCases.header("LABEL", "VALUE")
     testCases.banner("==================== BLACK =======================")
 
-    modelType = FinLiborCapFloorModelTypes.BLACK
-    modelParams = {'volatility': 0.25}
+    model = FinLiborModelBlack(0.25)
 
     capFloorType = FinLiborCapFloorType.CAP
     capfloor = FinLiborCapFloor(
@@ -219,7 +222,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 
     testCases.print("CAP Value:", value)
@@ -230,7 +233,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 
     testCases.print("FLOOR Value:", value)
@@ -249,8 +252,7 @@ def test_FinLiborCapFloor():
 
     start = time.time()
 
-    modelType = FinLiborCapFloorModelTypes.SHIFTED_BLACK
-    modelParams = {'volatility': 0.25, 'shift': -0.01}
+    model = FinLiborModelShiftedBlack(0.25, -0.01)
 
     capFloorType = FinLiborCapFloorType.CAP
     capfloor = FinLiborCapFloor(
@@ -258,7 +260,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 
     testCases.print("CAP Value:", value)
@@ -269,7 +271,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 
     testCases.print("FLOOR Value:", value)
@@ -288,8 +290,7 @@ def test_FinLiborCapFloor():
 
     testCases.banner("============== SABR ==================")
 
-    modelType = FinLiborCapFloorModelTypes.SABR
-    modelParams = {'alpha': 0.28, 'beta': 1.0, 'rho': -0.09, 'nu': 0.21}
+    model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
 
     capFloorType = FinLiborCapFloorType.CAP
     capfloor = FinLiborCapFloor(
@@ -297,7 +298,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 
     testCases.print("CAP Value:", value)
@@ -308,7 +309,7 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, modelType, modelParams)
+    value = capfloor.value(valuationDate, liborCurve, model)
  #   capfloor.print()
 
     testCases.print("FLOOR Value:", value)

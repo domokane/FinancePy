@@ -60,13 +60,13 @@ class FinBasketOption(FinOption):
     def value(self,
               valueDate,
               stockPrices,
-              interestRate,
+              discountCurve,
               dividendYields,
               volatilities,
               betas):
 
         if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+            raise ValueError("Value date after expiry date.")
 
         self.validate(stockPrices,
                       dividendYields,
@@ -76,11 +76,13 @@ class FinBasketOption(FinOption):
         q = dividendYields
         v = volatilities
         s = stockPrices
-        r = interestRate
 
         a = np.ones(self._numAssets) * (1.0 / self._numAssets)
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
 
         smean = 0.0
         for ia in range(0, self._numAssets):
@@ -115,7 +117,7 @@ class FinBasketOption(FinOption):
         vhat2 = log(vnum / qnum / qnum) / t
 
         den = sqrt(vhat2) * sqrtT
-        mu = interestRate - qhat
+        mu = r - qhat
         d1 = (lnS0k + (mu + vhat2 / 2.0) * t) / den
         d2 = (lnS0k + (mu - vhat2 / 2.0) * t) / den
 
@@ -136,7 +138,7 @@ class FinBasketOption(FinOption):
     def valueMC(self,
                 valueDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -154,10 +156,12 @@ class FinBasketOption(FinOption):
         numAssets = len(stockPrices)
 
         np.random.seed(seed)
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        mus = interestRate - dividendYields
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -log(df)/t
+        mus = r - dividendYields
+
         k = self._strikePrice
-        r = interestRate
 
         numTimeSteps = 2
 

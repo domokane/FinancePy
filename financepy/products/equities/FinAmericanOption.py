@@ -189,8 +189,7 @@ class FinAmericanOption():
             raise FinError("Value date is after expiry date.")
 
         # do some validation
-        timeToExpiry = FinDate.datediff(
-            valueDate, self._expiryDate) / gDaysInYear
+        timeToExpiry = (self._expiryDate - valueDate) / gDaysInYear
 
         # Convergence is improved if I take the average of an even and
         # odd number of steps in the Binomial Tree

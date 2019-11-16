@@ -8,6 +8,8 @@ Created on Fri Feb 12 16:51:05 2016
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinOption import FinOptionTypes
 from financepy.products.equities.FinDigitalOption import FinDigitalOption
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -26,7 +28,8 @@ def test_FinDigitalOption():
     volatility = 0.30
     interestRate = 0.05
     dividendYield = 0.01
-
+    discountCurve = FinFlatCurve(valueDate, interestRate)
+    model = FinEquityModelBlackScholes(volatility)
     import time
 
     callOptionValues = []
@@ -51,16 +54,16 @@ def test_FinDigitalOption():
         value = callOption.value(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         start = time.time()
         valueMC = callOption.valueMC(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate,
+            model,
             numPaths)
         end = time.time()
         duration = end - start
@@ -89,27 +92,27 @@ def test_FinDigitalOption():
         value = callOption.value(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         delta = callOption.delta(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         vega = callOption.vega(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         theta = callOption.theta(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         callOptionValues.append(value)
         callOptionDeltas.append(delta)
         callOptionVegas.append(vega)
@@ -126,27 +129,27 @@ def test_FinDigitalOption():
         value = putOption.value(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         delta = putOption.delta(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         vega = putOption.vega(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         theta = putOption.theta(
             valueDate,
             stockPrice,
+            discountCurve,
             dividendYield,
-            volatility,
-            interestRate)
+            model)
         putOptionValues.append(value)
         putOptionDeltas.append(delta)
         putOptionVegas.append(vega)

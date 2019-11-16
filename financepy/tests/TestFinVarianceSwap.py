@@ -5,53 +5,73 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-from math import sqrt
 import numpy as np
+
+from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinVolatilityCurve import FinVolatilityCurve
 from financepy.products.equities.FinVarianceSwap import FinVarianceSwap
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+
 import sys
 sys.path.append("..//..")
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
 
 
 def volSkew(K, atmVol, atmK, skew):
     v = atmVol + skew * (K-atmK)
     return v
 
+###############################################################################
 
-startDate = FinDate(2018, 3, 20)
-tenor = "3M"
-strike = 0.3*0.3
 
-volSwap = FinVarianceSwap(startDate, tenor, strike)
+def test_FinVarianceSwap():
 
-valuationDate = FinDate(2018, 3, 20)
-stockPrice = 100.0
-dividendYield = 0.0
+    startDate = FinDate(2018, 3, 20)
+    tenor = "3M"
+    strike = 0.3*0.3
 
-atmVol = 0.20
-atmK = 100.0
-skew = -0.02/5.0  # defined as dsigma/dK
-strikes = np.linspace(50.0, 135.0, 18)
-volatilities = volSkew(strikes, atmVol, atmK, skew)
-volCurve = FinVolatilityCurve(valuationDate, strikes, volatilities)
+    volSwap = FinVarianceSwap(startDate, tenor, strike)
 
-print(strikes)
-print(volatilities)
+    valuationDate = FinDate(2018, 3, 20)
+    stockPrice = 100.0
+    dividendYield = 0.0
+    maturityDate = startDate.addMonths(3)
 
-strikeSpacing = 5.0
-numCallOptions = 10
-numPutOptions = 10
-r = 0.05
-useForward = False
+    atmVol = 0.20
+    atmK = 100.0
+    skew = -0.02/5.0  # defined as dsigma/dK
+    strikes = np.linspace(50.0, 135.0, 18)
+    vols = volSkew(strikes, atmVol, atmK, skew)
+    volCurve = FinVolatilityCurve(valuationDate, maturityDate, strikes, vols)
 
-k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendYield,
-                        volCurve, numCallOptions, numPutOptions,
-                        strikeSpacing, r, useForward)
-print("REPLICATION VARIANCE:", k1)
+    print(strikes)
+    print(vols)
 
-volSwap.print()
+    strikeSpacing = 5.0
+    numCallOptions = 10
+    numPutOptions = 10
+    r = 0.05
+    discountCurve = FinFlatCurve(valuationDate, r)
 
-k2 = volSwap.fairStrikeApprox(valuationDate, stockPrice, strikes, volatilities)
-print("DERMAN SKEW APPROX for K:", k2)
+    useForward = False
+
+    k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendYield,
+                            volCurve, numCallOptions, numPutOptions,
+                            strikeSpacing, discountCurve, useForward)
+    print("REPLICATION VARIANCE:", k1)
+
+    volSwap.print()
+
+    k2 = volSwap.fairStrikeApprox(valuationDate, stockPrice, strikes, vols)
+    print("DERMAN SKEW APPROX for K:", k2)
+
+##########################################################################
+
+
+test_FinVarianceSwap()
+testCases.compareTestCases()

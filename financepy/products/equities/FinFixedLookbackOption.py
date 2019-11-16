@@ -50,15 +50,17 @@ class FinFixedLookbackOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
               volatility,
               stockMinMax):
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
+        
         v = volatility
         s0 = stockPrice
-        r = interestRate
         q = dividendYield
         k = self._optionStrike
         smin = 0.0
@@ -161,7 +163,7 @@ class FinFixedLookbackOption(FinOption):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             volatility,
             stockMinMax,
@@ -169,10 +171,13 @@ class FinFixedLookbackOption(FinOption):
             numStepsPerYear=252,
             seed=4242):
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
+        mu = r - dividendYield
+
         numTimeSteps = int(t * numStepsPerYear)
-        mu = interestRate - dividendYield
-        r = interestRate
+
         optionType = self._optionType
         k = self._optionStrike
 

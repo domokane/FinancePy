@@ -30,6 +30,7 @@ verbose = False
 globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 #globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
+tolerance = 1e-8
 ##########################################################################
 ##########################################################################
 
@@ -169,7 +170,9 @@ class FinTestCases():
         if self._headerFields is None:
             print("ERROR: Need to set header fields before printing results")
         elif len(self._headerFields) != len(args):
-            print("ERROR: Number headers must equal number of arguments")
+            n1 = len(self._headerFields)
+            n2 = len(args)
+            print("ERROR: # headers must equal # of arguments", n1, n2)
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename

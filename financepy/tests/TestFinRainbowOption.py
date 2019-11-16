@@ -6,7 +6,9 @@ Created on Fri Feb 12 16:51:05 2016
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.equities.FinRainbowOption import FinRainbowOption, FinRainbowOptionTypes
+from financepy.products.equities.FinRainbowOption import FinRainbowOption
+from financepy.products.equities.FinRainbowOption import FinRainbowOptionTypes
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 from math import sqrt
@@ -25,6 +27,7 @@ def test_FinRainbowOption():
     valueDate = FinDate(2015, 1, 1)
     expiryDate = FinDate(2016, 1, 1)
     interestRate = 0.05
+    discountCurve = FinFlatCurve(valueDate, interestRate)
 
     numAssets = 2
     volatilities = np.ones(numAssets) * 0.3
@@ -61,7 +64,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -69,7 +72,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -116,7 +119,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -125,7 +128,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -174,7 +177,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -183,7 +186,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -230,7 +233,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -238,7 +241,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -298,7 +301,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -307,7 +310,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -359,7 +362,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas)
@@ -368,7 +371,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -431,7 +434,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -491,7 +494,7 @@ def test_FinRainbowOption():
                 valueDate,
                 expiryDate,
                 stockPrices,
-                interestRate,
+                discountCurve,
                 dividendYields,
                 volatilities,
                 betas,

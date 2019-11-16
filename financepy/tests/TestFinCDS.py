@@ -15,7 +15,8 @@ from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from financepy.finutils.FinCalendar import FinBusDayConventionTypes
+from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes

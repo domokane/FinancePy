@@ -8,13 +8,17 @@ Created on Sun Aug 07 14:23:13 2019
 from math import log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
+from .FinLiborModelTypes import FinLiborModelBlack
+from .FinLiborModelTypes import FinLiborModelShiftedBlack
+from .FinLiborModelTypes import FinLiborModelSABR
 from ...models.FinSABRModel import blackVolFromSABR
 
 ##########################################################################
@@ -96,8 +100,7 @@ class FinLiborCapFloor():
     def value(self,
               valuationDate,
               liborCurve,
-              modelType,
-              modelParams):
+              model):
 
         self._capFloorDates = FinSchedule(self._startDate,
                                           self._maturityDate,
@@ -165,8 +168,7 @@ class FinLiborCapFloor():
                                                         startDate,
                                                         endDate,
                                                         liborCurve,
-                                                        modelType,
-                                                        modelParams)
+                                                        model)
 
             capFloorValue += capFloorLetValue
 
@@ -181,20 +183,22 @@ class FinLiborCapFloor():
                             startDate,
                             endDate,
                             liborCurve,
-                            modelType,
-                            modelParams):
+                            model):
 
         df = liborCurve.df(endDate)
         t = (startDate - valuationDate) / gDaysInYear
         f = liborCurve.fwdLibor(startDate, endDate, self._dayCountType)
         k = self._strikeRate
 
-        if modelType == FinLiborCapFloorModelTypes.BLACK:
+        if type(model) == FinLiborModelBlack:
 
-            v = modelParams["volatility"]
+            v = model._volatility
 
             if v <= 0:
                 raise FinError("Black Volatility must be positive")
+
+            if f <= 0:
+                raise FinError("Forward must be positive")
 
             d1 = (log(f / k) + v * v * t / 2.0) / v / sqrt(t)
             d2 = d1 - v * sqrt(t)
@@ -204,10 +208,10 @@ class FinLiborCapFloor():
             elif self._optionType == FinLiborCapFloorType.FLOOR:
                 capFloorLetValue = df * (k * N(-d2) - f * N(-d1))
 
-        elif modelType == FinLiborCapFloorModelTypes.SHIFTED_BLACK:
+        elif type(model) == FinLiborModelShiftedBlack:
 
-            v = modelParams["volatility"]
-            h = modelParams["shift"]
+            v = model._volatility
+            h = model._shift
 
             if v <= 0:
                 raise FinError("Black Volatility must be positive")
@@ -220,12 +224,12 @@ class FinLiborCapFloor():
             elif self._optionType == FinLiborCapFloorType.FLOOR:
                 capFloorLetValue = df * ((k - h) * N(-d2) - (f - h) * N(-d1))
 
-        elif modelType == FinLiborCapFloorModelTypes.SABR:
+        elif type(model) == FinLiborModelSABR:
 
-            alpha = modelParams["alpha"]
-            beta = modelParams["beta"]
-            rho = modelParams["rho"]
-            nu = modelParams["nu"]
+            alpha = model._alpha
+            beta = model._beta
+            rho = model._rho
+            nu = model._nu
 
             v = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
 
@@ -238,7 +242,7 @@ class FinLiborCapFloor():
                 capFloorLetValue = df * ((k) * N(-d2) - (f) * N(-d1))
 
         else:
-            raise FinError("Unknown model type " + str(modelType))
+            raise FinError("Unknown model type " + str(model))
 
         return capFloorLetValue
 

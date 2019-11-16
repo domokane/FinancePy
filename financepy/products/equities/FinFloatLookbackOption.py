@@ -48,15 +48,17 @@ class FinFloatLookbackOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
-              interestRate,
+              discountCurve,
               dividendYield,
               volatility,
               stockMinMax):
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
+
         v = volatility
         s0 = stockPrice
-        r = interestRate
         q = dividendYield
         smin = 0.0
         smax = 0.0
@@ -125,7 +127,7 @@ class FinFloatLookbackOption(FinOption):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
             volatility,
             stockMinMax,
@@ -133,10 +135,13 @@ class FinFloatLookbackOption(FinOption):
             numStepsPerYear=252,
             seed=4242):
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
+
         numTimeSteps = int(t * numStepsPerYear)
-        mu = interestRate - dividendYield
-        r = interestRate
+        mu = r - dividendYield
+
         optionType = self._optionType
         smin = 0.0
         smax = 0.0

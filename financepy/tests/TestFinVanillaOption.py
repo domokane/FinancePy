@@ -5,25 +5,23 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
+import time
+
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinOption import FinOptionTypes
 from financepy.products.equities.FinVanillaOption import FinVanillaOption
 from financepy.products.equities.FinVanillaOption import FinOptionModelTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
-
-from financepy.products.equities.FinEquityModelTypes import FinEquityModel
 from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
 
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
-import time
 
 def test_FinVanillaOption():
 
@@ -35,7 +33,6 @@ def test_FinVanillaOption():
     dividendYield = 0.01
     model = FinEquityModelBlackScholes(volatility)
     discountCurve = FinFlatCurve(valueDate, interestRate)
-
 
     numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 

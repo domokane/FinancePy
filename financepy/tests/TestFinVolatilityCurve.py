@@ -22,8 +22,8 @@ def test_FinVolatilityCurve():
 
     valueDate = FinDate(2012, 6, 20)
     expiryDate = FinDate(2012, 12, 20)
-    strikes = [70, 80, 90, 100, 110, 120, 130]
-    vols = [0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35]
+    strikes = np.linspace(70, 130, 7)
+    vols = np.array([0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35])
     polynomial = 5
     volCurve = FinVolatilityCurve(valueDate, expiryDate,
                                   strikes, vols, polynomial)
@@ -31,9 +31,10 @@ def test_FinVolatilityCurve():
     interpStrikes = np.linspace(50, 150, 100)
     interpVols = volCurve.volatility(interpStrikes)
 
-    import matplotlib.pyplot as plt
-    plt.plot(strikes, vols, 'o', interpStrikes, interpVols)
-    plt.show()
+    if 1 == 0:
+        import matplotlib.pyplot as plt
+        plt.plot(strikes, vols, 'o', interpStrikes, interpVols)
+        plt.show()
 
 
 test_FinVolatilityCurve()

@@ -6,7 +6,6 @@ Created on Mon Aug  5 16:23:12 2019
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionModelTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionType
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -15,6 +14,11 @@ from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+
+from financepy.products.libor.FinLiborModelTypes import FinLiborModelBlack
+from financepy.products.libor.FinLiborModelTypes import FinLiborModelSABR
+
+
 import sys
 sys.path.append("..//..")
 
@@ -163,11 +167,10 @@ def test_FinLiborSwaption():
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType)
 
-    modelType = FinLiborSwaptionModelTypes.BLACK
-    modelParams = {'volatility': 0.25}
-    value = swaption.value(valuationDate, liborCurve, modelType, modelParams)
+    model = FinLiborModelBlack(0.25)
+    value = swaption.value(valuationDate, liborCurve, model)
 
-#    swaption.print()
+    swaption.print()
 
     testCases.header("LABEL", "VALUE")
     testCases.print("PAYER Swaption Value", value)
@@ -180,11 +183,10 @@ def test_FinLiborSwaption():
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType)
 
-    modelType = FinLiborSwaptionModelTypes.BLACK
-    modelParams = {'volatility': 0.25}
-    value = swaption.value(valuationDate, liborCurve, modelType, modelParams)
+    model = FinLiborModelBlack(0.25)
+    value = swaption.value(valuationDate, liborCurve, model)
 
-#    swaption.print()
+    swaption.print()
 
     testCases.print("RECEIVER Swaption Value", value)
 
@@ -210,11 +212,10 @@ def test_FinLiborSwaption():
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType)
 
-    modelType = FinLiborSwaptionModelTypes.SABR
-    modelParams = {'alpha': 0.28, 'beta': 1.0, 'rho': -0.09, 'nu': 0.21}
-    value = swaption.value(valuationDate, liborCurve, modelType, modelParams)
+    model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
+    value = swaption.value(valuationDate, liborCurve, model)
 
-#    swaption.print()
+    swaption.print()
 
     testCases.header("LABEL", "VALUE")
     testCases.print("PAYER Swaption Value", value)
@@ -228,11 +229,10 @@ def test_FinLiborSwaption():
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType)
 
-    modelType = FinLiborSwaptionModelTypes.SABR
-    modelParams = {'alpha': 0.28, 'beta': 1.0, 'rho': -0.09, 'nu': 0.21}
-    value = swaption.value(valuationDate, liborCurve, modelType, modelParams)
+    model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
+    value = swaption.value(valuationDate, liborCurve, model)
 
-#    swaption.print()
+    swaption.print()
 
     testCases.print("RECEIVER Swaption Value", value)
 

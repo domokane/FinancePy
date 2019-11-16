@@ -39,20 +39,19 @@ def test_FinCompoundOption():
     optionType1 = FinOptionTypes.EUROPEAN_CALL
     optionType2 = FinOptionTypes.EUROPEAN_PUT
 
-    numStepsList = [
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900,
-        1000,
-        2000,
-        3000,
-        4000,
-        5000]
+    numStepsList = [200,
+                    300,
+                    400,
+                    500,
+                    600,
+                    700,
+                    800,
+                    900,
+                    1000,
+                    2000,
+                    3000,
+                    4000,
+                    5000]
 
     cmpdOption = FinCompoundOption(
         expiryDate1,

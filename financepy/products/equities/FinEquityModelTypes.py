@@ -2,11 +2,7 @@
 
 
 class FinEquityModel(object):
-    ''' This is a container class for models. A model may not just be a 
-    different dynamical process but can also be a specific implementation. For 
-    example Black Scholes can be implemented as closed-form or as Monte Carlo. 
-    These would be different models as they have different parameter require-
-    ments.'''
+    ''' This is a parent class for equity models. '''
 
     def __init__(self):
         self._parentType = None

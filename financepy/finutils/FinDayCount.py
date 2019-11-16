@@ -144,13 +144,14 @@ class FinDayCount(object):
                 return accFactor
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
-                if dt3 is None:
-                    raise ValueError("ACT_ACT_ICMA requires three dates")
 
-                num = dt2 - dt1
-                den = dt3 - dt1
-                accFactor = num/den
-                return accFactor
+            if dt3 is None:
+                raise ValueError("ACT_ACT_ICMA requires three dates")
+
+            num = dt2 - dt1
+            den = dt3 - dt1
+            accFactor = num/den
+            return accFactor
 
         elif self._type == FinDayCountTypes.ACT_360:
 
@@ -207,8 +208,8 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return accFactor
             else:
-                daysYear1 = FinDate.datediff(dt1, FinDate(y1 + 1, 1, 1))
-                daysYear2 = FinDate.datediff(FinDate(y1 + 1, 1, 1), dt2)
+                daysYear1 = FinDate(y1 + 1, 1, 1) - dt1
+                daysYear2 = dt2 - FinDate(y1 + 1, 1, 1)
                 accFactor = daysYear1 / denom1
                 accFactor += daysYear2 / denom2
                 return accFactor

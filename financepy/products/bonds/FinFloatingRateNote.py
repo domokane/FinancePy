@@ -110,10 +110,10 @@ class FinFloatingRateNote(object):
         self.calculateFlowDates(settlementDate)
         months = int(12 / self._frequency)
 
-        ncd = self._flowDates[0]
-        dc = FinDate.datediff(settlementDate, ncd)
+        ncd = self._flowDates[0] # check!
+        dc = ncd - settlementDate
         pcd = FinDate.addMonths(ncd, -months)
-        dbc = FinDate.datediff(pcd, ncd)
+        dbc = ncd - pcd
 
         alpha = float(dc) / float(dbc)
         f = self._frequency

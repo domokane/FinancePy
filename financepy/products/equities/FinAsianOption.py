@@ -420,12 +420,9 @@ class FinAsianOption(FinOption):
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate)  / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         df = discountCurve.df(t)
         r = -log(df)/t
@@ -489,12 +486,11 @@ class FinAsianOption(FinOption):
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
 
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        # the years to the start of the averaging period
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate)  / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+
         multiplier = 1.0
 
         df = discountCurve.df(t)
@@ -548,70 +544,6 @@ class FinAsianOption(FinOption):
 
 ##########################################################################
 
-# =============================================================================
-#    def valueMilevskyPosner(self,
-#               valueDate,
-#               stockPrice,
-#               dividendYield,
-#               volatility,
-#               interestRate,
-#               accruedAverage):
-#
-#         # This is based on paper by Milevsky and Posner
-#         if valueDate > self._expiryDate:
-#             raise FinError("Value date after option expiry date.")
-#
-#         t0 = FinDate.datediff(valueDate,self._startAveragingDate)/gDaysInYear
-#         t = FinDate.datediff(valueDate,self._expiryDate)/gDaysInYear
-#
-#         if abs(volatility) < gSmall:
-#             volatility = gSmall
-#
-#         n = self._numObservations
-#         K = self._strikePrice
-#         S0 = stockPrice
-#         r = interestRate
-#
-#         sigSq = volatility**2
-#         h = (t-t0)/self._numObservations
-#         g = interestRate - dividendYield
-#
-#         if g == 0:
-#             M1 = S0
-#             M2 = 2 * S0 * S0/ (t*t) * (exp(sigSq*t) - 1 - sigSq*t)/sigSq/sigSq
-#         else:
-#             M1 = (S0/n) * exp(g*h) * (1.0 - exp(g*n*h))/(1.0 - exp(g*h))
-#             A1 = (1.0 - exp(g*h)) * (1.0 - exp((2.0*g+sigSq)*h))
-#             A1 = (exp((2.0*g+sigSq)*h) - exp((2.0*g+sigSq)*(n+1)*h))/A1
-#             A2 = (1.0 - exp(g*h)) * (1.0 - exp((g+sigSq)*h))
-#             A2 = (exp((g*(n+2)+sigSq)*h)-exp((2.0*g+sigSq)*(n+1)*h))/A2
-#             A3 = (1.0 - exp(g*h)) * (1.0 - exp((g+sigSq)*h))
-#             A3 = (exp((3.0*g+sigSq)*h) - exp((g*(n+2) + sigSq) * h)) / A3
-#             A4 = (1.0 - exp((g+sigSq)*h)) * (1.0 - exp((2.0*g+sigSq)*h))
-#             A4 = (exp((2.0*g+sigSq)*2*h)-exp((2.0*g+sigSq)*(n+1)*h))/ A4
-#             M2 = (S0*S0) / (n*n) * (A1 - A2 + A3 - A4)
-#
-#             # moments matched
-#             alpha = (2.0 * M2 - M1 * M1)/ (M2-M1*M1)
-#             beta = (M2 - M1*M1)/ (M1*M2)
-#
-#             G1 = gamma.cdf(x = 1.0/K, a = alpha-1.0, scale = beta)
-#             G2 = gamma.cdf(x = 1.0/K, a = alpha,scale = beta)
-#
-#         call = exp(-r*t) * (M1 * G1 - K * G2)
-#
-#         if self._optionType == "CALL":
-#             v = call
-#         elif self._optionType == "PUT":
-#             v = call - (M1 - K) * exp(-r*t)
-#         else:
-#             raise FinError("Unknown option type " + str(self._optionType))
-#
-#         return v
-# =============================================================================
-
-##########################################################################
-
     def valueTurnbullWakeman(self,
                              valueDate,
                              stockPrice,
@@ -627,12 +559,9 @@ class FinAsianOption(FinOption):
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
 
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         multiplier = 1.0
@@ -698,61 +627,7 @@ class FinAsianOption(FinOption):
 
         return v
 
-##########################################################################
-
-# =============================================================================
-#    def valueLevy(self,
-#               valueDate,
-#               stockPrice,
-#               dividendYield,
-#               volatility,
-#               interestRate,
-#               accruedAverage):
-#
-#         # This is based on paper by Levy 1992
-#
-#         if valueDate > self._expiryDate:
-#             raise FinError("Value date after option expiry date.")
-#
-#         t0 = FinDate.datediff(valueDate,self._startAveragingDate)/gDaysInYear
-#         t = FinDate.datediff(valueDate,self._expiryDate)/gDaysInYear
-#         tau = FinDate.datediff(self._startAveragingDate,self._expiryDate)/gDaysInYear
-#
-#         S0 = stockPrice
-#         r = interestRate
-#         K = self._strikePrice
-#
-#         # need to handle this
-#         b = interestRate - dividendYield
-#         SE = (S0/t/b) *(exp((b-r)*t)-exp(-r*t))
-#         sigma2 = volatility**2
-#         a1 = b + sigma2
-#         a2 = 2.0 * b + sigma2
-#         S0 = stockPrice
-#         K = self._strikePrice
-#         r = interestRate
-#
-#         M = (2.0*S0*S0)/(a1)*((exp(a2*t) - 1.0)/a2 - (exp(b*t)-1.0)/b)
-#         D= M/t/t
-#         V = log(D) - 2.0 * (r*t + log(SE))
-#
-#         Xstar = K #- ((t-tau)/tau) * accruedAverage
-#
-#         d1 = (log(D)/2.0 - log(Xstar))/sqrt(V)
-#         d2 = d1 - sqrt(V)
-#
-#         call = SE * normsdist(d1) - Xstar * exp(-r*t) * normsdist(d2)
-#
-#         if self._optionType == "CALL":
-#             v = call
-#         elif self._optionType == "PUT":
-#             v = call - SE + Xstar * exp(-r*t)
-#         else:
-#             return None
-#
-#         return v
-# =============================================================================
-###############################################################################
+##############################################################################
 
     def valueMC(self,
                 valueDate,
@@ -772,12 +647,10 @@ class FinAsianOption(FinOption):
             raise FinError(
                 "In averaging period so need to enter accrued average.")
 
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        # the years to the start of the averaging period
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate)  / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         df = discountCurve.df(t)
         r = -log(df)/t
@@ -809,12 +682,10 @@ class FinAsianOption(FinOption):
                      seed,
                      accruedAverage):
 
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        # the years to the start of the averaging period
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate)  / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations
@@ -846,12 +717,10 @@ class FinAsianOption(FinOption):
                         seed,
                         accruedAverage):
 
-        t0 = FinDate.datediff(
-            valueDate, self._startAveragingDate) / gDaysInYear
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        tau = FinDate.datediff(
-            self._startAveragingDate,
-            self._expiryDate) / gDaysInYear
+        # the years to the start of the averaging period
+        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
+        t = (self._expiryDate - valueDate)  / gDaysInYear
+        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations

@@ -4,6 +4,7 @@ Created on Fri Jan 18 15:28:41 2019
 
 @author: Dominic O'Kane
 """
+# TODO Fix this
 
 import numpy as np
 from scipy.stats import norm
@@ -15,7 +16,8 @@ class BlackModel():
 
     ##########################################################################
 
-    def value(forwardRate,
+    def value(self,
+              forwardRate,
               strikeRate,
               timeToExpiry,
               sigma,

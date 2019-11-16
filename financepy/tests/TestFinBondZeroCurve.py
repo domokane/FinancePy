@@ -9,8 +9,6 @@ Created on Fri Apr 08 09:26:27 2016
 import sys
 import datetime as dt
 
-sys.path.append("..//..")
-
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate

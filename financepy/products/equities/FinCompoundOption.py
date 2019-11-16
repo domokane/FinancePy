@@ -11,7 +11,6 @@ import numpy as np
 from scipy import optimize
 from numba import njit
 
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, phi2
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
@@ -19,7 +18,7 @@ from ...finutils.FinError import FinError
 from ...products.equities.FinOption import FinOption
 from ...products.equities.FinOption import FinOptionTypes
 from ...products.equities.FinVanillaOption import FinVanillaOption
-from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+from ...market.curves.FinFlatCurve import FinFlatCurve
 
 ###############################################################################
 
@@ -30,13 +29,12 @@ def f(s0, *args):
     valueDate = args[1]
     discountCurve = args[2]
     dividendYield = args[3]
-    volatility = args[4]
+    model = args[4]
     value = args[5]
 
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits K1")
 
-    model = FinEquityModelBlackScholes(volatility)
     objFn = self.value(
         valueDate,
         s0,
@@ -230,8 +228,8 @@ class FinCompoundOption(FinOption):
               dividendYield,
               model):
 
-        t1 = FinDate.datediff(valueDate, self._expiryDate1) / gDaysInYear
-        t2 = FinDate.datediff(valueDate, self._expiryDate2) / gDaysInYear
+        t1 = (self._expiryDate1 - valueDate) / gDaysInYear
+        t2 = (self._expiryDate2 - valueDate) / gDaysInYear
 
         df2 = discountCurve.df(t2)
         r = -log(df2)/t2
@@ -259,9 +257,9 @@ class FinCompoundOption(FinOption):
             k1,
             k2,
             self._optionType2,
-            discountCurve,
+            r,
             q,
-            v)
+            model)
 
         a1 = (log(s0 / sstar) + (r - q + (v**2) / 2.0) * t1) / v / sqrt(t1)
         a2 = a1 - v * sqrt(t1)
@@ -308,8 +306,8 @@ class FinCompoundOption(FinOption):
         if valueDate > self._expiryDate1:
             raise FinError("Value date is after expiry date.")
 
-        t1 = FinDate.datediff(valueDate, self._expiryDate1) / gDaysInYear
-        t2 = FinDate.datediff(valueDate, self._expiryDate2) / gDaysInYear
+        t1 = (self._expiryDate1 - valueDate) / gDaysInYear
+        t2 = (self._expiryDate2 - valueDate) / gDaysInYear
 
         df2 = discountCurve.df(t2)
         riskFreeRate = -log(df2)/t2
@@ -332,8 +330,10 @@ class FinCompoundOption(FinOption):
                        dividendYield,
                        volatility,
                        t1, t2,
-                       self._optionType1, self._optionType2,
-                       self._strikePrice1, self._strikePrice2,
+                       self._optionType1,
+                       self._optionType2,
+                       self._strikePrice1,
+                       self._strikePrice2,
                        numSteps + 1)
 
         return (v1 + v2) / 2.0
@@ -347,18 +347,20 @@ class FinCompoundOption(FinOption):
                           strikePrice1,
                           strikePrice2,
                           optionType2,
-                          discountCurve,
+                          interestRate,
                           dividendYield,
-                          volatility):
+                          model):
 
         option = FinVanillaOption(expiryDate2, strikePrice2, optionType2)
+
+        discountCurve = FinFlatCurve(expiryDate1, interestRate)
 
         argtuple = (
             option,
             expiryDate1,
             discountCurve,
             dividendYield,
-            volatility,
+            model,
             strikePrice1)
 
         sigma = optimize.newton(

@@ -46,7 +46,7 @@ def expectedLoss(lossSizeVector,
 ###############################################################################
 
 
-@njit(float64(float64[:], float64[:],float64),fastmath=True, cache=True)
+@njit(float64(float64[:], float64[:], float64),fastmath=True, cache=True)
 def valueAtRisk(lossSizeVector,
                 lossProbabilityVector,
                 confidenceLevel):

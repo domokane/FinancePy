@@ -10,7 +10,6 @@ import numpy as np
 from enum import Enum
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.equities.FinOption import FinOption
@@ -33,8 +32,12 @@ class FinBarrierTypes(Enum):
 
 class FinBarrierOption(FinOption):
 
-    def __init__(self, expiryDate, strikePrice, optionType,
-                 barrierLevel, numObservationsPerYear):
+    def __init__(self,
+                 expiryDate,
+                 strikePrice,
+                 optionType,
+                 barrierLevel,
+                 numObservationsPerYear):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
@@ -52,28 +55,32 @@ class FinBarrierOption(FinOption):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            volatility):
+            model):
 
         # This prices the option using the formulae given in the paper
         # by Clewlow, Llanos and Strickland December 1994 which can be found at
         # https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         lnS0k = log(float(stockPrice) / self._strikePrice)
         sqrtT = sqrt(t)
+
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
 
         k = self._strikePrice
         s = stockPrice
         h = self._barrierLevel
 
+        volatility = model._volatility
         sigmaRootT = volatility * sqrtT
         v2 = volatility * volatility
-        mu = interestRate - dividendYield
+        mu = r - dividendYield
         d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigmaRootT
         d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigmaRootT
-        df = exp(-interestRate * t)
+        df = exp(-r * t)
         dq = exp(-dividendYield * t)
 
         c = s * dq * N(d1) - k * df * N(d2)
@@ -156,17 +163,17 @@ class FinBarrierOption(FinOption):
                 price = c - c_do
         elif self._optionType == FinBarrierTypes.UP_AND_IN_CALL:
             if h >= k:
-                c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) - s * dq * pow(hOverS,
-                                                                                   2.0 * l) * (N(-y) - N(-y1)) + k * df * pow(hOverS,
-                                                                                                                              2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
+                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c_ui
             else:
                 price = c
         elif self._optionType == FinBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
-                c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) - s * dq * pow(hOverS,
-                                                                                   2.0 * l) * (N(-y) - N(-y1)) + k * df * pow(hOverS,
-                                                                                                                              2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
+                     - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                     + k * df * pow(hOverS, 2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c - c_ui
             else:
                 price = 0.0
@@ -222,21 +229,23 @@ class FinBarrierOption(FinOption):
             self,
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             processType,
             modelParams,
             numAnnSteps=252,
             numPaths=10000,
             seed=4242):
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         numTimeSteps = int(t * numAnnSteps)
-        r = interestRate
         K = self._strikePrice
         B = self._barrierLevel
         optionType = self._optionType
 
         process = FinProcessSimulator()
+
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
 
         #######################################################################
 
@@ -269,12 +278,12 @@ class FinBarrierOption(FinOption):
 
         if simpleCall:
             c = (np.maximum(Sall[:, -1] - K, 0)).mean()
-            c = c * exp(-interestRate * t)
+            c = c * exp(-r * t)
             return c
 
         if simplePut:
             p = (np.maximum(K - Sall[:, -1], 0)).mean()
-            p = p * exp(-interestRate * t)
+            p = p * exp(-r * t)
             return p
 
         # Get full set of paths

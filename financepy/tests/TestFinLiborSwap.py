@@ -7,18 +7,17 @@ Created on Sun Feb 07 14:23:13 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinInterpolate import FinInterpMethods
 from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from financepy.finutils.FinCalendar import FinBusDayConventionTypes
+from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-import numpy as np
+
 import sys
 sys.path.append("..//..")
 
@@ -101,8 +100,6 @@ def buildLiborCurve(valuationDate):
     endDate = startDate.addMonths(1)
     fra = FinLiborFRA(startDate, endDate, -0.00126, True, dcType)
     fras.append(fra)
-
-    print("FRA END DATE", endDate)
 
     fixedFreq = FinFrequencyTypes.ANNUAL
     dcType = FinDayCountTypes.THIRTY_360
@@ -276,15 +273,15 @@ def buildLiborCurve(valuationDate):
     ''' Check calibration '''
     for depo in depos:
         v = depo.value(valuationDate, liborCurve)
-        print("DEPO:", depo._maturityDate, v)
+        print("DEPO VALUE:", depo._maturityDate, v)
 
     for fra in fras:
         v = fra.value(valuationDate, liborCurve)
-        print("FRA:", fra._maturityDate, v)
+        print("FRA VALUE:", fra._maturityDate, v)
 
     for swap in swaps:
         v = swap.value(valuationDate, liborCurve, liborCurve, None)
-        print("SWAP:", swap._maturityDate, v)
+        print("SWAP VALUE:", swap._maturityDate, v)
 
     return liborCurve
 

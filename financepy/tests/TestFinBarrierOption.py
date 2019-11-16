@@ -9,7 +9,9 @@ from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.equities.FinBarrierOption import FinBarrierTypes
 from financepy.products.equities.FinBarrierOption import FinBarrierOption
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
+from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
 import sys
 sys.path.append("..//..")
 
@@ -30,6 +32,8 @@ def test_FinBarrierOption():
     drift = interestRate - dividendYield
     scheme = FinGBMNumericalScheme.NORMAL
     processType = FinProcessTypes.GBM
+    discountCurve = FinFlatCurve(valueDate, interestRate)
+    model = FinEquityModelBlackScholes(volatility)
 
     #######################################################################
 
@@ -59,15 +63,15 @@ def test_FinBarrierOption():
             value = option.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                volatility)
+                model)
             start = time.time()
             modelParams = (stockPrice, drift, volatility, scheme)
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 processType,
                 modelParams)
 
@@ -105,15 +109,15 @@ def test_FinBarrierOption():
         value = option.value(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             dividendYield,
-            volatility)
+            model)
         start = time.time()
         modelParams = (stockPrice, drift, volatility, scheme)
         valueMC = option.valueMC(
             valueDate,
             stockPrice,
-            interestRate,
+            discountCurve,
             processType,
             modelParams)
         end = time.time()
@@ -150,27 +154,27 @@ def test_FinBarrierOption():
             value = barrierOption.value(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                volatility)
+                model)
             delta = barrierOption.delta(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                volatility)
+                model)
             vega = barrierOption.vega(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                volatility)
+                model)
             theta = barrierOption.theta(
                 valueDate,
                 stockPrice,
-                interestRate,
+                discountCurve,
                 dividendYield,
-                volatility)
+                model)
 
             testCases.print(
                 optionType,

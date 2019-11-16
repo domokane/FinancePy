@@ -34,9 +34,9 @@ class FinDigitalOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
+              discountCurve,
               dividendYield,
-              volatility,
-              interestRate):
+              model):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -49,22 +49,27 @@ class FinDigitalOption(FinOption):
             else:
                 raise FinError("Unknown option type.")
 
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         lnS0k = log(float(stockPrice) / self._strikePrice)
         sqrtT = sqrt(t)
+
+        df = discountCurve.df(t)
+        r = -log(df)/t
+
+        volatility = model._volatility
 
         if abs(volatility) < gSmall:
             volatility = gSmall
 
         den = volatility * sqrtT
         v2 = volatility * volatility
-        mu = interestRate - dividendYield
+        mu = r - dividendYield
         d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
         if self._optionType == FinOptionTypes.DIGITAL_CALL:
-            v = exp(-interestRate * t) * N(d2)
+            v = exp(-r * t) * N(d2)
         elif self._optionType == FinOptionTypes.DIGITAL_PUT:
-            v = exp(-interestRate * t) * N(-d2)
+            v = exp(-r * t) * N(-d2)
         else:
             raise FinError("Unknown option type")
 
@@ -75,15 +80,20 @@ class FinDigitalOption(FinOption):
     def valueMC(self,
                 valueDate,
                 stockPrice,
+                discountCurve,
                 dividendYield,
-                volatility,
-                interestRate,
+                model,
                 numPaths=10000,
                 seed=4242):
 
         np.random.seed(seed)
-        t = FinDate.datediff(valueDate, self._expiryDate) / gDaysInYear
-        mu = interestRate - dividendYield
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(t)
+        r = -np.log(df)/t
+
+        volatility = model._volatility
+
+        mu = r - dividendYield
         v2 = volatility**2
         K = self._strikePrice
         sqrtdt = np.sqrt(t)
@@ -105,7 +115,7 @@ class FinDigitalOption(FinOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * exp(-interestRate * t) / 2.0
+        v = payoff * exp(-r * t) / 2.0
         return v
 
 ##########################################################################
