@@ -3,20 +3,23 @@
 # TODO
 
 from math import exp, sqrt
-from numba import njit, jit
+from numba import njit
 import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...finutils.FinInterpolate import FinInterpMethods, interpolate
+from ...finutils.FinInterpolate import FinInterpMethods, uinterpolate
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
-from .FinBond import FinBondAccruedTypes
+from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+
+from ...finutils.FinSchedule import FinSchedule
+from ...finutils.FinCalendar import FinCalendarTypes
+from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 ###############################################################################
-
-
 
 
 @njit(fastmath=True, cache=True)
@@ -93,7 +96,7 @@ def valueConvertible(tmat,
     treeTimes = np.linspace(0.0, tmat, numTimes)
     treeDfs = np.zeros(numTimes)
     for i in range(0, numTimes):
-        df = interpolate(treeTimes[i], discountTimes, discountFactors, interp)
+        df = uinterpolate(treeTimes[i], discountTimes, discountFactors, interp)
         treeDfs[i] = df
 
     h = creditSpread/(1.0 - recRate)
@@ -106,9 +109,9 @@ def valueConvertible(tmat,
         flowTime = couponTimes[i]
         n = int(round(flowTime/dt, 0))
         treeTime = treeTimes[n]
-        df_flow = interpolate(flowTime, discountTimes, discountFactors, interp)
+        df_flow = uinterpolate(flowTime, discountTimes, discountFactors, interp)
         df_flow *= exp(-h*flowTime)
-        df_tree = interpolate(treeTime, discountTimes, discountFactors, interp)
+        df_tree = uinterpolate(treeTime, discountTimes, discountFactors, interp)
         df_tree *= exp(-h*treeTime)
         treeFlows[n] += couponAmounts[i] * 100.0 * df_flow / df_tree
 
@@ -254,14 +257,15 @@ class FinConvertibleBond(object):
             raise FinError("Invalid Frequency:" + str(frequencyType))
             return
 
-        if accrualType not in FinBondAccruedTypes:
-            raise FinError("Unknown Bond Accrued Convention type " +
+        if accrualType not in FinDayCountTypes:
+            raise FinError("Unknown Day Count Accrued Convention type " +
                            str(accrualType))
 
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._accrualType = accrualType
         self._frequency = FinFrequency(frequencyType)
+        self._frequencyType = frequencyType
         self._callDates = callDates
         self._callPrices = callPrices
         self._putDates = putDates
@@ -269,7 +273,7 @@ class FinConvertibleBond(object):
         self._startConvertDate = startConvertDate
         self._conversionRatio = conversionRatio
         self._face = face
-        self._settlementDate = None
+        self._settlementDate = FinDate(1900, 1, 1)
         ''' I do not determine cashflow dates as I do not want to require
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. '''
@@ -279,18 +283,25 @@ class FinConvertibleBond(object):
     def calculateFlowDates(self, settlementDate):
         ''' Determine the bond cashflow payment dates. '''
 
+        # No need to generate flows if settlement date has not changed
+        if settlementDate == self._settlementDate:
+            return
+
         self._settlementDate = settlementDate
-        self._flowDates = []
+        calendarType = FinCalendarTypes.NONE
+        busDayRuleType = FinBusDayConventionTypes.NONE
+        dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
-        nextDate = self._maturityDate
-        months = int(12 / self._frequency)
+        self._flowDates = FinSchedule(settlementDate,
+                                      self._maturityDate,
+                                      self._frequencyType,
+                                      calendarType,
+                                      busDayRuleType,
+                                      dateGenRuleType).generate()
 
-        while nextDate._excelDate > settlementDate._excelDate:
-            self._flowDates.append(nextDate)
-            nextDate = nextDate.addMonths(-months)
-
-        self._flowDates.reverse()
-        return
+        self._pcd = self._flowDates[0]
+        self._ncd = self._flowDates[1]
+        self._accruedInterest(settlementDate)
 
 ##########################################################################
 
@@ -333,7 +344,7 @@ class FinConvertibleBond(object):
         couponTimes = [0.0]
         couponFlows = [0.0]
         cpn = self._coupon/self._frequency
-        for dt in self._flowDates:
+        for dt in self._flowDates[1:]:
             flowTime = (dt - settlementDate) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
@@ -376,19 +387,19 @@ class FinConvertibleBond(object):
         discountFactors = np.array(discountFactors)
 
         if testMonotonicity(couponTimes) is False:
-            return ValueError("Coupon times not monotonic")
+            raise ValueError("Coupon times not monotonic")
 
         if testMonotonicity(callTimes) is False:
-            return ValueError("Coupon times not monotonic")
+            raise ValueError("Coupon times not monotonic")
 
         if testMonotonicity(putTimes) is False:
-            return ValueError("Coupon times not monotonic")
+            raise ValueError("Coupon times not monotonic")
 
         if testMonotonicity(discountTimes) is False:
-            return ValueError("Coupon times not monotonic")
+            raise ValueError("Coupon times not monotonic")
 
         if testMonotonicity(dividendTimes) is False:
-            return ValueError("Coupon times not monotonic")
+            raise ValueError("Coupon times not monotonic")
 
         v = valueConvertible(tmat,
                              self._face,
@@ -427,75 +438,28 @@ class FinConvertibleBond(object):
 
 ##########################################################################
 
-    def pcd(self, settlementDate):
-        ''' Determine the previous coupon date before the settlement date. '''
-        self.calculateFlowDates(settlementDate)
-
-        if len(self._flowDates) <= 2:
-            raise FinError("Accrued interest - not enough flow dates.")
-
-        months = int(12 / self._frequency)
-        ncd = self._flowDates[0]
-        pcd = FinDate.addMonths(ncd, -months)
-
-        return pcd
-
-##########################################################################
-
-    def accruedInterest(self, settlementDate):
+    def _accruedInterest(self, settlementDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
         self.calculateFlowDates(settlementDate)
 
-        if len(self._flowDates) <= 2:
+        if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        months = int(12 / self._frequency)
-        ncd = self._flowDates[0]
-        pcd = FinDate.addMonths(ncd, -months)
+        dc = FinDayCount(self._accrualType)
 
-        f = self._frequency
-        dt1 = pcd
-        dt2 = settlementDate
-
-        if dt1 > dt2:
-            raise FinError("First coupon must precede settlement date.")
-
-        d1 = dt1._d
-        d2 = dt2._d
-        m1 = dt1._m
-        m2 = dt2._m
-        y1 = dt1._y
-        y2 = dt2._y
-
-        if self._accrualType == FinBondAccruedTypes.THIRTY_360:
-            dayDiff = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
-            daysInPeriod = 360.0 / f
-            accFactor = dayDiff / daysInPeriod
-        elif self._accrualType == FinBondAccruedTypes.THIRTY_360_BOND:
-            d1 = min(d1, 30)
-            if d1 == 31 or d1 == 30:
-                d2 = min(d2, 30)
-            dayDiff = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
-            daysInPeriod = 360.0 / f
-            accFactor = dayDiff / daysInPeriod
-        elif self._accrualType == FinBondAccruedTypes.ACT_360:
-            accFactor = (dt2 - dt1) / 360.0
-            daysInPeriod = 360.0 / f
-            accFactor = (dt2 - dt1) / daysInPeriod
-        elif self._accrualType == FinBondAccruedTypes.ACT_365:
-            daysInPeriod = 365.0 / f
-            accFactor = (dt2 - dt1) / daysInPeriod
-        elif self._accrualType == FinBondAccruedTypes.ACT_ACT:
-            daysInPeriod = ncd - pcd
-            accFactor = (settlementDate - pcd) / daysInPeriod
+        if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
+            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)
+            alpha = 1.0 - accFactor
+            accFactor = accFactor/self._frequency
         else:
-            raise FinError(str(self._type) + " is not one of BondAccrualTypes")
+            accFactor = dc.yearFrac(self._pcd, settlementDate)
+            alpha = 1.0 - accFactor
 
-        flow = self._coupon / f
-        accrued = accFactor * flow * self._face
-        return accrued
+        self._accrued = accFactor * self._face * self._coupon
+        self._alpha = alpha
+        self._accruedDays = settlementDate - self._pcd
 
 ##########################################################################
 

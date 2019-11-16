@@ -119,20 +119,19 @@ class FinBond(object):
             return
 
         self._settlementDate = settlementDate
-        self._flowDates = []
+        calendarType = FinCalendarTypes.NONE
+        busDayRuleType = FinBusDayConventionTypes.NONE
+        dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
-        nextDate = self._maturityDate
-        months = int(12 / self._frequency)
+        self._flowDates = FinSchedule(settlementDate,
+                                      self._maturityDate,
+                                      self._frequencyType,
+                                      calendarType,
+                                      busDayRuleType,
+                                      dateGenRuleType).generate()
 
-        while nextDate._excelDate > settlementDate._excelDate:
-            self._flowDates.append(nextDate)
-            nextDate = nextDate.addMonths(-months)
-
-        self._flowDates.reverse()
-
-        months = int(12 / self._frequency)
-        self._ncd = self._flowDates[0]
-        self._pcd = FinDate.addMonths(self._ncd, -months)
+        self._pcd = self._flowDates[0]
+        self._ncd = self._flowDates[1]
         self._accruedInterest(settlementDate)
 
 ###############################################################################
@@ -149,9 +148,12 @@ class FinBond(object):
         c = self._coupon
         v = 1.0 / (1.0 + y/f)
 
+        # n is the number of flows after the next coupon - we remove 2 because
+        # the first element is the previous coupon date and then the ncd
+        n = len(self._flowDates) - 2
+
         if convention == FinYieldConventions.UK_DMO:
 
-            n = len(self._flowDates) - 1
             if n == 0:
                 fp = (v**(self._alpha))*(1.0+c/f)
             else:
@@ -163,7 +165,6 @@ class FinBond(object):
 
         elif convention == FinYieldConventions.US_TREASURY:
 
-            n = len(self._flowDates) - 1
             if n == 0:
                 fp = (v**(self._alpha))*(1.0+c/f)
             else:
@@ -176,7 +177,6 @@ class FinBond(object):
 
         elif convention == FinYieldConventions.US_STREET:
 
-            n = len(self._flowDates) - 1
             vw = 1.0 / (1.0 + self._alpha * y/f)
             if n == 0:
                 vw = 1.0 / (1.0 + self._alpha * y/f)
@@ -367,9 +367,9 @@ class FinBond(object):
         bondPrice = (cleanPrice + self._accrued)/self._face
         # Calculate the price of the bond discounted on the Libor curve
         pvLibor = 0.0
-        prevDate = self._flowDates[0]
+        prevDate = self._pcd
 
-        for dt in self._flowDates:
+        for dt in self._flowDates[1:]:
             df = discountCurve.df(dt)
             pvLibor += df * self._coupon / self._frequency
         pvLibor += df
@@ -386,7 +386,7 @@ class FinBond(object):
 
         dayCount = FinDayCount(swapFloatDayCountConventionType)
 
-        prevDate = schedule._adjustedDates[0]
+        prevDate = self._pcd
         pv01 = 0.0
         for dt in schedule._adjustedDates[1:]:
             df = discountCurve.df(dt)
@@ -411,7 +411,7 @@ class FinBond(object):
         c = self._coupon
 
         pv = 0.0
-        for dt in self._flowDates:
+        for dt in self._flowDates[1:]:
             t = (dt - settlementDate) / gDaysInYear
             df = discountCurve.df(dt)
             # determine the Libor implied zero rate
@@ -459,8 +459,8 @@ class FinBond(object):
         self.calculateFlowDates(settlementDate)
         pcd = self._pcd
         print("PCD", pcd)
-        datediff = settlementDate - pcd
-        print("NOW", settlementDate, datediff)
+        diff = settlementDate - pcd
+        print("NOW", settlementDate, diff)
         for dt in self._flowDates:
             print("NCD", dt)
 
