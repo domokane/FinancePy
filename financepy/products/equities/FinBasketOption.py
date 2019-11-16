@@ -157,11 +157,9 @@ class FinBasketOption(FinOption):
 
         np.random.seed(seed)
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -log(df)/t
-        mus = r - dividendYields
-
+        mus = interestRate - dividendYields
         k = self._strikePrice
+        r = interestRate
 
         numTimeSteps = 2
 
