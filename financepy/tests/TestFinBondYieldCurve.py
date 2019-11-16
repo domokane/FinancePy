@@ -8,7 +8,6 @@ Created on Fri Apr 08 09:26:27 2016
 import datetime as dt
 
 import sys
-sys.path.append("..//..")
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -16,11 +15,13 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBond import FinBond
-from financepy.market.curves.FinFitBondYieldCurve import FinFitBondYieldCurve
+from financepy.market.curves.FinBondYieldCurve import FinBondYieldCurve
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodPolynomial
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegel
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegelSvensson
 from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodBSpline
+
+sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -28,7 +29,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def test_FinFitBondYieldCurve():
+def test_FinBondYieldCurve():
 
     ###########################################################################
 
@@ -58,23 +59,23 @@ def test_FinFitBondYieldCurve():
     ###########################################################################
 
     curveFitMethod = FinCurveFitMethodPolynomial()
-    fittedCurve1 = FinFitBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fittedCurve1 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
     fittedCurve1.display("GBP Yield Curve")
 
     curveFitMethod = FinCurveFitMethodPolynomial(5)
-    fittedCurve2 = FinFitBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fittedCurve2 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
     fittedCurve2.display("GBP Yield Curve")
 
     curveFitMethod = FinCurveFitMethodNelsonSiegel()
-    fittedCurve3 = FinFitBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fittedCurve3 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
     fittedCurve3.display("GBP Yield Curve")
 
     curveFitMethod = FinCurveFitMethodNelsonSiegelSvensson()
-    fittedCurve4 = FinFitBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fittedCurve4 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
     fittedCurve4.display("GBP Yield Curve")
 
     curveFitMethod = FinCurveFitMethodBSpline()
-    fittedCurve5 = FinFitBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fittedCurve5 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
     fittedCurve5.display("GBP Yield Curve")
 
     ###########################################################################
@@ -100,5 +101,5 @@ def test_FinFitBondYieldCurve():
 
     ###########################################################################
 
-test_FinFitBondYieldCurve()
+test_FinBondYieldCurve()
 testCases.compareTestCases()
