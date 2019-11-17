@@ -197,32 +197,25 @@ class FinAmericanOption():
         volatility = model._volatility
         df = discountCurve.df(self._expiryDate)
         riskFreeRate = -np.log(df)/timeToExpiry
-        v = 0.0
 
-        if model._implementation == FinImplementations.CRR_TREE:
+        value1 = crrTreeVal(stockPrice,
+                            riskFreeRate,
+                            dividendYield,
+                            volatility,
+                            numSteps,
+                            timeToExpiry,
+                            self._optionType.value,
+                            self._strikePrice)
+        value2 = crrTreeVal(stockPrice,
+                            riskFreeRate,
+                            dividendYield,
+                            volatility,
+                            numSteps + 1,
+                            timeToExpiry,
+                            self._optionType.value,
+                            self._strikePrice)
 
-            value1 = crrTreeVal(stockPrice,
-                                riskFreeRate,
-                                dividendYield,
-                                volatility,
-                                numSteps,
-                                timeToExpiry,
-                                self._optionType.value,
-                                self._strikePrice)
-            value2 = crrTreeVal(stockPrice,
-                                riskFreeRate,
-                                dividendYield,
-                                volatility,
-                                numSteps + 1,
-                                timeToExpiry,
-                                self._optionType.value,
-                                self._strikePrice)
-
-            v = (value1 + value2) / 2.0
-
-        elif model._implementation == FinImplementations.BARONE_ADESI_APPROX:
-            v = 999
-
+        v = (value1 + value2) / 2.0
         return v
 
 ###############################################################################
