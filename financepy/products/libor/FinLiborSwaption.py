@@ -124,7 +124,7 @@ class FinLiborSwaption():
         f = swap.parCoupon(valuationDate, liborCurve)
         t = (self._exerciseDate - liborCurve._curveDate) / gDaysInYear
         forwardDf = liborCurve.df(t)
-        swap.printFixedLeg(valuationDate)
+#        swap.printFixedLeg(valuationDate)
 
         if type(model) == FinLiborModelBlack:
 

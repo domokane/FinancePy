@@ -49,9 +49,6 @@ def test_FinVarianceSwap():
     vols = volSkew(strikes, atmVol, atmK, skew)
     volCurve = FinVolatilityCurve(valuationDate, maturityDate, strikes, vols)
 
-    print(strikes)
-    print(vols)
-
     strikeSpacing = 5.0
     numCallOptions = 10
     numPutOptions = 10
@@ -60,15 +57,18 @@ def test_FinVarianceSwap():
 
     useForward = False
 
+    testCases.header("LABEL", "VALUE")
+
     k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendYield,
                             volCurve, numCallOptions, numPutOptions,
                             strikeSpacing, discountCurve, useForward)
-    print("REPLICATION VARIANCE:", k1)
 
-    volSwap.print()
+    testCases.print("REPLICATION VARIANCE:", k1)
+
+    # volSwap.print()
 
     k2 = volSwap.fairStrikeApprox(valuationDate, stockPrice, strikes, vols)
-    print("DERMAN SKEW APPROX for K:", k2)
+    testCases.print("DERMAN SKEW APPROX for K:", k2)
 
 ##########################################################################
 

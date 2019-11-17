@@ -38,3 +38,4 @@ def test_FinVolatilityCurve():
 
 
 test_FinVolatilityCurve()
+testCases.compareTestCases()

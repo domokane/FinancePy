@@ -8,8 +8,11 @@ print("Looking in folder:", dirname(__file__))
 modules = glob.glob(join(dirname(__file__), "TestFin*.py"))
 
 numModules = len(modules)
+
+# change this to start later
 n = 0
-for moduleFileName in modules[0:]:
+
+for moduleFileName in modules[n:]:
 
     n = n + 1
     ll = moduleFileName.find("\\TestFin")

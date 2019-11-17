@@ -82,23 +82,23 @@ def test_FinBondYieldCurve():
 
     testCases.header("PARAMETER", "VALUE")
     testCases.print("beta1", fittedCurve3._curveFitMethod._beta1)
-    testCases.printprint("beta2", fittedCurve3._curveFitMethod._beta2)
-    testCases.printprint("beta3", fittedCurve3._curveFitMethod._beta3)
-    testCases.printprint("tau", fittedCurve3._curveFitMethod._tau)
+    testCases.print("beta2", fittedCurve3._curveFitMethod._beta2)
+    testCases.print("beta3", fittedCurve3._curveFitMethod._beta3)
+    testCases.print("tau", fittedCurve3._curveFitMethod._tau)
 
     testCases.header("PARAMETER", "VALUE")
-    testCases.printprint("beta1", fittedCurve4._curveFitMethod._beta1)
-    testCases.printprint("beta2", fittedCurve4._curveFitMethod._beta2)
-    testCases.printprint("beta3", fittedCurve4._curveFitMethod._beta3)
-    testCases.printprint("beta4", fittedCurve4._curveFitMethod._beta4)
-    testCases.printprint("tau1", fittedCurve4._curveFitMethod._tau1)
-    testCases.printprint("tau2", fittedCurve4._curveFitMethod._tau2)
+    testCases.print("beta1", fittedCurve4._curveFitMethod._beta1)
+    testCases.print("beta2", fittedCurve4._curveFitMethod._beta2)
+    testCases.print("beta3", fittedCurve4._curveFitMethod._beta3)
+    testCases.print("beta4", fittedCurve4._curveFitMethod._beta4)
+    testCases.print("tau1", fittedCurve4._curveFitMethod._tau1)
+    testCases.print("tau2", fittedCurve4._curveFitMethod._tau2)
 
 ###############################################################################
 
     maturityDate = FinDate(2030, 9, 19)
     interpolatedYield = fittedCurve5.interpolatedYield(maturityDate)
-    testCases.printprint(maturityDate, interpolatedYield)
+    testCases.print(maturityDate, interpolatedYield)
 
 ###############################################################################
 

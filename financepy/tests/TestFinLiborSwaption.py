@@ -170,7 +170,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelBlack(0.25)
     value = swaption.value(valuationDate, liborCurve, model)
 
-    swaption.print()
+#    swaption.print()
 
     testCases.header("LABEL", "VALUE")
     testCases.print("PAYER Swaption Value", value)
@@ -186,7 +186,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelBlack(0.25)
     value = swaption.value(valuationDate, liborCurve, model)
 
-    swaption.print()
+#    swaption.print()
 
     testCases.print("RECEIVER Swaption Value", value)
 
@@ -215,7 +215,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
     value = swaption.value(valuationDate, liborCurve, model)
 
-    swaption.print()
+#    swaption.print()
 
     testCases.header("LABEL", "VALUE")
     testCases.print("PAYER Swaption Value", value)
@@ -232,7 +232,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
     value = swaption.value(valuationDate, liborCurve, model)
 
-    swaption.print()
+#    swaption.print()
 
     testCases.print("RECEIVER Swaption Value", value)
 

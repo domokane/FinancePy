@@ -187,7 +187,6 @@ class FinLiborSwap(object):
 
         dfT = discountCurve.df(self._maturityDate)
         cpn = (df0 - dfT) / pv01
-#         print(pv01, df0, dfT)
         return cpn
 
 ##########################################################################

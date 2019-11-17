@@ -267,21 +267,22 @@ def buildLiborCurve(valuationDate):
         dcType)
     swaps.append(swap19)
 
-    liborCurve = FinLiborOneCurve(
-        "USD_LIBOR", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborOneCurve("USD", settlementDate, depos, fras, swaps)
+
+    testCases.header("LABEL", "DATE", "VALUE")
 
     ''' Check calibration '''
     for depo in depos:
         v = depo.value(valuationDate, liborCurve)
-        print("DEPO VALUE:", depo._maturityDate, v)
+        testCases.print("DEPO VALUE:", depo._maturityDate, v)
 
     for fra in fras:
         v = fra.value(valuationDate, liborCurve)
-        print("FRA VALUE:", fra._maturityDate, v)
+        testCases.print("FRA VALUE:", fra._maturityDate, v)
 
     for swap in swaps:
         v = swap.value(valuationDate, liborCurve, liborCurve, None)
-        print("SWAP VALUE:", swap._maturityDate, v)
+        testCases.print("SWAP VALUE:", swap._maturityDate, v)
 
     return liborCurve
 
@@ -332,8 +333,8 @@ def test_LiborSwap():
     valuationDate = FinDate(2018, 11, 30)
     liborCurve = buildLiborCurve(valuationDate)
     v = swap.value(valuationDate, liborCurve, liborCurve, firstFixing)
-    swap.printFixedLeg(valuationDate)
-    swap.printFloatLeg(valuationDate)
+#    swap.printFixedLeg(valuationDate)
+#    swap.printFloatLeg(valuationDate)
 
     v_bbg = 388147.0
     testCases.header("LABEL", "VALUE")

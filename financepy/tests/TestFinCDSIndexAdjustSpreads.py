@@ -132,7 +132,6 @@ def test_CDSIndexAdjustSpreads():
     path = dirname(__file__)
     filename = "CDX_NA_IG_S7_SPREADS.csv"
     full_filename_path = join(path, "data", filename)
-    print(full_filename_path)
     f = open(full_filename_path, 'r')
 
     data = f.readlines()

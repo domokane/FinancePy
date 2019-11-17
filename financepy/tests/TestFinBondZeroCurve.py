@@ -52,15 +52,17 @@ def test_FinBondZeroCurve():
 
     bondCurve = FinBondZeroCurve(settlement, bonds, cleanPrices)
 
+    testCases.header("DATE", "ZERO RATE")
+
     for index, bond in bondDataFrame.iterrows():
 
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = FinDate.fromDatetime(matDatetime)
         zeroRate = bondCurve.zeroRate(maturityDt)
-        print(maturityDt, zeroRate)
+        testCases.print(maturityDt, zeroRate)
 
-    bondCurve.display("BOND CURVE")
+#    bondCurve.display("BOND CURVE")
 
 ###############################################################################
 

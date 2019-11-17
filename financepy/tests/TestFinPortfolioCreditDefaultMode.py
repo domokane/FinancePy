@@ -45,25 +45,26 @@ def test_FinPortfolioCreditDefaultMode():
                                                    betas,
                                                    numPoints)
 
-    import matplotlib.pyplot as plt
-    plt.plot(support, dbn)
-    plt.show()
+#    import matplotlib.pyplot as plt
+#    plt.plot(support, dbn)
+#    plt.show()
 
     el1 = (1.0 - exp(-hazardRate*tmat)) * (1.0 - recoveryRate)
     el2 = expectedLoss(support, dbn)
-    print("EXPECTED LOSS: THEORY %10.7f  ACTUAL %10.7f" % (el1, el2))
+    testCases.header("EL THEORY", "EL ACTUAL")
+    testCases.print(el1, el2)
 
-    print("CONFIDENCE  VALUE_AT_RISK  EXPECTED_SHORTFALL")
+    testCases.header("CONFIDENCE", "VALUE_AT_RISK", "EXPECTED_SHORTFALL")
     for confidence in np.linspace(0.0, 0.99, 10):
         var = valueAtRisk(support, dbn, confidence)
         es = expectedShortfall(support, dbn, confidence)
-        print("%10.4f %10.7f %10.7f" % (confidence, var, es))
+        testCases.print(confidence, var, es)
 
-    print("CONFIDENCE  VALUE_AT_RISK  EXPECTED_SHORTFALL")
+    testCases.header("CONFIDENCE", "VALUE_AT_RISK", "EXPECTED_SHORTFALL")
     for confidence in np.linspace(0.99, 1.0, 101):
         var = valueAtRisk(support, dbn, confidence)
         es = expectedShortfall(support, dbn, confidence)
-        print("%10.4f %10.7f %10.7f" % (confidence, var, es))
+        testCases.print(confidence, var, es)
 
 
 test_FinPortfolioCreditDefaultMode()
