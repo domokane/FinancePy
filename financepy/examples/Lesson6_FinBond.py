@@ -1,88 +1,78 @@
 ###########################################################################
 
-import datetime as dt
-import pandas as pd
-
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.bonds.FinBond import FinBond
-from financepy.market.curves.FinBondYieldCurve import FinBondYieldCurve
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodPolynomial
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegel
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegelSvensson
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodBSpline
+from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinFlatCurve import FinCompoundingMethods
 
 ###############################################################################
-# FIRST LOAD UP SOME UK BOND DATA USING PANDAS
 
-bondDataFrame = pd.read_csv('../tests/data/giltbondprices.txt', sep='\t')
-
-# CALCULATE MID MARKET PRICES
-bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
-
-# SPECIFY UK BOND CONVENTIONS
-frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+print("BLOOMBERG US TREASURY EXAMPLE")
+settlementDate = FinDate(2017, 7, 21)
+maturityDate = FinDate(2027, 5, 15)
+coupon = 0.02375
+freqType = FinFrequencyTypes.SEMI_ANNUAL
 accrualType = FinDayCountTypes.ACT_ACT_ICMA
-settlement = FinDate(2012, 9, 19)
 
-bonds = []
-ylds = []
+# By setting the face to 100 we expect a price of par to be 100.0
+face = 100.0
 
-# LOAD BONDS AND CREATE A VECTOR OF FINBOND AND THEIR CORRESPONDING YIELDS
+bond = FinBond(maturityDate,
+               coupon,
+               freqType,
+               accrualType,
+               face)
 
-for index, bond in bondDataFrame.iterrows():
+cleanPrice = 99.780842  # if face is 1 then this must be 0.99780842
 
-    dateString = bond['maturity']
-    matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-    maturityDt = FinDate.fromDatetime(matDatetime)
-    coupon = bond['coupon']/100.0
-    cleanPrice = bond['mid']
-    bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
-    yld = bond.yieldToMaturity(settlement, cleanPrice)
-    bonds.append(bond)
-    ylds.append(yld)
+yld = bond.currentYield(cleanPrice)
+print("Current Yield = ", yld)
 
-# FIT THE BOND YIELDS TO A CUBIC POLYNOMIAL
-curveFitMethod = FinCurveFitMethodPolynomial()
-fittedCurve1 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-fittedCurve1.display("GBP Yield Curve")
+ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                           FinYieldConventions.UK_DMO)
+print("UK DMO Yield To Maturity = ", ytm)
 
-# FIT THE BOND YIELDS TO A QUINTIC POLYNOMIAL
-curveFitMethod = FinCurveFitMethodPolynomial(5)
-fittedCurve2 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-fittedCurve2.display("GBP Yield Curve")
+ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                           FinYieldConventions.US_STREET)
+print("US STREET Yield To Maturity = ", ytm)
 
-# FIT THE BONDS TO A NELSON-SIEGEL CURVE
-curveFitMethod = FinCurveFitMethodNelsonSiegel()
-fittedCurve3 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-fittedCurve3.display("GBP Yield Curve")
+ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                           FinYieldConventions.US_TREASURY)
+print("US TREASURY Yield To Maturity = ", ytm)
 
-print("NELSON-SIEGEL PARAMETERS")
-print("beta1", fittedCurve3._curveFitMethod._beta1)
-print("beta2", fittedCurve3._curveFitMethod._beta2)
-print("beta3", fittedCurve3._curveFitMethod._beta3)
-print("tau", fittedCurve3._curveFitMethod._tau)
+fullPrice = bond.fullPriceFromYield(settlementDate, ytm)
+print("Full Price = ", fullPrice)
 
-# FIT THE BONDS TO A NELSON-SIEGEL-SVENSSON CURVE
-curveFitMethod = FinCurveFitMethodNelsonSiegelSvensson()
-fittedCurve4 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-fittedCurve4.display("GBP Yield Curve")
+cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
+print("Clean Price = ", cleanPrice)
 
-print("NELSON-SIEGEL-SVENSSON PARAMETERS")
-print("beta1", fittedCurve4._curveFitMethod._beta1)
-print("beta2", fittedCurve4._curveFitMethod._beta2)
-print("beta3", fittedCurve4._curveFitMethod._beta3)
-print("beta4", fittedCurve4._curveFitMethod._beta4)
-print("tau1", fittedCurve4._curveFitMethod._tau1)
-print("tau2", fittedCurve4._curveFitMethod._tau2)
+accd = bond._accrued
+print("Accrued = ", accd)
 
-# FIT THE BONDS TO A B-SPLINE CURVE
-curveFitMethod = FinCurveFitMethodBSpline()
-fittedCurve5 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-fittedCurve5.display("GBP Yield Curve")
+accddays = bond._accruedDays
+print("Accrued Days = ", accddays)
 
-# EXTRACT A YIELD FROM A FITTED YIELD CURVE
-maturityDate = FinDate(2030, 9, 19)
-interpolatedYield = fittedCurve5.interpolatedYield(maturityDate)
-print(maturityDate, interpolatedYield)
+duration = bond.dollarDuration(settlementDate, ytm)
+print("Dollar Duration = ", duration)
+
+modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
+print("Modified Duration = ", modifiedDuration)
+
+macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
+print("Macauley Duration = ", macauleyDuration)
+
+conv = bond.convexityFromYield(settlementDate, ytm)
+print("Convexity = ", conv)
+
+discountRate = 0.0275
+flatCurve = FinFlatCurve(settlementDate,
+                         discountRate,
+                         FinCompoundingMethods.SEMI_ANNUAL)
+
+asw = bond.assetSwapSpread(settlementDate, cleanPrice, flatCurve)
+print("Discounted on LIBOR Curve ASW (bp):", asw * 10000)
+
+oas = bond.optionAdjustedSpread(settlementDate, cleanPrice, flatCurve)
+print("Discounted on LIBOR Curve OAS (bp):", oas * 10000)

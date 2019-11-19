@@ -9,7 +9,7 @@ modules = glob.glob(join(dirname(__file__), "TestFin*.py"))
 
 numModules = len(modules)
 
-# change this to start later
+''' This is the index of the file - change this to start later in the list '''
 n = 0
 
 for moduleFileName in modules[n:]:

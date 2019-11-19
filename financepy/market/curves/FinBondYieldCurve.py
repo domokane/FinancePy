@@ -20,8 +20,7 @@ from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
 
 ##########################################################################
-# TODO: Inherit from FinCurve and add df method
-# TODO: Add fitting optimiser to take in bonds and do a best fit
+# TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
 ##########################################################################
 
 
@@ -59,7 +58,6 @@ class FinBondYieldCurve():
 
             xdata = self._yearsToMaturity
             ydata = self._ylds
-#            bnds = [(0.0, -1.0, -1.0, 0.0), (1.0, 1.0, 1.0, 100.0)]
             popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
                                    xdata, ydata)
 
@@ -72,6 +70,7 @@ class FinBondYieldCurve():
 
             xdata = self._yearsToMaturity
             ydata = self._ylds
+            # I impose some constraints to help ensure a sensible result
             bnds = [(0., -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]
             popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
                                    xdata, ydata, bounds=bnds)
@@ -112,7 +111,6 @@ class FinBondYieldCurve():
         fit = self._curveFitMethod
 
         if type(fit) == FinCurveFitMethodPolynomial:
-#            yld = np.polyval(fit._coeffs, t)
             yld = fit.interpolateRate(t)
         elif type(fit) == FinCurveFitMethodNelsonSiegel:
             yld = fit.interpolateRate(t,
