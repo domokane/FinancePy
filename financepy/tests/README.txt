@@ -1,1 +1,0 @@
-This folder contains the logic for performing comparison testing of code to ensure that it does not inadvertantly get broken. 

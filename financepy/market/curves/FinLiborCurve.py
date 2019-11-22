@@ -9,9 +9,9 @@ import numpy as np
 from scipy import optimize
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinInterpolate import FinInterpMethods
 from ...finutils.FinError import FinError
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...market.curves.FinInterpolate import FinInterpMethods
 
 #######################################################################
 
@@ -28,9 +28,9 @@ def f(df, *args):
 ###############################################################################
 
 
-class FinLiborOneCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Libor deposits,
-    FRAs and interest rate swaps. The curve date is the date on which we
+class FinLiborCurve(FinDiscountCurve):
+    ''' Constructs a discount curve as implied by the prices of Libor 
+    deposits, FRAs and IRS. The curve date is the date on which we
     are performing the valuation based on the information available on the
     curve date. Typically it is the date on which an amount of $1 paid
     has a present value of $1.
@@ -51,8 +51,8 @@ class FinLiborOneCurve(FinDiscountCurve):
         self._values = []
         self._curveDate = curveDate
         self._interpMethod = interpMethod
-
-        self.buildCurve(liborDeposits, liborFRAs, liborSwaps)
+        self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
+        self.buildCurve()
 
     ######################################################################
 
@@ -121,13 +121,8 @@ class FinLiborOneCurve(FinDiscountCurve):
 
     #######################################################################
 
-    def buildCurve(self,
-                   liborDeposits,
-                   liborFRAs,
-                   liborSwaps):
+    def buildCurve(self):
         ''' Construct the discount curve using a bootstrap approach. '''
-
-        self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
 
         self._times = np.array([])
         self._values = np.array([])

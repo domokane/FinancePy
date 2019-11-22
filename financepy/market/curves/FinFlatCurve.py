@@ -18,9 +18,11 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ##########################################################################
 
 
-class FinFlatCurve(FinDiscountCurve):
+class FinFlatCurve():
     ''' A trivally simple curve based on a single zero rate with its own
     specified compounding method. Hence the curve is assumed to be flat. '''
+
+##########################################################################
 
     def __init__(self, curveDate, rate, compoundingFreq=-1):
         ''' Create a FinFlatCurve which requires a curve date. '''
@@ -30,6 +32,8 @@ class FinFlatCurve(FinDiscountCurve):
         self._curveDate = curveDate
         self._rate = rate
         self._cmpdFreq = inputFrequency(compoundingFreq)
+
+##########################################################################
 
     def zeroRate(self, dt, compoundingFreq):
         ''' Return the zero rate which is simply the curve rate. '''
@@ -52,13 +56,16 @@ class FinFlatCurve(FinDiscountCurve):
             r = -np.log(df) / t
         else:
             r = (df**(-1.0/t) - 1) * f
-
         return r
+
+##########################################################################
 
     def fwd(self, dt):
         ''' Return the fwd rate which is simply the zero rate. '''
         fwdRate = self._rate
         return fwdRate
+
+##########################################################################
 
     def df(self, dt):
         ''' Return the discount factor based on the compounding approach. '''
@@ -70,6 +77,8 @@ class FinFlatCurve(FinDiscountCurve):
         else:
             df = ((1.0 + self._rate/self._cmpdFreq)**(-t*self._cmpdFreq))
         return df
+
+##########################################################################
 
     def fwdRate(self, date1, date2, dayCountType):
         ''' Calculate the forward rate according to the specified

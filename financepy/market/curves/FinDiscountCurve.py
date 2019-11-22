@@ -8,22 +8,20 @@ Created on Fri Feb 12 16:51:05 2016
 from math import log
 import numpy as np
 
-from ...finutils.FinInterpolate import uinterpolate, interpolate
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinMath import testMonotonicity
+from .FinInterpolate import interpolate
 
 ##########################################################################
 
 
 class FinDiscountCurve():
 
-    def __init__(self,
-                 curveDate,
-                 times,
-                 values,
-                 interpMethod):
+##########################################################################
+
+    def __init__(self, curveDate, times, values, interpMethod):
 
         # Validate curve
         if len(times) < 1:
@@ -32,15 +30,14 @@ class FinDiscountCurve():
         if len(times) != len(values):
             raise FinError("Times and Values are not the same")
 
-        num_times = len(times)
+        if times[0] != 0.0:
+            raise FinError("First time is not zero")
 
-        if times[0] < 0.0:
-            raise FinError("First time is negative")
+        if values[0] != 1.0:
+            raise FinError("First value is not zero" + str(values[0]))
 
-        for i in range(1, num_times):
-
-            if times[i] <= times[i - 1]:
-                raise FinError("Times are not sorted in increasing order")
+        if testMonotonicity(times) is False:
+            raise FinError("Times are not sorted in increasing order")
 
         self._curveDate = curveDate
         self._times = np.array(times)
@@ -49,88 +46,56 @@ class FinDiscountCurve():
 
 ##########################################################################
 
-    def df(self, time):
-
-        if type(time) is FinDate:
-            t = (time._excelDate - self._curveDate._excelDate) / gDaysInYear
-        else:
-            t = time
-
-        if np.any(t) < 0:
-            raise FinError("Date is before curve value date.")
-
-        z = interpolate(t, self._times, self._values,
-                        self._interpMethod.value)
-
-        return z
-
-##########################################################################
-
-    def survivalProbability(self, maturityDate):
-
-        if maturityDate < self._curveDate:
-            raise FinError("Date is before curve value date.")
-
-        if type(maturityDate) is FinDate:
-            t = (maturityDate - self._curveDate) / gDaysInYear
-        else:
-            t = maturityDate
-
-        q = interpolate(t, self._times, self._values, self._interpMethod.value)
-        return q
-
-###############################################################################
-
-    def zeroRate(self, maturityDate, frequency=None):
-        ''' Calculate the continuous compounded zero rate to maturity date. '''
-
-        if type(maturityDate) is FinDate:
-            t = (maturityDate - self._curveDate) / gDaysInYear
-        else:
-            t = maturityDate
-
-        if np.any(t) < 0:
-            raise FinError("Date is before curve value date.")
-
-        t = np.maximum(t, 1e-10)
+    def zeroRate(self, dt, compoundingFreq=-1):
+        ''' Calculate the zero rate to maturity date. '''
+        t = inputTime(dt, self)
+        f = inputFrequency(compoundingFreq)
         df = self.df(t)
 
-        if frequency is None:
+        if f == 0:  # Simple interest
+            zeroRate = (1.0/df-1.0)/t
+        if f == -1:  # Continuous
             zeroRate = -np.log(df) / t
         else:
-            zeroRate = (df**(-1.0/t) - 1) * frequency
-
+            zeroRate = (df**(-1.0/t/f) - 1) * f
         return zeroRate
 
 ##########################################################################
 
-    def fwdContinuous(self, forwardDate):
+    def df(self, dt):
+        t = inputTime(dt, self)
+        z = interpolate(t, self._times, self._values, self._interpMethod.value)
+        return z
+
+##########################################################################
+
+    def survProb(self, dt):
+        t = inputTime(dt, self)
+        q = interpolate(t, self._times, self._values, self._interpMethod.value)
+        return q
+
+##########################################################################
+
+    def fwd(self, dt):
         ''' Calculate the continuous forward rate at the forward date. '''
-
-        if forwardDate < self._curveDate:
-            raise FinError("Forward Date before curve value date.")
-
-        tau = (forwardDate - self._curveDate) / gDaysInYear
+        t = inputTime(dt, self)
         dt = 0.000001
-        df1 = self.df(tau)
-        df2 = self.df(tau + dt)
-        fwd = log(df1 / df2) / dt
+        df1 = self.df(t)
+        df2 = self.df(t+dt)
+        fwd = np.log(df1/df2)/dt
         return fwd
 
 ##########################################################################
 
-    def fwdLibor(self, date1, date2, dayCountType):
-        ''' Calculate the Libor forward rate according to the corresponding
+    def fwdRate(self, date1, date2, dayCountType):
+        ''' Calculate the forward rate according to the specified
         day count convention. '''
 
         if date1 < self._curveDate:
-            raise FinError("Date " +
-                           str(date1) +
-                           " before curve value date " +
-                           str(self._curveDate))
+            raise ValueError("Date1 before curve value date.")
 
         if date2 < date1:
-            raise FinError("Date2 before Date1")
+            raise ValueError("Date2 must not be before Date1")
 
         dayCount = FinDayCount(dayCountType)
         yearFrac = dayCount.yearFrac(date1, date2)
@@ -139,14 +104,12 @@ class FinDiscountCurve():
         fwd = (df1 / df2 - 1.0) / yearFrac
         return fwd
 
-#######################################################################
+##########################################################################
 
     def print(self):
-        ''' Print the details '''
-
         numPoints = len(self._times)
-
-        print("TIMES", "DISCOUNT FACTORS")
-
+        print("TIMES,DISCOUNT FACTORS")
         for i in range(0, numPoints):
-            print("%10.7f" % self._times[i], "%10.7f" % self._values[i])
+            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+
+#######################################################################

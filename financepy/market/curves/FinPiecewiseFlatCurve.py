@@ -8,43 +8,49 @@ Created on Fri Apr 08 09:26:27 2016
 import numpy as np
 
 ##########################################################################
-# TODO
-# Inherit from FinCurve and add df method
-# Put in a convention for the rate
-# Use Frequency object
-##########################################################################
 
-from ...market.curves.FinCurve import FinCurve
-from ...finutils.FinInterpolate import FinInterpMethods
+from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import inputFrequency
+from ...finutils.FinMath import testMonotonicity
+from .FinInterpolate import FinInterpMethods
 
 ##########################################################################
 ##########################################################################
 
 
-class FinPieceCurve(FinCurve):
-    ''' Curve is made up of a series of sections assumed to each have a constant
-    forward rate. This class needs to be checked carefully. '''
+class FinPiecewiseCurve():
+    ''' Curve is made up of a series of zero rates assumed to each have a 
+    piecewise flat constant shape OR a piecewise linear shape. '''
 
-    def __init__(self, times, values):
-        ''' Curve is defined by a vector of increasing times and zero rates. '''
+    def __init__(self,
+                 curveDate,
+                 times,
+                 zeroRates,
+                 compoundingFreq=-1,
+                 interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
+        ''' Curve is a vector of increasing times and zero rates. '''
 
-        if len(times) != len(values):
+        if not isinstance(curveDate, FinDate):
+            raise FinError("CurveDate is not a date " + str(curveDate))
+
+        if len(times) != len(zeroRates):
             raise ValueError("Times and rates vectors must have same length")
 
         if len(times) == 0:
             raise ValueError("Times and rates vectors must have length > 0")
 
-        numTimes = len(times)
-        for i in range(1, numTimes):
-            if times[i - 1] >= times[i]:
-                raise ValueError("Times must be strictly increasing")
+        if testMonotonicity(times) is False:
+            raise FinError("Times are not sorted in increasing order")
 
         self._times = times
-        self._values = values
+        self._zeroRates = zeroRates
+        self._cmpdFreq = inputFrequency(compoundingFreq)
+        self._interpMethod = interpolationMethod
 
 ##########################################################################
 
-    def zero(self, t, interpolationMethod=FinInterpMethods.LINEAR):
+    def zeroRate(self, t, compoundingFreq):
 
         l_index = 0
         r_index = 0
@@ -94,7 +100,7 @@ class FinPieceCurve(FinCurve):
     def df(self,
            t,
            freq=0,  # This corresponds to continuous compounding
-           interpolationMethod=FinInterpMethods.LINEAR):
+           interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
 
         df = 1.0
         numTimes = len(self._times)
