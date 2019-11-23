@@ -9,7 +9,7 @@ from math import log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -51,7 +51,7 @@ class FinLiborCapFloor():
                  dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA,
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         if startDate > maturityDate:
@@ -73,7 +73,7 @@ class FinLiborCapFloor():
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -134,7 +134,7 @@ class FinLiborCapFloor():
             # potentially some intrinsic value depending on strike
             startDate = self._startDate
             endDate = self._capFloorDates[1]
-            fwdRate = liborCurve.fwdLibor(
+            fwdRate = liborCurve.fwdRate(
                 startDate, endDate, self._dayCountType)
             alpha = dayCounter.yearFrac(startDate, endDate)
             df = liborCurve.df(endDate)
@@ -187,7 +187,7 @@ class FinLiborCapFloor():
 
         df = liborCurve.df(endDate)
         t = (startDate - valuationDate) / gDaysInYear
-        f = liborCurve.fwdLibor(startDate, endDate, self._dayCountType)
+        f = liborCurve.fwdRate(startDate, endDate, self._dayCountType)
         k = self._strikeRate
 
         if type(model) == FinLiborModelBlack:

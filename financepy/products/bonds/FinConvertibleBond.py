@@ -9,14 +9,14 @@ import numpy as np
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...finutils.FinInterpolate import FinInterpMethods, uinterpolate
+from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 ###############################################################################
@@ -289,7 +289,7 @@ class FinConvertibleBond(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinBusDayConventionTypes.NONE
+        busDayRuleType = FinDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,

@@ -5,7 +5,6 @@ Created on Sat Feb 06 07:26:46 2016
 @author: Dominic O'Kane
 """
 
-#from .FinMath import FinMath
 from enum import Enum
 from .FinDate import FinDate
 from .FinError import FinError
@@ -42,7 +41,7 @@ easterMondayDay = [98, 90, 103, 95, 114, 106, 91, 111, 102, 87,
                    116, 101, 93, 112, 97, 89, 109, 100, 85, 105]
 
 
-class FinBusDayConventionTypes(Enum):
+class FinDayAdjustTypes(Enum):
     NONE = 1
     FOLLOWING = 2
     MODIFIED_FOLLOWING = 3
@@ -54,8 +53,9 @@ class FinCalendarTypes(Enum):
     TARGET = 1
     US = 2
     UK = 3
-    NONE = 4
-    WEEKEND = 5
+    WEEKEND = 4
+    JAPAN = 5
+    NONE = 6
 
 
 class FinDateGenRuleTypes(Enum):
@@ -88,11 +88,14 @@ class FinCalendar(object):
 
         m = dt._m
 
-        if busDayConventionType == FinBusDayConventionTypes.NONE:
+        if type(busDayConventionType) != FinDayAdjustTypes:
+            raise FinError("Invalid type passed. Need FinBusDayConventionType")
+
+        if busDayConventionType == FinDayAdjustTypes.NONE:
 
             return dt
 
-        elif busDayConventionType == FinBusDayConventionTypes.FOLLOWING:
+        elif busDayConventionType == FinDayAdjustTypes.FOLLOWING:
 
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -100,7 +103,7 @@ class FinCalendar(object):
 
             return dt
 
-        elif busDayConventionType == FinBusDayConventionTypes.MODIFIED_FOLLOWING:
+        elif busDayConventionType == FinDayAdjustTypes.MODIFIED_FOLLOWING:
 
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -111,31 +114,31 @@ class FinCalendar(object):
             # I could speed this up by starting it at initial date
             if dt._m != m:
                 while self.isBusinessDay(dt) is False:
-                    dt.addDays(-1)
+                    dt = dt.addDays(-1)
 
             return dt
 
-        elif busDayConventionType == FinBusDayConventionTypes.PRECEDING:
+        elif busDayConventionType == FinDayAdjustTypes.PRECEDING:
 
             # if the business day is in the next month look back
             # for previous first business day one day at a time
             while self.isBusinessDay(dt) is False:
-                dt.addDays(-1)
+                dt = dt.addDays(-1)
 
             return dt
 
-        elif busDayConventionType == FinBusDayConventionTypes.MODIFIED_PRECEDING:
+        elif busDayConventionType == FinDayAdjustTypes.MODIFIED_PRECEDING:
 
             # step backward until we find a business day
             while self.isBusinessDay(dt) is False:
-                dt.addDays(-1)
+                dt = dt.addDays(-1)
 
             # if the business day is in a different month look forward
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
             if dt._m != m:
                 while self.isBusinessDay(dt) is False:
-                    dt.addDays(+1)
+                    dt = dt.addDays(+1)
 
             return dt
         else:
@@ -155,28 +158,30 @@ class FinCalendar(object):
         d = dt._d
 
         startDate = FinDate(y, 1, 1)
-
-        dd = dt._excelDate - startDate._excelDate
-
+        dd = dt._excelDate - startDate._excelDate + 1
         weekday = dt._weekday
 
         em = easterMondayDay[y - 1901]
 
-        if dt.isWeekend() is True:
-            return False
-
         if self._type == FinCalendarTypes.NONE:
+            # Every day is a business day when there are no holidays
             return True
 
+        if dt.isWeekend():
+            # If calendar is not NONE, every weekend is not a business date
+            return False
+
         if self._type == FinCalendarTypes.WEEKEND:
+            # it is not a weekend and no other hols then it is a business day
             return True
 
         if self._type == FinCalendarTypes.UK:
+            ''' Only holidays in England and Wales '''
 
             if m == 1 and d == 1:  # new years day
                 return False
 
-            if dd == em:
+            if dd == em:  # Easter Monday
                 return False
 
             if dd == em - 3:  # good friday
@@ -188,7 +193,10 @@ class FinCalendar(object):
             if m == 5 and d >= 25 and weekday == FinDate.MON:
                 return False
 
-            if m == 8 and d <= 7 and weekday == FinDate.MON:
+#            if m == 8 and d <= 7 and weekday == FinDate.MON: # Summer Bank 
+#                return False
+
+            if m == 8 and d > 24 and weekday == FinDate.MON:  # Late Summer
                 return False
 
             if m == 12 and d == 25:  # Xmas
@@ -211,27 +219,94 @@ class FinCalendar(object):
 
             return True
 
+        if self._type == FinCalendarTypes.JAPAN:
+            ''' This is not exact NEEDS DEBUGGING '''
+
+            print("Do not use this calendar as it has not been tested.")
+
+            if m == 1 and d == 1:  # new years day
+                return False
+
+            if m == 1 and d == 2:  # bank holiday
+                return False
+
+            if m == 1 and d == 3:  # bank holiday
+                return False
+
+            if m == 1 and d > 7 and d < 15 and weekday == FinDate.MON:  # coa
+                return False
+
+            if m == 2 and d == 11:  # nfd
+                return False
+
+            if m == 2 and d == 23:  # emperor's birthday
+                return False
+
+            if m == 3 and d == 20:  # vernal equinox - NOT EXACT
+                return False
+
+            if m == 4 and d == 29:  # SHOWA greenery
+                return False
+
+            if m == 5 and d == 3: # Memorial
+                return False
+
+            if m == 5 and d == 4: # nation
+                return False
+
+            if m == 5 and d == 5: # children
+                return False
+
+            # Marine
+            if m == 7 and d > 14 and d < 22 and weekday == FinDate.MON:
+                return False
+
+            # Mountain day
+            md = FinDate(11,8,y)
+            if md._weekday == FinDate.SUN:
+                md = md.addDays(1)
+
+            if dt == md:  # Mountain Day
+                return False
+
+            # Respect for aged
+            if m == 8 and d > 14 and d < 22 and weekday == FinDate.MON:
+                return False
+
+            # Equinox - APPROXIMATE
+            if m == 9 and d == 23:
+                return False
+
+            if m == 10 and d >=7 and d <= 14 and weekday == FinDate.MON:  # HS
+                return False
+
+            if m == 11 and d == 3:  # Culture
+                return False
+
+            if m == 11 and d == 23:  # Thanksgiving
+                return False
+
+            if m == 12 and d == 31:  # Xmas
+                return False
+
+            return True
+
         elif self._type == FinCalendarTypes.US:
+
+            ''' This is a generic US calendar that contains the superset of 
+            holidays for bond markets, NYSE, and public holidays. For each of 
+            these and other categories there will be some variations. '''
 
             if m == 1 and d == 1:  # NYD
                 return False
 
-            if m == 12 and d == 31 and weekday == FinDate.FRI:  # NYE
+            if m == 1 and d >= 15 and d < 22 and weekday == FinDate.MON:  # MLK
                 return False
 
-            if dd == em:
+            if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # GW
                 return False
 
-            if dd == em - 3:
-                return False
-
-            if m == 1 and d >= 15 and weekday == FinDate.MON:
-                return False
-
-            if m == 2 and d >= 15 and d <= 21 and weekday == FinDate.MON:
-                return False
-
-            if m == 5 and d >= 25 and d <= 21 and weekday == FinDate.MON:
+            if m == 5 and d >= 25 and d <= 31 and weekday == FinDate.MON:  # MD
                 return False
 
             if m == 7 and d == 4:  # Indep day
@@ -243,28 +318,25 @@ class FinCalendar(object):
             if m == 7 and d == 3 and weekday == FinDate.FRI:  # Indep day
                 return False
 
-            if m == 9 and d >= 8 and d <= 14 and weekday == FinDate.MON:
+            if m == 9 and d >= 1 and d < 8 and weekday == FinDate.MON:  # Lab
+                return False
+
+            if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # CD
                 return False
 
             if m == 11 and d == 11:  # Veterans day
                 return False
 
-            if m == 11 and d == 12 and weekday == FinDate.MON:  # Columbus day
+            if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
                 return False
 
-            if m == 11 and d == 10 and weekday == FinDate.FRI:  # Columbus day
+            if m == 11 and d == 10 and weekday == FinDate.FRI:  # Vets
                 return False
 
-            if m == 11 and d >= 22 and d <= 28 and weekday == FinDate.THU:
+            if m == 11 and d >= 22 and d < 29 and weekday == FinDate.THU:  # TG
                 return False
 
             if m == 12 and d == 25:  # Xmas holiday
-                return False
-
-            if m == 12 and d == 26 and weekday == FinDate.MON:
-                return False
-
-            if m == 12 and d == 24 and weekday == FinDate.FRI:
                 return False
 
             return True
@@ -277,6 +349,9 @@ class FinCalendar(object):
             if m == 5 and d == 1:  # May day
                 return False
 
+            if dd == em - 3:  # Easter Friday holiday
+                return False
+
             if dd == em:  # Easter monday holiday
                 return False
 
@@ -286,10 +361,26 @@ class FinCalendar(object):
             if m == 12 and d == 26:  # Xmas bank holiday
                 return False
 
-            if m == 12 and d == 31:  # NYD bank holiday
-                return False
+#            if m == 12 and d == 31:  # NYD bank holiday
+#                return False
 
             return True
+
+###############################################################################
+
+    def getHolidayList(self, year):
+
+        startDate = FinDate(1, 1, year)
+        endDate = FinDate(1, 1, year+1)
+        holidayList = []
+        while startDate < endDate:
+            if self.isBusinessDay(startDate) is False and \
+              startDate.isWeekend() is False:
+                holidayList.append(startDate.__str__())
+
+            startDate = startDate.addDays(1)
+
+        return holidayList
 
 ###############################################################################
 
@@ -301,8 +392,10 @@ class FinCalendar(object):
             raise FinError(
                 "Unable to determine Easter monday in year " + str(y))
 
-        easterMonday = easterMondayDay[y - 1901]
-        return easterMonday
+        emDays = easterMondayDay[y - 1901]
+        startDate = FinDate(1, 1, y)
+        em = startDate.addDays(emDays-1)
+        return em
 
 ###############################################################################
 

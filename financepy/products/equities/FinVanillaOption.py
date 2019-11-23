@@ -9,16 +9,12 @@ import numpy as np
 from math import exp, log, sqrt
 from scipy import optimize
 
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...products.equities.FinOption import FinOption, FinOptionTypes
-from ...products.equities.FinOption import FinOptionModelTypes
 from ...products.equities.FinEquityModelTypes import FinEquityModel
 from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
-from ...market.curves.FinCurve import FinCurve
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 

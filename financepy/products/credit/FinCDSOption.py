@@ -8,7 +8,7 @@ from math import sqrt, log
 from scipy import optimize
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -47,7 +47,7 @@ class FinCDSOption():
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         if maturityDate < expiryDate:
@@ -64,7 +64,7 @@ class FinCDSOption():
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

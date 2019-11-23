@@ -9,7 +9,7 @@ import numpy as np
 
 ##########################################################################
 
-from ...market.curves.FinCurve import FinCompoundingMethods, inputTime
+from ...market.curves.FinCurve import inputTime
 from ...finutils.FinDayCount import FinDayCount
 
 ##########################################################################
@@ -20,7 +20,7 @@ class FinPolynomialCurve():
     as a cubic polynomial. '''
 
     def __init__(self, curveDate, coefficients,
-                 compoundingType=FinCompoundingMethods.CONTINUOUS):
+                 compoundingType=-1):
         ''' Create cubic curve from coefficients '''
         self._curveDate = curveDate
         self._coefficients = coefficients

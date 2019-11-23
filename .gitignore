@@ -11,7 +11,9 @@ FinPyManual*.tex
 *.out
 *.pdf
 build
-financepy/docs/FinancePyManualV_0.15.tex
+FinancePyManualV*.tex
 financepy/examples/ipynb_checkpoints/*.*
+*checkpoint*.*
 
 
+financepy/docs/FinancePyManualV_0.15.tex

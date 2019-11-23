@@ -9,7 +9,6 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
-from financepy.market.curves.FinFlatCurve import FinCompoundingMethods
 
 ###############################################################################
 
@@ -75,7 +74,7 @@ def test_FinConvertibleBond():
     rate = 0.04
     discountCurve = FinFlatCurve(settlementDate,
                                  rate,
-                                 FinCompoundingMethods.CONTINUOUS)
+                                 -1)
     creditSpread = 0.00
     recoveryRate = 0.40
     numStepsPerYear = 20

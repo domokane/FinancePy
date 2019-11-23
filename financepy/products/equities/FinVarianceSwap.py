@@ -11,7 +11,6 @@ from math import log, exp, sqrt
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinInterpolate import FinInterpMethods, interpolate
 from .FinOption import FinEquityModelBlackScholes
 from .FinVanillaOption import FinVanillaOption, FinOptionTypes
 
@@ -89,9 +88,9 @@ class FinVarianceSwap(object):
         F is the forward stock price and sigma(F) is the ATM forward vol. '''
 
         f = fwdStockPrice
-        interpMethod = FinInterpMethods.PIECEWISE_LINEAR.value
 
-        atmVol = interpolate(f, strikes, volatilities, interpMethod)
+        # TODO Linear interpolation - to be revisited
+        atmVol = np.interp(f, strikes, volatilities)
         tmat = (self._maturityDate - valuationDate)/gDaysInYear
 
         ''' Calculate the slope of the volatility curve by taking the end

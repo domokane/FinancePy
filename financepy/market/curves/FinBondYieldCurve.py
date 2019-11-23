@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import scale
-from .FinCurveFitMethod import FinCurveFitMethodPolynomial
-from .FinCurveFitMethod import FinCurveFitMethodNelsonSiegel
-from .FinCurveFitMethod import FinCurveFitMethodNelsonSiegelSvensson
-from .FinCurveFitMethod import FinCurveFitMethodBSpline
+from .FinBondYieldCurveModel import FinCurveFitPolynomial
+from .FinBondYieldCurveModel import FinCurveFitNelsonSiegel
+from .FinBondYieldCurveModel import FinCurveFitNelsonSiegelSvensson
+from .FinBondYieldCurveModel import FinCurveFitBSpline
 
 from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
@@ -28,19 +28,21 @@ class FinBondYieldCurve():
     ''' Class to do fitting of the yield curve and to enable interpolation of 
     yields. Because yields assume a flat term structure for each bond, this 
     class does not allow discounting to be done and so does not inherit from 
-    FinCurve. It should only be used for visualisation and simple 
+    FinDiscountCurve. It should only be used for visualisation and simple 
     interpolation but not for full term-structure-consistent pricing. '''
 
-    def __init__(self, settlementDate, bonds, ylds, curveFitMethod):
+    def __init__(self, settlementDate, bonds, ylds, curveFit):
         ''' Fit the curve to a set of bond yields using the type of curve 
-        specified. Weights can be provided to deal with illiquid bonds. '''
+        specified. Bounds can be provided if you wish to enforce lower and 
+        upper limits on the respective model parameters. '''
 
         self._settlementDate = settlementDate
         self._bonds = bonds
         self._ylds = np.array(ylds)
-        self._curveFitMethod = curveFitMethod
+        self._curveFit = curveFit
 
-        fitType = type(self._curveFitMethod)
+        fitType = type(self._curveFit)
+        fit = self._curveFit
 
         yearsToMaturities = []
         for bond in bonds:
@@ -48,49 +50,48 @@ class FinBondYieldCurve():
             yearsToMaturities.append(maturityYears)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
-        if fitType is FinCurveFitMethodPolynomial:
+        if fitType is FinCurveFitPolynomial:
 
-            d = curveFitMethod._power
+            d = fit._power
             coeffs = np.polyfit(self._yearsToMaturity, self._ylds, deg=d)
-            self._curveFitMethod._coeffs = coeffs
+            fit._coeffs = coeffs
 
-        elif fitType is FinCurveFitMethodNelsonSiegel:
-
-            xdata = self._yearsToMaturity
-            ydata = self._ylds
-            popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
-                                   xdata, ydata)
-
-            self._curveFitMethod._beta1 = popt[0]
-            self._curveFitMethod._beta2 = popt[1]
-            self._curveFitMethod._beta3 = popt[2]
-            self._curveFitMethod._tau = popt[3]
-
-        elif fitType is FinCurveFitMethodNelsonSiegelSvensson:
+        elif fitType is FinCurveFitNelsonSiegel:
 
             xdata = self._yearsToMaturity
             ydata = self._ylds
-            # I impose some constraints to help ensure a sensible result
-            bnds = [(0., -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]
-            popt, pcov = curve_fit(self._curveFitMethod.interpolateRate,
-                                   xdata, ydata, bounds=bnds)
 
-            self._curveFitMethod._beta1 = popt[0]
-            self._curveFitMethod._beta2 = popt[1]
-            self._curveFitMethod._beta3 = popt[2]
-            self._curveFitMethod._beta4 = popt[3]
-            self._curveFitMethod._tau1 = popt[4]
-            self._curveFitMethod._tau2 = popt[5]
+            popt, pcov = curve_fit(self._curveFit._interpolatedYield,
+                                   xdata, ydata, bounds=fit._bounds)
 
-        elif fitType is FinCurveFitMethodBSpline:
+            fit._beta1 = popt[0]
+            fit._beta2 = popt[1]
+            fit._beta3 = popt[2]
+            fit._tau = popt[3]
+
+        elif fitType is FinCurveFitNelsonSiegelSvensson:
+
+            xdata = self._yearsToMaturity
+            ydata = self._ylds
+
+            popt, pcov = curve_fit(self._curveFit._interpolatedYield,
+                                   xdata, ydata, bounds=fit._bounds)
+
+            fit._beta1 = popt[0]
+            fit._beta2 = popt[1]
+            fit._beta3 = popt[2]
+            fit._beta4 = popt[3]
+            fit._tau1 = popt[4]
+            fit._tau2 = popt[5]
+
+        elif fitType is FinCurveFitBSpline:
 
             xdata = self._yearsToMaturity
             ydata = self._ylds
 
             ''' Cubic splines as k=3 '''
-            knots = [1, 3, 5, 10]
-            spline = splrep(xdata, ydata, k=3, t=knots)
-            self._curveFitMethod._spline = spline
+            spline = splrep(xdata, ydata, k=fit._power, t=fit._knots)
+            fit._spline = spline
 
         else:
             raise ValueError("Unrecognised curve fit type.")
@@ -105,36 +106,39 @@ class FinBondYieldCurve():
             t = maturityDate
         elif type(maturityDate) is np.ndarray:
             t = maturityDate
+        elif type(maturityDate) is float or type(maturityDate) is np.float64:
+            t = maturityDate
         else:
             raise ValueError("Unknown date type.")
 
-        fit = self._curveFitMethod
+        fit = self._curveFit
 
-        if type(fit) == FinCurveFitMethodPolynomial:
-            yld = fit.interpolateRate(t)
-        elif type(fit) == FinCurveFitMethodNelsonSiegel:
-            yld = fit.interpolateRate(t,
-                                      self._curveFitMethod._beta1,
-                                      self._curveFitMethod._beta2,
-                                      self._curveFitMethod._beta3,
-                                      self._curveFitMethod._tau)
+        if type(fit) == FinCurveFitPolynomial:
+            yld = fit._interpolatedYield(t)
+        elif type(fit) == FinCurveFitNelsonSiegel:
+            yld = fit._interpolatedYield(t,
+                                         fit._beta1,
+                                         fit._beta2,
+                                         fit._beta3,
+                                         fit._tau)
 
-        elif type(fit) == FinCurveFitMethodNelsonSiegelSvensson:
-            yld = fit.interpolateRate(t,
-                                      self._curveFitMethod._beta1,
-                                      self._curveFitMethod._beta2,
-                                      self._curveFitMethod._beta3,
-                                      self._curveFitMethod._beta4,
-                                      self._curveFitMethod._tau1,
-                                      self._curveFitMethod._tau2)
-        elif type(fit) == FinCurveFitMethodBSpline:
-            yld = fit.interpolateRate(t)
+        elif type(fit) == FinCurveFitNelsonSiegelSvensson:
+            yld = fit._interpolatedYield(t,
+                                         fit._beta1,
+                                         fit._beta2,
+                                         fit._beta3,
+                                         fit._beta4,
+                                         fit._tau1,
+                                         fit._tau2)
+
+        elif type(fit) == FinCurveFitBSpline:
+            yld = fit._interpolatedYield(t)
 
         return yld
 
 ##########################################################################
 
-    def display(self, title):
+    def plot(self, title):
         ''' Display yield curve. '''
 
         plt.figure(figsize=(12, 6))
@@ -149,7 +153,7 @@ class FinBondYieldCurve():
 
         yld = self.interpolatedYield(t)
         yld = scale(yld, 100.0)
-        plt.plot(t, yld, label=str(self._curveFitMethod))
+        plt.plot(t, yld, label=str(self._curveFit))
         plt.legend(loc='lower right')
         plt.ylim((min(yld)-0.3, max(yld)*1.1))
         plt.grid(True)

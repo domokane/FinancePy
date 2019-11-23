@@ -19,6 +19,7 @@ from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 sys.path.append("..//..")
+sys.path.append("..")
 
 ##########################################################################
 ##########################################################################
@@ -37,13 +38,12 @@ def test_FinBondZeroCurve():
     bonds = []
     cleanPrices = []
 
-    for index, bond in bondDataFrame.iterrows():
-
-        dateString = bond['maturity']
+    for index, bondRow in bondDataFrame.iterrows():
+        dateString = bondRow['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = FinDate.fromDatetime(matDatetime)
-        coupon = bond['coupon']/100.0
-        cleanPrice = bond['mid']
+        coupon = bondRow['coupon']/100.0
+        cleanPrice = bondRow['mid']
         bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
         bonds.append(bond)
         cleanPrices.append(cleanPrice)
@@ -62,7 +62,7 @@ def test_FinBondZeroCurve():
         zeroRate = bondCurve.zeroRate(maturityDt)
         testCases.print(maturityDt, zeroRate)
 
-#    bondCurve.display("BOND CURVE")
+    bondCurve.plot("BOND CURVE")
 
 ###############################################################################
 

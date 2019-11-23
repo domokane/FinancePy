@@ -10,7 +10,6 @@ import time
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equities.FinOption import FinOptionTypes
 from financepy.products.equities.FinVanillaOption import FinVanillaOption
-from financepy.products.equities.FinVanillaOption import FinOptionModelTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
 

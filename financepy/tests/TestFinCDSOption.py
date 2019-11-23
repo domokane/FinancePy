@@ -10,7 +10,7 @@ from financepy.products.credit.FinCDSOption import FinCDSOption
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -148,7 +148,7 @@ def buildFullIssuerCurve(tradeDate):
         dcType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborOneCurve(
+    liborCurve = FinLiborCurve(
         "USD_LIBOR", settlementDate, depos, fras, swaps)
 
     cdsMarketContracts = []

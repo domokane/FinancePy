@@ -9,7 +9,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinMath import ONE_MILLION
 
@@ -31,7 +31,7 @@ class FinLiborSwap(object):
                  floatDayCountType=FinDayCountTypes.THIRTY_360,
                  payFixedFlag=True,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract. '''
 
@@ -69,7 +69,7 @@ class FinLiborSwap(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -333,7 +333,7 @@ class FinLiborSwap(object):
             print("Fixed Flows not calculated.")
             return
 
-        print("PAYMENT DATE", "AMOUNT")
+        print("PAYMENT_DATE     YEAR_FRAC        FLOW         DF         DF*FLOW       CUM_PV")
         numFlows = len(self._adjustedFixedDates)
         totalPV = 0.0
 
@@ -345,7 +345,7 @@ class FinLiborSwap(object):
             df = self._fixedDfs[iFlow]
             flowPV = self._fixedFlowPVs[iFlow] * self._notional
             totalPV += flowPV
-            print("%s %10.7f %12.0f %12.6f %12.0f %12.0f" %
+            print("%15s %10.7f %12.2f %12.6f %12.2f %12.2f" %
                   (paymentDate, alpha, flow, df, flowPV, totalPV))
 
 ##########################################################################
@@ -364,7 +364,7 @@ class FinLiborSwap(object):
             print("Floating Flows not calculated.")
             return
 
-        print("PAYMENT DATE", "AMOUNT")
+        print("PAYMENT_DATE     YEAR_FRAC        FLOW         DF         DF*FLOW       CUM_PV")
         numFlows = len(self._adjustedFloatDates)
         totalPV = 0.0
 
@@ -376,7 +376,7 @@ class FinLiborSwap(object):
             df = self._floatDfs[iFlow]
             flowPV = self._floatFlowPVs[iFlow] * self._notional
             totalPV += flowPV
-            print("%s %10.7f %12.0f %12.6f %12.0f %12.0f" %
+            print("%15s %10.7f %12.2f %12.6f %12.2f %12.2f" %
                   (paymentDate, alpha, flow, df, flowPV, totalPV))
 
 ##########################################################################

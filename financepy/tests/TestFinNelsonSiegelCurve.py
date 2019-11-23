@@ -5,6 +5,7 @@ Created on Fri Apr 08 09:26:27 2016
 @author: Dominic O'Kane
 """
 
+from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinNelsonSiegelCurve import FinNelsonSiegelCurve
 from financepy.finutils.FinMath import scale
@@ -25,13 +26,14 @@ def test_FinNelsonSiegelCurve():
 
     tau = 2.0
     times = np.linspace(0.0, 10.0, 5)
+    curveDate = FinDate(2019, 6, 6)
 
-    curve1 = FinNelsonSiegelCurve(1., 0., 0., tau)
-    factor1loading = curve1.zero(times)
-    curve2 = FinNelsonSiegelCurve(0., 1., 0., tau)
-    factor2loading = curve2.zero(times)
-    curve3 = FinNelsonSiegelCurve(0., 0., 1., tau)
-    factor3loading = curve3.zero(times)
+    curve1 = FinNelsonSiegelCurve(curveDate, [1., 0., 0., tau])
+    factor1loading = curve1.zeroRate(times)
+    curve2 = FinNelsonSiegelCurve(curveDate, [0., 1., 0., tau])
+    factor2loading = curve2.zeroRate(times)
+    curve3 = FinNelsonSiegelCurve(curveDate, [0., 0., 1., tau])
+    factor3loading = curve3.zeroRate(times)
 
     testCases.header("FACTOR LOADING ON ZERO RATES")
     testCases.print(factor1loading)
@@ -57,36 +59,36 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.03
     beta2 = -0.02
     beta3 = 0.02
-    curve1 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates1 = curve1.zero(times)
+    curve1 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates1 = curve1.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates1)
 
     beta1 = 0.04
     beta2 = -0.02
     beta3 = 0.02
-    curve2 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates2 = curve2.zero(times)
+    curve2 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates2 = curve2.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates2)
 
     beta1 = 0.05
     beta2 = -0.02
     beta3 = 0.02
-    curve3 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates3 = curve3.zero(times)
+    curve3 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates3 = curve3.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates3)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve4 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates4 = curve4.zero(times)
+    curve4 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates4 = curve4.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates4)
 
     beta1 = 0.07
     beta2 = -0.02
     beta3 = 0.02
-    curve5 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates5 = curve5.zero(times)
+    curve5 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates5 = curve5.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates5)
 
     if PLOT_GRAPHS:
@@ -108,36 +110,36 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.04
     beta3 = 0.02
-    curve1 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates1 = curve1.zero(times)
+    curve1 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates1 = curve1.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates1)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve2 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates2 = curve2.zero(times)
+    curve2 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates2 = curve2.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates2)
 
     beta1 = 0.06
     beta2 = 0.00
     beta3 = 0.02
-    curve3 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates3 = curve3.zero(times)
+    curve3 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates3 = curve3.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates3)
 
     beta1 = 0.06
     beta2 = 0.02
     beta3 = 0.02
-    curve4 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates4 = curve4.zero(times)
+    curve4 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates4 = curve4.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates4)
 
     beta1 = 0.06
     beta2 = 0.04
     beta3 = 0.02
-    curve5 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates5 = curve5.zero(times)
+    curve5 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates5 = curve5.zeroRate(times)
     testCases.print(beta1, beta2, beta3, zeroRates5)
 
     if PLOT_GRAPHS:
@@ -157,40 +159,40 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = -0.02
-    curve1 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates1 = curve1.zero(times)
+    curve1 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates1 = curve1.zeroRate(times)
 
     testCases.print(beta1, beta2, beta3, zeroRates1)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.00
-    curve2 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates2 = curve2.zero(times)
+    curve2 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates2 = curve2.zeroRate(times)
 
     testCases.print(beta1, beta2, beta3, zeroRates2)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve3 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates3 = curve3.zero(times)
+    curve3 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates3 = curve3.zeroRate(times)
 
     testCases.print(beta1, beta2, beta3, zeroRates3)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.04
-    curve4 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates4 = curve4.zero(times)
+    curve4 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates4 = curve4.zeroRate(times)
 
     testCases.print(beta1, beta2, beta3, zeroRates4)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.06
-    curve5 = FinNelsonSiegelCurve(beta1, beta2, beta3, tau)
-    zeroRates5 = curve5.zero(times)
+    curve5 = FinNelsonSiegelCurve(curveDate, [beta1, beta2, beta3, tau])
+    zeroRates5 = curve5.zeroRate(times)
 
     testCases.print(beta1, beta2, beta3, zeroRates5)
 

@@ -24,17 +24,3 @@ class FinBondPortfolio(object):
         self._settlementDate = FinDate(1900, 1, 1)
 
 ###############################################################################
-
-    def fitYieldCurveToBonds( curvetype) 
-
-
-    def duration()
-
-
-    def convexity()
-    
-
-
-
-import pandas as pd
-bondDf = pd.read_csv('./data/giltbondprices.txt',sep='\t')

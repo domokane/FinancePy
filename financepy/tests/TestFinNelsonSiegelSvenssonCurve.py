@@ -6,7 +6,7 @@ Created on Fri Apr 08 09:26:27 2016
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinNelsonSiegelSvenssonCurve import FinNelsonSiegelSvenssonCurve
+from financepy.market.curves.FinNelsonSiegelCurve import FinNelsonSiegelSvenssonCurve
 from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt
 import numpy as np

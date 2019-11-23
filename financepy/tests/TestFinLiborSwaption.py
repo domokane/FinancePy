@@ -10,7 +10,7 @@ from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionType
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -132,11 +132,11 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
         fixedBasis)
     swaps.append(swap5)
 
-    liborCurve = FinLiborOneCurve("USD_LIBOR",
-                                  settlementDate,
-                                  depos,
-                                  fras,
-                                  swaps)
+    liborCurve = FinLiborCurve("USD_LIBOR",
+                               settlementDate,
+                               depos,
+                               fras,
+                               swaps)
 
     return liborCurve
 
@@ -168,7 +168,8 @@ def test_FinLiborSwaption():
                                 swapFixedDayCountType)
 
     model = FinLiborModelBlack(0.25)
-    value = swaption.value(valuationDate, liborCurve, model)
+    settlementDate = valuationDate.addWorkDays(2)
+    value = swaption.value(settlementDate, liborCurve, model)
 
 #    swaption.print()
 
@@ -184,7 +185,8 @@ def test_FinLiborSwaption():
                                 swapFixedDayCountType)
 
     model = FinLiborModelBlack(0.25)
-    value = swaption.value(valuationDate, liborCurve, model)
+    settlementDate = valuationDate.addWorkDays(2)
+    value = swaption.value(settlementDate, liborCurve, model)
 
 #    swaption.print()
 
@@ -213,7 +215,7 @@ def test_FinLiborSwaption():
                                 swapFixedDayCountType)
 
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
-    value = swaption.value(valuationDate, liborCurve, model)
+    value = swaption.value(settlementDate, liborCurve, model)
 
 #    swaption.print()
 
@@ -230,7 +232,7 @@ def test_FinLiborSwaption():
                                 swapFixedDayCountType)
 
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
-    value = swaption.value(valuationDate, liborCurve, model)
+    value = swaption.value(settlementDate, liborCurve, model)
 
 #    swaption.print()
 

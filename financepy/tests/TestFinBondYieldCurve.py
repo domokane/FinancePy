@@ -16,11 +16,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBond import FinBond
 from financepy.market.curves.FinBondYieldCurve import FinBondYieldCurve
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodPolynomial
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegel
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodNelsonSiegelSvensson
-from financepy.market.curves.FinCurveFitMethod import FinCurveFitMethodBSpline
-
+from financepy.market.curves.FinBondYieldCurveModel import * 
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -58,41 +54,41 @@ def test_FinBondYieldCurve():
 
 ###############################################################################
 
-    curveFitMethod = FinCurveFitMethodPolynomial()
+    curveFitMethod = FinCurveFitPolynomial()
     fittedCurve1 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 #    fittedCurve1.display("GBP Yield Curve")
 
-    curveFitMethod = FinCurveFitMethodPolynomial(5)
+    curveFitMethod = FinCurveFitPolynomial(5)
     fittedCurve2 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 #    fittedCurve2.display("GBP Yield Curve")
 
-    curveFitMethod = FinCurveFitMethodNelsonSiegel()
+    curveFitMethod = FinCurveFitNelsonSiegel()
     fittedCurve3 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 #    fittedCurve3.display("GBP Yield Curve")
 
-    curveFitMethod = FinCurveFitMethodNelsonSiegelSvensson()
+    curveFitMethod = FinCurveFitNelsonSiegelSvensson()
     fittedCurve4 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 #    fittedCurve4.display("GBP Yield Curve")
 
-    curveFitMethod = FinCurveFitMethodBSpline()
+    curveFitMethod = FinCurveFitBSpline()
     fittedCurve5 = FinBondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 #    fittedCurve5.display("GBP Yield Curve")
 
 ###############################################################################
 
     testCases.header("PARAMETER", "VALUE")
-    testCases.print("beta1", fittedCurve3._curveFitMethod._beta1)
-    testCases.print("beta2", fittedCurve3._curveFitMethod._beta2)
-    testCases.print("beta3", fittedCurve3._curveFitMethod._beta3)
-    testCases.print("tau", fittedCurve3._curveFitMethod._tau)
+    testCases.print("beta1", fittedCurve3._curveFit._beta1)
+    testCases.print("beta2", fittedCurve3._curveFit._beta2)
+    testCases.print("beta3", fittedCurve3._curveFit._beta3)
+    testCases.print("tau", fittedCurve3._curveFit._tau)
 
     testCases.header("PARAMETER", "VALUE")
-    testCases.print("beta1", fittedCurve4._curveFitMethod._beta1)
-    testCases.print("beta2", fittedCurve4._curveFitMethod._beta2)
-    testCases.print("beta3", fittedCurve4._curveFitMethod._beta3)
-    testCases.print("beta4", fittedCurve4._curveFitMethod._beta4)
-    testCases.print("tau1", fittedCurve4._curveFitMethod._tau1)
-    testCases.print("tau2", fittedCurve4._curveFitMethod._tau2)
+    testCases.print("beta1", fittedCurve4._curveFit._beta1)
+    testCases.print("beta2", fittedCurve4._curveFit._beta2)
+    testCases.print("beta3", fittedCurve4._curveFit._beta3)
+    testCases.print("beta4", fittedCurve4._curveFit._beta4)
+    testCases.print("tau1", fittedCurve4._curveFit._tau1)
+    testCases.print("tau2", fittedCurve4._curveFit._tau2)
 
 ###############################################################################
 

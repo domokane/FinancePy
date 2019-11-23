@@ -5,7 +5,7 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.finutils.FinInterpolate import interpolate, FinInterpMethods
+from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
 import numpy as np
 import math
 import sys
@@ -19,10 +19,9 @@ def test_FinInterpolate():
 
     import time
 
-    xValues = np.array([0.25, 0.5, 0.75, 1.0, 1.5])
-
-    a = -0.3
-    b = 0.4
+    xValues = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
+    a = -0.1
+    b = 0.002
 
     yValues = []
     for x in xValues:
@@ -47,11 +46,11 @@ def test_FinInterpolate():
 
         end = time.time()
 
-#    import matplotlib.pyplot as plt
-#    plt.figure(figsize=(12,10))
-#    plt.plot(xValues, yValues, color = 'r', marker= 'o')
-#    plt.plot(xInterpolateValues, yInterpValues, color = 'b', label=str(method))
-#    plt.legend()
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(12, 10))
+        plt.plot(xValues, yValues, color='r', marker='o')
+        plt.plot(xInterpolateValues, yInterpValues, color='b', label=str(method))
+        plt.legend()
 
     xp = np.array([0.2, 0.4, 0.45, 0.6, 0.82, 0.93, 0.99])
     yp = np.array([0.4, 0.9, 0.32, 0.2, 0.22, 0.10, 0.28])

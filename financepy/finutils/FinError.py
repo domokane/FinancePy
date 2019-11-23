@@ -25,5 +25,5 @@ class FinError(Exception):
     def __init__(self, message):
         self._message = message
 
-    def printMessage(self):
-        traceback.print_exc()
+    def print(self):
+        print("FinError:", self._message)

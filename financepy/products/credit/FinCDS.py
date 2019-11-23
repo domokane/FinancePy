@@ -11,12 +11,13 @@ from math import exp, log
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinInterpolate import interpolate, FinInterpMethods
+from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -46,8 +47,8 @@ def riskyPV01_NUMBA(teff,
                     npSurvTimes,
                     npSurvValues,
                     pv01Method):
-    ''' Fast calculation of the risky PV01 of a CDS using NUMBA. The output is a
-    numpy array of the full and clean risky PV01.'''
+    ''' Fast calculation of the risky PV01 of a CDS using NUMBA.
+    The output is a numpy array of the full and clean risky PV01.'''
 
     method = FinInterpMethods.FLAT_FORWARDS.value
 
@@ -61,9 +62,9 @@ def riskyPV01_NUMBA(teff,
 
     # The first coupon is a special case which needs to be handled carefully
     # taking into account what coupon has already accrued and what has not
-    qeff = interpolate(teff, npSurvTimes, npSurvValues, method)
-    q1 = interpolate(tncd, npSurvTimes, npSurvValues, method)
-    z1 = interpolate(tncd, npLiborTimes, npLiborValues, method)
+    qeff = uinterpolate(teff, npSurvTimes, npSurvValues, method)
+    q1 = uinterpolate(tncd, npSurvTimes, npSurvValues, method)
+    z1 = uinterpolate(tncd, npLiborTimes, npLiborValues, method)
 
     # this is the part of the coupon accrued from the previous coupon date to now
     # accrualFactorPCDToNow = dayCount.yearFrac(pcd,teff)
@@ -85,8 +86,8 @@ def riskyPV01_NUMBA(teff,
 
         t2 = paymentTimes[it]
 
-        q2 = interpolate(t2, npSurvTimes, npSurvValues, method)
-        z2 = interpolate(t2, npLiborTimes, npLiborValues, method)
+        q2 = uinterpolate(t2, npSurvTimes, npSurvValues, method)
+        z2 = uinterpolate(t2, npLiborTimes, npLiborValues, method)
 
         accrualFactor = yearFracs[it]
 
@@ -140,8 +141,8 @@ def protectionLegPV_NUMBA(teff,
     method = FinInterpMethods.FLAT_FORWARDS.value
     dt = (tmat - teff) / numStepsPerYear
     t = teff
-    z1 = interpolate(t, npLiborTimes, npLiborValues, method)
-    q1 = interpolate(t, npSurvTimes, npSurvValues, method)
+    z1 = uinterpolate(t, npLiborTimes, npLiborValues, method)
+    q1 = uinterpolate(t, npSurvTimes, npSurvValues, method)
 
     protPV = 0.0
     small = 1e-8
@@ -151,8 +152,8 @@ def protectionLegPV_NUMBA(teff,
         for i in range(0, numStepsPerYear):
 
             t = t + dt
-            z2 = interpolate(t, npLiborTimes, npLiborValues, method)
-            q2 = interpolate(t, npSurvTimes, npSurvValues, method)
+            z2 = uinterpolate(t, npLiborTimes, npLiborValues, method)
+            q2 = uinterpolate(t, npSurvTimes, npSurvValues, method)
             # This needs to be updated to handle small h+r
             h12 = -log(q2 / q1) / dt
             r12 = -log(z2 / z1) / dt
@@ -168,8 +169,8 @@ def protectionLegPV_NUMBA(teff,
         for i in range(0, numStepsPerYear):
 
             t += dt
-            z2 = interpolate(t, npLiborTimes, npLiborValues, method)
-            q2 = interpolate(t, npSurvTimes, npSurvValues, method)
+            z2 = uinterpolate(t, npLiborTimes, npLiborValues, method)
+            q2 = uinterpolate(t, npSurvTimes, npSurvValues, method)
             dq = q1 - q2
             dprotPV = 0.5 * (z1 + z2) * dq
             protPV += dprotPV
@@ -184,36 +185,36 @@ def protectionLegPV_NUMBA(teff,
 
 
 class FinCDS(object):
-
     ''' A class which manages Credit Default Swap. It performs schedule generation
     and the valuation and risk management of CDS. '''
 
     def __init__(self,
                  stepInDate,
-                 maturityDate,
+                 maturityDateOrTenor,
                  runningCoupon,
                  notional=ONE_MILLION,
                  longProtection=True,
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' stepInDate - FinDate that is the date protection starts
         (usually T+1) runningCoupon - Size of coupon on premium leg '''
+
+        if type(stepInDate) is not FinDate:
+            raise ValueError(
+                "Step in date must be a FinDate")
+
+        if type(maturityDateOrTenor) == FinDate:
+            maturityDate = maturityDateOrTenor
+        else:
+            maturityDate = stepInDate.addTenor(maturityDateOrTenor)
 
         if type(runningCoupon) is not float and type(
                 runningCoupon) is not np.float64:
             raise ValueError("Coupon is not float but is " +
                              str(type(runningCoupon)))
-
-        if type(stepInDate) is not FinDate:
-            raise ValueError(
-                "Step in date is not a date but is " + str(type(stepInDate)))
-
-        if type(maturityDate) is not FinDate:
-            raise ValueError(
-                "Maturity date is not a date but is " + str(type(maturityDate)))
 
         if stepInDate > maturityDate:
             raise ValueError("Step in date after maturity date")
@@ -231,7 +232,7 @@ class FinCDS(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -384,6 +385,100 @@ class FinCDS(object):
         cleanPV = fwdDf * longProt * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
         return (fullPV, cleanPV)
+
+##########################################################################
+
+    def creditDV01(self,
+                   valuationDate,
+                   issuerCurve,
+                   contractRecovery=standardRecovery,
+                   pv01Method=0,
+                   prot_method=0,
+                   numStepsPerYear=25):
+        ''' Valuation of a CDS contract '''
+
+        v0 = self.value(valuationDate,
+                        issuerCurve,
+                        contractRecovery,
+                        pv01Method,
+                        prot_method,
+                        numStepsPerYear)
+
+        survProbs = issuerCurve._values
+
+        bump = 0.0001
+        for cds in issuerCurve._cdsContracts:
+            cds._coupon += bump
+        issuerCurve.buildCurve()
+
+        v1 = self.value(valuationDate,
+                        issuerCurve,
+                        contractRecovery,
+                        pv01Method,
+                        prot_method,
+                        numStepsPerYear)
+
+        # NEED TO UNDO CHANGES TO CURVE OBJECT - NO NEED TO REBUILD !!!
+        for cds in issuerCurve._cdsContracts:
+            cds._coupon -= bump
+        issuerCurve._values = survProbs
+
+        creditDV01 = (v1[0] - v0[0])
+        return creditDV01
+
+##########################################################################
+
+    def interestDV01(self,
+                     valuationDate,
+                     issuerCurve,
+                     contractRecovery=standardRecovery,
+                     pv01Method=0,
+                     prot_method=0,
+                     numStepsPerYear=25):
+        ''' Calculation of the interest DV01 based on a simple bump of 
+        the discount factors and reconstruction of the CDS curve. '''
+
+        v0 = self.value(valuationDate,
+                        issuerCurve,
+                        contractRecovery,
+                        pv01Method,
+                        prot_method,
+                        numStepsPerYear)
+
+        dfs = issuerCurve._liborCurve._values
+        survProbs = issuerCurve._values
+
+        bump = 0.0001
+        for depo in issuerCurve._liborCurve._usedDeposits:
+            depo._depositRate += bump
+        for fra in issuerCurve._liborCurve._usedFRAs:
+            fra._fraRate += bump
+        for swap in issuerCurve._liborCurve._usedSwaps:
+            swap._fixedCoupon += bump
+        issuerCurve._liborCurve.buildCurve()
+        issuerCurve.buildCurve()
+
+        v1 = self.value(valuationDate,
+                        issuerCurve,
+                        contractRecovery,
+                        pv01Method,
+                        prot_method,
+                        numStepsPerYear)
+
+        # Need do undo changes to Libor curve object in issuer curve
+        # Do not need to rebuild it - just restore initial dfs and surv probs.
+        for depo in issuerCurve._liborCurve._usedDeposits:
+            depo._depositRate -= bump
+        for fra in issuerCurve._liborCurve._usedFRAs:
+            fra._fraRate -= bump
+        for swap in issuerCurve._liborCurve._usedSwaps:
+            swap._fixedCoupon -= bump
+
+        issuerCurve._liborCurve._values = dfs
+        issuerCurve._values = survProbs
+
+        creditDV01 = (v1[0] - v0[0])
+        return creditDV01
 
 ##########################################################################
 
@@ -667,7 +762,7 @@ class FinCDS(object):
         accurate approximation that avoids curve building. '''
 
         if type(valuationDate) is not FinDate:
-            raise FinError(
+            raise ValueError(
                 "Valuation date must be a FinDate and not " +
                 str(valuationDate))
 
@@ -742,13 +837,13 @@ class FinCDS(object):
 
         numFlows = len(self._adjustedDates)
 
-        print("PAYMENT DATE        YEAR FRAC       PAYMENT")
+        print("PAYMENT_DATE      YEAR_FRAC      FLOW")
 
         for it in range(1, numFlows):
             dt = self._adjustedDates[it]
             accFactor = self._accrualFactors[it]
             flow = self._flows[it]
-            print("%s  %10.6f % 14.2f" % (dt, accFactor, flow))
+            print("%15s %10.6f %12.2f" % (dt, accFactor, flow))
 
 ##########################################################################
 
@@ -756,15 +851,15 @@ class FinCDS(object):
 
         numFlows = len(self._adjustedDates)
 
-        print("PAYMENT DATE        YEAR FRAC       PAYMENT        DISCOUNT       SURVPROB         PV")
+        print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
 
         for it in range(1, numFlows):
             dt = self._adjustedDates[it]
             accFactor = self._accrualFactors[it]
             flow = self._flows[it]
             z = issuerCurve.df(dt)
-            q = issuerCurve.survivalProbability(dt)
-            print("%s  %10.6f % 14.2f %14.8f %14.8f %14.2f" %
+            q = issuerCurve.survProb(dt)
+            print("%15s %10.6f %12.2f %12.6f %12.6f %12.2f" %
                   (dt, accFactor, flow, z, q, flow * z * q))
 
 ##########################################################################

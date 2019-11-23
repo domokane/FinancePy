@@ -9,7 +9,7 @@ Created on Fri Nov 30 10:52:29 2018
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinAnnuity import FinAnnuity
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes
+from financepy.finutils.FinCalendar import FinDayAdjustTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -30,7 +30,7 @@ def test_FinAnnuity():
     d2 = FinDate(2018, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -52,7 +52,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.QUARTERLY
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     annuity = FinAnnuity(
@@ -73,7 +73,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.MONTHLY
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     annuity = FinAnnuity(
@@ -94,7 +94,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
 
     annuity = FinAnnuity(
@@ -115,7 +115,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     annuity = FinAnnuity(
@@ -136,7 +136,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     annuity = FinAnnuity(
@@ -157,7 +157,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
 
     annuity = FinAnnuity(
@@ -178,7 +178,7 @@ def test_FinAnnuity():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     annuity = FinAnnuity(

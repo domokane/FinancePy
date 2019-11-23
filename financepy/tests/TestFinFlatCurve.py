@@ -6,7 +6,7 @@ Created on Fri Apr 08 09:26:27 2016
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinFlatCurve import FinFlatCurve, FinCompoundingMethods
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
@@ -21,32 +21,32 @@ def test_FinFlatCurve():
     times = np.linspace(0.0, 1.0, 5)
 
     testCases.header("COMPOUNDING", "DFS")
-    compounding = FinCompoundingMethods.CONTINUOUS
+    compounding = -1
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = FinCompoundingMethods.ANNUAL
+    compounding = 1
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = FinCompoundingMethods.SEMI_ANNUAL
+    compounding = 2
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = FinCompoundingMethods.QUARTERLY
+    compounding = 4
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = FinCompoundingMethods.MONTHLY
+    compounding = 12
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = FinCompoundingMethods.MONEY_MARKET
+    compounding = 0
     flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)

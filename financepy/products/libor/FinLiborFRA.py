@@ -8,7 +8,7 @@ Created on Sun Feb 07 14:23:13 2016
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import ONE_MILLION
 
@@ -50,7 +50,7 @@ class FinLiborFRA(object):
                  dayCountType,  # For interest period
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.MODIFIED_FOLLOWING):
+                 busDayAdjustType=FinDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create FRA object. '''
 
         if type(settlementDate) != FinDate:

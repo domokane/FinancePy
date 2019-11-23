@@ -7,6 +7,7 @@ Created on Fri Apr 08 09:26:27 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinPolynomialCurve import FinPolynomialCurve
+from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
 sys.path.append("..//..")
@@ -18,42 +19,28 @@ sys.path.append("..//..")
 # Use Frequency object
 ##########################################################################
 
-
-#import matplotlib.pyplot as plt
+showPlots = True
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_FinPolynomialCurve():
 
-    times = np.linspace(0.0, 10.0, 5)
+    times = np.linspace(0.00, 10.0, 20)
+    curveDate = FinDate(2019, 2, 2)
+    coeffs = [0.0004, -0.0001, 0.00000010]
+    curve1 = FinPolynomialCurve(curveDate, coeffs)
+    zeros = curve1.zeroRate(times)
+    fwds = curve1.fwd(times)
 
-    curve1 = FinPolynomialCurve(1., 0., 0., 0.)
-    factor1loading = curve1.zero(times)
-    curve2 = FinPolynomialCurve(1., 1., 0., 0.)
-    factor2loading = curve2.zero(times)
-    curve3 = FinPolynomialCurve(1., 1., 1., 0)
-    factor3loading = curve3.zero(times)
-    curve4 = FinPolynomialCurve(1., 1., 1., 1.)
-    factor4loading = curve4.zero(times)
-
-    testCases.header("FACTOR LOADING")
-    testCases.print(factor1loading)
-    testCases.print(factor2loading)
-    testCases.print(factor3loading)
-    testCases.print(factor4loading)
-
-#    plt.figure(figsize = (6,4))
-#    plt.plot(times,scaleVector(factor1loading,1),label='c0=1');
-#    plt.plot(times,scaleVector(factor2loading,1),label='c0=c1=1');
-#    plt.plot(times,scaleVector(factor3loading,1),label='c0=c1=c2=1');
-#    plt.plot(times,scaleVector(factor4loading,1),label='c0=c1=c2=c3=1');
-#    plt.ylim((0,1000))
-#
-#    plt.title('Factor Loadings in Nelson-Siegel Model');
-#    plt.xlabel('Time (years)');
-#    plt.ylabel('Loading');
-#    plt.legend(loc='best')
+    if showPlots:
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(6, 4))
+        plt.plot(times, zeros, label="Zeros")
+        plt.plot(times, fwds, label="Forwards")
+        plt.xlabel('Time (years)')
+        plt.ylabel('Zero Rate')
+        plt.legend(loc='best')
 
 
 test_FinPolynomialCurve()

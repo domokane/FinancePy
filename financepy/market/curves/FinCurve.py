@@ -5,47 +5,50 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 
+import numpy as np
+from numba import jit
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinInterpolate import FinInterpMethods
 
 ###############################################################################
-# TO DO
-# Write interpolation scheme
+
+
+def inputFrequency(f):
+    if f in [-1, 0, 1, 2, 3, 4, 6, 12]:
+        return f
+    else:
+        raise FinError("Unknown frequency" + str(f))
+
 ###############################################################################
 
-from enum import Enum
 
+#@jit
+def inputTime(dt, curve):
 
-class FinCompoundingMethods(Enum):
-    CONTINUOUS = 1
-    ANNUAL = 2
-    SEMI_ANNUAL = 3
-    QUARTERLY = 4
-    MONTHLY = 5
-    MONEY_MARKET = 6
+    small = 1e-8
 
-################################################################################
+    def check(t):
+        if t < 0.0:
+            raise FinError("Date is before curve value date.")
+        elif t < small:
+            t = small
+        return t
 
-
-class FinCurve():
-
-    def __init__(self, curveDate, interpolationMethod, type):
-
-        self._curveDate = curveDate
-        self._type = None
-        self._times = None
-        self._values = None
-
-    def df(self, t, interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
-
-        if t < self._curveDate:
-            raise FinError("FinCurve: time before curve date")
-
-        if type(t) is FinDate:
-            t = (t - self._curveDate) / gDaysInYear
-
-        return self.interpolate(t)
+    if isinstance(dt, float):
+        t = dt
+        return check(t)
+    elif isinstance(dt, FinDate):
+        t = (dt - curve._curveDate) / gDaysInYear
+        return check(t)
+    elif isinstance(dt, np.ndarray):
+        t = dt
+        if np.any(t) < 0:
+            raise FinError("Date is before curve value date.")
+        t = np.maximum(small, t)
+        return t
+    else:
+        raise FinError("Unknown type.")
 
 ###############################################################################

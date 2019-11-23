@@ -8,7 +8,7 @@ Created on Wed Jan 16 17:54:03 2019
 from math import pow
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
@@ -24,7 +24,7 @@ class FinCDSIndexPortfolio():
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         self._dayCountType = dayCountType

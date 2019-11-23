@@ -5,17 +5,17 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 
-from math import log, ceil
-
-import scipy.optimize as optimize
+from math import log
 import numpy as np
+import scipy.optimize as optimize
 from numba import njit, float64
 
 from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinInterpolate import interpolate, FinInterpMethods
-
-from .FinDiscountCurve import FinDiscountCurve
+from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinDayCount import FinDayCount
 
 ###############################################################################
 
@@ -30,7 +30,6 @@ def uniformToDefaultTime(u, t, v):
         return 0.0
 
     numPoints = len(v)
-
     index = 0
 
     for i in range(1, numPoints):
@@ -71,10 +70,10 @@ def f(q, *args):
 ###############################################################################
 
 
-class FinCDSCurve(FinDiscountCurve):
+class FinCDSCurve():
     ''' Generate a survival probability curve implied by the value of CDS
-    contracts given a Libor curve and an assumed recovery rate. And interpolation
-    scheme for the survival probabilities is also required. '''
+    contracts given a Libor curve and an assumed recovery rate. A scheme for
+    the interpolation of the survival probabilities is also required. '''
 
     def __init__(self,
                  curveDate,
@@ -98,6 +97,8 @@ class FinCDSCurve(FinDiscountCurve):
             if len(cdsContracts) > 0:
                 self.validate(cdsContracts)
                 self.buildCurve()
+        else:
+            pass # In some cases we allow None to be passed
 
 ###############################################################################
 
@@ -117,8 +118,8 @@ class FinCDSCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def survivalProbability(self, dt):
-        ''' Extract the survival proibability to date dt. '''
+    def survProb(self, dt):
+        ''' Extract the survival probability to date dt. '''
 
         if isinstance(dt, FinDate):
             t = (dt - self._curveDate) / gDaysInYear
@@ -132,31 +133,26 @@ class FinCDSCurve(FinDiscountCurve):
         if t == 0.0:
             return 1.0
 
-#        if self._useCache == True and t < self._cachedTimeLimit:
-#            iDay = int(round(t * gDaysInYear))
-#            q = self._cachedDailySurvivalProbs[iDay]
-#        else:
-        q = interpolate(t, self._times, self._values,
-                        self._interpolationMethod.value)
+        q = uinterpolate(t, self._times, self._values,
+                         self._interpolationMethod.value)
 
         return q
 
 ###############################################################################
 
     def df(self, t):
-        ''' Extract the discount factor from the underlying Liubor curve. '''
+        ''' Extract the discount factor from the underlying Libor curve. '''
 
         if isinstance(t, FinDate):
             t = (t - self._curveDate) / gDaysInYear
 
         return self._liborCurve.df(t)
 
-##########################################################################
+###############################################################################
 
     def buildCurve(self):
 
         numTimes = len(self._cdsContracts)
-
         # we size the vectors to include time zero
 
         self._times = np.array([])
@@ -181,42 +177,60 @@ class FinCDSCurve(FinDiscountCurve):
             optimize.newton(f, x0=q, fprime=None, args=argtuple,
                             tol=1e-7, maxiter=50, fprime2=None)
 
-##########################################################################
+##############################################################################
 
-    def buildCachedIssuerCurve(self):
+    def fwd(self, dt):
+        ''' Calculate the instantaneous forward rate at the forward date. '''
+        t = inputTime(dt, self)
+        dt = 0.000001
+        df1 = self.df(t) * self.survProb(t)
+        df2 = self.df(t+dt) * self.survProb(t+dt)
+        fwd = np.log(df1/df2)/dt
+        return fwd
 
-        if self._useCache:
-            self._UseCache = False
+##############################################################################
 
-        timeCutoff = self._cachedTimeLimit
-        dt = 1.0 / gDaysInYear
+    def fwdRate(self, date1, date2, dayCountType):
+        ''' Calculate the forward rate according to the specified
+        day count convention. '''
 
-        if timeCutoff <= 0:
-            raise Exception("Cutoff must be greater than zero")
+        if date1 < self._curveDate:
+            raise ValueError("Date1 before curve value date.")
 
-        self.m_CachedTimeLimit = timeCutoff
+        if date2 < date1:
+            raise ValueError("Date2 must not be before Date1")
 
-        numDaysToTimeLimit = int(ceil(timeCutoff / dt) + 1)  # check +1
+        dayCount = FinDayCount(dayCountType)
+        yearFrac = dayCount.yearFrac(date1, date2)
+        df1 = self.df(date1)
+        df2 = self.df(date2)
+        fwd = (df1 / df2 - 1.0) / yearFrac
+        return fwd
 
-        self._cachedDailySurvivalProbs = np.zeros(numDaysToTimeLimit)
+##############################################################################
 
-        t = 0.0
+    def zeroRate(self, dt, compoundingFreq=-1):
+        ''' Calculate the zero rate to maturity date. '''
+        t = inputTime(dt, self)
+        f = inputFrequency(compoundingFreq)
+        df = self.df(t)
+        q = self.survProb(t)
+        dfq = df * q
 
-        for i in range(0, numDaysToTimeLimit):
+        if f == 0:  # Simple interest
+            zeroRate = (1.0/dfq-1.0)/t
+        if f == -1:  # Continuous
+            zeroRate = -np.log(dfq) / t
+        else:
+            zeroRate = (dfq**(-1.0/t) - 1) * f
+        return zeroRate
 
-            z = self.survivalProbability(self, t)
-            self._cachedDailySurvivalProbs[i] = z
-            t += dt
+##############################################################################
 
-        self._useCache = True
-
-###############################################################################
-
-    def dump(self):
-
+    def print(self):
         numPoints = len(self._times)
-
+        print("TIME,SURVIVAL_PROBABILITY")
         for i in range(0, numPoints):
-            print(self._times[i], self._values[i])
+            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
 
 ###############################################################################

@@ -82,30 +82,36 @@ class FinDate():
 
     ###########################################################################
 
-    def __init__(self,
-                 y,  # Year (1900-2100)
-                 m,  # Month (1-12)
-                 d):  # Day of Month (1-31 depending on month)
-        ''' Create a date given year, month and day of month. '''
+    def __init__(self, y_or_d, m, d_or_y):
+        ''' Create a date given year, month and day of month. The order is not 
+        enforced so 4th July 2019 can be created as FinDate(4,7,2019) or as 
+        FinDate(2019,7,4) so long as the middle number is the month. 
+        The year must be a 4-digit number greater than or equal to 1900. '''
+
+        if y_or_d >= 1900:
+            y = y_or_d
+            d = d_or_y
+        elif d_or_y >= 1900:
+            y = d_or_y
+            d = y_or_d
+        else:
+            raise FinError("Invalid date: Inconsistent year and month day.")
 
         if y < 1900 or y > 2100:
-            raise ValueError(
+            raise FinError(
                 "Date: year " + str(y) + " should be 1900 to 2100.")
 
-        if m < 1 or m > 12:
-            raise ValueError("Date: month " + str(m) + " should be 1 to 12.")
-
         if d < 1:
-            raise ValueError("Date: Leap year. Day not valid.")
+            raise FinError("Date: Leap year. Day not valid.")
 
         leapYear = isLeapYear(y)
 
         if leapYear:
             if d > monthDaysLeapYear[m - 1]:
-                raise ValueError("Date: Leap year. Day not valid.")
+                raise FinError("Date: Leap year. Day not valid.")
         else:
             if d > monthDaysNotLeapYear[m - 1]:
-                raise ValueError("Date: Not Leap year. Day not valid.")
+                raise FinError("Date: Not Leap year. Day not valid.")
 
         self._y = y
         self._m = m
@@ -230,8 +236,9 @@ class FinDate():
 
     ##########################################################################
 
-    def nextCDSDate(self, mm):
-        ''' Returns a CDS date that is mm months after the FinDate. '''
+    def nextCDSDate(self, mm=0):
+        ''' Returns a CDS date that is mm months after the FinDate. If no
+        argument is supplied it is the next CDS date. '''
 
         nextDate = self.addMonths(mm)
 
@@ -384,6 +391,11 @@ class FinDate():
         dateStr += shortMonthNames[self._m - 1]
         dateStr += " " + str(self._y)
         return dateStr
+
+    ###########################################################################
+
+    def print(self):
+        print(self.__str__())
 
     ###########################################################################
     ###########################################################################

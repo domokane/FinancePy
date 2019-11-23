@@ -11,7 +11,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -69,7 +69,7 @@ def test_FinLiborDepositsOnly():
     fras = []
     swaps = []
 
-    liborCurve = FinLiborOneCurve("USD_LIBOR",
+    liborCurve = FinLiborCurve("USD_LIBOR",
                                   settlementDate,
                                   depos,
                                   fras,
@@ -120,7 +120,7 @@ def test_FinLiborFRAsOnly():
     depos = []
     swaps = []
 
-    liborCurve = FinLiborOneCurve("USD_LIBOR",
+    liborCurve = FinLiborCurve("USD_LIBOR",
                                   settlementDate,
                                   depos,
                                   fras,
@@ -238,7 +238,7 @@ def test_FinLiborDepositsAndSwaps():
     swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType, fixedDCCType)
     swaps.append(swap)
 
-    liborCurve = FinLiborOneCurve("USD_LIBOR",
+    liborCurve = FinLiborCurve("USD_LIBOR",
                                   settlementDate,
                                   depos,
                                   fras,

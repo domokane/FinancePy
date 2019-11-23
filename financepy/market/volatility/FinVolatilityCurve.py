@@ -9,7 +9,6 @@ Created on Fri Feb 12 16:51:05 2016
 
 import numpy as np
 
-from ...finutils.FinInterpolate import FinInterpMethods, interpolate
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import testMonotonicity
 ##########################################################################

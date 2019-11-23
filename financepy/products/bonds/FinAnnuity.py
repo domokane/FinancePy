@@ -8,7 +8,7 @@ Created on Fri Nov 30 10:52:29 2018
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
@@ -26,7 +26,7 @@ class FinAnnuity(object):
                  endDate,
                  frequencyType=FinFrequencyTypes.ANNUAL,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType=FinDayCountTypes.ACT_360):
 
@@ -36,7 +36,7 @@ class FinAnnuity(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

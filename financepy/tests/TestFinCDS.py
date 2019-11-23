@@ -8,14 +8,14 @@ import time
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinInterpolate import FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpMethods
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes
+from financepy.finutils.FinCalendar import FinDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -131,7 +131,7 @@ def test_CurveBuild():
 
     valuationDate = FinDate(2018, 6, 20)
 
-    times = np.linspace(0, 10.0, 10)
+    times = np.linspace(0.0, 10.0, 10)
     r = 0.05
     discountFactors = np.power((1.0 + r), -times)
     liborCurve = FinDiscountCurve(
@@ -316,7 +316,7 @@ def buildFullIssuerCurve(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap10)
 
-    liborCurve = FinLiborOneCurve(
+    liborCurve = FinLiborCurve(
         "USD_LIBOR", settlementDate, depos, fras, swaps)
 
     cdsMarketContracts = []
@@ -504,7 +504,7 @@ def test_CDSDateGeneration():
                          FinFrequencyTypes.QUARTERLY,
                          FinDayCountTypes.ACT_360,
                          FinCalendarTypes.WEEKEND,
-                         FinBusDayConventionTypes.FOLLOWING,
+                         FinDayAdjustTypes.FOLLOWING,
                          FinDateGenRuleTypes.BACKWARD)
 
     testCases.header("Flow Date", "AccrualFactor", "Flow")

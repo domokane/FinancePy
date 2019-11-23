@@ -8,8 +8,8 @@ Created on Mon Aug  5 09:43:40 2019
 import datetime as dt
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve, FinCompoundingMethods
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -18,8 +18,8 @@ from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 import sys
-sys.path.append("..//..")
-
+sys.path.append("..\\..")
+sys.path.append("..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -164,11 +164,11 @@ def buildLiborCurve(valuationDate):
         fixedDCCType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborOneCurve("USD_LIBOR",
-                                  settlementDate,
-                                  depos,
-                                  fras,
-                                  swaps)
+    liborCurve = FinLiborCurve("USD_LIBOR",
+                               settlementDate,
+                               depos,
+                               fras,
+                               swaps)
 
     if 1 == 0:
         import numpy as np
@@ -269,7 +269,7 @@ def test_FinBond():
     # definition
     flatCurve = FinFlatCurve(settlementDate,
                              ytm,
-                             FinCompoundingMethods.SEMI_ANNUAL)
+                             2)
 
     testCases.header("FIELD", "VALUE")
 

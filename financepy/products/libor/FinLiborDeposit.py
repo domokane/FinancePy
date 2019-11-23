@@ -8,7 +8,7 @@ Created on Sun Feb 07 14:23:13 2016
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinMath import ONE_MILLION
@@ -25,11 +25,16 @@ class FinLiborDeposit(object):
                  dayCountType,
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.MODIFIED_FOLLOWING):
+                 busDayAdjustType=FinDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
 
         if type(settlementDate) != FinDate:
             raise ValueError("Settlement date must be a FinDate.")
+
+        if calendarType not in FinCalendarTypes:
+            raise ValueError("Unknown Calendar type " + str(calendarType))
+
+        self._calendarType = calendarType
 
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
@@ -46,16 +51,12 @@ class FinLiborDeposit(object):
                 "Unknown Day Count Rule type " +
                 str(dayCountType))
 
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
 
         self._settlementDate = settlementDate
-        self._calendarType = calendarType
         self._dayCountType = dayCountType
         self._depositRate = depositRate
         self._notional = notional

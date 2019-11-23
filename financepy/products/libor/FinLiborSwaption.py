@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from math import log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
@@ -49,7 +49,7 @@ class FinLiborSwaption():
                  swapFixedDayCountType,
                  swapNotional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         if exerciseDate > swapMaturityDate:
@@ -68,7 +68,7 @@ class FinLiborSwaption():
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

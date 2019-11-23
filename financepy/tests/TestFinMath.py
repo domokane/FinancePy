@@ -11,6 +11,7 @@ import numpy as np
 import time
 import sys
 sys.path.append("..//..")
+sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

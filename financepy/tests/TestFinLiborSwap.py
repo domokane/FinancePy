@@ -7,11 +7,11 @@ Created on Sun Feb 07 14:23:13 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.finutils.FinCalendar import FinBusDayConventionTypes
+from financepy.finutils.FinCalendar import FinDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -267,21 +267,21 @@ def buildLiborCurve(valuationDate):
         dcType)
     swaps.append(swap19)
 
-    liborCurve = FinLiborOneCurve("USD", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve("USD", settlementDate, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 
     ''' Check calibration '''
     for depo in depos:
-        v = depo.value(valuationDate, liborCurve)
+        v = depo.value(settlementDate, liborCurve)
         testCases.print("DEPO VALUE:", depo._maturityDate, v)
 
     for fra in fras:
-        v = fra.value(valuationDate, liborCurve)
+        v = fra.value(settlementDate, liborCurve)
         testCases.print("FRA VALUE:", fra._maturityDate, v)
 
     for swap in swaps:
-        v = swap.value(valuationDate, liborCurve, liborCurve, None)
+        v = swap.value(settlementDate, liborCurve, liborCurve, None)
         testCases.print("SWAP VALUE:", swap._maturityDate, v)
 
     return liborCurve
@@ -306,7 +306,7 @@ def test_LiborSwap():
     firstFixing = -0.00268
 
     swapCalendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayConventionTypes.FOLLOWING
+    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     payFixedFlag = False
@@ -331,8 +331,9 @@ def test_LiborSwap():
     future Libor rates. '''
 
     valuationDate = FinDate(2018, 11, 30)
+    settlementDate = valuationDate.addDays(2)
     liborCurve = buildLiborCurve(valuationDate)
-    v = swap.value(valuationDate, liborCurve, liborCurve, firstFixing)
+    v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
 #    swap.printFixedLeg(valuationDate)
 #    swap.printFloatLeg(valuationDate)
 

@@ -8,7 +8,7 @@ Created on Sat Aug  3 14:11:51 2019
 from math import exp, log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayConventionTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -37,7 +37,7 @@ class FinCDSIndexOption(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayConventionTypes.FOLLOWING,
+                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract.'''
@@ -64,7 +64,7 @@ class FinCDSIndexOption(object):
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinBusDayConventionTypes:
+        if busDayAdjustType not in FinDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -113,7 +113,7 @@ class FinCDSIndexOption(object):
         c = self._indexCoupon
         timeToExpiry = (self._expiryDate - valuationDate) / gDaysInYear
         df = liborCurve.df(timeToExpiry)
-        qExpiryIndex = indexCurve.survivalProbability(timeToExpiry)
+        qExpiryIndex = indexCurve.survProb(timeToExpiry)
 
         cds = FinCDS(valuationDate, self._maturityDate, k)
         strikeCurve = FinCDSCurve(
@@ -174,7 +174,7 @@ class FinCDSIndexOption(object):
             1.0)
         strikeCurve = FinCDSCurve(valuationDate, [strikeCDS], liborCurve)
         strikeRPV01s = strikeCDS.riskyPV01(valuationDate, strikeCurve)
-        qToExpiry = strikeCurve.survivalProbability(timeToExpiry)
+        qToExpiry = strikeCurve.survProb(timeToExpiry)
         strikeValue = (k - c) * strikeRPV01s[RPV01_INDEX]
         strikeValue /= (dfToExpiry * qToExpiry)
 
@@ -185,7 +185,7 @@ class FinCDSIndexOption(object):
         for iCredit in range(0, numCredits):
 
             issuerCurve = issuerCurves[iCredit]
-            q = issuerCurve.survivalProbability(timeToExpiry)
+            q = issuerCurve.survProb(timeToExpiry)
             dh1 = (1.0 - issuerCurve._recoveryRate) * (1.0 - q)
 
             s = self._cdsContract.parSpread(valuationDate, issuerCurve)

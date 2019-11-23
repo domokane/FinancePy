@@ -76,7 +76,7 @@ def buildChapter(foldername):
     ''' Parse a folder by loading up all of the modules in that folder that
     start with Fin. '''
 
-    readMeFile = foldername + "//" + "README.txt"
+    readMeFile = foldername + "//" + "README.md"
     f = open(readMeFile, 'r')
     lines = f.readlines()
     f.close()

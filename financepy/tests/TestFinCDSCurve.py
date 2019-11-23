@@ -8,7 +8,7 @@ from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
-from financepy.market.curves.FinLiborOneCurve import FinLiborOneCurve
+from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -42,7 +42,7 @@ def test_FinCDSCurve():
             fixedDCC)
         swaps.append(swap)
 
-    libor_curve = FinLiborOneCurve("USD_LIBOR", curveDate, depos, fras, swaps)
+    libor_curve = FinLiborCurve("USD_LIBOR", curveDate, depos, fras, swaps)
 
     cdsContracts = []
 
