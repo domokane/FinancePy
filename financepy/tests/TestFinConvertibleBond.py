@@ -2,6 +2,7 @@
 
 # TODO
 import time
+import numpy as np
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinConvertibleBond import FinConvertibleBond
@@ -31,13 +32,13 @@ def test_FinConvertibleBond():
     callDates = [FinDate(2007, 3, 20),
                  FinDate(2012, 3, 15),
                  FinDate(2017, 3, 15)]
-    callPrices = [callPrice, callPrice, callPrice]
+    callPrices = np.array([callPrice, callPrice, callPrice])
 
     putPrice = 90
     putDates = [FinDate(2007, 3, 20),
                 FinDate(2012, 3, 15),
                 FinDate(2017, 3, 15)]
-    putPrices = [putPrice, putPrice, putPrice]
+    putPrices = np.array([putPrice, putPrice, putPrice])
 
     bond = FinConvertibleBond(maturityDate,
                               coupon,
@@ -82,7 +83,7 @@ def test_FinConvertibleBond():
     testCases.header("LABEL")
     testCases.print("NO CALLS OR PUTS")
 
-    testCases.header("PERIOD","NUMSTEPS","PRICE","FIXEDINCOME","DELTA")
+    testCases.header("PERIOD", "NUMSTEPS", "PRICE", "FIXEDINCOME", "DELTA")
 
     for numStepsPerYear in [1, 2, 5, 10, 20, 40, 80]:
         start = time.time()
@@ -98,7 +99,8 @@ def test_FinConvertibleBond():
 
         end = time.time()
         period = end - start
-        testCases.print(period, numStepsPerYear, res[0], res[1], res[2])
+        testCases.print(period, numStepsPerYear, res)
+        print(res)
 
     dividendYields = [0.02] * 16
     testCases.header("LABEL")
@@ -118,8 +120,8 @@ def test_FinConvertibleBond():
                          numStepsPerYear)
         end = time.time()
         period = end - start
-        testCases.print(period, numStepsPerYear, res[0], res[1], res[2])
-
+        testCases.print(period, numStepsPerYear, res)
+        print(res)
 
 test_FinConvertibleBond()
 testCases.compareTestCases()

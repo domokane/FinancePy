@@ -221,7 +221,7 @@ def frange(start, stop, step):
 def normpdf(x):
     ''' Normal Density function at value x'''
     InvRoot2Pi = 0.3989422804014327
-    return exp(-x * x / 2.0) * InvRoot2Pi
+    return np.exp(-x * x / 2.0) * InvRoot2Pi
 
 ##########################################################################
 

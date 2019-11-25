@@ -5,6 +5,8 @@ Created on Sat Feb 06 07:26:46 2016
 @author: Dominic O'Kane
 """
 
+# TODO Vectorize the functions such as addDays and addMonths
+
 import datetime
 from .FinError import FinError
 from .FinMath import isLeapYear

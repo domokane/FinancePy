@@ -2,8 +2,8 @@
 
 # TODO
 
-from math import exp, sqrt
-from numba import njit
+from math import exp, sqrt, log
+from numba import njit, jit
 import numpy as np
 
 from ...finutils.FinDate import FinDate
@@ -53,19 +53,19 @@ def valueConvertible(tmat,
 
     if len(callTimes) > 0:
         if callTimes[-1] > tmat:
-            raise ValueError("Coupon after maturity")
+            raise ValueError("Call times after maturity")
 
     if len(putTimes) > 0:
         if putTimes[-1] > tmat:
-            raise ValueError("Coupon after maturity")
+            raise ValueError("Put times after maturity")
 
     if len(discountTimes) > 0:
         if discountTimes[-1] > tmat:
-            raise ValueError("Coupon after maturity")
+            raise ValueError("Discount times after maturity")
 
     if len(dividendTimes) > 0:
         if dividendTimes[-1] > tmat:
-            raise ValueError("Coupon after maturity")
+            raise ValueError("Dividend times after maturity")
 
     if creditSpread < 0.0:
         raise ValueError("Credit spread negative.")
@@ -87,6 +87,9 @@ def valueConvertible(tmat,
 
     if dividendTimes[-1] > tmat:
         raise ValueError("Last dividend is after bond maturity.")
+
+    if recRate > 0.999 or recRate < 0.0:
+        raise ValueError("Recovery rate must be between 0 and 0.999.")
 
     numTimes = int(numStepsPerYear * tmat) + 1  # add one for today time 0
     numLevels = numTimes
@@ -113,10 +116,10 @@ def valueConvertible(tmat,
         df_flow *= exp(-h*flowTime)
         df_tree = uinterpolate(treeTime, discountTimes, discountFactors, interp)
         df_tree *= exp(-h*treeTime)
-        treeFlows[n] += couponAmounts[i] * 100.0 * df_flow / df_tree
+        treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
-    treeCallValue = np.ones(numTimes) * 9999.0
+    treeCallValue = np.ones(numTimes) * face * 1000.0
     numCalls = len(callTimes)
     for i in range(0, numCalls):
         callTime = callTimes[i]
@@ -167,7 +170,7 @@ def valueConvertible(tmat,
         if treeTimes[iTime] >= startConvertTime:
             for iNode in range(0, iTime + 1):
                 s = treeStockValue[iTime, iNode]
-                treeConvertValue[iTime, iNode] = s * convRatio * 100.0 / face
+                treeConvertValue[iTime, iNode] = s * convRatio * 1.0
 
     treeConvBondValue = np.zeros(shape=(numTimes, numLevels))
 
@@ -179,23 +182,28 @@ def valueConvertible(tmat,
         a = treeDfs[iTime-1]/treeDfs[iTime] * exp(-q*dt)
         treeProbsUp[iTime] = (a - d*survProb) / (u - d)
         treeProbsDn[iTime] = (u*survProb - a) / (u - d)
+        r = log(a)/dt
+        n_min = r*r / stockVolatility / stockVolatility
+
+    if np.any(treeProbsUp > 1.0):
+        raise ValueError("pUp > 1.0. Increase time steps.")
 
     ###########################################################################
     # work backwards by first setting values at bond maturity date
     ###########################################################################
 
     flow = treeFlows[numTimes-1]
-    bulletPV = 100.0 + flow
-
+    bulletPV = (1.0 + flow) * face
     for iNode in range(0, numLevels):
         convValue = treeConvertValue[numTimes-1, iNode]
-        treeConvBondValue[numTimes-1, iNode] = max(100.0 + flow, convValue)
+        treeConvBondValue[numTimes-1, iNode] = max(bulletPV, convValue)
 
     #  begin backward steps from expiry
     for iTime in range(numTimes-2, -1, -1):
 
         pUp = treeProbsUp[iTime+1]
         pDn = treeProbsDn[iTime+1]
+
         pDef = 1.0 - survProb
         df = treeDfs[iTime+1]/treeDfs[iTime]
         call = treeCallValue[iTime]
@@ -205,14 +213,15 @@ def valueConvertible(tmat,
         for iNode in range(0, iTime+1):
             futValueUp = treeConvBondValue[iTime+1, iNode+1]
             futValueDn = treeConvBondValue[iTime+1, iNode]
-            hold = df * (pUp * futValueUp + pDn * futValueDn)
-            hold = hold + df * pDef * recRate * 100.0
-            conv = treeConvBondValue[iTime][iNode]
-            value = min(max(hold, conv, put), call) + flow
+            hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
+            holdPV = df * hold + pDef * df * recRate * face + flow * face
+            conv = treeConvertValue[iTime][iNode]
+            value = min(max(holdPV, conv, put), call)
             treeConvBondValue[iTime][iNode] = value
 
-        bulletPV = bulletPV * df * survProb + (1.0-survProb) * recRate * 100.0
-        bulletPV += flow
+        bulletPV = df * bulletPV * survProb
+        bulletPV += pDef * df * recRate * face
+        bulletPV += flow * face
 
     price = treeConvBondValue[0, 0]
     delta = (treeConvBondValue[1, 1] - treeConvBondValue[1, 0]) / \
@@ -337,8 +346,16 @@ class FinConvertibleBond(object):
         price. It also captures the embedded owner's put schedule of prices.
         '''
 
+        if stockPrice <= 0.0:
+            stockPrice = 1e-10  # Avoid overflows in delta calc
+
+        if stockVolatility <= 0.0:
+            stockVolatility = 1e-10  # Avoid overflows in delta calc
+
         self.calculateFlowDates(settlementDate)
         tmat = (self._maturityDate - settlementDate) / gDaysInYear
+        if tmat <= 0.0:
+            raise FinError("Maturity must not be on or before the value date.")
 
         # We include time zero in the coupon times and flows
         couponTimes = [0.0]
@@ -352,6 +369,12 @@ class FinConvertibleBond(object):
         couponTimes = np.array(couponTimes)
         couponFlows = np.array(couponFlows)
 
+        if np.any(couponTimes < 0.0):
+            raise FinError("No coupon times can be before the value date.")
+
+        if np.any(couponTimes > tmat):
+            raise FinError("No coupon times can be after the maturity date.")
+
         callTimes = []
         for dt in self._callDates:
             callTime = (dt - settlementDate) / gDaysInYear
@@ -359,12 +382,24 @@ class FinConvertibleBond(object):
         callTimes = np.array(callTimes)
         callPrices = np.array(self._callPrices)
 
+        if np.any(callTimes < 0.0):
+            raise FinError("No call times can be before the value date.")
+
+        if np.any(callTimes > tmat):
+            raise FinError("No call times can be after the maturity date.")
+
         putTimes = []
         for dt in self._putDates:
             putTime = (dt - settlementDate) / gDaysInYear
             putTimes.append(putTime)
         putTimes = np.array(putTimes)
         putPrices = np.array(self._putPrices)
+
+        if np.any(putTimes > tmat):
+            raise ValueError("No put times can be after the maturity date.")
+
+        if np.any(putTimes <= 0.0):
+            raise ValueError("No put times can be on or before value date.")
 
         if len(dividendYields) != len(dividendDates):
             raise ValueError("Number of dividend yields and dates not same.")
@@ -376,7 +411,9 @@ class FinConvertibleBond(object):
         dividendTimes = np.array(dividendTimes)
         dividendYields = np.array(dividendYields)
 
+        # If it's before today it starts today
         tconv = (self._startConvertDate - settlementDate) / gDaysInYear
+        tconv = max(tconv, 0.0)
 
         discountFactors = []
         for t in couponTimes:
@@ -401,29 +438,60 @@ class FinConvertibleBond(object):
         if testMonotonicity(dividendTimes) is False:
             raise ValueError("Coupon times not monotonic")
 
-        v = valueConvertible(tmat,
-                             self._face,
-                             couponTimes,
-                             couponFlows,
-                             callTimes,
-                             callPrices,
-                             putTimes,
-                             putPrices,
-                             self._conversionRatio,
-                             tconv,
-                             # Market inputs
-                             stockPrice,
-                             discountTimes,
-                             discountFactors,
-                             dividendTimes,
-                             dividendYields,
-                             stockVolatility,
-                             creditSpread,
-                             recoveryRate,
-                             # Tree details
-                             numStepsPerYear)
+        v1 = valueConvertible(tmat,
+                              self._face,
+                              couponTimes,
+                              couponFlows,
+                              callTimes,
+                              callPrices,
+                              putTimes,
+                              putPrices,
+                              self._conversionRatio,
+                              tconv,
+                              # Market inputs
+                              stockPrice,
+                              discountTimes,
+                              discountFactors,
+                              dividendTimes,
+                              dividendYields,
+                              stockVolatility,
+                              creditSpread,
+                              recoveryRate,
+                              # Tree details
+                              numStepsPerYear)
 
-        return v
+        v2 = valueConvertible(tmat,
+                              self._face,
+                              couponTimes,
+                              couponFlows,
+                              callTimes,
+                              callPrices,
+                              putTimes,
+                              putPrices,
+                              self._conversionRatio,
+                              tconv,
+                              # Market inputs
+                              stockPrice,
+                              discountTimes,
+                              discountFactors,
+                              dividendTimes,
+                              dividendYields,
+                              stockVolatility,
+                              creditSpread,
+                              recoveryRate,
+                              # Tree details
+                              numStepsPerYear + 1.0)
+
+        cbprice = (v1[0] + v2[0])/2.0
+        bond = (v1[1] + v2[1])/2.0
+        delta = (v1[2] + v2[2])/2.0
+        gamma = (v1[3] + v2[3])/2.0
+        theta = (v1[4] + v2[4])/2.0
+
+        results = {"cbprice": cbprice, "bond": bond, "delta": delta,
+                   "gamma": gamma, "theta": theta}
+
+        return results
 
 ##########################################################################
 
@@ -481,3 +549,49 @@ class FinConvertibleBond(object):
         print("Accrual:", self._accrualType)
 
 ##########################################################################
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+# TEST PV OF CASHFLOW MAPPING
+#    if 1==0:
+#        pv = 0.0
+#        for i in range(0, numCoupons):
+#            t = couponTimes[i]
+#            df = uinterpolate(t, discountTimes, discountFactors, interp)
+#            pv += df * couponAmounts[i]
+#            print(i, t, couponAmounts[i], df, pv)
+#        pv += df
+#
+#        print("ACTUAL PV",pv)
+#
+#        pv = 0.0
+#        for i in range(0, numTimes):
+#            t = treeTimes[i]
+#            df = uinterpolate(t, discountTimes, discountFactors, interp)
+#            pv += df * treeFlows[i]
+#            print(i, t, treeFlows[i], df, pv)
+#        pv += df
+#
+#        print("ACTUAL PV",pv)
+###############################################################################
+###############################################################################
+###############################################################################
+
+
+###############################################################################
+
+
+#def printTree(array):
+#    n1, n2 = array.shape
+#    for i in range(0, n1):
+#        for j in range(0, n2):
+#            x = array[j, n1-1-i]
+#            if x != 0.0:
+#                print("%10.2f" % array[j, n1-i-1], end="")
+#            else:
+#                print("%10s" % '-', end="")
+#        print("")
+
+###############################################################################

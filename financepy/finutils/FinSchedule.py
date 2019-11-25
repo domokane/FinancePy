@@ -51,9 +51,17 @@ class FinSchedule(object):
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
-        self._adjustedDates = []
+        self._adjustedDates = None
 
         self.generate()
+
+###############################################################################
+
+    def flows(self):
+        if self._adjustedDates is None:
+            raise FinError("Dates have not been calculated.")
+
+        return self._adjustedDates
 
 ###############################################################################
 
@@ -127,12 +135,16 @@ class FinSchedule(object):
         print("CALENDAR:", self._calendarType)
         print("BUSDAYRULE:", self._busDayAdjustType)
         print("DATEGENRULE:", self._dateGenRuleType)
+        print("")
 
-        s = ""
-        for dt in self._adjustedDates:
-            print(str(dt))
-            s = s + "\n" + str(dt)
+        if len(self._adjustedDates) > 0:
+            print("PCD:", str(self._adjustedDates[0]))
 
-        return s
+        if len(self._adjustedDates) > 1:
+            print("NCD:", str(self._adjustedDates[1]))
+
+        if len(self._adjustedDates) > 2:
+            for dt in self._adjustedDates[2:]:
+                print("    ", str(dt))
 
 ###############################################################################

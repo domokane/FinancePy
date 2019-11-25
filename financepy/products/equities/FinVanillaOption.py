@@ -8,13 +8,18 @@ Created on Fri Feb 12 16:51:05 2016
 import numpy as np
 from math import exp, log, sqrt
 from scipy import optimize
+from scipy.stats import norm
 
-from ...finutils.FinMath import N, nprime
+#from ...finutils.FinMath import N, nprime
+from ...finutils.FinDate import FinDate
+from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...products.equities.FinOption import FinOption, FinOptionTypes
 from ...products.equities.FinEquityModelTypes import FinEquityModel
 from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+
+N = norm.cdf
 
 ###############################################################################
 
@@ -74,7 +79,7 @@ class FinVanillaOption(FinOption):
             raise FinError("Unknown Option Type", optionType)
 
         self._expiryDate = expiryDate
-        self._strikePrice = float(strikePrice)
+        self._strikePrice = strikePrice
         self._optionType = optionType
 
 ##########################################################################
@@ -86,258 +91,272 @@ class FinVanillaOption(FinOption):
               dividendYield,
               model):
 
-        if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
 
-        if stockPrice <= 0.0:
+        if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
-
-#        if discountCurve._parentType != FinCurve:
-#            raise FinError("Curve is not inherited off FinCurve.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
 
-        if t == 0.0:
-            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                return max(stockPrice - self._strikePrice, 0)
-            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                return max(self._strikePrice - stockPrice, 0)
-            else:
-                raise FinError("Unknown option type")
+        t = np.maximum(t, 1e-10)
 
-        df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
-
-        lnS0k = log(stockPrice / self._strikePrice)
-        sqrtT = sqrt(t)
+        df = discountCurve.df(t)
+        interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
             volatility = model._volatility
 
-            if volatility < 0.0:
-                raise FinError("Volatility is negative.")
+            if np.any(volatility) < 0.0:
+                raise FinError("Volatility should not be negative.")
 
-            if abs(volatility) < 1e-5:
-                volatility = 1e-5
+            volatility = np.maximum(volatility, 1e-10)
 
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            sqrtT = np.sqrt(t)
             den = volatility * sqrtT
-            v2 = volatility * volatility
             mu = interestRate - dividendYield
+            v2 = volatility * volatility
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                v = stockPrice * exp(-dividendYield * t) * N(d1)
-                v = v - self._strikePrice * exp(-interestRate * t) * N(d2)
+                v = stockPrice * np.exp(-dividendYield * t) * N(d1)
+                v = v - self._strikePrice * np.exp(-interestRate * t) * N(d2)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                v = self._strikePrice * exp(-interestRate * t) * N(-d2)
-                v = v - stockPrice * exp(-dividendYield * t) * N(-d1)
+                v = self._strikePrice * np.exp(-interestRate * t) * N(-d2)
+                v = v - stockPrice * np.exp(-dividendYield * t) * N(-d1)
             else:
                 raise FinError("Unknown option type")
+
+        else:
+            raise FinError("Unknown Model Type")
 
         return v
 
 ###############################################################################
 
-    def delta(self,
+    def xdelta(self,
               valueDate,
               stockPrice,
               discountCurve,
               dividendYield,
               model):
 
-        if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
 
-        if stockPrice <= 0.0:
+        if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        if valueDate == self._expiryDate:
-            t = 1e-10
-        else:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
 
-        df = discountCurve.df(self._expiryDate)
-        interestRate = -log(df)/t
+        t = np.maximum(t, 1e-10)
+
+        df = discountCurve.df(t)
+        interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
             volatility = model._volatility
 
-            if abs(volatility) < 1e-5:
-                volatility = 1e-5
+            if np.any(volatility < 0.0):
+                raise FinError("Volatility should not be negative.")
 
-            lnS0k = log(float(stockPrice) / self._strikePrice)
-            sqrtT = sqrt(t)
+            volatility = np.maximum(volatility, 1e-10)
+
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            sqrtT = np.sqrt(t)
+            den = volatility * sqrtT
             mu = interestRate - dividendYield
-            d1 = lnS0k + (mu + volatility * volatility / 2.0) * t
-            d1 = d1 / volatility / sqrtT
+            v2 = volatility * volatility
+            d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                delta = exp(-dividendYield * t) * N(d1)
+                delta = np.exp(-dividendYield * t) * N(d1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                delta = -exp(-dividendYield * t) * N(-d1)
+                delta = -np.exp(-dividendYield * t) * N(-d1)
             else:
-                print("Unknown option type")
-                return None
+                raise FinError("Unknown option type")
 
         return delta
 
 ###############################################################################
 
-    def gamma(self,
+    def xgamma(self,
               valueDate,
               stockPrice,
               discountCurve,
               dividendYield,
               model):
 
-        if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
 
-        if stockPrice <= 0.0:
+        if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        if valueDate == self._expiryDate:
-            t = 1e-10
-        else:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
 
-        df = discountCurve.df(self._expiryDate)
-        r = -log(df)/t
+        t = np.maximum(t, 1e-10)
+
+        df = discountCurve.df(t)
+        interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
             volatility = model._volatility
 
-            if abs(volatility) < 1e-5:
-                volatility = 1e-5
+            if np.any(volatility) < 0.0:
+                raise FinError("Volatility should not be negative.")
 
-            lnS0k = log(float(stockPrice) / self._strikePrice)
-            mu = r - dividendYield
-            d1 = (lnS0k + (mu + volatility * volatility / 2.0) * t) / \
-                volatility / sqrt(t)
-            gamma = exp(-dividendYield * t) * nprime(d1) / \
-                stockPrice / volatility / sqrt(t)
-            return gamma
+            volatility = np.maximum(volatility, 1e-10)
+
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            sqrtT = np.sqrt(t)
+            den = volatility * sqrtT
+            mu = interestRate - dividendYield
+            v2 = volatility * volatility
+            d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
+            gamma = np.exp(-dividendYield * t) * nprime(d1) / stockPrice / den
 
         else:
+            raise FinError("Unknown Model Type")
 
-            return None
+        return gamma
 
 ###############################################################################
 
-    def vega(self,
+    def xvega(self,
              valueDate,
              stockPrice,
              discountCurve,
              dividendYield,
              model):
 
-        if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
 
-        if stockPrice <= 0.0:
+        if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        if valueDate == self._expiryDate:
-            t = 1e-10
-        else:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
 
-        df = discountCurve.df(self._expiryDate)
-        r = -log(df)/t
+        t = np.maximum(t, 1e-10)
+
+        df = discountCurve.df(t)
+        interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
             volatility = model._volatility
 
-            if abs(volatility) < 1e-5:
-                volatility = 1e-5
+            if np.any(volatility) < 0.0:
+                raise FinError("Volatility should not be negative.")
 
-            v2 = volatility**2
+            volatility = np.maximum(volatility, 1e-10)
 
-            lnS0k = log(float(stockPrice) / self._strikePrice)
-            d1 = lnS0k + (r - dividendYield + v2 / 2.0) * t
-            d1 = d1 / (volatility * sqrt(t))
-            vega = stockPrice * sqrt(t) * exp(-dividendYield * t) * nprime(d1)
-            return vega
-
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            sqrtT = np.sqrt(t)
+            den = volatility * sqrtT
+            mu = interestRate - dividendYield
+            v2 = volatility * volatility
+            d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
+            vega = stockPrice * sqrtT * np.exp(-dividendYield * t) * nprime(d1)
         else:
+            raise FinError("Unknown Model type")
 
-            return None
+        return vega
 
 ###############################################################################
 
-    def theta(self,
+    def xtheta(self,
               valueDate,
               stockPrice,
               discountCurve,
               dividendYield,
               model):
 
-        if valueDate > self._expiryDate:
-            raise FinError("Value date after expiry date.")
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
 
-        if stockPrice <= 0.0:
+        if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if model._parentType != FinEquityModel:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
-        if valueDate == self._expiryDate:
-            t = 1e-10
-        else:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
 
-        df = discountCurve.df(self._expiryDate)
-        r = -log(df)/t
+        t = np.maximum(t, 1e-10)
+
+        df = discountCurve.df(t)
+        interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
 
             volatility = model._volatility
 
-            if abs(volatility) < 1e-5:
-                volatility = 1e-5
+            if np.any(volatility) < 0.0:
+                raise FinError("Volatility should not be negative.")
 
-            lnS0k = log(float(stockPrice) / self._strikePrice)
-            den = volatility * sqrt(t)
+            volatility = np.maximum(volatility, 1e-10)
+
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            sqrtT = np.sqrt(t)
+            den = volatility * sqrtT
+            mu = interestRate - dividendYield
             v2 = volatility * volatility
-            mu = r - dividendYield
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
-            v = 0.0
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                v = - stockPrice * exp(-dividendYield * t) * \
-                    nprime(d1) * volatility / 2.0 / sqrt(t)
-                v = v - r * self._strikePrice * \
-                    exp(-r * t) * N(d2)
+                v = - stockPrice * np.exp(-dividendYield * t) * \
+                    nprime(d1) * volatility / 2.0 / sqrtT
+                v = v - interestRate * self._strikePrice * \
+                    np.exp(-interestRate * t) * N(d2)
                 v = v + dividendYield * stockPrice * \
-                    exp(-dividendYield * t) * N(d1)
+                    np.exp(-dividendYield * t) * N(d1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                v = - stockPrice * exp(-dividendYield * t) * \
-                    nprime(d1) * volatility / 2.0 / sqrt(t)
-                v = v + r * self._strikePrice * \
-                    exp(-r * t) * N(-d2)
+                v = - stockPrice * np.exp(-dividendYield * t) * \
+                    nprime(d1) * volatility / 2.0 / sqrtT
+                v = v + interestRate * self._strikePrice * \
+                    np.exp(-interestRate * t) * N(-d2)
                 v = v - dividendYield * stockPrice * \
-                    exp(-dividendYield * t) * N(-d1)
+                    np.exp(-dividendYield * t) * N(-d1)
             else:
                 raise FinError("Unknown option type")
-                return 0.0
+
+        else:
+            raise FinError("Unknown Model Type")
 
         return v
 
@@ -377,7 +396,7 @@ class FinVanillaOption(FinOption):
         t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(self._expiryDate)
-        r = -log(df)/t
+        r = -np.log(df)/t
 
         mu = r - dividendYield
         v2 = volatility**2
@@ -401,7 +420,7 @@ class FinVanillaOption(FinOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * exp(-r * t) / 2.0
+        v = payoff * np.exp(-r * t) / 2.0
         return v
 
 ##########################################################################
@@ -419,7 +438,7 @@ class FinVanillaOption(FinOption):
         t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve.df(t)
-        r = -log(df)/t
+        r = -np.log(df)/t
 
         K = self._strikePrice
 
@@ -431,7 +450,7 @@ class FinVanillaOption(FinOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(path_payoff)
-        v = payoff * exp(-r * t)
+        v = payoff * np.exp(-r * t)
         return v
 
 ##########################################################################
