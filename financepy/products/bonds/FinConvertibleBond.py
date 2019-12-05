@@ -2,14 +2,13 @@
 
 # TODO
 
-from math import exp, sqrt, log
-from numba import njit, jit
+from math import exp, sqrt
+from numba import njit
 import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -18,6 +17,8 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
+
+from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 
 ###############################################################################
 
@@ -79,23 +80,20 @@ def valueConvertible(tmat,
     if numStepsPerYear < 1:
         raise ValueError("Num Steps per year must more than 1.")
 
-    if putTimes[-1] > tmat:
-        raise ValueError("Last put is after bond maturity.")
-
-    if callTimes[-1] > tmat:
-        raise ValueError("Last call is after bond maturity.")
-
-    if dividendTimes[-1] > tmat:
-        raise ValueError("Last dividend is after bond maturity.")
+    if len(dividendTimes) > 0.0:
+        if dividendTimes[-1] > tmat:
+            raise ValueError("Last dividend is after bond maturity.")
 
     if recRate > 0.999 or recRate < 0.0:
         raise ValueError("Recovery rate must be between 0 and 0.999.")
 
     numTimes = int(numStepsPerYear * tmat) + 1  # add one for today time 0
+    numTimes = numStepsPerYear  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
     numLevels = numTimes
 
     # this is the size of the step
     dt = tmat / (numTimes-1)
+
     treeTimes = np.linspace(0.0, tmat, numTimes)
     treeDfs = np.zeros(numTimes)
     for i in range(0, numTimes):
@@ -146,6 +144,9 @@ def valueConvertible(tmat,
     # unused but this may be a cost worth bearing for simpler code. Review.
     treeStockValue = np.zeros(shape=(numTimes, numLevels))
     e = stockVolatility**2 - h
+    if e < 0.0:
+        raise FinError("Volatility squared minus the hazard rate is negative.")
+
     u = exp(sqrt(e*dt))
     d = 1.0 / u
     u2 = u*u
@@ -165,12 +166,15 @@ def valueConvertible(tmat,
 
     # set up the tree of conversion values. Before allowed to convert the
     # conversion value must be set equal to zero
+
     treeConvertValue = np.zeros(shape=(numTimes, numLevels))
     for iTime in range(0, numTimes):
         if treeTimes[iTime] >= startConvertTime:
             for iNode in range(0, iTime + 1):
                 s = treeStockValue[iTime, iNode]
                 treeConvertValue[iTime, iNode] = s * convRatio * 1.0
+
+#    printTree(treeConvertValue)
 
     treeConvBondValue = np.zeros(shape=(numTimes, numLevels))
 
@@ -182,8 +186,8 @@ def valueConvertible(tmat,
         a = treeDfs[iTime-1]/treeDfs[iTime] * exp(-q*dt)
         treeProbsUp[iTime] = (a - d*survProb) / (u - d)
         treeProbsDn[iTime] = (u*survProb - a) / (u - d)
-        r = log(a)/dt
-        n_min = r*r / stockVolatility / stockVolatility
+#        r = log(a)/dt
+#        n_min = r*r / stockVolatility / stockVolatility
 
     if np.any(treeProbsUp > 1.0):
         raise ValueError("pUp > 1.0. Increase time steps.")
@@ -203,7 +207,6 @@ def valueConvertible(tmat,
 
         pUp = treeProbsUp[iTime+1]
         pDn = treeProbsDn[iTime+1]
-
         pDef = 1.0 - survProb
         df = treeDfs[iTime+1]/treeDfs[iTime]
         call = treeCallValue[iTime]
@@ -215,9 +218,9 @@ def valueConvertible(tmat,
             futValueDn = treeConvBondValue[iTime+1, iNode]
             hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
             holdPV = df * hold + pDef * df * recRate * face + flow * face
-            conv = treeConvertValue[iTime][iNode]
+            conv = treeConvertValue[iTime, iNode]
             value = min(max(holdPV, conv, put), call)
-            treeConvBondValue[iTime][iNode] = value
+            treeConvBondValue[iTime, iNode] = value
 
         bulletPV = df * bulletPV * survProb
         bulletPV += pDef * df * recRate * face
@@ -270,17 +273,42 @@ class FinConvertibleBond(object):
             raise FinError("Unknown Day Count Accrued Convention type " +
                            str(accrualType))
 
+        if startConvertDate > maturityDate:
+            raise FinError("Start convert date is after bond maturity.")
+
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._accrualType = accrualType
         self._frequency = FinFrequency(frequencyType)
         self._frequencyType = frequencyType
+
         self._callDates = callDates
         self._callPrices = callPrices
+
+        if len(self._callDates) != len(self._callPrices):
+            raise FinError("Call dates and prices not same length.")
+
         self._putDates = putDates
         self._putPrices = putPrices
+
+        if len(self._putDates) != len(self._putPrices):
+            raise FinError("Put dates and prices not same length.")
+
+        if len(putDates) > 0:
+            if putDates[-1] > maturityDate:
+                raise ValueError("Last put is after bond maturity.")
+
+        if len(callDates) > 0:
+            if callDates[-1] > maturityDate:
+                raise ValueError("Last call is after bond maturity.")
+
         self._startConvertDate = startConvertDate
+
+        if conversionRatio < 0.0:
+            raise FinError("Conversion ratio is negative.")
+
         self._conversionRatio = conversionRatio
+
         self._face = face
         self._settlementDate = FinDate(1900, 1, 1)
         ''' I do not determine cashflow dates as I do not want to require
@@ -322,8 +350,8 @@ class FinConvertibleBond(object):
               dividendYields,
               discountCurve,
               creditSpread,
-              recoveryRate,
-              numStepsPerYear):
+              recoveryRate = 0.40,
+              numStepsPerYear = 100):
 
         '''
         A binomial tree valuation model for a convertible bond that captures 
@@ -480,7 +508,7 @@ class FinConvertibleBond(object):
                               creditSpread,
                               recoveryRate,
                               # Tree details
-                              numStepsPerYear + 1.0)
+                              numStepsPerYear + 1)
 
         cbprice = (v1[0] + v2[0])/2.0
         bond = (v1[1] + v2[1])/2.0
@@ -583,15 +611,15 @@ class FinConvertibleBond(object):
 ###############################################################################
 
 
-#def printTree(array):
-#    n1, n2 = array.shape
-#    for i in range(0, n1):
-#        for j in range(0, n2):
-#            x = array[j, n1-1-i]
-#            if x != 0.0:
-#                print("%10.2f" % array[j, n1-i-1], end="")
-#            else:
-#                print("%10s" % '-', end="")
-#        print("")
+def printTree(array):
+    n1, n2 = array.shape
+    for i in range(0, n1):
+        for j in range(0, n2):
+            x = array[j, n1-1-i]
+            if x != 0.0:
+                print("%10.2f" % array[j, n1-i-1], end="")
+            else:
+                print("%10s" % '-', end="")
+        print("")
 
 ###############################################################################

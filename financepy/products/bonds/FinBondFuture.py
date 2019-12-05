@@ -78,7 +78,7 @@ class FinBondFuture(object):
                            bond,
                            futuresPrice):
         ' The total invoice amount paid to take delivery of bond. '
-        accd = bond._accrued
+        accd = bond._accruedInterest(settlementDate)
         pip = self.principalInvoicePrice(bond, futuresPrice)
         accrued = accd * self._contractSize / 100.0
         tia = pip + accrued
@@ -104,5 +104,17 @@ class FinBondFuture(object):
                 ctdNet = net
 
         return ctdBond
+
+##########################################################################
+
+    def deliveryGainLoss(self,
+                         bond,
+                         bondCleanPrice,
+                         futuresPrice):
+        ''' Determination of what is received when the bond is delivered. '''
+        receiveOnFuture = self.principalInvoicePrice(bond, futuresPrice)
+        payForBond = self._contractSize * bondCleanPrice / 100.0
+        net = receiveOnFuture - payForBond
+        return net, payForBond, receiveOnFuture
 
 ##########################################################################

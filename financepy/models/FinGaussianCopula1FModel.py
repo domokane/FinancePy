@@ -12,6 +12,7 @@ import numpy as np
 ##########################################################################
 
 from ..finutils.FinMath import norminvcdf, N, INVROOT2PI
+from ..finutils.FinError import FinError
 from .FinLossDbnBuilder import indepLossDbnRecursionGCD
 from .FinLossDbnBuilder import indepLossDbnHeterogeneousAdjBinomial
 from .FinLossDbnBuilder import portfolioGCD
@@ -35,7 +36,19 @@ def lossDbnRecursionGCD(numCredits,
     ''' Full construction of the loss distribution of a portfolio of credits
     where losses have been calculate as number of units based on the GCD. '''
 
-    numLossUnits = numCredits + 1  # CHECK
+    if len(defaultProbs) != numCredits:
+        raise FinError("Default probability length must equal num credits.")
+
+    if len(lossUnits) != numCredits:
+        raise FinError("Loss units length must equal num credits.")
+
+    if len(betaVector) != numCredits:
+        raise FinError("Beta vector length must equal num credits.")
+
+    numLossUnits = 1
+    for i in range(0, len(lossUnits)):
+        numLossUnits += int(lossUnits[i])
+
     uncondLossDbn = np.zeros(numLossUnits)
 
     z = minZ
@@ -58,7 +71,7 @@ def lossDbnRecursionGCD(numCredits,
                                             condDefaultProbs,
                                             lossUnits)
 
-        gaussWt = exp(-(z**2) / 2.0)
+        gaussWt = exp(-(z*z)/2.0)
 
         for iLossUnit in range(0, numLossUnits):
             uncondLossDbn[iLossUnit] += indepDbn[iLossUnit] * gaussWt

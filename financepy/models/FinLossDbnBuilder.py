@@ -14,7 +14,7 @@ from ..finutils.FinMath import pairGCD
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
 def indepLossDbnHeterogeneousAdjBinomial(numCredits,
-                                         condDefaultProbs,
+                                         condProbs,
                                          lossRatio):
 
     # Algorithm due to D. O'Kane.
@@ -24,7 +24,7 @@ def indepLossDbnHeterogeneousAdjBinomial(numCredits,
 
     p = 0.0
     for iCredit in range(0, numCredits):
-        p += lossRatio[iCredit] * condDefaultProbs[iCredit]
+        p += lossRatio[iCredit] * condProbs[iCredit]
     p = p / numCredits
 
     ###########################################################################
@@ -47,10 +47,9 @@ def indepLossDbnHeterogeneousAdjBinomial(numCredits,
     vexact = 0.0
 
     for iCredit in range(0, numCredits):
-        lossRatioSquared = lossRatio[iCredit] ** 2
-        vapprox += lossRatioSquared * p * (1.0 - p)
-        vexact += lossRatioSquared * \
-            condDefaultProbs[iCredit] * (1.0 - condDefaultProbs[iCredit])
+        lossRatio2 = lossRatio[iCredit] ** 2
+        vapprox += lossRatio2 * p * (1.0 - p)
+        vexact += lossRatio2 * condProbs[iCredit] * (1.0 - condProbs[iCredit])
 
     ###########################################################################
 
@@ -110,16 +109,19 @@ def indepLossDbnRecursionGCD(numCredits,
                              condDefaultProbs,
                              lossUnits):
 
-    numLossUnits = numCredits + 1
+    numLossUnits = 1
+    for i in range(0, len(lossUnits)):
+        numLossUnits += int(lossUnits[i])
+
     prevDbn = np.zeros(numLossUnits)
     prevDbn[0] = 1.0
+
     small = 1e-10
     nextDbn = np.zeros(numLossUnits)
 
     for iCredit in range(0, numCredits):
 
         p = condDefaultProbs[iCredit]
-
         loss = (int)(lossUnits[iCredit] + small)
 
         for iLossUnit in range(0, loss):

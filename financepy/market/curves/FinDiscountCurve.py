@@ -5,7 +5,7 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from math import log
+from math import log, exp
 import numpy as np
 
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
@@ -84,6 +84,24 @@ class FinDiscountCurve():
         df2 = self.df(t+dt)
         fwd = np.log(df1/df2)/dt
         return fwd
+
+##########################################################################
+
+    def bump(self, bumpSize):
+        ''' Calculate the continuous forward rate at the forward date. '''
+
+        times = self._times.copy()
+        values = self._values.copy()
+
+        n = len(self._times)
+        for i in range(0, n):
+            t = times[i]
+            values[i] = values[i] * exp(-bumpSize*t)
+
+        discCurve = FinDiscountCurve(self._curveDate, times, values,
+                                     self._interpMethod)
+
+        return discCurve
 
 ##########################################################################
 

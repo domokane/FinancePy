@@ -18,7 +18,7 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ##########################################################################
 
 
-class FinFlatCurve():
+class FinFlatCurve(FinDiscountCurve):
     ''' A trivally simple curve based on a single zero rate with its own
     specified compounding method. Hence the curve is assumed to be flat. '''
 
@@ -57,6 +57,15 @@ class FinFlatCurve():
         else:
             r = (df**(-1.0/t) - 1) * f
         return r
+
+##########################################################################
+
+    def bump(self, bumpSize):
+        ''' Calculate the continuous forward rate at the forward date. '''
+        r = self._rate + bumpSize
+        discCurve = FinFlatCurve(self._curveDate, r,
+                                 compoundingFreq=self._cmpdFreq)
+        return discCurve
 
 ##########################################################################
 

@@ -106,7 +106,7 @@ class FinBond(object):
         far to go back in the cashflow date schedule. '''
 
         self._settlementDate = FinDate(1900, 1, 1)
-        self._accrued = 0.0
+        self._accrued = None
         self._accruedDays = 0.0
         self._alpha = 0.0
 
@@ -356,6 +356,8 @@ class FinBond(object):
         self._accrued = accFactor * self._face * self._coupon
         self._alpha = alpha
         self._accruedDays = settlementDate - self._pcd
+
+        return self._accrued
 
 ##########################################################################
 

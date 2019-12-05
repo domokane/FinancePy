@@ -56,7 +56,12 @@ class FinOption(object):
             discountCurve,
             dividendYield,
             model)
-        delta = (vBumped - v) / bump
+
+        if type(vBumped) is dict:
+            delta = (vBumped['value'] - v['value']) / bump
+        else:
+            delta = (vBumped - v) / bump
+
         return delta
 
     def gamma(
@@ -72,13 +77,24 @@ class FinOption(object):
             discountCurve,
             dividendYield,
             model)
-        vBumped = self.delta(
+        vBumpedDn = self.delta(
             valueDate,
             stockPrice + bump,
             discountCurve,
             dividendYield,
             model)
-        gamma = (vBumped - v) / bump
+        vBumpedUp = self.delta(
+            valueDate,
+            stockPrice + bump,
+            discountCurve,
+            dividendYield,
+            model)
+
+        if type(v) is dict:
+            gamma = (vBumpedUp['value'] - 2.0 * v['value'] + vBumpedDn['value']) / bump / 2.0
+        else:
+            gamma = (vBumpedUp - 2.0 * v + vBumpedDn) / bump / 2.0
+
         return gamma
 
     def vega(
@@ -100,7 +116,12 @@ class FinOption(object):
             discountCurve,
             dividendYield,
             FinEquityModelBlackScholes(model._volatility + bump))
-        vega = (vBumped - v) / bump
+
+        if type(v) is dict:
+            vega = (vBumped['value'] - v['value']) / bump
+        else:
+            vega = (vBumped - v) / bump
+
         return vega
 
     def theta(
@@ -124,7 +145,12 @@ class FinOption(object):
             discountCurve,
             dividendYield,
             model)
-        theta = (vBumped - v) / bump
+
+        if type(v) is dict:
+            theta = (vBumped['value'] - v['value']) / bump
+        else:
+            theta = (vBumped - v) / bump
+
         return theta
 
     def rho(
@@ -147,7 +173,12 @@ class FinOption(object):
             discountCurve.bump(bump),
             dividendYield,
             model)
-        rho = (vBumped - v) / bump
+
+        if type(v) is dict:
+            rho = (vBumped['value'] - v['value']) / bump
+        else:
+            rho = (vBumped - v) / bump
+
         return rho
 
 ##########################################################################

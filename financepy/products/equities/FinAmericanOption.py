@@ -8,13 +8,16 @@ Created on Sun Jul 21 10:04:57 2019
 import numpy as np
 from numba import njit, float64, int64
 
+from enum import Enum
+
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDate import FinDate
 from ...products.equities.FinVanillaOption import FinOptionTypes
+from ...products.equities.FinEquityModelTypes import FinEquityModelBlackScholes
+
+bump = 1e-4
 
 ###############################################################################
-from enum import Enum
 
 
 class FinImplementations(Enum):
@@ -37,21 +40,36 @@ class FinImplementations(Enum):
         int64,
         float64,
         int64,
-        float64),
+        float64,
+        int64),
     fastmath=True,
     cache=True)
 def crrTreeVal(stockPrice,
                riskFreeRate,
                dividendYield,
                volatility,
-               numSteps,
+               numStepsPerYear,
                timeToExpiry,
                optionType,
-               strikePrice):
+               strikePrice,
+               isEven):
     ''' Value an American option using a Binomial Treee '''
-    if numSteps < 3:
-        numSteps = 3
 
+    numSteps = int(numStepsPerYear * timeToExpiry)
+
+    if numSteps < 30:
+        numSteps = 30
+
+    ## OVERRIDE JUST TO SEE 
+    numSteps = numStepsPerYear
+
+    # if the number of steps is even but we want odd then make it odd
+    if numSteps % 2 == 0 and isEven == 0:
+        numSteps += 1
+    elif numSteps % 2 == 1 and isEven == 1:
+        numSteps += 1
+
+#    print(numSteps)
     # this is the size of the step
     dt = timeToExpiry / numSteps
     r = riskFreeRate
@@ -183,7 +201,7 @@ class FinAmericanOption():
               discountCurve,
               dividendYield,
               model,
-              numSteps=100):
+              numStepsPerYear=100):
 
         if valueDate > self._expiryDate:
             raise FinError("Value date is after expiry date.")
@@ -202,20 +220,169 @@ class FinAmericanOption():
                             riskFreeRate,
                             dividendYield,
                             volatility,
-                            numSteps,
+                            numStepsPerYear,
                             timeToExpiry,
                             self._optionType.value,
-                            self._strikePrice)
+                            self._strikePrice,
+                            1)  # even
+
         value2 = crrTreeVal(stockPrice,
                             riskFreeRate,
                             dividendYield,
                             volatility,
-                            numSteps + 1,
+                            numStepsPerYear,
                             timeToExpiry,
                             self._optionType.value,
-                            self._strikePrice)
+                            self._strikePrice,
+                            0)  # odd
 
         v = (value1 + value2) / 2.0
-        return v
+        res = {'value': v[0], 'delta': v[1], 'gamma': v[2], 'theta': v[3]}
+        return res
+
+###############################################################################
+
+    def delta(self,
+              valueDate,
+              stockPrice,
+              discountCurve,
+              dividendYield,
+              model):
+        v = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+        vBumped = self.value(
+            valueDate,
+            stockPrice + bump,
+            discountCurve,
+            dividendYield,
+            model)
+
+        delta = (vBumped['value'] - v['value']) / bump
+        return delta
+
+###############################################################################
+
+    def gamma(self,
+              valueDate,
+              stockPrice,
+              discountCurve,
+              dividendYield,
+              model):
+
+        v = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+        vBumpedDn = self.value(
+            valueDate,
+            stockPrice - bump,
+            discountCurve,
+            dividendYield,
+            model)
+        vBumpedUp = self.value(
+            valueDate,
+            stockPrice + bump,
+            discountCurve,
+            dividendYield,
+            model)
+
+        d2 = vBumpedUp['value'] - v['value']
+        d1 = v['value'] - vBumpedDn['value']
+        gamma = (d2 - d1) / bump
+        return gamma
+
+###############################################################################
+
+    def vega(self,
+             valueDate,
+             stockPrice,
+             discountCurve,
+             dividendYield,
+             model):
+        v = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+        vBumped = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            FinEquityModelBlackScholes(model._volatility + bump))
+
+        if type(v) is dict:
+            vega = (vBumped['value'] - v['value']) / bump
+        else:
+            vega = (vBumped - v) / bump
+
+        return vega
+
+###############################################################################
+
+    def theta(self,
+              valueDate,
+              stockPrice,
+              discountCurve,
+              dividendYield,
+              model):
+
+        v = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+        nextDate = valueDate.addDays(1)
+        bump = 1.0 / gDaysInYear
+        vBumped = self.value(
+            nextDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+
+        if type(v) is dict:
+            theta = (vBumped['value'] - v['value']) / bump
+        else:
+            theta = (vBumped - v) / bump
+
+        return theta
+
+###############################################################################
+
+    def rho(self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+
+        v = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model)
+        vBumped = self.value(
+            valueDate,
+            stockPrice,
+            discountCurve.bump(bump),
+            dividendYield,
+            model)
+
+        if type(v) is dict:
+            rho = (vBumped['value'] - v['value']) / bump
+        else:
+            rho = (vBumped - v) / bump
+
+        return rho
 
 ###############################################################################
