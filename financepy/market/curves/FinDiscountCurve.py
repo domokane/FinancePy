@@ -12,7 +12,7 @@ from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinMath import testMonotonicity
-from .FinInterpolate import interpolate
+from .FinInterpolate import interpolate, FinInterpMethods
 
 ##########################################################################
 
@@ -21,7 +21,8 @@ class FinDiscountCurve():
 
 ##########################################################################
 
-    def __init__(self, curveDate, times, values, interpMethod):
+    def __init__(self, curveDate, times, values,
+                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
 
         # Validate curve
         if len(times) < 1:
