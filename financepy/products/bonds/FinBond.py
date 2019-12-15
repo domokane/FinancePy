@@ -4,9 +4,10 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-# TODO - ROUNDING CONVENTIONS FOR ACCRUED
-# TODO - CHECK OAS CALCULATION
-# TODO - Check how first coupon on floating leg is sized on asset swaps. '''
+
+#  - ROUNDING CONVENTIONS FOR ACCRUED
+#  - CHECK OAS CALCULATION
+#  - Check how first coupon on floating leg is sized on asset swaps. '''
 
 # https://www.dmo.gov.uk/media/15004/convention_changes.pdf
 ###############################################################################
@@ -26,7 +27,6 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
-from math import pow
 from scipy import optimize
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
@@ -139,7 +139,7 @@ class FinBond(object):
 
     def fullPriceFromYield(self, settlementDate, y,
                            convention=FinYieldConventions.UK_DMO):
-        ''' Calculate the full price of bond from its yield to maturity. This 
+        ''' Calculate the full price of bond from its yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
         if convention not in FinYieldConventions:
@@ -233,7 +233,7 @@ class FinBond(object):
 
     def convexityFromYield(self, settlementDate, ytm,
                            convention=FinYieldConventions.UK_DMO):
-        ''' Calculate the bond convexity from the yield to maturity. This 
+        ''' Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
         self.calculateFlowDates(settlementDate)
@@ -248,7 +248,7 @@ class FinBond(object):
 
     def cleanPriceFromYield(self, settlementDate, ytm,
                             convention=FinYieldConventions.UK_DMO):
-        ''' Calculate the bond clean price from the yield to maturity. This 
+        ''' Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
         fullPrice = self.fullPriceFromYield(settlementDate, ytm, convention)
@@ -372,7 +372,7 @@ class FinBond(object):
             swapFloatBusDayAdjustRuleType=FinDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Calculate the par asset swap spread of the bond. The discount curve
-        is a Libor curve that is passed in. This function is vectorised with 
+        is a Libor curve that is passed in. This function is vectorised with
         respect to the clean price. '''
 
         cleanPrice = np.array(cleanPrice)

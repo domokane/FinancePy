@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="financepy",
-    version="0.152",
+    version="0.153",
     author="Dominic O'Kane",
     author_email="okane.dominic@gmail.com",
     description="A Finance Library",

@@ -11,6 +11,23 @@ from .FinGlobalVariables import gDaysInYear
 
 ##########################################################################
 
+def printTree(array, depth=None):
+    n1, n2 = array.shape
+
+    if depth is not None:
+        n1 = depth
+
+    for j in range(0, n2):
+        for i in range(0, n1):
+            x = array[i, n2-j-1]
+            if x != 0.0:
+                print("%10.5f" % x, end="")
+            else:
+                print("%10s" % '-', end="")
+        print("")
+
+##########################################################################
+
 
 def inputFrequency(f):
     if f in [-1, 0, 1, 2, 3, 4, 6, 12]:

@@ -1,21 +1,49 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numba import njit
+from numba import njit, jit
 from math import ceil, sqrt, exp, log
+from scipy import optimize
+
 from ..finutils.FinMath import N
 from ..finutils.FinError import FinError
 from ..finutils.FinGlobalVariables import gDaysInYear
 from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 
 ###############################################################################
+# TODO : Calculate accrued in bond option according to accrual convention
+# TODO : Numba - this is not easy right now as scipy.optimise does not work but
+#        could result in a significant speed up.
+# TODO : Convergence is unstable - investigate how to improve it
+###############################################################################
 
-@njit(fastmath=True, cache=True)
+def f(alpha, *args):
+
+    m = args[0]
+    nm = args[1]
+    Q = args[2]
+    P = args[3]
+    dX = args[4]
+    dt = args[5]
+    N = args[6]
+
+    sumQZ = 0.0
+    for j in range(-nm, nm+1):
+         x = alpha + j*dX
+         rdt = exp(x)*dt
+         sumQZ += Q[m, j+N] * exp(-rdt)
+
+    objFn = sumQZ - P
+    return objFn
+
+###############################################################################
+# Unable to jit this totally due to scipty optimise
+#@jit
 def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
     treeMaturity = treeTimes[-1]
     dt = treeMaturity / (numTimeSteps+1)
-    dR = sigma * sqrt(3.0 * dt)
+    dX = sigma * sqrt(3.0 * dt)
     jmax = ceil(0.1835/(a * dt))
     jmin = - jmax
     N = jmax
@@ -25,6 +53,8 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
     pd = np.zeros(shape=(2*jmax+1))
 
     # The short rate goes out one step extra to have the final short rate
+    # This is the BK model so x = log(r)
+    X = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
     rt = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
 
     # probabilities start at time 0 and go out to one step before T
@@ -56,25 +86,31 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
     # Time zero is trivial for the Arrow-Debreu price
     Q[0, N] = 1.0
+    x0 = -3.0
 
     # Big loop over time steps
     for m in range(0, numTimeSteps + 1):
 
         nm = min(m, jmax)
-        sumQZ = 0.0
-        for j in range(-nm, nm+1):
-            rdt = j*dR*dt
-            sumQZ += Q[m, j+N] * exp(-rdt)
-        alpha[m] = log(sumQZ/discountFactors[m+1]) / dt
+
+        # Need to do drift adjustment which is non-linear and so requires a
+        # root search algorithm - we choose to use Newton-Raphson
+        argtuple = (m, nm, Q, discountFactors[m+1], dX, dt, N)
+
+        alpha[m] = optimize.newton(f, x0=x0, fprime=None, args=argtuple,
+                                   tol=1e-6, maxiter=50, fprime2=None)
+
+        x0 = alpha[m]
 
         for j in range(-nm, nm+1):
             jN = j + N
-            rt[m, jN] = alpha[m] + j*dR
+            X[m, jN] = alpha[m] + j*dX
+            rt[m, jN] = exp(X[m, jN])
 
         # Loop over all nodes at time m to calculate next values of Q
         for j in range(-nm, nm+1):
             jN = j + N
-            rdt = rt[m, jN] * dt
+            rdt = exp(X[m, jN]) * dt
             z = exp(-rdt)
 
             if j == jmax:
@@ -95,12 +131,12 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 ##########################################################################
 
 
-class FinHullWhiteRateModel():
+class FinBlackKarasinskiRateModel():
 
     def __init__(self, a, sigma):
-        ''' Constructs the Hull-White rate model. The speed of mean reversion
-        a and volatility are passed in. The short rate process is given by
-        dr = (theta(t) - ar) * dt  + sigma * dW '''
+        ''' Constructs the Black Karasinski rate model. The speed of mean
+        reversion a and volatility are passed in. The short rate process
+        is given by d(log(r)) = (theta(t) - a*log(r)) * dt  + sigma * dW '''
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
@@ -121,174 +157,11 @@ class FinHullWhiteRateModel():
 
 ###############################################################################
 
-    def P(self, t, T, Rt, delta, pt, ptd, pT):
-        ''' Forward discount factor as seen at some time t which may be in the
-        future for payment at time T where Rt is the delta-period short rate
-        seen at time t and pt is the discount factor to time t, ptd is the one
-        period discount factor to time t+dt and pT is the discount factor from
-        now until the payment of the $1 of the discount factor. '''
-
-        sigma = self._sigma
-        a = self._a
-
-        BtT = (1.0 - exp(-self._a*(T-t)))/self._a
-        BtDelta = (1.0 - exp(-self._a * delta))/self._a
-
-        term1 = log(pT/pt) - (BtT/BtDelta) * log(ptd/pt)
-        term2 = (sigma**2)*(1.0-exp(-2.0*a*t)) * BtT * (BtT - BtDelta)/(4.0*a)
-
-        logAhat = term1 - term2
-        BhattT = (BtT/BtDelta) * delta
-        p = exp(logAhat - BhattT * Rt)
-        return p
-
-###############################################################################
-
-    def europeanBondOption(self, settlementDate, expiryDate,
-                           strikePrice, face, bond):
-        ''' Price an option on a coupon-paying bond using tree to generate
-        short rates at the expiry date and then to analytical solution of
-        zero coupon bond in HW model to calculate the corresponding bond price.
-        User provides bond object and option details. '''
-
-        texp = (expiryDate - settlementDate) / gDaysInYear
-        tmat = (bond._maturityDate - settlementDate) / gDaysInYear
-
-        if texp > tmat:
-            raise FinError("Option expiry after bond matures.")
-
-        if texp < 0.0:
-            raise FinError("Option expiry time negative.")
-
-        if self._treeTimes is None:
-            raise FinError("Tree has not been constructed.")
-
-        if self._treeTimes[-1] < texp:
-            raise FinError("Tree expiry must be >= option expiry date.")
-
-        bond.calculateFlowDates(expiryDate)
-        flowTimes = []
-        for flowDate in bond._flowDates[1:]:
-            t = (flowDate - settlementDate) / gDaysInYear
-            flowTimes.append(t)
-
-        dt = self._dt
-        tdelta = texp + dt
-        ptexp = self._discountCurve.df(texp)
-        ptdelta = self._discountCurve.df(tdelta)
-
-        numTimeSteps, numNodes = self._Q.shape
-        expiryStep = int(texp/dt+0.50)
-
-        callPrice = 0.0
-        putPrice = 0.0
-
-        for k in range(0, numNodes):
-            q = self._Q[expiryStep, k]
-            rt = self._rt[expiryStep, k]
-
-            pv = 0.0
-            for tflow in flowTimes:
-                ptflow = self._discountCurve.df(tflow)
-                zcb = self.P(texp, tflow, rt, dt, ptexp, ptdelta, ptflow)
-                pv += bond._coupon / bond._frequency * zcb
-            pv += zcb
-
-            putPayoff = max(strikePrice - pv * face, 0.0)
-            callPayoff = max(pv * face - strikePrice, 0.0)
-            putPrice += q * putPayoff
-            callPrice += q * callPayoff
-
-        return (callPrice, putPrice)
-
-###############################################################################
-
-    def europeanOptionOnZeroCouponBond_Anal(self, settlementDate,
-                                       expiryDate, maturityDate,
-                                       strikePrice, face, discountCurve):
-        ''' Price an option on a zero coupon bond using analytical solution of
-        Hull-White model. User provides bond face and option strike and expiry
-        date and maturity date. '''
-
-        texp = (expiryDate - settlementDate) / gDaysInYear
-        tmat = (maturityDate - settlementDate) / gDaysInYear
-
-        if texp > tmat:
-            raise FinError("Option expiry after bond matures.")
-
-        if texp < 0.0:
-            raise FinError("Option expiry time negative.")
-
-        ptexp = discountCurve.df(texp)
-        ptmat = discountCurve.df(tmat)
-
-        sigma = self._sigma
-        a = self._a
-
-        sigmap = (sigma/a) * (1.0 - exp(-a*(tmat-texp)))
-        sigmap *= sqrt((1.0-exp(-2.0*a*texp))/2.0/a)
-        h = log((face * ptmat)/(strikePrice * ptexp)) / sigmap + sigmap/2.0
-
-        callPrice = face * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
-        putPrice = strikePrice * ptexp * N(-h+sigmap) - face * ptmat * N(-h)
-
-        return callPrice, putPrice
-
-###############################################################################
-
-    def europeanOptionOnZeroCouponBond_Tree(self, settlementDate,
-                                    expiryDate, maturityDate,
-                                    strikePrice, face):
-
-        ''' Price an option on a zero coupon bond using a HW trinomial
-        tree. The discount curve was already supplied to the tree build. '''
-
-        texp = (expiryDate - settlementDate) / gDaysInYear
-        tmat = (maturityDate - settlementDate) / gDaysInYear
-
-        if texp > tmat:
-            raise FinError("Option expiry after bond matures.")
-
-        if texp < 0.0:
-            raise FinError("Option expiry time negative.")
-
-        if self._treeTimes is None:
-            raise FinError("Tree has not been constructed.")
-
-        if self._treeTimes[-1] < texp:
-            raise FinError("Tree expiry must be >= option expiry date.")
-
-        dt = self._dt
-        tdelta = texp + dt
-        ptexp = self._discountCurve.df(texp)
-        ptdelta = self._discountCurve.df(tdelta)
-        ptmat = self._discountCurve.df(tmat)
-
-        numTimeSteps, numNodes = self._Q.shape
-        expiryStep = int(texp/dt+0.50)
-
-        callPrice = 0.0
-        putPrice = 0.0
-
-        for k in range(0, numNodes):
-            q = self._Q[expiryStep, k]
-            rt = self._rt[expiryStep, k]
-            zcb = self.P(texp, tmat, rt, dt, ptexp, ptdelta, ptmat)
-            putPayoff = max(strikePrice - zcb * face, 0.0)
-            callPayoff = max(zcb * face - strikePrice, 0.0)
-            putPrice += q * putPayoff
-            callPrice += q * callPayoff
-
-        return (callPrice, putPrice)
-
-###############################################################################
-
     def bondOption(self, settlementDate, expiryDate, strikePrice,
                    face, bond, americanExercise):
-        ''' Value an option on a bond with coupons that can have European or
-        American exercise. Some minor issues to do with handling coupons on
-        the option expiry date need to be solved. Also this function should be
-        moved out of the class so it can be sped up using NUMBA. '''
+        ''' Option that can be exercised at any time over the exercise period.
+        Due to non-analytical bond price we need to extend tree out to bond
+        maturity and take into account cash flows through time. '''
 
         interp = FinInterpMethods.FLAT_FORWARDS.value
 
@@ -339,12 +212,11 @@ class FinHullWhiteRateModel():
 
         for i in range(0, numCoupons):
             flowTime = couponTimes[i]
-            if flowTime <= texp:
-                n = int(round(flowTime/dt, 0))
-                treeTime = self._treeTimes[n]
-                df_flow = uinterpolate(flowTime, dfTimes, dfValues, interp)
-                df_tree = uinterpolate(treeTime, dfTimes, dfValues, interp)
-                treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
+            n = int(round(flowTime/dt, 0))
+            treeTime = self._treeTimes[n]
+            df_flow = uinterpolate(flowTime, dfTimes, dfValues, interp)
+            df_tree = uinterpolate(treeTime, dfTimes, dfValues, interp)
+            treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
         accrued = np.zeros(numTimeSteps)
         for m in range(0, expiryStep+1):
@@ -365,26 +237,45 @@ class FinHullWhiteRateModel():
         optionValues = np.zeros(shape=(numTimeSteps, numNodes))
         bondValues = np.zeros(shape=(numTimeSteps, numNodes))
 
-        ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
-        ptdelta = uinterpolate(texp+dt, dfTimes, dfValues, interp)
+        # Start with the value of the bond at maturity
+        for k in range(0, numNodes):
+            bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
 
-        flow = treeFlows[expiryStep] * face
-        nm = min(expiryStep, jmax)
-        for k in range(-nm, nm+1):
-            kN = k + N
-            rt = self._rt[expiryStep, kN]
-            bondPrice = 0.0
-            for i in range(0, numCoupons):
-                tflow = couponTimes[i]
-                if tflow > self._treeTimes[expiryStep]: # must be >
-                    ptflow = uinterpolate(tflow, dfTimes, dfValues, interp)
-                    zcb = self.P(texp, tflow, rt, dt, ptexp, ptdelta, ptflow)
-                    bondPrice += cpn * face * zcb
+        N = jmax
 
-            bondPrice += face * zcb
-            bondValues[expiryStep, kN] = bondPrice + flow
+        for m in range(maturityStep-1, expiryStep-1, -1):
 
-  #      print(">>> bondValue", bondValues[expiryStep,N], "accrued", accrued[expiryStep],"flow", flow)
+            nm = min(m, jmax)
+            flow = treeFlows[m] * face
+
+            for k in range(-nm, nm+1):
+                kN = k + N
+                rt = self._rt[m, kN]
+                df = exp(-rt*dt)
+                pu = self._pu[kN]
+                pm = self._pm[kN]
+                pd = self._pd[kN]
+
+                if k == jmax:
+                    vu = bondValues[m+1, kN]
+                    vm = bondValues[m+1, kN-1]
+                    vd = bondValues[m+1, kN-2]
+                    v = (pu*vu + pm*vm + pd*vd) * df
+                    bondValues[m, kN] = v
+                elif k == -jmax:
+                    vu = bondValues[m+1, kN+2]
+                    vm = bondValues[m+1, kN+1]
+                    vd = bondValues[m+1, kN]
+                    v = (pu*vu + pm*vm + pd*vd) * df
+                    bondValues[m, kN] = v
+                else:
+                    vu = bondValues[m+1, kN+1]
+                    vm = bondValues[m+1, kN]
+                    vd = bondValues[m+1, kN-1]
+                    v = (pu*vu + pm*vm + pd*vd) * df
+                    bondValues[m, kN] = v
+
+                bondValues[m, kN] += flow
 
         # Now consider exercise of the option on the expiry date
         # Start with the value of the bond at maturity and overwrite values
@@ -459,30 +350,6 @@ class FinHullWhiteRateModel():
 
 ###############################################################################
 
-    def df_Tree(self, tmat):
-        ''' Discount factor as seen from now to time tmat as long as the time
-        is on the tree grid. '''
-
-        if tmat == 0.0:
-            return 1.0
-
-        numTimeSteps, numNodes = self._Q.shape
-        fn1 = tmat/self._dt
-        fn2 = float(int(tmat/self._dt))
-        if abs(fn1 - fn2) > 1e-6:
-            raise FinError("Time not on tree time grid")
-
-        timeStep = int(tmat / self._dt) + 1
-
-        p = 0.0
-        for i in range(0, numNodes):
-            ad = self._Q[timeStep, i]
-            p += ad
-        zeroRate = -log(p)/tmat
-        return p, zeroRate
-
-###############################################################################
-
     def buildTree(self, startDate, endDate, numTimeSteps, discountCurve):
 
         maturity = (endDate - startDate) / gDaysInYear
@@ -498,7 +365,7 @@ class FinHullWhiteRateModel():
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
             = buildTreeFast(self._a, self._sigma,
-                           treeTimes, numTimeSteps, discountFactors)
+                            treeTimes, numTimeSteps, discountFactors)
 
         self._treeTimes = treeTimes
         self._discountCurve = discountCurve

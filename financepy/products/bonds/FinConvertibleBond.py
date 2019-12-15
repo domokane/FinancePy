@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# TODO
+# TODO - MUST ADD ACCRUED INTEREST TO MODEL!!!!
 
 from math import exp, sqrt
 from numba import njit
@@ -27,7 +27,7 @@ from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 def valueConvertible(tmat,
                      face,
                      couponTimes,
-                     couponAmounts,
+                     couponFlows,
                      callTimes,
                      callPrices,
                      putTimes,
@@ -36,8 +36,8 @@ def valueConvertible(tmat,
                      startConvertTime,
                      # Market inputs
                      stockPrice,
-                     discountTimes,
-                     discountFactors,
+                     dfTimes,
+                     dfValues,
                      dividendTimes,
                      dividendYields,
                      stockVolatility,
@@ -60,8 +60,8 @@ def valueConvertible(tmat,
         if putTimes[-1] > tmat:
             raise ValueError("Put times after maturity")
 
-    if len(discountTimes) > 0:
-        if discountTimes[-1] > tmat:
+    if len(dfTimes) > 0:
+        if dfTimes[-1] > tmat:
             raise ValueError("Discount times after maturity")
 
     if len(dividendTimes) > 0:
@@ -97,7 +97,7 @@ def valueConvertible(tmat,
     treeTimes = np.linspace(0.0, tmat, numTimes)
     treeDfs = np.zeros(numTimes)
     for i in range(0, numTimes):
-        df = uinterpolate(treeTimes[i], discountTimes, discountFactors, interp)
+        df = uinterpolate(treeTimes[i], dfTimes, dfValues, interp)
         treeDfs[i] = df
 
     h = creditSpread/(1.0 - recRate)
@@ -110,11 +110,11 @@ def valueConvertible(tmat,
         flowTime = couponTimes[i]
         n = int(round(flowTime/dt, 0))
         treeTime = treeTimes[n]
-        df_flow = uinterpolate(flowTime, discountTimes, discountFactors, interp)
+        df_flow = uinterpolate(flowTime, dfTimes, dfValues, interp)
         df_flow *= exp(-h*flowTime)
-        df_tree = uinterpolate(treeTime, discountTimes, discountFactors, interp)
+        df_tree = uinterpolate(treeTime, dfTimes, dfValues, interp)
         df_tree *= exp(-h*treeTime)
-        treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
+        treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
     treeCallValue = np.ones(numTimes) * face * 1000.0
@@ -354,23 +354,23 @@ class FinConvertibleBond(object):
               numStepsPerYear = 100):
 
         '''
-        A binomial tree valuation model for a convertible bond that captures 
-        the embedded equity option due to the existence of a conversion option 
+        A binomial tree valuation model for a convertible bond that captures
+        the embedded equity option due to the existence of a conversion option
         which can be invoked after a specific date.
 
-        The model allows the user to enter a schedule of dividend payment 
-        dates but the size of the payments must be in yield terms i.e. a known 
-        percentage of currently unknown future stock price is paid. Not a 
-        fixed amount. A fixed yield. Following this payment the stock is 
+        The model allows the user to enter a schedule of dividend payment
+        dates but the size of the payments must be in yield terms i.e. a known
+        percentage of currently unknown future stock price is paid. Not a
+        fixed amount. A fixed yield. Following this payment the stock is
         assumed to drop by the size of the dividend payment.
 
-        The model also captures the stock dependent credit risk of the cash 
-        flows in which the bond price can default at any time with a hazard 
-        rate implied by the credit spread and an associated recovery rate. 
+        The model also captures the stock dependent credit risk of the cash
+        flows in which the bond price can default at any time with a hazard
+        rate implied by the credit spread and an associated recovery rate.
         This is the model proposed by Hull (OFODS 6th edition,.page 522).
 
-        The model captures both the issuer's call schedule which is assumed 
-        to apply on a list of dates provided by the user, along with a call 
+        The model captures both the issuer's call schedule which is assumed
+        to apply on a list of dates provided by the user, along with a call
         price. It also captures the embedded owner's put schedule of prices.
         '''
 

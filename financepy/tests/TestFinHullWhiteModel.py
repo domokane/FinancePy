@@ -3,8 +3,13 @@
 import numpy as np
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinHullWhiteRateModel import FinHullWhiteRateModel
-from financepy.models.FinHullWhiteRateModel import printTree
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
+from financepy.products.bonds.FinBond import FinBond
+from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.finutils.FinGlobalVariables import gDaysInYear
+from financepy.finutils.FinHelperFunctions import printTree
+
 import matplotlib.pyplot as plt
 import time
 
@@ -38,6 +43,7 @@ def test_HullWhiteExampleOne():
 
 def test_HullWhiteExampleTwo():
     # HULL BOOK ZERO COUPON BOND EXAMPLE 28.1 SEE TABLE 28.3
+    # Replication may not be exact as I am using dates rather than times
 
     zeroDays = [0, 3, 31, 62, 94, 185, 367, 731, 1096, 1461,
                 1826, 2194, 2558, 2922, 3287, 3653]
@@ -61,22 +67,24 @@ def test_HullWhiteExampleTwo():
     maturityDate = startDate.addTenor("9Y")
 
     model = FinHullWhiteRateModel(a, sigma)
-    vAnal = model.optionOnZeroCouponBond_Anal(startDate,
-                                              expiryDate,
-                                              maturityDate,
-                                              strike, face,
-                                              curve)
+    vAnal = model.europeanOptionOnZeroCouponBond_Anal(startDate,
+                                                      expiryDate,
+                                                      maturityDate,
+                                                      strike, face,
+                                                      curve)
 
     # Test convergence
-    numStepsList = range(50, 2000, 25)
+    numStepsList = range(100, 500, 10)
     analVector = []
     treeVector = []
 
     for numTimeSteps in numStepsList:
         start = time.time()
         model.buildTree(startDate, expiryDate, numTimeSteps, curve)
-        vTree = model.optionOnZeroCouponBond_Tree(startDate, expiryDate,
-                                                  maturityDate, strike, face)
+        vTree = model.europeanOptionOnZeroCouponBond_Tree(startDate,
+                                                          expiryDate,
+                                                          maturityDate,
+                                                          strike, face)
         end = time.time()
         period = end-start
         treeVector.append(vTree[1])
@@ -89,5 +97,65 @@ def test_HullWhiteExampleTwo():
 ###############################################################################
 
 
-test_HullWhiteExampleOne()
-test_HullWhiteExampleTwo()
+def test_HullWhiteExampleThree():
+    # Valuation of a European option on a coupon bearing bond
+
+    settlementDate = FinDate(1, 12, 2019)
+    expiryDate = settlementDate.addTenor("18m")
+    maturityDate = settlementDate.addTenor("10Y")
+    coupon = 0.05
+    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+
+    strikePrice = 105.0
+    face = 100.0
+
+    tmat = (maturityDate - settlementDate) / gDaysInYear
+    times = np.linspace(0, tmat, 20)
+    dfs = np.exp(-0.05*times)
+    curve = FinDiscountCurve(settlementDate, times, dfs)
+
+    price = bond.fullPriceFromDiscountCurve(settlementDate, curve)
+    print("Fixed Income Price:", price)
+
+    sigma = 0.01
+    a = 0.1
+
+    # Test convergence
+    numStepsList = [100,101,200,300,400,500,600,700,800,900,1000]
+    isAmerican = True
+
+    treeVector = []
+    for numTimeSteps in numStepsList:
+        start = time.time()
+        model = FinHullWhiteRateModel(a, sigma)
+        model.buildTree(settlementDate, expiryDate, numTimeSteps, curve)
+        v = model.bondOption(settlementDate, expiryDate, strikePrice,
+                             face, bond, isAmerican)
+        end = time.time()
+        period = end-start
+        treeVector.append(v[0])
+        print(numTimeSteps, v, period)
+
+#        print("BOND")
+#        printTree(model._bondValues)
+#        print("OPTION")
+#        printTree(model._optionValues)
+
+    plt.plot(numStepsList, treeVector)
+
+    if 1==0:
+        print("RT")
+        printTree(model._rt, 5)
+        print("BOND")
+        printTree(model._bondValues, 5)
+        print("OPTION")
+        printTree(model._optionValues, 5)
+
+###############################################################################
+
+
+#test_HullWhiteExampleOne()
+#test_HullWhiteExampleTwo()
+test_HullWhiteExampleThree()

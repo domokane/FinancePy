@@ -16,13 +16,17 @@ from finutils.FinMath import N
 
 
 class FinBondOptionModel(Enum):
+    BLACK = 1
     HO_LEE = 2
     HULL_WHITE = 3
+    BLACK_KARASINSKI = 4
 
 
 class FinBondOptionTypes(Enum):
     EUROPEAN_CALL = 1
     EUROPEAN_PUT = 2
+    AMERICAN_CALL = 3
+    AMERICAN_PUT = 4
 
 ###############################################################################
 ###############################################################################
@@ -37,7 +41,8 @@ class FinBondOption():
                  frequencyType,
                  accrualType,
                  expiryDate,
-                 strikePrice):
+                 strikePrice,
+                 exerciseType):
 
         self._expiryDate = expiryDate
         self._strikePrice = strikePrice
@@ -51,27 +56,20 @@ class FinBondOption():
     def value(self,
               valueDate,
               discountCurve,
-              modelType,
-              modelParams,
+              model,
               optionType):
         ''' Value the bond option using the specified model. '''
 
         t1 = (self._expiryDate - valueDate) / gDaysInYear
         t2 = (self._bond._maturityDate - valueDate) / gDaysInYear
-        K = self._strike
+        K = self._strikePrice
 
         if self._bond._coupon == 0.0:
-            # A zero coupon bond can be priced using either Ho-Lee or
-            # Hull-White
 
             if modelType == FinShortRateModel.HO_LEE:
-                sigma = modelParams[0]
-                sigmaP = sigma * (t2 - t1) * sqrt(t1)
+
             elif modelType == FinShortRateModel.HULL_WHITE:
-                a = modelParams[0]
-                term1 = (1.0 - exp(-a * (t2 - t1)))
-                term2 = (1.0 - exp(-2.0 * a * t1)) / 2.0 / a
-                sigmaP = sigma * term1 * sqrt(term2) / a
+                hWModel = FinHullWhiteRateModel
             else:
                 raise FinError("Unknown Model Type " + str(modelType))
 
