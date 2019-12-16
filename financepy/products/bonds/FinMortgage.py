@@ -5,7 +5,8 @@ Created on Fri Nov 30 10:52:29 2018
 @author: Dominic O'Kane
 """
 
-from ...finutils.FinFrequency import FinFrequencyTypes
+from ...finutils.FinError import FinError
+from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinDayAdjustTypes
@@ -15,16 +16,27 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 ###############################################################################
 
 
+from enum import Enum
+
+
+class FinMortgageType(Enum):
+    REPAYMENT=1
+    INTEREST_ONLY = 2
+
+###############################################################################
+
+
 class FinMortgage(object):
-    ''' A mortgage is a vector of dates and flows generated in order to repay 
-    a fixed amount given a known interest rate. Payments are all the same 
-    amount but with a varying mixture of interest and repayment of principal. 
+    ''' A mortgage is a vector of dates and flows generated in order to repay
+    a fixed amount given a known interest rate. Payments are all the same
+    amount but with a varying mixture of interest and repayment of principal.
     '''
 
     def __init__(self,
                  startDate,
                  endDate,
-                 frequencyType=FinFrequencyTypes.ANNUAL,
+                 principal,
+                 frequencyType=FinFrequencyTypes.MONTHLY,
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
@@ -53,6 +65,7 @@ class FinMortgage(object):
 
         self._startDate = startDate
         self._endDate = endDate
+        self._principal = principal
         self._frequencyType = frequencyType
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
@@ -65,60 +78,72 @@ class FinMortgage(object):
                                      self._calendarType,
                                      self._busDayAdjustType,
                                      self._dateGenRuleType)
-        self._flows = []
-
-        # now generate the schedule
-        self.generate(startDate)
 
 ###############################################################################
 
-    def montlhy(self, startDate):
+    def repaymentAmount(self, zeroRate):
 
-        self._flows = []
-        self._yearFractions = []
-
-        m = P * r *(1.0 + r)^n / (((1.0 + r)^n) -1)
-        return self._yearFractions
-
-###############################################################################
-
-    def generate(self, startDate):
-
-        self._flows = []
-        self._yearFractions = []
-
-        dayCount = FinDayCount(self._dayCountConventionType)
+        frequency = FinFrequency(self._frequencyType)
 
         numFlows = len(self._schedule._adjustedDates)
+        p = (1.0 + zeroRate/frequency) ** (numFlows-1)
+        m = zeroRate * p / (p - 1.0) / frequency
+        m = m * self._principal
+        return m
 
-        if numFlows > 0:
-            yearFrac = dayCount.yearFrac(
-                startDate, self._schedule._adjustedDates[0])
-            self._yearFractions.append(yearFrac)
+###############################################################################
+
+    def generateFlows(self, zeroRate, mortgageType):
+
+        self._mortgageType = mortgageType
+        self._interestFlows = [0]
+        self._principalFlows = [0]
+        self._principalRemaining = [self._principal]
+        self._totalFlows = [0]
+
+        numFlows = len(self._schedule._adjustedDates)
+        principal = self._principal
+        frequency = FinFrequency(self._frequencyType)
+
+        if mortgageType == FinMortgageType.REPAYMENT:
+            monthlyFlow = self.repaymentAmount(zeroRate)
+        elif mortgageType == FinMortgageType.INTEREST_ONLY:
+            monthlyFlow = zeroRate * self._principal / frequency
+        else:
+            raise FinError("Unknown Mortgage type.")
 
         for i in range(1, numFlows):
-            prevDate = self._schedule._adjustedDates[i - 1]
-            nextDate = self._schedule._adjustedDates[i]
-
-            yearFrac = dayCount.yearFrac(prevDate, nextDate)
-            self._yearFractions.append(yearFrac)
-
-        return self._yearFractions
+            interestFlow = principal * zeroRate / frequency
+            principalFlow = monthlyFlow - interestFlow
+            principal = principal - principalFlow
+            self._interestFlows.append(interestFlow)
+            self._principalFlows.append(principalFlow)
+            self._principalRemaining.append(principal)
+            self._totalFlows.append(monthlyFlow)
 
 ###############################################################################
 
     def print(self):
         print("START DATE:", self._startDate)
         print("END DATE:", self._endDate)
+        print("MORTGAGE TYPE:", self._mortgageType)
         print("FREQUENCY:", self._frequencyType)
         print("CALENDAR:", self._calendarType)
         print("BUSDAYRULE:", self._busDayAdjustType)
         print("DATEGENRULE:", self._dateGenRuleType)
 
         numFlows = len(self._schedule._adjustedDates)
+
+        print("%15s %12s %12s %12s %12s" %
+              ("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL"))
+        print("")
         for i in range(0, numFlows):
-            print(self._schedule._adjustedDates[i], self._yearFractions[i])
+            print("%15s %12.2f %12.2f %12.2f %12.2f" %
+                  (self._schedule._adjustedDates[i],
+                  self._interestFlows[i],
+                  self._principalFlows[i],
+                  self._principalRemaining[i],
+                  self._totalFlows[i]))
 
 ###############################################################################
-# -*- coding: utf-8 -*-
 
