@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from math import exp, log, sqrt
 import numpy as np
 
-from ...finutils.FinDate import FinDate
+
 from ...finutils.FinMath import N, M
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
@@ -26,7 +26,7 @@ class FinRainbowOptionTypes(Enum):
     CALL_ON_NTH = 5  # MAX(NTH(S1,S2,...,SN)-K,0)
     PUT_ON_NTH = 6  # MAX(K-NTH(S1,S2,...,SN),0)
 
-###############################################################################
+##########################################################################
 
 
 def payoffValue(s, payoffTypeValue, payoffParams):
@@ -60,7 +60,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
     return payoff
 
-###############################################################################
+##########################################################################
 
 
 def valueMCFast(t,
@@ -91,7 +91,8 @@ def valueMCFast(t,
     v = payoff * exp(-r * t)
     return v
 
-###############################################################################
+##########################################################################
+##########################################################################
 
 
 class FinRainbowOption(FinOption):
@@ -109,7 +110,7 @@ class FinRainbowOption(FinOption):
         self._payoffParams = payoffParams
         self._numAssets = numAssets
 
-###############################################################################
+##########################################################################
 
     def validate(self,
                  stockPrices,
@@ -133,7 +134,7 @@ class FinRainbowOption(FinOption):
             raise FinError("Betas must be a vector of length " +
                            str(self._numAssets))
 
-###############################################################################
+##########################################################################
 
     def validatePayoff(self, payoffType, payoffParams, numAssets):
 
@@ -166,7 +167,7 @@ class FinRainbowOption(FinOption):
             if n < 1 or n > numAssets:
                 raise FinError("Nth parameter must be 1 to " + str(numAssets))
 
-###############################################################################
+##########################################################################
 
     def value(self, 
               valueDate, 
@@ -236,7 +237,7 @@ class FinRainbowOption(FinOption):
 
         return v
 
-###############################################################################
+##########################################################################
 
     def valueMC(self,
                 valueDate,
@@ -273,4 +274,4 @@ class FinRainbowOption(FinOption):
 
         return v
 
-###############################################################################
+##########################################################################

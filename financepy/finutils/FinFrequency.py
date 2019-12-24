@@ -18,7 +18,8 @@ class FinFrequencyTypes(Enum):
 
 
 def FinFrequency(frequencyType):
-
+    ''' This is a function that takes in a Frequency Type and returns an
+    integer for the number of times a year a payment occurs.'''
     if frequencyType in FinFrequencyTypes:
         if frequencyType == FinFrequencyTypes.ANNUAL:
             return 1

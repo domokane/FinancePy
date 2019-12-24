@@ -9,6 +9,8 @@ Created on Fri Nov 30 10:52:29 2018
 
 
 class FinRateConverter(object):
+    ''' Convert rates between different compounding conventions. This is not
+    used. '''
 
     def __init__(self):
 

@@ -66,9 +66,8 @@ class FinDateGenRuleTypes(Enum):
 
 
 class FinCalendar(object):
-
-    ''' Class to manage designation of payment dates as holidays according to a
-    calendar convention specified by the user. '''
+    ''' Class to manage designation of payment dates as holidays according to
+    a regional or country-specific calendar convention specified by the user. '''
 
     def __init__(self, calendarType):
         ''' Create a calendar based on a specified calendar type. '''
@@ -142,8 +141,7 @@ class FinCalendar(object):
 
             return dt
         else:
-            raise FinError(
-                "Unknown adjustment convention",
+            raise FinError("Unknown adjustment convention",
                 str(busDayConventionType))
 
         return dt
@@ -151,7 +149,8 @@ class FinCalendar(object):
 ###############################################################################
 
     def isBusinessDay(self, dt):
-        ''' Determines if a date is a business day according to calendar. '''
+        ''' Determines if a date is a business day according to the specified
+        calendar. If it is it returns True, otherwise False. '''
 
         y = dt._y
         m = dt._m
@@ -193,7 +192,7 @@ class FinCalendar(object):
             if m == 5 and d >= 25 and weekday == FinDate.MON:
                 return False
 
-#            if m == 8 and d <= 7 and weekday == FinDate.MON: # Summer Bank 
+#            if m == 8 and d <= 7 and weekday == FinDate.MON: # Summer Bank
 #                return False
 
             if m == 8 and d > 24 and weekday == FinDate.MON:  # Late Summer
@@ -293,8 +292,8 @@ class FinCalendar(object):
 
         elif self._type == FinCalendarTypes.US:
 
-            ''' This is a generic US calendar that contains the superset of 
-            holidays for bond markets, NYSE, and public holidays. For each of 
+            ''' This is a generic US calendar that contains the superset of
+            holidays for bond markets, NYSE, and public holidays. For each of
             these and other categories there will be some variations. '''
 
             if m == 1 and d == 1:  # NYD
@@ -369,7 +368,8 @@ class FinCalendar(object):
 ###############################################################################
 
     def getHolidayList(self, year):
-
+        ''' generates a list of holidays in a specific year for the specified
+        calendar. Useful for diagnostics. '''
         startDate = FinDate(1, 1, year)
         endDate = FinDate(1, 1, year+1)
         holidayList = []
@@ -385,7 +385,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def easterMonday(self, y):
-        ''' Get the day in a givenm year that is Easter Monday. This is not
+        ''' Get the day in a given year that is Easter Monday. This is not
         easy to compute so we rely on a pre-calculated array. '''
 
         if y > 2100:

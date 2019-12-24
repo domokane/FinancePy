@@ -36,7 +36,7 @@ class FinDayCountTypes(Enum):
 
 class FinDayCount(object):
     ''' Calculate the fractional day count between two dates according to a
-    specified convention. '''
+    specified day count convention. '''
 
     def __init__(self, dccType):
         ''' Create Day Count convention by passing in the Day Count Type. '''
@@ -221,6 +221,7 @@ class FinDayCount(object):
     ###########################################################################
 
     def __str__(self):
+        ''' Returns the calendar type as a string. '''
         return str(self._type)
 
     ###########################################################################

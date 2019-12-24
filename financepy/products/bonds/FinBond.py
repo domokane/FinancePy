@@ -133,6 +133,7 @@ class FinBond(object):
 
         self._pcd = self._flowDates[0]
         self._ncd = self._flowDates[1]
+
         self._accruedInterest(settlementDate)
 
 ###############################################################################
@@ -283,7 +284,7 @@ class FinBond(object):
         pv = pv + df
         return pv * self._face
 
-##########################################################################
+###############################################################################
 
     def currentYield(self, cleanPrice):
         ''' Calculate the current yield of the bond which is the
@@ -292,7 +293,7 @@ class FinBond(object):
         y = self._coupon * self._face / cleanPrice
         return y
 
-##########################################################################
+###############################################################################
 
     def yieldToMaturity(self,
                         settlementDate,
@@ -332,7 +333,7 @@ class FinBond(object):
         else:
             return np.array(ytms)
 
-##########################################################################
+###############################################################################
 
     def _accruedInterest(self, settlementDate):
         ''' Calculate the amount of coupon that has accrued between the
@@ -359,7 +360,7 @@ class FinBond(object):
 
         return self._accrued
 
-##########################################################################
+###############################################################################
 
     def assetSwapSpread(
             self,
@@ -411,7 +412,7 @@ class FinBond(object):
         asw = (pvLibor - bondPrice) / pv01
         return asw
 
-##########################################################################
+###############################################################################
 
     def fullPriceFromOAS(self,
                          settlementDate,
@@ -440,7 +441,7 @@ class FinBond(object):
         pv *= self._face
         return pv
 
-##########################################################################
+###############################################################################
 
     def optionAdjustedSpread(self,
                              settlementDate,
@@ -477,7 +478,7 @@ class FinBond(object):
 
         return np.array(oass)
 
-##########################################################################
+###############################################################################
 
     def printFlows(self, settlementDate):
         ''' Print a list of the unadjusted coupon payment dates used in
@@ -489,7 +490,7 @@ class FinBond(object):
 
         print(self._flowDates[-1], ",", self._face + flow)
 
-##########################################################################
+###############################################################################
 
     def priceFromSurvivalCurve(self,
                                discountCurve,
@@ -499,7 +500,7 @@ class FinBond(object):
         This has not been completed. '''
         pass
 
-##########################################################################
+###############################################################################
 
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
@@ -510,4 +511,4 @@ class FinBond(object):
         print("Accrual Type:", self._accrualType)
         print("Face:", self._face)
 
-##########################################################################
+###############################################################################

@@ -8,7 +8,6 @@ Created on Fri Feb 12 16:51:05 2016
 from math import exp, log, sqrt
 import numpy as np
 
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinGBMProcess import FinGBMProcess

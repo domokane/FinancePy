@@ -19,13 +19,13 @@ from .FinCDS import FinCDS
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
-##########################################################################
+###############################################################################
 
 
 class FinCDSIndexOption(object):
 
     ''' Class to manage the pricing and risk management of an option to enter
-    into a CDS index. Different pricing algorithms are presented. '''
+    into a CDS index. Different pricing algorithms are presented.'''
 
     def __init__(self,
                  expiryDate,
@@ -98,7 +98,7 @@ class FinCDSIndexOption(object):
                                    self._businessDateAdjustType,
                                    self._dateGenRuleType)
 
-##########################################################################
+###############################################################################
 
     def valueAdjustedBlack(self,
                            valuationDate,
@@ -145,7 +145,7 @@ class FinCDSIndexOption(object):
 
         return (v_pay, v_rec)
 
-##########################################################################
+###############################################################################
 
     def valueAnderson(self,
                       valuationDate,
@@ -220,7 +220,7 @@ class FinCDSIndexOption(object):
         expH *= 10000.0
         return v_pay, v_rec, strikeValue, x, expH
 
-##########################################################################
+###############################################################################
 
     def solveForX(self,
                   valuationDate,
@@ -265,7 +265,7 @@ class FinCDSIndexOption(object):
 
         return rtb
 
-##########################################################################
+###############################################################################
 
     def calcObjFunc(self,
                     x,
@@ -290,7 +290,7 @@ class FinCDSIndexOption(object):
 
         return values[0]
 
-##########################################################################
+###############################################################################
 
     def calcIndexPayerOptionPrice(self,
                                   valuationDate,
@@ -353,4 +353,4 @@ class FinCDSIndexOption(object):
         intMaxH *= INVROOT2PI * dz * dfToExpiry
         return intH, intMaxH
 
-##########################################################################
+###############################################################################

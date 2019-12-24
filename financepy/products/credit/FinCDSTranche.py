@@ -27,7 +27,7 @@ from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinError import FinError
 
-##########################################################################
+###############################################################################
 
 from enum import Enum
 
@@ -38,7 +38,7 @@ class FinLossDistributionBuilder(Enum):
     GAUSSIAN = 3
     LHP = 4
 
-##########################################################################
+###############################################################################
 
 
 class FinCDSTranche(object):
@@ -87,7 +87,7 @@ class FinCDSTranche(object):
                                    self._busDayAdjustType,
                                    self._dateGenRuleType)
 
-##########################################################################
+###############################################################################
 
     def valueBC(self,
                 valuationDate,
@@ -230,4 +230,4 @@ class FinCDSTranche(object):
 
         return trancheOutput
 
-##########################################################################
+###############################################################################

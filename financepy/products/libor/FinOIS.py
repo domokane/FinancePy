@@ -6,7 +6,6 @@ Created on Sun Feb 07 14:23:13 2016
 """
 
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule

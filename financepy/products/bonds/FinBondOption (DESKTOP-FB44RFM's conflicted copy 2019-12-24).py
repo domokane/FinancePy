@@ -5,13 +5,9 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from math import sqrt, exp, log
-from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import N
 from ...models.FinHullWhiteRateModel import FinHullWhiteRateModel
 from ...models.FinBlackKarasinskiRateModel import FinBlackKarasinskiRateModel
-from .FinBond import FinBond
 
 from enum import Enum
 import numpy as np

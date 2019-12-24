@@ -11,10 +11,11 @@ from scipy.stats import norm
 
 from ...finutils.FinMath import N
 
+###############################################################################
+
 
 class BlackModel():
 
-    ##########################################################################
 
     def value(self,
               forwardRate,

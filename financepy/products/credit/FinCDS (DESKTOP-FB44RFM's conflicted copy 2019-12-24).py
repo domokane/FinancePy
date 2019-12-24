@@ -17,7 +17,6 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -185,8 +184,8 @@ def protectionLegPV_NUMBA(teff,
 
 
 class FinCDS(object):
-    ''' A class which manages a Credit Default Swap. It performs schedule
-    generation and the valuation and risk management of CDS. '''
+    ''' A class which manages Credit Default Swap. It performs schedule generation
+    and the valuation and risk management of CDS. '''
 
     def __init__(self,
                  stepInDate,
@@ -362,9 +361,7 @@ class FinCDS(object):
               pv01Method=0,
               prot_method=0,
               numStepsPerYear=25):
-        ''' Valuation of a CDS contract on a specific valuation date given 
-        an issuer curve and a contract recovery rate.'''
-
+        ''' Valuation of a CDS contract '''
         fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
                                                issuerCurve,
                                                pv01Method)
@@ -397,8 +394,7 @@ class FinCDS(object):
                    pv01Method=0,
                    prot_method=0,
                    numStepsPerYear=25):
-        ''' Calculation of the change in the value of the CDS contract for a 
-        one basis point change in the level of the CDS curve.'''
+        ''' Valuation of a CDS contract '''
 
         v0 = self.value(valuationDate,
                         issuerCurve,
@@ -493,8 +489,6 @@ class FinCDS(object):
                              pv01Method=0,
                              prot_method=0,
                              numStepsPerYear=25):
-        ''' Value of the contract on the settlement date including accrued
-        interest. '''
 
         v = self.value(valuationDate,
                        issuerCurve,
@@ -517,7 +511,6 @@ class FinCDS(object):
                    pv01Method=0,
                    prot_method=0,
                    numStepsPerYear=52):
-        ''' Value of the CDS contract excluding accrued interest. '''
 
         fullRPV01, cleanRPV01 = self.riskyPV01(
             valuationDate, issuerCurve, pv01Method)
@@ -540,7 +533,6 @@ class FinCDS(object):
                       valuationDate,
                       issuerCurve,
                       pv01Method=0):
-        ''' RiskyPV01 of the contract using the OLD method. '''
 
         paymentDates = self._adjustedDates
         dayCount = FinDayCount(self._dayCountType)
@@ -626,8 +618,6 @@ class FinCDS(object):
 ##########################################################################
 
     def accruedDays(self):
-        ''' Number of days between the previous coupon and the currrent step 
-        in date. '''
 
         # I assume accrued runs to the effective date
         paymentDates = self._adjustedDates
@@ -686,8 +676,6 @@ class FinCDS(object):
                   valuationDate,
                   issuerCurve,
                   pv01Method=0):
-        ''' The riskyPV01 is the present value of a risky one dollar paid on 
-        the premium leg of a CDS contract. '''
 
         liborCurve = issuerCurve._liborCurve
 
@@ -729,7 +717,6 @@ class FinCDS(object):
                      valuationDate,
                      issuerCurve,
                      pv01Method=0):
-        ''' Value of the premium leg of a CDS. '''
 
         fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
                                                issuerCurve,
@@ -747,8 +734,6 @@ class FinCDS(object):
                   numStepsPerYear=25,
                   pv01Method=0,
                   protMethod=0):
-        ''' Breakeven CDS coupon that would make the value of the CDS contract 
-        equal to zero. '''
 
         fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
                                                issuerCurve,

@@ -31,8 +31,9 @@ def test_BlackKarasinskiExampleOne():
     sigma = 0.25
     a = 0.22
     numTimeSteps = 6
+    tmat = (endDate - startDate)/gDaysInYear
     model = FinBlackKarasinskiRateModel(a, sigma)
-    model.buildTree(startDate, endDate, numTimeSteps, curve)
+    model.buildTree(tmat, numTimeSteps, times, dfs)
     printTree(model._Q)
     print("")
     printTree(model._rt)
@@ -54,10 +55,23 @@ def test_BlackKarasinskiExampleTwo():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
 
+    bond.calculateFlowDates(settlementDate)
+    couponTimes = []
+    couponFlows = []
+    cpn = bond._coupon/bond._frequency
+    for flowDate in bond._flowDates:
+        flowTime = (flowDate - settlementDate) / gDaysInYear
+        couponTimes.append(flowTime)
+        couponFlows.append(cpn)
+
+    couponTimes = np.array(couponTimes)
+    couponFlows = np.array(couponFlows)
+
     strikePrice = 105.0
     face = 100.0
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
+    texp = (expiryDate - settlementDate) / gDaysInYear
     times = np.linspace(0, tmat, 20)
     dfs = np.exp(-0.05*times)
     curve = FinDiscountCurve(settlementDate, times, dfs)
@@ -69,16 +83,16 @@ def test_BlackKarasinskiExampleTwo():
     a = 0.05
 
     # Test convergence
-    numStepsList = [100,101,200,300,400,500,600,700,800,900,1000]
+    numStepsList = [100] #,101,200,300,400,500,600,700,800,900,1000]
     isAmerican = True
 
     treeVector = []
     for numTimeSteps in numStepsList:
         start = time.time()
         model = FinBlackKarasinskiRateModel(a, sigma)
-        model.buildTree(settlementDate, maturityDate, int(numTimeSteps), curve)
-        v = model.bondOption(settlementDate, expiryDate, strikePrice,
-                             face, bond, isAmerican)
+        model.buildTree(tmat, int(numTimeSteps), times, dfs)
+        v = model.bondOption(texp, strikePrice,
+                             face, couponTimes, couponFlows, isAmerican)
         end = time.time()
         period = end-start
         treeVector.append(v[0])
@@ -98,5 +112,6 @@ if 1==0:
 
 ###############################################################################
 
+# This has broken and needs to be repaired!!!!
 #test_BlackKarasinskiExampleOne()
 test_BlackKarasinskiExampleTwo()

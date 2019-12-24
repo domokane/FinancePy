@@ -71,8 +71,8 @@ def dailyWorkingDaySchedule(self, startDate, endDate):
 
 class FinDate():
 
-    ''' Date class that is simple to use and includes a number of useful
-    date functions used frequently in Finance. '''
+    ''' Date class to manage dates that is simple to use and includes a
+    number of useful date functions used frequently in Finance. '''
 
     MON = 0
     TUE = 1
@@ -85,9 +85,9 @@ class FinDate():
     ###########################################################################
 
     def __init__(self, y_or_d, m, d_or_y):
-        ''' Create a date given year, month and day of month. The order is not 
-        enforced so 4th July 2019 can be created as FinDate(4,7,2019) or as 
-        FinDate(2019,7,4) so long as the middle number is the month. 
+        ''' Create a date given year, month and day of month. The order is not
+        enforced so 4th July 2019 can be created as FinDate(4,7,2019) or as
+        FinDate(2019,7,4) so long as the middle number is the month.
         The year must be a 4-digit number greater than or equal to 1900. '''
 
         if y_or_d >= 1900:
@@ -126,7 +126,9 @@ class FinDate():
     ###########################################################################
 
     def fromDatetime(dt):
-        ''' Construct a FinDate from a datetime '''
+        ''' Construct a FinDate from a datetime as this is often needed if we
+        receive inputs from other Python objects such as Pandas dataframes. '''
+
         finDate = FinDate(dt.year, dt.month, dt.day)
         return finDate
 
@@ -185,6 +187,7 @@ class FinDate():
 
     def addDays(self, numDays):
         ''' Returns a new date that is numDays after the FinDate. '''
+
         dt = datetime.date(self._y, self._m, self._d)
         dt = dt + datetime.timedelta(days=numDays)
         d = dt.day
@@ -240,7 +243,7 @@ class FinDate():
 
     def nextCDSDate(self, mm=0):
         ''' Returns a CDS date that is mm months after the FinDate. If no
-        argument is supplied it is the next CDS date. '''
+        argument is supplied then the next CDS date after today is returned.'''
 
         nextDate = self.addMonths(mm)
 
@@ -277,7 +280,7 @@ class FinDate():
 
     def thirdWednesdayOfMonth(self, m, y):
         ''' For a specific month and year this returns the day number of the
-            3rd Wednesday by scanning through dates in the third week '''
+            3rd Wednesday by scanning through dates in the third week. '''
 
         d_start = 14
         d_end = 21
@@ -328,7 +331,11 @@ class FinDate():
     ###########################################################################
 
     def addTenor(self, tenor):
-        ''' Return the date based on the tenor. '''
+        ''' Return the date following the FinDate by a period given by the
+        tenor which is a string consisting of a number and a letter, the
+        letter being d, w, m , y for day, week, month or year. This is case
+        independent. For example 10Y means 10 years while 120m also means 10
+        years. '''
 
         if type(tenor) != str:
             raise ValueError("Tenor must be a string e.g. '5Y'")
@@ -377,11 +384,13 @@ class FinDate():
 
     def datediff(d1, d2):
         ''' Calculate the number of dates between two dates. '''
+
         return (d2._excelDate - d1._excelDate)
 
     ###########################################################################
 
     def date(self):
+
         return datetime.date(self._y, self._m, self._d)
 
     ###########################################################################
@@ -399,5 +408,4 @@ class FinDate():
     def print(self):
         print(self.__str__())
 
-    ###########################################################################
     ###########################################################################

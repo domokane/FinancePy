@@ -10,7 +10,6 @@ from scipy import integrate
 from math import exp, log, pi
 import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
 
-from ..finutils.FinDate import FinDate
 from ..finutils.FinGlobalVariables import gDaysInYear
 from ..products.equities.FinOption import FinOptionTypes
 from ..finutils.FinMath import norminvcdf

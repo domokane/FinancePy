@@ -14,7 +14,8 @@ from ...finutils.FinError import FinError
 
 
 class LHPlusModel():
-
+    ''' Large Homogenous Portfolio model with extra asset. Used for
+    approximating full Gaussian copula. '''
     def __init__(self, P, R, H, beta, P0, R0, H0, beta0):
 
         self._P = P
@@ -29,7 +30,7 @@ class LHPlusModel():
 ##########################################################################
 
     def probLossGreaterThanK(self, K):
-
+        ''' Returns P(L>K) where L is the portfolio loss given by model. '''
         if K < (1.0 - self._R0) * self._H0:
             raise FinError("Function does not work when K<(1-R0)H0")
 

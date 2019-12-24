@@ -26,6 +26,8 @@ class FinCDSIndexPortfolio():
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+        ''' Create FinCDSIndexPortfolio object. Note that all of the inputs
+        have a default value which reflects the CDS market standard. '''
 
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
@@ -33,7 +35,7 @@ class FinCDSIndexPortfolio():
         self._frequencyType = frequencyType
         self._businessDateAdjustType = busDayAdjustType
 
-##########################################################################
+###############################################################################
 
     def intrinsicRPV01(self,
                        valuationDate,
@@ -60,7 +62,7 @@ class FinCDSIndexPortfolio():
         intrinsicRPV01 /= numCredits
         return(intrinsicRPV01)
 
-##########################################################################
+###############################################################################
 
     def intrinsicProtectionLegPV(self,
                                  valuationDate,
@@ -90,7 +92,7 @@ class FinCDSIndexPortfolio():
         intrinsicProtPV /= numCredits
         return intrinsicProtPV
 
-##########################################################################
+###############################################################################
 
     def intrinsicSpread(self,
                         valuationDate,
@@ -115,7 +117,7 @@ class FinCDSIndexPortfolio():
 
         return(intrinsicSpread)
 
-##########################################################################
+###############################################################################
 
     def averageSpread(self,
                       valuationDate,
@@ -139,15 +141,15 @@ class FinCDSIndexPortfolio():
         averageSpread /= numCredits
         return averageSpread
 
-##########################################################################
+###############################################################################
 
     def totalSpread(self,
                     valuationDate,
                     stepInDate,
                     maturityDate,
                     issuerCurves):
-        ''' Calculates the total CDS spread of the CDS portfolio.
-        TODO: DO I NEED THIS ? '''
+        ''' Calculates the total CDS spread of the CDS portfolio by summing 
+        over all of the issuers and adding the spread with no weights. '''
 
         numCredits = len(issuerCurves)
 
@@ -163,14 +165,15 @@ class FinCDSIndexPortfolio():
 
         return totalSpread
 
-##########################################################################
+###############################################################################
 
     def minSpread(self,
                   valuationDate,
                   stepInDate,
                   maturityDate,
                   issuerCurves):
-        ''' Calculates the MINIMUM par CDS spread of the CDS portfolio. '''
+        ''' Calculates the minimum par CDS spread across all of the issuers in
+        the CDS portfolio. '''
 
         numCredits = len(issuerCurves)
 
@@ -192,14 +195,15 @@ class FinCDSIndexPortfolio():
 
         return minSpread
 
-##########################################################################
+###############################################################################
 
     def maxSpread(self,
                   valuationDate,
                   stepInDate,
                   maturityDate,
                   issuerCurves):
-        ''' Calculates the MAXIMUM par CDS spread of the CDS portfolio. '''
+        ''' Calculates the maximum par CDS spread across all of the issuers in
+        the CDS portfolio. '''
 
         numCredits = len(issuerCurves)
 
@@ -221,7 +225,7 @@ class FinCDSIndexPortfolio():
 
         return maxSpread
 
-##########################################################################
+###############################################################################
 
     def spreadAdjustIntrinsic(valuationDate,
                               issuerCurves,
@@ -373,7 +377,7 @@ class FinCDSIndexPortfolio():
 
         return adjustedIssuerCurves
 
-##########################################################################
+###############################################################################
 
     def hazardRateAdjustIntrinsic(valuationDate,
                                   issuerCurves,
@@ -462,4 +466,4 @@ class FinCDSIndexPortfolio():
 
         return adjustedIssuerCurves
 
-##########################################################################
+###############################################################################

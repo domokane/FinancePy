@@ -24,7 +24,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 
-##########################################################################
+###############################################################################
 
 
 class FinCDSBasket(object):
@@ -65,7 +65,7 @@ class FinCDSBasket(object):
                                    self._busDayAdjustType,
                                    self._dateGenRuleType)
 
-##########################################################################
+###############################################################################
 
     def valueLegs_MC(self,
                      valuationDate,
@@ -143,7 +143,7 @@ class FinCDSBasket(object):
         prot = prot / numTrials
         return (rpv01, prot)
 
-##########################################################################
+###############################################################################
 
     def valueGaussian_MC(self,
                          valuationDate,
@@ -153,7 +153,9 @@ class FinCDSBasket(object):
                          liborCurve,
                          numTrials,
                          seed):
-        ''' Value the default basket using a Gaussian copula model. '''
+        ''' Value the default basket using a Gaussian copula model. This 
+        depends on the issuer curves and correlation matrix. '''
+
         numCredits = len(issuerCurves)
 
         if nToDefault > numCredits or nToDefault < 1:
@@ -178,7 +180,7 @@ class FinCDSBasket(object):
 
         return (value, rpv01, spd)
 
-##########################################################################
+###############################################################################
 
     def valueStudentT_MC(self,
                          valuationDate,
@@ -190,6 +192,7 @@ class FinCDSBasket(object):
                          numTrials,
                          seed):
         ''' Value the default basket using the Student-T copula. '''
+
         numCredits = len(issuerCurves)
 
         if nToDefault > numCredits or nToDefault < 1:
@@ -217,7 +220,7 @@ class FinCDSBasket(object):
 
         return (value, rpv01, spd)
 
-##########################################################################
+###############################################################################
 
     def value1FGaussian_Homo(self,
                              valuationDate,
@@ -297,3 +300,5 @@ class FinCDSBasket(object):
         basketOutput[3] = protLegPV / riskyPV01
 
         return basketOutput
+
+###############################################################################

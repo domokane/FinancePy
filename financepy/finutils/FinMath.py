@@ -41,7 +41,7 @@ def scale(x, factor):
 
 @njit(boolean(float64[:]), fastmath=True, cache=True)
 def testMonotonicity(x):
-    ''' Scale all of the elements of an array by the same amount factor. '''
+    ''' Check that an array of doubles is monotonic and strictly increasing. '''
     for i in range(1, len(x)):
         if x[i] <= x[i-1]:
             return False
@@ -52,7 +52,8 @@ def testMonotonicity(x):
 
 @njit(fastmath=True, cache=True)
 def testRange(x, lower, upper):
-    ''' Scale all of the elements of an array by the same amount factor. '''
+    ''' Check that all of the values of an array fall between a lower and
+    upper bound. '''
     for i in range(0, len(x)):
         if x[i] < lower:
             raise ValueError("Value below lower.")
@@ -64,8 +65,9 @@ def testRange(x, lower, upper):
 
 @njit(fastmath=True, cache=True)
 def maximum(a, b):
-    ''' Determine the maximum of two values a and b.
-    TODO: Add Numba function signature and test speed versus Numpy. '''
+    ''' Determine the array in which each element is the maximum of the
+    corresponding element in two equally length arrays a and b. '''
+
     n = len(a)
     out = [0.0] * n
 
@@ -219,7 +221,8 @@ def frange(start, stop, step):
 
 @njit(fastmath=True, cache=True)
 def normpdf(x):
-    ''' Normal Density function at value x'''
+    ''' Calculate the probability density function for a Gaussian (Normal)
+    function at value x'''
     InvRoot2Pi = 0.3989422804014327
     return np.exp(-x * x / 2.0) * InvRoot2Pi
 

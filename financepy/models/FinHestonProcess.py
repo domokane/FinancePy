@@ -7,11 +7,12 @@ Created on Sat Aug  3 14:10:12 2019
 ### DO NOT USE!!!!!!!!!!!!!!!!!
 
 from numba import njit, float64, int64
-from scipy import exp, linspace, zeros, real, imag, log
+from scipy import exp, log
 from numpy import sqrt
 import numpy as np
 
 from finutils.FinMath import norminvcdf
+from FinProcess import FinProcess
 
 ################################################################################
 # Heston Process

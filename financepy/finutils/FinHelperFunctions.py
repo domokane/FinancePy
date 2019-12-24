@@ -12,6 +12,8 @@ from .FinGlobalVariables import gDaysInYear
 ##########################################################################
 
 def printTree(array, depth=None):
+    ''' Function that prints a binomial or trinonial tree to screen for the
+    purpose of debugging. '''
     n1, n2 = array.shape
 
     if depth is not None:
@@ -28,8 +30,8 @@ def printTree(array, depth=None):
 
 ##########################################################################
 
-
 def inputFrequency(f):
+    ''' Function takes a frequency number and checks if it is valid. '''
     if f in [-1, 0, 1, 2, 3, 4, 6, 12]:
         return f
     else:
@@ -37,8 +39,12 @@ def inputFrequency(f):
 
 ###############################################################################
 
-
 def inputTime(dt, curve):
+    ''' Validates a time input in relation to a curve. If it is a float then
+    it returns a float as long as it is positive. If it is a FinDate then it
+    converts it to a float. If it is a Numpy array then it returns the array
+    as long as it is all positive. '''
+
     small = 1e-8
 
     def check(t):
@@ -82,9 +88,10 @@ def listdiff(a, b):
 
 ##########################################################################
 
-
 @njit(fastmath=True, cache=True)
 def dotproduct(xVector, yVector):
+    ''' Fast calculation of dot product using Numba. '''
+
     dotprod = 0.0
     n = len(xVector)
     for i in range(0, n):
@@ -105,9 +112,10 @@ def frange(start, stop, step):
 
 ##########################################################################
 
-
 @njit(fastmath=True, cache=True)
 def normaliseWeights(wtVector):
+    ''' Normalise a vector of weights so that they sum up to 1.0. '''
+
     n = len(wtVector)
     sumWts = 0.0
     for i in range(0, n):

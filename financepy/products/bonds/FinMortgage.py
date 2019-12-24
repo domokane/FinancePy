@@ -11,7 +11,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinDayCount import FinDayCountTypes
 
 ###############################################################################
 

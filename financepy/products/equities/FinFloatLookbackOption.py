@@ -9,7 +9,6 @@ import numpy as np
 from math import exp, log, sqrt
 from enum import Enum
 
-from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError

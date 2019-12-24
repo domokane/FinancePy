@@ -14,7 +14,6 @@ from .FinFrequency import (FinFrequency, FinFrequencyTypes)
 
 
 class FinSchedule(object):
-
     ''' A Schedule is a vector of dates generated according to ISDA standard
     rules which starts on the next date after the start date and runs up to
     an end date. Dates are adjusted to a provided calendar. The zeroth
@@ -27,6 +26,7 @@ class FinSchedule(object):
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+        ''' Create FinSchedule object. '''
 
         if startDate > endDate:
             raise FinError("Start Date after End Date")
@@ -58,6 +58,7 @@ class FinSchedule(object):
 ###############################################################################
 
     def flows(self):
+        ''' Returns a list of the schedule of dates. '''
         if self._adjustedDates is None:
             raise FinError("Dates have not been calculated.")
 

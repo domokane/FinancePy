@@ -14,7 +14,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinOption import FinEquityModelBlackScholes
 from .FinVanillaOption import FinVanillaOption, FinOptionTypes
 
-##########################################################################
+###############################################################################
 
 
 class FinVarianceSwap(object):
@@ -53,7 +53,7 @@ class FinVarianceSwap(object):
         self._callWts = []
         self._callStrikes = []
 
-##########################################################################
+###############################################################################
 
     def value(self, 
               valuationDate, 
@@ -76,7 +76,7 @@ class FinVarianceSwap(object):
         v = payoff * self._notional * df
         return v
 
-##########################################################################
+###############################################################################
 
     def fairStrikeApprox(self,
                          valuationDate,
@@ -102,7 +102,7 @@ class FinVarianceSwap(object):
         var = (atmVol**2) * sqrt(1.0+3.0*tmat*(b**2))
         return var
 
-##########################################################################
+###############################################################################
 
     def fairStrike(self,
                    valuationDate,
@@ -217,7 +217,7 @@ class FinVarianceSwap(object):
 
         return var
 
-##########################################################################
+###############################################################################
 
     def realisedVariance(self, closePrices, useLogs=True):
 
@@ -245,7 +245,7 @@ class FinVarianceSwap(object):
         return var
 
 
-##########################################################################
+###############################################################################
 
     def print(self):
 
@@ -262,3 +262,5 @@ class FinVarianceSwap(object):
             k = self._callStrikes[n]
             wt = self._callWts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))
+
+###############################################################################

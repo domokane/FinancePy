@@ -18,7 +18,7 @@ from ...products.credit.FinCDS import FinCDS
 ##########################################################################
 
 
-def f(volatility, *args):
+def fvol(volatility, *args):
     ''' Root searching function in the calculation of the CDS implied volatility. '''
 
     self = args[0]
@@ -159,7 +159,8 @@ class FinCDSOption():
                           optionValue):
         ''' Calculate the implied CDS option volatility from a price. '''
         argtuple = (self, valuationDate, issuerCurve, optionValue)
-        sigma = optimize.newton(f, x0=0.5, args=argtuple, tol=1e-7, maxiter=50)
+        sigma = optimize.newton(fvol, x0=0.5, args=argtuple, tol=1e-7,
+                                maxiter=50)
         return sigma
 
 ##########################################################################

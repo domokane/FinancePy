@@ -16,10 +16,111 @@ fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
-introFile = "./intro.tex"
 
 ##########################################################################
 
+def parseMarkdown(lines):
+
+    print("MARKDOWN IN")
+    print(lines)
+    
+    parsedLines = ["\n"]
+
+    bulletListActive = False
+    numberedListActive = False
+
+    for line in lines:
+
+        lineFound = False
+
+        if line[0] == "*":
+            lineFound= True
+            if bulletListActive is False:
+                parsedLines.append("\\begin{itemize}")
+                parsedLines.append("\n")
+                bulletListActive = True
+                parsedLines.append("\\item{" + line[1:] + "}")
+                parsedLines.append("\n")
+            else:
+                parsedLines.append("\\item{" + line[1:] + "}")
+                parsedLines.append("\n")
+        elif bulletListActive is True:
+            bulletListActive = False
+            parsedLines.append("\\end{itemize}")
+            parsedLines.append("\n")
+
+        if line[0].isdigit() is True:
+            lineFound= True
+            col = line.find(".") + 1
+            if numberedListActive is False:
+                parsedLines.append("\\begin{enumerate}")
+                parsedLines.append("\n")
+                numberedListActive = True
+                parsedLines.append("\\item{" + line[col:] + "}")
+                parsedLines.append("\n")
+            else:
+                parsedLines.append("\\item{" + line[col:] + "}")
+                parsedLines.append("\n")
+        elif numberedListActive is True:
+            numberedListActive = False
+            parsedLines.append("\\end{enumerate}")
+            parsedLines.append("\n")
+
+        if line.find("###") > -1:
+            lineFound= True
+            content = line.replace("#","")
+            content = content.replace("\n","")
+            content = content.strip()
+            parsedLines.append("\n")
+            parsedLines.append("\\subsubsection*{" + content + "}")
+            parsedLines.append("\n")
+        elif line.find("##") > -1:
+            lineFound= True
+            content = line.replace("#","")
+            content = content.replace("\n","")
+            content = content.strip()
+            parsedLines.append("\n")
+            parsedLines.append("\\subsection*{" + content + "}")
+            parsedLines.append("\n")
+        elif line.find("#") > -1:
+            lineFound= True
+            content = line.replace("#","")
+            content = content.replace("\n","")
+            content = content.strip()
+            parsedLines.append("\n")
+            parsedLines.append("\\section*{" + content + "}")
+            parsedLines.append("\n")
+
+        if lineFound is False:
+            parsedLines.append(line)
+
+    if bulletListActive is True:
+        bulletListActive = False
+        parsedLines.append("\\end{itemize}")
+        parsedLines.append("\n")
+
+    if numberedListActive is True:
+        numberedListActive = False
+        parsedLines.append("\\end{enumerate}")
+        parsedLines.append("\n")
+        
+    print("MARKDOWN OUT")
+    print(parsedLines)
+
+    return parsedLines
+
+##########################################################################
+
+def addToList(listName, item):
+
+    for x in listName:
+        if item == x:
+            return listName
+
+    listName.append(item)
+    return listName
+
+##########################################################################
 
 def open_file(filename):
     if sys.platform == "win32":
@@ -59,39 +160,77 @@ def buildTail():
 ##########################################################################
 
 
-def buildIntro():
+def buildIntro(introfile):
     ''' Add on end latex to close document. '''
-    f = open(introFile, 'r')
+    f = open(introfile, 'r')
     lines = f.readlines()
     f.close()
 
+    parsedLines = parseMarkdown(lines)
+
     f = open(userGuideFileName, 'a')
-    f.writelines(lines)
+    
+    f.write("\chapter{Introduction to FinancePy}")
+    f.writelines(parsedLines)
     f.close()
 
 ##########################################################################
 
 
-def buildChapter(foldername):
+def buildChapter(folderName):
     ''' Parse a folder by loading up all of the modules in that folder that
-    start with Fin. '''
+    start with the threee letters - Fin. '''
 
-    readMeFile = foldername + "//" + "README.md"
+    readMeFile = folderName + "//" + "README.md"
     f = open(readMeFile, 'r')
-    lines = f.readlines()
+    readMeLines = f.readlines()
     f.close()
+    
+    chapterName = folderName.replace("//",".")
+    chapterName = chapterName.replace("..","financepy")
+
+    newLines = []
+    newLines.append("\n")
+    newLines.append("\\chapter{" + chapterName + "}")
+    newLines.append("\n")
+    newLines.append("\\section{Introduction}")
+    newLines.append("\n")
 
     f = open(userGuideFileName, 'a')
-    f.write("\n")
-    f.writelines("\\chapter{" + foldername + "}")
-    f.write("\n")
-    f.writelines("\\section{Introduction}")
-    f.write("\n")
-    f.writelines(lines)
-    f.write("\n")
+    f.writelines(newLines)
     f.close()
 
-    modules = glob.glob(foldername + "//Fin*.py")
+    # validIntro = False
+    # for line in readMeLines:
+    
+    #     if line[0:3] == "Fin":
+    #         validIntro = True
+
+    # if validIntro is True:
+    #     for line in readMeLines[0:1]:
+    #         line = line.replace("#","")
+    #         line = line.replace("$","\\$")
+    #         newLines.append(line)
+
+    #     newLines.append("\\begin{itemize}\n")
+
+    #     for line in readMeLines[1:]:
+    #         line = line.replace("#","")
+    #         line = line.replace("$","\\$")
+    #         if line[0:3] == "Fin":
+    #             newLines.append("\\item{" + line + "}\n")
+    
+    #     newLines.append("\\end{itemize}")
+    
+    #     newLines.append("\n")
+
+    readMeLines = parseMarkdown(readMeLines)
+
+    f = open(userGuideFileName, 'a')
+    f.writelines(readMeLines)
+    f.close()
+
+    modules = glob.glob(folderName + "//Fin*.py")
 
     for module in modules:
         moduleName = module.split("\\")[-1]
@@ -102,7 +241,7 @@ def buildChapter(foldername):
         f.close()
         parseModule(module)
 
-    modules = glob.glob(foldername + "//TestFin*.py")
+    modules = glob.glob(folderName + "//TestFin*.py")
 
     for module in modules:
         moduleName = module.split("\\")[-1]
@@ -156,7 +295,7 @@ def parseModule(moduleName):
     startClassLines.append(numRows)
     startFunctionLines.append(numRows)
 
-    print("startClassLines", startClassLines)
+#    print("startClassLines", startClassLines)
 
     f = open(userGuideFileName, 'a')
 
@@ -199,9 +338,9 @@ def parseClass(lines, startLine, endLine):
     className = className.replace(":", "")
     className = className.replace("\n", "")
 
-    print(className, startLine, endLine)
+#    print(className, startLine, endLine)
 
-    newLines.append("\\subsection{Class: " + className + "}")
+    newLines.append("\\subsection*{Class: " + className + "}")
     newLines.append("\n")
 
     ##################################################
@@ -216,7 +355,7 @@ def parseClass(lines, startLine, endLine):
         line = lines[rowNum]
         if line.find(" def ") > 0:
             commentEndLine = rowNum
-            print("End Comment Row", rowNum)
+#            print("End Comment Row", rowNum)
             break
 
     classComment = ""
@@ -244,7 +383,7 @@ def parseClass(lines, startLine, endLine):
         endComment = True
 
     if endComment:
-        print(startCommentRow, endCommentRow)
+#        print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("'", "")
@@ -252,7 +391,7 @@ def parseClass(lines, startLine, endLine):
             line = line.replace("\n", "")
             line = line.replace("#", r"\#")
             line = line.lstrip()
-            classComment += line
+            classComment += line + " "
 
     newLines.append(classComment)
     newLines.append("\n")
@@ -261,9 +400,10 @@ def parseClass(lines, startLine, endLine):
     ##################################################
     # Now get the data members
 
-    newLines.append("\\subsubsection{Class Data Members}\n")
+    newLines.append("\\subsubsection*{Data Members}\n")
+#    newLines.append("The class data members are:")
 
-    dataMembers = set()
+    dataMembers = []
 
     for rowNum in range(startLine, endLine):
         row = lines[rowNum]
@@ -275,12 +415,14 @@ def parseClass(lines, startLine, endLine):
 
         n1 = row.find("self.")
         n2 = row.find("=")
+        n3 = row.find("[")
 
-        if n1 != -1 and n2 > n1:
+        if n1 != -1 and n2 > n1 and n3 == -1:
             dataMember = row[n1:n2]
             dataMember = dataMember.strip(" ")
             dataMember = dataMember.strip(")")
-            dataMembers.add(dataMember)
+            dataMember = dataMember.replace("self.","")
+            dataMembers = addToList(dataMembers,dataMember)
 
     if len(dataMembers) > 0:
         newLines.append("\\begin{itemize}\n")
@@ -295,14 +437,14 @@ def parseClass(lines, startLine, endLine):
         newLines.append("\n")
         newLines.append("\n")
 
-    newLines.append("\\subsubsection{Class Functions}\n")
+    newLines.append("\\subsection*{Functions}\n")
     newLines.append("\n")
 
     # Now get the functions
     numClassFunctions = 0
     startClassFunctionLines = []
 
-    print(startLine, endLine)
+#    print(startLine, endLine)
     for rowNum in range(startLine, endLine):
 
         line = lines[rowNum]
@@ -366,10 +508,17 @@ def parseFunction(lines, startLine, endLine, classFlag):
 
     for rowNum in range(startLine, endLine):
         line = lines[rowNum]
-        if line.find("'''") > 0:
+
+        if line.count("'''") == 1:
             startCommentRow = rowNum
             startComment = True
             startLine = rowNum + 1
+            break
+
+        if line.count("'''") == 2:
+            startCommentRow = rowNum
+            startComment = True
+            startLine = rowNum
             break
 
     for rowNum in range(startLine, endLine):
@@ -385,7 +534,7 @@ def parseFunction(lines, startLine, endLine, classFlag):
         endComment = True
 
     if endComment:
-        print(startCommentRow, endCommentRow)
+#        print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("_", r"\_")
@@ -393,14 +542,15 @@ def parseFunction(lines, startLine, endLine, classFlag):
             line = line.replace("\n", "")
             line = line.replace("#", r"\#")
             line = line.lstrip()
-            functionComment += line
+            # This is because we remove trailing whitespace
+            functionComment += line + " "
 
     # LATEX FORMATTING
     if classFlag:
-        functionDescription = r"\subsection{Class Method {\it " + \
+        functionDescription = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
     else:
-        functionDescription = r"\subsection{Function {\it " + \
+        functionDescription = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
 
     functionDescription += functionComment + "\n"
@@ -409,7 +559,7 @@ def parseFunction(lines, startLine, endLine, classFlag):
     functionDescription += functionSignature
     functionDescription += "\\end{lstlisting}\n"
 
-    print(functionDescription)
+#    print(functionDescription)
     return functionDescription
 
 ##########################################################################
@@ -453,19 +603,22 @@ def parseEnum(lines, startLine, endLine):
 
 
 buildHead()
-buildIntro()
-buildChapter("..//finutils")
-buildChapter("..//products//equities")
-buildChapter("..//products//credit")
-buildChapter("..//products//bonds")
-buildChapter("..//products//libor")
-buildChapter("..//products//fx")
-buildChapter("..//models")
-buildChapter("..//portfolio")
-buildChapter("..//risk")
-buildChapter("..//market//curves")
-buildChapter("..//tests")
-buildChapter("..//docs")
+buildIntro("..//..//README.md")
+
+if 1==1:
+    buildChapter("..//finutils")
+    buildChapter("..//products//equities")
+    buildChapter("..//products//credit")
+    buildChapter("..//products//bonds")
+    buildChapter("..//products//libor")
+    buildChapter("..//products//fx")
+    buildChapter("..//models")
+    buildChapter("..//portfolio")
+    buildChapter("..//risk")
+    buildChapter("..//market//curves")
+#    buildChapter("..//tests")
+#    buildChapter("..//docs")
+
 buildTail()
 
 if 1 == 1:

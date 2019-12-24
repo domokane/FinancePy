@@ -6,7 +6,7 @@ Created on Fri Feb 12 16:51:05 2016
 """
 
 import numpy as np
-from math import exp, log, sqrt
+
 from scipy import optimize
 from scipy.stats import norm
 
@@ -82,7 +82,7 @@ class FinVanillaOption(FinOption):
         self._strikePrice = strikePrice
         self._optionType = optionType
 
-###############################################################################
+##########################################################################
 
     def value(self,
               valueDate,
@@ -376,7 +376,7 @@ class FinVanillaOption(FinOption):
                                 tol=1e-5, maxiter=50, fprime2=None)
         return sigma
 
-###############################################################################
+##########################################################################
 
     def valueMC(self,
                 valueDate,
@@ -423,7 +423,7 @@ class FinVanillaOption(FinOption):
         v = payoff * np.exp(-r * t) / 2.0
         return v
 
-###############################################################################
+##########################################################################
 
     def value_MC_OLD(self,
                      valueDate,
@@ -453,4 +453,4 @@ class FinVanillaOption(FinOption):
         v = payoff * np.exp(-r * t)
         return v
 
-###############################################################################
+##########################################################################
