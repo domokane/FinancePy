@@ -98,193 +98,383 @@ def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 ###############################################################################
 
 @njit(fastmath=True, cache = True)
-def bondOptionFast(texp, tmat, strikePrice,  face, couponTimes, couponFlows,
-                   americanExercise, _dfTimes, _dfValues,
-                   _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
-        ''' Option that can be exercised at any time over the exercise period.
-        Due to non-analytical bond price we need to extend tree out to bond
-        maturity and take into account cash flows through time. '''
+def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
+                                 couponTimes, couponFlows,
+                                 americanExercise,
+                                 _dfTimes, _dfValues,
+                                 _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+    ''' Option that can be exercised at any time over the exercise period.
+    Due to non-analytical bond price we need to extend tree out to bond
+    maturity and take into account cash flows through time. '''
+
+#        print(texp, tmat, strikePrice, face)
+#        print(couponTimes)
+#        print(couponFlows)
+    interp = FinInterpMethods.FLAT_FORWARDS.value
+
+    #######################################################################
+
+    numTimeSteps, numNodes = _Q.shape
+    jmax = ceil(0.1835/(_a * _dt))
+    N = jmax
+    expiryStep = int(texp/_dt + 0.50)
+    maturityStep = int(tmat/_dt + 0.50)
+
+    #######################################################################
+
+    treeFlows = np.zeros(numTimeSteps)
+    numCoupons = len(couponTimes)
+
+    for i in range(0, numCoupons):
+        tcpn = couponTimes[i]
+        n = int(round(tcpn/_dt, 0))
+        ttree = _treeTimes[n]
+        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
+
+    accrued = np.zeros(numTimeSteps)
+    for m in range(0, expiryStep+1):
+        treeTime = _treeTimes[m]
+
+        for nextCpn in range(1, numCoupons):
+            prevTime = couponTimes[nextCpn-1]
+            nextTime = couponTimes[nextCpn]
+            if treeTime > prevTime and treeTime < nextTime:
+                accdPeriod = treeTime - prevTime
+                period = (nextTime - prevTime)
+                accd = (accdPeriod / period) * couponFlows[nextCpn] * face
+                accrued[m] = accd
+                break
+
+    #######################################################################
+
+    callOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
+    putOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
+    bondValues = np.zeros(shape=(numTimeSteps, numNodes))
+
+    # Start with the value of the bond at maturity
+    for k in range(0, numNodes):
+        bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
+
+    N = jmax
+
+    for m in range(maturityStep-1, expiryStep-1, -1):
+
+        nm = min(m, jmax)
+        flow = treeFlows[m] * face
+
+        for k in range(-nm, nm+1):
+            kN = k + N
+            df = exp(-_rt[m,kN]*_dt)
+            pu = _pu[kN]
+            pm = _pm[kN]
+            pd = _pd[kN]
+
+            if k == jmax:
+                vu = bondValues[m+1, kN]
+                vm = bondValues[m+1, kN-1]
+                vd = bondValues[m+1, kN-2]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            elif k == -jmax:
+                vu = bondValues[m+1, kN+2]
+                vm = bondValues[m+1, kN+1]
+                vd = bondValues[m+1, kN]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            else:
+                vu = bondValues[m+1, kN+1]
+                vm = bondValues[m+1, kN]
+                vd = bondValues[m+1, kN-1]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+
+            bondValues[m, kN] += flow
+
+    # Now consider exercise of the option on the expiry date
+    # Start with the value of the bond at maturity and overwrite values
+    nm = min(expiryStep, jmax)
+    for k in range(-nm, nm+1):
+        kN = k + N
+        cleanPrice = bondValues[expiryStep, kN] - accrued[expiryStep]
+        callOptionValues[expiryStep, kN] = max(cleanPrice-strikePrice, 0.0)
+        putOptionValues[expiryStep, kN] = max(strikePrice-cleanPrice, 0.0)
+
+    # Now step back to today considering early exercise
+    for m in range(expiryStep-1, -1, -1):
+        nm = min(m, jmax)
+        flow = treeFlows[m] * face
+
+        for k in range(-nm, nm+1):
+            kN = k + N
+            df = exp(-_rt[m,kN]*_dt)
+            pu = _pu[kN]
+            pm = _pm[kN]
+            pd = _pd[kN]
+
+            if k == jmax:
+                vu = bondValues[m+1, kN]
+                vm = bondValues[m+1, kN-1]
+                vd = bondValues[m+1, kN-2]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            elif k == jmax:
+                vu = bondValues[m+1, kN+2]
+                vm = bondValues[m+1, kN+1]
+                vd = bondValues[m+1, kN]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            else:
+                vu = bondValues[m+1, kN+1]
+                vm = bondValues[m+1, kN]
+                vd = bondValues[m+1, kN-1]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+
+            bondValues[m, kN] += flow
+            vcall = 0.0
+            vput = 0.0
+
+            if k == jmax:
+                vu = callOptionValues[m+1, kN]
+                vm = callOptionValues[m+1, kN-1]
+                vd = callOptionValues[m+1, kN-2]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
+            elif k == jmax:
+                vu = callOptionValues[m+1, kN+2]
+                vm = callOptionValues[m+1, kN+1]
+                vd = callOptionValues[m+1, kN]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
+            else:
+                vu = callOptionValues[m+1, kN+1]
+                vm = callOptionValues[m+1, kN]
+                vd = callOptionValues[m+1, kN-1]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
+
+            callOptionValues[m, kN] = vcall
+
+            if k == jmax:
+                vu = putOptionValues[m+1, kN]
+                vm = putOptionValues[m+1, kN-1]
+                vd = putOptionValues[m+1, kN-2]
+                vput = (pu*vu + pm*vm + pd*vd) * df
+            elif k == jmax:
+                vu = putOptionValues[m+1, kN+2]
+                vm = putOptionValues[m+1, kN+1]
+                vd = putOptionValues[m+1, kN]
+                vput = (pu*vu + pm*vm + pd*vd) * df
+            else:
+                vu = putOptionValues[m+1, kN+1]
+                vm = putOptionValues[m+1, kN]
+                vd = putOptionValues[m+1, kN-1]
+                vput = (pu*vu + pm*vm + pd*vd) * df
+
+            putOptionValues[m, kN] = vput
+
+            if americanExercise is True:
+                cleanPrice = bondValues[m, kN] - accrued[m]
+                exercise = max(cleanPrice - strikePrice,0)
+
+                hold = callOptionValues[m, kN]
+                callOptionValues[m, kN] = max(exercise, hold)
+
+                hold = putOptionValues[m, kN]
+                putOptionValues[m, kN] = max(exercise, hold)
+
+    return (callOptionValues[0, N], putOptionValues[0,N])
+
+###############################################################################
+
+@njit(fastmath=True, cache = True)
+def callablePuttableBond_Fast(couponTimes, couponFlows,
+                              callTimes, callPrices,
+                              putTimes, putPrices,
+                              _dfTimes, _dfValues,
+                              _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+    ''' Option that can be exercised at any time over the exercise period.
+    Due to non-analytical bond price we need to extend tree out to bond
+    maturity and take into account cash flows through time. '''
 
 #        print(texp, tmat, strikePrice, face)
 #        print(couponTimes)
 #        print(couponFlows)
 
-        interp = FinInterpMethods.FLAT_FORWARDS.value
+    interp = FinInterpMethods.FLAT_FORWARDS.value
 
-        #######################################################################
+    #######################################################################
+    tmat = couponTimes[-1]
+    numTimeSteps, numNodes = _Q.shape
+    jmax = ceil(0.1835/(_a * _dt))
+    N = jmax
+    maturityStep = int(tmat/_dt + 0.50)
 
-        numTimeSteps, numNodes = _Q.shape
-        jmax = ceil(0.1835/(_a * _dt))
-        N = jmax
-        expiryStep = int(texp/_dt + 0.50)
-        maturityStep = int(tmat/_dt + 0.50)
+    #######################################################################
 
-        #######################################################################
+    treeFlows = np.zeros(numTimeSteps)
+    numCoupons = len(couponTimes)
 
-        treeFlows = np.zeros(numTimeSteps)
-        numCoupons = len(couponTimes)
+    for i in range(0, numCoupons):
+        tcpn = couponTimes[i]
+        n = int(round(tcpn/_dt, 0))
+        ttree = _treeTimes[n]
+        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
-        for i in range(0, numCoupons):
-            tcpn = couponTimes[i]
-            n = int(round(tcpn/_dt, 0))
-            ttree = _treeTimes[n]
-            df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-            df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
-            treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
+    accrued = np.zeros(numTimeSteps)
+    for m in range(0, expiryStep+1):
+        treeTime = _treeTimes[m]
 
-        accrued = np.zeros(numTimeSteps)
-        for m in range(0, expiryStep+1):
-            treeTime = _treeTimes[m]
+        for nextCpn in range(1, numCoupons):
+            prevTime = couponTimes[nextCpn-1]
+            nextTime = couponTimes[nextCpn]
+            if treeTime > prevTime and treeTime < nextTime:
+                accdPeriod = treeTime - prevTime
+                period = (nextTime - prevTime)
+                accd = (accdPeriod / period) * couponFlows[nextCpn] * face
+                accrued[m] = accd
+                break
 
-            for nextCpn in range(1, numCoupons):
-                prevTime = couponTimes[nextCpn-1]
-                nextTime = couponTimes[nextCpn]
-                if treeTime > prevTime and treeTime < nextTime:
-                    accdPeriod = treeTime - prevTime
-                    period = (nextTime - prevTime)
-                    accd = (accdPeriod / period) * couponFlows[nextCpn] * face
-                    accrued[m] = accd
-                    break
+    #######################################################################
 
-        #######################################################################
+    callOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
+    putOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
+    bondValues = np.zeros(shape=(numTimeSteps, numNodes))
 
-        callOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
-        putOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
-        bondValues = np.zeros(shape=(numTimeSteps, numNodes))
+    # Start with the value of the bond at maturity
+    for k in range(0, numNodes):
+        bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
 
-        # Start with the value of the bond at maturity
-        for k in range(0, numNodes):
-            bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
+    N = jmax
 
-        N = jmax
+    for m in range(maturityStep-1, expiryStep-1, -1):
 
-        for m in range(maturityStep-1, expiryStep-1, -1):
+        nm = min(m, jmax)
+        flow = treeFlows[m] * face
 
-            nm = min(m, jmax)
-            flow = treeFlows[m] * face
-
-            for k in range(-nm, nm+1):
-                kN = k + N
-                df = exp(-_rt[m,kN]*_dt)
-                pu = _pu[kN]
-                pm = _pm[kN]
-                pd = _pd[kN]
-
-                if k == jmax:
-                    vu = bondValues[m+1, kN]
-                    vm = bondValues[m+1, kN-1]
-                    vd = bondValues[m+1, kN-2]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
-                elif k == -jmax:
-                    vu = bondValues[m+1, kN+2]
-                    vm = bondValues[m+1, kN+1]
-                    vd = bondValues[m+1, kN]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
-                else:
-                    vu = bondValues[m+1, kN+1]
-                    vm = bondValues[m+1, kN]
-                    vd = bondValues[m+1, kN-1]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
-
-                bondValues[m, kN] += flow
-
-        # Now consider exercise of the option on the expiry date
-        # Start with the value of the bond at maturity and overwrite values
-        nm = min(expiryStep, jmax)
         for k in range(-nm, nm+1):
             kN = k + N
-            cleanPrice = bondValues[expiryStep, kN] - accrued[expiryStep]
-            callOptionValues[expiryStep, kN] = max(cleanPrice-strikePrice, 0.0)
-            putOptionValues[expiryStep, kN] = max(strikePrice-cleanPrice, 0.0)
+            df = exp(-_rt[m,kN]*_dt)
+            pu = _pu[kN]
+            pm = _pm[kN]
+            pd = _pd[kN]
 
-        # Now step back to today considering early exercise
-        for m in range(expiryStep-1, -1, -1):
-            nm = min(m, jmax)
-            flow = treeFlows[m] * face
+            if k == jmax:
+                vu = bondValues[m+1, kN]
+                vm = bondValues[m+1, kN-1]
+                vd = bondValues[m+1, kN-2]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            elif k == -jmax:
+                vu = bondValues[m+1, kN+2]
+                vm = bondValues[m+1, kN+1]
+                vd = bondValues[m+1, kN]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            else:
+                vu = bondValues[m+1, kN+1]
+                vm = bondValues[m+1, kN]
+                vd = bondValues[m+1, kN-1]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
 
-            for k in range(-nm, nm+1):
-                kN = k + N
-                df = exp(-_rt[m,kN]*_dt)
-                pu = _pu[kN]
-                pm = _pm[kN]
-                pd = _pd[kN]
+            bondValues[m, kN] += flow
 
-                if k == jmax:
-                    vu = bondValues[m+1, kN]
-                    vm = bondValues[m+1, kN-1]
-                    vd = bondValues[m+1, kN-2]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
-                elif k == jmax:
-                    vu = bondValues[m+1, kN+2]
-                    vm = bondValues[m+1, kN+1]
-                    vd = bondValues[m+1, kN]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
-                else:
-                    vu = bondValues[m+1, kN+1]
-                    vm = bondValues[m+1, kN]
-                    vd = bondValues[m+1, kN-1]
-                    v = (pu*vu + pm*vm + pd*vd) * df
-                    bondValues[m, kN] = v
+    # Now consider exercise of the option on the expiry date
+    # Start with the value of the bond at maturity and overwrite values
+    nm = min(expiryStep, jmax)
+    for k in range(-nm, nm+1):
+        kN = k + N
+        cleanPrice = bondValues[expiryStep, kN] - accrued[expiryStep]
+        callOptionValues[expiryStep, kN] = max(cleanPrice-strikePrice, 0.0)
+        putOptionValues[expiryStep, kN] = max(strikePrice-cleanPrice, 0.0)
 
-                bondValues[m, kN] += flow
-                vcall = 0.0
-                vput = 0.0
+    # Now step back to today considering early exercise
+    for m in range(expiryStep-1, -1, -1):
+        nm = min(m, jmax)
+        flow = treeFlows[m] * face
 
-                if k == jmax:
-                    vu = callOptionValues[m+1, kN]
-                    vm = callOptionValues[m+1, kN-1]
-                    vd = callOptionValues[m+1, kN-2]
-                    vcall = (pu*vu + pm*vm + pd*vd) * df
-                elif k == jmax:
-                    vu = callOptionValues[m+1, kN+2]
-                    vm = callOptionValues[m+1, kN+1]
-                    vd = callOptionValues[m+1, kN]
-                    vcall = (pu*vu + pm*vm + pd*vd) * df
-                else:
-                    vu = callOptionValues[m+1, kN+1]
-                    vm = callOptionValues[m+1, kN]
-                    vd = callOptionValues[m+1, kN-1]
-                    vcall = (pu*vu + pm*vm + pd*vd) * df
+        for k in range(-nm, nm+1):
+            kN = k + N
+            df = exp(-_rt[m,kN]*_dt)
+            pu = _pu[kN]
+            pm = _pm[kN]
+            pd = _pd[kN]
 
-                callOptionValues[m, kN] = vcall
+            if k == jmax:
+                vu = bondValues[m+1, kN]
+                vm = bondValues[m+1, kN-1]
+                vd = bondValues[m+1, kN-2]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            elif k == jmax:
+                vu = bondValues[m+1, kN+2]
+                vm = bondValues[m+1, kN+1]
+                vd = bondValues[m+1, kN]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
+            else:
+                vu = bondValues[m+1, kN+1]
+                vm = bondValues[m+1, kN]
+                vd = bondValues[m+1, kN-1]
+                v = (pu*vu + pm*vm + pd*vd) * df
+                bondValues[m, kN] = v
 
-                if k == jmax:
-                    vu = putOptionValues[m+1, kN]
-                    vm = putOptionValues[m+1, kN-1]
-                    vd = putOptionValues[m+1, kN-2]
-                    vput = (pu*vu + pm*vm + pd*vd) * df
-                elif k == jmax:
-                    vu = putOptionValues[m+1, kN+2]
-                    vm = putOptionValues[m+1, kN+1]
-                    vd = putOptionValues[m+1, kN]
-                    vput = (pu*vu + pm*vm + pd*vd) * df
-                else:
-                    vu = putOptionValues[m+1, kN+1]
-                    vm = putOptionValues[m+1, kN]
-                    vd = putOptionValues[m+1, kN-1]
-                    vput = (pu*vu + pm*vm + pd*vd) * df
+            bondValues[m, kN] += flow
+            vcall = 0.0
+            vput = 0.0
 
-                putOptionValues[m, kN] = vput
+            if k == jmax:
+                vu = callOptionValues[m+1, kN]
+                vm = callOptionValues[m+1, kN-1]
+                vd = callOptionValues[m+1, kN-2]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
+            elif k == jmax:
+                vu = callOptionValues[m+1, kN+2]
+                vm = callOptionValues[m+1, kN+1]
+                vd = callOptionValues[m+1, kN]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
+            else:
+                vu = callOptionValues[m+1, kN+1]
+                vm = callOptionValues[m+1, kN]
+                vd = callOptionValues[m+1, kN-1]
+                vcall = (pu*vu + pm*vm + pd*vd) * df
 
-                if americanExercise is True:
-                    cleanPrice = bondValues[m, kN] - accrued[m]
-                    exercise = max(cleanPrice - strikePrice,0)
+            callOptionValues[m, kN] = vcall
 
-                    hold = callOptionValues[m, kN]
-                    callOptionValues[m, kN] = max(exercise, hold)
+            if k == jmax:
+                vu = putOptionValues[m+1, kN]
+                vm = putOptionValues[m+1, kN-1]
+                vd = putOptionValues[m+1, kN-2]
+                vput = (pu*vu + pm*vm + pd*vd) * df
+            elif k == jmax:
+                vu = putOptionValues[m+1, kN+2]
+                vm = putOptionValues[m+1, kN+1]
+                vd = putOptionValues[m+1, kN]
+                vput = (pu*vu + pm*vm + pd*vd) * df
+            else:
+                vu = putOptionValues[m+1, kN+1]
+                vm = putOptionValues[m+1, kN]
+                vd = putOptionValues[m+1, kN-1]
+                vput = (pu*vu + pm*vm + pd*vd) * df
 
-                    hold = putOptionValues[m, kN]
-                    putOptionValues[m, kN] = max(exercise, hold)
+            putOptionValues[m, kN] = vput
 
-        return (callOptionValues[0, N], putOptionValues[0,N])
+            if americanExercise is True:
+                cleanPrice = bondValues[m, kN] - accrued[m]
+                exercise = max(cleanPrice - strikePrice,0)
+
+                hold = callOptionValues[m, kN]
+                callOptionValues[m, kN] = max(exercise, hold)
+
+                hold = putOptionValues[m, kN]
+                putOptionValues[m, kN] = max(exercise, hold)
+
+    return (callOptionValues[0, N], putOptionValues[0,N])
 
 ###############################################################################
-# Unable to jit this totally due to scipty optimise
+
 @njit(fastmath=True)
 def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
@@ -418,14 +608,39 @@ class FinBlackKarasinskiRateModel():
         #######################################################################
 
         callValue, putValue \
-            = bondOptionFast(texp, tmat, strikePrice, face, couponTimes,
-                             couponFlows, americanExercise,
-                             self._dfTimes, self._dfValues,
-                             self._treeTimes, self._Q,
-                             self._pu, self._pm, self._pd, self._rt,
-                             self._dt, self._a)
+            = americanBondOption_Tree_Fast(texp, tmat, strikePrice, face,
+                                           couponTimes, couponFlows,
+                                           americanExercise,
+                                           self._dfTimes, self._dfValues,
+                                           self._treeTimes, self._Q,
+                                           self._pu, self._pm, self._pd,
+                                           self._rt,
+                                           self._dt, self._a)
 
-        N = ceil(0.1835/(self._a * self._dt))
+        return (callValue, putValue)
+
+###############################################################################
+
+    def callablePuttableBond(self, couponTimes, couponFlows,
+                             callTimes, callAmounts, 
+                             putTimes, putAmounts):
+
+        ''' Option that can be exercised at any time over the exercise period.
+        Due to non-analytical bond price we need to extend tree out to bond
+        maturity and take into account cash flows through time. '''
+
+        tmat = couponTimes[-1]
+
+        #######################################################################
+
+        callValue, putValue \
+            = callablePuttableBond_Fast(couponTimes, couponFlows,                                
+                                        callTimes, callPrices,
+                                        putTimes, putPrices,
+                                        self._dfTimes, self._dfValues,
+                                        self._treeTimes, self._Q,
+                                        self._pu, self._pm, self._pd, self._rt,
+                                        self._dt, self._a)
 
         return (callValue, putValue)
 

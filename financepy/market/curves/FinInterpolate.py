@@ -5,7 +5,7 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 from math import exp, log, fabs
-from numba import njit, float64, int64, jit
+from numba import njit, float64, int64
 import numpy as np
 
 ###############################################################################

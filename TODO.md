@@ -10,13 +10,13 @@ Equities - Add interest rate risk to the Convertible bond model.
 Equities - Cliquets
 Equities - Range Notes
 Equities - CPPI
-Equities - Bull Notes 
+Equities - Bull Notes
 Equities - Payoff language
 Equities - Power options
 
 FX - Vanilla FX options (leverage common code base where possible)
 FX - Digital FX options
-FX - FX One-touch 
+FX - FX One-touch
 FX - FX Barriers
 FX - Barrier bending
 FX - Breedon-Litzenburger implied distribution of terminal stock price

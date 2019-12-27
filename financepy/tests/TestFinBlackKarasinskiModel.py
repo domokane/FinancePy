@@ -98,7 +98,7 @@ def test_BlackKarasinskiExampleTwo():
         treeVector.append(v[0])
         print(numTimeSteps, v, period)
 
-    plt.plot(numStepsList, treeVector)
+#    plt.plot(numStepsList, treeVector)
 
     # The value in Hill converges to 0.699 with 100 time steps while I get 0.700
 

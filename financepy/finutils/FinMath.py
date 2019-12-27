@@ -18,6 +18,20 @@ ONE_BILLION = 1000000000
 
 ##########################################################################
 
+@njit(fastmath=True, cache=True)
+def accruedInterpolator(tset, couponTimes, couponAmounts):
+    ''' Fast calulation of accrued interest using an Actual/Actual type of
+    convention. This does not calculate according to other conventions. '''
+
+    numCoupons = len(couponTimes)
+    for i in range(1, numCoupons):
+        if couponTimes[i-1] >= tset:
+            denom = couponTimes[i]-couponTimes[i-1]
+            accdFrac = (tset-couponTimes[i-1])/ denom
+            accdCpn = accdFrac * couponAmounts[i]
+            return accdCpn
+
+##########################################################################
 
 @njit(boolean(int64), fastmath=True, cache=True)
 def isLeapYear(y):

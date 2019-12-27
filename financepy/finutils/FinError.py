@@ -8,7 +8,6 @@ import traceback
 
 
 def func_name():
-    import traceback
     return traceback.extract_stack(None, 2)[0][2]
 
 

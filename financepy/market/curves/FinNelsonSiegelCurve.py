@@ -9,7 +9,6 @@ import numpy as np
 from math import exp
 
 from ...finutils.FinGlobalVariables import gSmall
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 
 ##########################################################################

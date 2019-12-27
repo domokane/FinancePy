@@ -4,6 +4,7 @@ Created on Fri Nov 30 10:52:29 2018
 
 @author: Dominic O'Kane
 """
+from finutils.FinError import FinError
 
 ###############################################################################
 
@@ -12,7 +13,7 @@ class FinRateConverter(object):
     ''' Convert rates between different compounding conventions. This is not
     used. '''
 
-    def __init__(self):
+    def __init__(self, frequency):
 
         # we permit frequency to be entered as a string or integer
         if isinstance(frequency, int):
@@ -51,6 +52,9 @@ class FinRateConverter(object):
                 self.name = frequency
             else:
                 raise Exception("Frequency value must be 1M, 3M, 6M or 12M")
+
+        else:
+            raise FinError("Invalid frequency type.")
 
 ###############################################################################
 

@@ -31,8 +31,8 @@
  
 \makeindex
 
-\usepackage{tocloft}
-\addtolength{\cftsecnumwidth}{16pt}
+%\usepackage{tocloft}
+%\addtolength{\cftsecnumwidth}{16pt}
 
 \renewcommand{\baselinestretch}{1.1}
 
@@ -2595,7 +2595,7 @@ Value the legs of the default basket using Monte Carlo. The default times are an
 \end{lstlisting}
 
 \subsubsection*{{\bf valueGaussian\_MC}}
-Value the default basket using a Gaussian copula model.  
+Value the default basket using a Gaussian copula model. This  depends on the issuer curves and correlation matrix.  
 
 \begin{lstlisting}
     def valueGaussian_MC(self,

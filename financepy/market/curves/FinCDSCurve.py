@@ -11,7 +11,6 @@ import scipy.optimize as optimize
 from numba import njit, float64
 
 from ...finutils.FinDate import FinDate
-from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
