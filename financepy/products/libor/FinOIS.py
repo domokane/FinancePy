@@ -9,6 +9,7 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule
+from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinDate import dailyWorkingDaySchedule
 

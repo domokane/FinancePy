@@ -89,6 +89,10 @@ def valueConvertible(tmat,
 
     numTimes = int(numStepsPerYear * tmat) + 1  # add one for today time 0
     numTimes = numStepsPerYear  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
+    
+    if numTimes < 5:
+        raise ValueError("Numsteps must be greater than 5.")
+
     numLevels = numTimes
 
     # this is the size of the step
