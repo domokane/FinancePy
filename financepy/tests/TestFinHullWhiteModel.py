@@ -26,7 +26,6 @@ def test_HullWhiteExampleOne():
     dfs = np.exp(-zeros*times)
 
     startDate = FinDate(1, 12, 2019)
-    curve = FinDiscountCurve(startDate, times, dfs)
     endDate = FinDate(1, 12, 2022)
     sigma = 0.01
     a = 0.1
@@ -58,7 +57,6 @@ def test_HullWhiteExampleTwo():
     dfs = np.exp(-zeros*times)
 
     startDate = FinDate(1, 12, 2019)
-    curve = FinDiscountCurve(startDate, times, dfs)
     sigma = 0.01
     a = 0.1
     strike = 63.0
@@ -97,7 +95,7 @@ def test_HullWhiteExampleTwo():
 ###############################################################################
 
 
-def test_HullWhiteExampleThree():
+def test_HullWhiteBondOption():
     # Valuation of a European option on a coupon bearing bond
 
     settlementDate = FinDate(1, 12, 2019)
@@ -171,11 +169,107 @@ def test_HullWhiteExampleThree():
         print("OPTION")
         printTree(model._optionValues, 5)
 
-
     v = model.europeanBondOption_Jamshidian(texp, strikePrice, face,
                                     couponTimes, couponFlows, times, dfs)
 
     print("EUROPEAN BOND JAMSHIDIAN DECOMP", v)
+
+###############################################################################
+
+
+def test_HullWhiteCallableBond():
+    # Valuation of a European option on a coupon bearing bond
+
+    settlementDate = FinDate(1, 12, 2019)
+    maturityDate = settlementDate.addTenor("10Y")
+    coupon = 0.05
+    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+
+    bond.calculateFlowDates(settlementDate)
+    couponTimes = []
+    couponFlows = []
+    cpn = bond._coupon/bond._frequency
+    for flowDate in bond._flowDates[1:]:
+       flowTime = (flowDate - settlementDate) / gDaysInYear
+       couponTimes.append(flowTime)
+       couponFlows.append(cpn)
+    couponTimes = np.array(couponTimes)
+    couponFlows = np.array(couponFlows)
+
+    ###########################################################################
+    # Set up the call and put times and prices
+    ###########################################################################
+
+    callDates = []
+    callPrices = []
+    callPx = 120.0
+    callDates.append(settlementDate.addTenor("5Y")); callPrices.append(callPx)
+    callDates.append(settlementDate.addTenor("6Y")); callPrices.append(callPx)
+    callDates.append(settlementDate.addTenor("7Y")); callPrices.append(callPx)
+    callDates.append(settlementDate.addTenor("8Y")); callPrices.append(callPx)
+
+    callTimes = []
+    for dt in callDates:
+        t = (dt - settlementDate) / gDaysInYear
+        callTimes.append(t)
+
+    putDates = []
+    putPrices = []
+    putPx = 98.0
+    putDates.append(settlementDate.addTenor("5Y")); putPrices.append(putPx)
+    putDates.append(settlementDate.addTenor("6Y")); putPrices.append(putPx)
+    putDates.append(settlementDate.addTenor("7Y")); putPrices.append(putPx)
+    putDates.append(settlementDate.addTenor("8Y")); putPrices.append(putPx)
+
+    putTimes = []
+    for dt in putDates:
+        t = (dt - settlementDate) / gDaysInYear
+        putTimes.append(t)
+
+    ###########################################################################
+
+    tmat = (maturityDate - settlementDate) / gDaysInYear
+    times = np.linspace(0, tmat, 20)
+    dfs = np.exp(-0.05*times)
+    curve = FinDiscountCurve(settlementDate, times, dfs)
+
+    ###########################################################################
+
+    v1 = bond.fullPriceFromDiscountCurve(settlementDate, curve)
+
+    sigma = 0.02 # basis point volatility
+    a = 0.1
+
+   # Test convergence
+    numStepsList = [100,200,300,400,500,600,700,800,900,1000]
+    tmat = (maturityDate - settlementDate)/gDaysInYear
+
+    print("NUMSTEPS", "BOND_ONLY", "CALLABLE_BOND", "TIME")
+
+    for numTimeSteps in numStepsList:
+        start = time.time()
+        model = FinHullWhiteRateModel(a, sigma)
+        model.buildTree(tmat, numTimeSteps, times, dfs)
+
+        v2 = model.callablePuttableBond_Tree(couponTimes, couponFlows,
+                                             callTimes, callPrices,
+                                             putTimes, putPrices)
+        
+        end = time.time()
+        period = end-start
+        print(numTimeSteps, v1, v2, period)
+
+
+    if 1==0:
+        print("RT")
+        printTree(model._rt, 5)
+        print("BOND")
+        printTree(model._bondValues, 5)
+        print("OPTION")
+        printTree(model._optionValues, 5)
+
 
 
 ###############################################################################
@@ -183,4 +277,5 @@ def test_HullWhiteExampleThree():
 
 #test_HullWhiteExampleOne()
 #test_HullWhiteExampleTwo()
-test_HullWhiteExampleThree()
+#test_HullWhiteBondOption()
+test_HullWhiteCallableBond()

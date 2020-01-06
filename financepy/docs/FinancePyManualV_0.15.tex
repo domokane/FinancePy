@@ -618,6 +618,13 @@ def normaliseWeights(wtVector):
 \newpage
 \section{FinMath}
 
+\subsubsection*{{\bf accruedInterpolator}}
+Fast calulation of accrued interest using an Actual/Actual type of convention. This does not calculate according to other conventions.  
+
+\begin{lstlisting}
+def accruedInterpolator(tset, couponTimes, couponAmounts):
+\end{lstlisting}
+
 \subsubsection*{{\bf isLeapYear}}
 Test whether year y is a leap year - if so return True, else False  
 
@@ -794,10 +801,10 @@ Convert rates between different compounding conventions. This is not used.
 \subsection*{Functions}
 
 \subsubsection*{{\bf \_\_init\_\_}}
-def \_\_init\_\_(self): 
+def \_\_init\_\_(self, frequency): 
 
 \begin{lstlisting}
-    def __init__(self):
+    def __init__(self, frequency):
 \end{lstlisting}
 
 \subsubsection*{{\bf str}}
@@ -3294,6 +3301,60 @@ def g(oas, *args):
 \newpage
 \section{FinBondCallable}
 
+\subsubsection{Enumerated Type: FinBondModelTypes}
+\begin{itemize}
+\item{BLACK}
+\item{HO\_LEE}
+\item{HULL\_WHITE}
+\item{BLACK\_KARASINSKI}
+\end{itemize}
+
+\subsubsection{Enumerated Type: FinBondOptionTypes}
+\begin{itemize}
+\item{EUROPEAN\_CALL}
+\item{EUROPEAN\_PUT}
+\item{AMERICAN\_CALL}
+\item{AMERICAN\_PUT}
+\end{itemize}
+
+\subsection*{Class: FinCallableBond()}
+
+
+\subsubsection*{Data Members}
+\begin{itemize}
+\item{\_callDates}
+\item{\_callPrices}
+\item{\_putDates}
+\item{\_putPrices}
+\item{\_bond}
+\item{\_face}
+\end{itemize}
+
+\subsection*{Functions}
+
+\subsubsection*{{\bf \_\_init\_\_}}
+face): 
+
+\begin{lstlisting}
+    def __init__(self,
+                 bond,
+                 callDates,
+                 callPrices,
+                 putDates,
+                 putPrices,
+                 face):
+\end{lstlisting}
+
+\subsubsection*{{\bf value}}
+Value the bond option using the specified model.  
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              discountCurve,
+              model):
+\end{lstlisting}
+
 \newpage
 \section{FinBondFuture}
 
@@ -4731,6 +4792,15 @@ Option that can be exercised at any time over the exercise period. Due to non-an
                    face, couponTimes, couponFlows, americanExercise):
 \end{lstlisting}
 
+\subsubsection*{{\bf callablePuttableBond}}
+Option that can be exercised at any time over the exercise period. Due to non-analytical bond price we need to extend tree out to bond maturity and take into account cash flows through time.  
+
+\begin{lstlisting}
+    def callablePuttableBond(self, couponTimes, couponFlows,
+                             callTimes, callAmounts, 
+                             putTimes, putAmounts):
+\end{lstlisting}
+
 \subsubsection*{{\bf buildTree}}
 def buildTree(self, tmat, numTimeSteps, dfTimes, dfValues): 
 
@@ -4766,13 +4836,26 @@ def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 \end{lstlisting}
 
-\subsubsection*{{\bf bondOptionFast}}
+\subsubsection*{{\bf americanBondOption\_Tree\_Fast}}
 Option that can be exercised at any time over the exercise period. Due to non-analytical bond price we need to extend tree out to bond maturity and take into account cash flows through time.  
 
 \begin{lstlisting}
-def bondOptionFast(texp, tmat, strikePrice,  face, couponTimes, couponFlows,
-                   americanExercise, _dfTimes, _dfValues,
-                   _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
+                                 couponTimes, couponFlows,
+                                 americanExercise,
+                                 _dfTimes, _dfValues,
+                                 _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+\end{lstlisting}
+
+\subsubsection*{{\bf callablePuttableBond\_Fast}}
+Option that can be exercised at any time over the exercise period. Due to non-analytical bond price we need to extend tree out to bond maturity and take into account cash flows through time.  
+
+\begin{lstlisting}
+def callablePuttableBond_Fast(couponTimes, couponFlows,
+                              callTimes, callPrices,
+                              putTimes, putPrices,
+                              _dfTimes, _dfValues,
+                              _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
 \end{lstlisting}
 
 \subsubsection*{{\bf buildTreeFast}}
@@ -5405,6 +5488,15 @@ Price an option on a zero coupon bond using a HW trinomial tree. The discount cu
                         couponTimes, couponAmounts, americanExercise):
 \end{lstlisting}
 
+\subsubsection*{{\bf callablePuttableBond\_Tree}}
+
+
+\begin{lstlisting}
+    def callablePuttableBond_Tree(self, couponTimes, couponAmounts,
+                                  callTimes, callPrices,
+                                  putTimes, putPrices):
+\end{lstlisting}
+
 \subsubsection*{{\bf americanBondOption\_Tree\_OLD}}
 
 
@@ -5425,13 +5517,6 @@ def buildTree(self, treeMat, numTimeSteps, dfTimes, dfValues):
 
 \begin{lstlisting}
     def buildTree(self, treeMat, numTimeSteps, dfTimes, dfValues):
-\end{lstlisting}
-
-\subsubsection*{{\bf accruedInterpolator}}
-Fast calulation of accrued interest using an Actual/Actual type of convention. This does not calculate according to other conventions.  
-
-\begin{lstlisting}
-def accruedInterpolator(tset, couponTimes, couponAmounts):
 \end{lstlisting}
 
 \subsubsection*{{\bf P\_Fast}}
@@ -5456,6 +5541,18 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
                     couponTimes, couponAmounts, americanExercise,
                     _sigma, _a, _Q, _pu, _pm, _pd, _rt, _dt, _treeTimes,
                     _dfTimes, _dfValues):
+\end{lstlisting}
+
+\subsubsection*{{\bf callablePuttableBond\_Tree\_Fast}}
+
+
+\begin{lstlisting}
+def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts, 
+                                   callTimes, callPrices, 
+                                   putTimes, putPrices,
+                                   _sigma, _a, _Q,
+                                   _pu, _pm, _pd, _rt, _dt, _treeTimes,
+                                   _dfTimes, _dfValues):
 \end{lstlisting}
 
 \subsubsection*{{\bf fwdFullBondPrice}}
