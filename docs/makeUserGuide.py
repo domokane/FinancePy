@@ -195,7 +195,7 @@ def buildChapter(folderName):
     f.close()
     
     chapterName = folderName.replace("//",".")
-    chapterName = chapterName.replace("..","financepy")
+    chapterName = chapterName.replace("...","")
 
     newLines = []
     newLines.append("\n")
