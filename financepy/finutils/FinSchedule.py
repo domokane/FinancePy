@@ -12,7 +12,6 @@ from .FinFrequency import (FinFrequency, FinFrequencyTypes)
 
 ###############################################################################
 
-
 class FinSchedule(object):
     ''' A Schedule is a vector of dates generated according to ISDA standard
     rules which starts on the next date after the start date and runs up to

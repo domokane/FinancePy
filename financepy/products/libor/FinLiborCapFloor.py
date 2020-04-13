@@ -19,7 +19,7 @@ from ...finutils.FinSchedule import FinSchedule
 from .FinLiborModelTypes import FinLiborModelBlack
 from .FinLiborModelTypes import FinLiborModelShiftedBlack
 from .FinLiborModelTypes import FinLiborModelSABR
-from ...models.FinSABRModel import blackVolFromSABR
+from ...models.FinModelSABR import blackVolFromSABR
 
 ##########################################################################
 

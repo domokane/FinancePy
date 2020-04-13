@@ -22,8 +22,8 @@ class FinOIS(object):
     which a fixed payment leg is exchanged for a floating coupon leg. There
     is no exchange of par.
 
-    The contract lasts from a start date to a specified maturity date. The fixed coupon is
-    the OIS fixed rate which is set at contract initiation.
+    The contract lasts from a start date to a specified maturity date. 
+    The fixed coupon is the OIS fixed rate which is set at contract initiation.
 
     The floating rate is not known until the end of each payment period. It is
     calculated at the end of the period as it is based on daily observations

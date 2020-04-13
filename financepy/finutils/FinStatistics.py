@@ -73,7 +73,6 @@ def moment(x, m):
 
 ##########################################################################
 
-
 @njit(float64(float64[:], float64[:]), fastmath=True, cache=True)
 def correlation(x1, x2):
     ''' Calculate the correlation between two series x1 and x2. '''

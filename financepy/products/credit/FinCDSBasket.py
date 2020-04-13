@@ -14,9 +14,9 @@ from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
 
-from ...models.FinGaussianCopula1FModel import homogeneousBasketLossDbn
-from ...models.FinGaussianCopulaModel import defaultTimesGC
-from ...models.FinStudentTCopulaModel import FinStudentTCopulaModel
+from ...models.FinModelGaussianCopula1F import homogeneousBasketLossDbn
+from ...models.FinModelGaussianCopula import defaultTimesGC
+from ...models.FinModelStudentTCopula import FinModelStudentTCopula
 
 from ...market.curves.FinCDSCurve import FinCDSCurve
 
@@ -198,7 +198,7 @@ class FinCDSBasket(object):
         if nToDefault > numCredits or nToDefault < 1:
             raise ValueError("nToDefault must be 1 to numCredits")
 
-        model = FinStudentTCopulaModel()
+        model = FinModelStudentTCopula()
 
         defaultTimes = model.defaultTimes(issuerCurves,
                                           correlationMatrix,

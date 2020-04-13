@@ -16,7 +16,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
 from ...products.libor.FinLiborSwap import FinLiborSwap
-from ...models.FinSABRModel import blackVolFromSABR
+from ...models.FinModelSABR import blackVolFromSABR
 
 from .FinLiborModelTypes import FinLiborModelBlack
 from .FinLiborModelTypes import FinLiborModelSABR

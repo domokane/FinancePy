@@ -34,7 +34,7 @@ class FinBondOptionTypes(Enum):
 ###############################################################################
 
 
-class FinCallableBond():
+class FinBondCallable():
     ''' Class for options on fixed coupon bonds. '''
 
     def __init__(self,
