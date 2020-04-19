@@ -201,6 +201,9 @@ class FinDate():
     def addWorkDays(self, numDays):
         ''' Returns a new date that is numDays working days after FinDate. '''
 
+        if type(numDays) is not int:
+            raise FinError("Num days must be an integer")
+
         dt = datetime.date(self._y, self._m, self._d)
         d = dt.day
         m = dt.month

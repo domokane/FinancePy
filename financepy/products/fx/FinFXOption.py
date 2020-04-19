@@ -13,20 +13,6 @@ from .FinFXModelTypes import FinFXModelBlackScholes
 
 bump = 1e-4
 
-
-class FinFXOptionTypes(Enum):
-    EUROPEAN_CALL = 1
-    EUROPEAN_PUT = 2
-    AMERICAN_CALL = 3
-    AMERICAN_PUT = 4
-    DIGITAL_CALL = 5
-    DIGITAL_PUT = 6
-    ASIAN_CALL = 7
-    ASIAN_PUT = 8
-    COMPOUND_CALL = 9
-    COMPOUND_PUT = 10
-
-
 class FinOptionModelTypes(Enum):
     BLACKSCHOLES = 1
     ANOTHER = 2

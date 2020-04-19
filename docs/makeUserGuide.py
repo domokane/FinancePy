@@ -175,7 +175,7 @@ def buildIntro(introfile):
     parsedLines = parseMarkdown(lines)
 
     f = open(userGuideFileName, 'a')
-    
+
     f.write("\chapter{Introduction to FinancePy}")
     f.writelines(parsedLines)
     f.close()
@@ -193,7 +193,7 @@ def buildChapter(folderName):
     f = open(readMeFile, 'r')
     readMeLines = f.readlines()
     f.close()
-    
+
     chapterName = folderName.replace("//",".")
     chapterName = chapterName.replace("...","")
 
@@ -210,7 +210,7 @@ def buildChapter(folderName):
 
     # validIntro = False
     # for line in readMeLines:
-    
+
     #     if line[0:3] == "Fin":
     #         validIntro = True
 
@@ -227,9 +227,9 @@ def buildChapter(folderName):
     #         line = line.replace("$","\\$")
     #         if line[0:3] == "Fin":
     #             newLines.append("\\item{" + line + "}\n")
-    
+
     #     newLines.append("\\end{itemize}")
-    
+
     #     newLines.append("\n")
 
     readMeLines = parseMarkdown(readMeLines)
@@ -267,7 +267,7 @@ def buildChapter(folderName):
 def parseModule(moduleName):
     ''' Parse a module looking for classes, functions and classes for
     enumerated types. Functions inside classes are parsed inside the class. '''
-
+    print(moduleName)
     f = open(moduleName, 'r')
     lines = f.readlines()
     f.close()
@@ -303,7 +303,7 @@ def parseModule(moduleName):
     startClassLines.append(numRows)
     startFunctionLines.append(numRows)
 
-#    print("startClassLines", startClassLines)
+    # print("startClassLines", startClassLines)
 
     f = open(userGuideFileName, 'a')
 
@@ -363,7 +363,6 @@ def parseClass(lines, startLine, endLine):
         line = lines[rowNum]
         if line.find(" def ") > 0:
             commentEndLine = rowNum
-#            print("End Comment Row", rowNum)
             break
 
     classComment = ""
@@ -509,7 +508,7 @@ def parseFunction(lines, startLine, endLine, classFlag):
             break
 
     functionComment = ""
-    startCommentRow = startLine
+    startCommentRow = startLine+1
     endCommentRow = startLine
     startComment = False
     endComment = False
@@ -553,6 +552,10 @@ def parseFunction(lines, startLine, endLine, classFlag):
             # This is because we remove trailing whitespace
             functionComment += line + " "
 
+
+    if functionComment == " ":
+        functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
+
     # LATEX FORMATTING
     if classFlag:
         functionDescription = r"\subsubsection*{{\bf " + \
@@ -567,7 +570,6 @@ def parseFunction(lines, startLine, endLine, classFlag):
     functionDescription += functionSignature
     functionDescription += "\\end{lstlisting}\n"
 
-#    print(functionDescription)
     return functionDescription
 
 ##########################################################################

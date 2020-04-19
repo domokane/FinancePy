@@ -2,7 +2,6 @@
 
 
 class FinFXModel(object):
-    ''' This is a parent class for equity models. '''
 
     def __init__(self):
         self._parentType = None
@@ -27,6 +26,17 @@ class FinFXModelHeston(FinFXModel):
         self._parentType = FinFXModel
         self._volatility = volatility
         self._meanReversion = meanReversion
+        self._implementation = 0
+
+###############################################################################
+
+class FinFXModelSABR(FinFXModel):
+    def __init__(self, alpha, beta, rho, volatility):
+        self._parentType = FinFXModel
+        self._alpha = alpha
+        self._beta = beta
+        self._rho = rho
+        self._nu = nu
         self._implementation = 0
 
 ###############################################################################
