@@ -37,6 +37,7 @@ See the changelog for a detailed history of changes
 
 ### Contributions
 Contributions are welcome. There are a number of requirements:
+
 * You should use CamelCase i.e. variables of the form optionPrice
 * Comments are required for every class and function and they should be clear
 * At least one test case must be provided for every module
