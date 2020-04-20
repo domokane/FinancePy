@@ -18,6 +18,8 @@ from ...finutils.FinError import FinError
 ###############################################################################
 
 class FinFXForward():
+    ''' This is a contract to buy or sell currency at a forward rate decided
+    today. '''
 
     def __init__(self,
                  expiryDate,
@@ -26,12 +28,15 @@ class FinFXForward():
                  notional,
                  notionalCurrency,  # must be FOR or DOM
                  spotDays = 0):
+        ''' Creates a FinFXForward which allows the owner to buy the FOR
+        against the DOM currency at the strikeFXRate and to pay it in the
+        notional currency. '''
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 
         ''' The FX rate is in the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
-        price in USD (CCY2) of 1 unit of EUR (CCY1)'''
+        price in USD (CCY2) of 1 unit of EUR (CCY1) '''
 
         if deliveryDate < expiryDate:
             raise FinError("Delivery date must be on or after expiry date.")
@@ -61,6 +66,8 @@ class FinFXForward():
               spotFXRate,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
               domDiscountCurve,
               forDiscountCurve):
+        ''' Calculate the value of an FX forward contract where the current
+        FX rate is the spotFXRate. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -117,6 +124,8 @@ class FinFXForward():
                 spotFXRate,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
                 domDiscountCurve,
                 forDiscountCurve):
+        ''' Calculate the FX Forward rate that makes the value of the FX
+        contract equal to zero. '''
 
         if type(valueDate) == FinDate:
             t = (self._deliveryDate - valueDate) / gDaysInYear

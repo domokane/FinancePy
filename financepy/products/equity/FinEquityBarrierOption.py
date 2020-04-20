@@ -31,13 +31,16 @@ class FinEquityBarrierTypes(Enum):
 ##########################################################################
 
 class FinEquityBarrierOption(FinEquityOption):
-
+    ''' Class to hold details of an Equity Barrier Option. It also
+    calculates the option price using Black Scholes for 8 different
+    variants on the Barrier structure in enum FinEquityBarrierTypes. '''
     def __init__(self,
                  expiryDate,
                  strikePrice,
                  optionType,
                  barrierLevel,
-                 numObservationsPerYear):
+                 numObservationsPerYear,
+                 notional = 1.0):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
@@ -48,6 +51,7 @@ class FinEquityBarrierOption(FinEquityOption):
             raise FinError("Option Type ", optionType, " unknown.")
 
         self._optionType = optionType
+        self._notional = notional
 
 ##########################################################################
 
@@ -221,7 +225,8 @@ class FinEquityBarrierOption(FinEquityOption):
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))
 
-        return price
+        v = price * self._notional
+        return v
 
 ###############################################################################
 
@@ -344,6 +349,6 @@ class FinEquityBarrierOption(FinEquityOption):
 
         v = payoff.mean() * exp(- r * t)
 
-        return v
+        return v * self._notional
 
 ##########################################################################

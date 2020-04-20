@@ -12,10 +12,13 @@ from scipy.stats import norm
 from ...finutils.FinMath import N
 
 ###############################################################################
+# NOTE: Need to convert option types to use enums.
+# NOTE: Perhaps just turn this into a function rather than a class.
+###############################################################################
 
-
-class BlackModel():
-
+class FinModelBlack():
+    ''' Black's Model which prices call and put options in the forward
+    measure according to the Black-Scholes equation. '''
 
     def value(self,
               forwardRate,
@@ -23,6 +26,8 @@ class BlackModel():
               timeToExpiry,
               sigma,
               callOrPut):
+        ''' Price a derivative using Black's model which values in the forward
+        measure following a change of measure. '''
 
         if strikeRate < 0:
             raise Exception("Error: Negative strike")
@@ -48,30 +53,4 @@ class BlackModel():
         return returnValue
 
 ###############################################################################
-
-#    public static double BlackImpliedVol(double forward,
-#                                         double timeToExpiry,
-#                                         double strike,
-#                                         ref string callOrPut,
-#                                         double optionPrice)
-#    {
-#
-#      BlackVolObjectiveFunction objFnBlackModel = new BlackVolObjectiveFunction();
-#      objFnBlackModel.m_forward = forward;
-#      objFnBlackModel.m_strike = strike;
-#      objFnBlackModel.m_timeToExpiry = timeToExpiry;
-#      objFnBlackModel.m_callOrPut = callOrPut;
-#      objFnBlackModel.m_optionPrice = optionPrice;
-#
-#      // optimisation parameters
-#      double xmin = 0.00000001;
-#      double xmax = 0.9999;
-#      double xacc = 0.0000000001;
-#      int maxIter = 40;
-#
-#      ObjectiveFunction objFn = (ObjectiveFunction) objFnBlackModel;
-#      Solvers.generalOneDimensionalSolver(ref objFn, xmin, xmax, xacc, xacc, maxIter);
-#
-#      return objFnBlackModel.m_volatility;
-#    }
-#
+###############################################################################

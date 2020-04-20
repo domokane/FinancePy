@@ -60,7 +60,7 @@ def crrTreeVal(stockPrice,
     if numSteps < 30:
         numSteps = 30
 
-    ## OVERRIDE JUST TO SEE 
+    ## OVERRIDE JUST TO SEE
     numSteps = numStepsPerYear
 
     # if the number of steps is even but we want odd then make it odd
@@ -184,6 +184,8 @@ class FinEquityAmericanOption():
                  expiryDate,
                  strikePrice,
                  optionType):
+        ''' Create the American option using its expiry date, strike price
+        and option type (call or put). The option notional is provided too. '''
 
         if strikePrice < 0.0:
             raise FinError("Strike price must be positive.")
@@ -201,6 +203,8 @@ class FinEquityAmericanOption():
               dividendYield,
               model,
               numStepsPerYear=100):
+        ''' Value the American option using a CRR Binomial Tree. The model
+        assumes that the dividend is a continuous one. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date is after expiry date.")

@@ -13,10 +13,6 @@ from .FinFXModelTypes import FinFXModelBlackScholes
 
 bump = 1e-4
 
-class FinOptionModelTypes(Enum):
-    BLACKSCHOLES = 1
-    ANOTHER = 2
-
 ##########################################################################
 ##########################################################################
 

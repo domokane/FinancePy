@@ -26,18 +26,20 @@ class FinBarrierTypes(Enum):
     DOWN_AND_OUT_PUT = 7
     DOWN_AND_IN_PUT = 8
 
-
 ###############################################################################
 ##########################################################################
 
-class FinBarrierOption(FinOption):
+class FinFXBarrierOption(FinOption):
 
     def __init__(self,
                  expiryDate,
-                 strikePrice,
+                 strikePrice,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 currencyPair,  # FORDOM
                  optionType,
                  barrierLevel,
-                 numObservationsPerYear):
+                 numObservationsPerYear,
+                 notional,
+                 notionalCurrency):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
@@ -48,6 +50,8 @@ class FinBarrierOption(FinOption):
             raise FinError("Option Type ", optionType, " unknown.")
 
         self._optionType = optionType
+        self._notional = notional
+        self._notionalCurrency = notionalCurrency
 
 ##########################################################################
 

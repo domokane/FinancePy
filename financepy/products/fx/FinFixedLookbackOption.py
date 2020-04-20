@@ -23,7 +23,7 @@ from ...products.equities.FinOption import FinOption
 from enum import Enum
 
 
-class FinFixedLookbackOptionTypes(Enum):
+class FinFXFixedLookbackOptionTypes(Enum):
     FIXED_CALL = 1
     FIXED_PUT = 2
 
@@ -33,7 +33,7 @@ class FinFixedLookbackOptionTypes(Enum):
 ##########################################################################
 
 
-class FinFixedLookbackOption(FinOption):
+class FinFXFixedLookbackOption(FinOption):
 
     def __init__(self,
                  expiryDate,
@@ -49,18 +49,20 @@ class FinFixedLookbackOption(FinOption):
     def value(self,
               valueDate,
               stockPrice,
-              discountCurve,
-              dividendYield,
+              domesticCurve,
+              foreignCurve,
               volatility,
               stockMinMax):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
+        df = domesticCurve.df(t)
         r = -np.log(df)/t
-        
+
+        dq = foreignCurve.df(t)
+        q = -np.log(dq)/t
+
         v = volatility
         s0 = stockPrice
-        q = dividendYield
         k = self._optionStrike
         smin = 0.0
         smax = 0.0
@@ -92,7 +94,7 @@ class FinFixedLookbackOption(FinOption):
         if self._optionType == FinFixedLookbackOptionTypes.FIXED_CALL:
 
             if k > smax:
-                d1 = (log(s0 / k) + (b + v * v / 2) * t) / v / sqrt(t)
+                d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
                 d2 = d1 - v * sqrt(t)
 
                 if s0 == k:
@@ -106,7 +108,7 @@ class FinFixedLookbackOption(FinOption):
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
-                e1 = (log(s0 / smax) + (r - q + v * v / 2) * t) / v / sqrt(t)
+                e1 = (log(s0/smax) + (b+v*v/2.0)*t) / v / sqrt(t)
                 e2 = e1 - v * sqrt(t)
 
                 if s0 == smax:
@@ -115,7 +117,7 @@ class FinFixedLookbackOption(FinOption):
                     term = expbt * N(e1)
                 else:
                     term = (-(s0 / smax)**(-w)) * \
-                        N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
+                        N(e1 - 2.0*b*sqrt(t) / v) + expbt * N(e1)
 
                 v = df * (smax - k) + s0 * dq * N(e1) - \
                     smax * df * N(e2) + s0 * df * u * term
@@ -161,19 +163,24 @@ class FinFixedLookbackOption(FinOption):
     def valueMC(
             self,
             valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
+            spotFXRate,  # FORDOM
+            domesticCurve,
+            foreignCurve,
             volatility,
-            stockMinMax,
+            spotFXRateMinMax,
             numPaths=10000,
             numStepsPerYear=252,
             seed=4242):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
+
+        df = domesticCurve.df(t)
         r = -np.log(df)/t
-        mu = r - dividendYield
+
+        dq = foreignCurve.df(t)
+        q = -np.log(dq)/t
+
+        mu = r - q
 
         numTimeSteps = int(t * numStepsPerYear)
 
@@ -184,12 +191,12 @@ class FinFixedLookbackOption(FinOption):
         smax = 0.0
 
         if self._optionType == FinFixedLookbackOptionTypes.FIXED_CALL:
-            smax = stockMinMax
+            smax = spotFXRateMinMax
             if smax < stockPrice:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
         elif self._optionType == FinFixedLookbackOptionTypes.FIXED_PUT:
-            smin = stockMinMax
+            smin = spotFXRateMinMax
             if smin > stockPrice:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
@@ -221,5 +228,5 @@ class FinFixedLookbackOption(FinOption):
         else:
             raise FinError("Unknown lookback option type:" + str(optionType))
 
-        v = payoff.mean() * exp(-r * t)
+        v = payoff.mean() * exp(-r*t)
         return v
