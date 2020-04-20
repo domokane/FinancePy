@@ -318,6 +318,7 @@ def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
 
 
 class FinEquityAsianOption(FinEquityOption):
+    ''' Class to store an Equity Asian Option. '''
 
     def __init__(self,
                  startAveragingDate,
@@ -345,6 +346,7 @@ class FinEquityAsianOption(FinEquityOption):
               model,
               valuationMethod,
               accruedAverage=None):
+        ''' Calculate the value of an Asian option. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")

@@ -208,7 +208,6 @@ class FinFXVanillaOption():
             d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
             d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
 
-
             numStepsPerYear = 100
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:

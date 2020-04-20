@@ -12,7 +12,7 @@ from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
@@ -206,7 +206,7 @@ def test_FinBond():
 
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-            maturityDt = FinDate.fromDatetime(matDatetime)
+            maturityDt = fromDatetime(matDatetime)
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType)

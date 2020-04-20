@@ -7,7 +7,7 @@ Created on Fri Feb 12 16:51:05 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityCompoundOption import FinEquityCompoundOption
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
@@ -36,8 +36,8 @@ def test_FinEquityCompoundOption():
     model = FinEquityModelBlackScholes(volatility)
     discountCurve = FinFlatCurve(valueDate, interestRate)
 
-    optionType1 = FinEquityOptionTypes.EUROPEAN_CALL
-    optionType2 = FinEquityOptionTypes.EUROPEAN_PUT
+    optionType1 = FinOptionTypes.EUROPEAN_CALL
+    optionType2 = FinOptionTypes.EUROPEAN_PUT
 
     numStepsList = [200,
                     300,
@@ -111,11 +111,11 @@ def test_FinEquityCompoundOption():
         "THETA")
 
     for optionType1 in [
-            FinEquityOptionTypes.EUROPEAN_CALL,
-            FinEquityOptionTypes.EUROPEAN_PUT]:
+            FinOptionTypes.EUROPEAN_CALL,
+            FinOptionTypes.EUROPEAN_PUT]:
         for optionType2 in [
-                FinEquityOptionTypes.EUROPEAN_CALL,
-                FinEquityOptionTypes.EUROPEAN_PUT]:
+                FinOptionTypes.EUROPEAN_CALL,
+                FinOptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = FinEquityCompoundOption(
                 expiryDate1, expiryDate2, k1, k2, optionType1, optionType2)

@@ -14,21 +14,24 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 ##########################################################################
 
-from ...products.equities.FinOption import FinOption, FinOptionTypes
+from ...products.equities.FinEquityOption import FinEquityOption
+from ...products.FinOptionTypes import FinOptionTypes
 
 
-class FinBasketOption(FinOption):
+class FinBasketOption(FinEquityOption):
 
     def __init__(self,
                  expiryDate,
                  strikePrice,
                  optionType,
-                 numAssets):
+                 numAssets,
+                 notional = 1.0):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
         self._optionType = optionType
         self._numAssets = numAssets
+        self._notional = notional
 
 ##########################################################################
 

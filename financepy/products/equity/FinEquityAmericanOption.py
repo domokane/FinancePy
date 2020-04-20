@@ -12,7 +12,7 @@ from enum import Enum
 
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...products.equity.FinEquityVanillaOption import FinEquityOptionTypes
+from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 
 bump = 1e-4
@@ -109,13 +109,13 @@ def crrTreeVal(stockPrice,
 
         s = stockValues[index + iNode]
 
-        if optionType == FinEquityOptionTypes.EUROPEAN_CALL.value:
+        if optionType == FinOptionTypes.EUROPEAN_CALL.value:
             optionValues[index + iNode] = max(s - strikePrice, 0)
-        elif optionType == FinEquityOptionTypes.EUROPEAN_PUT.value:
+        elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
             optionValues[index + iNode] = max(strikePrice - s, 0)
-        elif optionType == FinEquityOptionTypes.AMERICAN_CALL.value:
+        elif optionType == FinOptionTypes.AMERICAN_CALL.value:
             optionValues[index + iNode] = max(s - strikePrice, 0)
-        elif optionType == FinEquityOptionTypes.AMERICAN_PUT.value:
+        elif optionType == FinOptionTypes.AMERICAN_PUT.value:
             optionValues[index + iNode] = max(strikePrice - s, 0)
 
     # begin backward steps from expiry to value date
@@ -127,13 +127,13 @@ def crrTreeVal(stockPrice,
 
             s = stockValues[index + iNode]
 
-            if optionType == FinEquityOptionTypes.EUROPEAN_CALL.value:
+            if optionType == FinOptionTypes.EUROPEAN_CALL.value:
                 exerciseValue = 0.0
-            elif optionType == FinEquityOptionTypes.EUROPEAN_PUT.value:
+            elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
                 exerciseValue = 0.0
-            elif optionType == FinEquityOptionTypes.AMERICAN_CALL.value:
+            elif optionType == FinOptionTypes.AMERICAN_CALL.value:
                 exerciseValue = max(s - strikePrice, 0.0)
-            elif optionType == FinEquityOptionTypes.AMERICAN_PUT.value:
+            elif optionType == FinOptionTypes.AMERICAN_PUT.value:
                 exerciseValue = max(strikePrice - s, 0.0)
 
             nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
@@ -147,13 +147,13 @@ def crrTreeVal(stockPrice,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            if optionType == FinEquityOptionTypes.EUROPEAN_CALL.value:
+            if optionType == FinOptionTypes.EUROPEAN_CALL.value:
                 optionValues[index + iNode] = holdValue
-            elif optionType == FinEquityOptionTypes.EUROPEAN_PUT.value:
+            elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
                 optionValues[index + iNode] = holdValue
-            elif optionType == FinEquityOptionTypes.AMERICAN_CALL.value:
+            elif optionType == FinOptionTypes.AMERICAN_CALL.value:
                 optionValues[index + iNode] = max(exerciseValue, holdValue)
-            elif optionType == FinEquityOptionTypes.AMERICAN_PUT.value:
+            elif optionType == FinOptionTypes.AMERICAN_PUT.value:
                 optionValues[index + iNode] = max(exerciseValue, holdValue)
 
     # We calculate all of the important Greeks in one go

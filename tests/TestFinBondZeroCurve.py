@@ -11,7 +11,7 @@ import datetime as dt
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.market.curves.FinBondZeroCurve import FinBondZeroCurve
 
@@ -41,7 +41,7 @@ def test_FinBondZeroCurve():
     for index, bondRow in bondDataFrame.iterrows():
         dateString = bondRow['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-        maturityDt = FinDate.fromDatetime(matDatetime)
+        maturityDt = fromDatetime(matDatetime)
         coupon = bondRow['coupon']/100.0
         cleanPrice = bondRow['mid']
         bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
@@ -58,7 +58,7 @@ def test_FinBondZeroCurve():
 
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-        maturityDt = FinDate.fromDatetime(matDatetime)
+        maturityDt = fromDatetime(matDatetime)
         zeroRate = bondCurve.zeroRate(maturityDt)
         testCases.print(maturityDt, zeroRate)
 

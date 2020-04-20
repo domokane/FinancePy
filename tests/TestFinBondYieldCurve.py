@@ -13,10 +13,10 @@ from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.market.curves.FinBondYieldCurve import FinBondYieldCurve
-from financepy.market.curves.FinBondYieldCurveModel import * 
+from financepy.market.curves.FinBondYieldCurveModel import *
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -44,7 +44,7 @@ def test_FinBondYieldCurve():
 
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
-        maturityDt = FinDate.fromDatetime(matDatetime)
+        maturityDt = fromDatetime(matDatetime)
         coupon = bond['coupon']/100.0
         cleanPrice = bond['mid']
         bond = FinBond(maturityDt, coupon, frequencyType, accrualType)

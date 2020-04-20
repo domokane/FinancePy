@@ -75,6 +75,15 @@ def datediff(d1, d2):
 
 ###############################################################################
 
+def fromDatetime(dt):
+    ''' Construct a FinDate from a datetime as this is often needed if we
+    receive inputs from other Python objects such as Pandas dataframes. '''
+
+    finDate = FinDate(dt.year, dt.month, dt.day)
+    return finDate
+
+###############################################################################
+
 class FinDate():
 
     ''' Date class to manage dates that is simple to use and includes a
@@ -128,15 +137,6 @@ class FinDate():
 
         # update the excel date used for doing lots of financial calculations
         self.refresh()
-
-    ###########################################################################
-
-    def fromDatetime(self, dt):
-        ''' Construct a FinDate from a datetime as this is often needed if we
-        receive inputs from other Python objects such as Pandas dataframes. '''
-
-        finDate = FinDate(dt._y, dt._m, dt._d)
-        return finDate
 
     ###########################################################################
 
@@ -391,12 +391,13 @@ class FinDate():
     ###########################################################################
 
     def date(self):
-
+        ''' Returns a datetime of the date '''
         return datetime.date(self._y, self._m, self._d)
 
     ###########################################################################
 
     def __str__(self):
+        ''' returns a formatted string of the date '''
         dateStr = ""
         dateStr += shortDayNames[self._weekday]
         dateStr += " " + str(self._d) + " "
@@ -407,6 +408,7 @@ class FinDate():
     ###########################################################################
 
     def print(self):
+        ''' prints formatted string of the date. '''
         print(self.__str__())
 
     ###########################################################################

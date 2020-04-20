@@ -10,7 +10,7 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTre
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.finutils.FinDate import FinDate
 
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
@@ -46,7 +46,7 @@ def test_FinBinomialTree():
     putOption = FinEquityVanillaOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_PUT)
+        FinOptionTypes.EUROPEAN_PUT)
     value = putOption.value(
         valueDate,
         stockPrice,
@@ -132,7 +132,7 @@ def test_FinBinomialTree():
     callOption = FinEquityVanillaOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_CALL)
+        FinOptionTypes.EUROPEAN_CALL)
     value = callOption.value(
         valueDate,
         stockPrice,

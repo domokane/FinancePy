@@ -362,7 +362,7 @@ class FinCDS(object):
               pv01Method=0,
               prot_method=0,
               numStepsPerYear=25):
-        ''' Valuation of a CDS contract on a specific valuation date given 
+        ''' Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate.'''
 
         fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
@@ -397,7 +397,7 @@ class FinCDS(object):
                    pv01Method=0,
                    prot_method=0,
                    numStepsPerYear=25):
-        ''' Calculation of the change in the value of the CDS contract for a 
+        ''' Calculation of the change in the value of the CDS contract for a
         one basis point change in the level of the CDS curve.'''
 
         v0 = self.value(valuationDate,
@@ -438,7 +438,7 @@ class FinCDS(object):
                      pv01Method=0,
                      prot_method=0,
                      numStepsPerYear=25):
-        ''' Calculation of the interest DV01 based on a simple bump of 
+        ''' Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve. '''
 
         v0 = self.value(valuationDate,
@@ -626,7 +626,7 @@ class FinCDS(object):
 ##########################################################################
 
     def accruedDays(self):
-        ''' Number of days between the previous coupon and the currrent step 
+        ''' Number of days between the previous coupon and the currrent step
         in date. '''
 
         # I assume accrued runs to the effective date
@@ -686,7 +686,7 @@ class FinCDS(object):
                   valuationDate,
                   issuerCurve,
                   pv01Method=0):
-        ''' The riskyPV01 is the present value of a risky one dollar paid on 
+        ''' The riskyPV01 is the present value of a risky one dollar paid on
         the premium leg of a CDS contract. '''
 
         liborCurve = issuerCurve._liborCurve
@@ -747,7 +747,7 @@ class FinCDS(object):
                   numStepsPerYear=25,
                   pv01Method=0,
                   protMethod=0):
-        ''' Breakeven CDS coupon that would make the value of the CDS contract 
+        ''' Breakeven CDS coupon that would make the value of the CDS contract
         equal to zero. '''
 
         fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,

@@ -14,9 +14,9 @@ I intend that subsequent versions will also include asset selection, portfolio-l
 In general my objectives have been:
 
 1. To make the code as simple as possible so that students and those with a basic Python fluency can understand and check the code.
-2. To keep all the code in Python so users can look through the code to the lowest level. 
+2. To keep all the code in Python so users can look through the code to the lowest level.
 3. To offset the performance impact of (2) by leveraging Numba to make the code as fast as possible without resorting to Cython.
-4. To make the design product-based rather than model-based so someone wanting to price a specific exotic option can easily find that without having to worry too much about the model – just use the default – unless they want to. 
+4. To make the design product-based rather than model-based so someone wanting to price a specific exotic option can easily find that without having to worry too much about the model – just use the default – unless they want to.
 5. To make the library as complete as possible so a user can find all their required finance-related functionality in one place. This is better for the user as they only have to learn one interface.
 6. To avoid complex designs as I do not want to make it too hard for unskilled Python programmers to use the library.
 7. To have good documentation and easy-to-follow examples.
@@ -33,10 +33,14 @@ FinancePy can be installed via pip as
 pip install financepy
 
 ### Changelog
-See the changelog for a detailed history of changes 
+See the changelog for a detailed history of changes
 
 ### Contributions
-Contributions are welcome, as long as you don't mind camel case ;-)
+Contributions are welcome. There are a number of requirements:
+* You should use CamelCase i.e. variables of the form optionPrice
+* Comments are required for every class and function and they should be clear
+* At least one test case must be provided for every module
+* Use a dict if you are planning to return multiple values. Makes it easier for users to understand values.
 
 ### License
 MIT

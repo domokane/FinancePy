@@ -9,7 +9,7 @@ import time
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.products.equity.FinEquityVanillaOption import FinEquityOptionTypes
+from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
@@ -41,7 +41,7 @@ def testFinEquityAmericanOption():
     putOption = FinEquityVanillaOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_PUT)
+        FinOptionTypes.EUROPEAN_PUT)
     value = putOption.value(
         valueDate,
         stockPrice,
@@ -73,7 +73,7 @@ def testFinEquityAmericanOption():
     option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_PUT)
+        FinOptionTypes.EUROPEAN_PUT)
 
     testCases.header(
         "OPTION_TYPE",
@@ -99,7 +99,7 @@ def testFinEquityAmericanOption():
     option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.AMERICAN_PUT)
+        FinOptionTypes.AMERICAN_PUT)
 
     testCases.header(
         "OPTION_TYPE",
@@ -126,7 +126,7 @@ def testFinEquityAmericanOption():
     callOption = FinEquityVanillaOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_CALL)
+        FinOptionTypes.EUROPEAN_CALL)
     value = callOption.value(
         valueDate,
         stockPrice,
@@ -158,7 +158,7 @@ def testFinEquityAmericanOption():
     option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.EUROPEAN_CALL)
+        FinOptionTypes.EUROPEAN_CALL)
 
     testCases.header(
         "OPTION_TYPE",
@@ -190,7 +190,7 @@ def testFinEquityAmericanOption():
     option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
-        FinEquityOptionTypes.AMERICAN_CALL)
+        FinOptionTypes.AMERICAN_CALL)
 
     for numSteps in numStepsList:
         start = time.time()

@@ -16,7 +16,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.equity.FinEquityOption import FinEquityOptionTypes
+from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinFlatCurve import FinFlatCurve
 
@@ -40,7 +40,7 @@ def f(s0, *args):
         s0,
         discountCurve,
         dividendYield,
-        model) - value
+        model)['value'] - value
 
     return objFn
 
@@ -123,9 +123,9 @@ def valueOnce(stockPrice,
 
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
-        if optionType2 == FinEquityOptionTypes.EUROPEAN_CALL:
+        if optionType2 == FinOptionTypes.EUROPEAN_CALL:
             optionValues[index + iNode] = max(s - k2, 0)
-        elif optionType2 == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif optionType2 == FinOptionTypes.EUROPEAN_PUT:
             optionValues[index + iNode] = max(k2 - s, 0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
@@ -155,9 +155,9 @@ def valueOnce(stockPrice,
         futureExpectedValue += (1.0 - probs[iTime]) * vDn
         holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-        if optionType1 == FinEquityOptionTypes.EUROPEAN_CALL:
+        if optionType1 == FinOptionTypes.EUROPEAN_CALL:
             optionValues[index + iNode] = max(holdValue - k1, 0)
-        elif optionType1 == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif optionType1 == FinOptionTypes.EUROPEAN_PUT:
             optionValues[index + iNode] = max(k1 - holdValue, 0)
 
     # begin backward steps from t1 expiry to value date
@@ -273,8 +273,8 @@ class FinEquityCompoundOption(FinEquityOption):
 
         # Taken from Hull Page 532 (6th edition)
 
-        CALL = FinEquityOptionTypes.EUROPEAN_CALL
-        PUT = FinEquityOptionTypes.EUROPEAN_PUT
+        CALL = FinOptionTypes.EUROPEAN_CALL
+        PUT = FinOptionTypes.EUROPEAN_PUT
 
         if self._optionType1 == CALL and self._optionType2 == CALL:
             v = s0 * dq2 * phi2(a1, b1, c) - k2 * df2 * \
