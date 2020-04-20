@@ -68,6 +68,12 @@ def dailyWorkingDaySchedule(self, startDate, endDate):
 
 ###############################################################################
 
+def datediff(d1, d2):
+    ''' Calculate the number of days between two dates. '''
+
+    return (d2._excelDate - d1._excelDate)
+
+###############################################################################
 
 class FinDate():
 
@@ -125,11 +131,11 @@ class FinDate():
 
     ###########################################################################
 
-    def fromDatetime(dt):
+    def fromDatetime(self, dt):
         ''' Construct a FinDate from a datetime as this is often needed if we
         receive inputs from other Python objects such as Pandas dataframes. '''
 
-        finDate = FinDate(dt.year, dt.month, dt.day)
+        finDate = FinDate(dt._y, dt._m, dt._d)
         return finDate
 
     ###########################################################################
@@ -381,14 +387,6 @@ class FinDate():
                 newDate = newDate.addMonths(12)
 
         return newDate
-
-    ###########################################################################
-    # This should be moved out of the class
-
-    def datediff(d1, d2):
-        ''' Calculate the number of dates between two dates. '''
-
-        return (d2._excelDate - d1._excelDate)
 
     ###########################################################################
 

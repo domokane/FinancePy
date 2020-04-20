@@ -16,6 +16,7 @@ from ...finutils.FinError import FinError
 from ...products.FinOptionTypes import FinOptionTypes
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
+from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import blackVolFromSABR
 
@@ -179,6 +180,7 @@ class FinFXVanillaOption():
 
         S0 = spotFXRate
         K = self._strikeFXRate
+        F0T = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes \
             or type(model) == FinFXModelSABR:
@@ -190,7 +192,7 @@ class FinFXVanillaOption():
                                               model.beta,
                                               model.rho,
                                               model.nu,
-                                              F, K, tdel)
+                                              F0T, K, tdel)
 
             if np.any(volatility) < 0.0:
                 raise FinError("Volatility should not be negative.")
@@ -206,7 +208,6 @@ class FinFXVanillaOption():
             d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
             d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
 
-            F0T = S0 * np.exp((rd-rf)*tdel)
 
             numStepsPerYear = 100
 

@@ -31,7 +31,7 @@ class FinFXModelHeston(FinFXModel):
 ###############################################################################
 
 class FinFXModelSABR(FinFXModel):
-    def __init__(self, alpha, beta, rho, volatility):
+    def __init__(self, alpha, beta, rho, nu, volatility):
         self._parentType = FinFXModel
         self._alpha = alpha
         self._beta = beta
