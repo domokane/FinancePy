@@ -5,7 +5,8 @@ Created on Fri Nov 30 10:10:19 2018
 @author: Dominic O'Kane
 """
 
-from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear
+from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
+
 from .FinMath import isLeapYear
 
 from enum import Enum
@@ -137,8 +138,8 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return accFactor
             else:
-                daysYear1 = FinDate.datediff(dt1, FinDate(y1 + 1, 1, 1))
-                daysYear2 = FinDate.datediff(FinDate(y1 + 1, 1, 1), dt2)
+                daysYear1 = datediff(dt1, FinDate(y1 + 1, 1, 1))
+                daysYear2 = datediff(FinDate(y1 + 1, 1, 1), dt2)
                 accFactor = daysYear1 / denom1
                 accFactor += daysYear2 / denom2
                 return accFactor

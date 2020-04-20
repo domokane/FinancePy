@@ -6,7 +6,7 @@ Created on Fri Feb 12 16:51:05 2016
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
@@ -50,7 +50,7 @@ def test_FinEquityDigitalOption():
     for numPaths in numPathsList:
 
         callOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinEquityOptionTypes.DIGITAL_CALL)
+            expiryDate, 100.0, FinOptionTypes.DIGITAL_CALL)
         value = callOption.value(
             valueDate,
             stockPrice,
@@ -88,7 +88,7 @@ def test_FinEquityDigitalOption():
 
     for stockPrice in stockPrices:
         callOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinEquityOptionTypes.DIGITAL_CALL)
+            expiryDate, 100.0, FinOptionTypes.DIGITAL_CALL)
         value = callOption.value(
             valueDate,
             stockPrice,
@@ -125,7 +125,7 @@ def test_FinEquityDigitalOption():
 
     for stockPrice in stockPrices:
         putOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinEquityOptionTypes.DIGITAL_PUT)
+            expiryDate, 100.0, FinOptionTypes.DIGITAL_PUT)
         value = putOption.value(
             valueDate,
             stockPrice,

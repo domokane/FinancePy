@@ -14,7 +14,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 ##########################################################################
 
-from ...products.equities.FinEquityOption import FinEquityOption
+from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.FinOptionTypes import FinOptionTypes
 
 

@@ -6,7 +6,7 @@ Created on Fri Feb 12 16:51:05 2016
 """
 import time
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.equity.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAsianOption import FinEquityAsianOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
@@ -48,7 +48,7 @@ def testConvergence():
     asianOption = FinEquityAsianOption(startAveragingDate,
                                  expiryDate,
                                  K,
-                                 FinEquityOptionTypes.EUROPEAN_CALL,
+                                 FinOptionTypes.EUROPEAN_CALL,
                                  numObservations)
 
     testCases.header(
@@ -160,7 +160,7 @@ def testTimeEvolution():
     asianOption = FinEquityAsianOption(startAveragingDate,
                                  expiryDate,
                                  K,
-                                 FinEquityOptionTypes.EUROPEAN_CALL,
+                                 FinOptionTypes.EUROPEAN_CALL,
                                  numObservations)
 
     testCases.header(
@@ -286,7 +286,7 @@ def testMCTimings():
     asianOption = FinEquityAsianOption(startAveragingDate,
                                  expiryDate,
                                  K,
-                                 FinEquityOptionTypes.EUROPEAN_CALL,
+                                 FinOptionTypes.EUROPEAN_CALL,
                                  numObservations)
 
     testCases.header(

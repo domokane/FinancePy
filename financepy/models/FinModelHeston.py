@@ -11,7 +11,7 @@ from math import exp, log, pi
 import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
 
 from ..finutils.FinGlobalVariables import gDaysInYear
-from ..products.equity.FinEquityOption import FinEquityOptionTypes
+from ..products.FinOptionTypes import FinOptionTypes
 from ..finutils.FinMath import norminvcdf
 
 ##########################################################################
@@ -39,7 +39,7 @@ class FinHestonNumericalScheme(Enum):
 ##########################################################################
 
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
-                    float64, float64, float64, float64, int64, int64, int64), 
+                    float64, float64, float64, float64, int64, int64, int64),
                     fastmath=True)
 def getPaths(
         s0,
@@ -207,9 +207,9 @@ class FinModelHeston():
                           seed,
                           schemeValue)
 
-        if option._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if option._optionType == FinOptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(sPaths[:, -1] - K, 0)
-        elif option._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif option._optionType == FinOptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - sPaths[:, -1], 0)
         else:
             raise ValueError("Unknown option type.")

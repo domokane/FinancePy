@@ -7,7 +7,7 @@ Created on Fri Feb 12 16:51:05 2016
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.FinModelHeston import FinModelHeston, FinHestonNumericalScheme
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.finutils.FinDate import FinDate
 import time
@@ -56,7 +56,7 @@ def testAnalyticalModels():
             hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
             for strikePrice in np.linspace(95, 105, 3):
                 callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinEquityOptionTypes.EUROPEAN_CALL)
+                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
                 valueMC_Heston = hestonModel.value_MC(
                     valueDate,
                     callOption,
@@ -127,7 +127,7 @@ def testMonteCarlo():
             for numPaths in [10000, 20000]:
                 hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
                 callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinEquityOptionTypes.EUROPEAN_CALL)
+                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
                     valueDate, callOption, stockPrice, interestRate, dividendYield)
 

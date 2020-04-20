@@ -83,7 +83,7 @@ class FinEquityVanillaOption(FinEquityOption):
          optionType != FinOptionTypes.EUROPEAN_PUT and \
          optionType != FinOptionTypes.AMERICAN_CALL and \
          optionType != FinOptionTypes.AMERICAN_PUT:
-            raise FinError("Unknown Option Type", optionType)
+            raise FinError("Unknown Option Type" + str(optionType))
 
         self._expiryDate = expiryDate
         self._strikePrice = strikePrice
@@ -361,14 +361,14 @@ class FinEquityVanillaOption(FinEquityOption):
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
-            if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
                 v = - stockPrice * np.exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrtT
                 v = v - interestRate * self._strikePrice * \
                     np.exp(-interestRate * t) * N(d2)
                 v = v + dividendYield * stockPrice * \
                     np.exp(-dividendYield * t) * N(d1)
-            elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
                 v = - stockPrice * np.exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrtT
                 v = v + interestRate * self._strikePrice * \

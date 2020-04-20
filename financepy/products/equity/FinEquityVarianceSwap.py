@@ -12,7 +12,8 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityOption import FinEquityModelBlackScholes
-from .FinEquityVanillaOption import FinEquityVanillaOption, FinEquityOptionTypes
+from ..FinOptionTypes import FinOptionTypes
+from .FinEquityVanillaOption import FinEquityVanillaOption
 
 ###############################################################################
 
@@ -55,10 +56,10 @@ class FinEquityVarianceSwap(object):
 
 ###############################################################################
 
-    def value(self, 
-              valuationDate, 
-              realisedVar, 
-              fairStrikeVar, 
+    def value(self,
+              valuationDate,
+              realisedVar,
+              fairStrikeVar,
               liborCurve):
         ''' Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
@@ -122,8 +123,8 @@ class FinEquityVarianceSwap(object):
         self._numPutOptions = numPutOptions
         self._numCallOptions = numCallOptions
 
-        callType = FinEquityOptionTypes.EUROPEAN_CALL
-        putType = FinEquityOptionTypes.EUROPEAN_PUT
+        callType = FinOptionTypes.EUROPEAN_CALL
+        putType = FinOptionTypes.EUROPEAN_PUT
 
         tmat = (self._maturityDate - valuationDate)/gDaysInYear
 
@@ -198,7 +199,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, putType)
             model = FinEquityModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)
+                          dividendYield, model)['value']
             piPut += v * self._putWts[n]
 
         piCall = 0.0
@@ -208,7 +209,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, callType)
             model = FinEquityModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)
+                          dividendYield, model)['value']
             piCall += v * self._callWts[n]
 
         pi = piCall + piPut

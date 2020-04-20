@@ -6,7 +6,7 @@ Created on Fri Feb 12 16:51:05 2016
 """
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
-from financepy.products.equity.FinEquityOption import FinEquityOptionTypes
+from financepy.products.equity.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np
@@ -45,7 +45,7 @@ def test_FinBasketOption():
     for beta in betaList:
         for numPaths in [10000]:
             callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinEquityOptionTypes.EUROPEAN_CALL, numAssets)
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
             start = time.time()
             v = callOption.value(
@@ -85,7 +85,7 @@ def test_FinBasketOption():
         for numPaths in [10000]:
 
             callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinEquityOptionTypes.EUROPEAN_CALL, numAssets)
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
             start = time.time()
             v = callOption.value(
@@ -122,7 +122,7 @@ def test_FinBasketOption():
     for beta in betaList:
         for numPaths in [10000]:
             callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinEquityOptionTypes.EUROPEAN_PUT, numAssets)
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
             start = time.time()
             v = callOption.value(
@@ -161,7 +161,7 @@ def test_FinBasketOption():
         for numPaths in [10000]:
 
             callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinEquityOptionTypes.EUROPEAN_PUT, numAssets)
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
             start = time.time()
             v = callOption.value(
