@@ -35,7 +35,7 @@ class FinBondOptionTypes(Enum):
 
 
 class FinBondCallable():
-    ''' Class for options on fixed coupon bonds. '''
+    ''' Class for fixed coupon bonds with embedded call or put optionality. '''
 
     def __init__(self,
                  bond,
@@ -95,6 +95,9 @@ class FinBondCallable():
 
         if type(model) == FinHullWhiteRateModel:
 
+            ''' Because we have a closed form bond price we need only build
+            the tree out the the option expiry date. '''
+
             numTimeSteps = 100
             model.buildTree(texp, numTimeSteps, dfTimes, dfValues)
 
@@ -105,6 +108,9 @@ class FinBondCallable():
             return v[0]
 
         elif type(model) == FinBlackKarasinskiRateModel:
+
+            ''' Because we not have a closed form bond price we need to build
+            the tree out to the bond maturity which is after option expiry. '''
 
             maturityDate = self._bond._maturityDate
             numTimeSteps = 100

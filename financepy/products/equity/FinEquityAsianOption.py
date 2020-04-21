@@ -16,7 +16,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.equity.FinEquityOption import FinEquityOptionTypes
+from ...products.FinOptionTypes import FinOptionTypes
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff
@@ -111,10 +111,10 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType,
         s_1_arithmetic /= n
         s_2_arithmetic /= n
 
-        if optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if optionType == FinOptionTypes.EUROPEAN_CALL:
             payoff_a += max(s_1_arithmetic - K, 0)
             payoff_a += max(s_2_arithmetic - K, 0)
-        elif optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif optionType == FinOptionTypes.EUROPEAN_PUT:
             payoff_a += max(K - s_1_arithmetic, 0)
             payoff_a += max(K - s_2_arithmetic, 0)
         else:
@@ -192,10 +192,10 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
-    if optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+    if optionType == FinOptionTypes.EUROPEAN_CALL:
         payoff_a_1 = np.maximum(s_1_arithmetic - K, 0)
         payoff_a_2 = np.maximum(s_2_arithmetic - K, 0)
-    elif optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+    elif optionType == FinOptionTypes.EUROPEAN_PUT:
         payoff_a_1 = np.maximum(K - s_1_arithmetic, 0)
         payoff_a_2 = np.maximum(K - s_2_arithmetic, 0)
     else:
@@ -284,12 +284,12 @@ def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
         s_2_arithmetic[ip] /= n
         s_2_geometric[ip] = np.exp(ln_s_2_geometric[ip] / n)
 
-    if optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+    if optionType == FinOptionTypes.EUROPEAN_CALL:
         payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
         payoff_g_1 = np.maximum(s_1_geometric - K, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
         payoff_g_2 = np.maximum(s_2_geometric - K, 0.0)
-    elif optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+    elif optionType == FinOptionTypes.EUROPEAN_PUT:
         payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
         payoff_g_1 = np.maximum(K - s_1_geometric, 0.0)
         payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
@@ -462,9 +462,9 @@ class FinEquityAsianOption(FinEquityOption):
         # the Geometric price is the lower bound
         call_g = exp(-r * t) * (EG * N(d1) - K * N(d2))
 
-        if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             v = call_g
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             put_g = call_g - (EG - K) * exp(-r * t)
             v = put_g
         else:
@@ -533,9 +533,9 @@ class FinEquityAsianOption(FinEquityOption):
         d1 = (log(FA / K) + sigmaA * sigmaA * t / 2.0) / (sigmaA * sqrt(t))
         d2 = d1 - sigmaA * sqrt(t)
 
-        if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             v = exp(-r * t) * (FA * N(d1) - K * N(d2))
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             v = exp(-r * t) * (K * N(-d2) - FA * N(-d1))
         else:
             return None
@@ -615,10 +615,10 @@ class FinEquityAsianOption(FinEquityOption):
         d1 = (log(F0 / K) + sigma2 * t / 2) / sigma / sqrt(t)
         d2 = d1 - sigma * sqrt(t)
 
-        if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             call = exp(-r * t) * (F0 * N(d1) - K * N(d2))
             v = call
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             put = exp(-r * t) * (K * N(-d2) - F0 * N(-d1))
             v = put
         else:

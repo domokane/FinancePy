@@ -37,8 +37,7 @@ def f(dm, *args):
 ##########################################################################
 
 
-class FinBondFloatingRateNote(object):
-
+class FinBondFRN(object):
     ''' Class for managing floating rate notes that pay a floating index plus a
     quoted margin.'''
 

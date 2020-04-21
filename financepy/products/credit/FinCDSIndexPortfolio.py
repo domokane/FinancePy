@@ -55,8 +55,11 @@ class FinCDSIndexPortfolio():
 
         for m in range(0, numCredits):
 
-            fullRPV01, cleanRPV01 = cdsContract.riskyPV01(valuationDate,
-                                                          issuerCurves[m])
+            retValue = cdsContract.riskyPV01(valuationDate,
+                                             issuerCurves[m])
+
+            cleanRPV01 = retValue['clean_rpv01']
+
             intrinsicRPV01 += cleanRPV01
 
         intrinsicRPV01 /= numCredits
@@ -328,8 +331,8 @@ class FinCDSIndexPortfolio():
                     indexProtectionPV = cdsIndex.protectionLegPV(
                         valuationDate, adjustedIssuerCurve, indexRecoveryRate)
 
-                    fullRPV01, cleanRPV01 = cdsIndex.riskyPV01(
-                        valuationDate, adjustedIssuerCurve)
+                    cleanRPV01 = cdsIndex.riskyPV01(valuationDate, 
+                                                    adjustedIssuerCurve)['clean_rpv01']
 
                     sumRPV01 += cleanRPV01
                     sumProt += indexProtectionPV
@@ -448,8 +451,10 @@ class FinCDSIndexPortfolio():
                     indexProtPV = cdsIndex.protectionLegPV(
                         valuationDate, adjustedIssuerCurves[iCredit], indexRecoveryRate)
 
-                    fullRPV01, cleanRPV01 = cdsIndex.riskyPV01(
+                    rpv01Ret = cdsIndex.riskyPV01(
                         valuationDate, adjustedIssuerCurves[iCredit])
+
+                    cleanRPV01 = rpv01Ret['clean_rpv01']
 
                     sumRPV01 += cleanRPV01
                     sumProt += indexProtPV

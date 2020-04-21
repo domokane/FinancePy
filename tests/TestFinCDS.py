@@ -79,7 +79,7 @@ def test_CDSFastApproximation():
 
         cdsContract = FinCDS(valuationDate, maturityDate, contractCoupon)
         v_exact = cdsContract.value(
-            valuationDate, issuerCurve, recoveryRate)[0]
+            valuationDate, issuerCurve, recoveryRate)['full_pv']
         v_approx = cdsContract.valueFastApprox(
             valuationDate, r, mktCoupon, recoveryRate)[0]
         pctdiff = (v_exact - v_approx) / ONE_MILLION * 100.0
@@ -405,8 +405,8 @@ def test_fullPriceCDS():
     testCases.print("PAR_SPREAD", spd)
 
     v = cdsContract.value(valuationDate, issuerCurve, cdsRecovery)
-    testCases.print("FULL_VALUE", v[0])
-    testCases.print("CLEAN_VALUE", v[1])
+    testCases.print("FULL_VALUE", v['full_pv'])
+    testCases.print("CLEAN_VALUE", v['clean_pv'])
 
     p = cdsContract.cleanPrice(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("CLEAN_PRICE", p)
@@ -432,13 +432,13 @@ def test_fullPriceCDS():
 
     liborCurve, issuerCurve = buildFullIssuerCurve(bump, 0)
     v_bump = cdsContract.value(valuationDate, issuerCurve, cdsRecovery)
-    dv = v_bump[0] - v[0]
+    dv = v_bump['full_pv'] - v['full_pv']
     testCases.print("CREDIT_DV01", dv)
 
     # Interest Rate Bump
     liborCurve, issuerCurve = buildFullIssuerCurve(0, bump)
     v_bump = cdsContract.value(valuationDate, issuerCurve, cdsRecovery)
-    dv = v_bump[0] - v[0]
+    dv = v_bump['full_pv'] - v['full_pv']
     testCases.print("INTEREST_DV01", dv)
 
     t = (maturityDate - valuationDate) / gDaysInYear
@@ -481,7 +481,7 @@ def test_fullPriceCDSConvergence():
     testCases.header("NumSteps", "Value")
     for n in [10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000]:
         v_full = cdsContract.value(
-            valuationDate, issuerCurve, cdsRecovery, 0, 1, n)[0]
+            valuationDate, issuerCurve, cdsRecovery, 0, 1, n)['full_pv']
         testCases.print(n, v_full)
 
 ##########################################################################

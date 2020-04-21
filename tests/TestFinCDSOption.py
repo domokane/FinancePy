@@ -238,8 +238,8 @@ def test_fullPriceCDSwaption():
     testCases.print("PAR SPREAD:", spd)
 
     v = cdsContract.value(valuationDate, issuerCurve, cdsRecovery)
-    testCases.print("FULL VALUE", v[0])
-    testCases.print("CLEAN VALUE", v[1])
+    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("CLEAN VALUE", v['clean_pv'])
 
     p = cdsContract.cleanPrice(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("CLEAN PRICE", p)
@@ -281,8 +281,8 @@ def test_fullPriceCDSwaption():
     testCases.print("PAR SPREAD", spd)
 
     v = cdsContract.value(valuationDate, issuerCurve, cdsRecovery)
-    testCases.print("FULL VALUE", v[0])
-    testCases.print("CLEAN VALUE", v[1])
+    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("CLEAN VALUE", v['clean_pv'])
 
     protPV = cdsContract.protectionLegPV(
         valuationDate, issuerCurve, cdsRecovery)

@@ -7,7 +7,7 @@ Created on Mon Aug  5 09:43:40 2019
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.products.bonds.FinBondFloatingRateNote import FinBondFloatingRateNote
+from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -184,7 +184,7 @@ def buildLiborCurve(valuationDate):
 ##########################################################################
 
 
-def test_FinBondFloatingRateNote():
+def test_FinBondFRN():
 
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # I have a day out problem on the accrued interest - should be 71 and not 72 days
@@ -203,12 +203,12 @@ def test_FinBondFloatingRateNote():
     face = 100.0
     redemption = 1.0
 
-    bond = FinBondFloatingRateNote(maturityDate,
-                               quotedMargin,
-                               freqType,
-                               accrualType,
-                               face,
-                               redemption)
+    bond = FinBondFRN(maturityDate,
+                      quotedMargin,
+                      freqType,
+                      accrualType,
+                      face,
+                      redemption)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 96.793
@@ -277,12 +277,12 @@ def test_FinBondFloatingRateNote():
     face = 100.0
     redemption = 1.0
 
-    bond = FinBondFloatingRateNote(maturityDate,
-                               quotedMargin,
-                               freqType,
-                               accrualType,
-                               face,
-                               redemption)
+    bond = FinBondFRN(maturityDate,
+                      quotedMargin,
+                      freqType,
+                      accrualType,
+                      face,
+                      redemption)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 93.08
@@ -339,5 +339,5 @@ def test_FinBondFloatingRateNote():
 
 
 ##########################################################################
-test_FinBondFloatingRateNote()
+test_FinBondFRN()
 testCases.compareTestCases()

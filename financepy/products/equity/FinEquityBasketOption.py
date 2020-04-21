@@ -15,7 +15,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 ##########################################################################
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.equity.FinEquityOption import FinEquityOptionTypes
+from ...products.FinOptionTypes import FinOptionTypes
 
 class FinEquityBasketOption(FinEquityOption):
 
@@ -120,10 +120,10 @@ class FinEquityBasketOption(FinEquityOption):
         d1 = (lnS0k + (mu + vhat2 / 2.0) * t) / den
         d2 = (lnS0k + (mu - vhat2 / 2.0) * t) / den
 
-        if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             v = smean * exp(-qhat * t) * N(d1)
             v = v - self._strikePrice * exp(-r * t) * N(d2)
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             v = self._strikePrice * exp(-r * t) * N(-d2)
             v = v - smean * exp(-qhat * t) * N(-d1)
         else:
@@ -176,9 +176,9 @@ class FinEquityBasketOption(FinEquityOption):
             betas,
             seed)
 
-        if self._optionType == FinEquityOptionTypes.EUROPEAN_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(Sall, axis=1) - k, 0)
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(k - np.mean(Sall, axis=1), 0)
         else:
             raise ValueError("Unknown option type.")

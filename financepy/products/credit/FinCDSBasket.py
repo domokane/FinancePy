@@ -285,7 +285,7 @@ class FinCDSBasket(object):
 
         protLegPV = self._cdsContract.protectionLegPV(
             valuationDate, basketCurve, curveRecovery)
-        riskyPV01 = self._cdsContract.riskyPV01(valuationDate, basketCurve)[1]
+        riskyPV01 = self._cdsContract.riskyPV01(valuationDate, basketCurve)['clean_rpv01']
 
         # Long protection
         mtm = self._notional * (protLegPV - riskyPV01 * self._coupon)

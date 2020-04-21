@@ -121,9 +121,9 @@ class FinCDSIndexOption(object):
 #        qExpiryStrike = strikeCurve.survivalProbability(timeToExpiry)
 
         strikeRPV01 = self._cdsContract.riskyPV01(
-            valuationDate, strikeCurve)[RPV01_INDEX]
+            valuationDate, strikeCurve)['clean_rpv01']
         indexRPV01 = self._cdsContract.riskyPV01(
-            valuationDate, indexCurve)[RPV01_INDEX]
+            valuationDate, indexCurve)['clean_rpv01']
 
         s = self._cdsContract.parSpread(valuationDate, indexCurve)
 
@@ -175,7 +175,7 @@ class FinCDSIndexOption(object):
         strikeCurve = FinCDSCurve(valuationDate, [strikeCDS], liborCurve)
         strikeRPV01s = strikeCDS.riskyPV01(valuationDate, strikeCurve)
         qToExpiry = strikeCurve.survProb(timeToExpiry)
-        strikeValue = (k - c) * strikeRPV01s[RPV01_INDEX]
+        strikeValue = (k - c) * strikeRPV01s['clean_rpv01']
         strikeValue /= (dfToExpiry * qToExpiry)
 
         expH = 0.0
@@ -190,7 +190,7 @@ class FinCDSIndexOption(object):
 
             s = self._cdsContract.parSpread(valuationDate, issuerCurve)
             rpv01 = self._cdsContract.riskyPV01(valuationDate, issuerCurve)
-            dh2 = (s - c) * rpv01[RPV01_INDEX] / (dfToExpiry * qToExpiry)
+            dh2 = (s - c) * rpv01['clean_rpv01'] / (dfToExpiry * qToExpiry)
 
             h1 = h1 + dh1
             h2 = h2 + dh2

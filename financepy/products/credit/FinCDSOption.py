@@ -119,7 +119,7 @@ class FinCDSOption():
 
         strike = self._strikeCoupon
         forwardSpread = cds.parSpread(valuationDate, issuerCurve)
-        forwardRPV01 = cds.riskyPV01(valuationDate, issuerCurve)[0]
+        forwardRPV01 = cds.riskyPV01(valuationDate, issuerCurve)['full_rpv01']
 
         timeToExpiry = (self._expiryDate - valuationDate) / gDaysInYear
         logMoneyness = log(forwardSpread / strike)

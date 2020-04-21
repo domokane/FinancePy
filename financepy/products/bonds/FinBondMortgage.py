@@ -40,6 +40,7 @@ class FinBondMortgage(object):
                  busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType=FinDayCountTypes.ACT_360):
+        ''' Create the mortgage using start and end dates and principal. '''
 
         if startDate > endDate:
             raise ValueError("Start Date after End Date")
@@ -81,6 +82,7 @@ class FinBondMortgage(object):
 ###############################################################################
 
     def repaymentAmount(self, zeroRate):
+        ''' Determine monthly repayment amount based on current zero rate. '''
 
         frequency = FinFrequency(self._frequencyType)
 
@@ -93,6 +95,7 @@ class FinBondMortgage(object):
 ###############################################################################
 
     def generateFlows(self, zeroRate, mortgageType):
+        ''' Generate the bond flow amounts. '''
 
         self._mortgageType = mortgageType
         self._interestFlows = [0]

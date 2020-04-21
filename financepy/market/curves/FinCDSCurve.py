@@ -63,7 +63,7 @@ def f(q, *args):
     self._values[numPoints - 1] = q
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    objFn = cds.value(valueDate, self)[1]
+    objFn = cds.value(valueDate, self)['clean_pv']
     return objFn
 
 ###############################################################################

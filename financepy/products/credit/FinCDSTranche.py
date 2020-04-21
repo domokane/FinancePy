@@ -215,7 +215,7 @@ class FinCDSTranche(object):
 
         protLegPV = self._cdsContract.protectionLegPV(
             valuationDate, trancheCurve, curveRecovery)
-        riskyPV01 = self._cdsContract.riskyPV01(valuationDate, trancheCurve)[1]
+        riskyPV01 = self._cdsContract.riskyPV01(valuationDate, trancheCurve)['clean_rpv01']
 
         mtm = self._notional * (protLegPV - upfront - riskyPV01 * coupon)
 

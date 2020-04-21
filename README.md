@@ -1,4 +1,5 @@
 # FinancePy
+
 FinancePy is a library of native Python functions which covers the following functionality:
 
 * Valuation and risk of a wide range of equity, FX, interest rate and credit derivatives.
@@ -24,18 +25,22 @@ In general my objectives have been:
 
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
 
-### Dependencies
+## Dependencies
+
 FinancePy depends on Numpy and Numba and Scipy.
 
-### Installation
+## Installation
+
 FinancePy can be installed via pip as
 
 pip install financepy
 
-### Changelog
+## Changelog
+
 See the changelog for a detailed history of changes
 
-### Contributions
+## Contributions
+
 Contributions are welcome. There are a number of requirements:
 
 * You should use CamelCase i.e. variables of the form optionPrice
@@ -43,5 +48,6 @@ Contributions are welcome. There are a number of requirements:
 * At least one test case must be provided for every module
 * Use a dict if you are planning to return multiple values. Makes it easier for users to understand values.
 
-### License
+## License
+
 MIT

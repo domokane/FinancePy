@@ -189,9 +189,9 @@ class FinCDS(object):
     generation and the valuation and risk management of CDS. '''
 
     def __init__(self,
-                 stepInDate,
-                 maturityDateOrTenor,
-                 runningCoupon,
+                 stepInDate, #  FinDate is when protection starts (usually T+1)
+                 maturityDateOrTenor,  # FinDate or a FinTenor
+                 runningCoupon, # Annualised coupon on premium leg
                  notional=ONE_MILLION,
                  longProtection=True,
                  frequencyType=FinFrequencyTypes.QUARTERLY,
@@ -199,8 +199,7 @@ class FinCDS(object):
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
-        ''' stepInDate - FinDate that is the date protection starts
-        (usually T+1) runningCoupon - Size of coupon on premium leg '''
+        ''' Create a CDS from the step-in date, maturity date and coupon '''
 
         if type(stepInDate) is not FinDate:
             raise ValueError(
@@ -386,7 +385,8 @@ class FinCDS(object):
             (protPV - self._coupon * fullRPV01 * self._notional)
         cleanPV = fwdDf * longProt * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
-        return (fullPV, cleanPV)
+
+        return {'full_pv':fullPV, 'clean_pv':cleanPV)
 
 ##########################################################################
 
@@ -519,8 +519,7 @@ class FinCDS(object):
                    numStepsPerYear=52):
         ''' Value of the CDS contract excluding accrued interest. '''
 
-        fullRPV01, cleanRPV01 = self.riskyPV01(
-            valuationDate, issuerCurve, pv01Method)
+        cleanRPV01 = self.riskyPV01(valuationDate, issuerCurve, pv01Method)['clean_rpv01']
 
         protPV = self.protectionLegPV(valuationDate,
                                       issuerCurve,
@@ -621,7 +620,7 @@ class FinCDS(object):
 
 #        print("OLD PV01",fullRPV01, cleanRPV01)
 
-        return fullRPV01, cleanRPV01
+        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01
 
 ##########################################################################
 

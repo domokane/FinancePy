@@ -145,8 +145,8 @@ def test_valueCDSIndex():
     testCases.print("PAR SPREAD", spd)
 
     v = cdsIndexContract.value(valuationDate, issuerCurve, cdsRecovery)
-    testCases.print("FULL VALUE", v[0])
-    testCases.print("CLEAN VALUE", v[1])
+    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("CLEAN VALUE", v['clean_pv'])
 
     p = cdsIndexContract.cleanPrice(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("CLEAN PRICE", p)

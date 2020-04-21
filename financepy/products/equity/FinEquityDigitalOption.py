@@ -11,7 +11,8 @@ import numpy as np
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
-from ...products.equity.FinEquityOption import FinEquityOption, FinEquityOptionTypes
+from ...products.FinOptionTypes import FinOptionTypes
+from ...products.equity.FinEquityOption import FinEquityOption
 
 ##########################################################################
 ##########################################################################
@@ -65,9 +66,9 @@ class FinEquityDigitalOption(FinEquityOption):
         mu = r - dividendYield
         d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
-        if self._optionType == FinEquityOptionTypes.DIGITAL_CALL:
+        if self._optionType == FinOptionTypes.DIGITAL_CALL:
             v = exp(-r * t) * N(d2)
-        elif self._optionType == FinEquityOptionTypes.DIGITAL_PUT:
+        elif self._optionType == FinOptionTypes.DIGITAL_PUT:
             v = exp(-r * t) * N(-d2)
         else:
             raise FinError("Unknown option type")
@@ -104,10 +105,10 @@ class FinEquityDigitalOption(FinEquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        if self._optionType == FinEquityOptionTypes.DIGITAL_CALL:
+        if self._optionType == FinOptionTypes.DIGITAL_CALL:
             payoff_a_1 = np.heaviside(s_1 - K, 0)
             payoff_a_2 = np.heaviside(s_2 - K, 0)
-        elif self._optionType == FinEquityOptionTypes.DIGITAL_PUT:
+        elif self._optionType == FinOptionTypes.DIGITAL_PUT:
             payoff_a_1 = np.heaviside(K - s_1, 0)
             payoff_a_2 = np.heaviside(K - s_2, 0)
         else:
