@@ -23,7 +23,6 @@ from ...models.FinModelSABR import blackVolFromSABR
 N = norm.cdf
 
 ###############################################################################
-###############################################################################
 
 
 def f(volatility, *args):
@@ -32,24 +31,23 @@ def f(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
-    stockPrice = args[2]
-    discountCurve = args[3]
-    dividendYield = args[4]
+    spotFXRate = args[2]
+    domDiscountCurve = args[3]
+    forDiscountCurve = args[4]
     price = args[5]
 
     model = FinFXModelBlackScholes(volatility)
 
     self.value(valueDate,
-               stockPrice,
-               discountCurve,
-               dividendYield,
+               spotFXRate,
+               domDiscountCurve,
+               forDiscountCurve,
                model)
 
     objFn = self._vdf - price
 
     return objFn
 
-###############################################################################
 ###############################################################################
 
 
@@ -60,19 +58,72 @@ def fvega(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
-    stockPrice = args[2]
-    discountCurve = args[3]
-    dividendYield = args[4]
+    spotFXRate = args[2]
+    domDiscountCurve = args[3]
+    forDiscountCurve = args[4]
 
     model = FinFXModelBlackScholes(volatility)
 
     fprime = self.vega(valueDate,
-                       stockPrice,
-                       discountCurve,
-                       dividendYield,
+                       spotFXRate,
+                       domDiscountCurve,
+                       forDiscountCurve,
                        model)
 
     return fprime
+
+###############################################################################
+
+
+def g(K, *args):
+    ''' This is the objective function used in the determination of the FX
+    Option implied strike which is computed in the class below. '''
+
+    self = args[0]
+    valueDate = args[1]
+    stockPrice = args[2]
+    domDiscountCurve = args[3]
+    forDiscountCurve = args[4]
+    delta = args[5]
+    deltaType = args[6]
+    volatility = args[7]
+
+    model = FinFXModelBlackScholes(volatility)
+
+    self._strikeFXRate = K
+
+    deltaDict = self.delta(valueDate,
+                           stockPrice,
+                           domDiscountCurve,
+                           forDiscountCurve,
+                           model)
+
+    deltaOut = deltaDict[deltaType]
+    objFn = delta - deltaOut
+    return objFn
+
+###############################################################################
+
+
+def solveForStrike(valueDate,
+                   vanillaOption,
+                   spotFXRate,
+                   domDiscountCurve,
+                   forDiscountCurve,
+                   delta,
+                   deltaType,
+                   volatility):
+    ''' This function determines the implied strike of an FX option
+    given a delta and the other option details. It uses a one-dimensional
+    Newton root search algorith to determine the strike that matches an
+    input volatility. '''
+
+    argtuple = (vanillaOption, valueDate, spotFXRate, domDiscountCurve,
+                forDiscountCurve, delta, deltaType, volatility)
+
+    sigma = optimize.newton(g, x0=spotFXRate, args=argtuple,
+                            tol=1e-5, maxiter=50, fprime2=None)
+    return sigma
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -82,11 +133,11 @@ def fvega(volatility, *args):
 
 
 class FinFXVanillaOption():
-#        ''' This is a class for an FX Option trade. It permits the user to
-#        calculate the price of an FX Option trade which can be expressed in a
-#        number of ways depending on the investor or hedger's currency. It aslo
-#        allows the calculation of the option's delta in a number of forms as
-#        well as the various Greek risk sensitivies. '''
+    ''' This is a class for an FX Option trade. It permits the user to
+    calculate the price of an FX Option trade which can be expressed in a
+    number of ways depending on the investor or hedger's currency. It aslo
+    allows the calculation of the option's delta in a number of forms as
+    well as the various Greek risk sensitivies. '''
 
     def __init__(self,
                  expiryDate,
@@ -94,8 +145,8 @@ class FinFXVanillaOption():
                  currencyPair,  # FORDOM
                  optionType,
                  notional,
-                 notionalCurrency,
-                 spotDays = 0):
+                 premCurrency,
+                 spotDays=0):
         ''' Create the FX Vanilla Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -106,7 +157,7 @@ class FinFXVanillaOption():
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 
-        ''' The FX rate is in the price in domestic currency ccy2 of a single unit
+        ''' The FX rate the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
         price in USD (CCY2) of 1 unit of EUR (CCY1)'''
 
@@ -118,33 +169,37 @@ class FinFXVanillaOption():
 
         self._expiryDate = expiryDate
         self._deliveryDate = deliveryDate
+
+        if strikeFXRate < 0.0:
+            raise FinError("Negative strike.")
+
         self._strikeFXRate = strikeFXRate
 
         self._currencyPair = currencyPair
         self._forName = self._currencyPair[0:3]
         self._domName = self._currencyPair[3:6]
 
-        if notionalCurrency != self._domName and notionalCurrency != self._forName:
-            raise FinError("Notional currency not in currency pair.")
+        if premCurrency != self._domName and premCurrency != self._forName:
+            raise FinError("Premium currency not in currency pair.")
 
-        self._notionalCurrency = notionalCurrency
+        self._premCurrency = premCurrency
+
         self._notional = notional
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
-         optionType != FinOptionTypes.EUROPEAN_PUT and\
-         optionType != FinOptionTypes.AMERICAN_CALL and \
-         optionType != FinOptionTypes.AMERICAN_PUT:
+           optionType != FinOptionTypes.EUROPEAN_PUT and\
+           optionType != FinOptionTypes.AMERICAN_CALL and \
+           optionType != FinOptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type:" + optionType)
 
         self._optionType = optionType
         self._spotDays = spotDays
 
 ###############################################################################
-###############################################################################
 
     def value(self,
               valueDate,
-              spotFXRate, #  ONE UNIT OF FOREIGN IN DOMESTIC CCY
+              spotFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
               domDiscountCurve,
               forDiscountCurve,
               model):
@@ -182,8 +237,8 @@ class FinFXVanillaOption():
         K = self._strikeFXRate
         F0T = S0 * np.exp((rd-rf)*tdel)
 
-        if type(model) == FinFXModelBlackScholes \
-            or type(model) == FinFXModelSABR:
+        if type(model) == FinFXModelBlackScholes or \
+            type(model) == FinFXModelSABR:
 
             if type(model) == FinFXModelBlackScholes:
                 volatility = model._volatility
@@ -208,64 +263,64 @@ class FinFXVanillaOption():
             d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
             d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
 
-            numStepsPerYear = 100
-
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
                 vdf = np.exp(-rd*tdel) * (F0T*N(d1) - K*N(d2))
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
                 vdf = -np.exp(-rd*tdel) * (F0T*N(-d1) - K*N(-d2))
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
+                numStepsPerYear = 100
                 vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
-                                    texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
+                        texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
             elif self._optionType == FinOptionTypes.AMERICAN_PUT:
+                numStepsPerYear = 100
                 vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
-                                    texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
+                        texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
             else:
                 raise FinError("Unknown option type")
 
-        # The option value v is in domestic currency terms but the value of the
-        # option may be quoted in either currency terms and so we calculate these
+        # The option value v is in domestic currency terms but the value of
+        # the option may be quoted in either currency terms and so we calculate
+        # these
 
-        if self._notionalCurrency == self._domName:
-            self._notional_dom = self._notional
-            self._notional_for = self._notional / self._strikeFXRate
-        elif self._notionalCurrency == self._forName:
-            self._notional_dom = self._notional * self._strikeFXRate
-            self._notional_for = self._notional
+        if self._premCurrency == self._domName:
+            notional_dom = self._notional
+            notional_for = self._notional / self._strikeFXRate
+        elif self._premCurrency == self._forName:
+            notional_dom = self._notional * self._strikeFXRate
+            notional_for = self._notional
         else:
             raise FinError("Invalid notional currency.")
 
-        self._vdf = vdf
-        self._pips_dom = vdf
-        self._pips_for = vdf / (spotFXRate * self._strikeFXRate)
+        vdf = vdf
+        pips_dom = vdf
+        pips_for = vdf / (spotFXRate * self._strikeFXRate)
 
-        self._cash_dom = vdf * self._notional_dom / self._strikeFXRate
-        self._cash_for = vdf * self._notional_for / spotFXRate
+        cash_dom = vdf * notional_dom / self._strikeFXRate
+        cash_for = vdf * notional_for / spotFXRate
 
-        self._pct_dom = vdf / self._strikeFXRate
-        self._pct_for = vdf / spotFXRate
+        pct_dom = vdf / self._strikeFXRate
+        pct_for = vdf / spotFXRate
 
-        return { 'v': vdf,
-                 "cash_dom": self._cash_dom,
-                 "cash_for": self._cash_for,
-                 "pips_dom": self._pips_dom,
-                 "pips_for": self._pips_for,
-                 "pct_dom": self._pct_dom,
-                 "pct_for": self._pct_for,
-                 "not_dom": self._notional_dom,
-                 "not_for": self._notional_for,
-                 "ccy_dom": self._domName,
-                 "ccy_for": self._forName}
+        return {'v': vdf,
+                "cash_dom": cash_dom,
+                "cash_for": cash_for,
+                "pips_dom": pips_dom,
+                "pips_for": pips_for,
+                "pct_dom": pct_dom,
+                "pct_for": pct_for,
+                "not_dom": notional_dom,
+                "not_for": notional_for,
+                "ccy_dom": self._domName,
+                "ccy_for": self._forName}
 
-###############################################################################
 ###############################################################################
 
     def delta_bump(self,
-              valueDate,
-              spotFXRate,
-              ccy1DiscountCurve,
-              ccy2DiscountCurve,
-              model):
+                   valueDate,
+                   spotFXRate,
+                   ccy1DiscountCurve,
+                   ccy2DiscountCurve,
+                   model):
         ''' Calculation of the FX option delta by bumping the spot FX rate by
         1 cent of its value. This gives the FX spot delta. For speed we prefer
         to use the analytical calculation of the derivative given below. '''
@@ -293,7 +348,6 @@ class FinFXVanillaOption():
 
         return delta
 
-###############################################################################
 ###############################################################################
 
     def delta(self,
@@ -332,8 +386,8 @@ class FinFXVanillaOption():
         forDf = forDiscountCurve.df(tdel)
         rf = -np.log(forDf)/tdel
 
-        K = self._strikeFXRate
         S0 = spotFXRate
+        K = self._strikeFXRate
         F = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes:
@@ -345,7 +399,7 @@ class FinFXVanillaOption():
 
             volatility = np.maximum(volatility, 1e-10)
 
-            lnS0k = np.log(spotFXRate / self._strikeFXRate)
+            lnS0k = np.log(S0/K)
             sqrtT = np.sqrt(texp)
             den = volatility * sqrtT
             mu = rd - rf
@@ -361,32 +415,26 @@ class FinFXVanillaOption():
             else:
                 raise FinError("Unknown option type")
 
-            spot_delta = w*np.exp(-rf * tdel)*N(w*d1)
+            pips_spot_delta = w*np.exp(-rf*tdel)*N(w*d1)
+            pips_fwd_delta = w*N(w*d1)
+            pct_spot_delta_prem_adj = w*np.exp(-rd*tdel)*N(w*d2)*K/S0
+            pct_fwd_delta_prem_adj = w*K*N(w*d2)/F
 
-            self._pips_spot_delta = spot_delta
-            self._pips_fwd_delta = w*N(w*d1)
-            self._pips_fut_delta = w*np.exp(-rd*tdel)*N(w*d1)
-            self._pct_spot_delta_prem_adj = w*np.exp(-rd*tdel)*N(w*d2)*K/S0
-            self._pct_fwd_delta_prem_adj = w*K*N(w*d2)/F
-            self._simple = w*N(w*(d1+d2)/2.0)
+        return {"pips_spot_delta": pips_spot_delta,
+                "pips_fwd_delta": pips_fwd_delta,
+                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
+                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
 
-        return {"pips_spot_delta": self._pips_spot_delta,
-                "pips_fwd_delta": self._pips_fwd_delta,
-                "pips_fut_delta": self._pips_fut_delta,
-                "pct_spot_delta_prem_adj": self._pct_spot_delta_prem_adj,
-                "pct_fwd_delta_prem_adj": self._pct_fwd_delta_prem_adj,
-                "simple": self._simple }
-
-###############################################################################
 ###############################################################################
 
     def gamma(self,
-               valueDate,
-               spotFXRate,  # value of a unit of foreign in domestic currency
-               domDiscountCurve,
-               forDiscountCurve,
-               model):
-        ''' This function calculates the FX Option Gamma using the spot delta. '''
+              valueDate,
+              spotFXRate,  # value of a unit of foreign in domestic currency
+              domDiscountCurve,
+              forDiscountCurve,
+              model):
+        ''' This function calculates the FX Option Gamma using the spot delta.
+        '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -436,15 +484,15 @@ class FinFXVanillaOption():
         return gamma
 
 ###############################################################################
-###############################################################################
 
     def vega(self,
-              valueDate,
-              spotFXRate,  # value of a unit of foreign in domestic currency
-              domDiscountCurve,
-              forDiscountCurve,
-              model):
-        ''' This function calculates the FX Option Vega using the spot delta. '''
+             valueDate,
+             spotFXRate,  # value of a unit of foreign in domestic currency
+             domDiscountCurve,
+             forDiscountCurve,
+             model):
+        ''' This function calculates the FX Option Vega using the spot delta.
+        '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -493,14 +541,13 @@ class FinFXVanillaOption():
         return vega
 
 ###############################################################################
-###############################################################################
 
     def theta(self,
-               valueDate,
-               spotFXRate,  # value of a unit of foreign in domestic currency
-               domDiscountCurve,
-               forDiscountCurve,
-               model):
+              valueDate,
+              spotFXRate,  # value of a unit of foreign in domestic currency
+              domDiscountCurve,
+              forDiscountCurve,
+              model):
         ''' This function calculates the time decay of the FX option. '''
 
         if type(valueDate) == FinDate:
@@ -562,7 +609,6 @@ class FinFXVanillaOption():
         return v
 
 ###############################################################################
-###############################################################################
 
     def impliedVolatility(self,
                           valueDate,
@@ -578,10 +624,9 @@ class FinFXVanillaOption():
                     discountCurve, dividendYield, price)
 
         sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
-                                tol=1e-5, maxiter=50, fprime2=None)
+                                tol=1e-6, maxiter=50, fprime2=None)
         return sigma
 
-###############################################################################
 ###############################################################################
 
     def valueMC(self,
@@ -637,5 +682,4 @@ class FinFXVanillaOption():
         v = payoff * np.exp(-rd * t) / 2.0
         return v
 
-###############################################################################
 ###############################################################################

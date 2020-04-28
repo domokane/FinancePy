@@ -6,12 +6,10 @@ Created on Sun Jul 21 10:04:57 2019
 """
 
 
-from ..finutils.FinGlobalVariables import gDaysInYear
-from ..finutils.FinError import FinError
 from ..products.FinOptionTypes import FinOptionTypes
 
 import numpy as np
-from numba import njit, jit, float64, int64
+from numba import njit, float64, int64
 
 bump = 1e-4
 
@@ -114,6 +112,8 @@ def crrTreeVal(stockPrice,
         for iNode in range(0, iTime + 1):
 
             s = stockValues[index + iNode]
+
+            exerciseValue = 0.0
 
             if optionType == FinOptionTypes.EUROPEAN_CALL.value:
                 exerciseValue = 0.0

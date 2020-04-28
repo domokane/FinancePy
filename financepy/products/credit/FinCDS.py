@@ -364,9 +364,12 @@ class FinCDS(object):
         ''' Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate.'''
 
-        fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
-                                               issuerCurve,
-                                               pv01Method)
+        rpv01 = self.riskyPV01(valuationDate,
+                               issuerCurve,
+                               pv01Method)
+
+        fullRPV01 = rpv01['full_rpv01']
+        cleanRPV01 = rpv01['clean_rpv01']
 
         protPV = self.protectionLegPV(valuationDate,
                                       issuerCurve,
@@ -386,7 +389,7 @@ class FinCDS(object):
         cleanPV = fwdDf * longProt * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
 
-        return {'full_pv':fullPV, 'clean_pv':cleanPV)
+        return {'full_pv': fullPV, 'clean_pv': cleanPV}
 
 ##########################################################################
 
@@ -519,7 +522,9 @@ class FinCDS(object):
                    numStepsPerYear=52):
         ''' Value of the CDS contract excluding accrued interest. '''
 
-        cleanRPV01 = self.riskyPV01(valuationDate, issuerCurve, pv01Method)['clean_rpv01']
+        riskyPV01 = self.riskyPV01(valuationDate, issuerCurve, pv01Method)
+
+        cleanRPV01 = riskyPV01['clean_rpv01']
 
         protPV = self.protectionLegPV(valuationDate,
                                       issuerCurve,
@@ -554,7 +559,7 @@ class FinCDS(object):
         pcd = paymentDates[0]  # PCD
         ncd = paymentDates[1]  # NCD
 
-        # The first coupon is a special case which needs to be handled carefully
+        # The first coupon is a special case which must be handled carefully
         # taking into account what coupon has already accrued and what has not
         qeff = issuerCurve.survivalProbability(teff)
         q1 = issuerCurve.survivalProbability(ncd)
@@ -620,7 +625,7 @@ class FinCDS(object):
 
 #        print("OLD PV01",fullRPV01, cleanRPV01)
 
-        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01
+        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
 ##########################################################################
 
@@ -720,7 +725,7 @@ class FinCDS(object):
         cleanRPV01 = valueRPV01[1]
 
 #        print("NEW PV01",fullRPV01, cleanRPV01)
-        return fullRPV01, cleanRPV01
+        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
 ##########################################################################
 
@@ -730,9 +735,9 @@ class FinCDS(object):
                      pv01Method=0):
         ''' Value of the premium leg of a CDS. '''
 
-        fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
-                                               issuerCurve,
-                                               pv01Method)
+        fullRPV01 = self.riskyPV01(valuationDate,
+                                   issuerCurve,
+                                   pv01Method)['full_rpv01']
 
         v = fullRPV01 * self._notional * self._coupon
         return v
@@ -749,9 +754,9 @@ class FinCDS(object):
         ''' Breakeven CDS coupon that would make the value of the CDS contract
         equal to zero. '''
 
-        fullRPV01, cleanRPV01 = self.riskyPV01(valuationDate,
-                                               issuerCurve,
-                                               pv01Method)
+        cleanRPV01 = self.riskyPV01(valuationDate,
+                                    issuerCurve,
+                                    pv01Method)['clean_rpv01']
 
         prot = self.protectionLegPV(valuationDate,
                                     issuerCurve,

@@ -11,6 +11,7 @@ from .FinGlobalVariables import gDaysInYear
 
 ##########################################################################
 
+
 def printTree(array, depth=None):
     ''' Function that prints a binomial or trinonial tree to screen for the
     purpose of debugging. '''
@@ -30,6 +31,7 @@ def printTree(array, depth=None):
 
 ##########################################################################
 
+
 def inputFrequency(f):
     ''' Function takes a frequency number and checks if it is valid. '''
     if f in [-1, 0, 1, 2, 3, 4, 6, 12]:
@@ -38,6 +40,7 @@ def inputFrequency(f):
         raise ValueError("Unknown frequency" + str(f))
 
 ###############################################################################
+
 
 def inputTime(dt, curve):
     ''' Validates a time input in relation to a curve. If it is a float then
@@ -72,6 +75,7 @@ def inputTime(dt, curve):
 
 ###############################################################################
 
+
 @njit(fastmath=True, cache=True)
 def listdiff(a, b):
     ''' Calculate a vector of differences between two equal sized vectors. '''
@@ -88,6 +92,7 @@ def listdiff(a, b):
 
 ##########################################################################
 
+
 @njit(fastmath=True, cache=True)
 def dotproduct(xVector, yVector):
     ''' Fast calculation of dot product using Numba. '''
@@ -100,6 +105,7 @@ def dotproduct(xVector, yVector):
 
 ##########################################################################
 
+
 @njit(fastmath=True, cache=True)
 def frange(start, stop, step):
     x = []
@@ -110,6 +116,7 @@ def frange(start, stop, step):
     return x
 
 ##########################################################################
+
 
 @njit(fastmath=True, cache=True)
 def normaliseWeights(wtVector):

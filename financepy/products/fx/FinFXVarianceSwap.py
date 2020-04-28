@@ -55,10 +55,10 @@ class FinFXVarianceSwap(object):
 
 ###############################################################################
 
-    def value(self, 
-              valuationDate, 
-              realisedVar, 
-              fairStrikeVar, 
+    def value(self,
+              valuationDate,
+              realisedVar,
+              fairStrikeVar,
               liborCurve):
         ''' Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
@@ -195,8 +195,8 @@ class FinFXVarianceSwap(object):
         for n in range(0, numPutOptions):
             k = putK[n]
             vol = volatilityCurve.volatility(k)
-            opt = FinVanillaOption(self._maturityDate, k, putType)
-            model = FinEquityModelBlackScholes(vol)
+            opt = FinFXVanillaOption(self._maturityDate, k, putType)
+            model = FinFXModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
                           dividendYield, model)
             piPut += v * self._putWts[n]
@@ -205,8 +205,8 @@ class FinFXVarianceSwap(object):
         for n in range(0, numCallOptions):
             k = callK[n]
             vol = volatilityCurve.volatility(k)
-            opt = FinVanillaOption(self._maturityDate, k, callType)
-            model = FinEquityModelBlackScholes(vol)
+            opt = FinFXVanillaOption(self._maturityDate, k, callType)
+            model = FinFXModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
                           dividendYield, model)
             piCall += v * self._callWts[n]
@@ -220,7 +220,6 @@ class FinFXVarianceSwap(object):
 ###############################################################################
 
     def realisedVariance(self, closePrices, useLogs=True):
-
         ''' Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns.'''
 

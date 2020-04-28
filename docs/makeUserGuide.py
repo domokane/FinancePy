@@ -21,9 +21,10 @@ verbose = False
 
 ##########################################################################
 
+
 def parseMarkdown(lines):
 
-    if verbose == True:
+    if verbose is True:
         print("MARKDOWN IN")
         print(lines)
 
@@ -37,7 +38,7 @@ def parseMarkdown(lines):
         lineFound = False
 
         if line[0] == "*":
-            lineFound= True
+            lineFound = True
             if bulletListActive is False:
                 parsedLines.append("\\begin{itemize}")
                 parsedLines.append("\n")
@@ -53,7 +54,7 @@ def parseMarkdown(lines):
             parsedLines.append("\n")
 
         if line[0].isdigit() is True:
-            lineFound= True
+            lineFound = True
             col = line.find(".") + 1
             if numberedListActive is False:
                 parsedLines.append("\\begin{enumerate}")
@@ -70,25 +71,25 @@ def parseMarkdown(lines):
             parsedLines.append("\n")
 
         if line.find("###") > -1:
-            lineFound= True
-            content = line.replace("#","")
-            content = content.replace("\n","")
+            lineFound = True
+            content = line.replace("#", "")
+            content = content.replace("\n", "")
             content = content.strip()
             parsedLines.append("\n")
             parsedLines.append("\\subsubsection*{" + content + "}")
             parsedLines.append("\n")
         elif line.find("##") > -1:
-            lineFound= True
-            content = line.replace("#","")
-            content = content.replace("\n","")
+            lineFound = True
+            content = line.replace("#", "")
+            content = content.replace("\n", "")
             content = content.strip()
             parsedLines.append("\n")
             parsedLines.append("\\subsection*{" + content + "}")
             parsedLines.append("\n")
         elif line.find("#") > -1:
-            lineFound= True
-            content = line.replace("#","")
-            content = content.replace("\n","")
+            lineFound = True
+            content = line.replace("#", "")
+            content = content.replace("\n", "")
             content = content.strip()
             parsedLines.append("\n")
             parsedLines.append("\\section*{" + content + "}")
@@ -115,6 +116,7 @@ def parseMarkdown(lines):
 
 ##########################################################################
 
+
 def addToList(listName, item):
 
     for x in listName:
@@ -125,6 +127,7 @@ def addToList(listName, item):
     return listName
 
 ##########################################################################
+
 
 def open_file(filename):
     if sys.platform == "win32":
@@ -194,8 +197,8 @@ def buildChapter(folderName):
     readMeLines = f.readlines()
     f.close()
 
-    chapterName = folderName.replace("//",".")
-    chapterName = chapterName.replace("...","")
+    chapterName = folderName.replace("//", ".")
+    chapterName = chapterName.replace("...", "")
 
     newLines = []
     newLines.append("\n")
@@ -390,7 +393,7 @@ def parseClass(lines, startLine, endLine):
         endComment = True
 
     if endComment:
-#        print(startCommentRow, endCommentRow)
+        #  print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("'", "")
@@ -428,8 +431,8 @@ def parseClass(lines, startLine, endLine):
             dataMember = row[n1:n2]
             dataMember = dataMember.strip(" ")
             dataMember = dataMember.strip(")")
-            dataMember = dataMember.replace("self.","")
-            dataMembers = addToList(dataMembers,dataMember)
+            dataMember = dataMember.replace("self.", "")
+            dataMembers = addToList(dataMembers, dataMember)
 
     if len(dataMembers) > 0:
         newLines.append("\\begin{itemize}\n")
@@ -541,7 +544,7 @@ def parseFunction(lines, startLine, endLine, classFlag):
         endComment = True
 
     if endComment:
-#        print(startCommentRow, endCommentRow)
+        #  print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("_", r"\_")
@@ -551,7 +554,6 @@ def parseFunction(lines, startLine, endLine, classFlag):
             line = line.lstrip()
             # This is because we remove trailing whitespace
             functionComment += line + " "
-
 
     if functionComment == " ":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
@@ -615,7 +617,7 @@ def parseEnum(lines, startLine, endLine):
 buildHead()
 buildIntro("..//README.md")
 
-if 1==1:
+if 1 == 1:
     buildChapter("..//financepy//finutils")
     buildChapter("..//financepy//products//equity")
     buildChapter("..//financepy//products//credit")

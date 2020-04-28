@@ -18,6 +18,7 @@ ONE_BILLION = 1000000000
 
 ##########################################################################
 
+
 @njit(fastmath=True, cache=True)
 def accruedInterpolator(tset, couponTimes, couponAmounts):
     ''' Fast calulation of accrued interest using an Actual/Actual type of
@@ -27,11 +28,12 @@ def accruedInterpolator(tset, couponTimes, couponAmounts):
     for i in range(1, numCoupons):
         if couponTimes[i-1] >= tset:
             denom = couponTimes[i]-couponTimes[i-1]
-            accdFrac = (tset-couponTimes[i-1])/ denom
+            accdFrac = (tset-couponTimes[i-1])/denom
             accdCpn = accdFrac * couponAmounts[i]
             return accdCpn
 
 ##########################################################################
+
 
 @njit(boolean(int64), fastmath=True, cache=True)
 def isLeapYear(y):
@@ -55,7 +57,7 @@ def scale(x, factor):
 
 @njit(boolean(float64[:]), fastmath=True, cache=True)
 def testMonotonicity(x):
-    ''' Check that an array of doubles is monotonic and strictly increasing. '''
+    ''' Check that an array of doubles is monotonic and strictly increasing.'''
     for i in range(1, len(x)):
         if x[i] <= x[i-1]:
             return False
@@ -303,8 +305,8 @@ def normcdf_integrate(x):
 
 @njit(float64(float64), fastmath=True, cache=True)
 def normcdf_slow(z):
-    '''  Calculation of Normal Distribution CDF accurate to 1d-15.
-    This method is faster than integration but slower than other approximations.
+    '''  Calculation of Normal Distribution CDF accurate to 1d-15. This
+    method is faster than integration but slower than other approximations.
     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. '''
 
     a = [0.0] * 25
@@ -383,8 +385,8 @@ def normcdf(x, fastFlag):
 
 @njit(float64(float64), fastmath=True, cache=True)
 def N(x):
-    ''' This is the shortcut to the default Normal CDF function and is currently
-    hardcoded to the fastest of the implemented routines. This is the most
+    ''' This is the shortcut to the default Normal CDF function and currently
+    is hardcoded to the fastest of the implemented routines. This is the most
     widely used way to access the Normal CDF. '''
     return normcdf(x, 1)
 
@@ -396,7 +398,7 @@ def phi3(b1, b2, b3, r12, r13, r23):
     ''' Bivariate Normal CDF function to upper limits $b1$ and $b2$ which uses
     integration to perform the innermost integral. This may need further
     refinement to ensure it is optimal as the current range of integration is
-    from -7 and the integration steps are dx = 0.001. This may be excessive. '''
+    from -7 and the integration steps are dx = 0.001. This may be excessive.'''
 
     dx = 0.001
     lowerLimit = -7
@@ -470,7 +472,7 @@ def norminvcdf(p):
         # Rational approximation for lower region
         q = sqrt(-2.0 * log(p))
         inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
-                      * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+                    * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5

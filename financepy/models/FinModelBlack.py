@@ -16,6 +16,7 @@ from ...finutils.FinMath import N
 # NOTE: Perhaps just turn this into a function rather than a class.
 ###############################################################################
 
+
 class FinModelBlack():
     ''' Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. '''

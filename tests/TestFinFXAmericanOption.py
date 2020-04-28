@@ -5,26 +5,21 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-import time
 import numpy as np
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.FinOptionTypes import FinOptionTypes
-from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
-
-from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
 
 ##########################################################################
 
@@ -73,16 +68,16 @@ def test_FinFXAmericanOption():
 
         callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
-                                        "EURUSD",
+                                        currencyPair,
                                         FinOptionTypes.EUROPEAN_CALL,
                                         1000000,
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
@@ -92,14 +87,14 @@ def test_FinFXAmericanOption():
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
-
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("CALL %9.6f %9.6f %9.7f %10.8f"% (spotFXRate, valueEuropean, valueAmerican, diff))
+        print("CALL %9.6f %9.6f %9.7f %10.8f" %
+              (spotFXRate, valueEuropean, valueAmerican, diff))
 
     for spotFXRate in spotFXRates:
 
@@ -111,10 +106,10 @@ def test_FinFXAmericanOption():
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
@@ -124,13 +119,14 @@ def test_FinFXAmericanOption():
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("PUT  %9.6f %9.6f %9.7f %10.8f"% (spotFXRate, valueEuropean, valueAmerican, diff))
+        print("PUT  %9.6f %9.6f %9.7f %10.8f" % (spotFXRate, valueEuropean,
+                                                 valueAmerican, diff))
 
 
 ###############################################################################
