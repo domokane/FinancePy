@@ -1,6 +1,8 @@
 ### TO DO 
 
 ## NOT STARTED
+All products - Add notional to class
+
 Equities - Add term structure of interest rates to all models so that full discount curve is respected.
 Equities - Discrete dividends 
 Equities - Log contracts using given skew curve

@@ -8,10 +8,10 @@ Created on Wed Jan 16 17:56:21 2019
 import numpy as np
 from math import sqrt
 
-from ...models.FinGaussianCopula1FModel import trSurvProbGaussian
-from ...models.FinGaussianCopula1FModel import trSurvProbAdjBinomial
-from ...models.FinGaussianCopula1FModel import trSurvProbRecursion
-from ...models.FinGaussianCopulaLHPModel import trSurvProbLHP
+from ...models.FinModelGaussianCopula1F import trSurvProbGaussian
+from ...models.FinModelGaussianCopula1F import trSurvProbAdjBinomial
+from ...models.FinModelGaussianCopula1F import trSurvProbRecursion
+from ...models.FinModelGaussianCopulaLHP import trSurvProbLHP
 
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes

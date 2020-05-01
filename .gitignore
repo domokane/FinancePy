@@ -9,7 +9,7 @@ financepy.egg-info
 *.toc
 FinPyManual*.tex
 *.out
-*.pdf
+.pdf
 build
 FinancePyManualV*.tex
 financepy/examples/ipynb_checkpoints/*.*

@@ -74,7 +74,7 @@ def getPaths(s0,r,q,v0,kappa,theta,sigma,rho,t,dt,numPaths,seed,scheme):
     rhohat = sqrt(1.0 - rho*rho)
     sigma2 = sigma*sigma
 
-    if scheme == FinHestonNumericalScheme.EULER.value:        
+    if scheme == FinHestonNumericalScheme.EULER.value:
         # Basic scheme to first order with truncation on variance
         for iPath in range(0,numPaths):
             s = s0
@@ -90,7 +90,7 @@ def getPaths(s0,r,q,v0,kappa,theta,sigma,rho,t,dt,numPaths,seed,scheme):
                 s += (r-q)*s*dt + rtvplus*s*zS + 0.5*s*vplus*(zV*zV-dt)
                 sPaths[iPath,iStep] = s
 
-    elif scheme == FinHestonNumericalScheme.EULERLOG.value:        
+    elif scheme == FinHestonNumericalScheme.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
         for iPath in range(0,numPaths):
             x = log(s0)

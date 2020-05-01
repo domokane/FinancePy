@@ -6,8 +6,8 @@ Created on Fri Feb 12 16:51:05 2016
 """
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...models.FinHullWhiteRateModel import FinHullWhiteRateModel
-from ...models.FinBlackKarasinskiRateModel import FinBlackKarasinskiRateModel
+from ...models.FinModelRatesHullWhite import FinModelRatesHullWhite
+from ...models.FinModelRatesBlackKarasinski import FinModelRatesBlackKarasinski
 
 from enum import Enum
 import numpy as np
@@ -77,7 +77,7 @@ class FinBondOption():
         cpnTimes = np.array(cpnTimes)
         cpnAmounts = np.array(cpnAmounts)
 
-        if type(model) == FinHullWhiteRateModel:
+        if type(model) == FinModelRatesHullWhite:
 
             if self._optionType == FinBondOptionTypes.EUROPEAN_CALL:
 
@@ -121,7 +121,7 @@ class FinBondOption():
 
                 return v[1]
 
-        elif type(model) == FinBlackKarasinskiRateModel:
+        elif type(model) == FinModelRatesBlackKarasinski:
 
             maturityDate = self._bond._maturityDate
             numTimeSteps = 100

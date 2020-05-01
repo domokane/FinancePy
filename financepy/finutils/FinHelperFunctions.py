@@ -100,7 +100,6 @@ def dotproduct(xVector, yVector):
 
 ##########################################################################
 
-
 @njit(fastmath=True, cache=True)
 def frange(start, stop, step):
     x = []

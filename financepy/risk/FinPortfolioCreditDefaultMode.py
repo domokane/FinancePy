@@ -8,7 +8,7 @@ Created on Sat Aug  3 21:57:13 2019
 from math import exp
 import numpy as np
 from ..finutils.FinHelperFunctions import normaliseWeights
-from ..models.FinGaussianCopula1FModel import lossDbnHeterogeneousAdjBinomial
+from ..models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
 
 
 class FinPortfolioCreditDefaultMode(object):

@@ -26,6 +26,7 @@ class FinFlatCurve(FinDiscountCurve):
 
     def __init__(self, curveDate, rate, compoundingFreq=-1):
         ''' Create a FinFlatCurve which requires a curve date. '''
+
         if not isinstance(curveDate, FinDate):
             raise FinError("CurveDate is not a date " + str(curveDate))
 
@@ -37,6 +38,7 @@ class FinFlatCurve(FinDiscountCurve):
 
     def zeroRate(self, dt, compoundingFreq):
         ''' Return the zero rate which is simply the curve rate. '''
+
         t = inputTime(dt, self)
         f = inputFrequency(compoundingFreq)
 
@@ -48,7 +50,7 @@ class FinFlatCurve(FinDiscountCurve):
         elif self._cmpdFreq == -1:
             df = np.exp(-self._rate * t)
         else:
-            df = ((1.0+self._rate/self._cmpdFreq)**(-t*self._cmpdFreq))
+            df = (1.0 + self._rate/self._cmpdFreq)**(-t*self._cmpdFreq)
 
         if f == 0:  # Simple interest
             r = (1.0/df-1.0)/t
@@ -79,6 +81,7 @@ class FinFlatCurve(FinDiscountCurve):
     def df(self, dt):
         ''' Return the discount factor based on the compounding approach. '''
         t = inputTime(dt, self)
+
         if self._cmpdFreq == 0:
             df = 1.0/(1.0 + t*self._rate)
         elif self._cmpdFreq == -1:

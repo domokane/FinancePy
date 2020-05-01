@@ -27,3 +27,4 @@ class FinError(Exception):
 
     def print(self):
         print("FinError:", self._message)
+
