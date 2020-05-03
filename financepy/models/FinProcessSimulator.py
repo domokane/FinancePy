@@ -272,7 +272,7 @@ def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
 
     else:
 
-        raise FinError("Uknown FinGBMNumericalScheme")
+        raise FinError("Unknown FinGBMNumericalScheme")
 
     return Sall
 

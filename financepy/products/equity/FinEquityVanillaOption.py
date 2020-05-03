@@ -77,7 +77,7 @@ class FinEquityVanillaOption(FinEquityOption):
                  expiryDate,
                  strikePrice,
                  optionType,
-                 numOptions = 1.0):
+                 numOptions=1.0):
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
          optionType != FinOptionTypes.EUROPEAN_PUT and \
@@ -140,18 +140,28 @@ class FinEquityVanillaOption(FinEquityOption):
             d1 = (lnS0k + (mu + v2 / 2.0) * texp) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * texp) / den
 
-            numStepsPerYear = 100
-
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                v = stockPrice * np.exp(-q * texp) * N(d1)
-                v = v - self._strikePrice * np.exp(-r * texp) * N(d2)
+                if model._useTree == True: 
+                    numStepsPerYear = model._numStepsPerYear
+                    v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
+                        texp, FinOptionTypes.EUROPEAN_CALL.value, K)['value']
+                else:
+                    v = stockPrice * np.exp(-q * texp) * N(d1)
+                    v = v - self._strikePrice * np.exp(-r * texp) * N(d2)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                v = self._strikePrice * np.exp(-r * texp) * N(-d2)
-                v = v - stockPrice * np.exp(-q * texp) * N(-d1)
+                if model._useTree == True: 
+                    numStepsPerYear = model._numStepsPerYear
+                    v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
+                        texp, FinOptionTypes.EUROPEAN_PUT.value, K)['value']
+                else:
+                    v = self._strikePrice * np.exp(-r * texp) * N(-d2)
+                    v = v - stockPrice * np.exp(-q * texp) * N(-d1)
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
+                numStepsPerYear = model._numStepsPerYear
                 v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
                         texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
             elif self._optionType == FinOptionTypes.AMERICAN_PUT:
+                numStepsPerYear = model._numStepsPerYear
                 v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
                         texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
             else:
@@ -161,16 +171,16 @@ class FinEquityVanillaOption(FinEquityOption):
             raise FinError("Unknown Model Type")
 
         v = v * self._numOptions
-        return {'value':v }
+        return {'value': v}
 
 ###############################################################################
 
     def xdelta(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -220,11 +230,11 @@ class FinEquityVanillaOption(FinEquityOption):
 ###############################################################################
 
     def xgamma(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -270,11 +280,11 @@ class FinEquityVanillaOption(FinEquityOption):
 ###############################################################################
 
     def xvega(self,
-             valueDate,
-             stockPrice,
-             discountCurve,
-             dividendYield,
-             model):
+              valueDate,
+              stockPrice,
+              discountCurve,
+              dividendYield,
+              model):
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -319,11 +329,11 @@ class FinEquityVanillaOption(FinEquityOption):
 ###############################################################################
 
     def xtheta(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear

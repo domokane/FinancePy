@@ -12,7 +12,6 @@ from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
-from financepy.finutils.FinCalendar import FinCalendarTypes
 
 from financepy.finutils.FinDate import FinDate
 import sys
@@ -44,13 +43,6 @@ def test_FinFXAmericanOption():
     strikeFXRate = 1.250
     volatility = 0.10
 
-    spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
-    maturityDate = settlementDate.addMonths(12)
-    notional = 1000000.0
-    notionalCurrency = "EUR"
-    calendarType = FinCalendarTypes.TARGET
-
     domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
     forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
 
@@ -58,7 +50,6 @@ def test_FinFXAmericanOption():
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
-    notional = 1000000.0
 
     testCases.header("SPOT FX RATE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 

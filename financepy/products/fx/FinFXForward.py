@@ -17,6 +17,7 @@ from ...finutils.FinError import FinError
 # EUR IS THE FOREIGN CURRENCY
 ###############################################################################
 
+
 class FinFXForward():
     ''' This is a contract to buy or sell currency at a forward rate decided
     today. '''
@@ -27,14 +28,14 @@ class FinFXForward():
                  currencyPair,  # FORDOM
                  notional,
                  notionalCurrency,  # must be FOR or DOM
-                 spotDays = 0):
+                 spotDays=0):
         ''' Creates a FinFXForward which allows the owner to buy the FOR
         against the DOM currency at the strikeFXRate and to pay it in the
         notional currency. '''
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 
-        ''' The FX rate is in the price in domestic currency ccy2 of a single unit
+        ''' The FX rate is the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
         price in USD (CCY2) of 1 unit of EUR (CCY1) '''
 
@@ -87,7 +88,6 @@ class FinFXForward():
                                     domDiscountCurve,
                                     forDiscountCurve)
 
-        forDF = forDiscountCurve.df(t)
         domDF = domDiscountCurve.df(t)
 
         if self._notionalCurrency == self._domName:
@@ -110,12 +110,12 @@ class FinFXForward():
         self._cash_for = v * self._notional_for / spotFXRate
 
         return {"value": v,
-               "cash_dom": self._cash_dom,
-               "cash_for": self._cash_for,
-               "not_dom": self._notional_dom,
-               "not_for": self._notional_for,
-               "ccy_dom": self._domName,
-               "ccy_for": self._forName}
+                "cash_dom": self._cash_dom,
+                "cash_for": self._cash_for,
+                "not_dom": self._notional_dom,
+                "not_for": self._notional_for,
+                "ccy_dom": self._domName,
+                "ccy_for": self._forName}
 
 ###############################################################################
 
@@ -143,7 +143,7 @@ class FinFXForward():
         forDF = forDiscountCurve.df(t)
         domDF = domDiscountCurve.df(t)
 
-        fwdFXRate = spotFXRate * domDF / forDF
+        fwdFXRate = spotFXRate * forDF / domDF
         return fwdFXRate
 
 ###############################################################################

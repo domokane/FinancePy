@@ -9,11 +9,13 @@ from math import exp, log, sqrt
 import numpy as np
 
 from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
+from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...products.equities.FinOption import FinOption, FinOptionTypes
+from ...finutils.FinDate import FinDate
+from ...products.fx.FinFXModelTypes import FinFXModel
+from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 
-##########################################################################
 ##########################################################################
 
 
@@ -23,9 +25,9 @@ class FinFXDigitalOption(FinOption):
                  expiryDate,
                  strikePrice,  # ONE UNIT OF FOREIGN IN DOMESTIC CC
                  currencyPair,  # FORDOM
-                 optionType
+                 optionType,
                  notional,
-                 notionalCurrency):
+                 premCurrency):
         ''' Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -43,7 +45,7 @@ class FinFXDigitalOption(FinOption):
         self._forName = self._currencyPair[0:3]
         self._domName = self._currencyPair[3:6]
 
-        if notionalCurrency != self._domName and notionalCurrency != self._forName:
+        if premCurrency != self._domName and premCurrency != self._forName:
             raise FinError("Notional currency not in currency pair.")
 
 ###############################################################################
@@ -89,32 +91,31 @@ class FinFXDigitalOption(FinOption):
         S0 = spotFXRate
         K = self._strikeFXRate
 
-        if type(model) == FinFXModelBlackScholes \
+        if type(model) == FinFXModelBlackScholes:
 
             volatility = model._volatility
             lnS0k = log(S0 / K)
             den = volatility * sqrt(texp)
             v2 = volatility * volatility
             mu = rd - rf
-            d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
-            d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
+            d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den
 
-            if self._optionType == FinOptionTypes.DIGITAL_CALL
-                and self._forName = self._notionalCurrency:
-                    v = S0 * exp(-rf * tdel) * N(d2)
-            elif self._optionType == FinOptionTypes.DIGITAL_PUT:
-                and self._forName = self._notionalCurrency:
-                    v = S0 * exp(-rf * tdel) * N(-d2)
-            if self._optionType == FinOptionTypes.DIGITAL_CALL
-                and self._domName = self._notionalCurrency:
-                    v = exp(-rd * tdel) * N(d2)
-            elif self._optionType == FinOptionTypes.DIGITAL_PUT:
-                and self._domName = self._notionalCurrency:
-                    v = exp(-rd * tdel) * N(-d2)
+            if self._optionType == FinOptionTypes.DIGITAL_CALL and \
+                self._forName == self._premCurrency:
+                v = S0 * exp(-rf * tdel) * N(d2)
+            elif self._optionType == FinOptionTypes.DIGITAL_PUT and \
+                self._forName == self._premCurrency:
+                v = S0 * exp(-rf * tdel) * N(-d2)
+            if self._optionType == FinOptionTypes.DIGITAL_CALL and \
+                self._domName == self._premCurrency:
+                v = exp(-rd * tdel) * N(d2)
+            elif self._optionType == FinOptionTypes.DIGITAL_PUT and \
+                self._domName == self._premCurrency:
+                v = exp(-rd * tdel) * N(-d2)
             else:
                 raise FinError("Unknown option type")
 
-            v = v * notional
+            v = v * self.premNotional
 
         return v
 

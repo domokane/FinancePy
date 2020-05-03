@@ -18,7 +18,7 @@ from ...products.equities.FinOption import FinOption
 from enum import Enum
 
 
-class FinRainbowOptionTypes(Enum):
+class FinFXRainbowOptionTypes(Enum):
     CALL_ON_MAXIMUM = 1
     PUT_ON_MAXIMUM = 2
     CALL_ON_MINIMUM = 3
@@ -31,25 +31,25 @@ class FinRainbowOptionTypes(Enum):
 
 def payoffValue(s, payoffTypeValue, payoffParams):
 
-    if payoffTypeValue == FinRainbowOptionTypes.CALL_ON_MINIMUM.value:
+    if payoffTypeValue == FinFXRainbowOptionTypes.CALL_ON_MINIMUM.value:
         k = payoffParams[0]
         payoff = np.maximum(np.min(s, axis=1) - k, 0.0)
-    elif payoffTypeValue == FinRainbowOptionTypes.CALL_ON_MAXIMUM.value:
+    elif payoffTypeValue == FinFXRainbowOptionTypes.CALL_ON_MAXIMUM.value:
         k = payoffParams[0]
         payoff = np.maximum(np.max(s, axis=1) - k, 0.0)
-    elif payoffTypeValue == FinRainbowOptionTypes.PUT_ON_MINIMUM.value:
+    elif payoffTypeValue == FinFXRainbowOptionTypes.PUT_ON_MINIMUM.value:
         k = payoffParams[0]
         payoff = np.maximum(k - np.min(s, axis=1), 0.0)
-    elif payoffTypeValue == FinRainbowOptionTypes.PUT_ON_MAXIMUM.value:
+    elif payoffTypeValue == FinFXRainbowOptionTypes.PUT_ON_MAXIMUM.value:
         k = payoffParams[0]
         payoff = np.maximum(k - np.max(s, axis=1), 0.0)
-    elif payoffTypeValue == FinRainbowOptionTypes.CALL_ON_NTH.value:
+    elif payoffTypeValue == FinFXRainbowOptionTypes.CALL_ON_NTH.value:
         n = payoffParams[0]
         k = payoffParams[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
         payoff = np.maximum(assetn - k, 0)
-    elif payoffTypeValue == FinRainbowOptionTypes.PUT_ON_NTH.value:
+    elif payoffTypeValue == FinFXRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoffParams[0]
         k = payoffParams[1]
         ssorted = np.sort(s)
@@ -139,17 +139,17 @@ class FinRainbowOption(FinOption):
 
         numParams = 0
 
-        if payoffType == FinRainbowOptionTypes.CALL_ON_MINIMUM:
+        if payoffType == FinFXRainbowOptionTypes.CALL_ON_MINIMUM:
             numParams = 1
-        elif payoffType == FinRainbowOptionTypes.CALL_ON_MAXIMUM:
+        elif payoffType == FinFXRainbowOptionTypes.CALL_ON_MAXIMUM:
             numParams = 1
-        elif payoffType == FinRainbowOptionTypes.PUT_ON_MINIMUM:
+        elif payoffType == FinFXRainbowOptionTypes.PUT_ON_MINIMUM:
             numParams = 1
-        elif payoffType == FinRainbowOptionTypes.PUT_ON_MAXIMUM:
+        elif payoffType == FinFXRainbowOptionTypes.PUT_ON_MAXIMUM:
             numParams = 1
-        elif payoffType == FinRainbowOptionTypes.CALL_ON_NTH:
+        elif payoffType == FinFXRainbowOptionTypes.CALL_ON_NTH:
             numParams = 2
-        elif payoffType == FinRainbowOptionTypes.PUT_ON_NTH:
+        elif payoffType == FinFXRainbowOptionTypes.PUT_ON_NTH:
             numParams = 2
         else:
             raise FinError("Unknown payoff type")
@@ -161,20 +161,21 @@ class FinRainbowOption(FinOption):
                 " must be " +
                 str(numParams))
 
-        if payoffType == FinRainbowOptionTypes.CALL_ON_NTH or payoffType == FinRainbowOptionTypes.PUT_ON_NTH:
+        if payoffType == FinFXRainbowOptionTypes.CALL_ON_NTH \
+                or payoffType == FinFXRainbowOptionTypes.PUT_ON_NTH:
             n = payoffParams[0]
             if n < 1 or n > numAssets:
                 raise FinError("Nth parameter must be 1 to " + str(numAssets))
 
 ###############################################################################
 
-    def value(self, 
-              valueDate, 
-              expiryDate, 
-              stockPrices, 
+    def value(self,
+              valueDate,
+              expiryDate,
+              stockPrices,
               discountCurve,
-              dividendYields, 
-              volatilities, 
+              dividendYields,
+              volatilities,
               betas):
 
         if self._numAssets != 2:
@@ -215,24 +216,25 @@ class FinRainbowOption(FinOption):
         dq2 = exp(-q2 * t)
         df = exp(-r * t)
 
-        if self._payoffType == FinRainbowOptionTypes.CALL_ON_MAXIMUM:
-            v = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
-        elif self._payoffType == FinRainbowOptionTypes.CALL_ON_MINIMUM:
-            v = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrt(t), -rho2) \
+        if self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MAXIMUM:
+            v = s1 * dq1 * M(y1, d, rho1)+s2*dq2*M(y2, -d + v*sqrt(t), rho2) \
+                - k * df * (1.0 - M(-y1 + v1*sqrt(t), -y2 + v2*sqrt(t), rho))
+        elif self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MINIMUM:
+            v = s1*dq1*M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v*sqrt(t), -rho2)\
                 - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
-        elif self._payoffType == FinRainbowOptionTypes.PUT_ON_MAXIMUM:
+        elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrt(t))
-            cmax2 = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+            cmax2 = s1 * dq1 * M(y1, d, rho1) \
+                + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
+                - k*df*(1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             v = k * df - cmax1 + cmax2
-        elif self._payoffType == FinRainbowOptionTypes.PUT_ON_MINIMUM:
+        elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MINIMUM:
             cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrt(t))
             cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrt(
                 t), -rho2) - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
             v = k * df - cmin1 + cmin2
         else:
-            raise FinError("Unsupported Rainbow option type")
+            raise FinError("Unsupported FX Rainbow option type")
 
         return v
 

@@ -14,18 +14,18 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 ##########################################################################
 
-from ...products.equity.FinEquityOption import FinEquityOption
+from ...products.fx.FinFXOption import FinFXOption
 from ...products.FinOptionTypes import FinOptionTypes
 
 
-class FinBasketOption(FinEquityOption):
+class FinFXBasketOption(FinFXOption):
 
     def __init__(self,
                  expiryDate,
                  strikePrice,
                  optionType,
                  numAssets,
-                 notional = 1.0):
+                 notional=1.0):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
@@ -42,20 +42,20 @@ class FinBasketOption(FinEquityOption):
                  betas):
 
         if len(stockPrices) != self._numAssets:
-            raise ValueError(
-                "Stock prices must be a vector of length " + str(self._numAssets))
+            raise ValueError("Stock prices must be a vector of length "
+                             + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
-            raise ValueError(
-                "Dividend yields must be a vector of length " + str(self._numAssets))
+            raise ValueError("Dividend yields must be a vector of length "
+                             + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
-            raise ValueError(
-                "Volatilities must be a vector of length " + str(self._numAssets))
+            raise ValueError("Volatilities must be a vector of length "
+                             + str(self._numAssets))
 
         if len(betas) != self._numAssets:
-            raise ValueError(
-                "Betas must be a vector of length " + str(self._numAssets))
+            raise ValueError("Betas must be a vector of length "
+                             + str(self._numAssets))
 
 ##########################################################################
 
@@ -140,8 +140,8 @@ class FinBasketOption(FinEquityOption):
     def valueMC(self,
                 valueDate,
                 stockPrices,
-                discountCurve,
-                dividendYields,
+                domDiscountCurve,
+                forDiscountCurve,
                 volatilities,
                 betas,
                 numPaths=10000,
@@ -150,44 +150,43 @@ class FinBasketOption(FinEquityOption):
         if valueDate > self._expiryDate:
             raise ValueError("Value date after expiry date.")
 
-        self.validate(stockPrices,
-                      dividendYields,
-                      volatilities,
-                      betas)
-
         numAssets = len(stockPrices)
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -log(df)/t
-        mus = r - dividendYields
-        k = self._strikePrice
+
+        df = domDiscountCurve.df(t)
+        rd = -log(df)/t
+
+        dq = forDiscountCurve.df(t)
+        rf = -log(dq)/t
+
+        mus = rd - rf
+        K = self._strikePrice
 
         numTimeSteps = 2
 
         model = FinGBMProcess()
         np.random.seed(seed)
 
-        Sall = model.getPathsAssets(
-            numAssets,
-            numPaths,
-            numTimeSteps,
-            t,
-            mus,
-            stockPrices,
-            volatilities,
-            betas,
-            seed)
+        Sall = model.getPathsAssets(numAssets,
+                                    numPaths,
+                                    numTimeSteps,
+                                    t,
+                                    mus,
+                                    stockPrices,
+                                    volatilities,
+                                    betas,
+                                    seed)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            payoff = np.maximum(np.mean(Sall, axis=1) - k, 0)
+            payoff = np.maximum(np.mean(Sall, axis=1) - K, 0)
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            payoff = np.maximum(k - np.mean(Sall, axis=1), 0)
+            payoff = np.maximum(K - np.mean(Sall, axis=1), 0)
         else:
             raise ValueError("Unknown option type.")
 
         payoff = np.mean(payoff)
-        v = payoff * exp(-r * t)
+        v = payoff * exp(-rd * t)
         return v
 
 ###############################################################################

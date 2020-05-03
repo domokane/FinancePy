@@ -68,7 +68,7 @@ def test_HullWhiteExampleTwo():
     texp = (expiryDate - startDate)/gDaysInYear
     tmat = (maturityDate - startDate)/gDaysInYear
 
-    model = FinHullWhiteRateModel(a, sigma)
+    model = FinModelRatesHullWhite(a, sigma)
     vAnal = model.optionOnZeroCouponBond(texp,
                                          tmat,
                                          strike, face,
@@ -111,9 +111,9 @@ def test_HullWhiteBondOption():
     couponFlows = []
     cpn = bond._coupon/bond._frequency
     for flowDate in bond._flowDates[1:]:
-       flowTime = (flowDate - settlementDate) / gDaysInYear
-       couponTimes.append(flowTime)
-       couponFlows.append(cpn)
+        flowTime = (flowDate - settlementDate) / gDaysInYear
+        couponTimes.append(flowTime)
+        couponFlows.append(cpn)
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
 
@@ -134,8 +134,8 @@ def test_HullWhiteBondOption():
     sigma = 0.01
     a = 0.1
 
-   # Test convergence
-    numStepsList = [100,200,300,400,500]
+    #  Test convergence
+    numStepsList = [100, 200, 300, 400, 500]
     texp = (expiryDate - settlementDate)/gDaysInYear
 
     print("NUMSTEPS", "FAST TREE", "FULLTREE", "TIME")
@@ -147,12 +147,11 @@ def test_HullWhiteBondOption():
 
         americanExercise = False
         v1 = model.americanBondOption_Tree(texp, strikePrice, face,
-                             couponTimes, couponFlows, americanExercise)
-
-
+                                           couponTimes, couponFlows,
+                                           americanExercise)
 
         v2 = model.europeanBondOption_Tree(texp, strikePrice, face,
-                                 couponTimes, couponFlows)
+                                           couponTimes, couponFlows)
 
         end = time.time()
         period = end-start
@@ -161,7 +160,7 @@ def test_HullWhiteBondOption():
 
 #    plt.plot(numStepsList, treeVector)
 
-    if 1==0:
+    if 1 == 0:
         print("RT")
         printTree(model._rt, 5)
         print("BOND")
@@ -170,7 +169,8 @@ def test_HullWhiteBondOption():
         printTree(model._optionValues, 5)
 
     v = model.europeanBondOption_Jamshidian(texp, strikePrice, face,
-                                    couponTimes, couponFlows, times, dfs)
+                                            couponTimes, couponFlows,
+                                            times, dfs)
 
     print("EUROPEAN BOND JAMSHIDIAN DECOMP", v)
 
@@ -192,9 +192,9 @@ def test_HullWhiteCallableBond():
     couponFlows = []
     cpn = bond._coupon/bond._frequency
     for flowDate in bond._flowDates[1:]:
-       flowTime = (flowDate - settlementDate) / gDaysInYear
-       couponTimes.append(flowTime)
-       couponFlows.append(cpn)
+        flowTime = (flowDate - settlementDate) / gDaysInYear
+        couponTimes.append(flowTime)
+        couponFlows.append(cpn)
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
 
@@ -239,11 +239,11 @@ def test_HullWhiteCallableBond():
 
     v1 = bond.fullPriceFromDiscountCurve(settlementDate, curve)
 
-    sigma = 0.02 # basis point volatility
+    sigma = 0.02  # basis point volatility
     a = 0.1
 
-   # Test convergence
-    numStepsList = [100,200,300,400,500,600,700,800,900,1000]
+    # Test convergence
+    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     tmat = (maturityDate - settlementDate)/gDaysInYear
 
     print("NUMSTEPS", "BOND_ONLY", "CALLABLE_BOND", "TIME")
@@ -256,21 +256,18 @@ def test_HullWhiteCallableBond():
         v2 = model.callablePuttableBond_Tree(couponTimes, couponFlows,
                                              callTimes, callPrices,
                                              putTimes, putPrices)
-        
+
         end = time.time()
         period = end-start
         print(numTimeSteps, v1, v2, period)
 
-
-    if 1==0:
+    if 1 == 0:
         print("RT")
         printTree(model._rt, 5)
         print("BOND")
         printTree(model._bondValues, 5)
         print("OPTION")
         printTree(model._optionValues, 5)
-
-
 
 ###############################################################################
 

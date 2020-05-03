@@ -5,20 +5,13 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-import time
 import numpy as np
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.FinOptionTypes import FinOptionTypes
-from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
-
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 from financepy.finutils.FinDate import FinDate
 import sys
@@ -27,6 +20,7 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
+
 
 def test_FinFXOptionSABR():
 
@@ -40,22 +34,14 @@ def test_FinFXOptionSABR():
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
     # DOM = USD , FOR = EUR
-    ccy1 = "EUR"
-    ccy2 = "USD"
     ccy1CCRate = 0.030  # EUR
     ccy2CCRate = 0.025  # USD
 
-    currencyPair = ccy1 + ccy2  # Always ccy1ccy2
     spotFXRate = 1.20
     strikeFXRate = 1.250
     volatility = 0.10
 
-    spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
-    maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
-    notionalCurrency = "EUR"
-    calendarType = FinCalendarTypes.TARGET
 
     domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
     forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
@@ -76,14 +62,14 @@ def test_FinFXOptionSABR():
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
-                                        1000000,
+                                        notional,
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
@@ -93,14 +79,16 @@ def test_FinFXOptionSABR():
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
-
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("CALL %9.6f %9.6f %9.7f %10.8f"% (spotFXRate, valueEuropean, valueAmerican, diff))
+        print("CALL %9.6f %9.6f %9.7f %10.8f" % (spotFXRate,
+                                                 valueEuropean,
+                                                 valueAmerican,
+                                                 diff))
 
     for spotFXRate in spotFXRates:
 
@@ -112,10 +100,10 @@ def test_FinFXOptionSABR():
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
@@ -125,16 +113,19 @@ def test_FinFXOptionSABR():
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                 spotFXRate,
-                                 domDiscountCurve,
-                                 forDiscountCurve,
-                                 model)['v']
+                                         spotFXRate,
+                                         domDiscountCurve,
+                                         forDiscountCurve,
+                                         model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("PUT  %9.6f %9.6f %9.7f %10.8f"% (spotFXRate, valueEuropean, valueAmerican, diff))
-
+        print("PUT  %9.6f %9.6f %9.7f %10.8f" % (spotFXRate,
+                                                 valueEuropean,
+                                                 valueAmerican,
+                                                 diff))
 
 ###############################################################################
+
 
 test_FinFXOptionSABR()
 testCases.compareTestCases()

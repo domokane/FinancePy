@@ -16,8 +16,8 @@ from ...finutils.FinMath import testMonotonicity
 
 
 class FinVolatilityCurve():
-    ''' Class to manage a smile or skew in volatility at a single maturity 
-    horizon. It fits the volatility using a polynomial. Includes analytics to 
+    ''' Class to manage a smile or skew in volatility at a single maturity
+    horizon. It fits the volatility using a polynomial. Includes analytics to
     extract the implied pdf of the underyling at maturity. '''
 
     def __init__(self,
@@ -56,7 +56,7 @@ class FinVolatilityCurve():
 ###############################################################################
 
     def volatility(self, strike):
-        ''' Return the volatility for a strike using a given polynomial 
+        ''' Return the volatility for a strike using a given polynomial
         interpolation. '''
 
         vol = self._f(strike)
@@ -69,7 +69,7 @@ class FinVolatilityCurve():
 ###############################################################################
 
     def calculatePDF():
-        ''' calculate the probability density function of the underlying using 
-        the volatility smile or skew curve following the approach set out in 
+        ''' calculate the probability density function of the underlying using
+        the volatility smile or skew curve following the approach set out in
         Breedon and Litzenberger. '''
         pass

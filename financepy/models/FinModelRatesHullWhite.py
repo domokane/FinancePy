@@ -118,11 +118,12 @@ def buildTree_Fast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
 ##########################################################################
 
+
 @njit(fastmath=True, cache=True)
 def americanBondOption_Tree_Fast(texp, strikePrice, face,
-                    couponTimes, couponAmounts, americanExercise,
-                    _sigma, _a, _Q, _pu, _pm, _pd, _rt, _dt, _treeTimes,
-                    _dfTimes, _dfValues):
+                                 couponTimes, couponAmounts, americanExercise,
+                                 _sigma, _a, _Q, _pu, _pm, _pd, _rt, _dt,
+                                 _treeTimes, _dfTimes, _dfValues):
     ''' Value an option on a bond with coupons that can have European or
     American exercise. Some minor issues to do with handling coupons on
     the option expiry date need to be solved. Also this function should be
@@ -182,7 +183,7 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
         bondPrice = 0.0
         for i in range(0, numCoupons):
             tflow = couponTimes[i]
-            if tflow > _treeTimes[expiryStep]: # must be >
+            if tflow > _treeTimes[expiryStep]:  # must be >
                 ptflow = uinterpolate(tflow, _dfTimes, _dfValues, interp)
                 zcb = P_Fast(texp, tflow, rt, dt, ptexp, ptdelta, ptflow,
                              _sigma, _a)
@@ -274,7 +275,7 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
 
             if americanExercise is True:
                 cleanPrice = bondValues[m, kN] - accrued[m]
-                exercise = max(cleanPrice - strikePrice,0)
+                exercise = max(cleanPrice - strikePrice, 0)
 
                 hold = callOptionValues[m, kN]
                 callOptionValues[m, kN] = max(exercise, hold)
@@ -282,14 +283,15 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
                 hold = putOptionValues[m, kN]
                 putOptionValues[m, kN] = max(exercise, hold)
 
-    return callOptionValues[0, N], putOptionValues[0,N]
+    return callOptionValues[0, N], putOptionValues[0, N]
 
 ##########################################################################
 # TODO: CHECK ACCRUED AND COUPONS TO SEE IF IT WORKS FOR LOW TREE STEPS
-    
+
+
 @njit(fastmath=True, cache=True)
-def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts, 
-                                   callTimes, callPrices, 
+def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
+                                   callTimes, callPrices,
                                    putTimes, putPrices,
                                    _sigma, _a, _Q,
                                    _pu, _pm, _pd, _rt, _dt, _treeTimes,
@@ -310,7 +312,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
     maturityStep = int(tmat/dt + 0.50)
     face = 100.0
 
- #   print("maturity", maturityStep)
+#   print("maturity", maturityStep)
     ###########################################################################
     # Map coupons onto tree while preserving the present value
     ###########################################################################
@@ -325,12 +327,13 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
         df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
         df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
- #       couponAmounts[i] = treeFlows[n]
+#       couponAmounts[i] = treeFlows[n]
 
 #    print("Times", _treeTimes)
 #    print("Flows", treeFlows)
     ###########################################################################
-    # Calculate the accrued interest at each tree time - NEED TO USE TREE FLOWS!!!!
+    # Calculate the accrued interest at each tree time - NEED TO USE TREE FLOWS
+    # !!!!
     ###########################################################################
 
     accrued = np.zeros(numTimeSteps)
@@ -339,7 +342,6 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
     if ACCRUED_MAP is True:
         for m in range(0, maturityStep+1):
             treeTime = _treeTimes[m]
-    
             for nextCpn in range(1, numCoupons):
                 prevTime = couponTimes[nextCpn-1]
                 nextTime = couponTimes[nextCpn]
@@ -382,8 +384,9 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
 
     DEBUG = True
     if DEBUG:
+        df = 1.0
         px = 0.0
-        for i in range(0,maturityStep+1):
+        for i in range(0, maturityStep+1):
             flow = treeFlows[i]
             t = _treeTimes[i]
             df = uinterpolate(t, _dfTimes, _dfValues, interp)
@@ -405,9 +408,9 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
     value = min(max(vclean, vput), vcall) + accrued[m]
 
     for k in range(-nm, nm+1):
-         kN = k + N
-         bondValues[m, kN] = (1.0 + treeFlows[m]) * face
-         callPutBondValues[m, kN] = value
+        kN = k + N
+        bondValues[m, kN] = (1.0 + treeFlows[m]) * face
+        callPutBondValues[m, kN] = value
 #         print("m",m,"k",k, bondValues[m,kN], vput,vcall,vhold,"==>",value)
 
 #    print("=====================")
@@ -485,9 +488,10 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
 #    printTree(callPutBondValues)
 #    print(accrued)
 
-    return callPutBondValues[0, N], bondValues[0,N]
+    return callPutBondValues[0, N], bondValues[0, N]
 
 ##########################################################################
+
 
 def fwdFullBondPrice(rt, *args):
     ''' Price a coupon bearing bond on the option expiry date and return
@@ -533,6 +537,7 @@ def fwdFullBondPrice(rt, *args):
     return obj
 
 ##########################################################################
+
 
 class FinModelRatesHullWhite():
 
@@ -591,8 +596,9 @@ class FinModelRatesHullWhite():
 
 ###############################################################################
 
-    def europeanBondOption_Jamshidian(self, texp, strikePrice, face, cpnTimes,
-                              cpnAmounts, dfTimes, dfValues):
+    def europeanBondOption_Jamshidian(self, texp, strikePrice, face,
+                                      cpnTimes, cpnAmounts,
+                                      dfTimes, dfValues):
         ''' Valuation of a European bond option using the Jamshidian deconstruction
         of the bond into a strip of zero coupon bonds with the short rate that
         would make the bond option be at the money forward. '''
@@ -736,7 +742,8 @@ class FinModelRatesHullWhite():
 ###############################################################################
 
     def americanBondOption_Tree(self, texp, strikePrice, face,
-                        couponTimes, couponAmounts, americanExercise):
+                                couponTimes, couponAmounts,
+                                americanExercise):
         ''' Value an option on a bond with coupons that can have European or
         American exercise. Some minor issues to do with handling coupons on
         the option expiry date need to be solved. Also this function should be
@@ -756,9 +763,11 @@ class FinModelRatesHullWhite():
 
 ###############################################################################
 
-
-    def callablePuttableBond_Tree(self, couponTimes, couponAmounts,
-                                  callTimes, callPrices,
+    def callablePuttableBond_Tree(self,
+                                  couponTimes,
+                                  couponAmounts,
+                                  callTimes,
+                                  callPrices,
                                   putTimes, putPrices):
         ''' Value an option on a bond with coupons that can have European or
         American exercise. Some minor issues to do with handling coupons on
@@ -773,21 +782,24 @@ class FinModelRatesHullWhite():
 
         callableBondPx, pureBondPx \
             = callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
-                                            callTimes, callPrices,
-                                            putTimes, putPrices,
-                                            self._sigma, self._a,
-                                            self._Q,
-                                            self._pu, self._pm, self._pd,
-                                            self._rt, self._dt, self._treeTimes,
-                                            self._dfTimes, self._dfValues)
+                                             callTimes, callPrices,
+                                             putTimes, putPrices,
+                                             self._sigma, self._a,
+                                             self._Q,
+                                             self._pu, self._pm, self._pd,
+                                             self._rt, self._dt,
+                                             self._treeTimes,
+                                             self._dfTimes, self._dfValues)
 
         return (callableBondPx, pureBondPx)
 
 ###############################################################################
 # THIS IS THE VERSION THAT DOES NOT USE NUMBA
 
-    def americanBondOption_Tree_OLD(self, texp, strikePrice, face,
-                        couponTimes, couponAmounts, americanExercise):
+    def americanBondOption_Tree_OLD(self,
+                                    texp, strikePrice, face,
+                                    couponTimes, couponAmounts,
+                                    americanExercise):
         ''' Value an option on a bond with coupons that can have European or
         American exercise. Some minor issues to do with handling coupons on
         the option expiry date need to be solved. Also this function should be
@@ -847,7 +859,7 @@ class FinModelRatesHullWhite():
                 if tflow > self._treeTimes[expiryStep]: # must be >
                     ptflow = uinterpolate(tflow, self._dfTimes, self._dfValues,
                                           interp)
-                    zcb = self.P(texp, tflow, rt, dt, ptexp, ptdelta, ptflow)
+                    zcb = self.P(texp, tflow, rt, dt, ptexp, ptdelta, ptflow) # CHECK THIS BUG ??
                     bondPrice += couponAmounts[i] * face * zcb
 
             bondPrice += face * zcb
@@ -936,7 +948,7 @@ class FinModelRatesHullWhite():
 
                 if americanExercise is True:
                     cleanPrice = bondValues[m, kN] - accrued[m]
-                    exercise = max(cleanPrice - strikePrice,0)
+                    exercise = max(cleanPrice - strikePrice, 0)
 
                     hold = callOptionValues[m, kN]
                     callOptionValues[m, kN] = max(exercise, hold)
@@ -948,7 +960,7 @@ class FinModelRatesHullWhite():
         self._callOptionValues = callOptionValues
         self._putOptionValues = putOptionValues
 
-        return (callOptionValues[0, N], putOptionValues[0,N])
+        return (callOptionValues[0, N], putOptionValues[0, N])
 
 ###############################################################################
 
@@ -990,7 +1002,7 @@ class FinModelRatesHullWhite():
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
             = buildTree_Fast(self._a, self._sigma,
-                           treeTimes, numTimeSteps, dfTree)
+                             treeTimes, numTimeSteps, dfTree)
 
         self._treeTimes = treeTimes
         self._dfTimes = dfTimes

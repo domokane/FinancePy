@@ -52,7 +52,6 @@ def test_FinEquityBarrierOption():
         "TIME")
 
     for optionType in FinEquityBarrierTypes:
-
         for stockPrice in range(80, 120, 10):
 
             B = 110.0
@@ -89,53 +88,42 @@ def test_FinEquityBarrierOption():
                 diff,
                 timeElapsed)
 
-    testCases.header(
-        "Type",
-        "K",
-        "B",
-        "S:",
-        "Value:",
-        "ValueMC",
-        "Diff",
-        "TIME")
+        for stockPrice in range(80, 120, 10):
 
-    for stockPrice in range(80, 120, 10):
+            B = 100.0
+            K = 110.0
 
-        B = 100.0
-        K = 110.0
+            option = FinEquityBarrierOption(
+                expiryDate, K, optionType, B, numObservationsPerYear)
+            value = option.value(
+                valueDate,
+                stockPrice,
+                discountCurve,
+                dividendYield,
+                model)
+            start = time.time()
+            modelParams = (stockPrice, drift, volatility, scheme)
+            valueMC = option.valueMC(
+                valueDate,
+                stockPrice,
+                discountCurve,
+                processType,
+                modelParams)
+            end = time.time()
+            timeElapsed = round(end - start, 3)
+            diff = valueMC - value
 
-        option = FinEquityBarrierOption(
-            expiryDate, K, optionType, B, numObservationsPerYear)
-        value = option.value(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model)
-        start = time.time()
-        modelParams = (stockPrice, drift, volatility, scheme)
-        valueMC = option.valueMC(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            processType,
-            modelParams)
+            testCases.print(
+                optionType,
+                K,
+                B,
+                stockPrice,
+                value,
+                valueMC,
+                diff,
+                timeElapsed)
+
         end = time.time()
-        timeElapsed = round(end - start, 3)
-        diff = valueMC - value
-
-        testCases.print(
-            optionType,
-            K,
-            B,
-            stockPrice,
-            value,
-            valueMC,
-            diff,
-            timeElapsed)
-
-    end = time.time()
-
 
 ##########################################################################
 

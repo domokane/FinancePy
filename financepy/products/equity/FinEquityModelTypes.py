@@ -14,10 +14,11 @@ class FinEquityModel(object):
 
 
 class FinEquityModelBlackScholes(FinEquityModel):
-    def __init__(self, volatility):
+    def __init__(self, volatility, numStepsPerYear=100, useTree=False):
         self._parentType = FinEquityModel
         self._volatility = volatility
-        self._implementation = 0
+        self._numStepsPerYear = numStepsPerYear
+        self._useTree = useTree
 
 ###############################################################################
 
