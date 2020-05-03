@@ -10,9 +10,7 @@ FinancePy is a library of native Python functions which covers the following fun
 
 The aim of this library for me has been to provide a comprehensive and accessible Python library for financial calculations that can be used by students to learn about financial derivatives. It can also be used by academics and practitioners to perform the pricing and risk-management of complex financial products, albeit without any warranties. Users should perform their own testing. See the license for the full disclaimer.
 
-I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools.
-
-In general my objectives have been:
+I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. In general my objectives have been:
 
 1. To make the code as simple as possible so that students and those with a basic Python fluency can understand and check the code.
 2. To keep all the code in Python so users can look through the code to the lowest level.
@@ -25,15 +23,24 @@ In general my objectives have been:
 
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
 
+## Author
+
+My name is Dr. Dominic O'Kane. I am a finance professor at the EDHEC Business School in Nice, France.
+
+## Installation
+
+FinancePy can be installed from pip
+
+pip install financepy
+
+or to upgrade
+
+pip install --upgrade financepy
+
 ## Dependencies
 
 FinancePy depends on Numpy and Numba and Scipy.
 
-## Installation
-
-FinancePy can be installed via pip as
-
-pip install financepy
 
 ## Changelog
 
