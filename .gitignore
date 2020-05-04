@@ -1,17 +1,26 @@
 # .gitignore
-__pycache__
-.spyproject
-.vs
+
+# VISUAL CODE
+./.vs
 .vscode
 *.code-workspace
+
+# PYTHON AND JUPYTER FILES
+build
+__pycache__
 dist
 financepy.egg-info
+.ipynb_checkpoints
+*.out
+
+# SPYDER
+.spyproject
+
+# LATEX FILES
+FinPyManual*.tex
+*.log
+*.aux
 *.aux
 *.idx
 *.toc
-FinPyManual*.tex
-*.out
-build
-.ipynb_checkpoints
-*checkpoint*.*
-*.log
+

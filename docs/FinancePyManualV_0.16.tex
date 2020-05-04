@@ -101,7 +101,7 @@
 
 \begin{document}
 
-\title{{\Huge \bf FinancePy}}
+\title{{\Huge \bf FinancePy V0.16}}
 \author{Dominic O'Kane}
 
 \maketitle 
@@ -136,9 +136,7 @@ FinancePy is a library of native Python functions which covers the following fun
 
 The aim of this library for me has been to provide a comprehensive and accessible Python library for financial calculations that can be used by students to learn about financial derivatives. It can also be used by academics and practitioners to perform the pricing and risk-management of complex financial products, albeit without any warranties. Users should perform their own testing. See the license for the full disclaimer.
 
-I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools.
-
-In general my objectives have been:
+I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. In general my objectives have been:
 
 \begin{enumerate}
 \item{ To make the code as simple as possible so that students and those with a basic Python fluency can understand and check the code.
@@ -162,16 +160,26 @@ In general my objectives have been:
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
 
 
-\subsection*{Dependencies}
+\subsection*{Author}
 
-FinancePy depends on Numpy and Numba and Scipy.
+My name is Dr. Dominic O'Kane. I am a finance professor at the EDHEC Business School in Nice, France.
 
 
 \subsection*{Installation}
 
-FinancePy can be installed via pip as
+FinancePy can be installed from pip
 
 pip install financepy
+
+or to upgrade
+
+pip install --upgrade financepy
+
+
+\subsection*{Dependencies}
+
+FinancePy depends on Numpy and Numba and Scipy.
+
 
 
 \subsection*{Changelog}
@@ -1019,7 +1027,7 @@ Compare output of COMPARE mode to GOLDEN output
 \section{Introduction}
 
 This folder covers a range of equity derivative products. These range from simple Vanilla-style options to more complex payoffs and path-dependent options. \newpage
-\section{FinEquityAmericanOption}
+\section{FinEquityAmericanOptionDELETE}
 
 \subsubsection{Enumerated Type: FinImplementations}
 \begin{itemize}
@@ -1829,7 +1837,8 @@ class FinEquityModelBlackScholes(FinEquityModel):
 \begin{itemize}
 \item{\_parentType}
 \item{\_volatility}
-\item{\_implementation}
+\item{\_numStepsPerYear}
+\item{\_useTree}
 \end{itemize}
 
 \subsection*{Functions}
@@ -1838,7 +1847,7 @@ class FinEquityModelBlackScholes(FinEquityModel):
 self.\_parentType = FinEquityModel 
 
 \begin{lstlisting}
-    def __init__(self, volatility):
+    def __init__(self, volatility, numStepsPerYear=100, useTree=False):
 \end{lstlisting}
 
 \subsection*{Class: FinEquityModelHeston(FinEquityModel)}
@@ -2090,7 +2099,7 @@ PLEASE ADD A FUNCTION DESCRIPTION
                  expiryDate,
                  strikePrice,
                  optionType,
-                 numOptions = 1.0):
+                 numOptions=1.0):
 \end{lstlisting}
 
 \subsubsection*{{\bf value}}
@@ -2110,11 +2119,11 @@ PLEASE ADD A FUNCTION DESCRIPTION
 
 \begin{lstlisting}
     def xdelta(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 \end{lstlisting}
 
 \subsubsection*{{\bf xgamma}}
@@ -2122,11 +2131,11 @@ PLEASE ADD A FUNCTION DESCRIPTION
 
 \begin{lstlisting}
     def xgamma(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 \end{lstlisting}
 
 \subsubsection*{{\bf xvega}}
@@ -2134,11 +2143,11 @@ PLEASE ADD A FUNCTION DESCRIPTION
 
 \begin{lstlisting}
     def xvega(self,
-             valueDate,
-             stockPrice,
-             discountCurve,
-             dividendYield,
-             model):
+              valueDate,
+              stockPrice,
+              discountCurve,
+              dividendYield,
+              model):
 \end{lstlisting}
 
 \subsubsection*{{\bf xtheta}}
@@ -2146,11 +2155,11 @@ PLEASE ADD A FUNCTION DESCRIPTION
 
 \begin{lstlisting}
     def xtheta(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+               valueDate,
+               stockPrice,
+               discountCurve,
+               dividendYield,
+               model):
 \end{lstlisting}
 
 \subsubsection*{{\bf impliedVolatility}}
@@ -4757,7 +4766,7 @@ This module describes a curve that is fitted to bond yields calculated from bond
 \newpage
 \section{FinFXBarrierOption}
 
-\subsubsection{Enumerated Type: FinBarrierTypes}
+\subsubsection{Enumerated Type: FinFXBarrierTypes}
 \begin{itemize}
 \item{DOWN\_AND\_OUT\_CALL}
 \item{DOWN\_AND\_IN\_CALL}
@@ -4769,13 +4778,13 @@ This module describes a curve that is fitted to bond yields calculated from bond
 \item{DOWN\_AND\_IN\_PUT}
 \end{itemize}
 
-\subsection*{Class: FinFXBarrierOption(FinOption)}
-class FinFXBarrierOption(FinOption): 
+\subsection*{Class: FinFXBarrierOption(FinFXOption)}
+class FinFXBarrierOption(FinFXOption): 
 
 \subsubsection*{Data Members}
 \begin{itemize}
 \item{\_expiryDate}
-\item{\_strikePrice}
+\item{\_strikeFXRate}
 \item{\_barrierLevel}
 \item{\_numObservationsPerYear}
 \item{\_optionType}
@@ -4791,7 +4800,7 @@ PLEASE ADD A FUNCTION DESCRIPTION
 \begin{lstlisting}
     def __init__(self,
                  expiryDate,
-                 strikePrice,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
                  currencyPair,  # FORDOM
                  optionType,
                  barrierLevel,
@@ -4806,7 +4815,7 @@ PLEASE ADD A FUNCTION DESCRIPTION
 \begin{lstlisting}
     def value(self,
               valueDate,
-              stockPrice,
+              spotFXRate,
               domDiscountCurve,
               forDiscountCurve,
               model):
@@ -4818,20 +4827,20 @@ PLEASE ADD A FUNCTION DESCRIPTION
 \begin{lstlisting}
     def valueMC(self,
                 valueDate,
-                stockPrice,
-                discountCurve,
+                spotFXRate,
+                domInterestRate,
                 processType,
                 modelParams,
-                numAnnSteps=252,
-                numPaths=10000,
+                numAnnSteps=552,
+                numPaths=20000,
                 seed=4242):
 \end{lstlisting}
 
 \newpage
 \section{FinFXBasketOption}
 
-\subsection*{Class: FinBasketOption(FinEquityOption)}
-class FinBasketOption(FinEquityOption): 
+\subsection*{Class: FinFXBasketOption(FinFXOption)}
+class FinFXBasketOption(FinFXOption): 
 
 \subsubsection*{Data Members}
 \begin{itemize}
@@ -5162,16 +5171,12 @@ PLEASE ADD A FUNCTION DESCRIPTION
 class FinFXModel(object): 
 
 \subsubsection*{Data Members}
-\begin{itemize}
-\item{\_parentType}
-\item{\_volatility}
-\item{\_implementation}
-\end{itemize}
+No data members found.
 
 \subsection*{Functions}
 
 \subsubsection*{{\bf \_\_init\_\_}}
-self.\_parentType = None 
+pass 
 
 \begin{lstlisting}
     def __init__(self):
@@ -5183,6 +5188,7 @@ self.\_parentType = None
 \subsubsection*{Data Members}
 \begin{itemize}
 \item{\_parentType}
+\item{\_modelType}
 \item{\_volatility}
 \item{\_implementation}
 \end{itemize}
@@ -5201,7 +5207,7 @@ self.\_parentType = FinFXModel
 
 \subsubsection*{Data Members}
 \begin{itemize}
-\item{\_parentType}
+\item{\_modelType}
 \item{\_volatility}
 \item{\_meanReversion}
 \item{\_implementation}
@@ -5210,7 +5216,7 @@ self.\_parentType = FinFXModel
 \subsection*{Functions}
 
 \subsubsection*{{\bf \_\_init\_\_}}
-self.\_parentType = FinFXModel 
+self.\_modelType = FinFXModel 
 
 \begin{lstlisting}
     def __init__(self, volatility, meanReversion):
@@ -5221,7 +5227,7 @@ self.\_parentType = FinFXModel
 
 \subsubsection*{Data Members}
 \begin{itemize}
-\item{\_parentType}
+\item{\_modelType}
 \item{\_alpha}
 \item{\_beta}
 \item{\_rho}
@@ -5232,7 +5238,7 @@ self.\_parentType = FinFXModel
 \subsection*{Functions}
 
 \subsubsection*{{\bf \_\_init\_\_}}
-self.\_parentType = FinFXModel 
+self.\_modelType = FinFXModel 
 
 \begin{lstlisting}
     def __init__(self, alpha, beta, rho, nu, volatility):
@@ -5240,6 +5246,188 @@ self.\_parentType = FinFXModel
 
 \newpage
 \section{FinFXOption}
+
+\subsection*{Class: FinFXOption(object)}
+class FinFXOption(object): 
+
+\subsubsection*{Data Members}
+No data members found.
+
+\subsection*{Functions}
+
+\subsubsection*{{\bf delta}}
+v = self.value( 
+
+\begin{lstlisting}
+    def delta(
+            self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+\end{lstlisting}
+
+\subsubsection*{{\bf gamma}}
+v = self.delta( 
+
+\begin{lstlisting}
+    def gamma(
+            self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+\end{lstlisting}
+
+\subsubsection*{{\bf vega}}
+v = self.value( 
+
+\begin{lstlisting}
+    def vega(
+            self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+\end{lstlisting}
+
+\subsubsection*{{\bf theta}}
+v = self.value( 
+
+\begin{lstlisting}
+    def theta(
+            self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+\end{lstlisting}
+
+\subsubsection*{{\bf rho}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def rho(
+            self,
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model):
+\end{lstlisting}
+
+\newpage
+\section{FinFXRainbowOption}
+
+\subsubsection{Enumerated Type: FinFXRainbowOptionTypes}
+\begin{itemize}
+\item{CALL\_ON\_MAXIMUM}
+\item{PUT\_ON\_MAXIMUM}
+\item{CALL\_ON\_MINIMUM}
+\item{PUT\_ON\_MINIMUM}
+\item{CALL\_ON\_NTH}
+\item{PUT\_ON\_NTH}
+\end{itemize}
+
+\subsection*{Class: FinRainbowOption(FinOption)}
+class FinRainbowOption(FinOption): 
+
+\subsubsection*{Data Members}
+\begin{itemize}
+\item{\_expiryDate}
+\item{\_payoffType}
+\item{\_payoffParams}
+\item{\_numAssets}
+\end{itemize}
+
+\subsection*{Functions}
+
+\subsubsection*{{\bf \_\_init\_\_}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def __init__(self,
+                 expiryDate,
+                 payoffType,
+                 payoffParams,
+                 numAssets):
+\end{lstlisting}
+
+\subsubsection*{{\bf validate}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def validate(self,
+                 stockPrices,
+                 dividendYields,
+                 volatilities,
+                 betas):
+\end{lstlisting}
+
+\subsubsection*{{\bf validatePayoff}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def validatePayoff(self, payoffType, payoffParams, numAssets):
+\end{lstlisting}
+
+\subsubsection*{{\bf value}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def value(self,
+              valueDate,
+              expiryDate,
+              stockPrices,
+              discountCurve,
+              dividendYields,
+              volatilities,
+              betas):
+\end{lstlisting}
+
+\subsubsection*{{\bf valueMC}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+    def valueMC(self,
+                valueDate,
+                expiryDate,
+                stockPrices,
+                discountCurve,
+                dividendYields,
+                volatilities,
+                betas,
+                numPaths=10000,
+                seed=4242):
+\end{lstlisting}
+
+\subsubsection*{{\bf payoffValue}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+def payoffValue(s, payoffTypeValue, payoffParams):
+\end{lstlisting}
+
+\subsubsection*{{\bf valueMCFast}}
+PLEASE ADD A FUNCTION DESCRIPTION
+
+\begin{lstlisting}
+def valueMCFast(t,
+                stockPrices,
+                discountCurve,
+                dividendYields,
+                volatilities,
+                betas,
+                numAssets,
+                payoffType,
+                payoffParams,
+                numPaths=10000,
+                seed=4242):
+\end{lstlisting}
 
 \newpage
 \section{FinFXVanillaOption}
@@ -5503,7 +5691,7 @@ PLEASE ADD A FUNCTION DESCRIPTION
 \end{lstlisting}
 
 \newpage
-\section{FinFXVolatilitySmile}
+\section{FinFXVolatilitySmileDELETE}
 
 \subsection*{Class: FinFXVolatilitySmile()}
 
@@ -5667,115 +5855,6 @@ def f(volatility, *args):
 
 \begin{lstlisting}
 def fvega(volatility, *args):
-\end{lstlisting}
-
-\newpage
-\section{FinRainbowOption}
-
-\subsubsection{Enumerated Type: FinRainbowOptionTypes}
-\begin{itemize}
-\item{CALL\_ON\_MAXIMUM}
-\item{PUT\_ON\_MAXIMUM}
-\item{CALL\_ON\_MINIMUM}
-\item{PUT\_ON\_MINIMUM}
-\item{CALL\_ON\_NTH}
-\item{PUT\_ON\_NTH}
-\end{itemize}
-
-\subsection*{Class: FinRainbowOption(FinOption)}
-class FinRainbowOption(FinOption): 
-
-\subsubsection*{Data Members}
-\begin{itemize}
-\item{\_expiryDate}
-\item{\_payoffType}
-\item{\_payoffParams}
-\item{\_numAssets}
-\end{itemize}
-
-\subsection*{Functions}
-
-\subsubsection*{{\bf \_\_init\_\_}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-    def __init__(self,
-                 expiryDate,
-                 payoffType,
-                 payoffParams,
-                 numAssets):
-\end{lstlisting}
-
-\subsubsection*{{\bf validate}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-    def validate(self,
-                 stockPrices,
-                 dividendYields,
-                 volatilities,
-                 betas):
-\end{lstlisting}
-
-\subsubsection*{{\bf validatePayoff}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-    def validatePayoff(self, payoffType, payoffParams, numAssets):
-\end{lstlisting}
-
-\subsubsection*{{\bf value}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-    def value(self, 
-              valueDate, 
-              expiryDate, 
-              stockPrices, 
-              discountCurve,
-              dividendYields, 
-              volatilities, 
-              betas):
-\end{lstlisting}
-
-\subsubsection*{{\bf valueMC}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-    def valueMC(self,
-                valueDate,
-                expiryDate,
-                stockPrices,
-                discountCurve,
-                dividendYields,
-                volatilities,
-                betas,
-                numPaths=10000,
-                seed=4242):
-\end{lstlisting}
-
-\subsubsection*{{\bf payoffValue}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-def payoffValue(s, payoffTypeValue, payoffParams):
-\end{lstlisting}
-
-\subsubsection*{{\bf valueMCFast}}
-PLEASE ADD A FUNCTION DESCRIPTION
-
-\begin{lstlisting}
-def valueMCFast(t,
-                stockPrices,
-                discountCurve,
-                dividendYields,
-                volatilities,
-                betas,
-                numAssets,
-                payoffType,
-                payoffParams,
-                numPaths=10000,
-                seed=4242):
 \end{lstlisting}
 
 
@@ -6702,8 +6781,9 @@ Price an option on a zero coupon bond using analytical solution of Hull-White mo
 Valuation of a European bond option using the Jamshidian deconstruction of the bond into a strip of zero coupon bonds with the short rate that would make the bond option be at the money forward.  
 
 \begin{lstlisting}
-    def europeanBondOption_Jamshidian(self, texp, strikePrice, face, cpnTimes,
-                              cpnAmounts, dfTimes, dfValues):
+    def europeanBondOption_Jamshidian(self, texp, strikePrice, face,
+                                      cpnTimes, cpnAmounts,
+                                      dfTimes, dfValues):
 \end{lstlisting}
 
 \subsubsection*{{\bf europeanBondOption\_Tree}}
@@ -6726,15 +6806,19 @@ Price an option on a zero coupon bond using a HW trinomial tree. The discount cu
 
 \begin{lstlisting}
     def americanBondOption_Tree(self, texp, strikePrice, face,
-                        couponTimes, couponAmounts, americanExercise):
+                                couponTimes, couponAmounts,
+                                americanExercise):
 \end{lstlisting}
 
 \subsubsection*{{\bf callablePuttableBond\_Tree}}
 
 
 \begin{lstlisting}
-    def callablePuttableBond_Tree(self, couponTimes, couponAmounts,
-                                  callTimes, callPrices,
+    def callablePuttableBond_Tree(self,
+                                  couponTimes,
+                                  couponAmounts,
+                                  callTimes,
+                                  callPrices,
                                   putTimes, putPrices):
 \end{lstlisting}
 
@@ -6742,8 +6826,10 @@ Price an option on a zero coupon bond using a HW trinomial tree. The discount cu
 
 
 \begin{lstlisting}
-    def americanBondOption_Tree_OLD(self, texp, strikePrice, face,
-                        couponTimes, couponAmounts, americanExercise):
+    def americanBondOption_Tree_OLD(self,
+                                    texp, strikePrice, face,
+                                    couponTimes, couponAmounts,
+                                    americanExercise):
 \end{lstlisting}
 
 \subsubsection*{{\bf df\_Tree}}
@@ -6779,17 +6865,17 @@ def buildTree_Fast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
 \begin{lstlisting}
 def americanBondOption_Tree_Fast(texp, strikePrice, face,
-                    couponTimes, couponAmounts, americanExercise,
-                    _sigma, _a, _Q, _pu, _pm, _pd, _rt, _dt, _treeTimes,
-                    _dfTimes, _dfValues):
+                                 couponTimes, couponAmounts, americanExercise,
+                                 _sigma, _a, _Q, _pu, _pm, _pd, _rt, _dt,
+                                 _treeTimes, _dfTimes, _dfValues):
 \end{lstlisting}
 
 \subsubsection*{{\bf callablePuttableBond\_Tree\_Fast}}
 
 
 \begin{lstlisting}
-def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts, 
-                                   callTimes, callPrices, 
+def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
+                                   callTimes, callPrices,
                                    putTimes, putPrices,
                                    _sigma, _a, _Q,
                                    _pu, _pm, _pd, _rt, _dt, _treeTimes,

@@ -9,8 +9,9 @@ import glob
 import os
 import sys
 import subprocess
+import shutil
 
-VERSION = 0.15
+VERSION = 0.16
 
 fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
@@ -633,7 +634,13 @@ if 1 == 1:
 
 buildTail()
 
+print("Latex filename:", userGuideFileName)
+
+
 if 1 == 1:
     # Do it twice for the TOC
     os.system("pdflatex " + userGuideFileName)
-    open_file(fileName + ".pdf")
+    pdfFileName1 = fileName + ".pdf"
+    pdfFileName2 = '../' + pdfFileName1
+    shutil.copyfile(pdfFileName1, pdfFileName2)
+    open_file(pdfFileName1)
