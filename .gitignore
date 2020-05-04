@@ -1,8 +1,8 @@
 # .gitignore
 __pycache__
 .spyproject
-.vscode
 .vs
+.vscode
 dist
 financepy.egg-info
 *.aux
