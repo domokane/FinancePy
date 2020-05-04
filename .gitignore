@@ -2,6 +2,7 @@
 __pycache__
 .spyproject
 .vscode
+.vs
 dist
 financepy.egg-info
 *.aux
