@@ -17,7 +17,7 @@ financepy.egg-info
 .spyproject
 
 # LATEX FILES
-FinPyManual*.tex
+*.tex
 *.log
 *.aux
 *.aux

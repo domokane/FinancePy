@@ -641,6 +641,6 @@ if 1 == 1:
     # Do it twice for the TOC
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
-    pdfFileName2 = '../' + pdfFileName1
-    shutil.copyfile(pdfFileName1, pdfFileName2)
+#    pdfFileName2 = '../' + pdfFileName1
+#    shutil.copyfile(pdfFileName1, pdfFileName2)
     open_file(pdfFileName1)
