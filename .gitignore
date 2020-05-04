@@ -3,6 +3,8 @@ __pycache__
 .spyproject
 .vs
 .vscode
+*.code-workspace
+
 dist
 financepy.egg-info
 *.aux
@@ -13,7 +15,7 @@ FinPyManual*.tex
 .pdf
 build
 FinancePyManualV*.tex
-financepy/examples/ipynb_checkpoints/*.*
+.ipynb_checkpoints
 *checkpoint*.*
 financepy/docs/FinancePyManualV_0.15.tex
 *.log
