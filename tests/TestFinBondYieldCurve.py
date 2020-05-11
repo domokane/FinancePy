@@ -30,7 +30,7 @@ def test_FinBondYieldCurve():
     ###########################################################################
 
     import pandas as pd
-    bondDataFrame = pd.read_csv('./data/giltbondprices.txt', sep='\t')
+    bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL

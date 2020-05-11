@@ -84,6 +84,27 @@ def fromDatetime(dt):
 
 ###############################################################################
 
+def dateRange(startDate, endDate, tenor="1D"):
+    ''' Returns a list of dates between startDate (inclusive) 
+    and endDate (inclusive). 
+    The tenor represents the distance between two consecutive dates
+    and is set to daily by default. '''
+
+    if startDate > endDate:
+        return []
+    
+    dateList = []
+    
+    dt = startDate
+    while dt < endDate:
+        dateList.append(dt)
+        dt = dt.addTenor(tenor)
+    dateList.append(endDate)
+        
+    return dateList
+
+###############################################################################
+
 class FinDate():
 
     ''' Date class to manage dates that is simple to use and includes a
@@ -396,7 +417,7 @@ class FinDate():
 
     ###########################################################################
 
-    def __str__(self):
+    def __repr__(self):
         ''' returns a formatted string of the date '''
         dateStr = ""
         dateStr += shortDayNames[self._weekday]

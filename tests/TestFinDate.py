@@ -6,7 +6,7 @@ Created on Sat Feb 06 07:26:46 2016
 """
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, dateRange
 import sys
 sys.path.append("..//..")
 
@@ -69,7 +69,32 @@ def test_FinDateTenors():
     print(tenor, startDate.addTenor(tenor))
 
 
+def test_FinDateHelpers():
+    startDate = FinDate(2010, 1, 1)
+    
+    testCases.header("Tenor", "Dates")
+    
+    endDate = startDate.addDays(3)
+    tenor = "Default"
+    testCases.print(tenor, dateRange(startDate, endDate))
+    
+    endDate = startDate.addDays(20)
+    tenor = "1W"
+    testCases.print(tenor, dateRange(startDate, endDate, tenor))
+    
+    tenor = "7D"
+    testCases.print(tenor, dateRange(startDate, endDate, tenor))
+    
+    testCases.header("Case", "Dates")
+    
+    case = "Same startDate"
+    testCases.print(case, dateRange(startDate, startDate))
+    case = "startDate before endDate"
+    testCases.print(case, dateRange(endDate, startDate))
+
+
 test_FinDate()
 test_FinDateTenors()
+test_FinDateHelpers()
 
 testCases.compareTestCases()
