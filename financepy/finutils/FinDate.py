@@ -86,9 +86,8 @@ def fromDatetime(dt):
 
 def dateRange(startDate, endDate, tenor="1D"):
     ''' Returns a list of dates between startDate (inclusive) 
-    and endDate (inclusive). 
-    The tenor represents the distance between two consecutive dates
-    and is set to daily by default. '''
+    and endDate (inclusive). The tenor represents the distance 
+    between two consecutive dates and is set to daily by default. '''
 
     if startDate > endDate:
         return []
