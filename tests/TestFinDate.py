@@ -69,7 +69,7 @@ def test_FinDateTenors():
     print(tenor, startDate.addTenor(tenor))
 
 
-def test_FinDateHelpers():
+def test_FinDateRange():
     startDate = FinDate(2010, 1, 1)
     
     testCases.header("Tenor", "Dates")
@@ -95,6 +95,6 @@ def test_FinDateHelpers():
 
 test_FinDate()
 test_FinDateTenors()
-test_FinDateHelpers()
+test_FinDateRange()
 
 testCases.compareTestCases()
