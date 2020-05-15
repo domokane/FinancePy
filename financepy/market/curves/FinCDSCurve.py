@@ -21,6 +21,8 @@ from ...finutils.FinDayCount import FinDayCount
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
 def uniformToDefaultTime(u, t, v):
+    ''' Fast mapping of a uniform random variable to a default time given a
+    survival probability curve. '''
 
     if u == 0.0:
         return 99999.0
@@ -56,6 +58,9 @@ def uniformToDefaultTime(u, t, v):
 
 
 def f(q, *args):
+    ''' Function that returns zero when the survival probability that gives a
+    zero value of the CDS has been determined. '''
+
     self = args[0]
     valueDate = args[1]
     cds = args[2]
@@ -118,38 +123,52 @@ class FinCDSCurve():
 ###############################################################################
 
     def survProb(self, dt):
-        ''' Extract the survival probability to date dt. '''
+        ''' Extract the survival probability to date dt. This function
+        supports vectorisation. '''
 
         if isinstance(dt, FinDate):
             t = (dt - self._curveDate) / gDaysInYear
+        elif isinstance(dt, list):
+            t = np.array(dt)
         else:
             t = dt
 
-        if t < 0.0:
-            print(t, dt, self._curveDate)
+        if np.any(t < 0.0):
             raise ValueError("Survival Date before curve anchor date")
 
-        if t == 0.0:
-            return 1.0
+        if isinstance(t, np.ndarray):
+            n = len(t)
+            qs = np.zeros(n)
+            for i in range(0, n):
+                qs[i] = uinterpolate(t[i], self._times, self._values,
+                                     self._interpolationMethod.value)
+            return qs
+        else:
+            q = uinterpolate(t, self._times, self._values,
+                             self._interpolationMethod.value)
+            return q
 
-        q = uinterpolate(t, self._times, self._values,
-                         self._interpolationMethod.value)
-
-        return q
+        return 999
 
 ###############################################################################
 
-    def df(self, t):
-        ''' Extract the discount factor from the underlying Libor curve. '''
+    def df(self, dt):
+        ''' Extract the discount factor from the underlying Libor curve. This
+        function supports vectorisation. '''
 
-        if isinstance(t, FinDate):
-            t = (t - self._curveDate) / gDaysInYear
+        if isinstance(dt, FinDate):
+            t = (dt - self._curveDate) / gDaysInYear
+        elif isinstance(dt, list):
+            t = np.array(dt)
+        else:
+            t = dt
 
         return self._liborCurve.df(t)
 
 ###############################################################################
 
     def buildCurve(self):
+        ''' Construct the CDS survival curve from a set of CDS contracts '''
 
         numTimes = len(self._cdsContracts)
         # we size the vectors to include time zero
@@ -179,19 +198,21 @@ class FinCDSCurve():
 ##############################################################################
 
     def fwd(self, dt):
-        ''' Calculate the instantaneous forward rate at the forward date. '''
+        ''' Calculate the instantaneous forward rate at the forward date dt
+        using the numerical derivative. '''
+
         t = inputTime(dt, self)
-        dt = 0.000001
+        epsilon = 1e-8
         df1 = self.df(t) * self.survProb(t)
-        df2 = self.df(t+dt) * self.survProb(t+dt)
+        df2 = self.df(t+epsilon) * self.survProb(t+epsilon)
         fwd = np.log(df1/df2)/dt
         return fwd
 
 ##############################################################################
 
     def fwdRate(self, date1, date2, dayCountType):
-        ''' Calculate the forward rate according to the specified
-        day count convention. '''
+        ''' Calculate the forward rate according between dates date1 and date2
+        according to the specified day count convention. '''
 
         if date1 < self._curveDate:
             raise ValueError("Date1 before curve value date.")
@@ -209,7 +230,9 @@ class FinCDSCurve():
 ##############################################################################
 
     def zeroRate(self, dt, compoundingFreq=-1):
-        ''' Calculate the zero rate to maturity date. '''
+        ''' Calculate the zero rate to date dt in the chosen compounding
+        frequency where -1 is continuous is the default. '''
+
         t = inputTime(dt, self)
         f = inputFrequency(compoundingFreq)
         df = self.df(t)
@@ -227,6 +250,8 @@ class FinCDSCurve():
 ##############################################################################
 
     def print(self):
+        ''' Print out the details of the survival probability curve. '''
+
         numPoints = len(self._times)
         print("TIME,SURVIVAL_PROBABILITY")
         for i in range(0, numPoints):

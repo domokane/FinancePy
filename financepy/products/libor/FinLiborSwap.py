@@ -171,11 +171,11 @@ class FinLiborSwap(object):
 ##########################################################################
 
     def parCoupon(self, valuationDate, discountCurve):
-        ''' Calculate the fixed leg coupon that makes the swap worth zero. 
-        If the valuation date is before the swap payments start then this 
-        is the forward swap rate as it starts in the future. The swap rate 
-        is then a forward swap rate and so we use a forward discount 
-        factor. If the swap fixed leg has begun then we have a spot 
+        ''' Calculate the fixed leg coupon that makes the swap worth zero.
+        If the valuation date is before the swap payments start then this
+        is the forward swap rate as it starts in the future. The swap rate
+        is then a forward swap rate and so we use a forward discount
+        factor. If the swap fixed leg has begun then we have a spot
         starting swap. '''
 
         pv01 = self.pv01(valuationDate, discountCurve)

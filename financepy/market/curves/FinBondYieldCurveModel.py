@@ -64,9 +64,10 @@ class FinCurveFitNelsonSiegel():
 
 class FinCurveFitNelsonSiegelSvensson():
 
-    def __init__(self, tau1=None, 
-                 tau2=None, 
-                 bounds = [(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
+    def __init__(self, tau1=None,
+                 tau2=None,
+                 bounds = [(0, -1, -1, -1, 0, 1),
+                           (1, 1, 1, 1, 10, 100)]):
         self._parentType = FinCurveFitMethod
         self._beta1 = None
         self._beta2 = None
@@ -77,6 +78,9 @@ class FinCurveFitNelsonSiegelSvensson():
         ''' I impose some bounds to help ensure a sensible result if
         the user does not provide any bounds. Especially for tau2. '''
         self._bounds = bounds
+
+###############################################################################
+
 
     def _interpolatedYield(self, t, beta1=None, beta2=None, beta3=None,
                            beta4=None, tau1=None, tau2=None):

@@ -10,7 +10,6 @@ import numpy as np
 
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.FinOptionTypes import FinOptionTypes
-from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
@@ -27,6 +26,7 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
+
 
 def test_FinFXVanillaOptionWystupExample1():
 
@@ -51,12 +51,7 @@ def test_FinFXVanillaOptionWystupExample1():
     strikeFXRate = 1.250
     volatility = 0.10
 
-    spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
-    maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
-    notionalCurrency = "EUR"
-    calendarType = FinCalendarTypes.TARGET
 
     domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
     forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
@@ -128,12 +123,7 @@ def test_FinFXVanillaOptionWystupExample2():
     strikeFXRate = 0.9090
     volatility = 0.12
 
-    spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
-    maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
-    notionalCurrency = "EUR"
-    calendarType = FinCalendarTypes.TARGET
 
     domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
     forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
@@ -203,7 +193,8 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinLiborDeposit(settlementDate, maturityDate, domDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinLiborCurve(forName, settlementDate, depos, fras, swaps)
+    domDiscountCurve = FinLiborCurve(forName, settlementDate,
+                                     depos, fras, swaps)
 
     depos = []
     fras = []
@@ -211,7 +202,8 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinLiborDeposit(settlementDate, maturityDate, forDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinLiborCurve(domName, settlementDate, depos, fras, swaps)
+    forDiscountCurve = FinLiborCurve(domName, settlementDate,
+                                     depos, fras, swaps)
 
     model = FinFXModelBlackScholes(volatility)
 
@@ -241,9 +233,10 @@ def test_FinFXVanillaOptionBloombergExample():
 
 ###############################################################################
 
+
 def test_FinFXVanillaOptionHullExample():
 
-#   Example from Hull 4th edition page 284
+    #   Example from Hull 4th edition page 284
     valueDate = FinDate(2015, 1, 1)
     expiryDate = valueDate.addMonths(4)
     spotFXRate = 1.60
@@ -401,7 +394,8 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model)
-        # callOption.rho(valueDate,stockPrice, interestRate, dividendYield, modelType, modelParams)
+        #  callOption.rho(valueDate,stockPrice, interestRate,
+        #  dividendYield, modelType, modelParams)
         rho = 999
         testCases.print(spotFXRate, value, delta, vega, theta, rho)
 
@@ -479,6 +473,7 @@ def test_FinFXVanillaOptionHullExample():
         testCases.print(spotFXRate, value, volatility, impliedVol)
 
 ###############################################################################
+
 
 test_FinFXVanillaOptionWystupExample1()
 test_FinFXVanillaOptionWystupExample2()

@@ -10,13 +10,21 @@ import os
 import sys
 import subprocess
 import shutil
+import fileinput
 
-VERSION = 0.16
+with open("../version.py", "r") as fh:
+    version_number = fh.read()
+    VERSION = version_number[-6:]
+    VERSION = VERSION.replace('\n', '')
 
 fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
+
+with fileinput.FileInput(headFile, inplace=True, backup='.bak') as file:
+    for line in file:
+        print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
 
 verbose = False
 
@@ -641,6 +649,7 @@ if 1 == 1:
     # Do it twice for the TOC
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
-#    pdfFileName2 = '../' + pdfFileName1
-#    shutil.copyfile(pdfFileName1, pdfFileName2)
+    pdfFileName2 = '../../financepy-examples-git/' + pdfFileName1
+    shutil.copyfile(pdfFileName1, pdfFileName2)
+    print(pdfFileName2)
     open_file(pdfFileName1)

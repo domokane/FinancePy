@@ -188,8 +188,8 @@ def test_CDSIndexPortfolio():
     testCases.print("AVERAGE SPD 10Y", averageSpd10Y)
 
     ##########################################################################
-    # Now determine the intrinsic spread of the index to the same maturity dates
-    # As the single name CDS contracts
+    # Now determine the intrinsic spread of the index to the same maturity
+    # dates. As the single name CDS contracts
     ##########################################################################
 
     cdsIndex = FinCDSIndexPortfolio()
