@@ -16,6 +16,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
+from ...finutils.FinHelperFunctions import labelToString
 from .FinLiborModelTypes import FinLiborModelBlack
 from .FinLiborModelTypes import FinLiborModelShiftedBlack
 from .FinLiborModelTypes import FinLiborModelSABR
@@ -248,12 +249,18 @@ class FinLiborCapFloor():
 
 ##########################################################################
 
+    def __repr__(self):
+        s = labelToString("CAP FLOOR START DATE", self._startDate)
+        s += labelToString("CAP FLOOR MATURITY DATE", self._maturityDate)
+        s += labelToString("CAP FLOOR STRIKE COUPON", self._strikeRate * 100)
+        s += labelToString("CAP FLOOR OPTION TYPE", str(self._optionType))
+        s += labelToString("CAP FLOOR FREQUENCY", str(self._frequencyType))
+        s += labelToString("CAP FLOOR DAY COUNT", str(self._dayCountType), "")
+
+        return s
+##########################################################################
+
     def print(self):
-        print("CAP FLOOR START DATE:", self._startDate)
-        print("CAP FLOOR MATURITY DATE:", self._maturityDate)
-        print("CAP FLOOR STRIKE COUPON:", self._strikeRate * 100)
-        print("CAP FLOOR OPTION TYPE:", str(self._optionType))
-        print("CAP FLOOR FREQUENCY:", str(self._frequencyType))
-        print("CAP FLOOR DAY COUNT:", str(self._dayCountType))
+        print(self)
 
 ##########################################################################

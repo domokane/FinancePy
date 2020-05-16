@@ -229,6 +229,7 @@ def test_FinBond():
     face = 1.0
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
+    print(bond)
 
     testCases.header("FIELD", "VALUE")
     fullPrice = bond.fullPriceFromYield(settlementDate, y)

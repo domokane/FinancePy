@@ -433,6 +433,6 @@ class FinDate():
 
     def print(self):
         ''' prints formatted string of the date. '''
-        print(self.__str__())
+        print(self)
 
     ###########################################################################

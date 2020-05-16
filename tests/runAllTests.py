@@ -5,7 +5,7 @@ import sys
 sys.path.append("..//..")
 
 print("Looking in folder:", dirname(__file__))
-modules = glob.glob(join(dirname(__file__), "TestFin*.py"))
+modules = glob.glob("TestFin*.py")
 
 numModules = len(modules)
 

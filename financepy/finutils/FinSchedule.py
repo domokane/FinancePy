@@ -9,6 +9,7 @@ from . import FinError
 from .FinCalendar import (FinCalendar, FinCalendarTypes)
 from .FinCalendar import (FinDayAdjustTypes, FinDateGenRuleTypes)
 from .FinFrequency import (FinFrequency, FinFrequencyTypes)
+from .FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -124,27 +125,34 @@ class FinSchedule(object):
 
         return self._adjustedDates
 
+##############################################################################
+
+    def __repr__(self):
+        ''' Print out the details of the schedule and the actual dates. This
+        can be used for providing transparency on schedule calculations. '''
+
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("END DATE", self._endDate)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType, "")
+        
+        if len(self._adjustedDates) > 0:
+            s += "\n\n"
+            s += labelToString("PCD", self._adjustedDates[0], "")
+
+        if len(self._adjustedDates) > 1:
+            s += "\n"
+            s += labelToString("NCD", self._adjustedDates[1:], "", listFormat=True)
+
+        return s
+
 ###############################################################################
 
     def print(self):
         ''' Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations. '''
-        print("START DATE:", self._startDate)
-        print("END DATE:", self._endDate)
-        print("FREQUENCY:", self._frequencyType)
-        print("CALENDAR:", self._calendarType)
-        print("BUSDAYRULE:", self._busDayAdjustType)
-        print("DATEGENRULE:", self._dateGenRuleType)
-        print("")
-
-        if len(self._adjustedDates) > 0:
-            print("PCD:", str(self._adjustedDates[0]))
-
-        if len(self._adjustedDates) > 1:
-            print("NCD:", str(self._adjustedDates[1]))
-
-        if len(self._adjustedDates) > 2:
-            for dt in self._adjustedDates[2:]:
-                print("    ", str(dt))
+        print(self)
 
 ###############################################################################

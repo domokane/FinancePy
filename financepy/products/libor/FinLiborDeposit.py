@@ -12,6 +12,7 @@ from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -94,12 +95,19 @@ class FinLiborDeposit(object):
 
     ###########################################################################
 
+    def __repr__(self):
+        ''' Print the contractual details of the Libor deposit. '''
+        s = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("DAY COUNT TYPE", self._dayCountType)
+        s += labelToString("DEPOSIT RATE", self._depositRate, "")
+
+        return s
+
+    ###########################################################################
+
     def print(self):
         ''' Print the contractual details of the Libor deposit. '''
-
-        print("SETTLEMENT DATE:", self._settlementDate)
-        print("MATURITY DATE:", self._maturityDate)
-        print("DAY COUNT TYPE:", self._dayCountType)
-        print("DEPOSIT RATE:", self._depositRate)
+        print(self)
 
 ###############################################################################
