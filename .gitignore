@@ -24,3 +24,4 @@ financepy.egg-info
 *.idx
 *.toc
 *.pdf
+*.bak
