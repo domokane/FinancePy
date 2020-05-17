@@ -23,4 +23,4 @@ financepy.egg-info
 *.aux
 *.idx
 *.toc
-
+*.pdf

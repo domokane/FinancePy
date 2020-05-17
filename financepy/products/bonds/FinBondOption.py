@@ -194,35 +194,60 @@ class FinBondOption():
 
             maturityDate = self._bond._maturityDate
             tmat = (maturityDate - valueDate) / gDaysInYear
-            model.buildTree(tmat, dfTimes, dfValues)
 
             if self._optionType == FinBondOptionTypes.EUROPEAN_CALL:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, False)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, False)
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v['call']
+                v = (v1['call'] + v2['call'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, False)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, False)
 
-                return v['put']
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_CALL:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, True)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v['call']
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+
+                v = (v1['call'] + v2['call'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_PUT:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, True)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v['put']
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
         else:
             raise FinError("Unknown model and option combination")

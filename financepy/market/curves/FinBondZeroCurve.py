@@ -25,7 +25,7 @@ def f(df, *args):
     marketCleanPrice = args[3]
     numPoints = len(curve._times)
     curve._values[numPoints - 1] = df
-    bondDiscountPrice = bond.cleanPriceFromDiscountCurve(valueDate, curve)
+    bondDiscountPrice = bond.cleanValueFromDiscountCurve(valueDate, curve)
     objFn = bondDiscountPrice - marketCleanPrice
     return objFn
 

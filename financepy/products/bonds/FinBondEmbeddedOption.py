@@ -174,18 +174,17 @@ class FinBondEmbeddedOption(object):
             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices, face)
-
-            return v1
-
-            model._numTimeSteps += 0
+            model._numTimeSteps += 1
             model.buildTree(tmat, dfTimes, dfValues)
             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices, face)
+            model._numTimeSteps -= 1
 
-            model._numTimeSteps -= 0
-            v = (0.5*(v1[0] + v2[0]), 0.5*(v1[1] + v2[1]))
-            return v
+            v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
+            v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
+
+            return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
 
         elif type(model) == FinModelRatesBK:
 
@@ -193,13 +192,22 @@ class FinBondEmbeddedOption(object):
             the tree out to the bond maturity which is after option expiry. '''
 
             model.buildTree(tmat, dfTimes, dfValues)
+            v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+                                                 callTimes, callPrices,
+                                                 putTimes, putPrices,
+                                                 face)
+            model._numTimeSteps += 1
+            model.buildTree(tmat, dfTimes, dfValues)
+            v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+                                                 callTimes, callPrices,
+                                                 putTimes, putPrices,
+                                                 face)
+            model._numTimeSteps -= 1
 
-            v = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
-                                                callTimes, callPrices,
-                                                putTimes, putPrices, face)
+            v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
+            v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
 
-            return v
-
+            return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
         else:
             raise FinError("Unknown model type")
 
