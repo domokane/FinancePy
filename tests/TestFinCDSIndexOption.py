@@ -173,7 +173,6 @@ def test_fullPriceCDSIndexOption():
 
     indexCoupon = 0.004
     volatility = 0.50
-    numCredits = 125
     expiryDate = FinDate(2008, 2, 1)
     maturityDate = FinDate(2011, 12, 20)
     notional = 10000.0
@@ -200,11 +199,7 @@ def test_fullPriceCDSIndexOption():
             cds = FinCDS(valuationDate, dt, index / 10000.0)
             cdsContracts.append(cds)
 
-        indexCurve = FinCDSCurve(
-            valuationDate,
-            cdsContracts,
-            liborCurve,
-            indexRecovery)
+        indexCurve = FinCDSCurve(valuationDate, cdsContracts, liborCurve, indexRecovery)
 
         if 1 == 0:
 
@@ -221,6 +216,7 @@ def test_fullPriceCDSIndexOption():
         else:
 
             indexSpread = index / 10000.0
+            print(indexSpread)
             issuerCurve = buildFlatIssuerCurve(tradeDate,
                                                liborCurve,
                                                indexSpread,

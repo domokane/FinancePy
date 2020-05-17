@@ -46,7 +46,7 @@ def test_FinBondPortfolio():
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
-            accd = bond._accrued
+            accd = bond._accruedInterest
 
             testCases.print(accrualType, maturityDt, coupon*100.0,
                             cleanPrice, accd, ytm*100.0)

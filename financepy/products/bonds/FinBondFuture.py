@@ -78,7 +78,12 @@ class FinBondFuture(object):
                            bond,
                            futuresPrice):
         ' The total invoice amount paid to take delivery of bond. '
-        accd = bond._accruedInterest(settlementDate)
+
+        if bond._accruedInterest is None:
+            bond.calculateFlowDates(settlementDate)
+
+        accd = bond._accruedInterest
+
         pip = self.principalInvoicePrice(bond, futuresPrice)
         accrued = accd * self._contractSize / 100.0
         tia = pip + accrued

@@ -245,7 +245,7 @@ def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
-    numTimeSteps = int(t / dt)
+    numTimeSteps = int(t / dt + 0.50)
     vsqrtdt = sigma * sqrt(dt)
     m = exp((mu - sigma * sigma / 2.0) * dt)
 
@@ -273,6 +273,10 @@ def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
     else:
 
         raise FinError("Unknown FinGBMNumericalScheme")
+
+#    m = np.mean(Sall[:, -1])
+#    v = np.var(Sall[:, -1]/Sall[:, 0])
+#    print("GBM", numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, m,v)
 
     return Sall
 

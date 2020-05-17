@@ -429,7 +429,7 @@ class FinCDS(object):
             cds._coupon -= bump
         issuerCurve._values = survProbs
 
-        creditDV01 = (v1[0] - v0[0])
+        creditDV01 = (v1['full_pv'] - v0['full_pv'])
         return creditDV01
 
 ##########################################################################

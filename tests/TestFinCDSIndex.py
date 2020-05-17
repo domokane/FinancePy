@@ -100,7 +100,7 @@ def buildIssuerCurve(tradeDate, liborCurve):
     cdsMarketContracts = []
 
     cdsCoupon = 0.0048375
-    maturityDate = FinDate(2010, 6, 29)
+    maturityDate = FinDate(2010, 6, 20)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
     cdsMarketContracts.append(cds)
 

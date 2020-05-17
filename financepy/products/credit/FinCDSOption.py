@@ -159,7 +159,7 @@ class FinCDSOption():
                           optionValue):
         ''' Calculate the implied CDS option volatility from a price. '''
         argtuple = (self, valuationDate, issuerCurve, optionValue)
-        sigma = optimize.newton(fvol, x0=0.5, args=argtuple, tol=1e-7,
+        sigma = optimize.newton(fvol, x0=0.3, args=argtuple, tol=1e-6,
                                 maxiter=50)
         return sigma
 

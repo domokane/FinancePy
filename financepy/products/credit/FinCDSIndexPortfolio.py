@@ -72,7 +72,7 @@ class FinCDSIndexPortfolio():
                                  stepInDate,
                                  maturityDate,
                                  issuerCurves):
-        ''' Calculation of the intrinsic protection leg value of the CDS porfolio
+        ''' Calculation of intrinsic protection leg value of the CDS porfolio
         by taking the average sum the protection legs of each contract. '''
 
         numCredits = len(issuerCurves)
@@ -151,7 +151,7 @@ class FinCDSIndexPortfolio():
                     stepInDate,
                     maturityDate,
                     issuerCurves):
-        ''' Calculates the total CDS spread of the CDS portfolio by summing 
+        ''' Calculates the total CDS spread of the CDS portfolio by summing
         over all of the issuers and adding the spread with no weights. '''
 
         numCredits = len(issuerCurves)
@@ -236,10 +236,11 @@ class FinCDSIndexPortfolio():
                               indexUpfronts,
                               indexMaturityDates,
                               indexRecoveryRate,
-                              tolerance):
+                              tolerance=1e-6):
         ''' Adjust individual CDS curves to reprice CDS index prices.
         This approach uses an iterative scheme but is slow as it has to use a
-        CDS curve bootstrap required when each trial spread adjustment is made.'''
+        CDS curve bootstrap required when each trial spread adjustment is made
+        '''
 
         numCredits = len(issuerCurves)
 
@@ -328,8 +329,9 @@ class FinCDSIndexPortfolio():
                                                       liborCurve,
                                                       recoveryRate)
 
-                    indexProtectionPV = cdsIndex.protectionLegPV(
-                        valuationDate, adjustedIssuerCurve, indexRecoveryRate)
+                    indexProtectionPV = cdsIndex.protectionLegPV(valuationDate,
+                                                    adjustedIssuerCurve,
+                                                    indexRecoveryRate)
 
                     cleanRPV01 = cdsIndex.riskyPV01(valuationDate, 
                                                     adjustedIssuerCurve)['clean_rpv01']
@@ -388,7 +390,7 @@ class FinCDSIndexPortfolio():
                                   indexUpfronts,
                                   indexMaturityDates,
                                   indexRecoveryRate,
-                                  tolerance,
+                                  tolerance=1e-6,
                                   maxIterations=100):
         ''' Adjust individual CDS curves to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish

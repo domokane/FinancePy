@@ -34,6 +34,10 @@ class FinFlatCurve(FinDiscountCurve):
         self._rate = rate
         self._cmpdFreq = inputFrequency(compoundingFreq)
 
+        # Some methods require these members
+        self._times = np.linspace(0.0, 10.0, 40)
+        self._values = self.df(self._times)
+
 ##########################################################################
 
     def zeroRate(self, dt, compoundingFreq):

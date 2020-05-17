@@ -23,6 +23,18 @@ I intend that subsequent versions will also include asset selection, portfolio-l
 
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
 
+## How to Use the Library
+
+FinancePy can be installed using pip (see instructions below). I have provided a range of template Jupyter notebooks under the github repository called FinancePy-Examples. The link is as follows:
+
+https://github.com/domokane/FinancePy-Examples
+
+A pdf description of functions can be found at the same repository.
+
+## Help Needed
+
+The current version of the code is very much a beta. Hence there is no guarantee on its exactness. If you have any questions or issues then please send them to me as a matter of urgency and I will do my best to investigate as quickly as possible.
+
 ## Author
 
 My name is Dr. Dominic O'Kane. I am a finance professor at the EDHEC Business School in Nice, France.

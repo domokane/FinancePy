@@ -63,6 +63,7 @@ def indepLossDbnHeterogeneousAdjBinomial(numCredits,
     diffAbove = meanAbove - meanLoss
     diffBelow = meanBelow - meanLoss
 
+    # DOK - TO DO - SIMPLIFY THIS CODE AS PER JOD PAPER
     term = diffAbove * diffAbove + \
         (diffBelow * diffBelow - diffAbove * diffAbove) * diffAbove
     numer = vexact - term

@@ -14,7 +14,7 @@ from math import log, exp
 # TO DO - DECIDE WHETHER TO OO MODEL
 
 
-class FinModelRatesHoLee():
+class FinModelRatesHL():
 
     def __init__(self, discountCurve, sigma):
         self._discountCurve = discountCurve
