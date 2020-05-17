@@ -56,6 +56,7 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def dailyWorkingDaySchedule(self, startDate, endDate):
+    ''' Returns a list of working dates between startDate and endDate. '''
     dateList = []
 
     dt = startDate
@@ -81,6 +82,27 @@ def fromDatetime(dt):
 
     finDate = FinDate(dt.year, dt.month, dt.day)
     return finDate
+
+###############################################################################
+
+def dateRange(startDate, endDate, tenor="1D"):
+    ''' Returns a list of dates between startDate (inclusive) 
+    and endDate (inclusive). 
+    The tenor represents the distance between two consecutive dates
+    and is set to daily by default. '''
+
+    if startDate > endDate:
+        return []
+    
+    dateList = []
+    
+    dt = startDate
+    while dt < endDate:
+        dateList.append(dt)
+        dt = dt.addTenor(tenor)
+    dateList.append(endDate)
+        
+    return dateList
 
 ###############################################################################
 
@@ -396,7 +418,7 @@ class FinDate():
 
     ###########################################################################
 
-    def __str__(self):
+    def __repr__(self):
         ''' returns a formatted string of the date '''
         dateStr = ""
         dateStr += shortDayNames[self._weekday]
