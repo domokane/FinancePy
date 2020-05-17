@@ -131,3 +131,22 @@ def normaliseWeights(wtVector):
     return wtVector
 
 ##########################################################################
+
+def labelToString(label, value, separator="\n", listFormat=False):
+    ''' Format label/value pairs for a unified formatting. '''
+    # Format option for lists such that all values are aligned:
+    # Label: value1
+    #        value2
+    #        ...
+    if (listFormat and type(value) is list and len(value) > 0):
+        s = label + ": "
+        labelSpacing = " " * len(s)
+        s += str(value[0])
+
+        for v in value[1:]:
+            s += "\n" + labelSpacing + str(v)
+        s += separator
+
+        return s
+
+    return f"{label}: {value}{separator}"

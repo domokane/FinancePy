@@ -11,6 +11,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -119,11 +120,18 @@ class FinLiborFRA(object):
 
     ##########################################################################
 
+    def __repr__(self):
+        s = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("FRA RATE", self._fraRate)
+        s += labelToString("PAY FIXED LEG", self._payFixedRate)
+        s += labelToString("DAY COUNT TYPE", self._dayCountType, "")
+
+        return s
+
+    ##########################################################################
+
     def print(self):
-        print("SETTLEMENT DATE:", self._settlementDate)
-        print("MATURITY DATE  :", self._maturityDate)
-        print("FRA RATE       :", self._fraRate)
-        print("PAY FIXED LEG  :", self._payFixedRate)
-        print("DAY COUNT TYPE :", self._dayCountType)
+        print(self)
 
 ########################################################################

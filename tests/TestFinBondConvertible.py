@@ -51,6 +51,7 @@ def test_FinBondConvertible():
                               putPrices,
                               accrualBasis,
                               face)
+    print(bond)
 
     dividendDates = [FinDate(2007, 3, 20),
                      FinDate(2008, 3, 15),

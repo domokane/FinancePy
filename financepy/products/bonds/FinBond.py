@@ -26,6 +26,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 from scipy import optimize
 
@@ -546,13 +547,23 @@ class FinBond(object):
 
 ###############################################################################
 
+    def __repr__(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        s = labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE", self._face, "")
+
+        return s
+    
+    ##########################################################################
+
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        print("MATURITY DATE:", self._maturityDate)
-        print("COUPON:", self._coupon)
-        print("FREQUENCY:", self._frequencyType)
-        print("ACCRUED TYPE:", self._accrualType)
-        print("FACE:", self._face)
+        print(self)
+
 
 ###############################################################################

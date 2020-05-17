@@ -15,6 +15,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 from ...products.libor.FinLiborSwap import FinLiborSwap
 from ...models.FinModelSABR import blackVolFromSABR
 
@@ -172,17 +173,23 @@ class FinLiborSwaption():
 
 ##########################################################################
 
-    def print(self):
-        print("SWAPTION EXERCISE DATE:", self._exerciseDate)
-        print("SWAPTION OPTION TYPE:", str(self._swaptionType))
-        print("SWAP MATURITY DATE:", self._maturityDate)
-        print("SWAP FIXED COUPON:", self._swapFixedCoupon * 100)
-        print("SWAP FIXED FREQUENCY:", str(self._swapFixedFrequencyType))
-        print("SWAP FIXED DAY COUNT:", str(self._swapFixedDayCountType))
+    def __repr__(self):
+        s = labelToString("SWAPTION EXERCISE DATE", self._exerciseDate)
+        s += labelToString("SWAPTION OPTION TYPE", str(self._swaptionType))
+        s += labelToString("SWAP MATURITY DATE", self._maturityDate)
+        s += labelToString("SWAP FIXED COUPON", self._swapFixedCoupon * 100)
+        s += labelToString("SWAP FIXED FREQUENCY", str(self._swapFixedFrequencyType))
+        s += labelToString("SWAP FIXED DAY COUNT", str(self._swapFixedDayCountType), "")
 
         if self._pv01 is not None:
-            print("PV01:", self._pv01)
-            print("FWD SWAP RATE:", self._fwdSwapRate)
-            print("FWD DF TO EXPIRY:", self._forwardDf)
+            s += "\n"
+            s += labelToString("PV01", self._pv01)
+            s += labelToString("FWD SWAP RATE", self._fwdSwapRate)
+            s += labelToString("FWD DF TO EXPIRY", self._forwardDf, "")
+        
+        return s
+
+    def print(self):
+        print(self)
 
 ##########################################################################

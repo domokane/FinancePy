@@ -56,7 +56,9 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def dailyWorkingDaySchedule(self, startDate, endDate):
-    ''' Returns a list of working dates between startDate and endDate. '''
+    ''' Returns a list of working dates between startDate and endDate. 
+    This function should be replaced by dateRange once addTenor allows
+    for working days. '''
     dateList = []
 
     dt = startDate
@@ -431,6 +433,6 @@ class FinDate():
 
     def print(self):
         ''' prints formatted string of the date. '''
-        print(self.__str__())
+        print(self)
 
     ###########################################################################

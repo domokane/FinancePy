@@ -222,6 +222,9 @@ def test_FinLiborCapFloor():
         maturityDate,
         capFloorType,
         strikeRate)
+    
+    print(capfloor)
+    
     value = capfloor.value(valuationDate, liborCurve, model)
 #    capfloor.print()
 

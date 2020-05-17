@@ -37,6 +37,7 @@ def test_FinSchedule():
         busDayAdjustType,
         dateGenRuleType)
 
+    print(schedule)
     testCases.header("SEMI-ANNUAL FREQUENCY")
     for dt in schedule._adjustedDates:
         testCases.print(str(dt))
@@ -55,6 +56,7 @@ def test_FinSchedule():
         calendarType,
         busDayAdjustType,
         dateGenRuleType)
+    print(schedule)
 
     testCases.header("QUARTERLY FREQUENCY")
     for dt in schedule._adjustedDates:
@@ -171,6 +173,7 @@ def test_FinSchedule():
         calendarType,
         busDayAdjustType,
         dateGenRuleType)
+
     for dt in schedule._adjustedDates:
         testCases.print(str(dt))
 

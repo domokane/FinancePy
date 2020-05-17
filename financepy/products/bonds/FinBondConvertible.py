@@ -12,6 +12,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
@@ -572,13 +573,22 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
+    def __repr__(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        s = labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL", self._accrualType, "")
+
+        return s
+
+##########################################################################
+
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        print("Maturity Date:", self._maturityDate)
-        print("Coupon:", self._coupon)
-        print("Frequency:", self._frequencyType)
-        print("Accrual:", self._accrualType)
+        print(self)
 
 ##########################################################################
 
