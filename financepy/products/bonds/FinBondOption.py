@@ -9,6 +9,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 import numpy as np

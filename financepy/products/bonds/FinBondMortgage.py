@@ -12,6 +12,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -30,6 +31,7 @@ class FinBondMortgage(object):
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.
     '''
+###############################################################################
 
     def __init__(self,
                  startDate,
@@ -125,7 +127,7 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def print(self):
+    def __repr__(self):
         print("START DATE:", self._startDate)
         print("END DATE:", self._endDate)
         print("MORTGAGE TYPE:", self._mortgageType)
@@ -137,15 +139,21 @@ class FinBondMortgage(object):
         numFlows = len(self._schedule._adjustedDates)
 
         print("%15s %12s %12s %12s %12s" %
-              ("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL"))
+              ("PAYMENT DATE", "INTEREST", "PRINCIPAL",
+               "OUTSTANDING", "TOTAL"))
+
         print("")
         for i in range(0, numFlows):
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
                   (self._schedule._adjustedDates[i],
-                  self._interestFlows[i],
-                  self._principalFlows[i],
-                  self._principalRemaining[i],
-                  self._totalFlows[i]))
+                   self._interestFlows[i],
+                   self._principalFlows[i],
+                   self._principalRemaining[i],
+                   self._totalFlows[i]))
 
 ###############################################################################
 
+    def print(self):
+        print(self)
+
+###############################################################################

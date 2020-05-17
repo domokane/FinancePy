@@ -84,8 +84,7 @@ def test_FinFXAmericanOption():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("CALL %9.6f %9.6f %9.7f %10.8f" %
-              (spotFXRate, valueEuropean, valueAmerican, diff))
+        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
 
     for spotFXRate in spotFXRates:
 
@@ -116,9 +115,7 @@ def test_FinFXAmericanOption():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("PUT  %9.6f %9.6f %9.7f %10.8f" % (spotFXRate, valueEuropean,
-                                                 valueAmerican, diff))
-
+        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
 
 ###############################################################################
 

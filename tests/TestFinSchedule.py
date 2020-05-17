@@ -11,8 +11,6 @@ from financepy.finutils.FinSchedule import FinSchedule
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -37,7 +35,6 @@ def test_FinSchedule():
         busDayAdjustType,
         dateGenRuleType)
 
-    print(schedule)
     testCases.header("SEMI-ANNUAL FREQUENCY")
     for dt in schedule._adjustedDates:
         testCases.print(str(dt))
@@ -56,7 +53,6 @@ def test_FinSchedule():
         calendarType,
         busDayAdjustType,
         dateGenRuleType)
-    print(schedule)
 
     testCases.header("QUARTERLY FREQUENCY")
     for dt in schedule._adjustedDates:
@@ -176,6 +172,8 @@ def test_FinSchedule():
 
     for dt in schedule._adjustedDates:
         testCases.print(str(dt))
+
+###############################################################################
 
 
 test_FinSchedule()

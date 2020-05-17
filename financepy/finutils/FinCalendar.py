@@ -67,7 +67,8 @@ class FinDateGenRuleTypes(Enum):
 
 class FinCalendar(object):
     ''' Class to manage designation of payment dates as holidays according to
-    a regional or country-specific calendar convention specified by the user. '''
+    a regional or country-specific calendar convention specified by the user.
+    '''
 
     def __init__(self, calendarType):
         ''' Create a calendar based on a specified calendar type. '''
@@ -141,8 +142,7 @@ class FinCalendar(object):
 
             return dt
         else:
-            raise FinError("Unknown adjustment convention",
-                str(busDayConventionType))
+            raise FinError("Unknown adjustment convention" + str(busDayConventionType))
 
         return dt
 
@@ -247,13 +247,13 @@ class FinCalendar(object):
             if m == 4 and d == 29:  # SHOWA greenery
                 return False
 
-            if m == 5 and d == 3: # Memorial
+            if m == 5 and d == 3:  # Memorial Day
                 return False
 
-            if m == 5 and d == 4: # nation
+            if m == 5 and d == 4:  # nation
                 return False
 
-            if m == 5 and d == 5: # children
+            if m == 5 and d == 5:  # children
                 return False
 
             # Marine
@@ -261,7 +261,7 @@ class FinCalendar(object):
                 return False
 
             # Mountain day
-            md = FinDate(11,8,y)
+            md = FinDate(11, 8, y)
             if md._weekday == FinDate.SUN:
                 md = md.addDays(1)
 
@@ -276,7 +276,7 @@ class FinCalendar(object):
             if m == 9 and d == 23:
                 return False
 
-            if m == 10 and d >=7 and d <= 14 and weekday == FinDate.MON:  # HS
+            if m == 10 and d >= 7 and d <= 14 and weekday == FinDate.MON:  # HS
                 return False
 
             if m == 11 and d == 3:  # Culture

@@ -571,7 +571,14 @@ class FinBondConvertible(object):
         y = self._coupon * self._face / cleanPrice
         return y
 
-##########################################################################
+###############################################################################
+
+    def print(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        print(self)
+
+###############################################################################
 
     def __repr__(self):
         ''' Print a list of the unadjusted coupon payment dates used in
@@ -579,20 +586,23 @@ class FinBondConvertible(object):
         s = labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
-        s += labelToString("ACCRUAL", self._accrualType, "")
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE AMOUNT", self._face)
+        s += labelToString("CONVERSION RATIO", self._conversionRatio)
+        s += labelToString("START CONVERT DATE", self._startConvertDate)
+
+        for i in range(0, len(self._callDates)):
+            s += labelToString("CALL DATE", self._callDates[i],
+                               self._callPrices[i])
+
+        for i in range(0, len(self._putDates)):
+            s += labelToString("PUT DATE", self._putDates[i],
+                               self._putPrices[i])
 
         return s
 
-##########################################################################
-
-    def print(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
-        print(self)
-
-##########################################################################
-
-
+###############################################################################
+###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################

@@ -7,7 +7,7 @@ Created on Fri Feb 12 16:51:05 2019
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
-
+from ...finutils.FinHelperFunctions import labelToString
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
 ##########################################################################
@@ -121,5 +121,21 @@ class FinBondFuture(object):
         payForBond = self._contractSize * bondCleanPrice / 100.0
         net = receiveOnFuture - payForBond
         return net, payForBond, receiveOnFuture
+
+##########################################################################
+
+    def __repr__(self):
+
+        s = labelToString("TICKER NAME", self._tickerName)
+        s += labelToString("FIRST DELIVERY DATE", self._firstDeliveryDate)
+        s += labelToString("LAST DELIVERY DATE", self._lastDeliveryDate)
+        s += labelToString("CONTRACT SIZE", self._contractSize)
+        s += labelToString("COUPON", self._coupon)
+        return s
+
+##########################################################################
+
+    def print(self):
+        print(self)
 
 ##########################################################################

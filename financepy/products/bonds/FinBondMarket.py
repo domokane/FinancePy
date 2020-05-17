@@ -10,6 +10,7 @@ Created on Tue Nov 12 11:16:14 2019
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 

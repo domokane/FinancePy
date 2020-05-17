@@ -216,7 +216,6 @@ def test_fullPriceCDSIndexOption():
         else:
 
             indexSpread = index / 10000.0
-            print(indexSpread)
             issuerCurve = buildFlatIssuerCurve(tradeDate,
                                                liborCurve,
                                                indexSpread,

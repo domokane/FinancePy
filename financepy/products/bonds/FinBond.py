@@ -206,7 +206,7 @@ class FinBond(object):
         fullPrice = self.fullPriceFromYield(settlementDate,
                                             y, convention)
 
-        principal = fullPrice * self._face / self._par - self._accrued
+        principal = fullPrice * self._face / self._par - self._accruedInterest
         return principal
 
 ###############################################################################
@@ -555,10 +555,9 @@ class FinBond(object):
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE", self._face, "")
-
         return s
-    
-    ##########################################################################
+
+###############################################################################
 
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in

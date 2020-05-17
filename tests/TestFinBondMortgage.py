@@ -18,6 +18,9 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
+
+
 def test_FinBondMortgage():
 
     principal = 130000
@@ -27,12 +30,32 @@ def test_FinBondMortgage():
 
     rate = 0.035
     mortgage.generateFlows(rate, FinBondMortgageType.REPAYMENT)
-    mortgage.print()
+
+    numFlows = len(mortgage._schedule._adjustedDates)
+
+    testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
+                     "TOTAL")
+
+    for i in range(0, numFlows):
+        testCases.print(mortgage._schedule._adjustedDates[i],
+                        mortgage._interestFlows[i],
+                        mortgage._principalFlows[i],
+                        mortgage._principalRemaining[i],
+                        mortgage._totalFlows[i])
 
     mortgage.generateFlows(rate, FinBondMortgageType.INTEREST_ONLY)
-    mortgage.print()
 
+    testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
+                     "TOTAL")
+
+    for i in range(0, numFlows):
+        testCases.print(mortgage._schedule._adjustedDates[i],
+                        mortgage._interestFlows[i],
+                        mortgage._principalFlows[i],
+                        mortgage._principalRemaining[i],
+                        mortgage._totalFlows[i])
 ###############################################################################
+
 
 test_FinBondMortgage()
 testCases.compareTestCases()

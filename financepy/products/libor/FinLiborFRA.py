@@ -57,10 +57,25 @@ class FinLiborFRA(object):
         if type(settlementDate) != FinDate:
             raise ValueError("Settlement date must be a FinDate.")
 
+        if calendarType not in FinCalendarTypes:
+            raise ValueError("Unknown Calendar type " + str(calendarType))
+
+        self._calendarType = calendarType
+
+        if busDayAdjustType not in FinDayAdjustTypes:
+            raise ValueError(
+                "Unknown Business Day Adjust type " +
+                str(busDayAdjustType))
+
+        self._busDayAdjustType = busDayAdjustType
+
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
             maturityDate = settlementDate.addTenor(maturityDateOrTenor)
+            calendar = FinCalendar(self._calendarType)
+            maturityDate = calendar.adjust(maturityDate,
+                                           self._busDayAdjustType)
 
         if settlementDate > maturityDate:
             raise ValueError("Settlement date after maturity date")
@@ -73,12 +88,8 @@ class FinLiborFRA(object):
                 "Unknown Day Count Rule type " +
                 str(dayCountType))
 
-        self._calendarType = calendarType
-        cal = FinCalendar(self._calendarType)
-
-        self._settlementDate = cal.adjust(settlementDate, busDayAdjustType)
-        self._maturityDate = cal.adjust(maturityDate, busDayAdjustType)
-
+        self._settlementDate = settlementDate
+        self._maturityDate = maturityDate
         self._fraRate = fraRate
         self._payFixedRate = payFixedRate
         self._dayCountType = dayCountType
@@ -118,18 +129,37 @@ class FinLiborFRA(object):
         df2 = df1 / (1.0 + accFactor * self._fraRate)
         return df2
 
+    ###########################################################################
+
+    def printFlows(self, valueDate):
+        ''' Determine the value of the Deposit given a Libor curve. '''
+
+        flow_settle = self._notional
+        dc = FinDayCount(self._dayCountType)
+        accFactor = dc.yearFrac(self._settlementDate, self._maturityDate)
+        flow_maturity = (1.0 + accFactor * self._fraRate) * self._notional
+
+        if self._payFixedRate is True:
+            print(self._settlementDate, -flow_settle)
+            print(self._maturityDate, flow_maturity)
+        else:
+            print(self._settlementDate, flow_settle)
+            print(self._maturityDate, -flow_maturity)
+
     ##########################################################################
 
     def __repr__(self):
         s = labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("FRA RATE", self._fraRate)
-        s += labelToString("PAY FIXED LEG", self._payFixedRate)
-        s += labelToString("DAY COUNT TYPE", self._dayCountType, "")
-
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("PAY FIXED RATE", self._payFixedRate)
+        s += labelToString("DAY COUNT TYPE", self._dayCountType)
+        s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)
+        s += labelToString("CALENDAR", self._calendarType)
         return s
 
-    ##########################################################################
+    ###########################################################################
 
     def print(self):
         print(self)

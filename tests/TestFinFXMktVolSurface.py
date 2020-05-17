@@ -27,7 +27,7 @@ def test_FinFXMktVolSurface():
     if 1 == 1:
 
         # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
-        print("EURUSD EXAMPLE CLARKE")
+        # print("EURUSD EXAMPLE CLARKE")
 
         valueDate = FinDate(10, 4, 2020)
 
@@ -72,10 +72,10 @@ def test_FinFXMktVolSurface():
 
     if 1 == 1:
 
-        print("==============================================================")
+        #print("==============================================================")
 
         # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
-        print("EURJPY EXAMPLE CLARKE")
+        #print("EURJPY EXAMPLE CLARKE")
 
         valueDate = FinDate(10, 4, 2020)
 
@@ -116,14 +116,14 @@ def test_FinFXMktVolSurface():
 #        fxMarket.checkCalibration()
         fxMarket.plotVolCurves()
 
-    print("==================================================================")
+#    print("==================================================================")
 
-    ###########################################################################
+#    ###########################################################################
 
     if 1 == 1:
 
         # EURUSD Example from Paper by Uwe Wystup using Tables 4
-        print("EURUSD EXAMPLE WYSTUP")
+#        print("EURUSD EXAMPLE WYSTUP")
 
         valueDate = FinDate(20, 1, 2009)
 
@@ -164,14 +164,14 @@ def test_FinFXMktVolSurface():
         fxMarket.checkCalibration()
         fxMarket.plotVolCurves()
 
-        print("==============================================================")
+#        print("==============================================================")
 
     ###########################################################################
 
     if 1 == 1:
 
         # USDJPY Example from Paper by Uwe Wystup using Tables 4
-        print("USDJPY EXAMPLE WYSTUP")
+#        print("USDJPY EXAMPLE WYSTUP")
 
         valueDate = FinDate(20, 1, 2009)
 

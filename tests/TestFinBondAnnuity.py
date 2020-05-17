@@ -17,9 +17,6 @@ from financepy.finutils.FinDate import FinDate
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 
-import sys
-sys.path.append("..//..")
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
@@ -62,10 +59,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("===============================================================")
 #    print("QUARTERLY FREQUENCY")
@@ -89,10 +90,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("MONTHLY FREQUENCY")
@@ -116,10 +121,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN")
@@ -143,10 +152,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("BACKWARD GEN WITH SHORT END STUB")
@@ -170,10 +183,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN WITH LONG END STUB")
@@ -197,10 +214,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 ##########################################################################
 

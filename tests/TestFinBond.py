@@ -18,6 +18,8 @@ from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
+from financepy.finutils.FinHelperFunctions import dump
+
 import sys
 sys.path.append("..\\..")
 sys.path.append("..")
@@ -171,6 +173,9 @@ def buildLiborCurve(valuationDate):
                                fras,
                                swaps)
 
+    dump(liborCurve)
+    dump(swap9)
+
     if 1 == 0:
         import numpy as np
         numSteps = 40
@@ -212,7 +217,7 @@ def test_FinBond():
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType,
-                           ONE_MILLION)
+                           100)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
             accd = bond._accruedInterest
@@ -232,7 +237,6 @@ def test_FinBond():
     face = ONE_MILLION
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
-    print(bond)
 
     testCases.header("FIELD", "VALUE")
     fullPrice = bond.fullPriceFromYield(settlementDate, y)

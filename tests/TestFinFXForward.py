@@ -78,9 +78,7 @@ def test_FinFXForward():
     testCases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
     fwdValue = fxForward.value(valueDate, spotFXRate,
-                            domDiscountCurve, forDiscountCurve)
-
-    print(fwdValue)
+                               domDiscountCurve, forDiscountCurve)
 
     fwdFXRate = fxForward.forward(valueDate, spotFXRate,
                                   domDiscountCurve,
@@ -91,6 +89,7 @@ def test_FinFXForward():
     testCases.print(spotFXRate, fwdFXRate, fwdValue)
 
 ###############################################################################
+
 
 test_FinFXForward()
 testCases.compareTestCases()

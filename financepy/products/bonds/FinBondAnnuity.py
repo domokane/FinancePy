@@ -13,6 +13,7 @@ from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -185,15 +186,15 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def print(self):
+    def __repr__(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
 
-        print("END DATE:", self._maturityDate)
-        print("FREQUENCY:", self._frequencyType)
-        print("CALENDAR:", self._calendarType)
-        print("BUSDAYRULE:", self._busDayAdjustType)
-        print("DATEGENRULE:", self._dateGenRuleType)
-
+        s = labelToString("END DATE:", self._maturityDate)
+        s += labelToString("FREQUENCY:", self._frequencyType)
+        s += labelToString("CALENDAR:", self._calendarType)
+        s += labelToString("BUSDAYRULE:", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE:", self._dateGenRuleType)
+        return s
 
 ###############################################################################

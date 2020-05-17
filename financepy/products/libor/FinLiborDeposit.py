@@ -37,12 +37,20 @@ class FinLiborDeposit(object):
 
         self._calendarType = calendarType
 
+        if busDayAdjustType not in FinDayAdjustTypes:
+            raise ValueError(
+                "Unknown Business Day Adjust type " +
+                str(busDayAdjustType))
+
+        self._busDayAdjustType = busDayAdjustType
+
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
             maturityDate = settlementDate.addTenor(maturityDateOrTenor)
             calendar = FinCalendar(self._calendarType)
-            maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
+            maturityDate = calendar.adjust(self._maturityDate,
+                                           self._busDayAdjustType)
 
         if settlementDate > maturityDate:
             raise ValueError("Settlement date after maturity date")
@@ -52,16 +60,11 @@ class FinLiborDeposit(object):
                 "Unknown Day Count Rule type " +
                 str(dayCountType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
         self._settlementDate = settlementDate
-        self._dayCountType = dayCountType
-        self._depositRate = depositRate
-        self._notional = notional
         self._maturityDate = maturityDate
+        self._depositRate = depositRate
+        self._dayCountType = dayCountType
+        self._notional = notional
 
     ###########################################################################
 
@@ -95,19 +98,30 @@ class FinLiborDeposit(object):
 
     ###########################################################################
 
+    def printFlows(self, valueDate):
+        ''' Determine the value of the Deposit given a Libor curve. '''
+
+        dc = FinDayCount(self._dayCountType)
+        accFactor = dc.yearFrac(self._settlementDate, self._maturityDate)
+        flow = (1.0 + accFactor * self._depositRate) * self._notional
+        print(self._maturityDate, flow)
+
+    ###########################################################################
+
     def __repr__(self):
         ''' Print the contractual details of the Libor deposit. '''
         s = labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("DEPOSIT RATE", self._depositRate)
         s += labelToString("DAY COUNT TYPE", self._dayCountType)
-        s += labelToString("DEPOSIT RATE", self._depositRate, "")
-
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)
         return s
 
     ###########################################################################
 
     def print(self):
-        ''' Print the contractual details of the Libor deposit. '''
         print(self)
 
 ###############################################################################

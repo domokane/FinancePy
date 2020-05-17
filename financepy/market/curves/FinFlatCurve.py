@@ -50,7 +50,7 @@ class FinFlatCurve(FinDiscountCurve):
             return self._rate
 
         if self._cmpdFreq == 0:
-            df = 1.0/(1.0 + t*self._rate)
+            raise FinError("Compounding frequency cannot be zero.")
         elif self._cmpdFreq == -1:
             df = np.exp(-self._rate * t)
         else:

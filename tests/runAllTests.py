@@ -1,5 +1,5 @@
 import glob
-from os.path import dirname, join
+from os.path import dirname
 
 import sys
 sys.path.append("..//..")
