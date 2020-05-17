@@ -549,7 +549,6 @@ class FinBond(object):
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-
         print("MATURITY DATE:", self._maturityDate)
         print("COUPON:", self._coupon)
         print("FREQUENCY:", self._frequencyType)
