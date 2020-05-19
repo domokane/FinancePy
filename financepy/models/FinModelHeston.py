@@ -13,6 +13,7 @@ import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY
 from ..finutils.FinGlobalVariables import gDaysInYear
 from ..products.FinOptionTypes import FinOptionTypes
 from ..finutils.FinMath import norminvcdf
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # Heston Process

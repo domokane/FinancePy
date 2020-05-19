@@ -14,6 +14,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...products.credit.FinCDS import FinCDS
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

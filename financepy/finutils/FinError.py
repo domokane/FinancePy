@@ -16,6 +16,7 @@ def isNotEqual(x, y, tol=1e-6):
         return True
     return False
 
+###############################################################################
 
 class FinError(Exception):
     ''' Simple error class specific to FinPy. Need to decide how to handle

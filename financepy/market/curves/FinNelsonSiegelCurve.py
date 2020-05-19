@@ -10,6 +10,7 @@ from math import exp
 
 from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

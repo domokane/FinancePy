@@ -15,6 +15,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.FinProcessSimulator import FinProcessSimulator
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1

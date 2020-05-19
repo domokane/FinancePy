@@ -13,6 +13,7 @@ from .FinHelperFunctions import labelToString
 
 ###############################################################################
 
+
 class FinSchedule(object):
     ''' A Schedule is a vector of dates generated according to ISDA standard
     rules which starts on the next date after the start date and runs up to
@@ -119,6 +120,68 @@ class FinSchedule(object):
                 dt = calendar.adjust(unadjustedScheduleDates[i],
                                      self._busDayAdjustType)
 
+                self._adjustedDates.append(dt)
+
+            self._adjustedDates.append(self._endDate)
+
+        return self._adjustedDates
+
+###############################################################################
+
+    def generate_alternative(self):
+        ''' This adjusts each date BEFORE generating the next date.
+        Generate schedule of dates according to specified date generation
+        rules and also adjust these dates for holidays according to
+        the business day convention and the specified calendar. '''
+
+        # print("======= SCHEDULE HAS CHANGED - MUST TEST =============")
+
+        self._adjustedDates = []
+        calendar = FinCalendar(self._calendarType)
+        frequency = FinFrequency(self._frequencyType)
+        numMonths = int(12 / frequency)
+
+        unadjustedScheduleDates = []
+
+        if self._dateGenRuleType == FinDateGenRuleTypes.BACKWARD:
+
+            nextDate = self._endDate
+            print("END:", nextDate)
+            flowNum = 0
+
+            while nextDate > self._startDate:
+                unadjustedScheduleDates.append(nextDate)
+                nextDate = nextDate.addMonths(-numMonths)
+                nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
+                flowNum += 1
+
+            # Add on the Previous Coupon Date
+            unadjustedScheduleDates.append(nextDate)
+            flowNum += 1
+
+            # reverse order and holiday adjust dates
+            for i in range(0, flowNum):
+                dt = unadjustedScheduleDates[flowNum - i - 1]
+                self._adjustedDates.append(dt)
+
+        elif self._dateGenRuleType == FinDateGenRuleTypes.FORWARD:
+
+            # This needs checking
+            nextDate = self._startDate
+            flowNum = 0
+
+            unadjustedScheduleDates.append(nextDate)
+            flowNum = 1
+
+            while nextDate < self._endDate:
+                unadjustedScheduleDates.append(nextDate)
+                nextDate = nextDate.addMonths(numMonths)
+                nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
+                flowNum = flowNum + 1
+
+            for i in range(1, flowNum):
+
+                dt = unadjustedScheduleDates[i]
                 self._adjustedDates.append(dt)
 
             self._adjustedDates.append(self._endDate)

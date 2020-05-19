@@ -11,6 +11,7 @@ from numba import jit
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

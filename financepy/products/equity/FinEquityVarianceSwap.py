@@ -14,6 +14,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityOption import FinEquityModelBlackScholes
 from ..FinOptionTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

@@ -399,7 +399,7 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def str(self):
+    def __repr__(self):
         s = self._type
         return s
 

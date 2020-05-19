@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinEquityModel(object):

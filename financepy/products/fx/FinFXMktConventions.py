@@ -7,6 +7,7 @@ Created on Fri Feb 12 16:51:05 2016
 
 from ...finutils.FinError import FinError
 from enum import Enum
+from ...finutils.FinHelperFunctions import labelToString
 
 # Non exhaustive list of country codes and currency names
 

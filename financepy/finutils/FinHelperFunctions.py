@@ -12,6 +12,36 @@ from .FinGlobalVariables import gDaysInYear
 ##########################################################################
 
 
+def dump(obj):
+    ''' Get a list of all of the attributes of a class (not built in ones) '''
+
+    attrs = dir(obj)
+
+    non_function_attributes = [attr for attr in attrs
+                               if not callable(getattr(obj, attr))]
+
+    non_internal_attributes = [attr for attr in non_function_attributes
+                               if not attr.startswith('__')]
+
+    private_attributes = [attr for attr in non_internal_attributes
+                          if attr.startswith('_')]
+
+    public_attributes = [attr for attr in non_internal_attributes
+                         if not attr.startswith('_')]
+
+    print("PRIVATE ATTRIBUTES")
+    for attr in private_attributes:
+        x = getattr(obj, attr)
+        print(attr, x)
+
+    print("PUBLIC ATTRIBUTES")
+    for attr in public_attributes:
+        x = getattr(obj, attr)
+        print(attr, x)
+
+##########################################################################
+
+
 def printTree(array, depth=None):
     ''' Function that prints a binomial or trinonial tree to screen for the
     purpose of debugging. '''
@@ -131,6 +161,7 @@ def normaliseWeights(wtVector):
     return wtVector
 
 ##########################################################################
+
 
 def labelToString(label, value, separator="\n", listFormat=False):
     ''' Format label/value pairs for a unified formatting. '''

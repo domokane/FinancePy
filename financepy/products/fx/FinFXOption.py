@@ -8,6 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 
 from .FinFXModelTypes import FinFXModelBlackScholes
 from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

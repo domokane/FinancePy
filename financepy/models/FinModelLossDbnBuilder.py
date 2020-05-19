@@ -8,6 +8,7 @@ from numba import njit, float64, int64
 import numpy as np
 
 from ..finutils.FinMath import pairGCD
+from ..finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

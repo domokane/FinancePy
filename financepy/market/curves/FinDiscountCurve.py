@@ -13,6 +13,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

@@ -15,6 +15,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import heaviside
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityTreePayoffTypes(Enum):
     FWD_CONTRACT = 1

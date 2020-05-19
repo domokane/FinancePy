@@ -14,6 +14,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 

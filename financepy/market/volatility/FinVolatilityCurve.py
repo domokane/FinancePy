@@ -11,6 +11,8 @@ import numpy as np
 
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import testMonotonicity
+from ...finutils.FinHelperFunctions import labelToString
+
 ##########################################################################
 # TODO: This is unfinished
 

@@ -15,6 +15,7 @@ from ...products.equities.FinOption import FinOption, FinOptionTypes
 from ...finutils.FinDate import FinDate
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

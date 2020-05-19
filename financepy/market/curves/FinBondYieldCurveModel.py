@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import splev
+from ...finutils.FinHelperFunctions import labelToString
 
 
 ###############################################################################

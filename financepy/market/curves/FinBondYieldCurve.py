@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import scale
+from ...finutils.FinHelperFunctions import labelToString
+
 from .FinBondYieldCurveModel import FinCurveFitPolynomial
 from .FinBondYieldCurveModel import FinCurveFitNelsonSiegel
 from .FinBondYieldCurveModel import FinCurveFitNelsonSiegelSvensson
@@ -157,3 +159,14 @@ class FinBondYieldCurve():
         plt.legend(loc='lower right')
         plt.ylim((min(yld)-0.3, max(yld)*1.1))
         plt.grid(True)
+
+##########################################################################
+
+    def __repr__(self):
+        s  = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s += labelToString("BOND", self._bonds)
+        s += labelToString("YIELDS", self._ylds)
+        s += labelToString(self._curveFit)
+        return s
+
+##########################################################################

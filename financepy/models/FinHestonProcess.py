@@ -13,6 +13,7 @@ import numpy as np
 
 from finutils.FinMath import norminvcdf
 from FinProcess import FinProcess
+from ...finutils.FinHelperFunctions import labelToString
 
 ################################################################################
 # Heston Process

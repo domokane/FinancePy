@@ -24,6 +24,8 @@ from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 N = norm.cdf
 
+from ...finutils.FinHelperFunctions import labelToString
+
 ###############################################################################
 
 

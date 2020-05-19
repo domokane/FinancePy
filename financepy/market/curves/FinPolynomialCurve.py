@@ -11,6 +11,7 @@ import numpy as np
 
 from ...market.curves.FinCurve import inputTime
 from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

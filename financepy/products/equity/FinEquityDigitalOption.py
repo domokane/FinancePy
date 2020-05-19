@@ -13,6 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityOption import FinEquityOption
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 ##########################################################################

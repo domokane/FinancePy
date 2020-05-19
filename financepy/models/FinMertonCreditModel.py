@@ -7,6 +7,7 @@ Created on Fri Jan 18 20:00:02 2019
 
 from ..finutils.FinMath import N
 from math import sqrt, log, exp
+from ...finutils.FinHelperFunctions import labelToString
 
 
 def mertonCreditModelValues(assetValue,

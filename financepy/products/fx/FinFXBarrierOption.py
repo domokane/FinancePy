@@ -14,6 +14,7 @@ from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.fx.FinFXOption import FinFXOption
 from ...models.FinProcessSimulator import FinProcessSimulator
+from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinFXBarrierTypes(Enum):

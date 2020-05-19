@@ -13,6 +13,7 @@ import numpy as np
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import norminvcdf
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

@@ -9,6 +9,7 @@ from math import sqrt
 
 from ...finutils.FinMath import NormSInv, N, M, phi3
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

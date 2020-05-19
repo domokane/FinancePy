@@ -19,6 +19,8 @@ from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
+from ...finutils.FinHelperFunctions import labelToString
+
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
 

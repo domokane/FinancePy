@@ -71,12 +71,14 @@ def dailyWorkingDaySchedule(self, startDate, endDate):
 
 ###############################################################################
 
+
 def datediff(d1, d2):
     ''' Calculate the number of days between two dates. '''
 
     return (d2._excelDate - d1._excelDate)
 
 ###############################################################################
+
 
 def fromDatetime(dt):
     ''' Construct a FinDate from a datetime as this is often needed if we
@@ -87,6 +89,7 @@ def fromDatetime(dt):
 
 ###############################################################################
 
+
 def dateRange(startDate, endDate, tenor="1D"):
     ''' Returns a list of dates between startDate (inclusive) 
     and endDate (inclusive). 
@@ -95,18 +98,19 @@ def dateRange(startDate, endDate, tenor="1D"):
 
     if startDate > endDate:
         return []
-    
+
     dateList = []
-    
+
     dt = startDate
     while dt < endDate:
         dateList.append(dt)
         dt = dt.addTenor(tenor)
     dateList.append(endDate)
-        
+    
     return dateList
 
 ###############################################################################
+
 
 class FinDate():
 
@@ -233,6 +237,9 @@ class FinDate():
 
         if type(numDays) is not int:
             raise FinError("Num days must be an integer")
+
+        if numDays < 0:
+            raise FinError("Num days must be positive.")
 
         dt = datetime.date(self._y, self._m, self._d)
         d = dt.day

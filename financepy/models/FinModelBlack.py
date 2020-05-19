@@ -10,6 +10,7 @@ import numpy as np
 from scipy.stats import norm
 
 from ...finutils.FinMath import N
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.

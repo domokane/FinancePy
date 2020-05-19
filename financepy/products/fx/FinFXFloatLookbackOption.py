@@ -14,6 +14,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equities.FinOption import FinOption
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # TODO

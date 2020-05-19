@@ -14,6 +14,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

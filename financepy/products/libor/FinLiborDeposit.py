@@ -11,7 +11,6 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
@@ -24,7 +23,7 @@ class FinLiborDeposit(object):
                  maturityDateOrTenor,
                  depositRate,
                  dayCountType,
-                 notional=ONE_MILLION,
+                 notional=100.0,
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
@@ -80,10 +79,10 @@ class FinLiborDeposit(object):
 
     ###########################################################################
 
-    def value(self, valueDate, liborCurve):
+    def value(self, valuationDate, liborCurve):
         ''' Determine the value of the Deposit given a Libor curve. '''
 
-        if valueDate > self._maturityDate:
+        if valuationDate > self._maturityDate:
             raise ValueError("Start date after maturity date")
 
         dc = FinDayCount(self._dayCountType)
@@ -91,14 +90,14 @@ class FinLiborDeposit(object):
         df = liborCurve.df(self._maturityDate)
         value = (1.0 + accFactor * self._depositRate) * df * self._notional
 
-        df_settlement = liborCurve.df(self._settlementDate)
-        value = value / df_settlement
+        df_valueDate = liborCurve.df(valuationDate)
+        value = value / df_valueDate
 
         return value
 
     ###########################################################################
 
-    def printFlows(self, valueDate):
+    def printFlows(self, valuationDate):
         ''' Determine the value of the Deposit given a Libor curve. '''
 
         dc = FinDayCount(self._dayCountType)

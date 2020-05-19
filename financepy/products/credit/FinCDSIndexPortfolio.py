@@ -14,6 +14,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...market.curves.FinCDSCurve import FinCDSCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinCDSIndexPortfolio():

@@ -19,6 +19,7 @@ from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import blackVolFromSABR
+from ...finutils.FinHelperFunctions import labelToString
 
 N = norm.cdf
 

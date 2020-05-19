@@ -17,6 +17,7 @@ from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff

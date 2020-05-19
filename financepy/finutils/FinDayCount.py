@@ -221,7 +221,7 @@ class FinDayCount(object):
 
     ###########################################################################
 
-    def __str__(self):
+    def __repr__(self):
         ''' Returns the calendar type as a string. '''
         return str(self._type)
 

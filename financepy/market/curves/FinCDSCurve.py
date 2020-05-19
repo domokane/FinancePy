@@ -15,6 +15,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -249,12 +250,12 @@ class FinCDSCurve():
 
 ##############################################################################
 
-    def print(self):
+    def __repr__(self):
         ''' Print out the details of the survival probability curve. '''
 
         numPoints = len(self._times)
         print("TIME,SURVIVAL_PROBABILITY")
         for i in range(0, numPoints):
-            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+            label  ("%10.7f,%10.7f" % (self._times[i], self._values[i]))
 
 ###############################################################################

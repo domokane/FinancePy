@@ -14,6 +14,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import inputFrequency
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import FinInterpMethods
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 ##########################################################################

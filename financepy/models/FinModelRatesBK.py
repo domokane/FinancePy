@@ -7,6 +7,7 @@ from math import ceil, sqrt, exp
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
 from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpMethods.FLAT_FORWARDS.value
 

@@ -17,6 +17,7 @@ from ...products.equities.FinOption import FinOption
 
 from enum import Enum
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinFXRainbowOptionTypes(Enum):
     CALL_ON_MAXIMUM = 1

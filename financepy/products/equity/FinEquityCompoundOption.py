@@ -19,6 +19,7 @@ from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinFlatCurve import FinFlatCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

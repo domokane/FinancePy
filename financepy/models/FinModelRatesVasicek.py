@@ -8,6 +8,7 @@ Created on Sat Aug  3 14:10:12 2019
 from math import sqrt, exp
 from numba import njit, float64, int64
 import numpy as np
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # dr = a(b-r) + sigma dW

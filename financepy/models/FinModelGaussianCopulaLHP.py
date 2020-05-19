@@ -13,6 +13,7 @@ from numba import njit
 from ..finutils.FinMath import N
 from ..finutils.FinMath import normpdf, norminvcdf, M
 from ..finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

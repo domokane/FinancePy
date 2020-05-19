@@ -14,6 +14,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
+from ...finutils.FinHelperFunctions import labelToString
 
 ##############################################################################
 
