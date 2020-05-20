@@ -7,7 +7,7 @@ Created on Sun Feb 07 14:23:13 2016
 
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinMath import ONE_MILLION
@@ -50,7 +50,7 @@ class FinOIS(object):
                  payFixedLeg=True,
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create OIS object. '''
 
@@ -80,7 +80,7 @@ class FinOIS(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

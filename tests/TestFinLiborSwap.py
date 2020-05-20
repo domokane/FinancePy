@@ -11,7 +11,7 @@ from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -306,7 +306,7 @@ def test_LiborSwap():
     firstFixing = -0.00268
 
     swapCalendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     payFixedFlag = False

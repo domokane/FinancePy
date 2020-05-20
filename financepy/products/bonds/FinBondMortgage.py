@@ -9,7 +9,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinHelperFunctions import labelToString
@@ -20,7 +20,7 @@ from enum import Enum
 
 
 class FinBondMortgageType(Enum):
-    REPAYMENT=1
+    REPAYMENT = 1
     INTEREST_ONLY = 2
 
 ###############################################################################
@@ -39,7 +39,7 @@ class FinBondMortgage(object):
                  principal,
                  frequencyType=FinFrequencyTypes.MONTHLY,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType=FinDayCountTypes.ACT_360):
         ''' Create the mortgage using start and end dates and principal. '''
@@ -50,7 +50,7 @@ class FinBondMortgage(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

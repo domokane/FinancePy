@@ -11,13 +11,12 @@ from math import exp, log
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -199,7 +198,7 @@ class FinCDS(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create a CDS from the step-in date, maturity date and coupon '''
 
@@ -233,7 +232,7 @@ class FinCDS(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -585,7 +584,8 @@ class FinCDS(object):
         # future accrued from now to coupon payment date assuming default
         # roughly midway
         fullRPV01 = fullRPV01 + 0.5 * z1 * \
-            (qeff - q1) * (yearFrac - accrualFactorPCDToNow) * couponAccruedIndicator
+            (qeff - q1) * (yearFrac - accrualFactorPCDToNow) \
+            * couponAccruedIndicator
 
         for it in range(2, len(paymentDates)):
 

@@ -10,7 +10,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -32,7 +32,7 @@ class FinLiborSwap(object):
                  floatDayCountType=FinDayCountTypes.THIRTY_360,
                  payFixedFlag=True,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract. '''
 
@@ -70,7 +70,7 @@ class FinLiborSwap(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -126,6 +126,7 @@ class FinLiborSwap(object):
         self._fixedFlowPVs = []
 
         self._firstFixingRate = None
+        self._valuationDate = None
 
 ##########################################################################
 
@@ -233,6 +234,8 @@ class FinLiborSwap(object):
 
     def fixedLegValue(self, valuationDate, discountCurve, principal=0.0):
 
+        self._valuationDate = valuationDate
+
         self._fixedYearFracs = []
         self._fixedFlows = []
         self._fixedDfs = []
@@ -293,6 +296,7 @@ class FinLiborSwap(object):
         ''' Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve. '''
 
+        self._valuationDate = valuationDate
         self._floatYearFracs = []
         self._floatFlows = []
         self._floatDfs = []
@@ -370,7 +374,7 @@ class FinLiborSwap(object):
 
 ##########################################################################
 
-    def printFixedLeg(self, valuationDate):
+    def printFixedLeg(self):
         ''' Prints the fixed leg amounts. '''
 
         print("START DATE:", self._startDate)
@@ -378,7 +382,7 @@ class FinLiborSwap(object):
         print("COUPON (%):", self._fixedCoupon * 100)
         print("FIXED LEG FREQUENCY:", str(self._fixedFrequencyType))
         print("FIXED LEG DAY COUNT:", str(self._fixedDayCountType))
-        print("VALUATION DATE", valuationDate)
+        print("VALUATION DATE", self._valuationDate)
 
         if len(self._fixedFlows) == 0:
             print("Fixed Flows not calculated.")
@@ -404,7 +408,7 @@ class FinLiborSwap(object):
 
 ##########################################################################
 
-    def printFloatLeg(self, valuationDate):
+    def printFloatLeg(self):
         ''' Prints the floating leg amounts. '''
 
         print("START DATE:", self._startDate)
@@ -412,7 +416,7 @@ class FinLiborSwap(object):
         print("SPREAD COUPON (%):", self._floatSpread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._floatFrequencyType))
         print("FLOAT LEG DAY COUNT:", str(self._floatDayCountType))
-        print("VALUATION DATE", valuationDate)
+        print("VALUATION DATE", self._valuationDate)
 
         if len(self._floatFlows) == 0:
             print("Floating Flows not calculated.")

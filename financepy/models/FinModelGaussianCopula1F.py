@@ -16,7 +16,7 @@ from ..finutils.FinError import FinError
 from .FinModelLossDbnBuilder import indepLossDbnRecursionGCD
 from .FinModelLossDbnBuilder import indepLossDbnHeterogeneousAdjBinomial
 from .FinModelLossDbnBuilder import portfolioGCD
-from ...finutils.FinHelperFunctions import labelToString
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

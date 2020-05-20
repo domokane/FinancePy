@@ -18,7 +18,7 @@ from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 
 sys.path.append("..//..")
 
@@ -295,8 +295,8 @@ def test_FinLiborDepositsFRAsSwaps():
         df = liborCurve.df(swap._maturityDate)
         testCases.print(str(swap._maturityDate), df)
 
-    times = np.linspace(0, 10, 100)
-    fwds = liborCurve.fwd(times)
+    # times = np.linspace(0, 10, 100)
+    # fwds = liborCurve.fwd(times)
     # plt.plot(times, fwds)
 
     if 1 == 0:
@@ -410,10 +410,9 @@ def test_FinLiborDepositsFuturesSwaps():
     floatDCCType = FinDayCountTypes.ACT_360
     payFixed = True
     calendarType = FinCalendarTypes.US
-    busDayAdjustRule = FinDayAdjustTypes.PRECEDING
+    busDayAdjustRule = FinBusDayAdjustTypes.PRECEDING
 
     swapRate = 0.02776305
-    maturityDate = startDate.addMonths(24)
 
     swap = FinLiborSwap(startDate, "2Y", swapRate,
                         fixedFreqType, fixedDCCType, notional,
@@ -474,6 +473,7 @@ def test_FinLiborDepositsFuturesSwaps():
         liborCurve.print()
 
 ###############################################################################
+
 
 test_FinLiborDepositsOnly()
 test_FinLiborFRAsOnly() 

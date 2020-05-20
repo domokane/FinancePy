@@ -9,7 +9,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinError import FinError
@@ -29,7 +29,7 @@ class FinBondAnnuity(object):
                  coupon,
                  frequencyType,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType=FinDayCountTypes.ACT_360,
                  face=100.0):
@@ -41,7 +41,7 @@ class FinBondAnnuity(object):
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError("Unknown Business Day Adjust type " +
                            str(busDayAdjustType))
 
@@ -117,7 +117,7 @@ class FinBondAnnuity(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinDayAdjustTypes.NONE
+        busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,

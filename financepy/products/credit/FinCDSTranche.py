@@ -16,7 +16,7 @@ from ...models.FinModelGaussianCopulaLHP import trSurvProbLHP
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
 
@@ -56,7 +56,7 @@ class FinCDSTranche(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         if k1 >= k2:

@@ -24,7 +24,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -122,7 +122,7 @@ class FinBond(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinDayAdjustTypes.NONE
+        busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,
@@ -413,7 +413,7 @@ class FinBond(object):
             swapFloatDayCountConventionType=FinDayCountTypes.ACT_360,
             swapFloatFrequencyType=FinFrequencyTypes.SEMI_ANNUAL,
             swapFloatCalendarType=FinCalendarTypes.WEEKEND,
-            swapFloatBusDayAdjustRuleType=FinDayAdjustTypes.FOLLOWING,
+            swapFloatBusDayAdjustRuleType=FinBusDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Calculate the par asset swap spread of the bond. The discount curve
         is a Libor curve that is passed in. This function is vectorised with
@@ -548,8 +548,6 @@ class FinBond(object):
 ###############################################################################
 
     def __repr__(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
         s = labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)

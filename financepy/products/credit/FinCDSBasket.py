@@ -10,7 +10,7 @@ import numpy as np
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
 
@@ -42,7 +42,7 @@ class FinCDSBasket(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         self._stepInDate = stepInDate

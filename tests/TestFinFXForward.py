@@ -84,8 +84,6 @@ def test_FinFXForward():
                                   domDiscountCurve,
                                   forDiscountCurve)
 
-    print(fwdFXRate)
-
     testCases.print(spotFXRate, fwdFXRate, fwdValue)
 
 ###############################################################################

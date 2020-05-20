@@ -5,7 +5,6 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from math import log, exp
 import numpy as np
 
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
@@ -15,15 +14,21 @@ from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
 
-##########################################################################
+###############################################################################
+# TODO: Allow it to take in a vector of dates
+###############################################################################
 
 
 class FinDiscountCurve():
+    ''' This is a curve calculated from a set of times and discount factors.
+    '''
 
-##########################################################################
+###############################################################################
 
     def __init__(self, curveDate, times, values,
                  interpMethod=FinInterpMethods.FLAT_FORWARDS):
+        ''' Create the discount curve from a vector of times and discount
+        factors. '''
 
         # Validate curve
         if len(times) < 1:
@@ -46,7 +51,7 @@ class FinDiscountCurve():
         self._values = np.array(values)
         self._interpMethod = interpMethod
 
-##########################################################################
+###############################################################################
 
     def zeroRate(self, dt, compoundingFreq=-1):
         ''' Calculate the zero rate to maturity date. '''
@@ -98,7 +103,7 @@ class FinDiscountCurve():
         n = len(self._times)
         for i in range(0, n):
             t = times[i]
-            values[i] = values[i] * exp(-bumpSize*t)
+            values[i] = values[i] * np.exp(-bumpSize*t)
 
         discCurve = FinDiscountCurve(self._curveDate, times, values,
                                      self._interpMethod)
@@ -126,7 +131,7 @@ class FinDiscountCurve():
 
 ##########################################################################
 
-    def print(self):
+    def __repr__(self):
         numPoints = len(self._times)
         print("TIMES,DISCOUNT FACTORS")
         for i in range(0, numPoints):

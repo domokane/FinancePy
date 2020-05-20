@@ -16,7 +16,7 @@ from ...finutils.FinHelperFunctions import labelToString
 
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
@@ -331,7 +331,7 @@ class FinBondConvertible(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinDayAdjustTypes.NONE
+        busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,

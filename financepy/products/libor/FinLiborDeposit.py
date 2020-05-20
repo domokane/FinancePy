@@ -8,7 +8,7 @@ Created on Sun Feb 07 14:23:13 2016
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinHelperFunctions import labelToString
@@ -25,7 +25,7 @@ class FinLiborDeposit(object):
                  dayCountType,
                  notional=100.0,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.MODIFIED_FOLLOWING):
+                 busDayAdjustType=FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
 
         if type(settlementDate) != FinDate:
@@ -36,10 +36,9 @@ class FinLiborDeposit(object):
 
         self._calendarType = calendarType
 
-        if busDayAdjustType not in FinDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
+        if busDayAdjustType not in FinBusDayAdjustTypes:
+            raise ValueError("Unknown Business Day Adjust type " +
+                             str(busDayAdjustType))
 
         self._busDayAdjustType = busDayAdjustType
 

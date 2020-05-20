@@ -8,7 +8,7 @@ Created on Sun Feb 07 14:23:13 2016
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -50,7 +50,7 @@ class FinLiborFRA(object):
                  notional=100.0,
                  payFixedRate=True,  # True if the FRA rate is being paid
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.MODIFIED_FOLLOWING):
+                 busDayAdjustType=FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Forward Rate Agreeement object. '''
 
         if type(startDate) != FinDate:
@@ -61,7 +61,7 @@ class FinLiborFRA(object):
 
         self._calendarType = calendarType
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

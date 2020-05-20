@@ -8,7 +8,7 @@ Created on Wed Jan 16 17:54:03 2019
 from math import pow
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
@@ -25,7 +25,7 @@ class FinCDSIndexPortfolio():
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create FinCDSIndexPortfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard. '''

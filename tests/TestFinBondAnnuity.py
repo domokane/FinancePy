@@ -9,7 +9,7 @@ Created on Fri Nov 30 10:52:29 2018
 from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -44,7 +44,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
     face = 1000000
@@ -76,7 +76,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -107,7 +107,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.MONTHLY
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -138,7 +138,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -169,7 +169,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -200,7 +200,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 

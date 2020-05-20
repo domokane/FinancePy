@@ -41,7 +41,7 @@ easterMondayDay = [98, 90, 103, 95, 114, 106, 91, 111, 102, 87,
                    116, 101, 93, 112, 97, 89, 109, 100, 85, 105]
 
 
-class FinDayAdjustTypes(Enum):
+class FinBusDayAdjustTypes(Enum):
     NONE = 1
     FOLLOWING = 2
     MODIFIED_FOLLOWING = 3
@@ -88,14 +88,14 @@ class FinCalendar(object):
 
         m = dt._m
 
-        if type(busDayConventionType) != FinDayAdjustTypes:
+        if type(busDayConventionType) != FinBusDayAdjustTypes:
             raise FinError("Invalid type passed. Need FinBusDayConventionType")
 
-        if busDayConventionType == FinDayAdjustTypes.NONE:
+        if busDayConventionType == FinBusDayAdjustTypes.NONE:
 
             return dt
 
-        elif busDayConventionType == FinDayAdjustTypes.FOLLOWING:
+        elif busDayConventionType == FinBusDayAdjustTypes.FOLLOWING:
 
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -103,7 +103,7 @@ class FinCalendar(object):
 
             return dt
 
-        elif busDayConventionType == FinDayAdjustTypes.MODIFIED_FOLLOWING:
+        elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_FOLLOWING:
 
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -118,7 +118,7 @@ class FinCalendar(object):
 
             return dt
 
-        elif busDayConventionType == FinDayAdjustTypes.PRECEDING:
+        elif busDayConventionType == FinBusDayAdjustTypes.PRECEDING:
 
             # if the business day is in the next month look back
             # for previous first business day one day at a time
@@ -127,7 +127,7 @@ class FinCalendar(object):
 
             return dt
 
-        elif busDayConventionType == FinDayAdjustTypes.MODIFIED_PRECEDING:
+        elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_PRECEDING:
 
             # step backward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -142,7 +142,8 @@ class FinCalendar(object):
 
             return dt
         else:
-            raise FinError("Unknown adjustment convention" + str(busDayConventionType))
+            raise FinError("Unknown adjustment convention" +
+                           str(busDayConventionType))
 
         return dt
 

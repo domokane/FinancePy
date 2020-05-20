@@ -7,7 +7,7 @@ Created on Sun Feb 07 14:31:53 2016
 
 from .FinError import FinError
 from .FinCalendar import (FinCalendar, FinCalendarTypes)
-from .FinCalendar import (FinDayAdjustTypes, FinDateGenRuleTypes)
+from .FinCalendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
 from .FinFrequency import (FinFrequency, FinFrequencyTypes)
 from .FinHelperFunctions import labelToString
 
@@ -25,7 +25,7 @@ class FinSchedule(object):
                  endDate,
                  frequencyType=FinFrequencyTypes.ANNUAL,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create FinSchedule object. '''
 
@@ -35,7 +35,7 @@ class FinSchedule(object):
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
