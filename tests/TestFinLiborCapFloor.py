@@ -313,14 +313,44 @@ def test_FinLiborCapFloor():
         capFloorType,
         strikeRate)
     value = capfloor.value(valuationDate, liborCurve, model)
- #   capfloor.print()
 
-    testCases.print("FLOOR Value:", value)
-    end = time.time()
+    ###########################################################################
 
-    testCases.header("TIME")
-    testCases.print(end - start)
+    if 1 == 1: # TESTING PRINT LEGS
+
+        model = FinLiborModelBlack(0.25)
+
+        maturityDate = startDate.addMonths(12)
+        strikeRate = 0.025
+
+        capFloorType = FinLiborCapFloorType.CAP
+        capfloor = FinLiborCapFloor(
+            startDate,
+            maturityDate,
+            capFloorType,
+            strikeRate)
+
+        value = capfloor.value(valuationDate, liborCurve, model)
+        capfloor.print()
+        capfloor.printLeg()
+
+    if 1 == 0: # TESTING PRINT LEGS
+
+        capFloorType = FinLiborCapFloorType.FLOOR
+        capfloor = FinLiborCapFloor(
+            startDate,
+            maturityDate,
+            capFloorType,
+            strikeRate)
+
+        value = capfloor.value(valuationDate, liborCurve, model)
+
+        print(value)
+        capfloor.print()
+        capfloor.printLeg()
+
+    ###########################################################################
 
 
 test_FinLiborCapFloor()
-testCases.compareTestCases()
+# testCases.compareTestCases()
