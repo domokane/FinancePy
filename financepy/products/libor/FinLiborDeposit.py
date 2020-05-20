@@ -48,7 +48,7 @@ class FinLiborDeposit(object):
         else:
             maturityDate = settlementDate.addTenor(maturityDateOrTenor)
             calendar = FinCalendar(self._calendarType)
-            maturityDate = calendar.adjust(self._maturityDate,
+            maturityDate = calendar.adjust(maturityDate,
                                            self._busDayAdjustType)
 
         if settlementDate > maturityDate:

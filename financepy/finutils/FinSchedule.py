@@ -5,7 +5,7 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 
-from . import FinError
+from .FinError import FinError
 from .FinCalendar import (FinCalendar, FinCalendarTypes)
 from .FinCalendar import (FinDayAdjustTypes, FinDateGenRuleTypes)
 from .FinFrequency import (FinFrequency, FinFrequencyTypes)
@@ -200,7 +200,7 @@ class FinSchedule(object):
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType, "")
-        
+
         if len(self._adjustedDates) > 0:
             s += "\n\n"
             s += labelToString("PCD", self._adjustedDates[0], "")

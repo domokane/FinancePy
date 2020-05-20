@@ -96,21 +96,24 @@ class FinLiborCurve(FinDiscountCurve):
                 nextDt = depo._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Deposits must be in increasing maturity")
-
+                prevDt = nextDt
+ 
         if numFRAs != 0:
             prevDt = liborFRAs[0]._maturityDate
             for fra in liborFRAs[1:]:
                 nextDt = fra._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("FRAs must be in increasing maturity")
-
+                prevDt = nextDt
+ 
         if numSwaps != 0:
             prevDt = liborSwaps[0]._maturityDate
             for swap in liborSwaps[1:]:
                 nextDt = swap._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Swaps must be in increasing maturity")
-
+                prevDt = nextDt
+ 
         # Now we have ensure they are in order check for overlaps and the like
 
         lastDepositMaturityDate = FinDate(1, 1, 1900)

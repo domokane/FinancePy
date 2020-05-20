@@ -58,7 +58,7 @@ class FinRateConverter(object):
 
 ###############################################################################
 
-    def str(self):
+    def __repr__(self):
         s = self.name
         return s
 

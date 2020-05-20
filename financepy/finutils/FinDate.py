@@ -91,10 +91,9 @@ def fromDatetime(dt):
 
 
 def dateRange(startDate, endDate, tenor="1D"):
-    ''' Returns a list of dates between startDate (inclusive) 
-    and endDate (inclusive). 
-    The tenor represents the distance between two consecutive dates
-    and is set to daily by default. '''
+    ''' Returns a list of dates between startDate (inclusive)
+    and endDate (inclusive). The tenor represents the distance between two
+    consecutive dates and is set to daily by default. '''
 
     if startDate > endDate:
         return []
@@ -106,14 +105,13 @@ def dateRange(startDate, endDate, tenor="1D"):
         dateList.append(dt)
         dt = dt.addTenor(tenor)
     dateList.append(endDate)
-    
+
     return dateList
 
 ###############################################################################
 
 
 class FinDate():
-
     ''' Date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. '''
 

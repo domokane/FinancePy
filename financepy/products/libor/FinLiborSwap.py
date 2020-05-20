@@ -205,7 +205,7 @@ class FinLiborSwap(object):
         ''' Calculate the value of 1 basis point coupon on the fixed leg. '''
 
         pv = self.fixedLegValue(valuationDate, discountCurve)
-        pv01 = pv / self._fixedCoupon
+        pv01 = pv / self._fixedCoupon / self._notional
         return pv01
 
 ##########################################################################

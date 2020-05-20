@@ -30,7 +30,7 @@ class FinLiborFuture(object):
     def __init__(self,
                  todayDate,
                  futureNumber,  # 1, 2, 3 for the first, second, third future
-                 futureTenor="3M",   #  '1M', '2M', '3M'
+                 futureTenor="3M",  # '1M', '2M', '3M'
                  accrualType=FinDayCountTypes.ACT_360,
                  contractSize=ONE_MILLION):
         ''' Create an interest rate futures contract.'''
@@ -80,6 +80,9 @@ class FinLiborFuture(object):
 ###############################################################################
 
     def FRARate(self, futuresPrice, convexity):
+        ''' Convert futures price and convexity to a FRA rate using the BBG
+        negative convexity (in percent). This is then divided by 100 before
+        being added to the futures rate. '''
 
         futRate = (100.0 - futuresPrice) / 100.0
 
@@ -87,8 +90,6 @@ class FinLiborFuture(object):
             fraRate = futRate + convexity/100.0
         else:
             fraRate = futRate - convexity/100.0
-
-        print(futuresPrice, futRate, convexity, fraRate)
 
         return fraRate
 
@@ -100,7 +101,7 @@ class FinLiborFuture(object):
         in link below:
         http://www-2.rotman.utoronto.ca/~hull/TechnicalNotes/TechnicalNote1.pdf
 
-        NOTE THIS DOES NOT APPEAR TO AGREE WITH BLOOMBERG!!
+        NOTE THIS DOES NOT APPEAR TO AGREE WITH BLOOMBERG!! INVESTIGATE.
         '''
 
         a = meanReversion
