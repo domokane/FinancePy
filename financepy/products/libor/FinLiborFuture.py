@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:23:13 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 # TODO: Add functionality around settlement
 # TODO: Write test function

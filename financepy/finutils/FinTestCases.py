@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Sep 28 17:32:09 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
+
 from os.path import join, exists, split
 import time
 

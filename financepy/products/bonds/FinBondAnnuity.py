@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 10:52:29 2018
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes

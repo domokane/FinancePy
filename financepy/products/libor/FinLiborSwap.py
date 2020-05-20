@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:23:13 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate

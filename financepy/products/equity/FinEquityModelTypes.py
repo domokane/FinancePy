@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
-from ...finutils.FinHelperFunctions import labelToString
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityModel(object):
     ''' This is a parent class for equity models. '''

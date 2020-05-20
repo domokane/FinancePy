@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 16 18:00:13 2019
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import sqrt
 from numba import njit

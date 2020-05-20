@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:31:53 2019
-
-@author: Dominic O'Kane
-"""
 
 from math import sqrt
 from numba import njit, float64, int32

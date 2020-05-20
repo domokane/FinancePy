@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Feb 06 07:26:46 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from enum import Enum
 from .FinDate import FinDate

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:31:53 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 import numpy as np
 from numba import njit
 from .FinDate import FinDate

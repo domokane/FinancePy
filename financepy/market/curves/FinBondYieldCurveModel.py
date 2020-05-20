@@ -1,3 +1,8 @@
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
+
+
 import numpy as np
 from scipy.interpolate import splev
 from ...finutils.FinHelperFunctions import labelToString

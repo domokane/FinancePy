@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 10:10:19 2018
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-
 from .FinMath import isLeapYear
-
 from enum import Enum
-
 
 # A useful source for these definitions can be found at
 # https://developers.opengamma.com/quantitative-research/Interest-Rate-Instruments-and-Market-Conventions.pdf

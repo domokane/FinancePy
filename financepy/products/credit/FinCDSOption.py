@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 14:15:33 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 from math import sqrt, log
 from scipy import optimize
 

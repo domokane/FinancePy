@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 10:04:57 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 
 from math import exp, log, sqrt
 from enum import Enum
