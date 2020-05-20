@@ -2,7 +2,6 @@ import numpy as np
 from scipy.interpolate import splev
 from ...finutils.FinHelperFunctions import labelToString
 
-
 ###############################################################################
 
 
@@ -23,6 +22,14 @@ class FinCurveFitPolynomial():
         yld = np.polyval(self._coeffs, t)
         return yld
 
+    def __repr__(self):
+        s = labelToString("Power", self._power)
+
+        for c in self._coeffs:
+            s += labelToString("Coefficient", c)
+
+        return s
+
 ###############################################################################
 
 
@@ -37,7 +44,8 @@ class FinCurveFitNelsonSiegel():
         ''' Fairly permissive bounds. Only tau1 is 1-100 '''
         self._bounds = bounds
 
-    def _interpolatedYield(self, t, beta1=None, beta2=None, beta3=None, tau=None):
+    def _interpolatedYield(self, t, beta1=None, beta2=None,
+                           beta3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
@@ -60,15 +68,23 @@ class FinCurveFitNelsonSiegel():
         yld += beta3 * ((1.0 - expTerm) / theta - expTerm)
         return yld
 
+    def __repr__(self):
+        s = labelToString("Beta1", self._beta1)
+        s += labelToString("Beta2", self._beta2)
+        s += labelToString("Beta3", self._beta3)
+        s += labelToString("Tau", self._tau)
+        return s
+
 ###############################################################################
 
 
 class FinCurveFitNelsonSiegelSvensson():
 
-    def __init__(self, tau1=None,
-                 tau2=None,
-                 bounds = [(0, -1, -1, -1, 0, 1),
-                           (1, 1, 1, 1, 10, 100)]):
+    def __init__(self, tau1=None, tau2=None,
+                 bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
+        ''' Create object to store calibration and functional form of NSS
+        parametric fit. '''
+
         self._parentType = FinCurveFitMethod
         self._beta1 = None
         self._beta2 = None
@@ -76,12 +92,10 @@ class FinCurveFitNelsonSiegelSvensson():
         self._beta4 = None
         self._tau1 = tau1
         self._tau2 = tau2
+
         ''' I impose some bounds to help ensure a sensible result if
         the user does not provide any bounds. Especially for tau2. '''
         self._bounds = bounds
-
-###############################################################################
-
 
     def _interpolatedYield(self, t, beta1=None, beta2=None, beta3=None,
                            beta4=None, tau1=None, tau2=None):
@@ -117,6 +131,16 @@ class FinCurveFitNelsonSiegelSvensson():
         yld += beta4 * ((1.0 - expTerm2) / theta2 - expTerm2)
         return yld
 
+    def __repr__(self):
+        s = labelToString("Beta1", self._beta1)
+        s += labelToString("Beta2", self._beta2)
+        s += labelToString("Beta3", self._beta3)
+        s += labelToString("Beta4", self._beta3)
+        s += labelToString("Tau1", self._tau1)
+        s += labelToString("Tau2", self._tau2)
+        return s
+
+
 ###############################################################################
 
 
@@ -126,8 +150,15 @@ class FinCurveFitBSpline():
         self._parentType = FinCurveFitMethod
         self._power = power
         self._knots = knots
+        self._spline = None
 
     def _interpolatedYield(self, t):
         t = np.maximum(t, 1e-10)
         yld = splev(t, self._spline)
         return yld
+
+    def __repr__(self):
+        s = labelToString("Power", self._power)
+        s += labelToString("Knots", self._knots)
+        s += labelToString("Spline", self._spline)
+        return s

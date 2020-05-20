@@ -12,7 +12,7 @@ import numpy as np
 from numba import njit, float64, int64
 
 bump = 1e-4
-from ...finutils.FinHelperFunctions import labelToString
+from ..finutils.FinHelperFunctions import labelToString
 
 
 ###############################################################################

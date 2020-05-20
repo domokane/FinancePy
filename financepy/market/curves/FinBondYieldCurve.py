@@ -27,15 +27,15 @@ from scipy.interpolate import splrep
 
 
 class FinBondYieldCurve():
-    ''' Class to do fitting of the yield curve and to enable interpolation of 
-    yields. Because yields assume a flat term structure for each bond, this 
-    class does not allow discounting to be done and so does not inherit from 
-    FinDiscountCurve. It should only be used for visualisation and simple 
+    ''' Class to do fitting of the yield curve and to enable interpolation of
+    yields. Because yields assume a flat term structure for each bond, this
+    class does not allow discounting to be done and so does not inherit from
+    FinDiscountCurve. It should only be used for visualisation and simple
     interpolation but not for full term-structure-consistent pricing. '''
 
     def __init__(self, settlementDate, bonds, ylds, curveFit):
-        ''' Fit the curve to a set of bond yields using the type of curve 
-        specified. Bounds can be provided if you wish to enforce lower and 
+        ''' Fit the curve to a set of bond yields using the type of curve
+        specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters. '''
 
         self._settlementDate = settlementDate
@@ -163,10 +163,10 @@ class FinBondYieldCurve():
 ##########################################################################
 
     def __repr__(self):
-        s  = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s = labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("BOND", self._bonds)
         s += labelToString("YIELDS", self._ylds)
-        s += labelToString(self._curveFit)
+        s += labelToString("CURVE FIT", self._curveFit)
         return s
 
 ##########################################################################

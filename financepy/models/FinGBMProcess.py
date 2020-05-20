@@ -8,7 +8,7 @@ Created on Sat Jul 27 15:05:58 2019
 import numpy as np
 from math import sqrt, exp
 from numba import njit, float64, int64
-from ...finutils.FinHelperFunctions import labelToString
+from ..finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
