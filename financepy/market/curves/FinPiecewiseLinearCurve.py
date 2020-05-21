@@ -12,7 +12,7 @@ import numpy as np
 ##########################################################################
 
 #from ...market.curves.FinCurve import FinCurve
-from ...finutils.FinInterpolate import FinInterpMethods
+from ...market.curves.FinInterpolate import FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################

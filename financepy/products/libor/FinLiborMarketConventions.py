@@ -26,7 +26,7 @@ class FinLiborMarketConventions():
             spotLag = 2
             dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
             calendarType=FinCalendarTypes.TARGET
-        elif currencyName == "EUR"and indexName = "EURIBOR":
+        elif currencyName == "EUR"and indexName == "EURIBOR":
             spotLag = 2
             dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
             calendarType=FinCalendarTypes.TARGET

@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import log, sqrt
+import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -247,14 +247,17 @@ class FinLiborCapFloor():
 
             v = model._volatility
 
-            if v <= 0:
+            if v < 0:
                 raise FinError("Black Volatility must be positive")
 
-            if f <= 0:
-                raise FinError("Forward must be positive")
+            if v == 0.0:
+                v = 1e-10
 
-            d1 = (log(f / k) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            if f <= 0:
+                raise FinError("Forward must be positive in lognormal model.")
+
+            d1 = (np.log(f / k) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * (f * N(+d1) - k * N(+d2))
@@ -269,8 +272,8 @@ class FinLiborCapFloor():
             if v <= 0:
                 raise FinError("Black Volatility must be positive")
 
-            d1 = (log((f - h) / (k - h)) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            d1 = (np.log((f - h) / (k - h)) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * ((f - h) * N(+d1) - (k - h) * N(+d2))
@@ -286,8 +289,8 @@ class FinLiborCapFloor():
 
             v = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
 
-            d1 = (log((f) / (k)) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            d1 = (np.log((f) / (k)) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * ((f) * N(+d1) - (k) * N(+d2))

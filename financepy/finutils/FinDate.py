@@ -7,6 +7,10 @@ import datetime
 from .FinError import FinError
 from .FinMath import isLeapYear
 
+# from numba import njit, float64, int32
+
+##########################################################################
+
 shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 longDayNames = [
     'MONDAY',
@@ -52,7 +56,7 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def dailyWorkingDaySchedule(self, startDate, endDate):
-    ''' Returns a list of working dates between startDate and endDate. 
+    ''' Returns a list of working dates between startDate and endDate.
     This function should be replaced by dateRange once addTenor allows
     for working days. '''
     dateList = []
@@ -70,8 +74,8 @@ def dailyWorkingDaySchedule(self, startDate, endDate):
 
 def datediff(d1, d2):
     ''' Calculate the number of days between two dates. '''
-
-    return (d2._excelDate - d1._excelDate)
+    dd = (d2._excelDate - d1._excelDate)
+    return dd
 
 ###############################################################################
 

@@ -14,7 +14,7 @@ from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-
+from ...finutils.FinGlobalVariables import gDaysInYear
 
 ###############################################################################
 # TODO: Fix up __repr__ function
@@ -51,38 +51,47 @@ class FinZeroCurve():
             raise FinError("Unknown Cap Floor DayCountRule type " +
                            str(dayCountType))
 
+        freq = FinFrequency(frequencyType)
+
         times = []
+        values = []
+
         if isinstance(timesOrDates[0], float):
 
+            # We just calculate the discount factors using times as provided
             for i in range(0, len(timesOrDates)):
                 t = timesOrDates[i]
                 if t < 0.0:
                     raise FinError("Times must be > 0.")
+
+                r = zeroRates[i]
+                df = 1.0 / np.power(1.0 + r/freq, freq * t)
                 times.append(t)
+                values.append(df)
+
         elif isinstance(timesOrDates[0], FinDate):
+
+            # Now extract discount factors which depend on the zero rates which
+            # have been quoted witha frequency and day count convention
 
             dc = FinDayCount(dayCountType)
             for i in range(0, len(timesOrDates)):
-                t = dc.yearFrac(curveDate, timesOrDates[i])
+                t = (timesOrDates[i] - curveDate) / gDaysInYear
                 if t < 0.0:
                     raise FinError("Times must be > 0.")
+
+                alpha = dc.yearFrac(curveDate, timesOrDates[i])
+                r = zeroRates[i]
+                df = 1.0 / np.power(1.0 + r/freq, freq * alpha)
                 times.append(t)
+                values.append(df)
         else:
             raise FinError("Input timeOrDates must be list of times or dates")
 
         times = np.array(times)
 
         if testMonotonicity(times) is False:
-            raise FinError("Times are not sorted in increasing order")
-
-        freq = FinFrequency(frequencyType)
-
-        values = []
-        for i in range(0, len(timesOrDates)):
-            t = times[i]
-            r = zeroRates[i]
-            df = 1.0 / np.power(1.0 + r/freq, freq * t)
-            values.append(df)
+            raise FinError("Times or dates are not sorted in increasing order")
 
         self._curveDate = curveDate
         self._times = times
