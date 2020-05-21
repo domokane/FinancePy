@@ -132,10 +132,12 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return accFactor
             else:
-                daysYear1 = datediff(dt1, FinDate(y1 + 1, 1, 1))
-                daysYear2 = datediff(FinDate(y1 + 1, 1, 1), dt2)
-                accFactor = daysYear1 / denom1
-                accFactor += daysYear2 / denom2
+                daysYear1 = datediff(dt1, FinDate(1, 1, y1+1))
+                daysYear2 = datediff(FinDate(1, 1, y2), dt2)
+                accFactor1 = daysYear1 / denom1
+                accFactor2 = daysYear2 / denom2
+                yearDiff = y2 - y1 - 1.0
+                accFactor = accFactor1 + accFactor2 + yearDiff
                 return accFactor
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
