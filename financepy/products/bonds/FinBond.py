@@ -14,6 +14,7 @@
 ###############################################################################
 
 import numpy as np
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes

@@ -225,3 +225,14 @@ class FinLiborCurve(FinDiscountCurve):
                 raise FinError("Swap not repriced.")
 
 ###############################################################################
+
+    def __repr__(self):
+        ''' Print out the details of the Libor curve. '''
+        numPoints = len(self._times)
+
+        s = labelToString("TIME", "DISCOUNT FACTOR")
+        for i in range(0, numPoints):
+            s += labelToString(self._times[i], self._values[i])
+        return s
+
+###############################################################################

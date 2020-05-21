@@ -5,12 +5,14 @@
 ###############################################################################
 # Suppress error traceback messages in Jupyter
 
+'''
+
 import traceback
 import sys
+
 from IPython import get_ipython
 
 ipython = get_ipython()
-
 
 def hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                    exception_only=False, running_compiled_code=False):
@@ -19,14 +21,16 @@ def hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                                   ipython.InteractiveTB.get_exception_only(
                                       etype, value))
 
-# sys.tracebacklimit = 0er
-#ipython.showtraceback = hide_traceback
-
-###############################################################################
-
+sys.tracebacklimit = 0
+ipython.showtraceback = hide_traceback
 
 def func_name():
     return traceback.extract_stack(None, 2)[0][2]
+
+'''
+###############################################################################
+
+
 
 
 def isNotEqual(x, y, tol=1e-6):

@@ -249,10 +249,9 @@ class FinCDSCurve():
 
     def __repr__(self):
         ''' Print out the details of the survival probability curve. '''
-
         numPoints = len(self._times)
-        print("TIME,SURVIVAL_PROBABILITY")
+        s = labelToString("TIME","SURVIVAL_PROBABILITY")
         for i in range(0, numPoints):
-            label  ("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+            s += labelToString(self._times[i], self._values[i])
 
 ###############################################################################
