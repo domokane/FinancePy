@@ -4,8 +4,10 @@ Created on Sun Feb 07 14:31:53 2016
 
 @author: Dominic O'Kane
 """
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinFlatCurve import FinFlatCurve

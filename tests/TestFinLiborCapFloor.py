@@ -6,7 +6,8 @@ Created on Mon Aug  5 16:23:12 2019
 """
 import time
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorType
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap

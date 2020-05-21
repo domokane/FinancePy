@@ -4,7 +4,8 @@ Created on Fri Feb 12 16:51:05 2019
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.bonds.FinBondFuture import FinBondFuture
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes

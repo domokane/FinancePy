@@ -5,7 +5,9 @@ Created on Sun Jul 21 10:04:57 2019
 @author: Dominic
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTree
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes

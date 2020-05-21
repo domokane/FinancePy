@@ -4,7 +4,10 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes

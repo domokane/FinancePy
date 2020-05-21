@@ -5,7 +5,8 @@ Created on Sat Feb 06 07:26:46 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate, dateRange
 import sys
 sys.path.append("..//..")

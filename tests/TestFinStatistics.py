@@ -5,7 +5,8 @@ Created on Mon Sep 09 14:31:53 2019
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinStatistics import mean, stdev, correlation
 from math import sqrt
 import numpy as np

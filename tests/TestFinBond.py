@@ -5,7 +5,7 @@
 
 import datetime as dt
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes

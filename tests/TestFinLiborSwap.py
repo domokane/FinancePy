@@ -5,7 +5,9 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap

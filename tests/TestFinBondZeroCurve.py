@@ -9,13 +9,14 @@ Created on Fri Apr 08 09:26:27 2016
 import sys
 import datetime as dt
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.market.curves.FinBondZeroCurve import FinBondZeroCurve
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 sys.path.append("..//..")

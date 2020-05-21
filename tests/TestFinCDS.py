@@ -5,7 +5,8 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 import time
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.market.curves.FinInterpolate import FinInterpMethods

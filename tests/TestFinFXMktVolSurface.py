@@ -5,7 +5,9 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.market.volatility.FinFXMktVolSurface import FinFXMktVolSurface
 from financepy.market.volatility.FinFXMktVolSurface import FinFXATMMethod

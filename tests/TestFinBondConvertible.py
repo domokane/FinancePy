@@ -4,7 +4,7 @@
 import time
 import numpy as np
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondConvertible import FinBondConvertible
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes

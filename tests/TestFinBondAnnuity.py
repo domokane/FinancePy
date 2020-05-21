@@ -6,7 +6,7 @@ Created on Fri Nov 30 10:52:29 2018
 """
 # TODO Set up test cases correctly
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes

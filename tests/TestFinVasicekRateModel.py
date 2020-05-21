@@ -5,7 +5,9 @@ Created on Sat Aug  3 14:10:12 2019
 @author: Dominic
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.models.FinModelRatesVasicek import zeroPrice, zeroPrice_MC
 import numpy as np
 import time

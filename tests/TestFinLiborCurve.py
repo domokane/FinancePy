@@ -9,6 +9,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -17,7 +19,6 @@ from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 
 sys.path.append("..//..")

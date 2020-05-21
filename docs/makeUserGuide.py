@@ -19,8 +19,11 @@ fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
+newHeadFile = "./head_" + str(VERSION) + ".tex"
 
-with fileinput.FileInput(headFile, inplace=True, backup='.bak') as file:
+shutil.copyfile(headFile,newHeadFile)
+
+with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
 
@@ -150,7 +153,7 @@ def buildHead():
     ''' Start latex file with a header that sets all of the document
     properties. '''
 
-    f = open(headFile, 'r')
+    f = open(newHeadFile, 'r')
     lines = f.readlines()
     f.close()
 

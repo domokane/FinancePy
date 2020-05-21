@@ -1,5 +1,5 @@
 from .FinBond import *
-from .FinAnnuity import *
+from .FinBondAnnuity import *
 from .FinBondConvertible import *
 from .FinBondEmbeddedOption import *
 from .FinBondFRN import *

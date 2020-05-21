@@ -7,12 +7,13 @@ Created on Mon Aug  5 16:23:12 2019
 
 import sys
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.products.bonds.FinBondMortgage import FinBondMortgage, FinBondMortgageType
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 
 sys.path.append("..//..")
 

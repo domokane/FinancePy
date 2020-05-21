@@ -5,7 +5,8 @@ Created on Mon Aug  5 16:23:12 2019
 @author: Dominic
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionType
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborSwap import FinLiborSwap

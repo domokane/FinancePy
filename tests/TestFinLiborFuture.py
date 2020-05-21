@@ -4,7 +4,10 @@ Created on Mon Aug  5 16:23:12 2019
 
 @author: Dominic
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.libor.FinLiborFuture import FinLiborFuture
 from financepy.finutils.FinDate import FinDate
 
