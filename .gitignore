@@ -10,6 +10,7 @@ build
 __pycache__
 dist
 financepy.egg-info
+financepy-0.*
 .ipynb_checkpoints
 *.out
 

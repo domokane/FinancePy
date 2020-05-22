@@ -253,3 +253,20 @@ class FinBondOption():
         return 999.0
 
 ###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("FACE", self._face, "")
+        s += "Underlying Bond\n"
+        s += str(self._bond)
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+###############################################################################

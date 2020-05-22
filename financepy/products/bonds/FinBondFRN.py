@@ -474,6 +474,7 @@ class FinBondFRN(object):
 ###############################################################################
 
     def print(self):
+        ''' Simple print function for backward compatibility. '''
         print(self)
 
 ###############################################################################

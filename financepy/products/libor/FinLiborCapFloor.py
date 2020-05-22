@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# TODO: Implied volatility
+# TODO: Term structure of volatility
+
 import numpy as np
 
 from ...finutils.FinDate import FinDate

@@ -2,11 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# TODO: Use Numba to speed this up more.
+
 import numpy as np
 
 from ..finutils.FinMath import N
 from ..market.curves.FinCDSCurve import uniformToDefaultTime
-from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 
@@ -15,6 +16,8 @@ def defaultTimesGC(issuerCurves,
                    correlationMatrix,
                    numTrials,
                    seed):
+    ''' Generate a matrix of default times by credit and trial using a
+    Gaussian copula model using a full rank correlation matrix. '''
 
     np.random.seed(seed)
     numCredits = len(issuerCurves)

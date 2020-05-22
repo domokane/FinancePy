@@ -167,10 +167,18 @@ class FinBondZeroCurve():
 
 ##########################################################################
 
-    def print(self):
+    def __repr__(self):
         numPoints = len(self._times)
-        print("TIMES,DISCOUNT FACTORS")
+        s = labelToString("TIMES,DISCOUNT FACTORS")
         for i in range(0, numPoints):
-            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+            s += labelToString(self._times[i], self._values[i])
+
+        return s
+
+##########################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ##########################################################################

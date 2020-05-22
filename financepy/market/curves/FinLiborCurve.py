@@ -233,6 +233,13 @@ class FinLiborCurve(FinDiscountCurve):
         s = labelToString("TIME", "DISCOUNT FACTOR")
         for i in range(0, numPoints):
             s += labelToString(self._times[i], self._values[i])
+
         return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

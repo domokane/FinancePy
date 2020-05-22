@@ -167,7 +167,9 @@ def labelToString(label, value, separator="\n", listFormat=False):
     # Label: value1
     #        value2
     #        ...
-    if (listFormat and type(value) is list and len(value) > 0):
+    label = str(label)
+
+    if listFormat and type(value) is list and len(value) > 0:
         s = label + ": "
         labelSpacing = " " * len(s)
         s += str(value[0])
@@ -177,5 +179,5 @@ def labelToString(label, value, separator="\n", listFormat=False):
         s += separator
 
         return s
-
-    return f"{label}: {value}{separator}"
+    else:
+        return f"{label}: {value}{separator}"

@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# TODO: There are several speed ups for the Monte-Carlo including calculating
+# all default baskets at the same time.
 
 import numpy as np
 
@@ -153,7 +155,7 @@ class FinCDSBasket(object):
                          liborCurve,
                          numTrials,
                          seed):
-        ''' Value the default basket using a Gaussian copula model. This 
+        ''' Value the default basket using a Gaussian copula model. This
         depends on the issuer curves and correlation matrix. '''
 
         numCredits = len(issuerCurves)

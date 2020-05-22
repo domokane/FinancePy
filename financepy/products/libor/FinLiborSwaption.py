@@ -38,6 +38,7 @@ class FinLiborSwaptionModelTypes(Enum):
 
 
 class FinLiborSwaption():
+    ''' This is the class for the European-stype swaption. '''
 
     def __init__(self,
                  exerciseDate,
@@ -52,6 +53,10 @@ class FinLiborSwaption():
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+        ''' Create a European-style swaption by defining the exercise date of
+        the swaption, and all of the details of the underlying interest rate
+        swap including the fixed coupon and the details of the fixed and the
+        floating leg payment schedules. '''
 
         if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
@@ -104,6 +109,8 @@ class FinLiborSwaption():
               valuationDate,
               liborCurve,
               model):
+        ''' Valuation of a Libor European-style swaption using a choice of
+        models on a specified valuation date. '''
 
         floatSpread = 0.0
         payFixedFlag = True
@@ -193,6 +200,7 @@ class FinLiborSwaption():
 ###############################################################################
 
     def __repr__(self):
+        ''' Function to allow us to print the swaption details. '''
 
         s = labelToString("EXERCISE DATE", self._exerciseDate)
         s += labelToString("SWAPTION TYPE", str(self._swaptionType))
@@ -214,6 +222,8 @@ class FinLiborSwaption():
 ###############################################################################
 
     def print(self):
+        ''' Alternative print method. '''
+
         print(self)
 
 ###############################################################################

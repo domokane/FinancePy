@@ -168,3 +168,9 @@ class FinBondYieldCurve():
         return s
 
 ##########################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+##########################################################################

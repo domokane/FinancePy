@@ -125,14 +125,14 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def __repr__(self):
-        s = labelToString("START DATE:", self._startDate)
-        s += labelToString("END DATE:", self._endDate)
-        s += labelToString("MORTGAGE TYPE:", self._mortgageType)
-        s += labelToString("FREQUENCY:", self._frequencyType)
-        s += labelToString("CALENDAR:", self._calendarType)
-        s += labelToString("BUSDAYRULE:", self._busDayAdjustType)
-        s += labelToString("DATEGENRULE:", self._dateGenRuleType)
+    def printLeg(self):
+        print("START DATE:", self._startDate)
+        print("MATURITY DATE:", self._endDate)
+        print("MORTGAGE TYPE:", self._mortgageType)
+        print("FREQUENCY:", self._frequencyType)
+        print("CALENDAR:", self._calendarType)
+        print("BUSDAYRULE:", self._busDayAdjustType)
+        print("DATEGENRULE:", self._dateGenRuleType)
 
         numFlows = len(self._schedule._adjustedDates)
 
@@ -149,11 +149,22 @@ class FinBondMortgage(object):
                    self._principalRemaining[i],
                    self._totalFlows[i]))
 
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("MATURITY DATE", self._endDate)
+        s += labelToString("MORTGAGE TYPE", self._mortgageType)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
         return s
 
 ###############################################################################
 
     def print(self):
+        ''' Simple print function for backward compatibility. '''
         print(self)
 
 ###############################################################################

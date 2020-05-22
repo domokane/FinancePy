@@ -4,6 +4,7 @@
 
 # TODO: Add functionality around settlement
 # TODO: Write test function
+# TODO: Handle 1 month futures contracts
 
 from math import exp
 
@@ -37,6 +38,9 @@ class FinLiborFuture(object):
 
         if futureNumber < 1:
             raise FinError("Future number must be 1 or more")
+
+        if futureTenor != "3M" and futureTenor != "3m":
+            raise FinError("Only 3M IMM futures handled currently.")
 
         if accrualType not in FinDayCountTypes:
             raise FinError("Unknown Day Count Rule type " + str(accrualType))

@@ -35,6 +35,10 @@ class FinCurveFitPolynomial():
 
         return s
 
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
 ###############################################################################
 
 
@@ -79,6 +83,10 @@ class FinCurveFitNelsonSiegel():
         s += labelToString("Beta3", self._beta3)
         s += labelToString("Tau", self._tau)
         return s
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################
 
@@ -145,6 +153,9 @@ class FinCurveFitNelsonSiegelSvensson():
         s += labelToString("Tau2", self._tau2)
         return s
 
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################
 
@@ -167,3 +178,10 @@ class FinCurveFitBSpline():
         s += labelToString("Knots", self._knots)
         s += labelToString("Spline", self._spline)
         return s
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+##########################################################################
+
