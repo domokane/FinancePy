@@ -4,7 +4,8 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinCDSCurve import FinCDSCurve

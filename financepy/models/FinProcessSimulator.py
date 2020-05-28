@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 27 15:05:58 2019
-
-@author: Dominic
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import sqrt, exp, log
 from enum import Enum
@@ -13,6 +10,7 @@ import numpy as np
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import norminvcdf
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

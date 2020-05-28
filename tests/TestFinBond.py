@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 09:43:40 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 
 import datetime as dt
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -17,6 +15,8 @@ from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+
+from financepy.finutils.FinHelperFunctions import dump
 
 import sys
 sys.path.append("..\\..")
@@ -171,6 +171,9 @@ def buildLiborCurve(valuationDate):
                                fras,
                                swaps)
 
+    dump(liborCurve)
+    dump(swap9)
+
     if 1 == 0:
         import numpy as np
         numSteps = 40
@@ -212,7 +215,7 @@ def test_FinBond():
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType,
-                           ONE_MILLION)
+                           100)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
             accd = bond._accruedInterest
@@ -232,7 +235,6 @@ def test_FinBond():
     face = ONE_MILLION
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
-    print(bond)
 
     testCases.header("FIELD", "VALUE")
     fullPrice = bond.fullPriceFromYield(settlementDate, y)

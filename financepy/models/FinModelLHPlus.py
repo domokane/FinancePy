@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 16 18:00:54 2019
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import sqrt
 
 from ...finutils.FinMath import NormSInv, N, M, phi3
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

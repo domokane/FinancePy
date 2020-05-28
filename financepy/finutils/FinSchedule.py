@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:31:53 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
-from . import FinError
+from .FinError import FinError
 from .FinCalendar import (FinCalendar, FinCalendarTypes)
-from .FinCalendar import (FinDayAdjustTypes, FinDateGenRuleTypes)
+from .FinCalendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
 from .FinFrequency import (FinFrequency, FinFrequencyTypes)
 from .FinHelperFunctions import labelToString
 
 ###############################################################################
+
 
 class FinSchedule(object):
     ''' A Schedule is a vector of dates generated according to ISDA standard
@@ -24,7 +23,7 @@ class FinSchedule(object):
                  endDate,
                  frequencyType=FinFrequencyTypes.ANNUAL,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create FinSchedule object. '''
 
@@ -34,7 +33,7 @@ class FinSchedule(object):
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -125,6 +124,68 @@ class FinSchedule(object):
 
         return self._adjustedDates
 
+###############################################################################
+
+    def generate_alternative(self):
+        ''' This adjusts each date BEFORE generating the next date.
+        Generate schedule of dates according to specified date generation
+        rules and also adjust these dates for holidays according to
+        the business day convention and the specified calendar. '''
+
+        # print("======= SCHEDULE HAS CHANGED - MUST TEST =============")
+
+        self._adjustedDates = []
+        calendar = FinCalendar(self._calendarType)
+        frequency = FinFrequency(self._frequencyType)
+        numMonths = int(12 / frequency)
+
+        unadjustedScheduleDates = []
+
+        if self._dateGenRuleType == FinDateGenRuleTypes.BACKWARD:
+
+            nextDate = self._endDate
+            print("END:", nextDate)
+            flowNum = 0
+
+            while nextDate > self._startDate:
+                unadjustedScheduleDates.append(nextDate)
+                nextDate = nextDate.addMonths(-numMonths)
+                nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
+                flowNum += 1
+
+            # Add on the Previous Coupon Date
+            unadjustedScheduleDates.append(nextDate)
+            flowNum += 1
+
+            # reverse order and holiday adjust dates
+            for i in range(0, flowNum):
+                dt = unadjustedScheduleDates[flowNum - i - 1]
+                self._adjustedDates.append(dt)
+
+        elif self._dateGenRuleType == FinDateGenRuleTypes.FORWARD:
+
+            # This needs checking
+            nextDate = self._startDate
+            flowNum = 0
+
+            unadjustedScheduleDates.append(nextDate)
+            flowNum = 1
+
+            while nextDate < self._endDate:
+                unadjustedScheduleDates.append(nextDate)
+                nextDate = nextDate.addMonths(numMonths)
+                nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
+                flowNum = flowNum + 1
+
+            for i in range(1, flowNum):
+
+                dt = unadjustedScheduleDates[i]
+                self._adjustedDates.append(dt)
+
+            self._adjustedDates.append(self._endDate)
+
+        return self._adjustedDates
+
 ##############################################################################
 
     def __repr__(self):
@@ -137,7 +198,7 @@ class FinSchedule(object):
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType, "")
-        
+
         if len(self._adjustedDates) > 0:
             s += "\n\n"
             s += labelToString("PCD", self._adjustedDates[0], "")

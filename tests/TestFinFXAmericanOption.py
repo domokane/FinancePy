@@ -7,7 +7,9 @@ Created on Fri Feb 12 16:51:05 2016
 
 import numpy as np
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
@@ -84,8 +86,7 @@ def test_FinFXAmericanOption():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("CALL %9.6f %9.6f %9.7f %10.8f" %
-              (spotFXRate, valueEuropean, valueAmerican, diff))
+        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
 
     for spotFXRate in spotFXRates:
 
@@ -116,9 +117,7 @@ def test_FinFXAmericanOption():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("PUT  %9.6f %9.6f %9.7f %10.8f" % (spotFXRate, valueEuropean,
-                                                 valueAmerican, diff))
-
+        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
 
 ###############################################################################
 

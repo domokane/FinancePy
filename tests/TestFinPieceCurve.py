@@ -7,8 +7,8 @@ Created on Fri Apr 08 09:26:27 2016
 
 import sys
 import numpy as np
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-#from financepy.market.curves.FinPieceCurve import FinPieceCurve
+
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 sys.path.append("..//..")
 

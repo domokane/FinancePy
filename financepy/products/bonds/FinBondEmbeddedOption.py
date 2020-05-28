@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
@@ -12,6 +9,8 @@ from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...products.bonds.FinBond import FinBond
+
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 import numpy as np
@@ -116,6 +115,7 @@ class FinBondEmbeddedOption(object):
         self._callPrices = callPrices
         self._putDates = putDates
         self._putPrices = putPrices
+        self._face = face
 
 ###############################################################################
 
@@ -210,5 +210,32 @@ class FinBondEmbeddedOption(object):
             return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
         else:
             raise FinError("Unknown model type")
+
+###############################################################################
+
+    def __repr__(self):
+
+        s = labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE AMOUNT", self._face)
+        s += labelToString("CONVERSION RATIO", self._conversionRatio)
+        s += labelToString("START CONVERT DATE", self._startConvertDate)
+
+        for i in range(0, len(self._callDates)):
+            s += labelToString("CALL DATE AND PRICE", self._callDates[i],
+                               self._callPrices[i])
+
+        for i in range(0, len(self._putDates)):
+            s += labelToString("PUT DATE AND PRICE", self._putDates[i],
+                               self._putPrices[i])
+
+        return s
+
+###############################################################################
+
+    def print(self):
+        print(self)
 
 ###############################################################################

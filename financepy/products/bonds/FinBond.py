@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 #  - ROUNDING CONVENTIONS FOR ACCRUED
 #  - CHECK OAS CALCULATION
@@ -17,6 +14,7 @@ Created on Fri Feb 12 16:51:05 2016
 ###############################################################################
 
 import numpy as np
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
@@ -24,7 +22,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -122,7 +120,7 @@ class FinBond(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinDayAdjustTypes.NONE
+        busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,
@@ -206,7 +204,7 @@ class FinBond(object):
         fullPrice = self.fullPriceFromYield(settlementDate,
                                             y, convention)
 
-        principal = fullPrice * self._face / self._par - self._accrued
+        principal = fullPrice * self._face / self._par - self._accruedInterest
         return principal
 
 ###############################################################################
@@ -413,7 +411,7 @@ class FinBond(object):
             swapFloatDayCountConventionType=FinDayCountTypes.ACT_360,
             swapFloatFrequencyType=FinFrequencyTypes.SEMI_ANNUAL,
             swapFloatCalendarType=FinCalendarTypes.WEEKEND,
-            swapFloatBusDayAdjustRuleType=FinDayAdjustTypes.FOLLOWING,
+            swapFloatBusDayAdjustRuleType=FinBusDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Calculate the par asset swap spread of the bond. The discount curve
         is a Libor curve that is passed in. This function is vectorised with
@@ -548,17 +546,14 @@ class FinBond(object):
 ###############################################################################
 
     def __repr__(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
         s = labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE", self._face, "")
-
         return s
-    
-    ##########################################################################
+
+###############################################################################
 
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in

@@ -1,13 +1,41 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:31:53 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 import numpy as np
 from numba import njit
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
+
+##########################################################################
+
+
+def dump(obj):
+    ''' Get a list of all of the attributes of a class (not built in ones) '''
+
+    attrs = dir(obj)
+
+    non_function_attributes = [attr for attr in attrs
+                               if not callable(getattr(obj, attr))]
+
+    non_internal_attributes = [attr for attr in non_function_attributes
+                               if not attr.startswith('__')]
+
+    private_attributes = [attr for attr in non_internal_attributes
+                          if attr.startswith('_')]
+
+    public_attributes = [attr for attr in non_internal_attributes
+                         if not attr.startswith('_')]
+
+    print("PRIVATE ATTRIBUTES")
+    for attr in private_attributes:
+        x = getattr(obj, attr)
+        print(attr, x)
+
+    print("PUBLIC ATTRIBUTES")
+    for attr in public_attributes:
+        x = getattr(obj, attr)
+        print(attr, x)
 
 ##########################################################################
 
@@ -132,13 +160,16 @@ def normaliseWeights(wtVector):
 
 ##########################################################################
 
+
 def labelToString(label, value, separator="\n", listFormat=False):
     ''' Format label/value pairs for a unified formatting. '''
     # Format option for lists such that all values are aligned:
     # Label: value1
     #        value2
     #        ...
-    if (listFormat and type(value) is list and len(value) > 0):
+    label = str(label)
+
+    if listFormat and type(value) is list and len(value) > 0:
         s = label + ": "
         labelSpacing = " " * len(s)
         s += str(value[0])
@@ -148,8 +179,8 @@ def labelToString(label, value, separator="\n", listFormat=False):
         s += separator
 
         return s
-
-    return f"{label}: {value}{separator}"
+    else:
+        return f"{label}: {value}{separator}"
 
 def tableToString(header, valueTable, floatPrecision="10.7f"):
     ''' Format a 2D array into a table-like string. '''

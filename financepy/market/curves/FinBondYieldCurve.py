@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,6 +9,8 @@ import matplotlib.pyplot as plt
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import scale
+from ...finutils.FinHelperFunctions import labelToString
+
 from .FinBondYieldCurveModel import FinCurveFitPolynomial
 from .FinBondYieldCurveModel import FinCurveFitNelsonSiegel
 from .FinBondYieldCurveModel import FinCurveFitNelsonSiegelSvensson
@@ -25,15 +25,15 @@ from scipy.interpolate import splrep
 
 
 class FinBondYieldCurve():
-    ''' Class to do fitting of the yield curve and to enable interpolation of 
-    yields. Because yields assume a flat term structure for each bond, this 
-    class does not allow discounting to be done and so does not inherit from 
-    FinDiscountCurve. It should only be used for visualisation and simple 
+    ''' Class to do fitting of the yield curve and to enable interpolation of
+    yields. Because yields assume a flat term structure for each bond, this
+    class does not allow discounting to be done and so does not inherit from
+    FinDiscountCurve. It should only be used for visualisation and simple
     interpolation but not for full term-structure-consistent pricing. '''
 
     def __init__(self, settlementDate, bonds, ylds, curveFit):
-        ''' Fit the curve to a set of bond yields using the type of curve 
-        specified. Bounds can be provided if you wish to enforce lower and 
+        ''' Fit the curve to a set of bond yields using the type of curve
+        specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters. '''
 
         self._settlementDate = settlementDate
@@ -157,3 +157,20 @@ class FinBondYieldCurve():
         plt.legend(loc='lower right')
         plt.ylim((min(yld)-0.3, max(yld)*1.1))
         plt.grid(True)
+
+##########################################################################
+
+    def __repr__(self):
+        s = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s += labelToString("BOND", self._bonds)
+        s += labelToString("YIELDS", self._ylds)
+        s += labelToString("CURVE FIT", self._curveFit)
+        return s
+
+##########################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+##########################################################################

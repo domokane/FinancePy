@@ -6,19 +6,16 @@ Created on Fri Nov 30 10:52:29 2018
 """
 # TODO Set up test cases correctly
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
-
-import sys
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -47,7 +44,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
     face = 1000000
@@ -62,10 +59,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("===============================================================")
 #    print("QUARTERLY FREQUENCY")
@@ -75,7 +76,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -89,10 +90,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("MONTHLY FREQUENCY")
@@ -102,7 +107,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.MONTHLY
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -116,10 +121,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN")
@@ -129,7 +138,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -143,10 +152,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("BACKWARD GEN WITH SHORT END STUB")
@@ -156,7 +169,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -170,10 +183,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN WITH LONG END STUB")
@@ -183,7 +200,7 @@ def test_FinBondAnnuity():
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     basisType = FinDayCountTypes.ACT_360
 
@@ -197,10 +214,14 @@ def test_FinBondAnnuity():
         basisType,
         face)
 
-    annuity.print()
-    annuity.printFlows(settlementDate)
-    v = annuity.cleanPriceFromDiscountCurve(settlementDate, liborCurve)
-    print("VALUE:", v)
+    annuity.calculateFlowDatesPayments(settlementDate)
+
+    testCases.header("Date", "Flow")
+    numFlows = len(annuity._flowDates)
+    for i in range(1, numFlows):
+        dt = annuity._flowDates[i]
+        flow = annuity._flowAmounts[i]
+        testCases.print(dt, flow)
 
 ##########################################################################
 

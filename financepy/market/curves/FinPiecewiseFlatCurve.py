@@ -1,26 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
-
-##########################################################################
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import inputFrequency
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import FinInterpMethods
+from ...finutils.FinHelperFunctions import labelToString
 
-##########################################################################
-##########################################################################
+
+###############################################################################
 
 
 class FinPiecewiseCurve():
-    ''' Curve is made up of a series of zero rates assumed to each have a 
+    ''' Curve is made up of a series of zero rates assumed to each have a
     piecewise flat constant shape OR a piecewise linear shape. '''
 
     def __init__(self,
@@ -48,7 +44,7 @@ class FinPiecewiseCurve():
         self._cmpdFreq = inputFrequency(compoundingFreq)
         self._interpMethod = interpolationMethod
 
-##########################################################################
+###############################################################################
 
     def zeroRate(self, t, compoundingFreq):
 
@@ -63,11 +59,11 @@ class FinPiecewiseCurve():
 
         interpolatedZero = 0.0
 
-        if interpolationMethod == FinInterpMethods.FLAT:
+        if self._interpMethod == FinInterpMethods.FLAT_FORWARDS:
 
             interpolatedZero = self._values[l_index]
 
-        elif interpolationMethod == FinInterpMethods.LINEAR:
+        elif self._interpMethod == FinInterpMethods.LINEAR_FORWARDS:
 
             t1 = self._times[l_index]
             t2 = self._times[r_index]
@@ -75,7 +71,7 @@ class FinPiecewiseCurve():
             r2 = self._values[r_index]
             interpolatedZero = r1 + (r2 - r1) * (t - t1) / (t2 - t1)
 
-        elif interpolationMethod == FinInterpMethods.LOG:
+        elif self._interpMethod == FinInterpMethods.LINEAR_ZERO_RATES:
 
             t1 = self._times[l_index]
             t2 = self._times[r_index]

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinHelperFunctions import printTree
 from financepy.models.FinModelRatesBK import FinModelRatesBK
@@ -13,6 +17,8 @@ from financepy.finutils.FinHelperFunctions import printTree
 
 import matplotlib.pyplot as plt
 import time
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ###############################################################################

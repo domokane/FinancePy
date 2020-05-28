@@ -4,9 +4,9 @@ Created on Fri Apr 08 09:26:27 2016
 
 @author: Dominic O'Kane
 """
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinNelsonSiegelCurve import FinNelsonSiegelCurve
 from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from math import exp, log, sqrt
 import numpy as np
@@ -16,6 +14,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityBasketOption(FinEquityOption):
 

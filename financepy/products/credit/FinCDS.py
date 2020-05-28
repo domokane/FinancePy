@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 from numba import njit, float64, int64
@@ -11,14 +9,15 @@ from math import exp, log
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString, tableToString
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+
+from ...finutils.FinHelperFunctions import labelToString
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -198,7 +197,7 @@ class FinCDS(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create a CDS from the step-in date, maturity date and coupon '''
 
@@ -232,7 +231,7 @@ class FinCDS(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -484,8 +483,8 @@ class FinCDS(object):
         issuerCurve._liborCurve._values = dfs
         issuerCurve._values = survProbs
 
-        creditDV01 = (v1[0] - v0[0])
-        return creditDV01
+        interestDV01 = (v1['full_pv'] - v0['full_pv'])
+        return interestDV01
 
 ##########################################################################
 
@@ -584,7 +583,8 @@ class FinCDS(object):
         # future accrued from now to coupon payment date assuming default
         # roughly midway
         fullRPV01 = fullRPV01 + 0.5 * z1 * \
-            (qeff - q1) * (yearFrac - accrualFactorPCDToNow) * couponAccruedIndicator
+            (qeff - q1) * (yearFrac - accrualFactorPCDToNow) \
+            * couponAccruedIndicator
 
         for it in range(2, len(paymentDates)):
 

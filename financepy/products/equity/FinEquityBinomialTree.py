@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 10:04:57 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 
 from math import exp, log, sqrt
 from enum import Enum
@@ -15,6 +13,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import heaviside
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityTreePayoffTypes(Enum):
     FWD_CONTRACT = 1

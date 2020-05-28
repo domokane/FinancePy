@@ -1,15 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Aug 07 14:23:13 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
+# TODO: Implied volatility
+# TODO: Term structure of volatility
 
-from math import log, sqrt
+import numpy as np
 
+from ...finutils.FinDate import FinDate
+from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -17,9 +19,9 @@ from ...finutils.FinMath import ONE_MILLION, N
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString
-from .FinLiborModelTypes import FinLiborModelBlack
-from .FinLiborModelTypes import FinLiborModelShiftedBlack
-from .FinLiborModelTypes import FinLiborModelSABR
+from ...products.libor.FinLiborModelTypes import FinLiborModelBlack
+from ...products.libor.FinLiborModelTypes import FinLiborModelShiftedBlack
+from ...products.libor.FinLiborModelTypes import FinLiborModelSABR
 from ...models.FinModelSABR import blackVolFromSABR
 
 ##########################################################################
@@ -44,7 +46,7 @@ class FinLiborCapFloor():
 
     def __init__(self,
                  startDate,
-                 maturityDate,
+                 maturityDateOrTenor,
                  optionType,
                  strikeRate,
                  lastFixing=None,
@@ -52,8 +54,30 @@ class FinLiborCapFloor():
                  dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA,
                  notional=ONE_MILLION,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+
+        if type(startDate) != FinDate:
+            raise ValueError("Start date must be a FinDate.")
+
+        if calendarType not in FinCalendarTypes:
+            raise ValueError("Unknown Calendar type " + str(calendarType))
+
+        self._calendarType = calendarType
+
+        if busDayAdjustType not in FinBusDayAdjustTypes:
+            raise ValueError("Unknown Business Day Adjust type " +
+                             str(busDayAdjustType))
+
+        self._busDayAdjustType = busDayAdjustType
+
+        if type(maturityDateOrTenor) == FinDate:
+            maturityDate = maturityDateOrTenor
+        else:
+            maturityDate = startDate.addTenor(maturityDateOrTenor)
+            calendar = FinCalendar(self._calendarType)
+            maturityDate = calendar.adjust(maturityDate,
+                                           self._busDayAdjustType)
 
         if startDate > maturityDate:
             raise FinError("Start date must be before maturity date")
@@ -74,7 +98,7 @@ class FinLiborCapFloor():
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -92,9 +116,16 @@ class FinLiborCapFloor():
         self._frequencyType = frequencyType
         self._dayCountType = dayCountType
         self._notional = notional
-        self._calendarType = calendarType
-        self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
+
+        self._capFloorLetValues = []
+        self._capFloorLetAlphas = []
+        self._capFloorLetFwdRates = []
+        self._capFloorLetIntrinsic = []
+        self._capFloorLetDiscountFactors = []
+        self._capFloorPV = []
+
+        self._valuationDate = None
 
 ##########################################################################
 
@@ -102,6 +133,8 @@ class FinLiborCapFloor():
               valuationDate,
               liborCurve,
               model):
+
+        self._valuationDate = valuationDate
 
         self._capFloorDates = FinSchedule(self._startDate,
                                           self._maturityDate,
@@ -114,72 +147,91 @@ class FinLiborCapFloor():
         numOptions = len(self._capFloorDates)
         strikeRate = self._strikeRate
 
-#        for dt in self._capFloorDates:
-#            print(dt)
-
-        if strikeRate <= 0.0:
-            raise FinError("Strike <= 0.0")
+        if strikeRate < 0.0:
+            raise FinError("Strike < 0.0")
 
         if numOptions <= 1:
             raise FinError("Number of options in capfloor equals 1")
 
         #######################################################################
 
-        capFloorValue = 0.0
+        self._capFloorLetValues = [0]
+        self._capFloorLetAlphas = [0]
+        self._capFloorLetFwdRates = [0]
+        self._capFloorLetIntrinsic = [0]
+        self._capFloorLetDiscountFactors = [1.00]
+        self._capFloorPV = [0.0]
 
+        #######################################################################
+
+        capFloorValue = 0.0
+        capFloorLetValue = 0.0
         # Value the first caplet or floorlet with known payoff
 
+        startDate = self._startDate
+        endDate = self._capFloorDates[1]
+
         if self._lastFixing is None:
-
-            # Assume that the fixing is set today and that there is
-            # potentially some intrinsic value depending on strike
-            startDate = self._startDate
-            endDate = self._capFloorDates[1]
-            fwdRate = liborCurve.fwdRate(
-                startDate, endDate, self._dayCountType)
-            alpha = dayCounter.yearFrac(startDate, endDate)
-            df = liborCurve.df(endDate)
-
-            if self._optionType == FinLiborCapFloorType.CAP:
-                capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
-                capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
-
+            fwdRate = liborCurve.fwdRate(startDate, endDate,
+                                         self._dayCountType)
         else:
-
-            startDate = self._startDate
-            endDate = self._capFloorDates[1]
             fwdRate = self._lastFixing
-            df = liborCurve.df(endDate)
-            alpha = dayCounter.yearFrac(startDate, endDate)
 
-            if self._optionType == FinLiborCapFloorType.CAP:
-                capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
-                capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
+        alpha = dayCounter.yearFrac(startDate, endDate)
+        df = liborCurve.df(endDate)
 
+        if self._optionType == FinLiborCapFloorType.CAP:
+            capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
+        elif self._optionType == FinLiborCapFloorType.FLOOR:
+            capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
+
+        capFloorLetValue *= self._notional
         capFloorValue += capFloorLetValue
+
+        self._capFloorLetFwdRates.append(fwdRate)
+        self._capFloorLetValues.append(capFloorLetValue)
+        self._capFloorLetAlphas.append(alpha)
+        self._capFloorLetIntrinsic.append(capFloorLetValue)
+        self._capFloorLetDiscountFactors.append(df)
+        self._capFloorPV.append(capFloorValue)
 
         for i in range(2, numOptions):
 
             startDate = self._capFloorDates[i - 1]
             endDate = self._capFloorDates[i]
+            alpha = dayCounter.yearFrac(startDate, endDate)
+            df = liborCurve.df(endDate)
+            fwdRate = liborCurve.fwdRate(startDate, endDate,
+                                         self._dayCountType)
 
-            capFloorLetValue = self.valueCapletFloorlet(valuationDate,
+            if self._optionType == FinLiborCapFloorType.CAP:
+                intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0)
+            elif self._optionType == FinLiborCapFloorType.FLOOR:
+                intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0)
+
+            intrinsicValue *= self._notional
+
+            capFloorLetValue = self.valueCapletFloorLet(valuationDate,
                                                         startDate,
                                                         endDate,
                                                         liborCurve,
                                                         model)
 
+            capFloorLetValue *= self._notional * alpha
             capFloorValue += capFloorLetValue
 
-        capFloorValue = capFloorValue * self._notional
-        return capFloorValue
+            self._capFloorLetFwdRates.append(fwdRate)
+            self._capFloorLetValues.append(capFloorLetValue)
+            self._capFloorLetAlphas.append(alpha)
+            self._capFloorLetIntrinsic.append(intrinsicValue)
+            self._capFloorLetDiscountFactors.append(df)
+            self._capFloorPV.append(capFloorValue)
 
+        return capFloorValue
 
 ##########################################################################
 
-    def valueCapletFloorlet(self,
+    def valueCapletFloorLet(self,
                             valuationDate,
                             startDate,
                             endDate,
@@ -191,18 +243,24 @@ class FinLiborCapFloor():
         f = liborCurve.fwdRate(startDate, endDate, self._dayCountType)
         k = self._strikeRate
 
+        if k == 0.0:
+            k = 1e-10
+
         if type(model) == FinLiborModelBlack:
 
             v = model._volatility
 
-            if v <= 0:
+            if v < 0:
                 raise FinError("Black Volatility must be positive")
 
-            if f <= 0:
-                raise FinError("Forward must be positive")
+            if v == 0.0:
+                v = 1e-10
 
-            d1 = (log(f / k) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            if f <= 0:
+                raise FinError("Forward must be positive in lognormal model.")
+
+            d1 = (np.log(f / k) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * (f * N(+d1) - k * N(+d2))
@@ -217,8 +275,8 @@ class FinLiborCapFloor():
             if v <= 0:
                 raise FinError("Black Volatility must be positive")
 
-            d1 = (log((f - h) / (k - h)) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            d1 = (np.log((f - h) / (k - h)) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * ((f - h) * N(+d1) - (k - h) * N(+d2))
@@ -234,8 +292,8 @@ class FinLiborCapFloor():
 
             v = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
 
-            d1 = (log((f) / (k)) + v * v * t / 2.0) / v / sqrt(t)
-            d2 = d1 - v * sqrt(t)
+            d1 = (np.log((f) / (k)) + v * v * t / 2.0) / v / np.sqrt(t)
+            d2 = d1 - v * np.sqrt(t)
 
             if self._optionType == FinLiborCapFloorType.CAP:
                 capFloorLetValue = df * ((f) * N(+d1) - (k) * N(+d2))
@@ -247,20 +305,60 @@ class FinLiborCapFloor():
 
         return capFloorLetValue
 
-##########################################################################
+###############################################################################
+
+    def printLeg(self):
+        ''' Prints the cap floor amounts. '''
+
+        print("START DATE:", self._startDate)
+        print("MATURITY DATE:", self._maturityDate)
+        print("OPTION TYPE", str(self._optionType))
+        print("STRIKE (%):", self._strikeRate * 100)
+        print("FREQUENCY:", str(self._frequencyType))
+        print("DAY COUNT:", str(self._dayCountType))
+        print("VALUATION DATE", self._valuationDate)
+
+        if len(self._capFloorLetValues) == 0:
+            print("Caplets not calculated.")
+            return
+
+        if self._optionType == FinLiborCapFloorType.CAP:
+            header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
+            header += "     DF    CAPLET_PV       CUM_PV"
+        elif self._optionType == FinLiborCapFloorType.FLOOR:
+            header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
+            header += "     DF    FLRLET_PV       CUM_PV"
+
+        print(header)
+
+        iFlow = 0
+
+        for paymentDate in self._capFloorDates:
+            print("%15s %10.7f  %9.5f %12.2f %12.6f %12.2f %12.2f" %
+                  (paymentDate,
+                   self._capFloorLetAlphas[iFlow],
+                   self._capFloorLetFwdRates[iFlow]*100,
+                   self._capFloorLetIntrinsic[iFlow],
+                   self._capFloorLetDiscountFactors[iFlow],
+                   self._capFloorLetValues[iFlow],
+                   self._capFloorPV[iFlow]))
+
+            iFlow += 1
+
+###############################################################################
 
     def __repr__(self):
-        s = labelToString("CAP FLOOR START DATE", self._startDate)
-        s += labelToString("CAP FLOOR MATURITY DATE", self._maturityDate)
-        s += labelToString("CAP FLOOR STRIKE COUPON", self._strikeRate * 100)
-        s += labelToString("CAP FLOOR OPTION TYPE", str(self._optionType))
-        s += labelToString("CAP FLOOR FREQUENCY", str(self._frequencyType))
-        s += labelToString("CAP FLOOR DAY COUNT", str(self._dayCountType), "")
-
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("STRIKE COUPON", self._strikeRate * 100)
+        s += labelToString("OPTION TYPE", str(self._optionType))
+        s += labelToString("FREQUENCY", str(self._frequencyType))
+        s += labelToString("DAY COUNT", str(self._dayCountType), "")
         return s
-##########################################################################
+
+###############################################################################
 
     def print(self):
         print(self)
 
-##########################################################################
+###############################################################################

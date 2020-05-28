@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 13 21:52:16 2019
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import log
 import numpy as np
@@ -15,6 +12,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -257,11 +255,10 @@ class FinCDSCurve():
 
         return tableToString(header, valueTable, precision)
 
-
-##############################################################################
+###############################################################################
 
     def print(self):
-        ''' Print out the details of the survival probability curve. '''
+        ''' Simple print function for backward compatibility. '''
         print(self)
 
-###############################################################################
+##########################################################################

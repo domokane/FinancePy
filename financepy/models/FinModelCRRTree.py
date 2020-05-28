@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 10:04:57 2019
-
-@author: Dominic
-"""
-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ..products.FinOptionTypes import FinOptionTypes
 
@@ -12,6 +8,7 @@ import numpy as np
 from numba import njit, float64, int64
 
 bump = 1e-4
+from ..finutils.FinHelperFunctions import labelToString
 
 
 ###############################################################################

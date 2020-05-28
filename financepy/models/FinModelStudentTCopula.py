@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 18:47:58 2019
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import sqrt
 import numpy as np
 from scipy.stats import t as student
 
 from ..market.curves.FinCDSCurve import uniformToDefaultTime
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

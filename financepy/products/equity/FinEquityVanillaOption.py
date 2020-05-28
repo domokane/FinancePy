@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 
@@ -20,6 +18,7 @@ from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 N = norm.cdf
 

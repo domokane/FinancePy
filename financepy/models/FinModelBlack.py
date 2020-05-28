@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jan 18 15:28:41 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 # TODO Fix this
 
 import numpy as np
 from scipy.stats import norm
 
 from ...finutils.FinMath import N
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.

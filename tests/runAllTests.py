@@ -1,5 +1,9 @@
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
+
 import glob
-from os.path import dirname, join
+from os.path import dirname
 
 import sys
 sys.path.append("..//..")
@@ -10,7 +14,8 @@ modules = glob.glob("TestFin*.py")
 numModules = len(modules)
 
 ''' This is the index of the file - change this to start later in the list '''
-n = 0
+n = 65
+
 
 for moduleFileName in modules[n:]:
 

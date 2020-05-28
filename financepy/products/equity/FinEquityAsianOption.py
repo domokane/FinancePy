@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 
@@ -17,6 +15,7 @@ from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff

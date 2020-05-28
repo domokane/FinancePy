@@ -4,7 +4,10 @@ Created on Mon Aug  5 16:23:12 2019
 
 @author: Dominic
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+import time
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorType
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -13,6 +16,13 @@ from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+
+from financepy.finutils.FinCalendar import FinCalendarTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
+from financepy.finutils.FinCalendar import FinDateGenRuleTypes
+from financepy.market.curves.FinZeroCurve import FinZeroCurve
+from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor, FinLiborCapFloorType
+from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
 
 from financepy.products.libor.FinLiborModelTypes import FinLiborModelBlack
 from financepy.products.libor.FinLiborModelTypes import FinLiborModelShiftedBlack
@@ -313,14 +323,97 @@ def test_FinLiborCapFloor():
         capFloorType,
         strikeRate)
     value = capfloor.value(valuationDate, liborCurve, model)
- #   capfloor.print()
 
-    testCases.print("FLOOR Value:", value)
+    ###########################################################################
+
+    if 1 == 1: # TESTING PRINT LEGS
+
+        model = FinLiborModelBlack(0.25)
+
+        maturityDate = startDate.addMonths(12)
+        strikeRate = 0.025
+
+        capFloorType = FinLiborCapFloorType.CAP
+        capfloor = FinLiborCapFloor(
+            startDate,
+            maturityDate,
+            capFloorType,
+            strikeRate)
+
+        value = capfloor.value(valuationDate, liborCurve, model)
+        capfloor.print()
+        capfloor.printLeg()
+
+    if 1 == 0: # TESTING PRINT LEGS
+
+        capFloorType = FinLiborCapFloorType.FLOOR
+        capfloor = FinLiborCapFloor(
+            startDate,
+            maturityDate,
+            capFloorType,
+            strikeRate)
+
+        value = capfloor.value(valuationDate, liborCurve, model)
+
+        print(value)
+        capfloor.print()
+        capfloor.printLeg()
+
+###############################################################################
+
+
+
+
+def test_FinLiborCapFloorQLExample():
+
+    valuationDate = FinDate(14, 6, 2016)
+
+    dates = [FinDate(14, 6, 2016), FinDate(14, 9, 2016),
+             FinDate(14, 12, 2016), FinDate(14, 6, 2017),
+             FinDate(14, 6, 2019), FinDate(14, 6, 2021),
+             FinDate(15, 6, 2026), FinDate(16, 6, 2031),
+             FinDate(16, 6, 2036), FinDate(14, 6, 2046)]
+
+    rates = [0.000000, 0.006616, 0.007049, 0.007795,
+             0.009599, 0.011203, 0.015068, 0.017583,
+             0.018998, 0.020080]
+
+    frequencyType = FinFrequencyTypes.ANNUAL
+    dayCountType = FinDayCountTypes.ACT_ACT_ISDA
+
+    discountCurve = FinZeroCurve(valuationDate, dates, rates, frequencyType,
+                                 dayCountType,
+                                 FinInterpMethods.LINEAR_ZERO_RATES)
+
+    startDate = FinDate(14, 6, 2016)
+    endDate = FinDate(14, 6, 2026)
+    calendarType = FinCalendarTypes.US
+    busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
+    frequencyType = FinFrequencyTypes.QUARTERLY
+    dateGenRuleType = FinDateGenRuleTypes.FORWARD
+    lastFixing = 0.0065560
+    notional = 1000000
+    dayCountType = FinDayCountTypes.ACT_360
+    optionType = FinLiborCapFloorType.CAP
+    strikeRate = 0.02
+
+    cap = FinLiborCapFloor(startDate, endDate, optionType, strikeRate,
+                           lastFixing, frequencyType,  dayCountType, notional,
+                           calendarType, busDayAdjustType, dateGenRuleType)
+
+    blackVol = 0.547295
+    model = FinLiborModelBlack(blackVol)
+
+    start = time.time()
+    numRepeats = 10
+    for i in range(0, numRepeats):
+        v = cap.value(valuationDate, discountCurve, model)
+
     end = time.time()
-
-    testCases.header("TIME")
-    testCases.print(end - start)
+    period = end - start
+#    print(v, period/numRepeats)
 
 
 test_FinLiborCapFloor()
-testCases.compareTestCases()
+test_FinLiborCapFloorQLExample()
+# testCases.compareTestCases()

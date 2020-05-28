@@ -5,7 +5,8 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 import time
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.market.curves.FinInterpolate import FinInterpMethods
@@ -15,7 +16,7 @@ from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -504,14 +505,15 @@ def test_CDSDateGeneration():
                          FinFrequencyTypes.QUARTERLY,
                          FinDayCountTypes.ACT_360,
                          FinCalendarTypes.WEEKEND,
-                         FinDayAdjustTypes.FOLLOWING,
+                         FinBusDayAdjustTypes.FOLLOWING,
                          FinDateGenRuleTypes.BACKWARD)
 
     testCases.header("Flow Date", "AccrualFactor", "Flow")
     numFlows = len(cdsContract._adjustedDates)
     for n in range(0, numFlows):
         testCases.print(str(
-            cdsContract._adjustedDates[n]), cdsContract._accrualFactors[n], cdsContract._flows[n])
+            cdsContract._adjustedDates[n]), cdsContract._accrualFactors[n],
+            cdsContract._flows[n])
 
 ##########################################################################
 

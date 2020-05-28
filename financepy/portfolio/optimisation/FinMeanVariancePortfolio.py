@@ -1,4 +1,9 @@
-#import matplotlib.pyplot as plt
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
+
+
+# #import matplotlib.pyplot as plt
 #
 #
 #class MeanVariancePortfolio():

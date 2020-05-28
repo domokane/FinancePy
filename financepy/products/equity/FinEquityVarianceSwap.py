@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:23:13 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 from math import log, exp, sqrt
@@ -14,6 +12,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityOption import FinEquityModelBlackScholes
 from ..FinOptionTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

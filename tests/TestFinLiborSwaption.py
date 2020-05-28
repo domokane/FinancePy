@@ -5,23 +5,11 @@ Created on Mon Aug  5 16:23:12 2019
 @author: Dominic
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionType
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+from financepy.products.libor import *
+from financepy.finutils import *
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
-
-from financepy.products.libor.FinLiborModelTypes import FinLiborModelBlack
-from financepy.products.libor.FinLiborModelTypes import FinLiborModelSABR
-
-
-import sys
-sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -217,7 +205,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
     value = swaption.value(settlementDate, liborCurve, model)
 
-#    swaption.print()
+    print(swaption)
 
     testCases.header("LABEL", "VALUE")
     testCases.print("PAYER Swaption Value", value)
@@ -234,7 +222,7 @@ def test_FinLiborSwaption():
     model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
     value = swaption.value(settlementDate, liborCurve, model)
 
-#    swaption.print()
+    print(swaption)
 
     testCases.print("RECEIVER Swaption Value", value)
 
@@ -247,4 +235,5 @@ def test_FinLiborSwaption():
 
 
 test_FinLiborSwaption()
+
 testCases.compareTestCases()

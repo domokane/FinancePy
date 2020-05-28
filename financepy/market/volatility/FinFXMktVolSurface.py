@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 from scipy.stats import norm
@@ -23,6 +18,8 @@ from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 N = norm.cdf
+
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -373,9 +370,11 @@ class FinFXMktVolSurface():
 
     def checkCalibration(self):
 
-        print("==============================================================")
-        print("====== CHECK CALIBRATION =====================================")
-        print("==============================================================")
+        if 1 == 0:
+            print("==========================================================")
+            print("====== CHECK CALIBRATION =================================")
+            print("==========================================================")
+
         K_dummy = 0.0
 
         for i in range(0, self._numVolCurves):
@@ -415,42 +414,53 @@ class FinFXMktVolSurface():
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
 
-            print("Value Date:", self._valueDate)
-            print("Expiry Date:", self._expiryDates[i])
-            print("T:", self._texp[i])
-            print("S0:", self._spotFXRate)
-            print("F0T:", self._F0T[i])
-            print("ATM Method:", self._atmMethod)
-            print("DeltaATM:", self._deltaATM[i])
-            print("DeltaMethod:", self._deltaMethod)
+            if 1 == 0:
+                print("Value Date:", self._valueDate)
+                print("Expiry Date:", self._expiryDates[i])
+                print("T:", self._texp[i])
+                print("S0:", self._spotFXRate)
+                print("F0T:", self._F0T[i])
+                print("ATM Method:", self._atmMethod)
+                print("DeltaATM:", self._deltaATM[i])
+                print("DeltaMethod:", self._deltaMethod)
 
-            # Print key strikes and their volatilities
-            print("Parameters:", self._parameters[i])
+                # Print key strikes and their volatilities
+                print("Parameters:", self._parameters[i])
 
             sigma_K_25_D_P = self.volFunction(self._K_25_D_P[i], i)
-            print("K_25_D_P:    %9.7f    Vol: %9.4f    Delta: %9.8f"
-                  % (self._K_25_D_P[i], 100.0*sigma_K_25_D_P, delta_put))
+
+            if 1 == 0:
+                print("K_25_D_P:    %9.7f    Vol: %9.4f    Delta: %9.8f"
+                      % (self._K_25_D_P[i], 100.0*sigma_K_25_D_P, delta_put))
 
             sigma_K_25_D_P_MS = self.volFunction(self._K_25_D_P_MS[i], i)
-            print("K_25_D_P_MS: %9.7f    Vol: %9.4f"
-                  % (self._K_25_D_P_MS[i], 100.0*sigma_K_25_D_P_MS))
+
+            if 1 == 0:
+                print("K_25_D_P_MS: %9.7f    Vol: %9.4f"
+                      % (self._K_25_D_P_MS[i], 100.0*sigma_K_25_D_P_MS))
 
             sigma_ATM = self.volFunction(self._K_ATM[i], i)
-            print("K_ATM:       %9.7f    Vol: %9.4f"
-                  % (self._K_ATM[i], 100.0*sigma_ATM))
+
+            if 1 == 0:
+                print("K_ATM:       %9.7f    Vol: %9.4f"
+                      % (self._K_ATM[i], 100.0*sigma_ATM))
 
             sigma_K_25_D_C = self.volFunction(self._K_25_D_C[i], i)
-            print("K_25_D_C:    %9.7f    Vol: %9.4f    Delta: %9.8f"
-                  % (self._K_25_D_C[i], 100.0*sigma_K_25_D_C, delta_call))
+            if 1 == 0:
+                print("K_25_D_C:    %9.7f    Vol: %9.4f    Delta: %9.8f"
+                      % (self._K_25_D_C[i], 100.0*sigma_K_25_D_C, delta_call))
 
             sigma_K_25_D_C_MS = self.volFunction(self._K_25_D_C_MS[i], i)
-            print("K_25_D_C_MS: %9.7f    Vol: %9.4f"
-                  % (self._K_25_D_C_MS[i], 100.0*sigma_K_25_D_C_MS))
+            if 1 == 0:
+                print("K_25_D_C_MS: %9.7f    Vol: %9.4f"
+                      % (self._K_25_D_C_MS[i], 100.0*sigma_K_25_D_C_MS))
 
             sigma_RR = sigma_K_25_D_C - sigma_K_25_D_P
-            print("RR: %9.5f" % (100.0*sigma_RR))
+            if 1 == 0:
+                print("RR: %9.5f" % (100.0*sigma_RR))
 
-            print("V_25_D_MS: %9.6f" % self._V_25_D_MS[i])
+            if 1 == 0:
+                print("V_25_D_MS: %9.6f" % self._V_25_D_MS[i])
 
 ###############################################################################
 

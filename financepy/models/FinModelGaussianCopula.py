@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 18:47:58 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
+# TODO: Use Numba to speed this up more.
 
 import numpy as np
 
@@ -17,6 +16,8 @@ def defaultTimesGC(issuerCurves,
                    correlationMatrix,
                    numTrials,
                    seed):
+    ''' Generate a matrix of default times by credit and trial using a
+    Gaussian copula model using a full rank correlation matrix. '''
 
     np.random.seed(seed)
     numCredits = len(issuerCurves)

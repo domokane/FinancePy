@@ -5,7 +5,8 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.equity.FinEquityCompoundOption import FinEquityCompoundOption
 from financepy.products.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes

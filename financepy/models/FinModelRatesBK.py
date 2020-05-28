@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 from numba import njit, float64, int64
@@ -7,6 +9,7 @@ from math import ceil, sqrt, exp
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
 from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpMethods.FLAT_FORWARDS.value
 

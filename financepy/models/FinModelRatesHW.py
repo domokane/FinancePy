@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 from scipy import optimize
@@ -8,6 +10,7 @@ from math import ceil, sqrt, exp, log
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N, accruedInterpolator
 from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpMethods.FLAT_FORWARDS.value
 

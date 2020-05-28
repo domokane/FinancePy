@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 14:10:12 2019
-
-@author: Dominic
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import log, exp
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # dr = theta(t) dt + sigma * dW

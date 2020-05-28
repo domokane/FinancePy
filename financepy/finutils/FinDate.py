@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Feb 06 07:26:46 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
-
-# TODO Vectorize the functions such as addDays and addMonths
 
 import datetime
 from .FinError import FinError
 from .FinMath import isLeapYear
+
+# from numba import njit, float64, int32
+
+##########################################################################
 
 shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 longDayNames = [
@@ -56,7 +56,7 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def dailyWorkingDaySchedule(self, startDate, endDate):
-    ''' Returns a list of working dates between startDate and endDate. 
+    ''' Returns a list of working dates between startDate and endDate.
     This function should be replaced by dateRange once addTenor allows
     for working days. '''
     dateList = []
@@ -71,12 +71,14 @@ def dailyWorkingDaySchedule(self, startDate, endDate):
 
 ###############################################################################
 
+
 def datediff(d1, d2):
     ''' Calculate the number of days between two dates. '''
-
-    return (d2._excelDate - d1._excelDate)
+    dd = (d2._excelDate - d1._excelDate)
+    return dd
 
 ###############################################################################
+
 
 def fromDatetime(dt):
     ''' Construct a FinDate from a datetime as this is often needed if we
@@ -87,29 +89,29 @@ def fromDatetime(dt):
 
 ###############################################################################
 
+
 def dateRange(startDate, endDate, tenor="1D"):
-    ''' Returns a list of dates between startDate (inclusive) 
-    and endDate (inclusive). 
-    The tenor represents the distance between two consecutive dates
-    and is set to daily by default. '''
+    ''' Returns a list of dates between startDate (inclusive)
+    and endDate (inclusive). The tenor represents the distance between two
+    consecutive dates and is set to daily by default. '''
 
     if startDate > endDate:
         return []
-    
+
     dateList = []
-    
+
     dt = startDate
     while dt < endDate:
         dateList.append(dt)
         dt = dt.addTenor(tenor)
     dateList.append(endDate)
-        
+
     return dateList
 
 ###############################################################################
 
-class FinDate():
 
+class FinDate():
     ''' Date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. '''
 
@@ -233,6 +235,9 @@ class FinDate():
 
         if type(numDays) is not int:
             raise FinError("Num days must be an integer")
+
+        if numDays < 0:
+            raise FinError("Num days must be positive.")
 
         dt = datetime.date(self._y, self._m, self._d)
         d = dt.day

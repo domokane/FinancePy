@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
+from ...finutils.FinHelperFunctions import labelToString
 
 ##############################################################################
 
@@ -174,9 +174,11 @@ class FinBondZeroCurve():
 
         return tableToString(header, valueTable, precision)
 
+
 ##########################################################################
 
     def print(self):
+        ''' Simple print function for backward compatibility. '''
         print(self)
 
 ##########################################################################

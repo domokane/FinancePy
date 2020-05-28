@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from math import log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
@@ -40,6 +38,7 @@ class FinLiborSwaptionModelTypes(Enum):
 
 
 class FinLiborSwaption():
+    ''' This is the class for the European-stype swaption. '''
 
     def __init__(self,
                  exerciseDate,
@@ -49,9 +48,15 @@ class FinLiborSwaption():
                  swapFixedFrequencyType,
                  swapFixedDayCountType,
                  swapNotional=ONE_MILLION,
+                 swapFloatFrequencyType=FinFrequencyTypes.QUARTERLY,
+                 swapFloatDayCountType=FinDayCountTypes.THIRTY_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+        ''' Create a European-style swaption by defining the exercise date of
+        the swaption, and all of the details of the underlying interest rate
+        swap including the fixed coupon and the details of the fixed and the
+        floating leg payment schedules. '''
 
         if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
@@ -69,7 +74,7 @@ class FinLiborSwaption():
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -86,6 +91,9 @@ class FinLiborSwaption():
         self._swapFixedFrequencyType = swapFixedFrequencyType
         self._swapFixedDayCountType = swapFixedDayCountType
         self._swapNotional = swapNotional
+        self._swapFloatFrequencyType = swapFloatFrequencyType
+        self._swapFloatDayCountType = swapFloatDayCountType
+
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
@@ -93,6 +101,7 @@ class FinLiborSwaption():
         self._pv01 = None
         self._fwdSwapRate = None
         self._forwardDf = None
+        self._underlyingSwap = None
 
 ##########################################################################
 
@@ -100,10 +109,10 @@ class FinLiborSwaption():
               valuationDate,
               liborCurve,
               model):
+        ''' Valuation of a Libor European-style swaption using a choice of
+        models on a specified valuation date. '''
 
         floatSpread = 0.0
-        floatFreqType = FinFrequencyTypes.QUARTERLY
-        floatDayCountType = FinDayCountTypes.THIRTY_360
         payFixedFlag = True
 
         swap = FinLiborSwap(self._exerciseDate,
@@ -113,8 +122,8 @@ class FinLiborSwaption():
                             self._swapFixedDayCountType,
                             self._swapNotional,
                             floatSpread,
-                            floatFreqType,
-                            floatDayCountType,
+                            self._swapFloatFrequencyType,
+                            self._swapFloatDayCountType,
                             payFixedFlag,
                             self._calendarType,
                             self._busDayAdjustType,
@@ -125,7 +134,6 @@ class FinLiborSwaption():
         f = swap.parCoupon(valuationDate, liborCurve)
         t = (self._exerciseDate - liborCurve._curveDate) / gDaysInYear
         forwardDf = liborCurve.df(t)
-#        swap.printFixedLeg(valuationDate)
 
         if type(model) == FinLiborModelBlack:
 
@@ -161,35 +169,61 @@ class FinLiborSwaption():
                                str(self._optionType))
 
         else:
-
             raise FinError("Unknown swaption model " + str(model))
 
         self._pv01 = pv01
         self._fwdSwapRate = f
         self._forwardDf = forwardDf
+        self._underlyingSwap = swap
 
         swaptionPrice = swaptionPrice * pv01 * self._swapNotional
         return swaptionPrice
 
-##########################################################################
+###############################################################################
+
+    def printFixedLeg(self):
+
+        if self._underlyingSwap is None:
+            raise FinError("Underlying swap has not been set. Do a valuation.")
+
+        self._underlyingSwap.printFixedLeg()
+
+###############################################################################
+
+    def printFloatLeg(self):
+
+        if self._underlyingSwap is None:
+            raise FinError("Underlying swap has not been set. Do a valuation.")
+
+        self._underlyingSwap.printFloatLeg()
+
+###############################################################################
 
     def __repr__(self):
-        s = labelToString("SWAPTION EXERCISE DATE", self._exerciseDate)
-        s += labelToString("SWAPTION OPTION TYPE", str(self._swaptionType))
-        s += labelToString("SWAP MATURITY DATE", self._maturityDate)
-        s += labelToString("SWAP FIXED COUPON", self._swapFixedCoupon * 100)
-        s += labelToString("SWAP FIXED FREQUENCY", str(self._swapFixedFrequencyType))
-        s += labelToString("SWAP FIXED DAY COUNT", str(self._swapFixedDayCountType), "")
+        ''' Function to allow us to print the swaption details. '''
+
+        s = labelToString("EXERCISE DATE", self._exerciseDate)
+        s += labelToString("SWAPTION TYPE", str(self._swaptionType))
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("SWAP NOTIONAL", self._swapNotional)
+        s += labelToString("FIXED COUPON", self._swapFixedCoupon * 100)
+        s += labelToString("FIXED FREQUENCY", str(self._swapFixedFrequencyType))
+        s += labelToString("FIXED DAY COUNT", str(self._swapFixedDayCountType))
+        s += labelToString("FLOAT FREQUENCY", str(self._swapFixedFrequencyType))
+        s += labelToString("FLOAT DAY COUNT", str(self._swapFloatDayCountType))
 
         if self._pv01 is not None:
-            s += "\n"
             s += labelToString("PV01", self._pv01)
-            s += labelToString("FWD SWAP RATE", self._fwdSwapRate)
+            s += labelToString("FWD SWAP RATE", self._fwdSwapRate*100)
             s += labelToString("FWD DF TO EXPIRY", self._forwardDf, "")
-        
+
         return s
 
+###############################################################################
+
     def print(self):
+        ''' Alternative print method. '''
+
         print(self)
 
-##########################################################################
+###############################################################################

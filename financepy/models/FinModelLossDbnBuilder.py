@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 16 17:54:58 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 from numba import njit, float64, int64
 import numpy as np
 
 from ..finutils.FinMath import pairGCD
+from ..finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

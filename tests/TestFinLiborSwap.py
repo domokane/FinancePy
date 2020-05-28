@@ -5,13 +5,15 @@ Created on Sun Feb 07 14:23:13 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.finutils.FinCalendar import FinDayAdjustTypes
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -38,67 +40,67 @@ def buildLiborCurve(valuationDate):
 
     maturityDate = settlementDate.addMonths(6)
     depo1 = FinLiborDeposit(settlementDate, maturityDate, -0.00251, dcType)
-    depos.append(depo1)
+ #   depos.append(depo1)
 
     # Series of 1M futures
     startDate = settlementDate.nextIMMDate()
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.0023, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.0023, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00234, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00234, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00225, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00225, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00226, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00226, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00219, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00219, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00213, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00213, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00186, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00186, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00189, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00189, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00175, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00175, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00143, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00143, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00126, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00126, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00126, True, dcType)
+    fra = FinLiborFRA(startDate, endDate, -0.00126, dcType)
     fras.append(fra)
 
     fixedFreq = FinFrequencyTypes.ANNUAL
@@ -306,7 +308,7 @@ def test_LiborSwap():
     firstFixing = -0.00268
 
     swapCalendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     payFixedFlag = False

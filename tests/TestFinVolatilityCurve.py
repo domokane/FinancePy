@@ -7,9 +7,10 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 import numpy as np
 from financepy.market.volatility.FinVolatilityCurve import FinVolatilityCurve
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 
 import sys

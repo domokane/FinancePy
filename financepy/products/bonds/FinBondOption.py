@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 import numpy as np
@@ -253,5 +251,22 @@ class FinBondOption():
             raise FinError("Unknown model and option combination")
 
         return 999.0
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("FACE", self._face, "")
+        s += "Underlying Bond\n"
+        s += str(self._bond)
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

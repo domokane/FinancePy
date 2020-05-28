@@ -7,7 +7,7 @@ Created on Sun Feb 07 14:23:13 2016
 
 import numpy as np
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinVolatilityCurve import FinVolatilityCurve

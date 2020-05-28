@@ -6,7 +6,8 @@ Created on Sun Jan 13 21:52:16 2019
 """
 
 import time
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSIndexOption import FinCDSIndexOption
 from financepy.products.credit.FinCDS import FinCDS
@@ -216,7 +217,6 @@ def test_fullPriceCDSIndexOption():
         else:
 
             indexSpread = index / 10000.0
-            print(indexSpread)
             issuerCurve = buildFlatIssuerCurve(tradeDate,
                                                liborCurve,
                                                indexSpread,

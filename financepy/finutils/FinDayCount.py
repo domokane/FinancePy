@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 10:10:19 2018
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-
 from .FinMath import isLeapYear
-
 from enum import Enum
-
 
 # A useful source for these definitions can be found at
 # https://developers.opengamma.com/quantitative-research/Interest-Rate-Instruments-and-Market-Conventions.pdf
@@ -138,10 +132,12 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return accFactor
             else:
-                daysYear1 = datediff(dt1, FinDate(y1 + 1, 1, 1))
-                daysYear2 = datediff(FinDate(y1 + 1, 1, 1), dt2)
-                accFactor = daysYear1 / denom1
-                accFactor += daysYear2 / denom2
+                daysYear1 = datediff(dt1, FinDate(1, 1, y1+1))
+                daysYear2 = datediff(FinDate(1, 1, y2), dt2)
+                accFactor1 = daysYear1 / denom1
+                accFactor2 = daysYear2 / denom2
+                yearDiff = y2 - y1 - 1.0
+                accFactor = accFactor1 + accFactor2 + yearDiff
                 return accFactor
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
@@ -221,7 +217,7 @@ class FinDayCount(object):
 
     ###########################################################################
 
-    def __str__(self):
+    def __repr__(self):
         ''' Returns the calendar type as a string. '''
         return str(self._type)
 

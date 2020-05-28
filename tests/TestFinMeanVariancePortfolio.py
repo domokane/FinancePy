@@ -5,10 +5,13 @@ Created on Fri Oct 18 17:54:03 2019
 @author: Dominic O'Kane
 """
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinMeanVarPortfolio():
 
