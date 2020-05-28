@@ -12,7 +12,7 @@ from scipy import optimize
 from ...finutils.FinMath import scale, testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
 
 ##############################################################################
@@ -167,10 +167,16 @@ class FinBondZeroCurve():
 
 ##########################################################################
 
+    def __repr__(self):
+        header = "TIMES,DISCOUNT FACTORS"
+        valueTable = [self._times, self._values]
+        precision = "10.7f"
+
+        return tableToString(header, valueTable, precision)
+
+##########################################################################
+
     def print(self):
-        numPoints = len(self._times)
-        print("TIMES,DISCOUNT FACTORS")
-        for i in range(0, numPoints):
-            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+        print(self)
 
 ##########################################################################

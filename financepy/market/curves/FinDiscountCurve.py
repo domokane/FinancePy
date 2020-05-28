@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from math import log, exp
 import numpy as np
 
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinMath import testMonotonicity
@@ -125,10 +125,16 @@ class FinDiscountCurve():
 
 ##########################################################################
 
+    def __repr__(self):
+        header = "TIMES,DISCOUNT FACTORS"
+        valueTable = [self._times, self._values]
+        precision = "10.7f"
+
+        return tableToString(header, valueTable, precision)
+
+##########################################################################
+
     def print(self):
-        numPoints = len(self._times)
-        print("TIMES,DISCOUNT FACTORS")
-        for i in range(0, numPoints):
-            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+        print(self)
 
 #######################################################################

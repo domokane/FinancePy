@@ -15,6 +15,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 # TODO: Need to complete and verify the risk sensitity calculations.
 
@@ -463,13 +464,20 @@ class FinBondFRN(object):
 
 ###############################################################################
 
+    def __repr__(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        s = labelToString("MATURIY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE", self._face)
+
+        return s
+
     def print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        print("Maturity Date:", self._maturityDate)
-        print("Coupon:", self._coupon)
-        print("Frequency:", self._frequencyType)
-        print("Accrual Type:", self._accrualType)
-        print("Face:", self._face)
+        print(self)
 
 ###############################################################################

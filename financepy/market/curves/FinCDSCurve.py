@@ -13,7 +13,7 @@ from numba import njit, float64
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...finutils.FinDayCount import FinDayCount
 
 ###############################################################################
@@ -249,12 +249,19 @@ class FinCDSCurve():
 
 ##############################################################################
 
+    def __repr__(self):
+        ''' Print out the details of the survival probability curve. '''
+        header = "TIME,SURVIVAL_PROBABILITY"
+        valueTable = [self._times, self._values]
+        precision = "10.7f"
+
+        return tableToString(header, valueTable, precision)
+
+
+##############################################################################
+
     def print(self):
         ''' Print out the details of the survival probability curve. '''
-
-        numPoints = len(self._times)
-        print("TIME,SURVIVAL_PROBABILITY")
-        for i in range(0, numPoints):
-            print("%10.7f,%10.7f" % (self._times[i], self._values[i]))
+        print(self)
 
 ###############################################################################
