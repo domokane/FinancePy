@@ -5,6 +5,7 @@ Created on Mon Aug  5 16:23:12 2019
 @author: Dominic
 """
 import time
+import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -21,16 +22,13 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.market.curves.FinZeroCurve import FinZeroCurve
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor, FinLiborCapFloorType
-from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpMethods
 
-from financepy.products.libor.FinLiborModelTypes import FinLiborModelBlack
-from financepy.products.libor.FinLiborModelTypes import FinLiborModelShiftedBlack
-from financepy.products.libor.FinLiborModelTypes import FinLiborModelSABR
-
-import sys
-sys.path.append("..//..")
-
+from financepy.models.FinModelBlack import FinModelBlack
+from financepy.models.FinModelBlackShifted import FinModelBlackShifted
+from financepy.models.FinModelSABR import FinModelSABR
+from financepy.models.FinModelSABRShifted import FinModelSABRShifted
+from financepy.models.FinModelRatesHW import FinModelRatesHW
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -40,58 +38,17 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    spotDays = 2
+    spotDays = 0
     settlementDate = valuationDate.addWorkDays(spotDays)
+    depositRate = 0.05
 
-    depositRate = 0.020
-    maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(9)
-    depo5 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(12)
-    depo6 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
+    depo1 = FinLiborDeposit(settlementDate, "1M", depositRate, depoBasis)
+    depo2 = FinLiborDeposit(settlementDate, "3M", depositRate, depoBasis)
+    depo3 = FinLiborDeposit(settlementDate, "6M", depositRate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
     depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-    depos.append(depo6)
 
     fras = []
 
@@ -99,101 +56,16 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     fixedBasis = FinDayCountTypes.ACT_365_ISDA
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
 
-    swapRate = 0.02
-    maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
+    swapRate = 0.05
+    swap1 = FinLiborSwap(settlementDate, "1Y", swapRate, fixedFreq, fixedBasis)
+    swap2 = FinLiborSwap(settlementDate, "3Y", swapRate, fixedFreq, fixedBasis)
+    swap3 = FinLiborSwap(settlementDate, "5Y", swapRate, fixedFreq, fixedBasis)
+
     swaps.append(swap1)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
     swaps.append(swap2)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(48)
-    swap3 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
     swaps.append(swap3)
 
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(60)
-    swap4 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap4)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(72)
-    swap5 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap5)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(84)
-    swap6 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap6)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(96)
-    swap7 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap7)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(108)
-    swap8 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap8)
-
-    swapRate += 0.0025
-    maturityDate = settlementDate.addMonths(120)
-    swap9 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap9)
-
-    liborCurve = FinLiborCurve("USD_LIBOR",
-                                  settlementDate,
-                                  depos,
-                                  fras,
-                                  swaps)
+    liborCurve = FinLiborCurve("USD_LIBOR", settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -205,163 +77,87 @@ def test_FinLiborCapFloor():
     import time
 
     todayDate = FinDate(2019, 6, 20)
-    # Need to check this how it aligns with curve
-    startDate = FinDate(2019, 6, 24)
-    valuationDate = startDate
-    maturityDate = startDate.addMonths(60)
-    strikeRate = 0.050
+    valuationDate = todayDate
+    startDate = todayDate.addWorkDays(2)
+    maturityDate = startDate.addTenor("1Y")
     liborCurve = test_FinLiborDepositsAndSwaps(todayDate)
 
     # The capfloor has begun
-    #lastFixing = 0.028
+    # lastFixing = 0.028
 
     ##########################################################################
-    ############################ BLACK  ######################################
+    # COMPARISON OF MODELS
     ##########################################################################
 
     start = time.time()
+    strikes = np.linspace(0.02, 0.08, 10)
 
-    testCases.header("LABEL", "VALUE")
-    testCases.banner("==================== BLACK =======================")
+    testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
+                     "SABR_SHFTD", "HW")
 
-    model = FinLiborModelBlack(0.25)
+    model1 = FinModelBlack(0.20)
+    model2 = FinModelBlackShifted(0.25, 0.0)
+    model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
+    model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
+    model5 = FinModelRatesHW(0.30, 0.01)
 
-    capFloorType = FinLiborCapFloorType.CAP
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    
-    print(capfloor)
-    
-    value = capfloor.value(valuationDate, liborCurve, model)
-#    capfloor.print()
-
-    testCases.print("CAP Value:", value)
-
-    capFloorType = FinLiborCapFloorType.FLOOR
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, model)
-#    capfloor.print()
-
-    testCases.print("FLOOR Value:", value)
-    end = time.time()
-
-    testCases.header("TIME")
-    testCases.print(end - start)
-
-    ##########################################################################
-    #######################  SHIFTED BLACK  ##################################
-    ##########################################################################
-
-    testCases.banner("============== SHIFTED BLACK ==================")
-
-    testCases.header("LABEL", "VALUE")
-
-    start = time.time()
-
-    model = FinLiborModelShiftedBlack(0.25, -0.01)
-
-    capFloorType = FinLiborCapFloorType.CAP
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, model)
-#    capfloor.print()
-
-    testCases.print("CAP Value:", value)
-
-    capFloorType = FinLiborCapFloorType.FLOOR
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, model)
-#    capfloor.print()
-
-    testCases.print("FLOOR Value:", value)
-    end = time.time()
-
-    testCases.header("TIME")
-    testCases.print(end - start)
-
-    ##########################################################################
-    ################################ SABR  ###################################
-    ##########################################################################
-
-    testCases.header("LABEL", "VALUE")
-
-    start = time.time()
-
-    testCases.banner("============== SABR ==================")
-
-    model = FinLiborModelSABR(0.28, 1.0, -0.09, 0.21)
-
-    capFloorType = FinLiborCapFloorType.CAP
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, model)
-#    capfloor.print()
-
-    testCases.print("CAP Value:", value)
-
-    capFloorType = FinLiborCapFloorType.FLOOR
-    capfloor = FinLiborCapFloor(
-        startDate,
-        maturityDate,
-        capFloorType,
-        strikeRate)
-    value = capfloor.value(valuationDate, liborCurve, model)
-
-    ###########################################################################
-
-    if 1 == 1: # TESTING PRINT LEGS
-
-        model = FinLiborModelBlack(0.25)
-
-        maturityDate = startDate.addMonths(12)
-        strikeRate = 0.025
-
+    for k in strikes:
         capFloorType = FinLiborCapFloorType.CAP
-        capfloor = FinLiborCapFloor(
-            startDate,
-            maturityDate,
-            capFloorType,
-            strikeRate)
+        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
+        cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
+        cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
+        cvalue4 = capfloor.value(valuationDate, liborCurve, model4)
+        cvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+        testCases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5)
 
-        value = capfloor.value(valuationDate, liborCurve, model)
-        capfloor.print()
-        capfloor.printLeg()
+    testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
+                     "SABR_SHFTD", "HW")
 
-    if 1 == 0: # TESTING PRINT LEGS
-
+    for k in strikes:
         capFloorType = FinLiborCapFloorType.FLOOR
-        capfloor = FinLiborCapFloor(
-            startDate,
-            maturityDate,
-            capFloorType,
-            strikeRate)
-
-        value = capfloor.value(valuationDate, liborCurve, model)
-
-        print(value)
-        capfloor.print()
-        capfloor.printLeg()
+        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
+        fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
+        fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
+        fvalue4 = capfloor.value(valuationDate, liborCurve, model4)
+        fvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+        testCases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5)
 
 ###############################################################################
+# PUT CALL CHECK
+###############################################################################
 
+    testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
+          "SABR SHFTD", "HW")
 
+    for k in strikes:
+        capFloorType = FinLiborCapFloorType.CAP
+        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
+        cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
+        cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
+        cvalue4 = capfloor.value(valuationDate, liborCurve, model4)
+        cvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+
+        capFloorType = FinLiborCapFloorType.FLOOR
+        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
+        fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
+        fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
+        fvalue4 = capfloor.value(valuationDate, liborCurve, model4)
+        fvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+
+        pcvalue1 = cvalue1 - fvalue1
+        pcvalue2 = cvalue2 - fvalue2
+        pcvalue3 = cvalue3 - fvalue3
+        pcvalue4 = cvalue4 - fvalue4
+        pcvalue5 = cvalue5 - fvalue5
+
+        testCases.print("PUT_CALL", k, pcvalue1, pcvalue2, pcvalue3,
+                        pcvalue4, pcvalue5)
+
+###############################################################################
 
 
 def test_FinLiborCapFloorQLExample():
@@ -402,7 +198,7 @@ def test_FinLiborCapFloorQLExample():
                            calendarType, busDayAdjustType, dateGenRuleType)
 
     blackVol = 0.547295
-    model = FinLiborModelBlack(blackVol)
+    model = FinModelBlack(blackVol)
 
     start = time.time()
     numRepeats = 10
@@ -411,9 +207,9 @@ def test_FinLiborCapFloorQLExample():
 
     end = time.time()
     period = end - start
-#    print(v, period/numRepeats)
+    print(v, period/numRepeats)
 
 
 test_FinLiborCapFloor()
-test_FinLiborCapFloorQLExample()
-# testCases.compareTestCases()
+# test_FinLiborCapFloorQLExample()
+testCases.compareTestCases()

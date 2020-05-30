@@ -5,7 +5,7 @@
 import numpy as np
 from scipy import optimize
 from numba import njit
-from math import ceil, sqrt, exp, log
+from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N, accruedInterpolator
@@ -14,7 +14,11 @@ from ..finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpMethods.FLAT_FORWARDS.value
 
-###############################################################################
+small = 1e-10
+
+##########################################################################
+# dr = (theta(t) - r) dt + sigma * dW
+##########################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -25,15 +29,20 @@ def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
     period discount factor to time t+dt and pT is the discount factor from
     now until the payment of the 1 dollar of the discount factor. '''
 
-    BtT = (1.0 - exp(-_a*(T-t)))/_a
-    BtDelta = (1.0 - exp(-_a * delta))/_a
+    if abs(_a) < small:
+        _a = small
 
-    term1 = log(pT/pt) - (BtT/BtDelta) * log(ptd/pt)
-    term2 = (_sigma**2)*(1.0-exp(-2.0*_a*t)) * BtT * (BtT - BtDelta)/(4.0*_a)
+    BtT = (1.0 - np.exp(-_a*(T-t)))/_a
+    BtDelta = (1.0 - np.exp(-_a * delta))/_a
+
+    term1 = np.log(pT/pt) - (BtT/BtDelta) * np.log(ptd/pt)
+
+    term2 = (_sigma**2)*(1.0-np.exp(-2.0*_a*t)) \
+        * BtT * (BtT - BtDelta)/(4.0*_a)
 
     logAhat = term1 - term2
     BhattT = (BtT/BtDelta) * delta
-    p = exp(logAhat - BhattT * Rt)
+    p = np.exp(logAhat - BhattT * Rt)
     return p
 
 ###############################################################################
@@ -44,7 +53,7 @@ def buildTree_Fast(a, sigma, treeTimes, numTimeSteps, discountFactors):
     ''' Fast tree construction using Numba. '''
     treeMaturity = treeTimes[-1]
     dt = treeMaturity / (numTimeSteps+1)
-    dR = sigma * sqrt(3.0 * dt)
+    dR = sigma * np.sqrt(3.0 * dt)
     jmax = ceil(0.1835/(a * dt))
     jmin = - jmax
     N = jmax
@@ -93,8 +102,8 @@ def buildTree_Fast(a, sigma, treeTimes, numTimeSteps, discountFactors):
         sumQZ = 0.0
         for j in range(-nm, nm+1):
             rdt = j*dR*dt
-            sumQZ += Q[m, j+N] * exp(-rdt)
-        alpha[m] = log(sumQZ/discountFactors[m+1]) / dt
+            sumQZ += Q[m, j+N] * np.exp(-rdt)
+        alpha[m] = np.log(sumQZ/discountFactors[m+1]) / dt
 
         for j in range(-nm, nm+1):
             jN = j + N
@@ -104,7 +113,7 @@ def buildTree_Fast(a, sigma, treeTimes, numTimeSteps, discountFactors):
         for j in range(-nm, nm+1):
             jN = j + N
             rdt = rt[m, jN] * dt
-            z = exp(-rdt)
+            z = np.exp(-rdt)
 
             if j == jmax:
                 Q[m+1, jN] += Q[m, jN] * pu[jN] * z
@@ -285,7 +294,7 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
         for k in range(-nm, nm+1):
             kN = k + jmax
             rt = _rt[m, kN]
-            df = exp(-rt*dt)
+            df = np.exp(-rt*dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -366,7 +375,8 @@ def americanBondOption_Tree_Fast(texp, strikePrice, face,
         if DEBUG:
             outfile.write("CALL: %5d %5d %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f\n" % \
                     (m,k,_treeTimes[m],treeFlows[m], bondValues[m,kN],\
-                     cleanPrice,accrued[m],callOptionValues[m,kN],putOptionValues[m,kN]))
+                     cleanPrice,accrued[m],callOptionValues[m,kN],\
+                         putOptionValues[m,kN]))
 
     if DEBUG:
         outfile.close()
@@ -504,7 +514,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
         for k in range(-nm, nm+1):
             kN = k + jmax
             rt = _rt[m, kN]
-            df = exp(-rt*dt)
+            df = np.exp(-rt*dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -579,18 +589,28 @@ def fwdFullBondPrice(rt, *args):
         tcpn = cpnTimes[i]
         cpn = cpnAmounts[i]
 
-        if tcpn >= texp:
+        if tcpn >= texp:  # CHECK IF IT SHOULD BE >=
             ptcpn = uinterpolate(tcpn, dfTimes, dfValues, interp)
             zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
                          self._sigma, self._a)
             pv = pv + zcb * cpn
+#            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
 
     if tcpn >= texp:
         pv = pv + zcb
 
+#    print("TCPN", tcpn, "ZCB", zcb, "PRI", 1.0, "PV", pv)
+
     accd = accruedInterpolator(texp, cpnTimes, cpnAmounts)
+
+#    print("texp:", texp)
+#    print("cpnTimes:", cpnTimes)
+#    print("cpnAmounts:", cpnAmounts)
+
     pv_clean = pv - accd
     obj = face * pv_clean - strikePrice
+
+#    print("FWD PRICE", rt, pv, accd, strikePrice, obj)
     return obj
 
 ##########################################################################
@@ -598,7 +618,7 @@ def fwdFullBondPrice(rt, *args):
 
 class FinModelRatesHW():
 
-    def __init__(self, a, sigma, numTimeSteps=100, useJamshidian=True):
+    def __init__(self, sigma, a, numTimeSteps=100, useJamshidian=True):
         ''' Constructs the Hull-White rate model. The speed of mean reversion
         a and volatility are passed in. The short rate process is given by
         dr = (theta(t) - ar) * dt  + sigma * dW. The model will switch to use
@@ -611,8 +631,8 @@ class FinModelRatesHW():
         if a < 0.0:
             raise FinError("Mean reversion speed parameter should be >= 0.")
 
-        self._a = a
         self._sigma = sigma
+        self._a = a
         self._numTimeSteps = numTimeSteps
         self._useJamshidian = useJamshidian
 
@@ -627,8 +647,7 @@ class FinModelRatesHW():
 
 ###############################################################################
 
-    def optionOnZeroCouponBond(self, texp, tmat, strikePrice, face,
-                               dfTimes, dfValues):
+    def optionOnZCB(self, texp, tmat, strike, face, dfTimes, dfValues):
         ''' Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. '''
@@ -645,19 +664,24 @@ class FinModelRatesHW():
         sigma = self._sigma
         a = self._a
 
-        sigmap = (sigma/a) * (1.0 - exp(-a*(tmat-texp)))
-        sigmap *= sqrt((1.0-exp(-2.0*a*texp))/2.0/a)
-        sigmap = abs(sigmap) + 1e-10
+        if abs(a) < small:
+            a = small
 
-        h = log((face*ptmat)/(strikePrice * ptexp)) / sigmap + sigmap/2.0
-        callValue = face * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
-        putValue = strikePrice * ptexp * N(-h+sigmap) - face * ptmat * N(-h)
+        sigmap = (sigma/a) * (1.0 - np.exp(-a*(tmat-texp)))
+        sigmap *= np.sqrt((1.0-np.exp(-2.0*a*texp))/2.0/a)
+
+        if abs(sigmap) < small:
+            sigmap = small
+
+        h = np.log((face*ptmat)/(strike * ptexp)) / sigmap + sigmap / 2.0
+        callValue = face * ptmat * N(h) - strike * ptexp * N(h-sigmap)
+        putValue = strike * ptexp * N(-h+sigmap) - face * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
 
-    def europeanBondOption_Jamshidian(self, texp, strikePrice, face,
+    def europeanBondOption_Jamshidian(self, texp, strike, face,
                                       cpnTimes, cpnAmounts,
                                       dfTimes, dfValues):
         ''' Valuation of a European bond option using the Jamshidian
@@ -665,7 +689,7 @@ class FinModelRatesHW():
         short rate that would make the bond option be at the money forward. '''
 
         argtuple = (self, texp, cpnTimes, cpnAmounts,
-                    dfTimes, dfValues, strikePrice, face)
+                    dfTimes, dfValues, strike, face)
 
         x0 = 0.05
         rstar = optimize.newton(fwdFullBondPrice, x0=x0, fprime=None,
@@ -686,18 +710,20 @@ class FinModelRatesHW():
             tcpn = cpnTimes[i]
             cpn = cpnAmounts[i]
 
-            if tcpn >= texp:
+            if tcpn > texp:  # coupons on the expiry date are ignored
 
                 ptcpn = uinterpolate(tcpn, dfTimes, dfValues, interp)
 
-                strike = P_Fast(texp, tcpn, rstar, dt, ptexp, ptdelta, ptcpn,
-                                self._sigma, self._a)
+                strike = P_Fast(texp, tcpn, rstar, dt, ptexp, ptdelta,
+                                ptcpn, self._sigma, self._a)
 
-                v = self.optionOnZeroCouponBond(texp, tcpn, strike,
-                                                1.0, dfTimes, dfValues)
+                v = self.optionOnZCB(texp, tcpn, strike, 1.0,
+                                     dfTimes, dfValues)
 
                 call = v['call']
                 put = v['put']
+
+#                print(tcpn, ptcpn, strike, call, put)
 
                 callValue += call * cpn * face
                 putValue += put * cpn * face
@@ -705,6 +731,7 @@ class FinModelRatesHW():
         callValue += call * face
         putValue += put * face
 
+#        print("CALL VAL", callValue, "PUT VAL", putValue)
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
@@ -877,7 +904,7 @@ class FinModelRatesHW():
         for i in range(0, numNodes):
             ad = self._Q[timeStep, i]
             p += ad
-        zeroRate = -log(p)/tmat
+        zeroRate = -np.log(p)/tmat
         return p, zeroRate
 
 ###############################################################################
@@ -911,4 +938,10 @@ class FinModelRatesHW():
         return
 
 ###############################################################################
+
+    def __repr__(self):
+        s = labelToString("Sigma", self._sigma)
+        s += labelToString("a", self._a)
+        return s
+
 ###############################################################################

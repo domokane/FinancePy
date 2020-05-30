@@ -76,7 +76,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     timeSteps = range(50, 1000, 10)
     values = []
     for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
@@ -146,7 +146,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     timeSteps = range(100, 1000, 20)
     values = []
     for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
