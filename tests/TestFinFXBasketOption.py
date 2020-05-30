@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
-from financepy.products.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np

@@ -13,7 +13,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 ##########################################################################
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityBasketOption(FinEquityOption):

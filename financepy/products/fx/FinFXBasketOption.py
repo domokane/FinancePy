@@ -13,7 +13,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 ##########################################################################
 
 from ...products.fx.FinFXOption import FinFXOption
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 
 class FinFXBasketOption(FinFXOption):

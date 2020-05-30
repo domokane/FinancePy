@@ -65,7 +65,12 @@ class FinZeroCurve():
                     raise FinError("Times must be > 0.")
 
                 r = zeroRates[i]
-                df = 1.0 / np.power(1.0 + r/freq, freq * t)
+
+                if freq == -1:
+                    df = np.exp(-r*t)
+                else:
+                    df = 1.0 / np.power(1.0 + r/freq, freq * t)
+
                 times.append(t)
                 values.append(df)
 
@@ -82,7 +87,12 @@ class FinZeroCurve():
 
                 alpha = dc.yearFrac(curveDate, timesOrDates[i])
                 r = zeroRates[i]
-                df = 1.0 / np.power(1.0 + r/freq, freq * alpha)
+
+                if freq == -1:
+                    df = np.exp(-r*t)
+                else:
+                    df = 1.0 / np.power(1.0 + r/freq, freq * alpha)
+
                 times.append(t)
                 values.append(df)
         else:
@@ -102,6 +112,7 @@ class FinZeroCurve():
 
 ###############################################################################
 
+    # NEED TO CHANGE FREQUENCY TO USE FINFREQTYPE !!!
     def zeroRate(self, dt, compoundingFreq=-1):
         ''' Calculate the zero rate to maturity date. '''
         t = inputTime(dt, self)

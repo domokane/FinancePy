@@ -48,10 +48,7 @@ def test_FinFlatCurve():
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = 0
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
-    testCases.print(compounding, dfs)
+###############################################################################
 
 
 test_FinFlatCurve()

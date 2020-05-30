@@ -12,7 +12,7 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTre
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.products.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.finutils.FinDate import FinDate
 
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes

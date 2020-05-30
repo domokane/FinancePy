@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ..products.FinOptionTypes import FinOptionTypes
+from ..finutils.FinOptionTypes import FinOptionTypes
 
 import numpy as np
 from numba import njit, float64, int64

@@ -2,7 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# This is an exhaustive list of all option types
+
 from enum import Enum
+
 
 class FinOptionTypes(Enum):
     EUROPEAN_CALL = 1
