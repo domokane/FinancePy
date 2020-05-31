@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 13 21:52:16 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 from numba import jit
@@ -11,6 +9,7 @@ from numba import jit
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

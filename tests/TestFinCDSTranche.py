@@ -5,7 +5,8 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDSTranche import FinLossDistributionBuilder
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSTranche import FinCDSTranche

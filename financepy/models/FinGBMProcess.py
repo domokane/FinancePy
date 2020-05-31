@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 27 15:05:58 2019
-
-@author: Dominic
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 from math import sqrt, exp
 from numba import njit, float64, int64
+from ..finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 
@@ -16,7 +14,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff
@@ -57,7 +56,7 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType,
                   seed,
                   accruedAverage):
 
-    # Start pricing
+    # Start pricing here
     np.random.seed(seed)
 
     multiplier = 1.0
@@ -685,7 +684,7 @@ class FinEquityAsianOption(FinEquityOption):
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate)  / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice

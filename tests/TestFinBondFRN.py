@@ -5,7 +5,8 @@ Created on Mon Aug  5 09:43:40 2019
 @author: Dominic
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
 from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -161,10 +162,10 @@ def buildLiborCurve(valuationDate):
     swaps.append(swap9)
 
     liborCurve = FinLiborCurve("USD_LIBOR",
-                                  settlementDate,
-                                  depos,
-                                  fras,
-                                  swaps)
+                               settlementDate,
+                               depos,
+                               fras,
+                               swaps)
 
     if 1 == 0:
         import numpy as np
@@ -195,73 +196,106 @@ def test_FinBondFRN():
     ##########################################################################
 
     testCases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE")
-    settlementDate = FinDate(2017, 7, 21)
-    maturityDate = FinDate(2021, 11, 10)
+    maturityDate = FinDate(10, 11, 2021)
     quotedMargin = 0.0025
     freqType = FinFrequencyTypes.QUARTERLY
     accrualType = FinDayCountTypes.THIRTY_360
-    face = 100.0
-    redemption = 1.0
+    face = 1000000
 
     bond = FinBondFRN(maturityDate,
                       quotedMargin,
                       freqType,
                       accrualType,
-                      face,
-                      redemption)
+                      face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 96.793
-    nextCoupon = 0.0143456
+    resetLibor = 0.0143456 - quotedMargin
+    currentLibor = 0.0120534
     futureLibors = 0.0130522
 
+    settlementDate = FinDate(21, 7, 2017)
+
     dm = bond.discountMargin(settlementDate,
-                             nextCoupon,
+                             resetLibor,
+                             currentLibor,
                              futureLibors,
                              cleanPrice)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate, nextCoupon,
-                                                 futureLibors, dm)
+    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
+
     testCases.print("Full Price = ", fullPrice)
 
-    lastCouponDt = bond.pcd(settlementDate)
+    lastCouponDt = bond._pcd
     testCases.print("Last Coupon Date = ", str(lastCouponDt))
 
-    accddays = bond.accruedDays(settlementDate)
+    accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond.accruedInterest(settlementDate, nextCoupon)
+    accdAmount = bond._accruedInterest
     testCases.print("Accrued Amount = ", accdAmount)
 
-    duration = bond.dollarDuration(settlementDate,
-                                   nextCoupon,
-                                   futureLibors,
-                                   dm)
+    principal = bond.principal(settlementDate,
+                               resetLibor,
+                               currentLibor,
+                               futureLibors,
+                               dm)
 
-    testCases.print("Dollar Duration = ", duration)
+    testCases.print("Dollar Principal = ", principal)
 
-    modifiedDuration = bond.modifiedDuration(settlementDate,
-                                             nextCoupon,
-                                             futureLibors,
-                                             dm)
+    duration = bond.dollarRateDuration(settlementDate,
+                                       resetLibor,
+                                       currentLibor,
+                                       futureLibors,
+                                       dm)
 
-    testCases.print("Modified Duration = ", modifiedDuration)
+    testCases.print("Dollar Rate Duration = ", duration)
 
-    macauleyDuration = bond.macauleyDuration(settlementDate,
-                                             nextCoupon,
-                                             futureLibors,
-                                             dm)
+    modifiedDuration = bond.modifiedRateDuration(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
+
+    testCases.print("Modified Rate Duration = ", modifiedDuration)
+
+    macauleyDuration = bond.macauleyRateDuration(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
     convexity = bond.convexityFromDiscountMargin(settlementDate,
-                                                 nextCoupon,
+                                                 resetLibor,
+                                                 currentLibor,
                                                  futureLibors,
                                                  dm)
 
     testCases.print("Convexity = ", convexity)
+
+    duration = bond.dollarCreditDuration(settlementDate,
+                                         resetLibor,
+                                         currentLibor,
+                                         futureLibors,
+                                         dm)
+
+    testCases.print("Dollar Credit Duration = ", duration)
+
+    modifiedDuration = bond.modifiedCreditDuration(settlementDate,
+                                                   resetLibor,
+                                                   currentLibor,
+                                                   futureLibors,
+                                                   dm)
+
+    testCases.print("Modified Credit Duration = ", modifiedDuration)
 
 ##########################################################################
 # EXAMPLE
@@ -269,75 +303,116 @@ def test_FinBondFRN():
 ##########################################################################
 
     testCases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE II")
-    settlementDate = FinDate(2014, 3, 28)
-    maturityDate = FinDate(2021, 2, 3)
+    settlementDate = FinDate(28, 3, 2014)
+    maturityDate = FinDate(3, 2, 2021)
     quotedMargin = 0.0020
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.THIRTY_360
-    face = 100.0
-    redemption = 1.0
+    face = 1000000.0
 
     bond = FinBondFRN(maturityDate,
                       quotedMargin,
                       freqType,
                       accrualType,
-                      face,
-                      redemption)
+                      face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 93.08
-    nextCoupon = 0.00537
-    futureLibors = 0.027558
+    resetLibor = 0.00537 - quotedMargin
+    currentLibor = 0.027558
+    futureLibors = 0.03295
 
     dm = bond.discountMargin(settlementDate,
-                             nextCoupon,
+                             resetLibor,
+                             currentLibor,
                              futureLibors,
                              cleanPrice)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate, nextCoupon,
-                                                 futureLibors, dm)
+    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
+
     testCases.print("Full Price = ", fullPrice)
 
-    lastCouponDt = bond.pcd(settlementDate)
+    lastCouponDt = bond._pcd
     testCases.print("Last Coupon Date = ", str(lastCouponDt))
 
-    accddays = bond.accruedDays(settlementDate)
+    accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond.accruedInterest(settlementDate, nextCoupon)
+    accdAmount = bond._accruedInterest
     testCases.print("Accrued Amount = ", accdAmount)
 
-    duration = bond.dollarDuration(settlementDate,
-                                   nextCoupon,
-                                   futureLibors,
-                                   dm)
+    principal = bond.principal(settlementDate,
+                               resetLibor,
+                               currentLibor,
+                               futureLibors,
+                               dm)
 
-    testCases.print("Dollar Duration = ", duration)
+    testCases.print("Dollar Principal = ", principal)
 
-    modifiedDuration = bond.modifiedDuration(settlementDate,
-                                             nextCoupon,
-                                             futureLibors,
-                                             dm)
+    duration = bond.dollarRateDuration(settlementDate,
+                                       resetLibor,
+                                       currentLibor,
+                                       futureLibors,
+                                       dm)
 
-    testCases.print("Modified Duration = ", modifiedDuration)
+    testCases.print("Dollar Rate Duration = ", duration)
 
-    macauleyDuration = bond.macauleyDuration(settlementDate,
-                                             nextCoupon,
-                                             futureLibors,
-                                             dm)
+    modifiedDuration = bond.modifiedRateDuration(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
+
+    testCases.print("Modified Rate Duration = ", modifiedDuration)
+
+    macauleyDuration = bond.macauleyRateDuration(settlementDate,
+                                                 resetLibor,
+                                                 currentLibor,
+                                                 futureLibors,
+                                                 dm)
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
     convexity = bond.convexityFromDiscountMargin(settlementDate,
-                                                 nextCoupon,
+                                                 resetLibor,
+                                                 currentLibor,
                                                  futureLibors,
                                                  dm)
 
     testCases.print("Convexity = ", convexity)
 
+    principal = bond.principal(settlementDate,
+                               resetLibor,
+                               currentLibor,
+                               futureLibors,
+                               dm)
+
+    testCases.print("Principal = ", principal)
+
+    duration = bond.dollarCreditDuration(settlementDate,
+                                         resetLibor,
+                                         currentLibor,
+                                         futureLibors,
+                                         dm)
+
+    testCases.print("Dollar Credit Duration = ", duration)
+
+    modifiedDuration = bond.modifiedCreditDuration(settlementDate,
+                                                   resetLibor,
+                                                   currentLibor,
+                                                   futureLibors,
+                                                   dm)
+
+    testCases.print("Modified Credit Duration = ", modifiedDuration)
 
 ##########################################################################
+
+
 test_FinBondFRN()
 testCases.compareTestCases()

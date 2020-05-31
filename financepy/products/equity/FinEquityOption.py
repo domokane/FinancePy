@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from enum import Enum
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityModelTypes import FinEquityModelBlackScholes
+from ...finutils.FinHelperFunctions import labelToString
+
 ##########################################################################
 
 bump = 1e-4

@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 14:10:12 2019
-
-@author: Dominic
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import sqrt, exp
 from numba import njit, float64, int64
 import numpy as np
+from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # dr = a(b-r) + sigma dW
@@ -22,6 +20,12 @@ class FinModelRatesVasicek():
         self._a = a
         self._b = b
         self._sigma = sigma
+
+    def __repr__(self):
+        s = labelToString("a", self._a)
+        s = labelToString("b", self._b)
+        s = labelToString("sigma", self._sigma)
+        return s
 
 ##########################################################################
 

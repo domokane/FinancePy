@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY

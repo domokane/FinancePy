@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 
@@ -14,6 +12,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import inputTime, inputFrequency
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 
@@ -34,6 +33,17 @@ class FinFlatCurve(FinDiscountCurve):
         self._rate = rate
         self._cmpdFreq = inputFrequency(compoundingFreq)
 
+        # Some methods require these members but don't do this if rates is
+        # an array of doubles else it will fail due to vectorisations of
+        # different lengths
+
+        self._times = None
+        self._values = None
+
+        if isinstance(rate, np.ndarray) is False:
+            self._times = np.linspace(0.0, 10.0, 40)
+            self._values = self.df(self._times)
+
 ##########################################################################
 
     def zeroRate(self, dt, compoundingFreq):
@@ -46,7 +56,7 @@ class FinFlatCurve(FinDiscountCurve):
             return self._rate
 
         if self._cmpdFreq == 0:
-            df = 1.0/(1.0 + t*self._rate)
+            raise FinError("Compounding frequency cannot be zero.")
         elif self._cmpdFreq == -1:
             df = np.exp(-self._rate * t)
         else:
@@ -82,12 +92,14 @@ class FinFlatCurve(FinDiscountCurve):
         ''' Return the discount factor based on the compounding approach. '''
         t = inputTime(dt, self)
 
-        if self._cmpdFreq == 0:
-            df = 1.0/(1.0 + t*self._rate)
-        elif self._cmpdFreq == -1:
+        f = self._cmpdFreq
+
+        if f == 0:
+            raise FinError("Frequency cannot be zero.")
+        elif f == -1:
             df = np.exp(-self._rate * t)
         else:
-            df = ((1.0 + self._rate/self._cmpdFreq)**(-t*self._cmpdFreq))
+            df = np.power((1.0 + self._rate / f), (-t * f))
         return df
 
 ##########################################################################
@@ -108,5 +120,26 @@ class FinFlatCurve(FinDiscountCurve):
         df2 = self.df(date2)
         fwd = (df1 / df2 - 1.0) / yearFrac
         return fwd
+
+##########################################################################
+
+    def __repr__(self):
+
+        if self._times is None:
+            s = "Due to vectorisation issue, this has not been stored."
+            return s
+
+        numPoints = len(self._times)
+        s = labelToString("TIMES", "DISCOUNT FACTORS")
+        for i in range(0, numPoints):
+            s += labelToString(self._times[i], self._values[i])
+
+        return s
+
+##########################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ##########################################################################

@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 18:48:56 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
+# TODO: There are several speed ups for the Monte-Carlo including calculating
+# all default baskets at the same time.
 
 import numpy as np
 
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
 
@@ -23,6 +23,8 @@ from ...market.curves.FinCDSCurve import FinCDSCurve
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
+
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -40,7 +42,7 @@ class FinCDSBasket(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         self._stepInDate = stepInDate
@@ -153,7 +155,7 @@ class FinCDSBasket(object):
                          liborCurve,
                          numTrials,
                          seed):
-        ''' Value the default basket using a Gaussian copula model. This 
+        ''' Value the default basket using a Gaussian copula model. This
         depends on the issuer curves and correlation matrix. '''
 
         numCredits = len(issuerCurves)

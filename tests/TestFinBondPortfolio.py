@@ -5,7 +5,8 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -46,7 +47,7 @@ def test_FinBondPortfolio():
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
-            accd = bond._accrued
+            accd = bond._accruedInterest
 
             testCases.print(accrualType, maturityDt, coupon*100.0,
                             cleanPrice, accd, ytm*100.0)

@@ -1,21 +1,31 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  3 15:55:21 2017
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 
 import glob
 import os
 import sys
 import subprocess
+import shutil
+import fileinput
 
-VERSION = 0.15
+with open("../version.py", "r") as fh:
+    version_number = fh.read()
+    VERSION = version_number[-6:]
+    VERSION = VERSION.replace('\n', '')
 
 fileName = "FinancePyManualV_" + str(VERSION)
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
+newHeadFile = "./head_" + str(VERSION) + ".tex"
+
+shutil.copyfile(headFile,newHeadFile)
+
+with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
+    for line in file:
+        print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
 
 verbose = False
 
@@ -143,7 +153,7 @@ def buildHead():
     ''' Start latex file with a header that sets all of the document
     properties. '''
 
-    f = open(headFile, 'r')
+    f = open(newHeadFile, 'r')
     lines = f.readlines()
     f.close()
 
@@ -633,7 +643,14 @@ if 1 == 1:
 
 buildTail()
 
+print("Latex filename:", userGuideFileName)
+
+
 if 1 == 1:
     # Do it twice for the TOC
     os.system("pdflatex " + userGuideFileName)
-    open_file(fileName + ".pdf")
+    pdfFileName1 = fileName + ".pdf"
+    pdfFileName2 = '../../financepy-examples-git/' + pdfFileName1
+    shutil.copyfile(pdfFileName1, pdfFileName2)
+    print(pdfFileName2)
+    open_file(pdfFileName1)

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
-#
+
 from math import exp, log, sqrt
 import numpy as np
 from enum import Enum
@@ -15,6 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.FinProcessSimulator import FinProcessSimulator
 
+from ...finutils.FinHelperFunctions import labelToString
 
 class FinEquityBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
@@ -34,13 +33,14 @@ class FinEquityBarrierOption(FinEquityOption):
     ''' Class to hold details of an Equity Barrier Option. It also
     calculates the option price using Black Scholes for 8 different
     variants on the Barrier structure in enum FinEquityBarrierTypes. '''
+
     def __init__(self,
                  expiryDate,
                  strikePrice,
                  optionType,
                  barrierLevel,
                  numObservationsPerYear,
-                 notional = 1.0):
+                 notional=1.0):
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)
@@ -279,7 +279,7 @@ class FinEquityBarrierOption(FinEquityOption):
 
         if simplePut or simpleCall:
             Sall = process.getProcess(
-                processType, t, modelParams, 2, numPaths, seed)
+                processType, t, modelParams, 1, numPaths, seed)
 
         if simpleCall:
             c = (np.maximum(Sall[:, -1] - K, 0)).mean()

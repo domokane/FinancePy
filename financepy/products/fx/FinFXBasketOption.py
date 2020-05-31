@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from math import exp, log, sqrt
 import numpy as np
+from ...finutils.FinHelperFunctions import labelToString
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -15,7 +13,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 ##########################################################################
 
 from ...products.fx.FinFXOption import FinFXOption
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 
 class FinFXBasketOption(FinFXOption):

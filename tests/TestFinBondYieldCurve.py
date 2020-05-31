@@ -9,7 +9,7 @@ import datetime as dt
 
 import sys
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes

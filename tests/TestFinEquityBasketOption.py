@@ -4,9 +4,11 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
-from financepy.products.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate
 import numpy as np

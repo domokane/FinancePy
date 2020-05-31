@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 16 17:56:21 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 import numpy as np
 from math import sqrt
@@ -16,7 +14,7 @@ from ...models.FinModelGaussianCopulaLHP import trSurvProbLHP
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
 
@@ -26,6 +24,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinError import FinError
+
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -54,7 +54,7 @@ class FinCDSTranche(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
 
         if k1 >= k2:

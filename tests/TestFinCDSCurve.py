@@ -4,7 +4,8 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinCDSCurve import FinCDSCurve
@@ -15,6 +16,7 @@ from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
 
+import numpy as np
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -68,6 +70,27 @@ def test_FinCDSCurve():
         cds = FinCDS(curveDate, maturityDate, 0.005 + 0.001 * (i - 1))
         v = cds.value(curveDate, issuerCurve)
         testCases.print(i, v)
+
+    x = [0.0, 1.2, 1.6, 1.7, 10.0]
+    qs = issuerCurve.survProb(x)
+    print("===>", qs)
+
+    x = [0.3, 1.2, 1.6, 1.7, 10.0]
+    xx = np.array(x)
+    qs = issuerCurve.survProb(xx)
+    print("===>", qs)
+
+    x = [0.3, 1.2, 1.6, 1.7, 10.0]
+    dfs = issuerCurve.df(x)
+    print("===>", dfs)
+
+    x = [0.3, 1.2, 1.6, 1.7, 10.0]
+    xx = np.array(x)
+    dfs = issuerCurve.df(xx)
+    print("===>", dfs)
+
+
+###############################################################################
 
 
 test_FinCDSCurve()

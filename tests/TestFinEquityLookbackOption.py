@@ -5,7 +5,9 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOption
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOptionTypes
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption

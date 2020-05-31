@@ -1,16 +1,13 @@
-# -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import testMonotonicity
+from ...finutils.FinHelperFunctions import labelToString
+
 ##########################################################################
 # TODO: This is unfinished
 

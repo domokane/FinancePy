@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jan 18 20:00:02 2019
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ..finutils.FinMath import N
 from math import sqrt, log, exp
+from ...finutils.FinHelperFunctions import labelToString
 
 
 def mertonCreditModelValues(assetValue,

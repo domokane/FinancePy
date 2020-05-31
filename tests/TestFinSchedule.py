@@ -5,14 +5,15 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
+from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinSchedule import FinSchedule
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -26,7 +27,7 @@ def test_FinSchedule():
     d2 = FinDate(2018, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -45,7 +46,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -64,7 +65,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.MONTHLY
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -83,7 +84,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
 
     schedule = FinSchedule(
@@ -102,7 +103,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -121,7 +122,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -140,7 +141,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
 
     schedule = FinSchedule(
@@ -161,7 +162,7 @@ def test_FinSchedule():
     d2 = FinDate(2028, 6, 20)
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinDayAdjustTypes.FOLLOWING
+    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
     schedule = FinSchedule(
@@ -171,8 +172,11 @@ def test_FinSchedule():
         calendarType,
         busDayAdjustType,
         dateGenRuleType)
+
     for dt in schedule._adjustedDates:
         testCases.print(str(dt))
+
+###############################################################################
 
 
 test_FinSchedule()

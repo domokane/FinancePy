@@ -9,3 +9,11 @@ This folder contains a suite of bond-related functionality across a set of files
 * FinConvertibleBond enables the pricing and risk-management of convertible bonds. The model is a binomial tree implementation of Black-Scholes which allows for discrete dividends, embedded puts and calls, and a delayed start of the conversion option.
 * FinFloatingNote enables the pricing and risk-management of a bond with floating rate coupons. Discount margin calculations are provided.
 * FinMortgage generates the periodic cashflows for an interest-only and a repayment mortgage. 
+
+
+## Conventions
+
+* All interest rates are expressed as a fraction of 1. So 3% is 0.03.
+* All notionals of bond positions are given in terms of a notional amount.
+* All bond prices are based on a notional of 100.0.
+* The face of a derivatives position is the size of the underlying position.
