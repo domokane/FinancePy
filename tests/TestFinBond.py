@@ -12,11 +12,15 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 from financepy.finutils.FinHelperFunctions import dump
+
+
+# from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
+
+from financepy.products.bonds import *
 
 import sys
 sys.path.append("..\\..")
@@ -27,13 +31,13 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(valuationDate):
+def buildLiborCurve(valueDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spotDays = 2
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWorkDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
@@ -194,6 +198,8 @@ def buildLiborCurve(valuationDate):
 
 def test_FinBond():
 
+    x = FinBond(23,0.08,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
+
     import pandas as pd
     bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
@@ -214,8 +220,7 @@ def test_FinBond():
             maturityDt = fromDatetime(matDatetime)
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
-            bond = FinBond(maturityDt, coupon, frequencyType, accrualType,
-                           100)
+            bond = FinBond(maturityDt, coupon, frequencyType, accrualType, 100)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
             accd = bond._accruedInterest

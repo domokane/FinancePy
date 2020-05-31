@@ -24,7 +24,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkDate
 
 from scipy import optimize
 
@@ -82,6 +82,8 @@ class FinBond(object):
                  face=100.0):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
+
+        checkDate(maturityDate)
 
         if frequencyType not in FinFrequencyTypes:
             raise FinError("Invalid Frequency:" + str(frequencyType))

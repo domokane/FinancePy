@@ -6,9 +6,16 @@ import numpy as np
 from numba import njit
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
+from .FinError import FinError
 
 ##########################################################################
 
+def checkDate(d):
+
+    if isinstance(d, FinDate) is False:
+        raise FinError("Should be a date dummy!")
+
+##########################################################################
 
 def dump(obj):
     ''' Get a list of all of the attributes of a class (not built in ones) '''

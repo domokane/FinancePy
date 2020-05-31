@@ -40,22 +40,22 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_CDSFastApproximation():
 
-    valuationDate = FinDate(2018, 6, 20)
+    valueDate = FinDate(2018, 6, 20)
     # I build a discount curve that requires no bootstrap
     times = np.linspace(0, 10.0, 10)
     r = 0.05
 
     discountFactors = np.power((1.0 + r), -times)
 
-    liborCurve = FinDiscountCurve(valuationDate,
+    liborCurve = FinDiscountCurve(valueDate,
                                   times,
                                   discountFactors,
                                   FinInterpMethods.FLAT_FORWARDS)
 
     ##########################################################################
 
-    maturityDate = valuationDate.nextCDSDate(120)
-    t = (maturityDate - valuationDate) / 365.242
+    maturityDate = valueDate.nextCDSDate(120)
+    t = (maturityDate - valueDate) / 365.242
     z = liborCurve.df(t)
     r = -log(z) / t
 
@@ -69,20 +69,20 @@ def test_CDSFastApproximation():
 
         cdsContracts = []
 
-        cdsMkt = FinCDS(valuationDate, maturityDate, mktCoupon, ONE_MILLION)
+        cdsMkt = FinCDS(valueDate, maturityDate, mktCoupon, ONE_MILLION)
 
         cdsContracts.append(cdsMkt)
 
-        issuerCurve = FinCDSCurve(valuationDate,
+        issuerCurve = FinCDSCurve(valueDate,
                                   cdsContracts,
                                   liborCurve,
                                   recoveryRate)
 
-        cdsContract = FinCDS(valuationDate, maturityDate, contractCoupon)
+        cdsContract = FinCDS(valueDate, maturityDate, contractCoupon)
         v_exact = cdsContract.value(
-            valuationDate, issuerCurve, recoveryRate)['full_pv']
+            valueDate, issuerCurve, recoveryRate)['full_pv']
         v_approx = cdsContract.valueFastApprox(
-            valuationDate, r, mktCoupon, recoveryRate)[0]
+            valueDate, r, mktCoupon, recoveryRate)[0]
         pctdiff = (v_exact - v_approx) / ONE_MILLION * 100.0
         testCases.print(mktCoupon * 10000, v_exact, v_approx, pctdiff)
 

@@ -7,7 +7,6 @@ Created on Fri Nov 30 10:52:29 2018
 # TODO Set up test cases correctly
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -16,6 +15,9 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.market.curves.FinLiborCurve import FinLiborCurve
+
+# from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
+from financepy.products.bonds import *
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
