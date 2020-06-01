@@ -7,7 +7,8 @@ Created on Sun Nov 10 17:04:57 2019
 
 import numpy as np
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.risk.FinPortfolioRiskMetrics import expectedLoss
 from financepy.risk.FinPortfolioRiskMetrics import expectedShortfall
 from financepy.risk.FinPortfolioRiskMetrics import valueAtRisk

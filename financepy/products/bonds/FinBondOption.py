@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...models.FinModelRatesHullWhite import FinModelRatesHullWhite
-from ...models.FinModelRatesBlackKarasinski import FinModelRatesBlackKarasinski
+from ...models.FinModelRatesHW import FinModelRatesHW
+from ...models.FinModelRatesBK import FinModelRatesBK
+from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 import numpy as np
@@ -66,10 +65,11 @@ class FinBondOption():
         # We need all of the flows in case the option is American
         self._bond.calculateFlowDates(valueDate)
         cpn = self._bond._coupon/self._bond._frequency
-        cpnTimes = []
-        cpnAmounts = []
+        cpnTimes = [0.0]
+        cpnAmounts = [0.0]
 
-        for flowDate in self._bond._flowDates:
+        # The first flow is always the previous coupon date
+        for flowDate in self._bond._flowDates[1:]:
             cpnTime = (flowDate - valueDate) / gDaysInYear
             cpnTimes.append(cpnTime)
             cpnAmounts.append(cpn)
@@ -77,85 +77,194 @@ class FinBondOption():
         cpnTimes = np.array(cpnTimes)
         cpnAmounts = np.array(cpnAmounts)
 
-        if type(model) == FinModelRatesHullWhite:
+        if np.any(cpnTimes < 0.0):
+            raise FinError("No coupon times can be before the value date.")
 
-            if self._optionType == FinBondOptionTypes.EUROPEAN_CALL:
+        if isinstance(model, FinModelRatesHW):
 
-                v = model.bondOption_Jamshidian(texp, self._strikePrice,
-                                                cpnTimes, cpnAmounts,
-                                                dfTimes, dfValues)
+            if self._optionType == FinBondOptionTypes.EUROPEAN_CALL \
+                    and model._useJamshidian is True:
 
-                return v[0]
+                v = model.europeanBondOption_Jamshidian(texp,
+                                                        self._strikePrice,
+                                                        self._face,
+                                                        cpnTimes,
+                                                        cpnAmounts,
+                                                        dfTimes, dfValues)
 
-            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT:
+                return v['call']
 
-                v = model.bondOption_Jamshidian(texp, self._strikePrice,
-                                                cpnTimes, cpnAmounts,
-                                                dfTimes, dfValues)
+            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT  \
+                    and model._useJamshidian is True:
 
-                return v[1]
+                v = model.europeanBondOption_Jamshidian(texp,
+                                                        self._strikePrice,
+                                                        self._face,
+                                                        cpnTimes,
+                                                        cpnAmounts,
+                                                        dfTimes, dfValues)
+
+                return v['put']
+
+            elif self._optionType == FinBondOptionTypes.EUROPEAN_CALL  \
+                    and model._useJamshidian is False:
+
+                model.buildTree(texp, dfTimes, dfValues)
+                americanExercise = False
+
+                v1 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
+
+                model._numTimeSteps += 1
+                model.buildTree(texp, dfTimes, dfValues)
+                v2 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
+
+                v = (v1['call'] + v2['call'])/2.0
+                return v
+
+            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT  \
+                    and model._useJamshidian is False:
+
+                americanExercise = False
+                model.buildTree(texp, dfTimes, dfValues)
+                v1 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
+
+                model._numTimeSteps += 1
+                model.buildTree(texp, dfTimes, dfValues)
+                v2 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
+
+                model._numTimeSteps -= 1
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_CALL:
 
-                numTimeSteps = 100
-                model.buildTree(texp, numTimeSteps, dfTimes, dfValues)
                 americanExercise = True
+                model.buildTree(texp, dfTimes, dfValues)
+                v1 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
 
-                v = model.americanBondOption_Tree(texp, self._strikePrice,
-                                                  self._face,
-                                                  cpnTimes, cpnAmounts,
-                                                  americanExercise)
+                model._numTimeSteps += 1
+                model.buildTree(texp, dfTimes, dfValues)
+                v2 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
 
-                return v[0]
+                model._numTimeSteps -= 1
+                v = (v1['call'] + v2['call'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_PUT:
 
-                numTimeSteps = 100
-                model.buildTree(texp, numTimeSteps, dfTimes, dfValues)
                 americanExercise = True
+                model.buildTree(texp, dfTimes, dfValues)
+                v1 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
 
-                v = model.americanBondOption_Tree(texp, self._strikePrice,
-                                                  self._face,
-                                                  cpnTimes, cpnAmounts,
-                                                  americanExercise)
+                model._numTimeSteps += 1
+                model.buildTree(texp, dfTimes, dfValues)
+                v2 = model.americanBondOption_Tree(texp, self._strikePrice,
+                                                   self._face,
+                                                   cpnTimes, cpnAmounts,
+                                                   americanExercise)
 
-                return v[1]
+                model._numTimeSteps -= 1
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
-        elif type(model) == FinModelRatesBlackKarasinski:
+        elif type(model) == FinModelRatesBK:
 
             maturityDate = self._bond._maturityDate
-            numTimeSteps = 100
             tmat = (maturityDate - valueDate) / gDaysInYear
-            model.buildTree(tmat, numTimeSteps, dfTimes, dfValues)
 
             if self._optionType == FinBondOptionTypes.EUROPEAN_CALL:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, False)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, False)
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v[0]
+                v = (v1['call'] + v2['call'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, False)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, False)
 
-                return v[1]
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_CALL:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, True)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v[0]
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+
+                v = (v1['call'] + v2['call'])/2.0
+                return v
 
             elif self._optionType == FinBondOptionTypes.AMERICAN_PUT:
 
-                v = model.bondOption(texp, self._strikePrice, self._face,
-                                     cpnTimes, cpnAmounts, True)
+                model.buildTree(tmat, dfTimes, dfValues)
+                v1 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
+                model._numTimeSteps += 1
+                model.buildTree(tmat, dfTimes, dfValues)
+                v2 = model.bondOption(texp, self._strikePrice, self._face,
+                                      cpnTimes, cpnAmounts, True)
 
-                return v[1]
+                v = (v1['put'] + v2['put'])/2.0
+                return v
 
-        return 999.0
+        else:
+            raise FinError("Unknown model and option combination")
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("FACE", self._face, "")
+        s += "Underlying Bond\n"
+        s += str(self._bond)
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

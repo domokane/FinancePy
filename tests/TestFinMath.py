@@ -5,7 +5,9 @@ Created on Sun Feb 07 14:31:53 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.finutils.FinMath import normcdf, norminvcdf
 import numpy as np
 import time

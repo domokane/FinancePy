@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Sep 28 17:32:09 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
+
 from os.path import join, exists, split
 import time
 
 from enum import Enum
-
+from financepy.finutils.FinError import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
@@ -172,7 +171,7 @@ class FinTestCases():
         elif len(self._headerFields) != len(args):
             n1 = len(self._headerFields)
             n2 = len(args)
-            print("ERROR: # headers must equal # of arguments", n1, n2)
+            raise FinError("ERROR: # headers must equal # arguments", n1, n2)
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename
@@ -183,7 +182,10 @@ class FinTestCases():
         f.write("RESULTS,")
 
         for arg in args:
-            f.write(str(arg))
+            if isinstance(arg, float):
+                f.write("%10.8f" % (arg))
+            else:
+                f.write(str(arg))
             f.write(",")
 
         f.write("\n")

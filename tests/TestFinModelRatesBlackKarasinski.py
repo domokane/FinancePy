@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinHelperFunctions import printTree
-from financepy.models.FinModelRatesBlackKarasinski import FinModelRatesBlackKarasinski
+from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
+from financepy.finutils.FinHelperFunctions import printTree
 
 import matplotlib.pyplot as plt
 import time
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ###############################################################################
@@ -30,14 +37,14 @@ def test_BlackKarasinskiExampleOne():
     endDate = FinDate(1, 12, 2022)
     sigma = 0.25
     a = 0.22
-    numTimeSteps = 6
+    numTimeSteps = 40
     tmat = (endDate - startDate)/gDaysInYear
-    model = FinModelRatesBlackKarasinski(a, sigma)
-    model.buildTree(tmat, numTimeSteps, times, dfs)
-    printTree(model._Q)
-    print("")
-    printTree(model._rt)
-    print("")
+    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model.buildTree(tmat, times, dfs)
+#    printTree(model._Q)
+#    print("")
+#    printTree(model._rt)
+#    print("")
 
 ###############################################################################
 
@@ -76,7 +83,7 @@ def test_BlackKarasinskiExampleTwo():
     dfs = np.exp(-0.05*times)
     curve = FinDiscountCurve(settlementDate, times, dfs)
 
-    price = bond.fullPriceFromDiscountCurve(settlementDate, curve)
+    price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
     print("Fixed Income Price:", price)
 
     sigma = 0.20
@@ -89,8 +96,8 @@ def test_BlackKarasinskiExampleTwo():
     treeVector = []
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesBlackKarasinski(a, sigma)
-        model.buildTree(tmat, int(numTimeSteps), times, dfs)
+        model = FinModelRatesBK(sigma, a, numTimeSteps)
+        model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strikePrice,
                              face, couponTimes, couponFlows, isAmerican)
         end = time.time()
@@ -104,14 +111,14 @@ def test_BlackKarasinskiExampleTwo():
 
 if 1==0:
     print("RT")
-    printTree(model._rt, 5)
+#    printTree(model._rt, 5)
     print("BOND")
-    printTree(model._bondValues, 5)
+#    printTree(model._bondValues, 5)
     print("OPTION")
-    printTree(model._optionValues, 5)
+#    printTree(model._optionValues, 5)
 
 ###############################################################################
 
 # This has broken and needs to be repaired!!!!
-#test_BlackKarasinskiExampleOne()
-test_BlackKarasinskiExampleTwo()
+test_BlackKarasinskiExampleOne()
+# test_BlackKarasinskiExampleTwo()

@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 # TODO - MUST ADD ACCRUED INTEREST TO MODEL!!!!
 
@@ -12,10 +14,11 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
@@ -89,7 +92,7 @@ def valueConvertible(tmat,
 
     numTimes = int(numStepsPerYear * tmat) + 1  # add one for today time 0
     numTimes = numStepsPerYear  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
-    
+
     if numTimes < 5:
         raise ValueError("Numsteps must be greater than 5.")
 
@@ -330,7 +333,7 @@ class FinBondConvertible(object):
 
         self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
-        busDayRuleType = FinDayAdjustTypes.NONE
+        busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
         self._flowDates = FinSchedule(settlementDate,
@@ -354,9 +357,8 @@ class FinBondConvertible(object):
               dividendYields,
               discountCurve,
               creditSpread,
-              recoveryRate = 0.40,
-              numStepsPerYear = 100):
-
+              recoveryRate=0.40,
+              numStepsPerYear=100):
         '''
         A binomial tree valuation model for a convertible bond that captures
         the embedded equity option due to the existence of a conversion option
@@ -534,7 +536,7 @@ class FinBondConvertible(object):
         if len(self._flowDates) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        return settlementDate - self.pcd(settlementDate)
+        return settlementDate - self._pcd
 
 ##########################################################################
 
@@ -570,19 +572,39 @@ class FinBondConvertible(object):
         y = self._coupon * self._face / cleanPrice
         return y
 
-##########################################################################
+###############################################################################
 
-    def print(self):
+    def __repr__(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        print("Maturity Date:", self._maturityDate)
-        print("Coupon:", self._coupon)
-        print("Frequency:", self._frequencyType)
-        print("Accrual:", self._accrualType)
+        s = labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE AMOUNT", self._face)
+        s += labelToString("CONVERSION RATIO", self._conversionRatio)
+        s += labelToString("START CONVERT DATE", self._startConvertDate)
+        s += labelToString("CALL", "DATES")
 
-##########################################################################
+        for i in range(0, len(self._callDates)):
+            s += labelToString(self._callDates[i],
+                               self._callPrices[i])
 
+        s += labelToString("PUT", "DATES")
 
+        for i in range(0, len(self._putDates)):
+            s += labelToString(self._putDates[i],
+                               self._putPrices[i])
+
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################

@@ -4,7 +4,9 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -100,7 +102,7 @@ def buildIssuerCurve(tradeDate, liborCurve):
     cdsMarketContracts = []
 
     cdsCoupon = 0.0048375
-    maturityDate = FinDate(2010, 6, 29)
+    maturityDate = FinDate(2010, 6, 20)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
     cdsMarketContracts.append(cds)
 

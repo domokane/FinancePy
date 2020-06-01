@@ -4,7 +4,7 @@
 import time
 import numpy as np
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.FinBondConvertible import FinBondConvertible
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -51,6 +51,7 @@ def test_FinBondConvertible():
                               putPrices,
                               accrualBasis,
                               face)
+#    print(bond)
 
     dividendDates = [FinDate(2007, 3, 20),
                      FinDate(2008, 3, 15),
@@ -83,7 +84,7 @@ def test_FinBondConvertible():
     testCases.header("LABEL")
     testCases.print("NO CALLS OR PUTS")
 
-    testCases.header("PERIOD", "NUMSTEPS", "PRICE", "FIXEDINCOME", "DELTA")
+    testCases.header("PERIOD", "NUMSTEPS", "PRICE")
 
     for numStepsPerYear in [5, 10, 20, 40, 80]:
         start = time.time()
@@ -100,13 +101,12 @@ def test_FinBondConvertible():
         end = time.time()
         period = end - start
         testCases.print(period, numStepsPerYear, res)
-        print(res)
 
     dividendYields = [0.02] * 16
     testCases.header("LABEL")
     testCases.print("DIVIDENDS")
 
-    testCases.header("PERIOD","NUMSTEPS","PRICE","FIXEDINCOME","DELTA")
+    testCases.header("PERIOD", "NUMSTEPS", "PRICE")
     for numStepsPerYear in [5, 10, 20, 40, 80]:
         start = time.time()
         res = bond.value(settlementDate,
@@ -121,7 +121,8 @@ def test_FinBondConvertible():
         end = time.time()
         period = end - start
         testCases.print(period, numStepsPerYear, res)
-        print(res)
+
+###############################################################################
 
 test_FinBondConvertible()
 testCases.compareTestCases()

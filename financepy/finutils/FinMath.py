@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:31:53 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from math import exp, sqrt, fabs, log
 from numba import njit, boolean, int64, float64
 import numpy as np
+from .FinError import FinError
 
 PI = 3.14159265358979323846
 INVROOT2PI = 0.3989422804014327
@@ -25,12 +24,27 @@ def accruedInterpolator(tset, couponTimes, couponAmounts):
     convention. This does not calculate according to other conventions. '''
 
     numCoupons = len(couponTimes)
+    foundIndex = -1
+
     for i in range(1, numCoupons):
-        if couponTimes[i-1] >= tset:
-            denom = couponTimes[i]-couponTimes[i-1]
-            accdFrac = (tset-couponTimes[i-1])/denom
-            accdCpn = accdFrac * couponAmounts[i]
-            return accdCpn
+        if tset >= couponTimes[i-1] and tset <= couponTimes[i]:
+            foundIndex = i
+            break
+
+    if foundIndex == -1:
+        return 0.0
+
+    t0 = couponTimes[foundIndex - 1]
+    t1 = couponTimes[foundIndex]
+    denom = t1 - t0
+
+    if abs(denom) < 1e-6:
+        raise FinError("Coupon times are the same")
+
+    accdFrac = (tset-t0)/denom
+    accdCpn = accdFrac * couponAmounts[i]
+
+    return accdCpn
 
 ##########################################################################
 

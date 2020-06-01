@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
-
-@author: Dominic O'Kane
-"""
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 
@@ -11,6 +8,7 @@ import numpy as np
 
 from ...market.curves.FinCurve import inputTime
 from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 
@@ -37,7 +35,7 @@ class FinPolynomialCurve():
     def df(self, dt):
         ''' Discount factor from polynomial zero curve.'''
         t = inputTime(dt, self)
-        r = self.zero(t)
+        r = self.zeroRate(t)
         return np.exp(-r * t)
 
     def fwd(self, dt):
@@ -68,8 +66,20 @@ class FinPolynomialCurve():
         fwd = (df1 / df2 - 1.0) / yearFrac
         return fwd
 
-    def print(self):
-        for i in range(0, len(self._coefficients)):
-            print("Power %d Coefficient %10.7f" % (i, self._coefficients[i]))
+##############################################################################
 
-##########################################################################
+    def __repr__(self):
+        ''' Display internal parameters of curve. '''
+        s = labelToString("POWER", "COEFFICIENT")
+        for i in range(0, len(self._coefficients)):
+            s += labelToString(str(i), self._coefficients[i])
+
+        return s
+
+##############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+##############################################################################

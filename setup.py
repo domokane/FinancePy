@@ -1,11 +1,19 @@
+# from version import __version__
 import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("version.py", "r") as fh:
+    version_number = fh.read()
+    version_number_str = str(version_number[-6:])
+    version_number_str = version_number_str.replace('\n', '')
+
+print(">>>", version_number_str, "<<<")
+
 setuptools.setup(
     name="financepy",
-    version="0.160",
+    version=version_number_str,
     author="Dominic O'Kane",
     author_email="okane.dominic@gmail.com",
     description="A Finance Library",

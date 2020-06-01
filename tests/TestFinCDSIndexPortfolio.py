@@ -4,7 +4,9 @@ Created on Sun Jan 13 21:52:16 2019
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
@@ -188,8 +190,8 @@ def test_CDSIndexPortfolio():
     testCases.print("AVERAGE SPD 10Y", averageSpd10Y)
 
     ##########################################################################
-    # Now determine the intrinsic spread of the index to the same maturity dates
-    # As the single name CDS contracts
+    # Now determine the intrinsic spread of the index to the same maturity
+    # dates. As the single name CDS contracts
     ##########################################################################
 
     cdsIndex = FinCDSIndexPortfolio()

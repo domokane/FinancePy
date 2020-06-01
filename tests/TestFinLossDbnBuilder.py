@@ -5,7 +5,8 @@ Created on Wed Jan 16 17:54:58 2019
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.models.FinModelGaussianCopula1F import lossDbnRecursionGCD
 from financepy.models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
 import matplotlib.pyplot as plt

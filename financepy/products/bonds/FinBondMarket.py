@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 12 11:16:14 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 #TODO  Add Japan 
 
 
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinError import FinError
+from ...finutils.FinHelperFunctions import labelToString
 
 from enum import Enum
 

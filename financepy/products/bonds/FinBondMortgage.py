@@ -1,25 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 10:52:29 2018
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinDayAdjustTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
-
 from enum import Enum
 
+
 class FinBondMortgageType(Enum):
-    REPAYMENT=1
+    REPAYMENT = 1
     INTEREST_ONLY = 2
 
 ###############################################################################
@@ -30,6 +29,7 @@ class FinBondMortgage(object):
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.
     '''
+###############################################################################
 
     def __init__(self,
                  startDate,
@@ -37,7 +37,7 @@ class FinBondMortgage(object):
                  principal,
                  frequencyType=FinFrequencyTypes.MONTHLY,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType=FinDayCountTypes.ACT_360):
         ''' Create the mortgage using start and end dates and principal. '''
@@ -48,7 +48,7 @@ class FinBondMortgage(object):
         if calendarType not in FinCalendarTypes:
             raise ValueError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise ValueError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))
@@ -125,9 +125,9 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def print(self):
+    def printLeg(self):
         print("START DATE:", self._startDate)
-        print("END DATE:", self._endDate)
+        print("MATURITY DATE:", self._endDate)
         print("MORTGAGE TYPE:", self._mortgageType)
         print("FREQUENCY:", self._frequencyType)
         print("CALENDAR:", self._calendarType)
@@ -137,15 +137,34 @@ class FinBondMortgage(object):
         numFlows = len(self._schedule._adjustedDates)
 
         print("%15s %12s %12s %12s %12s" %
-              ("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL"))
+              ("PAYMENT DATE", "INTEREST", "PRINCIPAL",
+               "OUTSTANDING", "TOTAL"))
+
         print("")
         for i in range(0, numFlows):
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
                   (self._schedule._adjustedDates[i],
-                  self._interestFlows[i],
-                  self._principalFlows[i],
-                  self._principalRemaining[i],
-                  self._totalFlows[i]))
+                   self._interestFlows[i],
+                   self._principalFlows[i],
+                   self._principalRemaining[i],
+                   self._totalFlows[i]))
 
 ###############################################################################
 
+    def __repr__(self):
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("MATURITY DATE", self._endDate)
+        s += labelToString("MORTGAGE TYPE", self._mortgageType)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+###############################################################################

@@ -4,7 +4,9 @@ Created on Fri Nov 30 10:10:19 2018
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCount, FinDayCountTypes
 import sys

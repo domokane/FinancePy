@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 14:11:51 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic
-"""
 
 from math import exp, log, sqrt
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -16,6 +14,7 @@ from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
 from ...market.curves.FinCDSCurve import FinCDSCurve
 from .FinCDS import FinCDS
+from ...finutils.FinHelperFunctions import labelToString
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -37,7 +36,7 @@ class FinCDSIndexOption(object):
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract.'''
@@ -64,7 +63,7 @@ class FinCDSIndexOption(object):
         if calendarType not in FinCalendarTypes:
             raise FinError("Unknown Calendar type " + str(calendarType))
 
-        if busDayAdjustType not in FinDayAdjustTypes:
+        if busDayAdjustType not in FinBusDayAdjustTypes:
             raise FinError(
                 "Unknown Business Day Adjust type " +
                 str(busDayAdjustType))

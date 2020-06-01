@@ -4,7 +4,10 @@ Created on Fri Feb 12 16:51:05 2016
 
 @author: Dominic O'Kane
 """
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes
@@ -45,10 +48,12 @@ def test_FinFXBarrierOption():
     start = time.time()
     numObservationsPerYear = 100
 
-    testCases.header("Type", "K", "B", "S", "Value", "ValueMC", "Diff", "TIME")
-
     for optionType in FinFXBarrierTypes:
-        for spotFXRate in range(80, 130, 10):
+
+        testCases.header("Type", "K", "B", "S", "Value",
+                         "ValueMC", "Diff", "T")
+
+        for spotFXRate in range(60, 140, 10):
             B = 110.0
             K = 100.0
 
@@ -73,7 +78,7 @@ def test_FinFXBarrierOption():
             testCases.print(optionType, K, B, spotFXRate, value, valueMC,
                             diff, timeElapsed)
 
-        for spotFXRate in range(80, 130, 10):
+        for spotFXRate in range(60, 140, 10):
             B = 100.0
             K = 110.0
 

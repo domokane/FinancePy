@@ -1,51 +1,46 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 07 14:23:13 2016
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic O'Kane
-"""
-import numpy as np
-import sys
-#sys.path.append("..//..")
-#
-#from financepy import finutils
-#from financepy.products import libor
-#
-#def test_Imports():
-#
-#    print("Testing Imports")
-#    startDate = FinDate(2018, 11, 30)
-#    endDate = FinDate(2028, 6, 20)
-#
-#    endDate = startDate.addMonths(60)
-#    oisRate = 0.04
-#    isPayer = True
-#    fixedFreq = FinFrequencyTypes.ANNUAL
-#    fixedDayCount = FinDayCountTypes.ACT_ACT_ISDA
-#    floatFreq = FinFrequencyTypes.ANNUAL
-#    floatDayCount = FinDayCountTypes.ACT_ACT_ISDA
-#    notional = finutils.ONE_MILLION
-#
-#    ois = FinOIS(startDate,
-#                 endDate,
-#                 oisRate,
-#                 fixedFreq,
-#                 fixedDayCount,
-#                 floatFreq,
-#                 floatDayCount,
-#                 isPayer,
-#                 notional)
-#
-#    valueDate = FinDate(2018, 11, 30)
-#    marketRate = 0.05
-#    indexCurve = FinFlatCurve(
-#        valueDate,
-#        marketRate,
-#        FinCompoundingMethods.ANNUAL)
-#    ois.print(valueDate, indexCurve)
-#
-#    v = ois.value(startDate, indexCurve)
-#    print("SWAP_VALUE", v)
-#
-#
-#test_Imports()
+
+# from financepy.finutils.FinDate import FinDate # Works
+# from ..financepy import *  # fails
+
+
+from financepy.finutils import *
+from financepy.products.libor import *
+from financepy.products.bonds import *
+from financepy.market.curves import *
+# from financepy.products.bonds.FinBond import *
+
+
+def test_Imports():
+
+    print(dir())
+
+    if 1==1:
+        settlementDate = FinDate(1, 1, 2007)
+        curve = FinFlatCurve(settlementDate, 0.05, 1)
+    
+        dcType = FinDayCountTypes.ACT_360
+        fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+        swap1 = FinLiborSwap(settlementDate, FinDate(1,1,2008), 0.05, fixedFreq, dcType)
+        swap2 = FinLiborSwap(settlementDate, FinDate(1,1,2009), 0.05, fixedFreq, dcType)
+        swap3 = FinLiborSwap(settlementDate, FinDate(1,1,2010), 0.05, fixedFreq, dcType)
+        swaps = [swap1, swap2, swap3]
+        discountCurve = FinLiborCurve("USD_LIBOR", settlementDate, [], [], swaps)
+    
+        print(discountCurve)
+
+    maturityDate = FinDate(1, 1, 2010)
+    coupon = 0.05
+    frequencyType = FinFrequencyTypes.ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+
+    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+
+    print(bond)
+
+###############################################################################
+
+test_Imports()

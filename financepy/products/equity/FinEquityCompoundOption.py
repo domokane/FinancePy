@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from math import exp, log, sqrt
 
@@ -14,11 +12,12 @@ from numba import njit
 from ...finutils.FinMath import N, phi2
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinFlatCurve import FinFlatCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 16 17:54:03 2019
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
-@author: Dominic O'Kane
-"""
 
 from math import pow
 
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinDayAdjustTypes, FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...market.curves.FinCDSCurve import FinCDSCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinCDSIndexPortfolio():
@@ -24,7 +23,7 @@ class FinCDSIndexPortfolio():
                  frequencyType=FinFrequencyTypes.QUARTERLY,
                  dayCountType=FinDayCountTypes.ACT_360,
                  calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinDayAdjustTypes.FOLLOWING,
+                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Create FinCDSIndexPortfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard. '''
@@ -72,7 +71,7 @@ class FinCDSIndexPortfolio():
                                  stepInDate,
                                  maturityDate,
                                  issuerCurves):
-        ''' Calculation of the intrinsic protection leg value of the CDS porfolio
+        ''' Calculation of intrinsic protection leg value of the CDS porfolio
         by taking the average sum the protection legs of each contract. '''
 
         numCredits = len(issuerCurves)
@@ -151,7 +150,7 @@ class FinCDSIndexPortfolio():
                     stepInDate,
                     maturityDate,
                     issuerCurves):
-        ''' Calculates the total CDS spread of the CDS portfolio by summing 
+        ''' Calculates the total CDS spread of the CDS portfolio by summing
         over all of the issuers and adding the spread with no weights. '''
 
         numCredits = len(issuerCurves)
@@ -236,10 +235,11 @@ class FinCDSIndexPortfolio():
                               indexUpfronts,
                               indexMaturityDates,
                               indexRecoveryRate,
-                              tolerance):
+                              tolerance=1e-6):
         ''' Adjust individual CDS curves to reprice CDS index prices.
         This approach uses an iterative scheme but is slow as it has to use a
-        CDS curve bootstrap required when each trial spread adjustment is made.'''
+        CDS curve bootstrap required when each trial spread adjustment is made
+        '''
 
         numCredits = len(issuerCurves)
 
@@ -328,8 +328,9 @@ class FinCDSIndexPortfolio():
                                                       liborCurve,
                                                       recoveryRate)
 
-                    indexProtectionPV = cdsIndex.protectionLegPV(
-                        valuationDate, adjustedIssuerCurve, indexRecoveryRate)
+                    indexProtectionPV = cdsIndex.protectionLegPV(valuationDate,
+                                                    adjustedIssuerCurve,
+                                                    indexRecoveryRate)
 
                     cleanRPV01 = cdsIndex.riskyPV01(valuationDate, 
                                                     adjustedIssuerCurve)['clean_rpv01']
@@ -388,7 +389,7 @@ class FinCDSIndexPortfolio():
                                   indexUpfronts,
                                   indexMaturityDates,
                                   indexRecoveryRate,
-                                  tolerance,
+                                  tolerance=1e-6,
                                   maxIterations=100):
         ''' Adjust individual CDS curves to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish

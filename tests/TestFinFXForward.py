@@ -5,7 +5,9 @@ Created on Fri Feb 12 16:51:05 2016
 @author: Dominic O'Kane
 """
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+
 from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 
@@ -78,19 +80,16 @@ def test_FinFXForward():
     testCases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
     fwdValue = fxForward.value(valueDate, spotFXRate,
-                            domDiscountCurve, forDiscountCurve)
-
-    print(fwdValue)
+                               domDiscountCurve, forDiscountCurve)
 
     fwdFXRate = fxForward.forward(valueDate, spotFXRate,
                                   domDiscountCurve,
                                   forDiscountCurve)
 
-    print(fwdFXRate)
-
     testCases.print(spotFXRate, fwdFXRate, fwdValue)
 
 ###############################################################################
+
 
 test_FinFXForward()
 testCases.compareTestCases()

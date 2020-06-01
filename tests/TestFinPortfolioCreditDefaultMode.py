@@ -10,7 +10,7 @@ import numpy as np
 
 # TODO Set up test cases correctly
 
-from financepy.finutils.FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.risk.FinPortfolioCreditDefaultMode import FinPortfolioCreditDefaultMode
 from financepy.risk.FinPortfolioRiskMetrics import expectedLoss

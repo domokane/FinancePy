@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import matplotlib.pyplot as plt
+import time
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinDate import FinDate
-from financepy.models.FinModelRatesHullWhite import FinModelRatesHullWhite
+from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -10,8 +15,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
 
-import matplotlib.pyplot as plt
-import time
+testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -30,13 +34,13 @@ def test_HullWhiteExampleOne():
     sigma = 0.01
     a = 0.1
     numTimeSteps = 3
-    model = FinModelRatesHullWhite(a, sigma)
+    model = FinModelRatesHW(sigma, a, numTimeSteps)
     treeMat = (endDate - startDate)/gDaysInYear
-    model.buildTree(treeMat, numTimeSteps, times, dfs)
-    printTree(model._Q)
-    print("")
-    printTree(model._rt)
-    print("")
+    model.buildTree(treeMat, times, dfs)
+#   printTree(model._Q)
+#   print("")
+#   printTree(model._rt)
+#   print("")
 
 ###############################################################################
 
@@ -68,29 +72,28 @@ def test_HullWhiteExampleTwo():
     texp = (expiryDate - startDate)/gDaysInYear
     tmat = (maturityDate - startDate)/gDaysInYear
 
-    model = FinModelRatesHullWhite(a, sigma)
-    vAnal = model.optionOnZeroCouponBond(texp,
-                                         tmat,
-                                         strike, face,
-                                         times, dfs)
+    numTimeSteps = 100
+    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
     numStepsList = range(100, 500, 10)
     analVector = []
     treeVector = []
 
+    testCases.header("NUMTIMESTEP", "VTREE", "VANAL","PERIOD")
     for numTimeSteps in numStepsList:
         start = time.time()
-        model.buildTree(texp, numTimeSteps, times, dfs)
+        model.buildTree(texp, times, dfs)
         vTree = model.optionOnZeroCouponBond_Tree(texp, tmat, strike, face)
         end = time.time()
         period = end-start
-        treeVector.append(vTree[1])
-        analVector.append(vAnal[1])
-        print(numTimeSteps, vTree, vAnal, period)
+        treeVector.append(vTree['put'])
+        analVector.append(vAnal['put'])
+        testCases.print(numTimeSteps, vTree, vAnal, period)
 
-    plt.plot(numStepsList, treeVector)
-    plt.plot(numStepsList, analVector)
+ #   plt.plot(numStepsList, treeVector)
+ #   plt.plot(numStepsList, analVector)
 
 ###############################################################################
 
@@ -125,11 +128,11 @@ def test_HullWhiteBondOption():
     dfs = np.exp(-0.05*times)
     curve = FinDiscountCurve(settlementDate, times, dfs)
 
-    price = bond.fullPriceFromDiscountCurve(settlementDate, curve)
-    print("Spot Bond Price:", price)
+    #price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
+    #print("Spot Bond Price:", price)
 
-    price = bond.fullPriceFromDiscountCurve(expiryDate, curve)
-    print("Fwd Bond Price:", price)
+    #price = bond.valueBondUsingDiscountCurve(expiryDate, curve)
+    #print("Fwd Bond Price:", price)
 
     sigma = 0.01
     a = 0.1
@@ -138,12 +141,12 @@ def test_HullWhiteBondOption():
     numStepsList = [100, 200, 300, 400, 500]
     texp = (expiryDate - settlementDate)/gDaysInYear
 
-    print("NUMSTEPS", "FAST TREE", "FULLTREE", "TIME")
+    testCases.header("NUMSTEPS", "FAST TREE", "FULLTREE", "TIME")
 
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesHullWhite(a, sigma)
-        model.buildTree(texp, numTimeSteps, times, dfs)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
+        model.buildTree(texp, times, dfs)
 
         americanExercise = False
         v1 = model.americanBondOption_Tree(texp, strikePrice, face,
@@ -156,7 +159,7 @@ def test_HullWhiteBondOption():
         end = time.time()
         period = end-start
 
-        print(numTimeSteps, v1, v2, period)
+        testCases.print(numTimeSteps, v1, v2, period)
 
 #    plt.plot(numStepsList, treeVector)
 
@@ -171,8 +174,6 @@ def test_HullWhiteBondOption():
     v = model.europeanBondOption_Jamshidian(texp, strikePrice, face,
                                             couponTimes, couponFlows,
                                             times, dfs)
-
-    print("EUROPEAN BOND JAMSHIDIAN DECOMP", v)
 
 ###############################################################################
 
@@ -237,7 +238,7 @@ def test_HullWhiteCallableBond():
 
     ###########################################################################
 
-    v1 = bond.fullPriceFromDiscountCurve(settlementDate, curve)
+    v1 = bond.valueBondUsingDiscountCurve(settlementDate, curve)
 
     sigma = 0.02  # basis point volatility
     a = 0.1
@@ -246,20 +247,20 @@ def test_HullWhiteCallableBond():
     numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     tmat = (maturityDate - settlementDate)/gDaysInYear
 
-    print("NUMSTEPS", "BOND_ONLY", "CALLABLE_BOND", "TIME")
+    testCases.header("NUMSTEPS", "BOND_ONLY", "CALLABLE_BOND", "TIME")
 
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesHullWhite(a, sigma)
-        model.buildTree(tmat, numTimeSteps, times, dfs)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
+        model.buildTree(tmat, times, dfs)
 
         v2 = model.callablePuttableBond_Tree(couponTimes, couponFlows,
                                              callTimes, callPrices,
-                                             putTimes, putPrices)
+                                             putTimes, putPrices, 100.0)
 
         end = time.time()
         period = end-start
-        print(numTimeSteps, v1, v2, period)
+        testCases.print(numTimeSteps, v1, v2, period)
 
     if 1 == 0:
         print("RT")
@@ -272,7 +273,7 @@ def test_HullWhiteCallableBond():
 ###############################################################################
 
 
-#test_HullWhiteExampleOne()
-#test_HullWhiteExampleTwo()
-#test_HullWhiteBondOption()
+test_HullWhiteExampleOne()
+test_HullWhiteExampleTwo()
+test_HullWhiteBondOption()
 test_HullWhiteCallableBond()
