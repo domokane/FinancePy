@@ -24,7 +24,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinHelperFunctions import labelToString, checkDate, checkAnnotations
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from typing import List
 from scipy import optimize
@@ -76,15 +76,15 @@ class FinBond(object):
     size that are paid on known dates plus a payment of par at maturity.'''
 
     def __init__(self,
-                 maturityDate:FinDate,
-                 coupon:(int, float),
-                 frequencyType:FinFrequencyTypes,
-                 accrualType:FinDayCountTypes,
-                 face:(int, float)=100.0):
+                 maturityDate: FinDate,
+                 coupon: (int, float),
+                 frequencyType: FinFrequencyTypes,
+                 accrualType: FinDayCountTypes,
+                 face: (int, float) = 100.0):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
 
-        checkAnnotations(self.__init__, locals())
+        checkArgumentTypes(self.__init__, locals())
 
         if frequencyType not in FinFrequencyTypes:
             raise FinError("Invalid Frequency:" + str(frequencyType))

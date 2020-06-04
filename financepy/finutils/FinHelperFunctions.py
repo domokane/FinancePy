@@ -191,16 +191,16 @@ def labelToString(label, value, separator="\n", listFormat=False):
 
 ##########################################################################
 
-def checkAnnotations(func, values):
-    ''' Check that all values passed into a function are of the same type 
+
+def checkArgumentTypes(func, values):
+    ''' Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
     will not be checked. '''
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
         if not isinstance(value, annotationType):
-
-            raise FinError(f"In {func.__module__}.{func.__name__}:\n"
-                           f"Mismatched Types: "
-                           f"expected a {valueName} of type '{annotationType.__name__}', "
-                           f"however a value of type '{type(value).__name__}' was given."
-            )
+            s = f"In {func.__module__}.{func.__name__}:\n"
+            s += f"Mismatched Types: expected a "
+            s += f"{valueName} of type '{annotationType.__name__}', however"
+            s += f" a value of type '{type(value).__name__}' was given."
+            raise FinError(s)
