@@ -13,17 +13,17 @@ from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import ONE_MILLION, N
+from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString
 from ...products.libor.FinLiborSwap import FinLiborSwap
-from ...models.FinModelSABR import blackVolFromSABR
 
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
 from ...models.FinModelSABR import FinModelSABR
 from ...models.FinModelSABRShifted import FinModelSABRShifted
 from ...models.FinModelRatesHW import FinModelRatesHW
+from ...models.FinModelRatesBK import FinModelRatesBK
 
 
 from ...finutils.FinOptionTypes import FinOptionTypes
@@ -180,22 +180,29 @@ class FinLiborSwaption():
 
         elif isinstance(model, FinModelSABR):
 
-            alpha = model._alpha
-            beta = model._beta
-            rho = model._rho
-            nu = model._nu
+            # alpha = model._alpha
+            # beta = model._beta
+            # rho = model._rho
+            # nu = model._nu
 
-            v = blackVolFromSABR(alpha, beta, rho, nu, f, k, texp)
-            d1 = (np.log(f / k) + v * v * texp / 2.0) / v / np.sqrt(texp)
-            d2 = d1 - v * np.sqrt(texp)
+            # v = blackVolFromSABR(alpha, beta, rho, nu, f, k, texp)
+            # d1 = (np.log(f / k) + v * v * texp / 2.0) / v / np.sqrt(texp)
+            # d2 = d1 - v * np.sqrt(texp)
+
+            # if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            #     swaptionPrice = f * N(d1) - k * N(d2)
+            # elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            #     swaptionPrice = k * N(-d2) - f * N(-d1)
+            # else:
+            #     raise FinError("Unknown swaption option type" +
+            #                    str(self._optionType))
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = f * N(d1) - k * N(d2)
+                swaptionPrice = model.value(f, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_CALL)
             elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = k * N(-d2) - f * N(-d1)
-            else:
-                raise FinError("Unknown swaption option type" +
-                               str(self._optionType))
+                swaptionPrice = model.value(f, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
@@ -208,17 +215,11 @@ class FinLiborSwaption():
 
         elif isinstance(model, FinModelRatesHW):
 
-            cpnTimes = []
-            cpnFlows = []
-
-            cpnTimes.append(texp)
-            cpnFlows.append(0.0)
+            cpnTimes = [texp]
+            cpnFlows = [0.0]
 
             # The first flow is always the previous coupon date
             numFlows = len(swap._adjustedFixedDates)
-
-#            print("SWAP DATES:", swap._adjustedFixedDates)
-#            print("SWAP FLOWS:", swap._fixedFlows)
 
             for iFlow in range(1, numFlows):
                 flowDate = swap._adjustedFixedDates[iFlow]
@@ -230,18 +231,18 @@ class FinLiborSwaption():
             cpnTimes = np.array(cpnTimes)
             cpnFlows = np.array(cpnFlows)
 
-            strike = 1.0
-            face = 1.0
             dfTimes = discountCurve._times
             dfValues = discountCurve._values
 
             if np.any(cpnTimes < 0.0):
                 raise FinError("No coupon times can be before the value date.")
 
-            swaptionPx = model.europeanBondOption_Jamshidian(texp, strike,
-                                                             face, cpnTimes,
+            swaptionPx = model.europeanBondOption_Jamshidian(texp, 1.0,
+                                                             1.0, cpnTimes,
                                                              cpnFlows,
                                                              dfTimes, dfValues)
+
+#            print("SWAPTION PX", swaptionPx)
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
                 swaptionPrice = swaptionPx['put']
@@ -251,8 +252,46 @@ class FinLiborSwaption():
                 raise FinError("Unknown swaption option type" +
                                str(self._optionType))
 
+            # Cancel the multiplication at the end below
             swaptionPrice /= pv01
 
+        elif type(model) == FinModelRatesBK:
+
+            print("** USE WITH CAUTION AS TREE MAY NEED TWEAKS FOR ACCRUED **")
+            cpnTimes = [texp]
+            cpnFlows = [0.0]
+
+            # The first flow is always the previous coupon date
+            numFlows = len(swap._adjustedFixedDates)
+
+            for iFlow in range(1, numFlows):
+                flowDate = swap._adjustedFixedDates[iFlow]
+                cpnTime = (flowDate - valuationDate) / gDaysInYear
+                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+                cpnTimes.append(cpnTime)
+                cpnFlows.append(cpnFlow)
+
+            cpnTimes = np.array(cpnTimes)
+            cpnFlows = np.array(cpnFlows)
+
+            dfTimes = discountCurve._times
+            dfValues = discountCurve._values
+
+            if np.any(cpnTimes < 0.0):
+                raise FinError("No coupon times can be before the value date.")
+
+            tmat = (self._maturityDate - valuationDate) / gDaysInYear
+
+            model.buildTree(tmat, dfTimes, dfValues)
+            swaptionPx = model.bondOption(texp, 1.0, 1.0,
+                                          cpnTimes, cpnFlows, False)
+
+            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+                swaptionPrice = swaptionPx['put']
+            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+                swaptionPrice = swaptionPx['call']
+
+            swaptionPrice /= pv01
         else:
             raise FinError("Unknown swaption model " + str(model))
 

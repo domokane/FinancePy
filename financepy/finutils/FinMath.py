@@ -27,7 +27,7 @@ def accruedInterpolator(tset, couponTimes, couponAmounts):
     foundIndex = -1
 
     for i in range(1, numCoupons):
-        if tset >= couponTimes[i-1] and tset <= couponTimes[i]:
+        if tset >= couponTimes[i-1] and tset < couponTimes[i]:
             foundIndex = i
             break
 
@@ -43,7 +43,7 @@ def accruedInterpolator(tset, couponTimes, couponAmounts):
 
     accdFrac = (tset-t0)/denom
     accdCpn = accdFrac * couponAmounts[i]
-
+#    print(tset, t0, t1, denom, accdCpn)
     return accdCpn
 
 ##########################################################################
