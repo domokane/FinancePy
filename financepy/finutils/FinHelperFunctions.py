@@ -4,6 +4,7 @@
 
 import numpy as np
 from numba import njit
+from typing import get_origin, get_args, List, Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
@@ -192,13 +193,37 @@ def labelToString(label, value, separator="\n", listFormat=False):
 ##########################################################################
 
 
+def isIncorrectType(value, t):
+    ''' Return whether the value is of incorrect type. This function also
+    handles types from the `typing` module. '''
+
+    # Check for special types from `typing`
+    origin = get_origin(t)
+    if origin is list:
+        return isIncorrectType(value, (list, np.ndarray))
+    elif origin is Union:
+        # `get_args(t)` cannot be passed directly into isIncorrectType in 
+        # case of having `typing` types which must be handled separately.
+        # eg: Union[int, List[int]]
+        for arg in get_args(t):
+            if isIncorrectType(value, arg):
+                return True
+        return False
+
+    # Unrecognised types from typing aren't tested
+    if origin is None and not isinstance(value, t):
+        return True
+    else:
+        return False
+    
+
 def checkArgumentTypes(func, values):
     ''' Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
     will not be checked. '''
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
-        if not isinstance(value, annotationType):
+        if(isIncorrectType(value, annotationType)):
             s = f"In {func.__module__}.{func.__name__}:\n"
             s += f"Mismatched Types: expected a "
             s += f"{valueName} of type '{annotationType.__name__}', however"

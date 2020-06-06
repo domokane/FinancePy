@@ -10,7 +10,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import FinDate, labelToString, checkArgumentTypes
 
 ###############################################################################
 
@@ -32,15 +32,17 @@ class FinBondMortgage(object):
 ###############################################################################
 
     def __init__(self,
-                 startDate,
-                 endDate,
-                 principal,
-                 frequencyType=FinFrequencyTypes.MONTHLY,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
-                 dayCountConventionType=FinDayCountTypes.ACT_360):
+                 startDate: FinDate,
+                 endDate: FinDate,
+                 principal: int,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
+                 dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Create the mortgage using start and end dates and principal. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if startDate > endDate:
             raise ValueError("Start Date after End Date")

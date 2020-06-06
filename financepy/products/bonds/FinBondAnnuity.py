@@ -10,7 +10,9 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+
+from typing import Union
 
 ###############################################################################
 
@@ -22,14 +24,16 @@ class FinBondAnnuity(object):
     Dates are then adjusted according to a specified calendar. '''
 
     def __init__(self,
-                 maturityDate,
-                 coupon,
-                 frequencyType,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
-                 dayCountConventionType=FinDayCountTypes.ACT_360,
-                 face=100.0):
+                 maturityDate: FinDate,
+                 coupon: Union[int, float],
+                 frequencyType: FinFrequencyTypes,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
+                 dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 face: Union[int, float] = 100.0):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if frequencyType not in FinFrequencyTypes:
             raise FinError("Invalid Frequency:" + str(frequencyType))

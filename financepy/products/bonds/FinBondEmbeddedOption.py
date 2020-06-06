@@ -10,10 +10,12 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...products.bonds.FinBond import FinBond
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import FinDate, labelToString, checkArgumentTypes
+
 
 from enum import Enum
 import numpy as np
+from typing import Union, List
 
 ###############################################################################
 
@@ -41,17 +43,19 @@ class FinBondEmbeddedOption(object):
     ''' Class for fixed coupon bonds with embedded call or put optionality. '''
 
     def __init__(self,
-                 maturityDate,  # FinDate
-                 coupon,  # Annualised coupon - 0.03 = 3.00%
-                 frequencyType,  # Frequency type - see FinFrequencyTypes
-                 accrualType,  # Day count convention for accrued interest
-                 callDates,
-                 callPrices,
-                 putDates,
-                 putPrices,
-                 face=100.0):
+                 maturityDate: FinDate,  # FinDate
+                 coupon: Union[int, float],  # Annualised coupon - 0.03 = 3.00%
+                 frequencyType: FinFrequencyTypes,  # Frequency type - see FinFrequencyTypes
+                 accrualType: FinDayCountTypes,  # Day count convention for accrued interest
+                 callDates: List[FinDate],
+                 callPrices: List[int],
+                 putDates: List[FinDate],
+                 putPrices: List[int],
+                 face: Union[int, float] = 100.0):
         ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. '''
+        
+        checkArgumentTypes(self.__init__, locals())
 
         if frequencyType not in FinFrequencyTypes:
             raise FinError("Invalid Frequency:" + str(frequencyType))
