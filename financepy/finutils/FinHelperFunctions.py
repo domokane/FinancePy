@@ -191,31 +191,21 @@ def labelToString(label, value, separator="\n", listFormat=False):
         return f"{label}: {value}{separator}"
 
 ##########################################################################
-
-
-def isIncorrectType(value, t):
-    ''' Return whether the value is of incorrect type. This function also
-    handles types from the `typing` module. '''
-
-    # Check for special types from `typing`
+    
+def toUsableType(t):
+    ''' Convert any special types from the `typing` module into types
+    that can be used with `isinstance`. '''
     origin = get_origin(t)
     if origin is list:
-        return isIncorrectType(value, (list, np.ndarray))
+        return (list, np.ndarray)
     elif origin is Union:
-        # `get_args(t)` cannot be passed directly into isIncorrectType in 
-        # case of having `typing` types which must be handled separately.
-        # eg: Union[int, List[int]]
-        for arg in get_args(t):
-            if isIncorrectType(value, arg):
-                return True
-        return False
-
-    # Unrecognised types from typing aren't tested
-    if origin is None and not isinstance(value, t):
-        return True
+        # `toUsableType` is mapped onto all types inside the `Union`
+        types = get_args(t)
+        return tuple(toUsableType(tp) for tp in types)
     else:
-        return False
-    
+        return t
+
+##########################################################################
 
 def checkArgumentTypes(func, values):
     ''' Check that all values passed into a function are of the same type
@@ -223,9 +213,10 @@ def checkArgumentTypes(func, values):
     will not be checked. '''
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
-        if(isIncorrectType(value, annotationType)):
+        usableType = toUsableType(annotationType)
+        if(not isinstance(value, usableType)):
             s = f"In {func.__module__}.{func.__name__}:\n"
             s += f"Mismatched Types: expected a "
-            s += f"{valueName} of type '{annotationType.__name__}', however"
+            s += f"{valueName} of type '{usableType.__name__}', however"
             s += f" a value of type '{type(value).__name__}' was given."
             raise FinError(s)
