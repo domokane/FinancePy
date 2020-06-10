@@ -4,6 +4,7 @@
 
 
 from math import exp, log, sqrt
+from typing import Union
 
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
@@ -14,7 +15,7 @@ from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
 from ...market.curves.FinCDSCurve import FinCDSCurve
 from .FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, FinDate, checkArgumentTypes
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -27,19 +28,21 @@ class FinCDSIndexOption(object):
     into a CDS index. Different pricing algorithms are presented.'''
 
     def __init__(self,
-                 expiryDate,
-                 maturityDate,
-                 indexCoupon,
-                 strikeCoupon,
-                 notional=ONE_MILLION,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 expiryDate: FinDate,
+                 maturityDate: FinDate,
+                 indexCoupon: Union[int, float],
+                 strikeCoupon: Union[int, float],
+                 notional: Union[int, float] = ONE_MILLION,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract.'''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if expiryDate > maturityDate:
             raise FinError("Expiry date after end date")

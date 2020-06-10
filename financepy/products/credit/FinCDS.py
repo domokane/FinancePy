@@ -6,6 +6,7 @@
 import numpy as np
 from numba import njit, float64, int64
 from math import exp, log
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
@@ -16,7 +17,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -188,17 +189,19 @@ class FinCDS(object):
     generation and the valuation and risk management of CDS. '''
 
     def __init__(self,
-                 stepInDate, #  FinDate is when protection starts (usually T+1)
-                 maturityDateOrTenor,  # FinDate or a FinTenor
-                 runningCoupon, # Annualised coupon on premium leg
-                 notional=ONE_MILLION,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 stepInDate: FinDate, #  FinDate is when protection starts (usually T+1)
+                 maturityDateOrTenor: Union[FinDate, str],  # FinDate or a FinTenor
+                 runningCoupon: Union[int, float], # Annualised coupon on premium leg
+                 notional: Union[int, float] = ONE_MILLION,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create a CDS from the step-in date, maturity date and coupon '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(stepInDate) is not FinDate:
             raise ValueError(
