@@ -15,7 +15,8 @@ from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
 from ...market.curves.FinCDSCurve import FinCDSCurve
 from .FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString, FinDate, checkArgumentTypes
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 

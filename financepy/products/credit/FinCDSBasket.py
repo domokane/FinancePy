@@ -25,7 +25,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 
-from ...finutils.FinHelperFunctions import labelToString, FinDate, checkArgumentTypes
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
