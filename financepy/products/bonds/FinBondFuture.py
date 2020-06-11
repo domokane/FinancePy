@@ -4,7 +4,8 @@
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
-from ...finutils.FinHelperFunctions import FinDate, labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from typing import Union
 # TODO: Examine other exchange conventions.

@@ -6,7 +6,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import FinDate, labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from .FinBond import FinBond
 
 from enum import Enum

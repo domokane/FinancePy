@@ -10,7 +10,8 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinHelperFunctions import FinDate, labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 
