@@ -5,6 +5,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import Union
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -14,15 +15,18 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinOptionTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 class FinEquityBasketOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,
-                 optionType,
-                 numAssets):
+                 expiryDate: FinDate,
+                 strikePrice: Union[int, float],
+                 optionType: FinOptionTypes,
+                 numAssets: int):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)

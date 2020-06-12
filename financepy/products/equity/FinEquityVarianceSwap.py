@@ -5,6 +5,7 @@
 
 import numpy as np
 from math import log, exp, sqrt
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
@@ -12,7 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityOption import FinEquityModelBlackScholes
 from ...finutils.FinOptionTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 
@@ -21,12 +22,14 @@ class FinEquityVarianceSwap(object):
     ''' Class for managing an equity variance swap contract. '''
 
     def __init__(self,
-                 startDate,
-                 maturityDateOrTenor,
-                 strikeVariance,
-                 notional=ONE_MILLION,
-                 payStrikeFlag=True):
+                 startDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 strikeVariance: Union[int, float],
+                 notional: Union[int, float] = ONE_MILLION,
+                 payStrikeFlag: bool = True):
         ''' Create variance swap contract. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(startDate) != FinDate:
             raise ValueError("Settlement date must be a FinDate.")

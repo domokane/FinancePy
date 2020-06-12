@@ -5,13 +5,15 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import Union
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 ##########################################################################
 ##########################################################################
@@ -20,9 +22,11 @@ from ...finutils.FinHelperFunctions import labelToString
 class FinEquityDigitalOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,
-                 optionType):
+                 expiryDate: FinDate,
+                 strikePrice: Union[int, float],
+                 optionType: FinOptionTypes):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)

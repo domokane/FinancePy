@@ -6,6 +6,7 @@
 from math import exp, log, sqrt
 import numpy as np
 from enum import Enum
+from typing import Union
 
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import N
@@ -13,7 +14,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.FinProcessSimulator import FinProcessSimulator
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 class FinEquityBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
@@ -35,12 +37,14 @@ class FinEquityBarrierOption(FinEquityOption):
     variants on the Barrier structure in enum FinEquityBarrierTypes. '''
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,
-                 optionType,
-                 barrierLevel,
-                 numObservationsPerYear,
-                 notional=1.0):
+                 expiryDate: FinDate,
+                 strikePrice: Union[int, float],
+                 optionType: FinEquityBarrierTypes,
+                 barrierLevel: Union[int, float],
+                 numObservationsPerYear: int,
+                 notional: Union[int, float] = 1.0):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)

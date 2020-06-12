@@ -8,6 +8,7 @@ from math import exp, log, sqrt
 import numpy as np
 from scipy import optimize
 from numba import njit
+from typing import Union
 
 from ...finutils.FinMath import N, phi2
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
@@ -17,7 +18,8 @@ from ...finutils.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinFlatCurve import FinFlatCurve
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
@@ -203,12 +205,14 @@ def valueOnce(stockPrice,
 class FinEquityCompoundOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate1,
-                 expiryDate2,
-                 strikePrice1,
-                 strikePrice2,
-                 optionType1,
-                 optionType2):
+                 expiryDate1: FinDate,
+                 expiryDate2: FinDate,
+                 strikePrice1: Union[int, float],
+                 strikePrice2: Union[int, float],
+                 optionType1: FinOptionTypes,
+                 optionType2: FinOptionTypes):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if expiryDate1 > expiryDate2:
             raise FinError("Expiry date 1 must preced expiry date 2")

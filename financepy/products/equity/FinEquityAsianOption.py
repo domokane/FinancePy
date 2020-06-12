@@ -9,13 +9,16 @@ from math import exp, log, sqrt
 
 from numba import njit
 
+from typing import Union
+
 from ...finutils.FinMath import N, covar
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinOptionTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff
@@ -320,11 +323,13 @@ class FinEquityAsianOption(FinEquityOption):
     ''' Class to store an Equity Asian Option. '''
 
     def __init__(self,
-                 startAveragingDate,
-                 expiryDate,
-                 strikePrice,
-                 optionType,
-                 numberOfObservations=0):
+                 startAveragingDate: FinDate,
+                 expiryDate: FinDate,
+                 strikePrice: Union[int, float],
+                 optionType: FinOptionTypes,
+                 numberOfObservations: int = 0):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if startAveragingDate > expiryDate:
             raise FinError("Averaging starts after expiry date")
