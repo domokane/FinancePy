@@ -2,12 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 
@@ -40,15 +42,17 @@ class FinLiborFRA(object):
     date are the same date. This should be amended later. '''
 
     def __init__(self,
-                 startDate,  # The date the floating rate starts to accrue
-                 maturityDateOrTenor,  # The end of the Libor rate period
-                 fraRate,  # The fixed contractual FRA rate
-                 dayCountType,  # For interest period
-                 notional=100.0,
-                 payFixedRate=True,  # True if the FRA rate is being paid
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 startDate: FinDate,  # The date the floating rate starts to accrue
+                 maturityDateOrTenor: Union[FinDate, str],  # The end of the Libor rate period
+                 fraRate: Union[int, float],  # The fixed contractual FRA rate
+                 dayCountType: FinDayCountTypes,  # For interest period
+                 notional: Union[int, float] = 100.0,
+                 payFixedRate: bool = True,  # True if the FRA rate is being paid
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Forward Rate Agreeement object. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(startDate) != FinDate:
             raise ValueError("Settlement date must be a FinDate.")

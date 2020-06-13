@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinCalendar import FinCalendarTypes
@@ -9,7 +10,8 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinDate import dailyWorkingDaySchedule
+from ...finutils.FinDate import FinDate, dailyWorkingDaySchedule
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 
 ###############################################################################
 ###############################################################################
@@ -38,19 +40,21 @@ class FinOIS(object):
     the term structure of market OIS rates. '''
 
     def __init__(self,
-                 startDate,
-                 maturityDate,
-                 fixedRate,
-                 fixedFrequencyType,
-                 fixedDayCountType,
-                 floatFrequencyType=FinFrequencyTypes.ANNUAL,
-                 floatDayCountType=FinDayCountTypes.ACT_360,
-                 payFixedLeg=True,
-                 notional=ONE_MILLION,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,
+                 maturityDate: FinDate,
+                 fixedRate: Union[int, float],
+                 fixedFrequencyType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 payFixedLeg: bool = True,
+                 notional: Union[int, float] = ONE_MILLION,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create OIS object. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if startDate > maturityDate:
             raise ValueError("Start date after maturity date")

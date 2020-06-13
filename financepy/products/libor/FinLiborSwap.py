@@ -3,6 +3,8 @@
 ##############################################################################
 
 
+from typing import Union
+
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -10,7 +12,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ##########################################################################
 
@@ -19,20 +21,22 @@ class FinLiborSwap(object):
     ''' Class for managing an interest rate swap contract. '''
 
     def __init__(self,
-                 startDate,  # This is typically T+2 on a new swap
-                 maturityDateOrTenor,
-                 fixedCoupon,
-                 fixedFreqType,
-                 fixedDayCountType,
-                 notional=100.0,
-                 floatSpread=0.0,
-                 floatFreqType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_360,
-                 payFixedFlag=True,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,  # This is typically T+2 on a new swap
+                 maturityDateOrTenor: Union[FinDate, str],
+                 fixedCoupon: Union[int, float],
+                 fixedFreqType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 notional: Union[int, float] = 100.0,
+                 floatSpread: Union[int, float] = 0.0,
+                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 payFixedFlag: bool = True,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(startDate) != FinDate:
             raise ValueError("Swap Start date must be a FinDate.")

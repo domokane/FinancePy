@@ -7,6 +7,7 @@
 # TODO: Check that curve anchor date is valuation date ?
 
 import numpy as np
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -19,7 +20,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
 from ...models.FinModelSABR import FinModelSABR
@@ -49,17 +50,19 @@ class FinLiborCapFloorModelTypes(Enum):
 class FinLiborCapFloor():
 
     def __init__(self,
-                 startDate,
-                 maturityDateOrTenor,
-                 optionType,
-                 strikeRate,
-                 lastFixing=None,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA,
-                 notional=ONE_MILLION,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 optionType: FinLiborCapFloorType,
+                 strikeRate: Union[int, float],
+                 lastFixing: Union[int, float, None] = None,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
+                 notional: Union[int, float] = ONE_MILLION,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(startDate) != FinDate:
             raise ValueError("Start date must be a FinDate.")

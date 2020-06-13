@@ -2,13 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 
@@ -16,14 +18,16 @@ from ...finutils.FinHelperFunctions import labelToString
 class FinLiborDeposit(object):
 
     def __init__(self,
-                 settlementDate,
-                 maturityDateOrTenor,
-                 depositRate,
-                 dayCountType,
-                 notional=100.0,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 settlementDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 depositRate: Union[int, float],
+                 dayCountType: FinDayCountTypes,
+                 notional: Union[int, float] = 100.0,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if type(settlementDate) != FinDate:
             raise ValueError("Settlement date must be a FinDate.")

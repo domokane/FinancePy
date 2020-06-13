@@ -6,6 +6,7 @@
 # TODO: Extend to allow two fixed legs in underlying swap
 
 import numpy as np
+from typing import Union
 
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
@@ -15,7 +16,8 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 from ...products.libor.FinLiborSwap import FinLiborSwap
 
 from ...models.FinModelBlack import FinModelBlack
@@ -49,23 +51,25 @@ class FinLiborSwaption():
     ''' This is the class for the European-stype swaption. '''
 
     def __init__(self,
-                 settlementDate,
-                 exerciseDate,
-                 maturityDate,
-                 swaptionType,
-                 fixedCoupon,
-                 fixedFrequencyType,
-                 fixedDayCountType,
-                 notional=ONE_MILLION,
-                 floatFrequencyType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 settlementDate: FinDate,
+                 exerciseDate: FinDate,
+                 maturityDate: FinDate,
+                 swaptionType: FinLiborSwaptionTypes,
+                 fixedCoupon: Union[int, float],
+                 fixedFrequencyType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 notional: Union[int, float] = ONE_MILLION,
+                 floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
         floating leg payment schedules. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
