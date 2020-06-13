@@ -31,9 +31,6 @@ class FinEquityVarianceSwap(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(startDate) != FinDate:
-            raise ValueError("Settlement date must be a FinDate.")
-
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:

@@ -37,17 +37,11 @@ class FinLiborFuture(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if isinstance(futureNumber, int) is False:
-            raise FinError("Future number must be an integer")
-
         if futureNumber < 1:
             raise FinError("Future number must be 1 or more")
 
         if futureTenor != "3M" and futureTenor != "3m":
             raise FinError("Only 3M IMM futures handled currently.")
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Day Count Rule type " + str(accrualType))
 
         self._deliveryDate = todayDate.nextIMMDate()
 

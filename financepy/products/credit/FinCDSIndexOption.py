@@ -54,29 +54,6 @@ class FinCDSIndexOption(object):
         if strikeCoupon < 0.0:
             raise FinError("Index Option strike coupon is negative")
 
-        if dayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Fixed Day Count Rule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
-
         self._expiryDate = expiryDate
         self._maturityDate = maturityDate
         self._indexCoupon = indexCoupon

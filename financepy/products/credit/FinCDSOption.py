@@ -59,24 +59,6 @@ class FinCDSOption():
         if strikeCoupon < 0.0:
             raise ValueError("Strike must be greater than zero")
 
-        if frequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
-
         self._expiryDate = expiryDate
         self._maturityDate = maturityDate
         self._strikeCoupon = strikeCoupon

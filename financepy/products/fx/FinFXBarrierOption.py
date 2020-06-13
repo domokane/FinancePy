@@ -48,10 +48,6 @@ class FinFXBarrierOption(FinFXOption):
         self._strikeFXRate = float(strikeFXRate)
         self._barrierLevel = float(barrierLevel)
         self._numObservationsPerYear = int(numObservationsPerYear)
-
-        if optionType not in FinFXBarrierTypes:
-            raise FinError("Option Type ", optionType, " unknown.")
-
         self._optionType = optionType
         self._notional = notional
         self._notionalCurrency = notionalCurrency

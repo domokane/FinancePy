@@ -275,14 +275,6 @@ class FinBondConvertible(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Day Count Accrued Convention type " +
-                           str(accrualType))
-
         if startConvertDate > maturityDate:
             raise FinError("Start convert date is after bond maturity.")
 

@@ -203,45 +203,13 @@ class FinCDS(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(stepInDate) is not FinDate:
-            raise ValueError(
-                "Step in date must be a FinDate")
-
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
             maturityDate = stepInDate.addTenor(maturityDateOrTenor)
 
-        if type(runningCoupon) is not float and type(
-                runningCoupon) is not np.float64:
-            raise ValueError("Coupon is not float but is " +
-                             str(type(runningCoupon)))
-
         if stepInDate > maturityDate:
             raise ValueError("Step in date after maturity date")
-
-        if dayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Fixed Day Count Rule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate

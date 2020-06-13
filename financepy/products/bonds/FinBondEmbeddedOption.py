@@ -58,14 +58,6 @@ class FinBondEmbeddedOption(object):
         
         checkArgumentTypes(self.__init__, locals())
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Bond Accrued Convention type " +
-                           str(accrualType))
-
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._frequencyType = frequencyType

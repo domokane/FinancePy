@@ -77,39 +77,6 @@ class FinLiborSwaption():
         if exerciseDate > maturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
-        if fixedDayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Fixed DayCountRule type " +
-                str(fixedDayCountType))
-
-        if fixedFrequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Fixed Frequency type " +
-                str(fixedFrequencyType))
-
-        if floatDayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Float DayCountRule type " +
-                str(floatDayCountType))
-
-        if floatFrequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Float Frequency type " +
-                str(floatFrequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
-
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
         self._maturityDate = maturityDate

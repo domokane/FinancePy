@@ -35,25 +35,6 @@ class FinBondAnnuity(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError("Unknown Business Day Adjust type " +
-                           str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError("Unknown Date Gen Rule type " +
-                           str(dateGenRuleType))
-
-        if dayCountConventionType not in FinDayCountTypes:
-            raise ValueError("Unknown Day Count type " +
-                             str(dayCountConventionType))
-
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._frequencyType = frequencyType

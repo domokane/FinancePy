@@ -59,39 +59,6 @@ class FinOIS(object):
         if startDate > maturityDate:
             raise ValueError("Start date after maturity date")
 
-        if fixedDayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Fixed Day Count Rule type " +
-                str(fixedDayCountType))
-
-        if floatDayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Float Day Count Rule type " +
-                str(floatDayCountType))
-
-        if fixedFrequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(fixedFrequencyType))
-
-        if floatFrequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Float Frequency type " +
-                str(fixedFrequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
-
         self._startDate = startDate
         self._maturityDate = maturityDate
         self._payFixedLeg = payFixedLeg

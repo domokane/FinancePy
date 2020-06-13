@@ -54,19 +54,7 @@ class FinLiborFRA(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(startDate) != FinDate:
-            raise ValueError("Settlement date must be a FinDate.")
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
         self._calendarType = calendarType
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
         self._busDayAdjustType = busDayAdjustType
 
         if type(maturityDateOrTenor) == FinDate:
@@ -79,14 +67,6 @@ class FinLiborFRA(object):
 
         if startDate > maturityDate:
             raise ValueError("Settlement date after maturity date")
-
-        if type(payFixedRate) != bool:
-            raise ValueError("PayFixedRate must be true or false.")
-
-        if dayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Day Count Rule type " +
-                str(dayCountType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate

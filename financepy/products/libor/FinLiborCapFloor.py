@@ -64,18 +64,7 @@ class FinLiborCapFloor():
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(startDate) != FinDate:
-            raise ValueError("Start date must be a FinDate.")
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
         self._calendarType = calendarType
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError("Unknown Business Day Adjust type " +
-                             str(busDayAdjustType))
-
         self._busDayAdjustType = busDayAdjustType
 
         if type(maturityDateOrTenor) == FinDate:
@@ -88,32 +77,6 @@ class FinLiborCapFloor():
 
         if startDate > maturityDate:
             raise FinError("Start date must be before maturity date")
-
-        if optionType not in FinLiborCapFloorType:
-            raise FinError("Unknown Libor Cap Floor type " + str(optionType))
-
-        if dayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Cap Floor DayCountRule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown CapFloor Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate
