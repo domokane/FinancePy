@@ -193,14 +193,14 @@ def labelToString(label, value, separator="\n", listFormat=False):
 ##########################################################################
     
 def toUsableType(t):
-    ''' Convert any special types from the `typing` module into types
-    that can be used with `isinstance`. '''
+    ''' Convert a type such that it can be used with `isinstance` '''
     origin = get_origin(t)
     if origin is None:
         # t is a normal type
         if t is float:
             return (int, float)
     else:
+        # t comes from the `typing` module
         if origin is list:
             return (list, np.ndarray)
         elif origin is Union:
