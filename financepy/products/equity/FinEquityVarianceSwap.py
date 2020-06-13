@@ -24,8 +24,8 @@ class FinEquityVarianceSwap(object):
     def __init__(self,
                  startDate: FinDate,
                  maturityDateOrTenor: Union[FinDate, str],
-                 strikeVariance: Union[int, float],
-                 notional: Union[int, float] = ONE_MILLION,
+                 strikeVariance: float,
+                 notional: float = ONE_MILLION,
                  payStrikeFlag: bool = True):
         ''' Create variance swap contract. '''
 

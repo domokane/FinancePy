@@ -22,10 +22,10 @@ class FinFXDigitalOption(FinOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CC
+                 strikePrice: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CC
                  currencyPair: str,  # FORDOM
                  optionType: FinOptionTypes,
-                 notional: Union[int, float],
+                 notional: float,
                  premCurrency: str):
         ''' Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the

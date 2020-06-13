@@ -34,12 +34,12 @@ class FinFXBarrierOption(FinFXOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
                  currencyPair: str,  # FORDOM
                  optionType: FinFXBarrierTypes,
-                 barrierLevel: Union[int, float],
+                 barrierLevel: float,
                  numObservationsPerYear: int,
-                 notional: Union[int, float],
+                 notional: float,
                  notionalCurrency: str):
 
         checkArgumentTypes(self.__init__, locals())

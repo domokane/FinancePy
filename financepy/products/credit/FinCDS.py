@@ -191,8 +191,8 @@ class FinCDS(object):
     def __init__(self,
                  stepInDate: FinDate, #  FinDate is when protection starts (usually T+1)
                  maturityDateOrTenor: Union[FinDate, str],  # FinDate or a FinTenor
-                 runningCoupon: Union[int, float], # Annualised coupon on premium leg
-                 notional: Union[int, float] = ONE_MILLION,
+                 runningCoupon: float, # Annualised coupon on premium leg
+                 notional: float = ONE_MILLION,
                  longProtection: bool = True,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,

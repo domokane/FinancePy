@@ -53,11 +53,11 @@ class FinLiborCapFloor():
                  startDate: FinDate,
                  maturityDateOrTenor: Union[FinDate, str],
                  optionType: FinLiborCapFloorType,
-                 strikeRate: Union[int, float],
+                 strikeRate: float,
                  lastFixing: Union[int, float, None] = None,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
-                 notional: Union[int, float] = ONE_MILLION,
+                 notional: float = ONE_MILLION,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):

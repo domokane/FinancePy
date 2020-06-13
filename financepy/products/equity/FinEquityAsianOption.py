@@ -325,7 +325,7 @@ class FinEquityAsianOption(FinEquityOption):
     def __init__(self,
                  startAveragingDate: FinDate,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
+                 strikePrice: float,
                  optionType: FinOptionTypes,
                  numberOfObservations: int = 0):
 

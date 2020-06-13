@@ -38,11 +38,11 @@ class FinEquityBarrierOption(FinEquityOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
+                 strikePrice: float,
                  optionType: FinEquityBarrierTypes,
-                 barrierLevel: Union[int, float],
+                 barrierLevel: float,
                  numObservationsPerYear: int,
-                 notional: Union[int, float] = 1.0):
+                 notional: float = 1.0):
 
         checkArgumentTypes(self.__init__, locals())
 

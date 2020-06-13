@@ -77,10 +77,10 @@ class FinBond(object):
 
     def __init__(self,
                  maturityDate: FinDate,
-                 coupon: Union[int, float],
+                 coupon: float,
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
-                 face: Union[int, float] = 100.0):
+                 face: float = 100.0):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
 

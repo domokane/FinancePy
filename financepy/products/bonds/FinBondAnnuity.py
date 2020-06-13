@@ -25,13 +25,13 @@ class FinBondAnnuity(object):
 
     def __init__(self,
                  maturityDate: FinDate,
-                 coupon: Union[int, float],
+                 coupon: float,
                  frequencyType: FinFrequencyTypes,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
                  dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 face: Union[int, float] = 100.0):
+                 face: float = 100.0):
 
         checkArgumentTypes(self.__init__, locals())
 

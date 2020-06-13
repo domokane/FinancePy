@@ -77,9 +77,9 @@ class FinEquityVanillaOption(FinEquityOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
+                 strikePrice: float,
                  optionType: FinOptionTypes,
-                 numOptions: Union[int, float] = 1.0):
+                 numOptions: float = 1.0):
 
         checkArgumentTypes(self.__init__, locals())
 

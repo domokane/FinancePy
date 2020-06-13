@@ -196,14 +196,18 @@ def toUsableType(t):
     ''' Convert any special types from the `typing` module into types
     that can be used with `isinstance`. '''
     origin = get_origin(t)
-    if origin is list:
-        return (list, np.ndarray)
-    elif origin is Union:
-        # `toUsableType` is mapped onto all types inside the `Union`
-        types = get_args(t)
-        return tuple(toUsableType(tp) for tp in types)
+    if origin is None:
+        # t is a normal type
+        if t is float:
+            return (int, float)
     else:
-        return t
+        if origin is list:
+            return (list, np.ndarray)
+        elif origin is Union:
+            types = get_args(t)
+            return tuple(toUsableType(tp) for tp in types)
+    
+    return t
 
 ##########################################################################
 

@@ -140,10 +140,10 @@ class FinFXVanillaOption():
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
                  currencyPair: str,  # FORDOM
                  optionType: FinOptionTypes,
-                 notional: Union[int, float],
+                 notional: float,
                  premCurrency: str,
                  spotDays: int = 0):
         ''' Create the FX Vanilla Option object. Inputs include expiry date,

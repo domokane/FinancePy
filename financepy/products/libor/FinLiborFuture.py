@@ -32,7 +32,7 @@ class FinLiborFuture(object):
                  futureNumber: int,  # 1, 2, 3 for the first, second, third future
                  futureTenor: str = "3M",  # '1M', '2M', '3M'
                  accrualType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 contractSize: Union[int, float] = ONE_MILLION):
+                 contractSize: float = ONE_MILLION):
         ''' Create an interest rate futures contract.'''
 
         checkArgumentTypes(self.__init__, locals())

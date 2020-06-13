@@ -20,9 +20,9 @@ class FinLiborDeposit(object):
     def __init__(self,
                  settlementDate: FinDate,
                  maturityDateOrTenor: Union[FinDate, str],
-                 depositRate: Union[int, float],
+                 depositRate: float,
                  dayCountType: FinDayCountTypes,
-                 notional: Union[int, float] = 100.0,
+                 notional: float = 100.0,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''

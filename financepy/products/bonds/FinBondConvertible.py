@@ -259,16 +259,16 @@ class FinBondConvertible(object):
 
     def __init__(self,
                  maturityDate: FinDate,  # bond maturity date
-                 coupon: Union[int, float],  # annual coupon
+                 coupon: float,  # annual coupon
                  frequencyType: FinFrequencyTypes,  # coupon frequency type
                  startConvertDate: FinDate,  # date after which conversion is possible
-                 conversionRatio: Union[int, float],  # number of shares per face of notional
+                 conversionRatio: float,  # number of shares per face of notional
                  callDates: List[FinDate],  # list of call dates
                  callPrices: List[int],  # list of call prices
                  putDates: List[FinDate],  # list of put dates
                  putPrices: List[int],  # list of put prices
                  accrualType: FinDayCountTypes,  # day count type for accrued interest
-                 face: Union[int, float] = 100.0  # face amount
+                 face: float = 100.0  # face amount
                  ):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''

@@ -24,9 +24,9 @@ class FinFXForward():
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: Union[int, float],  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
                  currencyPair: str,  # FORDOM
-                 notional: Union[int, float],
+                 notional: float,
                  notionalCurrency: str,  # must be FOR or DOM
                  spotDays: int = 0):
         ''' Creates a FinFXForward which allows the owner to buy the FOR

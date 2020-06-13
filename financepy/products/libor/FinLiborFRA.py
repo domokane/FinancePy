@@ -44,9 +44,9 @@ class FinLiborFRA(object):
     def __init__(self,
                  startDate: FinDate,  # The date the floating rate starts to accrue
                  maturityDateOrTenor: Union[FinDate, str],  # The end of the Libor rate period
-                 fraRate: Union[int, float],  # The fixed contractual FRA rate
+                 fraRate: float,  # The fixed contractual FRA rate
                  dayCountType: FinDayCountTypes,  # For interest period
-                 notional: Union[int, float] = 100.0,
+                 notional: float = 100.0,
                  payFixedRate: bool = True,  # True if the FRA rate is being paid
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):

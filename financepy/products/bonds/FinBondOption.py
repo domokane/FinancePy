@@ -42,8 +42,8 @@ class FinBondOption():
     def __init__(self,
                  bond: FinBond,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
-                 face: Union[int, float],
+                 strikePrice: float,
+                 face: float,
                  optionType: FinBondOptionTypes):
 
         checkArgumentTypes(self.__init__, locals())

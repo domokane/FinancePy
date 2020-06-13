@@ -23,7 +23,7 @@ class FinEquityDigitalOption(FinEquityOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
+                 strikePrice: float,
                  optionType: FinOptionTypes):
 
         checkArgumentTypes(self.__init__, locals())

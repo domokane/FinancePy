@@ -4,6 +4,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import List
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, M
@@ -97,7 +98,7 @@ class FinRainbowOption(FinOption):
     def __init__(self,
                  expiryDate: FinDate,
                  payoffType: FinFXRainbowOptionTypes,
-                 payoffParams: list,
+                 payoffParams: List[float],
                  numAssets: int):
 
         checkArgumentTypes(self.__init__, locals())

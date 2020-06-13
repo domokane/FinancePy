@@ -48,10 +48,10 @@ class FinBondFRN(object):
 
     def __init__(self,
                  maturityDate: FinDate,
-                 quotedMargin: Union[int, float],
+                 quotedMargin: float,
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
-                 face: Union[int, float] = 100.0):
+                 face: float = 100.0):
         ''' Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
         the position and par is the notional on which price is quoted. '''

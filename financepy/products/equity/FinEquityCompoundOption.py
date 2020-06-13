@@ -207,8 +207,8 @@ class FinEquityCompoundOption(FinEquityOption):
     def __init__(self,
                  expiryDate1: FinDate,
                  expiryDate2: FinDate,
-                 strikePrice1: Union[int, float],
-                 strikePrice2: Union[int, float],
+                 strikePrice1: float,
+                 strikePrice2: float,
                  optionType1: FinOptionTypes,
                  optionType2: FinOptionTypes):
 

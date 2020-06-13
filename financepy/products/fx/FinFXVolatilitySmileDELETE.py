@@ -86,7 +86,7 @@ class FinFXVolatilitySmile():
     def __init__(self,
                  todayDate: FinDate,
                  expiryDate: FinDate,
-                 spotFXRate: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 spotFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
                  currencyPair: str,  # FORDOM
                  domDiscountCurve,
                  forDiscountCurve,

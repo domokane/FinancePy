@@ -24,10 +24,10 @@ class FinFXBasketOption(FinFXOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: Union[int, float],
+                 strikePrice: float,
                  optionType: FinOptionTypes,
                  numAssets: int,
-                 notional: Union[int, float] = 1.0):
+                 notional: float = 1.0):
 
         checkArgumentTypes(self.__init__, locals())
 

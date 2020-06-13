@@ -22,7 +22,7 @@ class FinBondFuture(object):
                  firstDeliveryDate: FinDate,
                  lastDeliveryDate: FinDate,
                  contractSize: int,
-                 coupon: Union[int, float]):
+                 coupon: float):
 
         checkArgumentTypes(self.__init__, locals())
 

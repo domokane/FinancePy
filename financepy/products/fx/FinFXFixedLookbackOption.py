@@ -39,7 +39,7 @@ class FinFXFixedLookbackOption(FinOption):
     def __init__(self,
                  expiryDate: FinDate,
                  optionType: FinFXFixedLookbackOptionTypes,
-                 optionStrike: Union[int, float]):
+                 optionStrike: float):
 
         checkArgumentTypes(self.__init__, locals())
 
