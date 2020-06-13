@@ -6,7 +6,7 @@
 # all default baskets at the same time.
 
 import numpy as np
-from typing import Union
+
 
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes

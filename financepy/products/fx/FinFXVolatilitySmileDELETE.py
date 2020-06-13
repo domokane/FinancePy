@@ -5,7 +5,7 @@
 import numpy as np
 from scipy import optimize
 from scipy.stats import norm
-from typing import Union
+
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime

@@ -4,7 +4,7 @@
 
 from math import sqrt, log
 from scipy import optimize
-from typing import Union
+
 
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes

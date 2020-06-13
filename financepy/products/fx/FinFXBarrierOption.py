@@ -5,7 +5,7 @@
 from math import exp, log, sqrt
 import numpy as np
 from enum import Enum
-from typing import Union
+
 
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import N

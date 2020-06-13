@@ -7,7 +7,7 @@
 # TODO: Handle 1 month futures contracts
 
 from math import exp
-from typing import Union
+
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCountTypes

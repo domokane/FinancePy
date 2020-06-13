@@ -7,7 +7,7 @@
 # TODO: Check that curve anchor date is valuation date ?
 
 import numpy as np
-from typing import Union
+from typing import Union, Optional
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -54,7 +54,7 @@ class FinLiborCapFloor():
                  maturityDateOrTenor: Union[FinDate, str],
                  optionType: FinLiborCapFloorType,
                  strikeRate: float,
-                 lastFixing: Union[int, float, None] = None,
+                 lastFixing: Optional[float] = None,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,

@@ -16,7 +16,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from enum import Enum
 import numpy as np
-from typing import Union, List
+from typing import List
 
 ###############################################################################
 

@@ -8,7 +8,7 @@ from math import exp, log, sqrt
 import numpy as np
 from scipy import optimize
 from numba import njit
-from typing import Union
+
 
 from ...finutils.FinMath import N, phi2
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall

@@ -7,7 +7,7 @@
 from math import exp, sqrt
 from numba import njit
 import numpy as np
-from typing import List, Union
+from typing import List
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError

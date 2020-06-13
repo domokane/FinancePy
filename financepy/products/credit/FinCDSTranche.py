@@ -5,7 +5,7 @@
 
 import numpy as np
 from math import sqrt
-from typing import Union
+
 
 from ...models.FinModelGaussianCopula1F import trSurvProbGaussian
 from ...models.FinModelGaussianCopula1F import trSurvProbAdjBinomial

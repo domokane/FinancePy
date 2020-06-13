@@ -8,7 +8,7 @@ import numpy as np
 from scipy import optimize
 from scipy.stats import norm
 
-from typing import Union
+
 
 # from ...finutils.FinMath import N, nprime
 from ...finutils.FinDate import FinDate

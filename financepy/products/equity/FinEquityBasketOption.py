@@ -5,7 +5,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
-from typing import Union
+
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear

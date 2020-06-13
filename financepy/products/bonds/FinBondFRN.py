@@ -3,7 +3,7 @@
 ##############################################################################
 
 from scipy import optimize
-from typing import Union
+
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError

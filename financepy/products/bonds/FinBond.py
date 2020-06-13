@@ -26,7 +26,7 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
-from typing import List, Union
+from typing import List
 from scipy import optimize
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf

@@ -6,7 +6,7 @@
 # TODO: Extend to allow two fixed legs in underlying swap
 
 import numpy as np
-from typing import Union
+
 
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes

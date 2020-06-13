@@ -4,7 +4,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
-from typing import Union
+
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
@@ -39,7 +39,7 @@ class FinEquityFixedLookbackOption(FinEquityOption):
     def __init__(self,
                  expiryDate: FinDate,
                  optionType: FinEquityFixedLookbackOptionTypes,
-                 optionStrike: Union[float, int]):
+                 optionStrike: float):
 
         checkArgumentTypes(self.__init__, locals())
 

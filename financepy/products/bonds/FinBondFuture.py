@@ -7,7 +7,7 @@ from ...products.bonds.FinBond import FinBond
 from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
-from typing import Union
+
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
 ##########################################################################

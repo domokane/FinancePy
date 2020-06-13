@@ -4,7 +4,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
-from typing import Union
+
 
 from ...finutils.FinHelperFunctions import labelToString
 

@@ -9,7 +9,7 @@ from math import exp, log, sqrt
 
 from numba import njit
 
-from typing import Union
+
 
 from ...finutils.FinMath import N, covar
 from ...finutils.FinGlobalVariables import gDaysInYear

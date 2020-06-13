@@ -4,7 +4,6 @@
 
 import numpy as np
 from math import log, exp, sqrt
-from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
@@ -23,7 +22,8 @@ class FinFXVarianceSwap(object):
 
     def __init__(self,
                  startDate: FinDate,
-                 maturityDateOrTenor: Union[FinDate, str],
+                 maturityDateOrTenor: :w
+                 [FinDate, str],
                  strikeVariance: float,
                  notional: float = ONE_MILLION,
                  payStrikeFlag: bool = True):
