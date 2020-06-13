@@ -198,7 +198,7 @@ def toUsableType(t):
     if origin is None:
         # t is a normal type
         if t is float:
-            return (int, float)
+            return (int, float, np.float64)
     else:
         # t comes from the `typing` module
         if origin is list:
