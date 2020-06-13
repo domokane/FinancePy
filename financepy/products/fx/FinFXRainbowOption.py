@@ -14,7 +14,7 @@ from ...products.equities.FinOption import FinOption
 
 from enum import Enum
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 class FinFXRainbowOptionTypes(Enum):
     CALL_ON_MAXIMUM = 1
@@ -95,10 +95,12 @@ def valueMCFast(t,
 class FinRainbowOption(FinOption):
 
     def __init__(self,
-                 expiryDate,
-                 payoffType,
-                 payoffParams,
-                 numAssets):
+                 expiryDate: FinDate,
+                 payoffType: FinFXRainbowOptionTypes,
+                 payoffParams: list,
+                 numAssets: int):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self.validatePayoff(payoffType, payoffParams, numAssets)
 

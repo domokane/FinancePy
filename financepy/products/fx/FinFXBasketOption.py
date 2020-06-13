@@ -4,6 +4,8 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import Union
+
 from ...finutils.FinHelperFunctions import labelToString
 
 from ...finutils.FinMath import N
@@ -14,16 +16,20 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 from ...products.fx.FinFXOption import FinFXOption
 from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 
 class FinFXBasketOption(FinFXOption):
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,
-                 optionType,
-                 numAssets,
-                 notional=1.0):
+                 expiryDate: FinDate,
+                 strikePrice: Union[int, float],
+                 optionType: FinOptionTypes,
+                 numAssets: int,
+                 notional: Union[int, float] = 1.0):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)

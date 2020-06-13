@@ -5,6 +5,7 @@
 import numpy as np
 from scipy import optimize
 from scipy.stats import norm
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -16,6 +17,7 @@ from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import blackVolFromSABR
+from ...finutils.FinHelperFunction import checkArgumentTypes
 
 N = norm.cdf
 
@@ -82,10 +84,10 @@ class FinFXVolatilitySmile():
         ''' Construct the volatility smile from market prices. '''
 
     def __init__(self,
-                 todayDate,
-                 expiryDate,
-                 spotFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
-                 currencyPair,  # FORDOM
+                 todayDate: FinDate,
+                 expiryDate: FinDate,
+                 spotFXRate: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 currencyPair: str,  # FORDOM
                  domDiscountCurve,
                  forDiscountCurve,
                  atmVol,
@@ -93,8 +95,10 @@ class FinFXVolatilitySmile():
                  strangleVol25Delta,
                  atmType,
                  deltaType,
-                 spotDays = 0):
+                 spotDays: int = 0):
         ''' . '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 

@@ -5,6 +5,7 @@
 import numpy as np
 from scipy import optimize
 from scipy.stats import norm
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -16,7 +17,7 @@ from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import blackVolFromSABR
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 N = norm.cdf
 
@@ -138,13 +139,13 @@ class FinFXVanillaOption():
     well as the various Greek risk sensitivies. '''
 
     def __init__(self,
-                 expiryDate,
-                 strikeFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
-                 currencyPair,  # FORDOM
-                 optionType,
-                 notional,
-                 premCurrency,
-                 spotDays=0):
+                 expiryDate: FinDate,
+                 strikeFXRate: Union[int, float],  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 currencyPair: str,  # FORDOM
+                 optionType: FinOptionTypes,
+                 notional: Union[int, float],
+                 premCurrency: str,
+                 spotDays: int = 0):
         ''' Create the FX Vanilla Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -152,6 +153,8 @@ class FinFXVanillaOption():
         one unit of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
         same for the domestic currency. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 

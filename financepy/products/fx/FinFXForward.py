@@ -3,11 +3,13 @@
 ##############################################################################
 
 import numpy as np
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -21,15 +23,17 @@ class FinFXForward():
     today. '''
 
     def __init__(self,
-                 expiryDate,
-                 strikeFXRate,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
-                 currencyPair,  # FORDOM
-                 notional,
-                 notionalCurrency,  # must be FOR or DOM
-                 spotDays=0):
+                 expiryDate: FinDate,
+                 strikeFXRate: Union[int, float],  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 currencyPair: str,  # FORDOM
+                 notional: Union[int, float],
+                 notionalCurrency: str,  # must be FOR or DOM
+                 spotDays: int = 0):
         ''' Creates a FinFXForward which allows the owner to buy the FOR
         against the DOM currency at the strikeFXRate and to pay it in the
         notional currency. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         deliveryDate = expiryDate.addWorkDays(spotDays)
 
