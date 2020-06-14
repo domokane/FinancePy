@@ -22,8 +22,7 @@ class FinFXVarianceSwap(object):
 
     def __init__(self,
                  startDate: FinDate,
-                 maturityDateOrTenor: :w
-                 [FinDate, str],
+                 maturityDateOrTenor: [FinDate, str],
                  strikeVariance: float,
                  notional: float = ONE_MILLION,
                  payStrikeFlag: bool = True):
