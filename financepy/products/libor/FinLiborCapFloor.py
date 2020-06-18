@@ -7,6 +7,7 @@
 # TODO: Check that curve anchor date is valuation date ?
 
 import numpy as np
+from typing import Union, Optional
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -19,7 +20,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
 from ...models.FinModelSABR import FinModelSABR
@@ -49,30 +50,21 @@ class FinLiborCapFloorModelTypes(Enum):
 class FinLiborCapFloor():
 
     def __init__(self,
-                 startDate,
-                 maturityDateOrTenor,
-                 optionType,
-                 strikeRate,
-                 lastFixing=None,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA,
-                 notional=ONE_MILLION,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 optionType: FinLiborCapFloorType,
+                 strikeRate: float,
+                 lastFixing: Optional[float] = None,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
+                 notional: float = ONE_MILLION,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
 
-        if type(startDate) != FinDate:
-            raise ValueError("Start date must be a FinDate.")
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
+        checkArgumentTypes(self.__init__, locals())
 
         self._calendarType = calendarType
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError("Unknown Business Day Adjust type " +
-                             str(busDayAdjustType))
-
         self._busDayAdjustType = busDayAdjustType
 
         if type(maturityDateOrTenor) == FinDate:
@@ -85,32 +77,6 @@ class FinLiborCapFloor():
 
         if startDate > maturityDate:
             raise FinError("Start date must be before maturity date")
-
-        if optionType not in FinLiborCapFloorType:
-            raise FinError("Unknown Libor Cap Floor type " + str(optionType))
-
-        if dayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Cap Floor DayCountRule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown CapFloor Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate

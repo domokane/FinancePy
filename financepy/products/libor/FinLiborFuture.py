@@ -8,12 +8,14 @@
 
 from math import exp
 
+
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinDate import FinDate
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...products.libor.FinLiborFRA import FinLiborFRA
 
 ###############################################################################
@@ -26,24 +28,20 @@ class FinLiborFuture(object):
     # https://www.cmegroup.com/education/files/eurodollar-futures-the-basics-file01.pdf
 
     def __init__(self,
-                 todayDate,
-                 futureNumber,  # 1, 2, 3 for the first, second, third future
-                 futureTenor="3M",  # '1M', '2M', '3M'
-                 accrualType=FinDayCountTypes.ACT_360,
-                 contractSize=ONE_MILLION):
+                 todayDate: FinDate,
+                 futureNumber: int,  # 1, 2, 3 for the first, second, third future
+                 futureTenor: str = "3M",  # '1M', '2M', '3M'
+                 accrualType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 contractSize: float = ONE_MILLION):
         ''' Create an interest rate futures contract.'''
 
-        if isinstance(futureNumber, int) is False:
-            raise FinError("Future number must be an integer")
+        checkArgumentTypes(self.__init__, locals())
 
         if futureNumber < 1:
             raise FinError("Future number must be 1 or more")
 
         if futureTenor != "3M" and futureTenor != "3m":
             raise FinError("Only 3M IMM futures handled currently.")
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Day Count Rule type " + str(accrualType))
 
         self._deliveryDate = todayDate.nextIMMDate()
 
