@@ -192,6 +192,28 @@ def labelToString(label, value, separator="\n", listFormat=False):
 
 ##########################################################################
     
+def tableToString(header, valueTable, floatPrecision="10.7f"):
+    ''' Format a 2D array into a table-like string. '''
+    if (len(valueTable) == 0 or type(valueTable) is not list):
+        print(len(valueTable))
+        return ""
+    
+    numRows = len(valueTable[0])
+
+    s = header + "\n"
+    for i in range(numRows):
+        for vList in valueTable:
+            # isinstance is needed instead of type in case of pandas floats
+            if (isinstance(vList[i], float)):
+                s += format(vList[i], floatPrecision) + ", "
+            else:
+                s += str(vList[i]) + ", "
+        s = s[:-2] + "\n"
+
+    return s[:-1]
+
+##########################################################################
+
 def toUsableType(t):
     ''' Convert a type such that it can be used with `isinstance` '''
     if hasattr(t, '__origin__'):

@@ -15,6 +15,7 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinHelperFunctions import labelToString, tableToString
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
@@ -805,6 +806,30 @@ class FinCDS(object):
         ir01 = fullPV_ir_bumped - fullPV
 
         return (fullPV, cleanPV, credit01, ir01)
+
+##########################################################################
+
+    def __repr__(self):
+        ''' print out details of the CDS contract and all of the calculated
+        cashflows '''
+        s = labelToString("STEPINDATE", self._stepInDate)
+        s += labelToString("MATURITY", self._maturityDate)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("RUNNING COUPON", self._coupon * 10000, "bp\n")
+        s += labelToString("DAYCOUNT", self._dayCountType)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("ACCRUED DAYS:", self.accruedDays())
+
+        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
+        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+        precision = "12.6f"
+
+        s += tableToString(header, valueTable, precision)
+
+        return s
 
 ##########################################################################
 

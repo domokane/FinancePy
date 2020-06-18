@@ -458,11 +458,12 @@ class FinBondFRN(object):
     def __repr__(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        s = labelToString("MATURITY DATE:", self._maturityDate)
-        s += labelToString("COUPON:", self._coupon)
-        s += labelToString("FREQUENCY:", self._frequencyType)
-        s += labelToString("ACCRUAL TYPE:", self._accrualType)
-        s += labelToString("FACE:", self._face)
+        s = labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("COUPON", self._coupon)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("ACCRUAL TYPE", self._accrualType)
+        s += labelToString("FACE", self._face)
+
         return s
 
 ###############################################################################
