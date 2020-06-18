@@ -6,10 +6,13 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from .FinBond import FinBond
 
 from enum import Enum
 import numpy as np
+
 
 ###############################################################################
 
@@ -37,11 +40,13 @@ class FinBondOption():
     ''' Class for options on fixed coupon bonds. '''
 
     def __init__(self,
-                 bond,
-                 expiryDate,
-                 strikePrice,
-                 face,
-                 optionType):
+                 bond: FinBond,
+                 expiryDate: FinDate,
+                 strikePrice: float,
+                 face: float,
+                 optionType: FinBondOptionTypes):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = strikePrice

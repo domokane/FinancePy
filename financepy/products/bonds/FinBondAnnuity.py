@@ -10,7 +10,9 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+
+
 
 ###############################################################################
 
@@ -22,33 +24,16 @@ class FinBondAnnuity(object):
     Dates are then adjusted according to a specified calendar. '''
 
     def __init__(self,
-                 maturityDate,
-                 coupon,
-                 frequencyType,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD,
-                 dayCountConventionType=FinDayCountTypes.ACT_360,
-                 face=100.0):
+                 maturityDate: FinDate,
+                 coupon: float,
+                 frequencyType: FinFrequencyTypes,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
+                 dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 face: float = 100.0):
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError("Unknown Business Day Adjust type " +
-                           str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError("Unknown Date Gen Rule type " +
-                           str(dateGenRuleType))
-
-        if dayCountConventionType not in FinDayCountTypes:
-            raise ValueError("Unknown Day Count type " +
-                             str(dayCountConventionType))
+        checkArgumentTypes(self.__init__, locals())
 
         self._maturityDate = maturityDate
         self._coupon = coupon

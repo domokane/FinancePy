@@ -6,6 +6,7 @@
 import numpy as np
 from math import sqrt
 
+
 from ...models.FinModelGaussianCopula1F import trSurvProbGaussian
 from ...models.FinModelGaussianCopula1F import trSurvProbAdjBinomial
 from ...models.FinModelGaussianCopula1F import trSurvProbRecursion
@@ -25,7 +26,8 @@ from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinError import FinError
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
@@ -44,18 +46,20 @@ class FinLossDistributionBuilder(Enum):
 class FinCDSTranche(object):
 
     def __init__(self,
-                 stepInDate,
-                 maturityDate,
-                 k1,
-                 k2,
-                 notional=ONE_MILLION,
-                 coupon=0.0,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 stepInDate: FinDate,
+                 maturityDate: FinDate,
+                 k1: float,
+                 k2: float,
+                 notional: float = ONE_MILLION,
+                 coupon: float = 0.0,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if k1 >= k2:
             raise FinError("K1 must be less than K2")

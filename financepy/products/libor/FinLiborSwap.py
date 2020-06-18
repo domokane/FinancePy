@@ -3,6 +3,8 @@
 ##############################################################################
 
 
+from typing import Union
+
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -10,7 +12,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ##########################################################################
 
@@ -19,23 +21,22 @@ class FinLiborSwap(object):
     ''' Class for managing an interest rate swap contract. '''
 
     def __init__(self,
-                 startDate,  # This is typically T+2 on a new swap
-                 maturityDateOrTenor,
-                 fixedCoupon,
-                 fixedFreqType,
-                 fixedDayCountType,
-                 notional=100.0,
-                 floatSpread=0.0,
-                 floatFreqType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_360,
-                 payFixedFlag=True,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,  # This is typically T+2 on a new swap
+                 maturityDateOrTenor: Union[FinDate, str],
+                 fixedCoupon: float,
+                 fixedFreqType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 notional: float = 100.0,
+                 floatSpread: float = 0.0,
+                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 payFixedFlag: bool = True,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract. '''
 
-        if type(startDate) != FinDate:
-            raise ValueError("Swap Start date must be a FinDate.")
+        checkArgumentTypes(self.__init__, locals())
 
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
@@ -44,39 +45,6 @@ class FinLiborSwap(object):
 
         if startDate > maturityDate:
             raise ValueError("Start date after maturity date")
-
-        if fixedDayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Fixed Day Count Rule type " +
-                str(fixedDayCountType))
-
-        if floatDayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Float Day Count Rule type " +
-                str(floatDayCountType))
-
-        if fixedFreqType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(fixedFreqType))
-
-        if floatFreqType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Float Frequency type " +
-                str(fixedFreqType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate

@@ -5,6 +5,7 @@
 from math import sqrt, log
 from scipy import optimize
 
+
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
@@ -12,7 +13,8 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...products.credit.FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ##########################################################################
 
@@ -37,41 +39,25 @@ class FinCDSOption():
     ''' Class to manage the pricing and risk-management of options on a CDS. '''
 
     def __init__(self,
-                 expiryDate,
-                 maturityDate,
-                 strikeCoupon,
-                 notional=ONE_MILLION,
-                 longProtection=True,
-                 knockoutFlag=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 expiryDate: FinDate,
+                 maturityDate: FinDate,
+                 strikeCoupon: float,
+                 notional: float = ONE_MILLION,
+                 longProtection: bool = True,
+                 knockoutFlag: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if maturityDate < expiryDate:
             raise ValueError("Maturity date must be after option expiry date")
 
         if strikeCoupon < 0.0:
             raise ValueError("Strike must be greater than zero")
-
-        if frequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._expiryDate = expiryDate
         self._maturityDate = maturityDate

@@ -5,6 +5,7 @@
 
 from math import exp, log, sqrt
 
+
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -14,7 +15,8 @@ from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
 from ...market.curves.FinCDSCurve import FinCDSCurve
 from .FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -27,19 +29,21 @@ class FinCDSIndexOption(object):
     into a CDS index. Different pricing algorithms are presented.'''
 
     def __init__(self,
-                 expiryDate,
-                 maturityDate,
-                 indexCoupon,
-                 strikeCoupon,
-                 notional=ONE_MILLION,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 expiryDate: FinDate,
+                 maturityDate: FinDate,
+                 indexCoupon: float,
+                 strikeCoupon: float,
+                 notional: float = ONE_MILLION,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract.'''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if expiryDate > maturityDate:
             raise FinError("Expiry date after end date")
@@ -49,29 +53,6 @@ class FinCDSIndexOption(object):
 
         if strikeCoupon < 0.0:
             raise FinError("Index Option strike coupon is negative")
-
-        if dayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Fixed Day Count Rule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._expiryDate = expiryDate
         self._maturityDate = maturityDate
