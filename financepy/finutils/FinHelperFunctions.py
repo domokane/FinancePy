@@ -4,7 +4,7 @@
 
 import numpy as np
 from numba import njit
-from typing import get_origin, get_args, List, Union
+from typing import List, Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
@@ -194,18 +194,18 @@ def labelToString(label, value, separator="\n", listFormat=False):
     
 def toUsableType(t):
     ''' Convert a type such that it can be used with `isinstance` '''
-    origin = get_origin(t)
-    if origin is None:
-        # t is a normal type
-        if t is float:
-            return (int, float, np.float64)
-    else:
+    if hasattr(t, '__origin__'):
+        origin = t.__origin__
         # t comes from the `typing` module
         if origin is list:
             return (list, np.ndarray)
         elif origin is Union:
-            types = get_args(t)
+            types = t.__args__
             return tuple(toUsableType(tp) for tp in types)
+    else:
+        # t is a normal type
+        if t is float:
+            return (int, float, np.float64) 
     
     return t
 
