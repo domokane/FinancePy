@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityCompoundOption import FinEquityCompoundOption
-from financepy.products.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 from financepy.finutils.FinDate import FinDate

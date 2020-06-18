@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
-
 from enum import Enum
 
 
 class FinFrequencyTypes(Enum):
+    CONTINUOUS = -1
     ANNUAL = 1
     SEMI_ANNUAL = 2
     QUARTERLY = 3
@@ -20,7 +19,9 @@ def FinFrequency(frequencyType):
     ''' This is a function that takes in a Frequency Type and returns an
     integer for the number of times a year a payment occurs.'''
     if frequencyType in FinFrequencyTypes:
-        if frequencyType == FinFrequencyTypes.ANNUAL:
+        if frequencyType == FinFrequencyTypes.CONTINUOUS:
+            return -1
+        elif frequencyType == FinFrequencyTypes.ANNUAL:
             return 1
         elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
             return 2

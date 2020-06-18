@@ -39,7 +39,7 @@ def test_BlackKarasinskiExampleOne():
     a = 0.22
     numTimeSteps = 40
     tmat = (endDate - startDate)/gDaysInYear
-    model = FinModelRatesBK(a, sigma, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, numTimeSteps)
     model.buildTree(tmat, times, dfs)
 #    printTree(model._Q)
 #    print("")
@@ -96,7 +96,7 @@ def test_BlackKarasinskiExampleTwo():
     treeVector = []
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesBK(a, sigma, numTimeSteps)
+        model = FinModelRatesBK(sigma, a, numTimeSteps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strikePrice,
                              face, couponTimes, couponFlows, isAmerican)

@@ -35,7 +35,7 @@ class FinLiborSwap(object):
         ''' Create an interest rate swap contract. '''
 
         if type(startDate) != FinDate:
-            raise ValueError("Settlement date must be a FinDate.")
+            raise ValueError("Swap Start date must be a FinDate.")
 
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor

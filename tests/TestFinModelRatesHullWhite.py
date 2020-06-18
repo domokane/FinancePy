@@ -34,7 +34,7 @@ def test_HullWhiteExampleOne():
     sigma = 0.01
     a = 0.1
     numTimeSteps = 3
-    model = FinModelRatesHW(a, sigma, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, numTimeSteps)
     treeMat = (endDate - startDate)/gDaysInYear
     model.buildTree(treeMat, times, dfs)
 #   printTree(model._Q)
@@ -73,18 +73,15 @@ def test_HullWhiteExampleTwo():
     tmat = (maturityDate - startDate)/gDaysInYear
 
     numTimeSteps = 100
-    model = FinModelRatesHW(a, sigma, numTimeSteps)
-    vAnal = model.optionOnZeroCouponBond(texp,
-                                         tmat,
-                                         strike, face,
-                                         times, dfs)
+    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
     numStepsList = range(100, 500, 10)
     analVector = []
     treeVector = []
 
-    testCases.header("NUMTIMESTEP","VTREE","VANAL","PERIOD")
+    testCases.header("NUMTIMESTEP", "VTREE", "VANAL","PERIOD")
     for numTimeSteps in numStepsList:
         start = time.time()
         model.buildTree(texp, times, dfs)
@@ -148,7 +145,7 @@ def test_HullWhiteBondOption():
 
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         model.buildTree(texp, times, dfs)
 
         americanExercise = False
@@ -254,7 +251,7 @@ def test_HullWhiteCallableBond():
 
     for numTimeSteps in numStepsList:
         start = time.time()
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         model.buildTree(tmat, times, dfs)
 
         v2 = model.callablePuttableBond_Tree(couponTimes, couponFlows,

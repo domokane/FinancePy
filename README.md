@@ -8,9 +8,19 @@ FinancePy is a library of native Python functions which covers the following fun
 * Optimal Portfolio asset allocation using Markovitz and other methods.
 * Time series analysis of financial data using econometric techniques.
 
-The aim of this library for me has been to provide a comprehensive and accessible Python library for financial calculations that can be used by students to learn about financial derivatives. It can also be used by academics and practitioners to perform the pricing and risk-management of complex financial products, albeit without any warranties. Users should perform their own testing. See the license for the full disclaimer.
+The target audience for this library is intended to include:
 
-I intend that subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. In general my objectives have been:
+* Students, professor, or other academics seeking to teach derivative or asset pricing pricing via a library which permits the ability to dig into the underlying functions.
+* Traders wishing to price or risk manage a derivative.
+* Quantitative analysts
+* Risk managers both on the buy and sell side
+* Portfolio managers wishing to check prices or calculate risk measures
+* Fund managers wanting to value a portfolio or examine a trading strategy
+* Structurers or financial engineers seeking to examine the pricing of a derivative structure.
+
+Users would be expected to have a good, but not advanced, understanding of Python, financial derivatives and some mathematics. 
+
+Up until now my main focus has been on financial derivatives. Subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. In general my objectives have been:
 
 1. To make the code as simple as possible so that students and those with a basic Python fluency can understand and check the code.
 2. To keep all the code in Python so users can look through the code to the lowest level.
@@ -22,6 +32,21 @@ I intend that subsequent versions will also include asset selection, portfolio-l
 8. To make it easy for interested parties to contribute.
 
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
+
+## The Library Design
+The underlying Python library is split into a number of major modules:
+
+* Finutils - These are utility functions used to assist you with modelling a security. These include dates (FinDate), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
+* Market - These are modules that capture the market information used to value a security. These include interest rate and credit curves, volatility surfaces and prices.
+* Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models. 
+* Products - These are the actual securities and range from Government bonds to Bermudan swaptions.
+
+Any price is the result of a PRODUCT + MODEL + MARKET. The interface to each product has a value() function that will take a model and market to produce a price.
+
+There are also two other folders which are currently fairly empty: They are:
+* Portfolio - This will be where portfolio allocation will go,
+* Risk - This is for portfolio risk analysis
+
 
 ## How to Use the Library
 
@@ -53,19 +78,18 @@ pip install --upgrade financepy
 
 FinancePy depends on Numpy and Numba and Scipy.
 
-
 ## Changelog
 
 See the changelog for a detailed history of changes
 
 ## Contributions
 
-Contributions are welcome. There are a number of requirements:
+Contributions are very welcome. There are a number of requirements:
 
 * You should use CamelCase i.e. variables of the form optionPrice
 * Comments are required for every class and function and they should be clear
-* At least one test case must be provided for every module
-* Use a dict if you are planning to return multiple values. Makes it easier for users to understand values.
+* At least one test case must be provided for every function
+* Follow the style of the code as currently written. This may change over time but please use the current style as your guide.
 
 ## License
 

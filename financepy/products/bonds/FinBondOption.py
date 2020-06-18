@@ -250,8 +250,6 @@ class FinBondOption():
         else:
             raise FinError("Unknown model and option combination")
 
-        return 999.0
-
 ###############################################################################
 
     def __repr__(self):

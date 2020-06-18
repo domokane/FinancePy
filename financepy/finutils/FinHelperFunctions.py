@@ -6,9 +6,16 @@ import numpy as np
 from numba import njit
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
+from .FinError import FinError
 
 ##########################################################################
 
+def checkDate(d):
+
+    if isinstance(d, FinDate) is False:
+        raise FinError("Should be a date dummy!")
+
+##########################################################################
 
 def dump(obj):
     ''' Get a list of all of the attributes of a class (not built in ones) '''
@@ -182,6 +189,8 @@ def labelToString(label, value, separator="\n", listFormat=False):
     else:
         return f"{label}: {value}{separator}"
 
+##########################################################################
+
 def tableToString(header, valueTable, floatPrecision="10.7f"):
     ''' Format a 2D array into a table-like string. '''
     if (len(valueTable) == 0 or type(valueTable) is not list):
@@ -201,3 +210,18 @@ def tableToString(header, valueTable, floatPrecision="10.7f"):
         s = s[:-2] + "\n"
 
     return s[:-1]
+
+##########################################################################
+
+def checkArgumentTypes(func, values):
+    ''' Check that all values passed into a function are of the same type
+    as the function annotations. If a value has not been annotated, it
+    will not be checked. '''
+    for valueName, annotationType in func.__annotations__.items():
+        value = values[valueName]
+        if not isinstance(value, annotationType):
+            s = f"In {func.__module__}.{func.__name__}:\n"
+            s += f"Mismatched Types: expected a "
+            s += f"{valueName} of type '{annotationType.__name__}', however"
+            s += f" a value of type '{type(value).__name__}' was given."
+            raise FinError(s)

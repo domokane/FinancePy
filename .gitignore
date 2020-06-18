@@ -26,3 +26,6 @@ financepy-0.*
 *.toc
 *.pdf
 *.bak
+
+# MYPY
+.mypy_cache

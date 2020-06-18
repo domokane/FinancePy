@@ -17,7 +17,7 @@ from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...models.FinModelCRRTree import crrTreeValAvg
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString
 
 N = norm.cdf

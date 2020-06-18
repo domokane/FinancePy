@@ -10,7 +10,7 @@ import numpy as np
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-from financepy.products.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinFlatCurve import FinFlatCurve

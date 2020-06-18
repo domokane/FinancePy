@@ -76,7 +76,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     timeSteps = range(50, 1000, 10)
     values = []
     for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
@@ -98,12 +98,12 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # 68.38 found in blog article. But this is for 40 grid points.
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
-    valueDate = FinDate(16, 8, 2016)
-    settlementDate = valueDate.addWorkDays(3)
+    valuationDate = FinDate(16, 8, 2016)
+    settlementDate = valuationDate.addWorkDays(3)
 
     ###########################################################################
 
-    discountCurve = FinFlatCurve(valueDate, 0.035, 2)
+    discountCurve = FinFlatCurve(valuationDate, 0.035, 2)
 
     ###########################################################################
 
@@ -146,7 +146,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     timeSteps = range(100, 1000, 20)
     values = []
     for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()

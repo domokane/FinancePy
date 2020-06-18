@@ -4,6 +4,7 @@
 
 # TODO: Implied volatility
 # TODO: Term structure of volatility
+# TODO: Check that curve anchor date is valuation date ?
 
 import numpy as np
 
@@ -15,14 +16,17 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import ONE_MILLION, N
+from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString
-from ...products.libor.FinLiborModelTypes import FinLiborModelBlack
-from ...products.libor.FinLiborModelTypes import FinLiborModelShiftedBlack
-from ...products.libor.FinLiborModelTypes import FinLiborModelSABR
-from ...models.FinModelSABR import blackVolFromSABR
+from ...models.FinModelBlack import FinModelBlack
+from ...models.FinModelBlackShifted import FinModelBlackShifted
+from ...models.FinModelSABR import FinModelSABR
+from ...models.FinModelSABRShifted import FinModelSABRShifted
+from ...models.FinModelRatesHW import FinModelRatesHW
+
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 ##########################################################################
 
@@ -126,6 +130,7 @@ class FinLiborCapFloor():
         self._capFloorPV = []
 
         self._valuationDate = None
+        self._dayCounter = None
 
 ##########################################################################
 
@@ -143,7 +148,7 @@ class FinLiborCapFloor():
                                           self._busDayAdjustType,
                                           self._dateGenRuleType).generate()
 
-        dayCounter = FinDayCount(self._dayCountType)
+        self._dayCounter = FinDayCount(self._dayCountType)
         numOptions = len(self._capFloorDates)
         strikeRate = self._strikeRate
 
@@ -177,7 +182,7 @@ class FinLiborCapFloor():
         else:
             fwdRate = self._lastFixing
 
-        alpha = dayCounter.yearFrac(startDate, endDate)
+        alpha = self._dayCounter.yearFrac(startDate, endDate)
         df = liborCurve.df(endDate)
 
         if self._optionType == FinLiborCapFloorType.CAP:
@@ -199,7 +204,7 @@ class FinLiborCapFloor():
 
             startDate = self._capFloorDates[i - 1]
             endDate = self._capFloorDates[i]
-            alpha = dayCounter.yearFrac(startDate, endDate)
+            alpha = self._dayCounter.yearFrac(startDate, endDate)
             df = liborCurve.df(endDate)
             fwdRate = liborCurve.fwdRate(startDate, endDate,
                                          self._dayCountType)
@@ -238,67 +243,71 @@ class FinLiborCapFloor():
                             liborCurve,
                             model):
 
-        df = liborCurve.df(endDate)
-        t = (startDate - valuationDate) / gDaysInYear
+        # Uncertainty starts after the swaption settles on its start date
+        texp = (startDate - self._startDate) / gDaysInYear
+        tend = (endDate - self._startDate) / gDaysInYear
+
         f = liborCurve.fwdRate(startDate, endDate, self._dayCountType)
         k = self._strikeRate
+        df = liborCurve.df(tend)
 
         if k == 0.0:
             k = 1e-10
 
-        if type(model) == FinLiborModelBlack:
-
-            v = model._volatility
-
-            if v < 0:
-                raise FinError("Black Volatility must be positive")
-
-            if v == 0.0:
-                v = 1e-10
-
-            if f <= 0:
-                raise FinError("Forward must be positive in lognormal model.")
-
-            d1 = (np.log(f / k) + v * v * t / 2.0) / v / np.sqrt(t)
-            d2 = d1 - v * np.sqrt(t)
+        if isinstance(model, FinModelBlack):
 
             if self._optionType == FinLiborCapFloorType.CAP:
-                capFloorLetValue = df * (f * N(+d1) - k * N(+d2))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_CALL)
             elif self._optionType == FinLiborCapFloorType.FLOOR:
-                capFloorLetValue = df * (k * N(-d2) - f * N(-d1))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_PUT)
 
-        elif type(model) == FinLiborModelShiftedBlack:
-
-            v = model._volatility
-            h = model._shift
-
-            if v <= 0:
-                raise FinError("Black Volatility must be positive")
-
-            d1 = (np.log((f - h) / (k - h)) + v * v * t / 2.0) / v / np.sqrt(t)
-            d2 = d1 - v * np.sqrt(t)
+        elif isinstance(model, FinModelBlackShifted):
 
             if self._optionType == FinLiborCapFloorType.CAP:
-                capFloorLetValue = df * ((f - h) * N(+d1) - (k - h) * N(+d2))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_CALL)
             elif self._optionType == FinLiborCapFloorType.FLOOR:
-                capFloorLetValue = df * ((k - h) * N(-d2) - (f - h) * N(-d1))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_PUT)
 
-        elif type(model) == FinLiborModelSABR:
-
-            alpha = model._alpha
-            beta = model._beta
-            rho = model._rho
-            nu = model._nu
-
-            v = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
-
-            d1 = (np.log((f) / (k)) + v * v * t / 2.0) / v / np.sqrt(t)
-            d2 = d1 - v * np.sqrt(t)
+        elif isinstance(model, FinModelSABR):
 
             if self._optionType == FinLiborCapFloorType.CAP:
-                capFloorLetValue = df * ((f) * N(+d1) - (k) * N(+d2))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_CALL)
             elif self._optionType == FinLiborCapFloorType.FLOOR:
-                capFloorLetValue = df * ((k) * N(-d2) - (f) * N(-d1))
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_PUT)
+
+        elif isinstance(model, FinModelSABRShifted):
+
+            if self._optionType == FinLiborCapFloorType.CAP:
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_CALL)
+            elif self._optionType == FinLiborCapFloorType.FLOOR:
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_PUT)
+
+        elif isinstance(model, FinModelRatesHW):
+
+            tmat = (endDate - valuationDate) / gDaysInYear
+            alpha = self._dayCounter.yearFrac(startDate, endDate)
+            strikePrice = 1.0/(1.0 + alpha * self._strikeRate)
+            notionalAdj = (1.0 + self._strikeRate * alpha)
+            face = 1.0
+            dfTimes = liborCurve._times
+            dfValues = liborCurve._values
+
+            v = model.optionOnZCB(texp, tmat, strikePrice, face,
+                                  dfTimes, dfValues)
+
+            # we divide by alpha to offset the multiplication above
+            if self._optionType == FinLiborCapFloorType.CAP:
+                capFloorLetValue = v['put'] * notionalAdj / alpha
+            elif self._optionType == FinLiborCapFloorType.FLOOR:
+                capFloorLetValue = v['call'] * notionalAdj / alpha
 
         else:
             raise FinError("Unknown model type " + str(model))

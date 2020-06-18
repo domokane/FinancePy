@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...products.FinOptionTypes import FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...products.fx.FinFXVanillaOption import solveForStrike
 from ...products.fx.FinFXMktConventions import FinFXATMMethod

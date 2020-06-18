@@ -64,7 +64,7 @@ def test_FinBondOption():
         a = 0.1
 
         bondOption = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model = FinModelRatesHW(a, sigma, numTimeSteps)
+        model = FinModelRatesHW(sigma, a, numTimeSteps)
         v = bondOption.value(settlementDate, discountCurve, model)
         testCases.print("EUROPEAN CALL - HW", strikePrice, v)
 
@@ -84,7 +84,7 @@ def test_FinBondOption():
         a = 0.1
 
         bondOption = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model = FinModelRatesHW(a, sigma)
+        model = FinModelRatesHW(sigma, a)
         v = bondOption.value(settlementDate, discountCurve, model)
         testCases.print("AMERICAN CALL - HW", strikePrice, v)
 
@@ -93,14 +93,14 @@ def test_FinBondOption():
     optionType = FinBondOptionTypes.EUROPEAN_PUT
 
     price = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
-    
+
     for strikePrice in strikes:
 
         sigma = 0.01
         a = 0.1
 
         bondOption = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model = FinModelRatesHW(a, sigma)
+        model = FinModelRatesHW(sigma, a)
         v = bondOption.value(settlementDate, discountCurve, model)
         testCases.print("EUROPEAN PUT - HW", strikePrice, v)
 
@@ -116,7 +116,7 @@ def test_FinBondOption():
         a = 0.1
 
         bondOption = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model = FinModelRatesHW(a, sigma)
+        model = FinModelRatesHW(sigma, a)
         v = bondOption.value(settlementDate, discountCurve, model)
         testCases.print("AMERICAN PUT - HW", strikePrice, v)
 
@@ -170,21 +170,21 @@ def test_FinBondOptionEuropeanConvergence():
         optionType = FinBondOptionTypes.EUROPEAN_PUT
 
         bondOption1 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model1 = FinModelRatesHW(a, sigma, numTimeSteps)
+        model1 = FinModelRatesHW(sigma, a, numTimeSteps)
         v1put = bondOption1.value(settlementDate, discountCurve, model1)
 
         bondOption2 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model2 = FinModelRatesHW(a, sigma, numTimeSteps, False)
+        model2 = FinModelRatesHW(sigma, a, numTimeSteps, False)
         v2put = bondOption2.value(settlementDate, discountCurve, model2)
 
         optionType = FinBondOptionTypes.EUROPEAN_CALL
 
         bondOption1 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model1 = FinModelRatesHW(a, sigma, numTimeSteps)
+        model1 = FinModelRatesHW(sigma, a, numTimeSteps)
         v1call = bondOption1.value(settlementDate, discountCurve, model1)
 
         bondOption2 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model2 = FinModelRatesHW(a, sigma, numTimeSteps, False)
+        model2 = FinModelRatesHW(sigma, a, numTimeSteps, False)
         v2call = bondOption2.value(settlementDate, discountCurve, model2)
 
         end = time.time()
@@ -237,22 +237,22 @@ def test_FinBondOptionAmericanConvergenceONE():
 
         optionType = FinBondOptionTypes.AMERICAN_PUT
         bondOption1 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model1 = FinModelRatesHW(a, sigma, numTimeSteps)
+        model1 = FinModelRatesHW(sigma, a, numTimeSteps)
         v1put = bondOption1.value(settlementDate, discountCurve, model1)
 
         optionType = FinBondOptionTypes.EUROPEAN_PUT
         bondOption2 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model2 = FinModelRatesHW(a, sigma, numTimeSteps, False)
+        model2 = FinModelRatesHW(sigma, a, numTimeSteps, False)
         v2put = bondOption2.value(settlementDate, discountCurve, model2)
 
         optionType = FinBondOptionTypes.AMERICAN_CALL
         bondOption1 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model1 = FinModelRatesHW(a, sigma, numTimeSteps)
+        model1 = FinModelRatesHW(sigma, a, numTimeSteps)
         v1call = bondOption1.value(settlementDate, discountCurve, model1)
 
         optionType = FinBondOptionTypes.EUROPEAN_CALL
         bondOption2 = FinBondOption(bond, expiryDate, strikePrice, face, optionType)
-        model2 = FinModelRatesHW(a, sigma, numTimeSteps, False)
+        model2 = FinModelRatesHW(sigma, a, numTimeSteps, False)
         v2call = bondOption2.value(settlementDate, discountCurve, model2)
 
         end = time.time()
@@ -286,7 +286,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
 
     sigma = 0.01
     a = 0.1
-    hwModel = FinModelRatesHW(a, sigma)
+    hwModel = FinModelRatesHW(sigma, a)
     K = 102.0
 
     vec_ec = []
@@ -297,7 +297,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
     numStepsVector = range(10,500,10)
 
     for numSteps in numStepsVector:
-        hwModel = FinModelRatesHW(a, sigma, numSteps)
+        hwModel = FinModelRatesHW(sigma, a, numSteps)
 
         start = time.time()
 

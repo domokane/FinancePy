@@ -12,9 +12,9 @@ from numba import njit
 from ...finutils.FinMath import N, phi2
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...products.FinOptionTypes import FinOptionTypes
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinFlatCurve import FinFlatCurve
 from ...finutils.FinHelperFunctions import labelToString
