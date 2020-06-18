@@ -7,6 +7,7 @@
 
 import numpy as np
 
+
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
@@ -15,7 +16,8 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 from ...products.libor.FinLiborSwap import FinLiborSwap
 
 from ...models.FinModelBlack import FinModelBlack
@@ -49,62 +51,31 @@ class FinLiborSwaption():
     ''' This is the class for the European-stype swaption. '''
 
     def __init__(self,
-                 settlementDate,
-                 exerciseDate,
-                 maturityDate,
-                 swaptionType,
-                 fixedCoupon,
-                 fixedFrequencyType,
-                 fixedDayCountType,
-                 notional=ONE_MILLION,
-                 floatFrequencyType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 settlementDate: FinDate,
+                 exerciseDate: FinDate,
+                 maturityDate: FinDate,
+                 swaptionType: FinLiborSwaptionTypes,
+                 fixedCoupon: float,
+                 fixedFrequencyType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 notional: float = ONE_MILLION,
+                 floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
         floating leg payment schedules. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
 
         if exerciseDate > maturityDate:
             raise FinError("Exercise date must be before swap maturity date")
-
-        if fixedDayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Fixed DayCountRule type " +
-                str(fixedDayCountType))
-
-        if fixedFrequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Fixed Frequency type " +
-                str(fixedFrequencyType))
-
-        if floatDayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Float DayCountRule type " +
-                str(floatDayCountType))
-
-        if floatFrequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown Float Frequency type " +
-                str(floatFrequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate

@@ -7,6 +7,7 @@
 from math import exp, sqrt
 from numba import njit
 import numpy as np
+from typing import List
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
@@ -14,7 +15,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
@@ -257,28 +258,22 @@ class FinBondConvertible(object):
     the credit quality of the issuer and the level of interest rates.'''
 
     def __init__(self,
-                 maturityDate,  # bond maturity date
-                 coupon,  # annual coupon
-                 frequencyType,  # coupon frequency type
-                 startConvertDate,  # date after which conversion is possible
-                 conversionRatio,  # number of shares per face of notional
-                 callDates,  # list of call dates
-                 callPrices,  # list of call prices
-                 putDates,  # list of put dates
-                 putPrices,  # list of put prices
-                 accrualType,  # day count type for accrued interest
-                 face=100.0  # face amount
+                 maturityDate: FinDate,  # bond maturity date
+                 coupon: float,  # annual coupon
+                 frequencyType: FinFrequencyTypes,  # coupon frequency type
+                 startConvertDate: FinDate,  # date after which conversion is possible
+                 conversionRatio: float,  # number of shares per face of notional
+                 callDates: List[FinDate],  # list of call dates
+                 callPrices: List[int],  # list of call prices
+                 putDates: List[FinDate],  # list of put dates
+                 putPrices: List[int],  # list of put prices
+                 accrualType: FinDayCountTypes,  # day count type for accrued interest
+                 face: float = 100.0  # face amount
                  ):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Day Count Accrued Convention type " +
-                           str(accrualType))
+        checkArgumentTypes(self.__init__, locals())
 
         if startConvertDate > maturityDate:
             raise FinError("Start convert date is after bond maturity.")

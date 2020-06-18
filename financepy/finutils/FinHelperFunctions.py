@@ -4,6 +4,7 @@
 
 import numpy as np
 from numba import njit
+from typing import get_origin, get_args, List, Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
@@ -190,7 +191,25 @@ def labelToString(label, value, separator="\n", listFormat=False):
         return f"{label}: {value}{separator}"
 
 ##########################################################################
+    
+def toUsableType(t):
+    ''' Convert a type such that it can be used with `isinstance` '''
+    origin = get_origin(t)
+    if origin is None:
+        # t is a normal type
+        if t is float:
+            return (int, float, np.float64)
+    else:
+        # t comes from the `typing` module
+        if origin is list:
+            return (list, np.ndarray)
+        elif origin is Union:
+            types = get_args(t)
+            return tuple(toUsableType(tp) for tp in types)
+    
+    return t
 
+##########################################################################
 
 def checkArgumentTypes(func, values):
     ''' Check that all values passed into a function are of the same type
@@ -198,9 +217,10 @@ def checkArgumentTypes(func, values):
     will not be checked. '''
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
-        if not isinstance(value, annotationType):
+        usableType = toUsableType(annotationType)
+        if(not isinstance(value, usableType)):
             s = f"In {func.__module__}.{func.__name__}:\n"
             s += f"Mismatched Types: expected a "
-            s += f"{valueName} of type '{annotationType.__name__}', however"
+            s += f"{valueName} of type '{usableType.__name__}', however"
             s += f" a value of type '{type(value).__name__}' was given."
             raise FinError(s)

@@ -5,12 +5,14 @@
 from math import exp, log, sqrt
 import numpy as np
 
+
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 ##########################################################################
 # TODO
@@ -35,9 +37,11 @@ class FinEquityFixedLookbackOptionTypes(Enum):
 class FinEquityFixedLookbackOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate,
-                 optionType,
-                 optionStrike):
+                 expiryDate: FinDate,
+                 optionType: FinEquityFixedLookbackOptionTypes,
+                 optionStrike: float):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._optionType = optionType

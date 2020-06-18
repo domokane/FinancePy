@@ -7,6 +7,7 @@
 
 import numpy as np
 
+
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes
@@ -24,7 +25,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
@@ -34,16 +36,18 @@ class FinCDSBasket(object):
     ''' Class to deal with n-to-default CDS baskets. '''
 
     def __init__(self,
-                 stepInDate,
-                 maturityDate,
-                 notional=ONE_MILLION,
-                 coupon=0.0,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 stepInDate: FinDate,
+                 maturityDate: FinDate,
+                 notional: float = ONE_MILLION,
+                 coupon: float = 0.0,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 
+        checkArgumentTypes(self.__init__, locals())
 
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
