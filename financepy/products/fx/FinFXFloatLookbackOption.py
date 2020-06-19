@@ -11,7 +11,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equities.FinOption import FinOption
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 ##########################################################################
 # TODO
@@ -34,8 +35,10 @@ class FinFloatLookbackOptionTypes(Enum):
 class FinFloatLookbackOption(FinOption):
 
     def __init__(self,
-                 expiryDate,
-                 optionType):
+                 expiryDate: FinDate,
+                 optionType: FinFloatLookbackOptionTypes):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._optionType = optionType

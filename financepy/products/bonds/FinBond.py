@@ -77,22 +77,14 @@ class FinBond(object):
 
     def __init__(self,
                  maturityDate: FinDate,
-                 coupon: (int, float),
+                 coupon: float,
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
-                 face: (int, float) = 100.0):
+                 face: float = 100.0):
         ''' Create FinBond object by providing Maturity Date, Frequency,
         coupon and the accrual convention type. '''
 
         checkArgumentTypes(self.__init__, locals())
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Bond Accrued Convention type " +
-                           str(accrualType))
 
         self._maturityDate = maturityDate
         self._coupon = coupon

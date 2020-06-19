@@ -4,6 +4,7 @@
 
 from scipy import optimize
 
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
@@ -12,7 +13,7 @@ from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 # TODO: Need to complete and verify the risk sensitity calculations.
 
@@ -46,23 +47,16 @@ class FinBondFRN(object):
     quoted margin.'''
 
     def __init__(self,
-                 maturityDate,
-                 quotedMargin,
-                 frequencyType,
-                 accrualType,
-                 face=100.0):
+                 maturityDate: FinDate,
+                 quotedMargin: float,
+                 frequencyType: FinFrequencyTypes,
+                 accrualType: FinDayCountTypes,
+                 face: float = 100.0):
         ''' Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
         the position and par is the notional on which price is quoted. '''
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Bond Accrued Convention type " +
-                str(accrualType))
+        checkArgumentTypes(self.__init__, locals())
 
         self._maturityDate = maturityDate
         self._quotedMargin = quotedMargin

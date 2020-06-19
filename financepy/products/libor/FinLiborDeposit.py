@@ -2,13 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 
@@ -16,27 +18,18 @@ from ...finutils.FinHelperFunctions import labelToString
 class FinLiborDeposit(object):
 
     def __init__(self,
-                 settlementDate,
-                 maturityDateOrTenor,
-                 depositRate,
-                 dayCountType,
-                 notional=100.0,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 settlementDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 depositRate: float,
+                 dayCountType: FinDayCountTypes,
+                 notional: float = 100.0,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Libor deposit object. '''
 
-        if type(settlementDate) != FinDate:
-            raise ValueError("Settlement date must be a FinDate.")
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
+        checkArgumentTypes(self.__init__, locals())
 
         self._calendarType = calendarType
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError("Unknown Business Day Adjust type " +
-                             str(busDayAdjustType))
-
         self._busDayAdjustType = busDayAdjustType
 
         if type(maturityDateOrTenor) == FinDate:
@@ -49,11 +42,6 @@ class FinLiborDeposit(object):
 
         if settlementDate > maturityDate:
             raise ValueError("Settlement date after maturity date")
-
-        if dayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Day Count Rule type " +
-                str(dayCountType))
 
         self._settlementDate = settlementDate
         self._maturityDate = maturityDate

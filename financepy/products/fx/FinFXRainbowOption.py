@@ -4,6 +4,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import List
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, M
@@ -14,7 +15,7 @@ from ...products.equities.FinOption import FinOption
 
 from enum import Enum
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 class FinFXRainbowOptionTypes(Enum):
     CALL_ON_MAXIMUM = 1
@@ -95,10 +96,12 @@ def valueMCFast(t,
 class FinRainbowOption(FinOption):
 
     def __init__(self,
-                 expiryDate,
-                 payoffType,
-                 payoffParams,
-                 numAssets):
+                 expiryDate: FinDate,
+                 payoffType: FinFXRainbowOptionTypes,
+                 payoffParams: List[float],
+                 numAssets: int):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self.validatePayoff(payoffType, payoffParams, numAssets)
 

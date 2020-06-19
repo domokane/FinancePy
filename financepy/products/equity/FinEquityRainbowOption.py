@@ -5,6 +5,7 @@
 
 from math import exp, log, sqrt
 import numpy as np
+from typing import List
 
 #from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, M
@@ -12,7 +13,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 from enum import Enum
 
@@ -96,10 +98,12 @@ def valueMCFast(t,
 class FinEquityRainbowOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate,
-                 payoffType,
-                 payoffParams,
-                 numAssets):
+                 expiryDate: FinDate,
+                 payoffType: FinEquityRainbowOptionTypes,
+                 payoffParams: List[float],
+                 numAssets: int):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self.validatePayoff(payoffType, payoffParams, numAssets)
 

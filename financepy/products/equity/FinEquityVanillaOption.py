@@ -8,6 +8,8 @@ import numpy as np
 from scipy import optimize
 from scipy.stats import norm
 
+
+
 # from ...finutils.FinMath import N, nprime
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -18,7 +20,8 @@ from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...finutils.FinOptionTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 N = norm.cdf
 
@@ -73,10 +76,12 @@ def fvega(volatility, *args):
 class FinEquityVanillaOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,
-                 optionType,
-                 numOptions=1.0):
+                 expiryDate: FinDate,
+                 strikePrice: float,
+                 optionType: FinOptionTypes,
+                 numOptions: float = 1.0):
+
+        checkArgumentTypes(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
          optionType != FinOptionTypes.EUROPEAN_PUT and \
