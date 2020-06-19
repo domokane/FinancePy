@@ -940,6 +940,7 @@ class FinModelRatesHW():
 ###############################################################################
 
     def __repr__(self):
+        ''' Return string with class details. '''
         s = "Hull-White Model\n"
         s += labelToString("Sigma", self._sigma)
         s += labelToString("a", self._a)

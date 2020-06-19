@@ -264,9 +264,9 @@ class FinBondConvertible(object):
                  startConvertDate: FinDate,  # date after which conversion is possible
                  conversionRatio: float,  # number of shares per face of notional
                  callDates: List[FinDate],  # list of call dates
-                 callPrices: List[int],  # list of call prices
+                 callPrices: List[float],  # list of call prices
                  putDates: List[FinDate],  # list of put dates
-                 putPrices: List[int],  # list of put prices
+                 putPrices: List[float],  # list of put prices
                  accrualType: FinDayCountTypes,  # day count type for accrued interest
                  face: float = 100.0  # face amount
                  ):

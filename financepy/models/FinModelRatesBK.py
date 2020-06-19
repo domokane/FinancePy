@@ -756,6 +756,8 @@ class FinModelRatesBK():
 ###############################################################################
 
     def __repr__(self):
+        ''' Return string with class details. '''
+
         s = "Black-Karasinski Model\n"
         s += labelToString("Sigma", self._sigma)
         s += labelToString("a", self._a)

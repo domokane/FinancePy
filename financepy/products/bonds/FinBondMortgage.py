@@ -35,7 +35,7 @@ class FinBondMortgage(object):
     def __init__(self,
                  startDate: FinDate,
                  endDate: FinDate,
-                 principal: int,
+                 principal: float,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,

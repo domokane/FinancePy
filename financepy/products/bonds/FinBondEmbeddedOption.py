@@ -49,9 +49,9 @@ class FinBondEmbeddedOption(object):
                  frequencyType: FinFrequencyTypes,  # Frequency type - see FinFrequencyTypes
                  accrualType: FinDayCountTypes,  # Day count convention for accrued interest
                  callDates: List[FinDate],
-                 callPrices: List[int],
+                 callPrices: List[float],
                  putDates: List[FinDate],
-                 putPrices: List[int],
+                 putPrices: List[float],
                  face: float = 100.0):
         ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. '''
