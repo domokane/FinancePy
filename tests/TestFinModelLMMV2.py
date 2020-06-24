@@ -10,13 +10,18 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 
-from financepy.models.FinModelRatesLMMV2 import LMMSimulateFwds
+from financepy.models.FinModelRatesLMMV2 import LMMSimulateFwdsNF
+from financepy.models.FinModelRatesLMMV2 import LMMSimulateFwds1F
 from financepy.models.FinModelRatesLMMV2 import LMMSwaptionPricer
-from financepy.models.FinModelRatesLMMV2 import LMMSwaptionVol
+from financepy.models.FinModelRatesLMMV2 import LMMSimSwaptionVol
 from financepy.models.FinModelRatesLMMV2 import LMMSwaptionVolApprox
 from financepy.models.FinModelRatesLMMV2 import LMMCapFlrPricer
-from financepy.models.FinModelRatesLMMV2 import priceCapsBlack, LMMSwapPricer
+from financepy.models.FinModelRatesLMMV2 import priceCapsBlack
+from financepy.models.FinModelRatesLMMV2 import LMMSwapPricer
 from financepy.models.FinModelRatesLMMV2 import LMMFwdFwdCorrelation
+from financepy.models.FinModelRatesLMMV2 import LMMRatchetCapletPricer
+from financepy.models.FinModelRatesLMMV2 import LMMStickyCapletPricer
+from financepy.models.FinModelRatesLMMV2 import printForwards
 
 import numpy as np
 
@@ -52,10 +57,11 @@ def getVolCurve(numFwds, dt, flatVol=None):
     if flatVol is None:
         capVolatilities = [15.50, 18.25, 17.91, 17.74, 17.27,
                            16.79, 16.30, 16.01, 15.76, 15.54]
+        capVolatilities = np.array(capVolatilities)/100.0
     else:
         capVolatilities = [flatVol] * numPeriods
+        capVolatilities = np.array(capVolatilities)
 
-    capVolatilities = np.array(capVolatilities)/100.0
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
     volCurve = FinCapVolCurve(valuationDate,
                               capVolDates,
@@ -106,7 +112,8 @@ def test_NAG_Swaptions():
 
     seed = 1489
     numPaths = 20000
-    fwds = LMMSimulateFwds(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
+    fwds = LMMSimulateFwdsNF(numFwds, numPaths, fwd0, zetas,
+                             correl, taus, seed)
 
     sumSimValue = 0.0
     sumBlkValue = 0.0
@@ -118,7 +125,7 @@ def test_NAG_Swaptions():
 
         swaptionPrice = LMMSwaptionPricer(K, a, b, numPaths, fwd0, fwds, taus)
         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
-        swapVolSim = LMMSwaptionVol(a, b, fwd0, fwds, taus)
+        swapVolSim = LMMSimSwaptionVol(a, b, fwd0, fwds, taus)
 
         valuationDate = FinDate(1, 1, 2010)
         liborCurve = FinFlatCurve(valuationDate, r, 4)
@@ -173,26 +180,34 @@ def test_Swaptions():
 
     r = 0.05
     fwd0 = getForwardCurve(numFwds, r)
-    correl = getCorrelationMatrix(numFwds, 1000.0, dt)
+    correl = getCorrelationMatrix(numFwds, 0.00000000000001, dt)
 
-    fwdRateVol = 40.0
+    fwdRateVol = 0.20
     zetas = getVolCurve(numFwds, dt, fwdRateVol)
 
     seed = 1489
-    numPaths = 20000
-    fwds = LMMSimulateFwds(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
+    numPaths = 100000
+    fwdsNF = LMMSimulateFwdsNF(numFwds, numPaths, fwd0,
+                               zetas, correl, taus, seed)
     strike = r
     payerSwaption = 1
+    fwds1F = LMMSimulateFwds1F(numFwds, numPaths, fwd0, zetas, taus, seed)
 
     for iExp in range(1, 10):
 
         texp = float(iExp)
         a = int(4*texp)
 
-        swaptionPrice = LMMSwaptionPricer(strike, a, b, numPaths,
-                                          fwd0, fwds, taus, payerSwaption)
+        swaptionPrice1F = LMMSwaptionPricer(strike, a, b, numPaths,
+                                            fwd0, fwds1F, taus, payerSwaption)
+
+        swaptionPriceNF = LMMSwaptionPricer(strike, a, b, numPaths,
+                                            fwd0, fwdsNF, taus, payerSwaption)
+
         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
-        swapVolSim = LMMSwaptionVol(a, b, fwd0, fwds, taus)
+
+        swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
+        swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
         valuationDate = FinDate(1, 1, 2010)
         liborCurve = FinFlatCurve(valuationDate, r, 4)
@@ -221,11 +236,10 @@ def test_Swaptions():
                                     floatDayCountType)
 
         model = FinModelBlack(swaptionVol)
-        v_swaption = swaption.value(valuationDate, liborCurve, model)
+        blackSwaptionPrice = swaption.value(valuationDate, liborCurve, model)
 
-        print("FwdVol: %9.5f  K: %9.5f texp: %9.5f SimPx: %9.5f  SimVol:%9.5f RebVol: %9.5f Black Px: %9.5f" 
-              % (fwdRateVol, strike, texp, swaptionPrice, swapVolSim,
-              swaptionVol, v_swaption))
+        print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
+              % (strike, texp, fwdRateVol, swapVolSim1F, swapVolSimNF, swaptionVol, swaptionPrice1F, swaptionPriceNF, blackSwaptionPrice))
 
 #        print(swaption)
 
@@ -235,7 +249,7 @@ def test_Swaptions():
 def test_CapsFloors():
 
     numFwds = 40
-    numPaths = 10000
+    numPaths = 100000
     dt = 0.25
     taus = np.array([dt] * numFwds)
     seeds = [42, 143, 101, 993, 9988]
@@ -243,7 +257,7 @@ def test_CapsFloors():
     r = 0.04
     fwd0 = getForwardCurve(numFwds, r)
 
-    fwdRateVol = 20.0
+    fwdRateVol = 0.20
     zetas = getVolCurve(numFwds, dt, fwdRateVol)
 
     correl = getCorrelationMatrix(numFwds, 100.0, dt)
@@ -252,21 +266,27 @@ def test_CapsFloors():
     K = r
     capletPricesBlack = priceCapsBlack(fwd0, zetas, numFwds, K, taus)
 
+    numFactors = 1
     # Examine variance for different seeds
     for seed in seeds:
 
         print("=============================================================")
-        print("Seed:", seed)   
-        fwds = LMMSimulateFwds(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
+        print("Seed:", seed)
+        if numFactors == 1:
+            fwds = LMMSimulateFwds1F(numFwds, numPaths, fwd0,
+                                     zetas, taus, seed)
+        else:
+            fwds = LMMSimulateFwdsNF(numFwds, numPaths, fwd0,
+                                     zetas, correl, taus, seed)
 
         sumCap = LMMCapFlrPricer(numFwds, numPaths, K, fwd0, fwds, taus, 1)
         sumFlr = LMMCapFlrPricer(numFwds, numPaths, K, fwd0, fwds, taus, 0)
 
-        print("i     CAP       FLR     BS CAP")
-        bsCap = 0.0
+        print("i     CAPLET       FLRLET     BS CAP")
         for i in range(0, numFwds):
             bsCapFlrLet = capletPricesBlack[i]
-            print("%d %9.6f %9.6f  %9.6f" % (i, sumCap[i], sumFlr[i], bsCapFlrLet*100.0))
+            print("%d %9.6f %9.6f  %9.6f" % (i, sumCap[i], sumFlr[i],
+                                             bsCapFlrLet*100.0))
 
 ###############################################################################
 
@@ -292,7 +312,8 @@ def test_NAG_Caplet():
     capletPricesBlack = priceCapsBlack(fwd0, zetas, numFwds, K, taus)
 
     start = time.time()
-    fwds = LMMSimulateFwds(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
+    fwds = LMMSimulateFwdsNF(numFwds, numPaths, fwd0,
+                             zetas, correl, taus, seed)
     end = time.time()
     print("SIM Period:", end - start)
 
@@ -312,6 +333,44 @@ def test_NAG_Caplet():
 ###############################################################################
 
 
+def test_HullBookExamples():
+    ''' Examining examples on page 770 of Hull OFODS '''
+
+    numFwds = 11
+    dt = 1.00
+    taus = np.array([dt] * numFwds)
+    seed = 42
+
+    r = 0.05127
+    fwd0 = np.zeros(numFwds)
+    for i in range(0, numFwds):
+        fwd0[i] = r
+
+    print("FWD CURVE:", fwd0)
+
+    fwdRateVol = None
+    zetas = getVolCurve(numFwds, dt, fwdRateVol)
+
+    print("ZETA CURVE:", zetas)
+
+    numPaths = 1000000
+    spread = 0.0025  # basis points
+
+    # One factor model
+    fwds = LMMSimulateFwds1F(numFwds, numPaths, fwd0, zetas, taus, seed)
+    printForwards(fwds)
+
+    vRatchetCaplets = LMMRatchetCapletPricer(spread, numFwds, numPaths,
+                                             fwd0, fwds, taus)
+    print("RATCHET CAPLETS:", vRatchetCaplets)
+
+    vStickyCaplets = LMMStickyCapletPricer(spread, numFwds, numPaths,
+                                           fwd0, fwds, taus)
+    print("STICKY CAPLETS:", vStickyCaplets)
+
+###############################################################################
+
+
 def test_Swap():
 
     numFwds = 40
@@ -323,12 +382,13 @@ def test_Swap():
     r = 0.04
     fwd0 = getForwardCurve(numFwds, r)
 
-    fwdRateVol = 40.0
+    fwdRateVol = 0.40
     zetas = getVolCurve(numFwds, dt, fwdRateVol)
     correl = getCorrelationMatrix(numFwds, 100.0)
 
     K = r
-    fwds = LMMSimulateFwds(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
+    fwds = LMMSimulateFwdsNF(numFwds, numPaths, fwd0, zetas,
+                             correl, taus, seed)
 
     start = time.time()
     cpn = 0.05
@@ -354,7 +414,9 @@ def fwdfwdCorrelation(fwds):
 
 ###############################################################################
 
+
+test_HullBookExamples()
 # test_CapsFloors()
+# test_Swaptions()
 # test_NAG_Caplet()
 # test_NAG_Swaptions()
-test_Swaptions()

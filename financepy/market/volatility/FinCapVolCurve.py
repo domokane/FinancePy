@@ -91,7 +91,7 @@ class FinCapVolCurve():
                 vol = self._capletVols[i]
                 return vol
 
-        return vol
+        return self._capletVols[-1]
 
 ###############################################################################
 
@@ -102,11 +102,11 @@ class FinCapVolCurve():
         vol = self._capVols[0]
 
         for i in range(0, numVols):
-            if self._times[i] > t:
+            if self._times[i] >= t:
                 vol = self._capVols[i]
                 return vol
 
-        return vol
+        return self._capVols[-1]
 
 ###############################################################################
 
