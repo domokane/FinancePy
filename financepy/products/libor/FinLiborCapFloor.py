@@ -53,7 +53,7 @@ class FinLiborCapFloor():
     def __init__(self,
                  startDate: FinDate,
                  maturityDateOrTenor: Union[FinDate, str],
-                 optionType: FinLiborCapFloorType,
+                 optionType: FinLiborCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,

@@ -10,6 +10,7 @@ from scipy.stats import norm
 from ..finutils.FinMath import N
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionTypes
+from ..finutils.FinError import FinError
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.
@@ -40,6 +41,9 @@ class FinModelBlack():
               callOrPut):    # Call or put
         ''' Price a derivative using Black's model which values in the forward
         measure following a change of measure. '''
+
+        if abs(strikeRate) < 1e-20:
+            raise FinError("Strike must not be zero")
 
         f = forwardRate
         t = timeToExpiry
