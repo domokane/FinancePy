@@ -7,10 +7,8 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..finutils.FinMath import N
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionTypes
-from ..finutils.FinError import FinError
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.
@@ -18,18 +16,13 @@ from ..finutils.FinError import FinError
 ###############################################################################
 
 
-class FinModelBlack():
-    ''' Black's Model which prices call and put options in the forward
-    measure according to the Black-Scholes equation. '''
+class FinModelBachelier():
+    ''' Bachelier's Model which prices call and put options in the forward
+    measure assuming the underlying rate follows a normal process. '''
 
-    def __init__(self, volatility, implementation=0):
+    def __init__(self, volatility):
         ''' Create FinModel black using parameters. '''
         self._volatility = volatility
-        self._implementation = 0
-        self._numSteps = 0
-        self._seed = 0
-        self._param1 = 0
-        self._param2 = 0
 
 ###############################################################################
 
@@ -39,25 +32,20 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Price a derivative using Black's model which values in the forward
-        measure following a change of measure. '''
-
-        if abs(strikeRate) < 1e-20:
-            raise FinError("Strike must not be zero")
+        ''' Price a derivative using Bachelier's model which values in the
+        forward measure following a change of measure. '''
 
         f = forwardRate
         t = timeToExpiry
         k = strikeRate
         sqrtT = np.sqrt(t)
         vol = self._volatility
-
-        d1 = (np.log((f)/(k)) + vol * vol * t / 2) / (vol * sqrtT)
-        d2 = d1 - vol*sqrtT
+        d = (f-k) / (vol * sqrtT)
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
-            return df * (f * norm.cdf(d1) - k * N(d2))
+            return df * ((f - k) * norm.cdf(d) + vol * sqrtT * norm.pdf(d))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
-            return df * (k * norm.cdf(-d2) - f * N(-d1))
+            return df * ((k - f) * norm.cdf(-d) + vol * sqrtT * norm.pdf(d))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")
 
@@ -66,10 +54,8 @@ class FinModelBlack():
 ###############################################################################
 
     def __repr__(self):
-        s = "FINMODELBLACK"
+        s = "FINMODELBACHELIER"
         s += labelToString("VOLATILITY", self._volatility)
-        s += labelToString("IMPLEMENTATION", self._implementation)
-        s += labelToString("NUMSTEPS", self._numSteps)
         return s
 
 ###############################################################################

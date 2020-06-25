@@ -648,9 +648,11 @@ print("Latex filename:", userGuideFileName)
 
 if 1 == 1:
     # Do it twice for the TOC
+    print("pdflatex " + userGuideFileName)
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
     pdfFileName2 = '../../financepy-examples-git/' + pdfFileName1
+    print("Copying ", pdfFileName1, " to ", pdfFileName2)
     shutil.copyfile(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
     open_file(pdfFileName1)

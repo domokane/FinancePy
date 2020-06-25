@@ -18,7 +18,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from enum import Enum
 
 
-class FinBondMortgageType(Enum):
+class FinBondMortgageTypes(Enum):
     REPAYMENT = 1
     INTEREST_ONLY = 2
 
@@ -35,7 +35,7 @@ class FinBondMortgage(object):
     def __init__(self,
                  startDate: FinDate,
                  endDate: FinDate,
-                 principal: int,
+                 principal: float,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -92,9 +92,9 @@ class FinBondMortgage(object):
         principal = self._principal
         frequency = FinFrequency(self._frequencyType)
 
-        if mortgageType == FinBondMortgageType.REPAYMENT:
+        if mortgageType == FinBondMortgageTypes.REPAYMENT:
             monthlyFlow = self.repaymentAmount(zeroRate)
-        elif mortgageType == FinBondMortgageType.INTEREST_ONLY:
+        elif mortgageType == FinBondMortgageTypes.INTEREST_ONLY:
             monthlyFlow = zeroRate * self._principal / frequency
         else:
             raise FinError("Unknown Mortgage type.")

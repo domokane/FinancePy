@@ -9,16 +9,17 @@ import numpy as np
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...products.equities.FinOption import FinOption, FinOptionTypes
+# from ...products.equity.FinEquityOption import FinOption
 from ...finutils.FinDate import FinDate
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 ##########################################################################
 
 
-class FinFXDigitalOption(FinOption):
+class FinFXDigitalOption():
 
     def __init__(self,
                  expiryDate: FinDate,

@@ -4,6 +4,7 @@
 
 # TODO: Extend to allow term structure of volatility
 # TODO: Extend to allow two fixed legs in underlying swap
+# TODO: Cash settled swaptions
 
 import numpy as np
 

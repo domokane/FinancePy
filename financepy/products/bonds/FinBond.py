@@ -98,7 +98,7 @@ class FinBond(object):
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. '''
 
-        self._flowDates : List[FinDate] = []
+        self._flowDates: List[FinDate] = []
         self._settlementDate = FinDate(1, 1, 1900)
         self._accruedInterest = None
         self._accruedDays = 0.0
