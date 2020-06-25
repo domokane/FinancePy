@@ -36,11 +36,38 @@ from functools import partial
 
 from numba import njit, objmode
 
+sArr = np.empty(0, dtype='int64')
+aArr = np.empty(0, dtype='int64')
+m_i = np.empty((0, 0), dtype='int64')
+dirname = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(dirname, "sobolcoeff.csv")
+del dirname
+
 def bytesToIntArray(l, s):
     arr = s.split(b' ')
     npArr = np.array(arr, dtype='int64')
     result = np.pad(npArr, (0, l - len(npArr)))
     return result
+
+def loadSobolCoeff(dimension):
+    global sArr
+    global aArr
+    global m_i
+    global path
+
+    rowsLoaded = len(sArr)
+    if (dimension - 1 > rowsLoaded):
+        sArrNew, aArrNew = np.loadtxt(path, delimiter=',', dtype='int64', skiprows=rowsLoaded+1, max_rows=dimension-1, usecols=(0,1), unpack=True)
+        maxLen = sArrNew[-1]
+        m_iNew = np.loadtxt(path, delimiter=',', dtype='int64', skiprows=rowsLoaded+1, max_rows=dimension-1, usecols=(2,), converters={2: partial(bytesToIntArray, maxLen)})
+        
+        sArr = np.concatenate((sArr, sArrNew))
+        aArr = np.concatenate((aArr, aArrNew))
+        padAmount = m_iNew.shape[1] - m_i.shape[1]
+        m_i = np.pad(m_i, ((0,0), (0,padAmount)))
+        m_i = np.concatenate((m_i, m_iNew))
+    return sArr, aArr, m_i
+
 
 @njit
 def generateSobol(numPoints, dimension):
@@ -56,15 +83,8 @@ def generateSobol(numPoints, dimension):
     """
 
     with objmode(sArr='int64[:]', aArr='int64[:]', m_i='int64[:,:]'):
-        dirname = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(dirname, "sobolcoeff.csv")
+        sArr, aArr, m_i = loadSobolCoeff(dimension)
 
-        sArr = np.loadtxt(path, delimiter=',', dtype="int64", skiprows=1, max_rows=dimension-1, usecols=(1,))
-        aArr = np.loadtxt(path, delimiter=',', dtype="int64", skiprows=1, max_rows=dimension-1, usecols=(2,))
-        maxLen = sArr[-1]
-        m_i = np.loadtxt(path, delimiter=',', dtype='int64', skiprows=1, max_rows=dimension-1, usecols=(3,), converters={3: partial(bytesToIntArray, maxLen)})
-
-    
     # ll = number of bits needed
     ll = int(np.ceil(np.log(numPoints)/np.log(2.0)))
 
