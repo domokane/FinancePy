@@ -1,4 +1,4 @@
-from financepy.finutils.FinSobol import generateSobol
+from financepy.finutils.FinSobol import getSobol, getGaussianSobol
 
 import time
 
@@ -7,7 +7,7 @@ def test_FinSobol():
     numPoints = 1000
     dimensions = 10
     
-    points = generateSobol(numPoints, dimensions)
+    points = getSobol(numPoints, dimensions)
 
     for d in range(dimensions):
         av = 0.0
@@ -25,12 +25,19 @@ def test_FinSobol():
         assert(avError < 0.002)
         assert(varError < 0.002)
       
-    start = time.time()
     numRepeats = 1000
+    numDimensions = 1600
+
+    start = time.time()
     for _ in range(numRepeats):
-        generateSobol(1000, 6)
+        getSobol(1000, numDimensions)
     end = time.time()
-    
+    print("Average time taken", (end - start) / numRepeats)
+
+    start = time.time()    
+    for _ in range(numRepeats):
+        getGaussianSobol(1000, numDimensions)
+    end = time.time()
     print("Average time taken", (end - start) / numRepeats)
         
         
