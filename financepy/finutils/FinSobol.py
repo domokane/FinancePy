@@ -34,16 +34,26 @@ import os
 import numpy as np
 from functools import partial
 
-from numba import njit, objmode
+from numba import njit, objmode, int64
 
 from financepy.finutils.FinMath import norminvcdf
 
-sArr = np.empty(0, dtype='int64')
-aArr = np.empty(0, dtype='int64')
-m_i = np.empty((0, 0), dtype='int64')
+#sArr = np.empty(0, dtype='int64')
+#aArr = np.empty(0, dtype='int64')
+#m_i = np.empty((0, 0), dtype='int64')
 dirname = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(dirname, "sobolcoeff.csv")
-del dirname
+path = os.path.join(dirname, "saved.npz")
+
+with np.load(path, encoding='bytes', mmap_mode='r') as f:
+    sArr = np.array(f['sa'][0])
+    aArr = np.array(f['sa'][1])
+    m_i = f['c']
+data = dict(np.load(path, mmap_mode='r'))
+
+#sArr = np.array([1,2,3])
+#aArr = np.array([0,1,1])
+#m_i = np.array([[1,0,0],[1,3,0],[1,3,1]])
+#del dirname
 
 def bytesToIntArray(l, s):
     arr = s.split(b' ')
@@ -51,6 +61,7 @@ def bytesToIntArray(l, s):
     result = np.pad(npArr, (0, l - len(npArr)))
     return result
 
+"""
 def loadSobolCoeff(dimension):
     global sArr
     global aArr
@@ -69,6 +80,7 @@ def loadSobolCoeff(dimension):
         m_i = np.pad(m_i, ((0,0), (0,padAmount)))
         m_i = np.concatenate((m_i, m_iNew))
     return sArr, aArr, m_i
+"""
 
 @njit
 def getGaussianSobol(numPoints, dimension):
@@ -89,7 +101,7 @@ def getGaussianSobol(numPoints, dimension):
 
     return points
 
-@njit
+@njit(cache=True)
 def getSobol(numPoints, dimension):
     """
     Sobol points generator based on graycode order.
@@ -101,11 +113,15 @@ def getSobol(numPoints, dimension):
      Return:
          point (nparray): 2-dimensional array with row as the point and column as the dimension.
     """
+    global sArr
+    global aArr
+    global m_i
+    #print(sArr)
 
-    with objmode(sArr='int64[:]', aArr='int64[:]', m_i='int64[:,:]'):
-        sArr, aArr, m_i = loadSobolCoeff(dimension)
-
+    #with objmode(sArr='int64[:]', aArr='int64[:]', m_i='int64[:,:]'):
+    #    sArr, aArr, m_i = loadSobolCoeff(dimension)
     # ll = number of bits needed
+    #print(sArr)
     ll = int(np.ceil(np.log(numPoints+1)/np.log(2.0)))
 
     # c[i] = index from the right of the first zero bit of i
@@ -164,3 +180,4 @@ def getSobol(numPoints, dimension):
             points[i-1, j] = x[i]/(2**32)
 
     return points
+    
