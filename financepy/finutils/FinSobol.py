@@ -32,13 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 import numpy as np
-from functools import partial
-from numba import njit, objmode
+from numba import njit
 
 from financepy.finutils.FinMath import norminvcdf
 
 dirname = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(dirname, "saved.npz")
+path = os.path.join(dirname, "sobolcoeff.npz")
 
 with np.load(path, mmap_mode='r') as f:
     sArr = np.array(f['sa'][0])
