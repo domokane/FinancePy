@@ -32,45 +32,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 import numpy as np
-from functools import partial
+from numba import njit
 
-from numba import njit, objmode
+from financepy.finutils.FinMath import norminvcdf
 
-sArr = np.empty(0, dtype='int64')
-aArr = np.empty(0, dtype='int64')
-m_i = np.empty((0, 0), dtype='int64')
 dirname = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(dirname, "sobolcoeff.csv")
-del dirname
+path = os.path.join(dirname, "sobolcoeff.npz")
 
-def bytesToIntArray(l, s):
-    arr = s.split(b' ')
-    npArr = np.array(arr, dtype='int64')
-    result = np.pad(npArr, (0, l - len(npArr)))
-    return result
+with np.load(path, mmap_mode='r') as f:
+    sArr = np.array(f['sa'][0])
+    aArr = np.array(f['sa'][1])
+    m_i = f['c']
 
-def loadSobolCoeff(dimension):
-    global sArr
-    global aArr
-    global m_i
-    global path
+@njit(cache=True)
+def getGaussianSobol(numPoints, dimension):
+    """
+    Sobol points generator based on graycode order.
+    The generated points follow a normal distribution.
+    Args:
+         numPoints (int): number of points (cannot be greater than 2^32)
+         dimension (int): number of dimensions
+     Return:
+         point (nparray): 2-dimensional array with row as the point and column as the dimension.
+    """
+    points = getSobol(numPoints, dimension)
 
-    rowsLoaded = len(sArr)
-    if (dimension - 1 > rowsLoaded):
-        sArrNew, aArrNew = np.loadtxt(path, delimiter=',', dtype='int64', skiprows=rowsLoaded+1, max_rows=dimension-1, usecols=(0,1), unpack=True)
-        maxLen = sArrNew[-1]
-        m_iNew = np.loadtxt(path, delimiter=',', dtype='int64', skiprows=rowsLoaded+1, max_rows=dimension-1, usecols=(2,), converters={2: partial(bytesToIntArray, maxLen)})
-        
-        sArr = np.concatenate((sArr, sArrNew))
-        aArr = np.concatenate((aArr, aArrNew))
-        padAmount = m_iNew.shape[1] - m_i.shape[1]
-        m_i = np.pad(m_i, ((0,0), (0,padAmount)))
-        m_i = np.concatenate((m_i, m_iNew))
-    return sArr, aArr, m_i
+    for i in range(numPoints):
+        for j in range(dimension):
+            points[i,j] = norminvcdf(points[i,j])
 
+    return points
 
-@njit
-def generateSobol(numPoints, dimension):
+@njit(cache=True)
+def getSobol(numPoints, dimension):
     """
     Sobol points generator based on graycode order.
     This function is translated from the original c++ program.
@@ -81,12 +75,12 @@ def generateSobol(numPoints, dimension):
      Return:
          point (nparray): 2-dimensional array with row as the point and column as the dimension.
     """
-
-    with objmode(sArr='int64[:]', aArr='int64[:]', m_i='int64[:,:]'):
-        sArr, aArr, m_i = loadSobolCoeff(dimension)
+    global sArr
+    global aArr
+    global m_i
 
     # ll = number of bits needed
-    ll = int(np.ceil(np.log(numPoints)/np.log(2.0)))
+    ll = int(np.ceil(np.log(numPoints+1)/np.log(2.0)))
 
     # c[i] = index from the right of the first zero bit of i
     c = np.zeros(numPoints, dtype=np.int64)
@@ -109,11 +103,10 @@ def generateSobol(numPoints, dimension):
         v[i] = int(v[i])
 
     #  Evalulate x[0] to x[N-1], scaled by 2**32
-    x = np.zeros(numPoints)
-    x[0] = 0
-    for i in range(1, numPoints):
+    x = np.zeros(numPoints+1)
+    for i in range(1, numPoints+1):
         x[i] = int(x[i-1]) ^ int(v[c[i-1]])
-        points[i, 0] = x[i]/(2**32)
+        points[i-1, 0] = x[i]/(2**32)
 
     # ----- Compute the remaining dimensions -----
     for j in range(1, dimension):
@@ -139,10 +132,9 @@ def generateSobol(numPoints, dimension):
                     v[i] = int(v[i]) ^ (((int(a) >> int(s-1-k)) & 1) * int(v[i-k]))
 
         # Evalulate X[0] to X[N-1], scaled by pow(2,32)
-        x = np.zeros(numPoints)
-        x[0] = 0
-        for i in range(1, numPoints):
+        x = np.zeros(numPoints+1)
+        for i in range(1, numPoints+1):
             x[i] = int(x[i-1]) ^ int(v[c[i-1]])
-            points[i, j] = x[i]/(2**32)
+            points[i-1, j] = x[i]/(2**32)
 
     return points
