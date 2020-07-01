@@ -479,8 +479,14 @@ def norminvcdf(p):
     p_high = 1.0 - p_low
 
     # If argument out of bounds, raise error
-    if p <= 0.0 or p >= 1.0:
+    if p < 0.0 or p > 1.0:
         raise ValueError("p must be between 0.0 and 1.0")
+
+    if p == 0.0:
+        p = 1e-10
+
+    if p == 1.0:
+        p = 1.0 - 1e-10
 
     if p < p_low:
         # Rational approximation for lower region

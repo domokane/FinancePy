@@ -126,7 +126,7 @@ class FinLiborSwaption():
 
         k = self._fixedCoupon
         pv01 = swap.pv01(valuationDate, discountCurve)
-        f = swap.parCoupon(valuationDate, discountCurve)
+        s = swap.parCoupon(valuationDate, discountCurve)
         texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
@@ -135,19 +135,19 @@ class FinLiborSwaption():
         if isinstance(model, FinModelBlack):
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
             elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
             elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
@@ -170,19 +170,19 @@ class FinLiborSwaption():
             #                    str(self._optionType))
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
             elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
             elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = model.value(f, k, texp, df,
+                swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelRatesHW):
@@ -268,7 +268,7 @@ class FinLiborSwaption():
             raise FinError("Unknown swaption model " + str(model))
 
         self._pv01 = pv01
-        self._fwdSwapRate = f
+        self._fwdSwapRate = s
         self._forwardDf = discountCurve.df(self._exerciseDate)
         self._underlyingSwap = swap
 

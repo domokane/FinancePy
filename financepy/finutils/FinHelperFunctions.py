@@ -11,6 +11,19 @@ from .FinError import FinError
 
 ##########################################################################
 
+def checkVectorDifferences(x,y,tol):
+    n1 = len(x)
+    n2 = len(y)
+    if n1 != n2:
+        raise FinError("Vectors x and y do not have same size.")
+        
+    for i in range(0, n1):
+        diff = x[i] - y[i]
+        if abs(diff) > tol:
+            print("Vector difference of:", diff, " at index: ", i)
+
+##########################################################################
+
 def checkDate(d):
 
     if isinstance(d, FinDate) is False:
