@@ -20,7 +20,8 @@ class MeanVarianceMarkowitz:
     """
     Mean-Variance class based on Markowitz quadratic programming
     """
-    def __init__(self, mu, sigma, rf=None):
+
+    def __init__(self, mu, cov, rf=None):
         """
         Args:
             mu: expected gross returns
@@ -28,26 +29,26 @@ class MeanVarianceMarkowitz:
         """
         self.num_assets = len(mu)
         self.mu = mu
-        self.sigma = sigma
+        self.sigma = cov
         self.rf = rf
         # vector of ones
         iota_n = np.ones((len(mu),))
-        self.sigma_inv = la.inv(sigma)
+        self.sigma_inv = la.inv(cov)
         # helper variables [see p. 82 Cochrane]
         self.A = self.mu @ self.sigma_inv @ self.mu
         self.B = self.mu @ self.sigma_inv @ iota_n
         self.C = iota_n @ self.sigma_inv @ iota_n
 
-        # weight are a combination of weights of two portfolios
+        # weights are a combination of weights of two portfolios
         # e.g. Mutual Fund Separation Theorem [e.g. Campbell(2017, 2.57)]
         # Though you would need to rewrite it a bit
         # as w_i and w_mu are not proper weights as they do not add to 1.
         self.base_w_i = self.sigma_inv @ iota_n
         self.base_w_mu = self.sigma_inv @ mu
 
-    def min_var(self):
+    def rate_min_var(self):
         """
-        the lowest possible variance
+        the expected return for the lowest possible variance
         """
         return self.B / self.C
 
@@ -60,9 +61,9 @@ class MeanVarianceMarkowitz:
         # Cochrane (2005) (5.7)
         mv_vars = self.A * np.ones(len(mus))
         for i, m in enumerate(mus):
-            mv_vars[i] += (self.C*m**2 - 2*self.B*m)
+            mv_vars[i] += (self.C * m**2 - 2 * self.B * m)
 
-        mv_vars /= (self.A*self.C - self.B**2)
+        mv_vars /= (self.A * self.C - self.B**2)
 
         return mv_vars
 
@@ -71,8 +72,8 @@ class MeanVarianceMarkowitz:
         compute the mean-variance weights for a given expected return
         """
         w = (self.base_w_mu * (self.C * mu - self.B) +
-             self.base_w_i * (self.A - self.B*mu)) / \
-             (self.A * self.C -self.B**2)
+             self.base_w_i * (self.A - self.B * mu)) / \
+            (self.A * self.C - self.B**2)
 
         return w
 
@@ -81,7 +82,7 @@ class MeanVarianceMarkowitz:
         computes the tangency porfolio for a given risk-free rate
         """
         # Campbell(2017, 2.62)
-        excess_r = (self.mu - rf*np.ones(len(self.mu)))
+        excess_r = (self.mu - rf * np.ones(len(self.mu)))
         w = self.sigma_inv @ excess_r
         # rescale weight to add to 1
         w /= w.sum()
@@ -147,7 +148,7 @@ class MeanVarianceHansenRichard:
 
         self.weights_adjustment = (np.eye(self.num_assets) -
                                    np.outer(self.r_star_weights, iota_n)) @ \
-                                   self.re_star_weights
+            self.re_star_weights
 
     def r_star_weights(self):
         """
@@ -190,7 +191,7 @@ class MeanVarianceHansenRichard:
 
     def rate_min_var(self):
         """
-        the minimum variance
+        the expected return at the minimum variance portfolio
         """
         return self.e_r_star + self._weight_min_var() * self.e_re_star
 
@@ -223,11 +224,12 @@ class MeanVarianceHansenRichard:
         """
         mv_vars = np.zeros(len(mus))
         # p.114 Cochrane (2005)
+        e_min_var = self.rate_min_var()
         for i, mu in enumerate(mus):
-            w = mu / self.e_re_star + self._weight_min_var()
+            w = (mu - e_min_var) / self.e_re_star + e_min_var
             mv_vars[i] = self.e_r_star2 + w**2 * self.e_re_star \
-                - self.e_r_star**2 - 2*w*self.e_r_star*self.e_re_star \
-                - w**2*self.e_re_star**2
+                - self.e_r_star**2 - 2 * w * self.e_r_star * self.e_re_star \
+                - w**2 * self.e_re_star**2
 
         return mv_vars
 
@@ -242,6 +244,18 @@ class MeanVarianceHansenRichard:
 
         return weights
 
+    def tangency_portfolio(self, rf):
+        """
+        computes the tangency porfolio for a given risk-free rate
+        """
+        # Campbell(2017, 2.62)
+        excess_r = (self.mu - rf * np.ones(len(self.mu)))
+        w = la.inv(self.cov) @ excess_r
+        # rescale weight to add to 1
+        w /= w.sum()
+
+        return w
+
     def hj_bounds(self, range_em=np.arange(90, 110) / 100):
         """
         compute the Hansen-Jaganathan bounds
@@ -252,7 +266,7 @@ class MeanVarianceHansenRichard:
         # loop over all given values for E[m]
         v = np.zeros(len(range_em))
         for i, em in enumerate(range_em):
-            one_minus_emer = (iota_n - em*self.mu)
+            one_minus_emer = (iota_n - em * self.mu)
             v[i] = one_minus_emer.T @ la.inv(self.cov) @ one_minus_emer
 
         return v
