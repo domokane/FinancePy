@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency
+from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinMath import testMonotonicity
@@ -130,14 +130,13 @@ class FinDiscountCurve():
 ##########################################################################
 
     def __repr__(self):
-        numPoints = len(self._times)
-        s = labelToString("TIMES", "DISCOUNT FACTORS")
-        for i in range(0, numPoints):
-            s += labelToString(self._times[i], self._values[i])
+        header = "TIMES,DISCOUNT FACTORS"
+        valueTable = [self._times, self._values]
+        precision = "10.7f"
 
-        return s
+        return tableToString(header, valueTable, precision)
 
-#######################################################################
+##########################################################################
 
     def print(self):
         ''' Simple print function for backward compatibility. '''

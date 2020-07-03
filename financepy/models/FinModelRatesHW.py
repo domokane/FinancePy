@@ -693,11 +693,11 @@ class FinModelRatesHW():
 
         x0 = 0.05
         rstar = optimize.newton(fwdFullBondPrice, x0=x0, fprime=None,
-                                args=argtuple, tol=1e-8, maxiter=50,
+                                args=argtuple, tol=1e-10, maxiter=50,
                                 fprime2=None)
 
         # Now we price a series of zero coupon bonds using this short rate
-        dt = 0.001
+        dt = 0.0001
         numCoupons = len(cpnTimes)
 
         ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
@@ -940,7 +940,9 @@ class FinModelRatesHW():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("Sigma", self._sigma)
+        ''' Return string with class details. '''
+        s = "Hull-White Model\n"
+        s += labelToString("Sigma", self._sigma)
         s += labelToString("a", self._a)
         return s
 

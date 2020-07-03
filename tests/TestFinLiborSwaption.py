@@ -24,6 +24,7 @@ from financepy.models.FinModelBlackShifted import FinModelBlackShifted
 from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
 from financepy.models.FinModelRatesHW import FinModelRatesHW
+from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 from financepy.finutils.FinCalendar import *
 
@@ -91,13 +92,14 @@ def testFinLiborSwaptionModels():
 
     strikes = np.linspace(0.02, 0.08, 10)
 
-    print("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR", "SABR_SHFTD", "HW")
+    print("LAB", "STRIKE", "BLK", "BLK_SHFT", "SABR", "SABR_SHFT", "HW", "BK")
 
     model1 = FinModelBlack(0.00001)
     model2 = FinModelBlackShifted(0.00001, 0.0)
     model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
     model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
     model5 = FinModelRatesHW(0.00001, 0.00001)
+    model6 = FinModelRatesBK(0.00001, 0.00001)
 
     settlementDate = valuationDate.addWorkDays(2)
 
@@ -116,7 +118,8 @@ def testFinLiborSwaptionModels():
         swap3 = swaption.value(valuationDate, liborCurve, model3)
         swap4 = swaption.value(valuationDate, liborCurve, model4)
         swap5 = swaption.value(valuationDate, liborCurve, model5)
-        print("PAY", swap1, swap2, swap3, swap4, swap5)
+        swap6 = swaption.value(valuationDate, liborCurve, model6)
+        print("PAY", swap1, swap2, swap3, swap4, swap5, swap6)
 
     print("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR", "SABR_SHFTD", "HW")
 
@@ -135,7 +138,8 @@ def testFinLiborSwaptionModels():
         swap3 = swaption.value(valuationDate, liborCurve, model3)
         swap4 = swaption.value(valuationDate, liborCurve, model4)
         swap5 = swaption.value(valuationDate, liborCurve, model5)
-        print("REC", k, swap1, swap2, swap3, swap4, swap5)
+        swap6 = swaption.value(valuationDate, liborCurve, model6)
+        print("REC", k, swap1, swap2, swap3, swap4, swap5, swap6)
 
 ###############################################################################
 
@@ -278,7 +282,7 @@ def testFinLiborSwaptionMatlabExamples():
     print("FP Price:", v_finpy)
     print("MATLAB Prix:", v_matlab)
     print("DIFF:", v_finpy - v_matlab)
-    print(swaption)
+#    print(swaption)
 
 ###############################################################################
 
@@ -311,7 +315,7 @@ def testFinLiborSwaptionMatlabExamples():
     floatDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     notional = 1000.0
 
-    # Pricing a PAYER
+    # Pricing a put
     swaptionType = FinLiborSwaptionTypes.RECEIVER
     swaption = FinLiborSwaption(settlementDate,
                                 exerciseDate,
@@ -332,7 +336,7 @@ def testFinLiborSwaptionMatlabExamples():
     print("MATLAB Prix:", v_matlab)
     print("DIFF:", v_finpy - v_matlab)
 
-    print(swaption)
+#    print(swaption)
 
 ###############################################################################
 
@@ -386,7 +390,7 @@ def testFinLiborSwaptionMatlabExamples():
     print("MATLAB Prix:", v_matlab)
     print("DIFF:", v_finpy - v_matlab)
 
-    print(swaption)
+#    print(swaption)
 
 
 ###############################################################################
@@ -439,7 +443,79 @@ def testFinLiborSwaptionMatlabExamples():
     print("MATLAB Prix:", v_matlab)
     print("DIFF:", v_finpy - v_matlab)
 
-    print(swaption)
+#    print(swaption)
+
+###############################################################################
+
+    print("====================================")
+    print("MATLAB EXAMPLE WITH BLACK KARASINSKI")
+    print("====================================")
+
+    # https://fr.mathworks.com/help/fininst/swaptionbyhw.html
+
+    valuationDate = FinDate(1, 1, 2007)
+
+    dates = [FinDate(1, 1, 2007), FinDate(1, 7, 2007), FinDate(1, 1, 2008),
+             FinDate(1, 7, 2008), FinDate(1, 1, 2009), FinDate(1, 7, 2009),
+             FinDate(1, 1, 2010), FinDate(1, 7, 2010),
+             FinDate(1, 1, 2011), FinDate(1, 7, 2011), FinDate(1, 1, 2012)]
+
+    zeroRates = np.array([0.07] * 11)
+
+    interpMethod = FinInterpMethods.FLAT_FORWARDS
+    dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    contFreq = FinFrequencyTypes.SEMI_ANNUAL
+
+    liborCurve = FinZeroCurve(valuationDate, dates, zeroRates, contFreq,
+                              dayCountType, interpMethod)
+
+    settlementDate = valuationDate
+    exerciseDate = FinDate(1, 1, 2011)
+    maturityDate = FinDate(1, 1, 2012)
+
+    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    notional = 100.0
+
+    model = FinModelRatesBK(0.1, 0.05, 200)
+
+    fixedCoupon = 0.07
+    swaptionType = FinLiborSwaptionTypes.PAYER
+    swaption = FinLiborSwaption(settlementDate,
+                                exerciseDate,
+                                maturityDate,
+                                swaptionType,
+                                fixedCoupon,
+                                fixedFrequencyType,
+                                fixedDayCountType,
+                                notional)
+
+    v_finpy = swaption.value(valuationDate, liborCurve, model)
+    v_matlab = 0.3634
+
+    print("FP Price:", v_finpy)
+    print("MATLAB Prix:", v_matlab)
+    print("DIFF:", v_finpy - v_matlab)
+
+    fixedCoupon = 0.0725
+    swaptionType = FinLiborSwaptionTypes.RECEIVER
+    swaption = FinLiborSwaption(settlementDate,
+                                exerciseDate,
+                                maturityDate,
+                                swaptionType,
+                                fixedCoupon,
+                                fixedFrequencyType,
+                                fixedDayCountType,
+                                notional)
+
+    v_finpy = swaption.value(valuationDate, liborCurve, model)
+    v_matlab = 0.4798
+
+    print("FP Price:", v_finpy)
+    print("MATLAB Prix:", v_matlab)
+    print("DIFF:", v_finpy - v_matlab)
+
+#    print(swaption)
 ###############################################################################
 
 # test_FinLiborSwaption()

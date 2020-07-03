@@ -92,6 +92,9 @@ class FinModelRatesHL():
 ###############################################################################
 
     def __repr__(self):
+        ''' Return string with class details. '''
+
+        s = "Ho-Lee Model\n"
         s = labelToString("Sigma", self._sigma)
         return s
 

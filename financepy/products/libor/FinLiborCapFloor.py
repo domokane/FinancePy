@@ -7,6 +7,7 @@
 # TODO: Check that curve anchor date is valuation date ?
 
 import numpy as np
+from typing import Union, Optional
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -19,9 +20,10 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
+from ...models.FinModelBachelier import FinModelBachelier
 from ...models.FinModelSABR import FinModelSABR
 from ...models.FinModelSABRShifted import FinModelSABRShifted
 from ...models.FinModelRatesHW import FinModelRatesHW
@@ -33,7 +35,7 @@ from ...finutils.FinOptionTypes import FinOptionTypes
 from enum import Enum
 
 
-class FinLiborCapFloorType(Enum):
+class FinLiborCapFloorTypes(Enum):
     CAP = 1
     FLOOR = 2
 
@@ -49,30 +51,21 @@ class FinLiborCapFloorModelTypes(Enum):
 class FinLiborCapFloor():
 
     def __init__(self,
-                 startDate,
-                 maturityDateOrTenor,
-                 optionType,
-                 strikeRate,
-                 lastFixing=None,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA,
-                 notional=ONE_MILLION,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,
+                 maturityDateOrTenor: Union[FinDate, str],
+                 optionType: FinLiborCapFloorTypes,
+                 strikeRate: float,
+                 lastFixing: Optional[float] = None,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
+                 notional: float = ONE_MILLION,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
 
-        if type(startDate) != FinDate:
-            raise ValueError("Start date must be a FinDate.")
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
+        checkArgumentTypes(self.__init__, locals())
 
         self._calendarType = calendarType
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError("Unknown Business Day Adjust type " +
-                             str(busDayAdjustType))
-
         self._busDayAdjustType = busDayAdjustType
 
         if type(maturityDateOrTenor) == FinDate:
@@ -85,32 +78,6 @@ class FinLiborCapFloor():
 
         if startDate > maturityDate:
             raise FinError("Start date must be before maturity date")
-
-        if optionType not in FinLiborCapFloorType:
-            raise FinError("Unknown Libor Cap Floor type " + str(optionType))
-
-        if dayCountType not in FinDayCountTypes:
-            raise FinError(
-                "Unknown Cap Floor DayCountRule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError(
-                "Unknown CapFloor Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._startDate = startDate
         self._maturityDate = maturityDate
@@ -185,9 +152,9 @@ class FinLiborCapFloor():
         alpha = self._dayCounter.yearFrac(startDate, endDate)
         df = liborCurve.df(endDate)
 
-        if self._optionType == FinLiborCapFloorType.CAP:
+        if self._optionType == FinLiborCapFloorTypes.CAP:
             capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
-        elif self._optionType == FinLiborCapFloorType.FLOOR:
+        elif self._optionType == FinLiborCapFloorTypes.FLOOR:
             capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
 
         capFloorLetValue *= self._notional
@@ -209,14 +176,14 @@ class FinLiborCapFloor():
             fwdRate = liborCurve.fwdRate(startDate, endDate,
                                          self._dayCountType)
 
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0)
 
             intrinsicValue *= self._notional
 
-            capFloorLetValue = self.valueCapletFloorLet(valuationDate,
+            capFloorLetValue = self.valueCapletFloorlet(valuationDate,
                                                         startDate,
                                                         endDate,
                                                         liborCurve,
@@ -236,7 +203,7 @@ class FinLiborCapFloor():
 
 ##########################################################################
 
-    def valueCapletFloorLet(self,
+    def valueCapletFloorlet(self,
                             valuationDate,
                             startDate,
                             endDate,
@@ -256,37 +223,46 @@ class FinLiborCapFloor():
 
         if isinstance(model, FinModelBlack):
 
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_PUT)
+
+        elif isinstance(model, FinModelBachelier):
+
+            if self._optionType == FinLiborCapFloorTypes.CAP:
+                capFloorLetValue = model.value(f, k, texp, df,
+                                               FinOptionTypes.EUROPEAN_CALL)
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
@@ -304,9 +280,9 @@ class FinLiborCapFloor():
                                   dfTimes, dfValues)
 
             # we divide by alpha to offset the multiplication above
-            if self._optionType == FinLiborCapFloorType.CAP:
+            if self._optionType == FinLiborCapFloorTypes.CAP:
                 capFloorLetValue = v['put'] * notionalAdj / alpha
-            elif self._optionType == FinLiborCapFloorType.FLOOR:
+            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
                 capFloorLetValue = v['call'] * notionalAdj / alpha
 
         else:
@@ -331,10 +307,10 @@ class FinLiborCapFloor():
             print("Caplets not calculated.")
             return
 
-        if self._optionType == FinLiborCapFloorType.CAP:
+        if self._optionType == FinLiborCapFloorTypes.CAP:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    CAPLET_PV       CUM_PV"
-        elif self._optionType == FinLiborCapFloorType.FLOOR:
+        elif self._optionType == FinLiborCapFloorTypes.FLOOR:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    FLRLET_PV       CUM_PV"
 

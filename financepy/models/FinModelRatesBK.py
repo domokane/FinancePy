@@ -4,7 +4,7 @@
 
 import numpy as np
 from numba import njit, float64, int64
-from math import ceil, sqrt, exp
+from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
@@ -17,6 +17,7 @@ interp = FinInterpMethods.FLAT_FORWARDS.value
 # TODO : Calculate accrued in bond option according to accrual convention
 # TODO : Convergence is unstable - investigate how to improve it
 # TODO : Write a fallback for gradient based alpha using bisection
+# TODO : Fix treatment of accrued interest on the option expiry date.
 ###############################################################################
 
 # (c) Dominic O'Kane - December-2019
@@ -31,8 +32,8 @@ def f(alpha, nm, Q, P, dX, dt, N):
     sumQZ = 0.0
     for j in range(-nm, nm+1):
         x = alpha + j*dX
-        rdt = exp(x)*dt
-        sumQZ += Q[j+N] * exp(-rdt)
+        rdt = np.exp(x)*dt
+        sumQZ += Q[j+N] * np.exp(-rdt)
 
     objFn = sumQZ - P
     return objFn
@@ -46,8 +47,8 @@ def fprime(alpha, nm, Q, P, dX, dt, N):
     sumQZdZ = 0.0
     for j in range(-nm, nm+1):
         x = alpha + j*dX
-        rdt = exp(x)*dt
-        sumQZdZ += Q[j+N] * exp(-rdt) * exp(x)
+        rdt = np.exp(x)*dt
+        sumQZdZ += Q[j+N] * np.exp(-rdt) * np.exp(x)
 
     deriv = -sumQZdZ*dt
     return deriv
@@ -61,8 +62,9 @@ def fprime(alpha, nm, Q, P, dX, dt, N):
       fastmath=True, cache=True)
 def searchRoot(x0, nm, Q, P, dX, dt, N):
 
+#    print("Searching for root", x0)
     max_iter = 50
-    max_error = 1e-7
+    max_error = 1e-8
 
     x1 = x0 * 1.0001
     f0 = f(x0, nm, Q, P, dX, dt, N)
@@ -87,9 +89,9 @@ def searchRoot(x0, nm, Q, P, dX, dt, N):
 
 ###############################################################################
 # This is Newton Raphson which is faster than the secant measure as it has the
-# analytical derivative  that is easy to calculate. 
+# analytical derivative  that is easy to calculate.
 # UPDATE IN MAY 2020: HAVING PROBLEMS WITH CONVERGENCE OF DERIVATIVE APPROACH
-# DUE TO FLATNESS OF FUNCTION AT NEGATIVE X. NEEDED LOWER LIMIT NUMTIMESTEPS 
+# DUE TO FLATNESS OF FUNCTION AT NEGATIVE X. NEEDED LOWER LIMIT NUMTIMESTEPS
 ###############################################################################
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
@@ -110,7 +112,7 @@ def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 
         if abs(fderiv) == 0.0:
             raise FinError("Function derivative is zero.")
- 
+
         step = fval/fderiv
         x0 = x0 - step
 
@@ -167,26 +169,47 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
 
     mappedTimes = [0.0]
     mappedAmounts = [0.0]
-    for n in range(0, len(_treeTimes)):
+    for n in range(1, len(_treeTimes)):
+
+        # I AM ENFORCING ZERO ACCRUED ON THE EXPIRY DATE OF THE OPTION
+        # THIS NEEDS FURTHER WORK. I SHOULD CALCULATE THE EXPIRY ACCD EXACTLY
+        # AND SET IT EQUAL TO THAT AMOUNT - !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        accdAtExpiry = 0.0
+        if _treeTimes[n-1] < texp and _treeTimes[n] >= texp:
+            mappedTimes.append(texp)
+            mappedAmounts.append(accdAtExpiry)
+
         if treeFlows[n] > 0.0:
             mappedTimes.append(_treeTimes[n])
             mappedAmounts.append(treeFlows[n])
 
-    # Need future cashflows which are exact time and size for accrued at texp
-    for n in range(0, numCoupons):
-        if couponTimes[n] > texp:
-            mappedTimes.append(couponTimes[n])
-            mappedAmounts.append(couponFlows[n])
+    # I HAVE REMOVED THIS
+    # Need cashflows which are exact time and size for accrued at texp
+#    for n in range(0, numCoupons):
+#        if couponTimes[n] > texp:
+#            mappedTimes.append(couponTimes[n])
+#            mappedAmounts.append(couponFlows[n])
 
-    for m in range(0, expiryStep+1):
+    for m in range(0, maturityStep+1):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, mappedTimes, mappedAmounts)
+#        print("==>", m, ttree, accrued[m])
         accrued[m] *= face
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
         if treeFlows[m] > 0.0:
             accrued[m] = treeFlows[m] * face
+
+    if DEBUG:
+        print("TEXP", texp)
+        print("TREE TIMES", _treeTimes)
+        print("TREE FLOWS", treeFlows)
+        print("MAPPED TIMES:", mappedTimes)
+        print("MAPPED AMOUNTS:", mappedAmounts)
+        print("ACCD TIMES", _treeTimes)
+        print("ACCD AMOUNT", accrued)
 
     #######################################################################
 
@@ -211,7 +234,7 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
 
         for k in range(-nm, nm+1):
             kN = k + jmax
-            df = exp(-_rt[m, kN] * _dt)
+            df = np.exp(-_rt[m, kN] * _dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -246,12 +269,13 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
     nm = min(expiryStep, jmax)
     for k in range(-nm, nm+1):
         kN = k + N
-        cleanPrice = bondValues[expiryStep, kN] - accrued[expiryStep]
+        accd = accrued[expiryStep]
+        cleanPrice = bondValues[expiryStep, kN] - accd
         callOptionValues[expiryStep, kN] = max(cleanPrice - strikePrice, 0.0)
         putOptionValues[expiryStep, kN] = max(strikePrice - cleanPrice, 0.0)
 
-        if DEBUG:
-            outfile.write("k: %d cleanPrice: %9.5f\n"% (k, cleanPrice))
+    if DEBUG:
+        outfile.write("k: %d cleanPrice: %9.5f accd: %9.5f \n" % (k, cleanPrice, accd))
 
     if DEBUG:
         outfile.write("OPTION    m    k     treeT      treeF  bondVal   cleanPx     Accd    CallVal    PutVal\n")
@@ -263,7 +287,7 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
 
         for k in range(-nm, nm+1):
             kN = k + N
-            df = exp(-_rt[m, kN] * _dt)
+            df = np.exp(-_rt[m, kN] * _dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -472,7 +496,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
         for k in range(-nm, nm+1):
             kN = k + jmax
             rt = _rt[m, kN]
-            df = exp(-rt*dt)
+            df = np.exp(-rt*dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -524,9 +548,12 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
     treeMaturity = treeTimes[-1]
     dt = treeMaturity / (numTimeSteps+1)
-    dX = sigma * sqrt(3.0 * dt)
+    dX = sigma * np.sqrt(3.0 * dt)
     jmax = ceil(0.1835/(a * dt))
     jmin = - jmax
+
+    if jmax > 1000:
+        raise FinError("Jmax > 1000. Increase a or dt.")
 
     pu = np.zeros(shape=(2*jmax+1))
     pm = np.zeros(shape=(2*jmax+1))
@@ -587,13 +614,13 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
         for j in range(-nm, nm+1):
             jN = j + jmax
             X[m, jN] = alpha[m] + j*dX
-            rt[m, jN] = exp(X[m, jN])
+            rt[m, jN] = np.exp(X[m, jN])
 
         # Loop over all nodes at time m to calculate next values of Q
         for j in range(-nm, nm+1):
             jN = j + jmax
-            rdt = exp(X[m, jN]) * dt
-            z = exp(-rdt)
+            rdt = np.exp(X[m, jN]) * dt
+            z = np.exp(-rdt)
 
             if j == jmax:
                 Q[m+1, jN] += Q[m, jN] * pu[jN] * z
@@ -615,7 +642,7 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
 class FinModelRatesBK():
 
-    def __init__(self, a, sigma, numTimeSteps=100):
+    def __init__(self, sigma, a, numTimeSteps=100):
         ''' Constructs the Black Karasinski rate model. The speed of mean
         reversion a and volatility are passed in. The short rate process
         is given by d(log(r)) = (theta(t) - a*log(r)) * dt  + sigma * dW '''
@@ -644,7 +671,7 @@ class FinModelRatesBK():
 
 ###############################################################################
 
-    def bondOption(self, texp, strikePrice,
+    def bondOption(self, texp, strike,
                    face, couponTimes, couponFlows, americanExercise):
         ''' Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
@@ -661,7 +688,7 @@ class FinModelRatesBK():
         #######################################################################
 
         callValue, putValue \
-            = americanBondOption_Tree_Fast(texp, tmat, strikePrice, face,
+            = americanBondOption_Tree_Fast(texp, tmat, strike, face,
                                            couponTimes, couponFlows,
                                            americanExercise,
                                            self._dfTimes, self._dfValues,
@@ -725,5 +752,15 @@ class FinModelRatesBK():
         self._treeTimes = treeTimes
         self._dfTimes = dfTimes
         self._dfValues = dfValues
+
+###############################################################################
+
+    def __repr__(self):
+        ''' Return string with class details. '''
+
+        s = "Black-Karasinski Model\n"
+        s += labelToString("Sigma", self._sigma)
+        s += labelToString("a", self._a)
+        return s
 
 ###############################################################################

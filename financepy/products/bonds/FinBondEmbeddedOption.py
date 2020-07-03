@@ -10,10 +10,13 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...products.bonds.FinBond import FinBond
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+
 
 from enum import Enum
 import numpy as np
+from typing import List
 
 ###############################################################################
 
@@ -41,25 +44,19 @@ class FinBondEmbeddedOption(object):
     ''' Class for fixed coupon bonds with embedded call or put optionality. '''
 
     def __init__(self,
-                 maturityDate,  # FinDate
-                 coupon,  # Annualised coupon - 0.03 = 3.00%
-                 frequencyType,  # Frequency type - see FinFrequencyTypes
-                 accrualType,  # Day count convention for accrued interest
-                 callDates,
-                 callPrices,
-                 putDates,
-                 putPrices,
-                 face=100.0):
+                 maturityDate: FinDate,  # FinDate
+                 coupon: float,  # Annualised coupon - 0.03 = 3.00%
+                 frequencyType: FinFrequencyTypes,  # Frequency type - see FinFrequencyTypes
+                 accrualType: FinDayCountTypes,  # Day count convention for accrued interest
+                 callDates: List[FinDate],
+                 callPrices: List[float],
+                 putDates: List[FinDate],
+                 putPrices: List[float],
+                 face: float = 100.0):
         ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. '''
-
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Invalid Frequency:" + str(frequencyType))
-            return
-
-        if accrualType not in FinDayCountTypes:
-            raise FinError("Unknown Bond Accrued Convention type " +
-                           str(accrualType))
+        
+        checkArgumentTypes(self.__init__, locals())
 
         self._maturityDate = maturityDate
         self._coupon = coupon

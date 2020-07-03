@@ -19,8 +19,8 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 class FinLiborMarketConventions():
 
     def __init__(self,
-                 currencyName,
-                 indexName = "LIBOR"):
+                 currencyName: str,
+                 indexName: str = "LIBOR"):
 
         if currencyName == "USD" and indexName == "LIBOR":
             spotLag = 2

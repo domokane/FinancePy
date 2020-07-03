@@ -4,7 +4,10 @@
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+
+
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
 ##########################################################################
@@ -15,11 +18,13 @@ class FinBondFuture(object):
     CME conventions and related analytics. '''
 
     def __init__(self,
-                 tickerName,
-                 firstDeliveryDate,
-                 lastDeliveryDate,
-                 contractSize,
-                 coupon):
+                 tickerName: str,
+                 firstDeliveryDate: FinDate,
+                 lastDeliveryDate: FinDate,
+                 contractSize: int,
+                 coupon: float):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._tickerName = tickerName
         self._firstDeliveryDate = firstDeliveryDate

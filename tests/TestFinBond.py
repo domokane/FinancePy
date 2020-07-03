@@ -198,7 +198,10 @@ def buildLiborCurve(valueDate):
 
 def test_FinBond():
 
-    x = FinBond(23,0.08,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
+#    FinBond(FinDate(1,1,2000),0.08,1, FinDayCountTypes.ACT_360)
+#    FinBond(FinDate(1,1,2000),8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
+#    FinBond(1.3,8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
+    FinBond(FinDate(1,1,2000),0.08,FinFrequencyTypes.ANNUAL, 1)
 
     import pandas as pd
     bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')

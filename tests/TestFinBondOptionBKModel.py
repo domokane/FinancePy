@@ -253,7 +253,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
 
     testCases.header("PERIOD","N","EUR_CALL","AMER_CALL","EUR_PUT","AMER_PUT")
 
-    sigma = 0.02
+    sigma = 0.2
     a = 0.1
     bkModel = FinModelRatesBK(sigma, a)
     K = 101.0
@@ -263,7 +263,14 @@ def test_FinBondOptionAmericanConvergenceTWO():
     vec_ep = []
     vec_ap = []
 
-    numStepsVector = range(40, 400, 1)
+    if 1==1:
+        K = 100.0
+        bkModel = FinModelRatesBK(sigma, a, 100)
+        europeanCallBondOption = FinBondOption(bond, expiryDate, K, face, FinBondOptionTypes.EUROPEAN_CALL)
+        v_ec = europeanCallBondOption.value(settlementDate, discountCurve, bkModel)
+        print("OPTION", v_ec)
+
+    numStepsVector = range(100, 100, 1) # should be 100-400
 
     for numSteps in numStepsVector:
 

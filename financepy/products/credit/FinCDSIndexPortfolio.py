@@ -12,7 +12,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...market.curves.FinCDSCurve import FinCDSCurve
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 class FinCDSIndexPortfolio():
@@ -20,13 +20,15 @@ class FinCDSIndexPortfolio():
     portfolio of CDS contracts with the same maturity date. '''
 
     def __init__(self,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create FinCDSIndexPortfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType

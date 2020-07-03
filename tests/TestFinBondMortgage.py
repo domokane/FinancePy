@@ -13,7 +13,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.bonds.FinBondMortgage import FinBondMortgage, FinBondMortgageType
+from financepy.products.bonds.FinBondMortgage import FinBondMortgage, FinBondMortgageTypes
 
 sys.path.append("..//..")
 
@@ -30,7 +30,7 @@ def test_FinBondMortgage():
     mortgage = FinBondMortgage(startDate, endDate, principal)
 
     rate = 0.035
-    mortgage.generateFlows(rate, FinBondMortgageType.REPAYMENT)
+    mortgage.generateFlows(rate, FinBondMortgageTypes.REPAYMENT)
 
     numFlows = len(mortgage._schedule._adjustedDates)
 
@@ -44,7 +44,7 @@ def test_FinBondMortgage():
                         mortgage._principalRemaining[i],
                         mortgage._totalFlows[i])
 
-    mortgage.generateFlows(rate, FinBondMortgageType.INTEREST_ONLY)
+    mortgage.generateFlows(rate, FinBondMortgageTypes.INTEREST_ONLY)
 
     testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
                      "TOTAL")

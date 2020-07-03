@@ -6,6 +6,7 @@
 import numpy as np
 from numba import njit, float64, int64
 from math import exp, log
+from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
@@ -14,9 +15,10 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinHelperFunctions import labelToString, tableToString
 from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -188,57 +190,27 @@ class FinCDS(object):
     generation and the valuation and risk management of CDS. '''
 
     def __init__(self,
-                 stepInDate, #  FinDate is when protection starts (usually T+1)
-                 maturityDateOrTenor,  # FinDate or a FinTenor
-                 runningCoupon, # Annualised coupon on premium leg
-                 notional=ONE_MILLION,
-                 longProtection=True,
-                 frequencyType=FinFrequencyTypes.QUARTERLY,
-                 dayCountType=FinDayCountTypes.ACT_360,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 stepInDate: FinDate, #  FinDate is when protection starts (usually T+1)
+                 maturityDateOrTenor: Union[FinDate, str],  # FinDate or a FinTenor
+                 runningCoupon: float, # Annualised coupon on premium leg
+                 notional: float = ONE_MILLION,
+                 longProtection: bool = True,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create a CDS from the step-in date, maturity date and coupon '''
 
-        if type(stepInDate) is not FinDate:
-            raise ValueError(
-                "Step in date must be a FinDate")
+        checkArgumentTypes(self.__init__, locals())
 
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
             maturityDate = stepInDate.addTenor(maturityDateOrTenor)
 
-        if type(runningCoupon) is not float and type(
-                runningCoupon) is not np.float64:
-            raise ValueError("Coupon is not float but is " +
-                             str(type(runningCoupon)))
-
         if stepInDate > maturityDate:
             raise ValueError("Step in date after maturity date")
-
-        if dayCountType not in FinDayCountTypes:
-            raise ValueError(
-                "Unknown Fixed Day Count Rule type " +
-                str(dayCountType))
-
-        if frequencyType not in FinFrequencyTypes:
-            raise ValueError(
-                "Unknown Fixed Frequency type " +
-                str(frequencyType))
-
-        if calendarType not in FinCalendarTypes:
-            raise ValueError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise ValueError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise ValueError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
 
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
@@ -834,6 +806,30 @@ class FinCDS(object):
         ir01 = fullPV_ir_bumped - fullPV
 
         return (fullPV, cleanPV, credit01, ir01)
+
+##########################################################################
+
+    def __repr__(self):
+        ''' print out details of the CDS contract and all of the calculated
+        cashflows '''
+        s = labelToString("STEPINDATE", self._stepInDate)
+        s += labelToString("MATURITY", self._maturityDate)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("RUNNING COUPON", self._coupon * 10000, "bp\n")
+        s += labelToString("DAYCOUNT", self._dayCountType)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("ACCRUED DAYS:", self.accruedDays())
+
+        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
+        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+        precision = "12.6f"
+
+        s += tableToString(header, valueTable, precision)
+
+        return s
 
 ##########################################################################
 

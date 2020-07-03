@@ -9,7 +9,7 @@ import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorType
+from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
@@ -25,6 +25,7 @@ from financepy.market.curves.FinZeroCurve import FinZeroCurve
 from financepy.market.curves.FinInterpolate import FinInterpMethods
 
 from financepy.models.FinModelBlack import FinModelBlack
+from financepy.models.FinModelBachelier import FinModelBachelier
 from financepy.models.FinModelBlackShifted import FinModelBlackShifted
 from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
@@ -93,69 +94,75 @@ def test_FinLiborCapFloor():
     strikes = np.linspace(0.02, 0.08, 10)
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
-                     "SABR_SHFTD", "HW")
+                     "SABR_SHFTD", "HW", "BACH")
 
     model1 = FinModelBlack(0.20)
     model2 = FinModelBlackShifted(0.25, 0.0)
     model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
     model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
     model5 = FinModelRatesHW(0.30, 0.01)
+    model6 = FinModelBachelier(0.01)
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorType.CAP
+        capFloorType = FinLiborCapFloorTypes.CAP
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
         cvalue4 = capfloor.value(valuationDate, liborCurve, model4)
         cvalue5 = capfloor.value(valuationDate, liborCurve, model5)
-        testCases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5)
+        cvalue6 = capfloor.value(valuationDate, liborCurve, model6)
+        testCases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
-                     "SABR_SHFTD", "HW")
+                     "SABR_SHFTD", "HW", "BACH")
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorType.FLOOR
+        capFloorType = FinLiborCapFloorTypes.FLOOR
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
         fvalue4 = capfloor.value(valuationDate, liborCurve, model4)
         fvalue5 = capfloor.value(valuationDate, liborCurve, model5)
-        testCases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5)
+        fvalue6 = capfloor.value(valuationDate, liborCurve, model6)
+        testCases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
 ###############################################################################
 # PUT CALL CHECK
 ###############################################################################
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
-          "SABR SHFTD", "HW")
+          "SABR SHFTD", "HW", "BACH")
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorType.CAP
+        capFloorType = FinLiborCapFloorTypes.CAP
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
         cvalue4 = capfloor.value(valuationDate, liborCurve, model4)
         cvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+        cvalue6 = capfloor.value(valuationDate, liborCurve, model6)
 
-        capFloorType = FinLiborCapFloorType.FLOOR
+        capFloorType = FinLiborCapFloorTypes.FLOOR
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
         fvalue4 = capfloor.value(valuationDate, liborCurve, model4)
         fvalue5 = capfloor.value(valuationDate, liborCurve, model5)
+        fvalue6 = capfloor.value(valuationDate, liborCurve, model6)
 
         pcvalue1 = cvalue1 - fvalue1
         pcvalue2 = cvalue2 - fvalue2
         pcvalue3 = cvalue3 - fvalue3
         pcvalue4 = cvalue4 - fvalue4
         pcvalue5 = cvalue5 - fvalue5
+        pcvalue6 = cvalue6 - fvalue6
 
         testCases.print("PUT_CALL", k, pcvalue1, pcvalue2, pcvalue3,
-                        pcvalue4, pcvalue5)
+                        pcvalue4, pcvalue5, pcvalue6)
 
 ###############################################################################
 
@@ -190,7 +197,7 @@ def test_FinLiborCapFloorQLExample():
     lastFixing = 0.0065560
     notional = 1000000
     dayCountType = FinDayCountTypes.ACT_360
-    optionType = FinLiborCapFloorType.CAP
+    optionType = FinLiborCapFloorTypes.CAP
     strikeRate = 0.02
 
     cap = FinLiborCapFloor(startDate, endDate, optionType, strikeRate,

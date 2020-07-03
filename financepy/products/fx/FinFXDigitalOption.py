@@ -5,27 +5,29 @@
 from math import exp, log, sqrt
 import numpy as np
 
+
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...products.equities.FinOption import FinOption, FinOptionTypes
+# from ...products.equity.FinEquityOption import FinOption
 from ...finutils.FinDate import FinDate
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 ##########################################################################
 
 
-class FinFXDigitalOption(FinOption):
+class FinFXDigitalOption():
 
     def __init__(self,
-                 expiryDate,
-                 strikePrice,  # ONE UNIT OF FOREIGN IN DOMESTIC CC
-                 currencyPair,  # FORDOM
-                 optionType,
-                 notional,
-                 premCurrency):
+                 expiryDate: FinDate,
+                 strikePrice: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CC
+                 currencyPair: str,  # FORDOM
+                 optionType: FinOptionTypes,
+                 notional: float,
+                 premCurrency: str):
         ''' Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -33,6 +35,8 @@ class FinFXDigitalOption(FinOption):
         one unit of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
         same for the domestic currency. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikePrice = float(strikePrice)

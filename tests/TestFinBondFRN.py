@@ -23,13 +23,13 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(valuationDate):
+def buildLiborCurve(valueDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spotDays = 2
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWorkDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)

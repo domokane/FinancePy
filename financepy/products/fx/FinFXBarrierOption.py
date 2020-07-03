@@ -6,12 +6,14 @@ from math import exp, log, sqrt
 import numpy as np
 from enum import Enum
 
+
 from ...finutils.FinError import FinError
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.fx.FinFXOption import FinFXOption
 from ...models.FinProcessSimulator import FinProcessSimulator
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinDate import FinDate
 
 
 class FinFXBarrierTypes(Enum):
@@ -31,23 +33,21 @@ class FinFXBarrierTypes(Enum):
 class FinFXBarrierOption(FinFXOption):
 
     def __init__(self,
-                 expiryDate,
-                 strikeFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
-                 currencyPair,  # FORDOM
-                 optionType,
-                 barrierLevel,
-                 numObservationsPerYear,
-                 notional,
-                 notionalCurrency):
+                 expiryDate: FinDate,
+                 strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 currencyPair: str,  # FORDOM
+                 optionType: FinFXBarrierTypes,
+                 barrierLevel: float,
+                 numObservationsPerYear: int,
+                 notional: float,
+                 notionalCurrency: str):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._expiryDate = expiryDate
         self._strikeFXRate = float(strikeFXRate)
         self._barrierLevel = float(barrierLevel)
         self._numObservationsPerYear = int(numObservationsPerYear)
-
-        if optionType not in FinFXBarrierTypes:
-            raise FinError("Option Type ", optionType, " unknown.")
-
         self._optionType = optionType
         self._notional = notional
         self._notionalCurrency = notionalCurrency
