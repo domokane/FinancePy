@@ -4,24 +4,23 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
+from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
 ##########################################################################
 # TODO: This is unfinished
 
 
-class FinCapletVolCurveReb():
-    ''' Class to manage a term structure of caplet volatilities using the 
+class FinCapFloorVolCurveFn():
+    ''' Class to manage a term structure of caplet volatilities using the
     parametric form suggested by Rebonato (1999). '''
 
     def __init__(self,
                  curveDate,
-                 a, 
-                 b, 
+                 a,
+                 b,
                  c,
                  d):
 
@@ -33,13 +32,12 @@ class FinCapletVolCurveReb():
 
 ###############################################################################
 
-    def volatility(self, date):
+    def capFloorletVol(self, dt):
         ''' Return the caplet volatility. '''
 
-        if isinstance(dt, FinDate): 
-            t = (date - self._curveDate) / gDaysInYear
-
-        vol = (a + b*t) * np.exp(-c*t) + d
+        if isinstance(dt, FinDate):
+            t = (dt - self._curveDate) / gDaysInYear
+            vol = (self._a + self._b*t) * np.exp(-self._c*t) + self._d
 
         if vol < 0.0:
             raise ValueError("Negative volatility. Not permitted.")

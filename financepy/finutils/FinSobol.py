@@ -36,6 +36,11 @@ from numba import njit
 
 from financepy.finutils.FinMath import norminvcdf
 
+###############################################################################
+# This code loads sobol coefficients from binary numpy file and allocates
+# contents to static global variables.
+###############################################################################
+
 dirname = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(dirname, "sobolcoeff.npz")
 
@@ -44,36 +49,43 @@ with np.load(path, mmap_mode='r') as f:
     aArr = np.array(f['sa'][1])
     m_i = f['c']
 
+###############################################################################
+
+
 @njit(cache=True)
 def getGaussianSobol(numPoints, dimension):
     """
-    Sobol points generator based on graycode order.
+    Sobol Gaussian quasi random points generator based on graycode order.
     The generated points follow a normal distribution.
     Args:
          numPoints (int): number of points (cannot be greater than 2^32)
          dimension (int): number of dimensions
      Return:
-         point (nparray): 2-dimensional array with row as the point and column as the dimension.
+         point (nparray): 2-dimensional array with row as the point
+         and column as the dimension.
     """
-    points = getSobol(numPoints, dimension)
+    points = getUniformSobol(numPoints, dimension)
 
     for i in range(numPoints):
         for j in range(dimension):
-            points[i,j] = norminvcdf(points[i,j])
-
+            points[i, j] = norminvcdf(points[i, j])
     return points
 
+###############################################################################
+
+
 @njit(cache=True)
-def getSobol(numPoints, dimension):
+def getUniformSobol(numPoints, dimension):
     """
-    Sobol points generator based on graycode order.
+    Sobol uniform quasi random points generator based on graycode order.
     This function is translated from the original c++ program.
     Original c++ program: https://web.maths.unsw.edu.au/~fkuo/sobol/
     Args:
          numPoints (int): number of points (cannot be greater than 2^32)
          dimension (int): number of dimensions
      Return:
-         point (nparray): 2-dimensional array with row as the point and column as the dimension.
+         point (nparray): 2-dimensional array with row as the point and
+         column as the dimension.
     """
     global sArr
     global aArr
@@ -129,7 +141,8 @@ def getSobol(numPoints, dimension):
             for i in range(s+1, ll+1):
                 v[i] = int(v[i-s]) ^ (int(v[i-s]) >> s)
                 for k in range(1, s):
-                    v[i] = int(v[i]) ^ (((int(a) >> int(s-1-k)) & 1) * int(v[i-k]))
+                    v[i] = int(v[i]) ^ (((int(a) >> int(s-1-k)) & 1)
+                                        * int(v[i-k]))
 
         # Evalulate X[0] to X[N-1], scaled by pow(2,32)
         x = np.zeros(numPoints+1)
@@ -138,3 +151,5 @@ def getSobol(numPoints, dimension):
             points[i-1, j] = x[i]/(2**32)
 
     return points
+
+###############################################################################

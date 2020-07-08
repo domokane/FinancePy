@@ -7,16 +7,8 @@ import numpy as np
 from financepy.finutils.FinError import FinError
 from financepy.finutils.FinMath import N
 from numba import jit, njit, float64, int64, prange
-from financepy.finutils.FinSobol import generateSobol
+from financepy.finutils.FinSobol import getUniformSobol
 from financepy.finutils.FinMath import norminvcdf
-
-
-from ...finutils.FinDate import FinDate
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
-from ...finutils.FinSchedule import FinSchedule
 
 # TO DO: SHITED LOGNORMAL
 # TO DO: TERMINAL MEASURE
@@ -240,7 +232,7 @@ def LMMFwdFwdCorrelation(numForwards, numPaths, iTime, fwds):
 
 @njit(float64[:](float64[:], float64[:], int64, float64, float64[:]),
       cache=True, fastmath=True)
-def priceCapsBlack(fwd0, volCaplet, p, K, taus):
+def LMMPriceCapsBlack(fwd0, volCaplet, p, K, taus):
     ''' Price a strip of capfloorlets using Black's model using the time grid
     of the LMM model. The prices can be compared with the LMM model prices. '''
 
@@ -351,8 +343,6 @@ def LMMSimulateFwdsNF(numForwards, numPaths, fwd0, zetas, correl, taus, seed):
                     gMatrix[iPath, j, k] = g
                     gMatrix[iPath + halfNumPaths, j, k] = -g
 
-#    gMatrix = getSobol3(numPaths)
-
     avgg = 0.0
     stdg = 0.0
 
@@ -409,8 +399,8 @@ def LMMSimulateFwdsNF(numForwards, numPaths, fwd0, zetas, correl, taus, seed):
 
 @njit(float64[:, :, :](int64, int64, int64, float64[:], float64[:], float64[:],
                        int64, int64), cache=True, fastmath=True, parallel=True)
-def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas, taus, 
-                      useSobol, seed):
+def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
+                      taus, useSobol, seed):
     ''' One factor Arbitrage-free simulation of forward Libor curves in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility term structure. The 3D matrix of forward rates by path, time
@@ -418,7 +408,7 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas, taus,
     simplicity and speed. '''
 
     if len(gammas) != numForwards:
-        raise FinError("Gamma vector does not have the right number of forwards")
+        raise FinError("Gamma vector does not have right number of forwards")
 
     np.random.seed(seed)
     # Even number of paths for antithetics
@@ -438,14 +428,14 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas, taus,
     if useSobol == 1:
         print("Using Sobol")
         numDimensions = numTimes
-        rands = generateSobol(halfNumPaths, numDimensions)
+        rands = getUniformSobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((numPaths, numTimes))
         for iPath in range(0, halfNumPaths):
             for j in range(0, numTimes):
                 u = rands[iPath, j]
                 g = norminvcdf(u)
                 gMatrix[iPath, j] = g
-                gMatrix[iPath + halfNumPaths, j] = -g        
+                gMatrix[iPath + halfNumPaths, j] = -g     
     elif useSobol == 0:
         gMatrix = np.empty((numPaths, numTimes))
         for iPath in range(0, halfNumPaths):
@@ -469,7 +459,7 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas, taus,
             for k in range(j, numForwards):  # FORWARDS LOOP
                 zkj = gammas[k-j]
                 muA = 0.0
-                
+ 
                 for i in range(j+1, k+1):
                     fi = fwd[iPath, j, i]
                     zij = gammas[i-j]
@@ -531,7 +521,7 @@ def LMMSimulateFwdsMF(numForwards, numFactors, numPaths, numeraireIndex, fwd0,
 
     if useSobol == 1:
         numDimensions = numTimes * numFactors
-        rands = generateSobol(halfNumPaths, numDimensions)
+        rands = getUniformSobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((numPaths, numTimes, numFactors))
         for iPath in range(0, halfNumPaths):
             for j in range(0, numTimes):
@@ -608,9 +598,9 @@ def LMMSimulateFwdsMF(numForwards, numFactors, numPaths, numeraireIndex, fwd0,
 ###############################################################################
 
 
-#@njit(float64[:](int64, int64, float64, float64[:], float64[:, :, :],
-#                 float64[:], int64),
-#      cache=True, fastmath=True, parallel=True)
+@njit(float64[:](int64, int64, float64, float64[:], float64[:, :, :],
+                 float64[:], int64),
+      cache=True, fastmath=True, parallel=True)
 def LMMCapFlrPricer(numPeriods, numPaths, K, fwd0, fwds, taus, isCap):
     ''' Function to price a strip of cap or floorlets in accordance with the
     simulated forward curve dynamics. '''
@@ -975,5 +965,3 @@ def LMMStickyCapletPricer(spread, numPeriods, numPaths, fwd0, fwds, taus):
     return stickyCapletValues
 
 ###############################################################################
-
-                    

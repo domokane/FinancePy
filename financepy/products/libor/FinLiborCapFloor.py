@@ -105,7 +105,7 @@ class FinLiborCapFloor():
               valuationDate,
               liborCurve,
               model):
-
+        ''' Value the cap or floor using the chosen model. '''
         self._valuationDate = valuationDate
 
         self._capFloorDates = FinSchedule(self._startDate,
@@ -209,8 +209,8 @@ class FinLiborCapFloor():
                             endDate,
                             liborCurve,
                             model):
+        ''' Value the caplet or floorlet using a specific model. '''
 
-        # Uncertainty starts after the swaption settles on its start date
         texp = (startDate - self._startDate) / gDaysInYear
         tend = (endDate - self._startDate) / gDaysInYear
 
