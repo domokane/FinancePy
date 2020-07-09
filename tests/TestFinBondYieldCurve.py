@@ -15,8 +15,8 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
-from financepy.market.curves.FinBondYieldCurve import FinBondYieldCurve
-from financepy.market.curves.FinBondYieldCurveModel import *
+from financepy.products.bonds.FinBondYieldCurve import FinBondYieldCurve
+from financepy.products.bonds.FinBondYieldCurveModel import *
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

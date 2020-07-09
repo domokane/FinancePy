@@ -8,7 +8,7 @@ Created on Fri Apr 08 09:26:27 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-from financepy.market.curves.FinNelsonSiegelCurve import FinNelsonSiegelSvenssonCurve
+from financepy.market.curves.FinDiscountCurveNSS import FinDiscountCurveNSS
 from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,13 +27,13 @@ def test_FinNelsonSiegelSvenssonCurve():
     tau2 = 0.5
     times = np.linspace(0.0, 10.0, 5)
 
-    curve1 = FinNelsonSiegelSvenssonCurve(1., 0., 0., 0., tau1, tau2)
+    curve1 = FinDiscountCurveNSS(1., 0., 0., 0., tau1, tau2)
     factor1loading = curve1.zero(times)
-    curve2 = FinNelsonSiegelSvenssonCurve(0., 1., 0., 0., tau1, tau2)
+    curve2 = FinDiscountCurveNSS(0., 1., 0., 0., tau1, tau2)
     factor2loading = curve2.zero(times)
-    curve3 = FinNelsonSiegelSvenssonCurve(0., 0., 1., 0., tau1, tau2)
+    curve3 = FinDiscountCurveNSS(0., 0., 1., 0., tau1, tau2)
     factor3loading = curve3.zero(times)
-    curve4 = FinNelsonSiegelSvenssonCurve(0., 0., 0., 1., tau1, tau2)
+    curve4 = FinDiscountCurveNSS(0., 0., 0., 1., tau1, tau2)
     factor4loading = curve4.zero(times)
 
     testCases.header("FACTOR LOADING ON ZERO RATES")
@@ -61,7 +61,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve1 = FinNelsonSiegelSvenssonCurve(
+    curve1 = FinDiscountCurveNSS(
         beta1, beta2, beta3, beta4, tau1, tau2)
     zeroRates1 = curve1.zero(times)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates1)
@@ -70,7 +70,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve2 = FinNelsonSiegelSvenssonCurve(
+    curve2 = FinDiscountCurveNSS(
         beta1, beta2, beta3, beta4, tau1, tau2)
     zeroRates2 = curve2.zero(times)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates2)
@@ -79,7 +79,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve3 = FinNelsonSiegelSvenssonCurve(
+    curve3 = FinDiscountCurveNSS(
         beta1, beta2, beta3, beta4, tau1, tau2)
     zeroRates3 = curve3.zero(times)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates3)
@@ -88,7 +88,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve4 = FinNelsonSiegelSvenssonCurve(
+    curve4 = FinDiscountCurveNSS(
         beta1, beta2, beta3, beta4, tau1, tau2)
     zeroRates4 = curve4.zero(times)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates4)
@@ -97,7 +97,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve5 = FinNelsonSiegelSvenssonCurve(
+    curve5 = FinDiscountCurveNSS(
         beta1, beta2, beta3, beta4, tau1, tau2)
     zeroRates5 = curve5.zero(times)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates5)

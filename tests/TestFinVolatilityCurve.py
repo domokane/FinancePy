@@ -18,6 +18,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
+
 
 def test_FinVolatilityCurve():
 
@@ -36,6 +38,8 @@ def test_FinVolatilityCurve():
         import matplotlib.pyplot as plt
         plt.plot(strikes, vols, 'o', interpStrikes, interpVols)
         plt.show()
+
+###############################################################################
 
 
 test_FinVolatilityCurve()

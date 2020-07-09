@@ -13,7 +13,7 @@ from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -38,8 +38,8 @@ def test_FinFXBarrierOption():
     drift = domInterestRate - forInterestRate
     scheme = FinGBMNumericalScheme.ANTITHETIC
     processType = FinProcessTypes.GBM
-    domDiscountCurve = FinFlatCurve(valueDate, domInterestRate)
-    forDiscountCurve = FinFlatCurve(valueDate, forInterestRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, domInterestRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, forInterestRate)
     model = FinFXModelBlackScholes(volatility)
 
     ###########################################################################

@@ -5,7 +5,7 @@ from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
@@ -27,6 +27,11 @@ from financepy.models.FinModelRatesLMM import LMMFlexiCapPricer
 from financepy.models.FinModelRatesLMM import LMMPrintForwards
 
 import numpy as np
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
 
 ###############################################################################
 
@@ -144,8 +149,9 @@ def test_Swaptions():
         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
         valuationDate = FinDate(1, 1, 2010)
-        liborCurve = FinFlatCurve(valuationDate, r,
-                                  FinFrequencyTypes.QUARTERLY)
+        liborCurve = FinDiscountCurveFlat(valuationDate, r,
+                                          FinFrequencyTypes.QUARTERLY)
+
         settlementDate = valuationDate
         exerciseDate = settlementDate.addMonths(a*3)
         maturityDate = settlementDate.addMonths(b*3)
@@ -465,3 +471,4 @@ def fwdfwdCorrelation(fwds):
 test_HullBookExamples()
 # test_CapsFloors()
 # test_Swaptions()
+testCases.compareTestCases()

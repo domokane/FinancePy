@@ -17,7 +17,7 @@ from ...finutils.FinOptionTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from ...market.curves.FinFlatCurve import FinFlatCurve
+from ...market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
 from ...finutils.FinDate import FinDate
 
@@ -356,7 +356,7 @@ class FinEquityCompoundOption(FinEquityOption):
 
         option = FinEquityVanillaOption(expiryDate2, strikePrice2, optionType2)
 
-        discountCurve = FinFlatCurve(expiryDate1, interestRate)
+        discountCurve = FinDiscountCurveFlat(expiryDate1, interestRate)
 
         argtuple = (
             option,

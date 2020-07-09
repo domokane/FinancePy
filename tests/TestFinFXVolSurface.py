@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
 from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
 from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
@@ -38,8 +38,8 @@ def test_FinFXMktVolSurface():
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = FinFlatCurve(valueDate, domCCRate)
-        forDiscountCurve = FinFlatCurve(valueDate, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -86,8 +86,8 @@ def test_FinFXMktVolSurface():
         forCCRate = 0.0294  # EUR
         domCCRate = 0.0171  # USD
 
-        domDiscountCurve = FinFlatCurve(valueDate, domCCRate)
-        forDiscountCurve = FinFlatCurve(valueDate, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 90.72
@@ -134,8 +134,8 @@ def test_FinFXMktVolSurface():
         forCCRate = 0.020113  # EUR
         domCCRate = 0.003525  # USD
 
-        domDiscountCurve = FinFlatCurve(valueDate, domCCRate)
-        forDiscountCurve = FinFlatCurve(valueDate, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3088
@@ -182,8 +182,8 @@ def test_FinFXMktVolSurface():
         forCCRate = 0.003525  # USD
         domCCRate = 0.0042875  # JPY
 
-        domDiscountCurve = FinFlatCurve(valueDate, domCCRate)
-        forDiscountCurve = FinFlatCurve(valueDate, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 90.68

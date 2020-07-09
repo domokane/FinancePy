@@ -28,9 +28,9 @@ from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 from financepy.finutils.FinCalendar import *
 
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
-from financepy.market.curves.FinZeroCurve import FinZeroCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpMethods
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -249,7 +249,8 @@ def testFinLiborSwaptionMatlabExamples():
     print("=======================================")
 
     valuationDate = FinDate(1, 1, 2010)
-    liborCurve = FinFlatCurve(valuationDate, 0.06, FinFrequencyTypes.CONTINUOUS)
+    liborCurve = FinDiscountCurveFlat(valuationDate, 0.06,
+                                      FinFrequencyTypes.CONTINUOUS)
 
     settlementDate = FinDate(1, 1, 2011)
     exerciseDate = FinDate(1, 1, 2016)
@@ -301,8 +302,9 @@ def testFinLiborSwaptionMatlabExamples():
     interpMethod = FinInterpMethods.LINEAR_ZERO_RATES
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
-    liborCurve = FinZeroCurve(valuationDate, dates, zeroRates, contFreq,
-                              dayCountType, interpMethod)
+    liborCurve = FinDiscountCurveZeros(valuationDate, dates,
+                                       zeroRates, contFreq,
+                                       dayCountType, interpMethod)
 
     settlementDate = FinDate(1, 1, 2011)
     exerciseDate = FinDate(1, 1, 2012)
@@ -355,8 +357,9 @@ def testFinLiborSwaptionMatlabExamples():
     interpMethod = FinInterpMethods.LINEAR_ZERO_RATES
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
-    liborCurve = FinZeroCurve(valuationDate, dates, zeroRates, contFreq,
-                              dayCountType, interpMethod)
+    liborCurve = FinDiscountCurveZeros(valuationDate, dates, zeroRates,
+                                       contFreq,
+                                       dayCountType, interpMethod)
 
     settlementDate = FinDate(1, 1, 2016)
     exerciseDate = FinDate(1, 1, 2017)
@@ -413,8 +416,9 @@ def testFinLiborSwaptionMatlabExamples():
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     contFreq = FinFrequencyTypes.SEMI_ANNUAL
 
-    liborCurve = FinZeroCurve(valuationDate, dates, zeroRates, contFreq,
-                              dayCountType, interpMethod)
+    liborCurve = FinDiscountCurveZeros(valuationDate, dates, zeroRates,
+                                       contFreq,
+                                       dayCountType, interpMethod)
 
     settlementDate = valuationDate
     exerciseDate = FinDate(1, 1, 2010)
@@ -466,8 +470,9 @@ def testFinLiborSwaptionMatlabExamples():
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     contFreq = FinFrequencyTypes.SEMI_ANNUAL
 
-    liborCurve = FinZeroCurve(valuationDate, dates, zeroRates, contFreq,
-                              dayCountType, interpMethod)
+    liborCurve = FinDiscountCurveZeros(valuationDate, dates, zeroRates,
+                                       contFreq,
+                                       dayCountType, interpMethod)
 
     settlementDate = valuationDate
     exerciseDate = FinDate(1, 1, 2011)
@@ -522,4 +527,4 @@ def testFinLiborSwaptionMatlabExamples():
 # testFinLiborSwaptionModels()
 testFinLiborSwaptionMatlabExamples()
 # test_FinLiborSwaptionQLExample()
-# testCases.compareTestCases()
+testCases.compareTestCases()

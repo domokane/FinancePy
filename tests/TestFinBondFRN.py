@@ -7,7 +7,7 @@ Created on Mon Aug  5 09:43:40 2019
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes

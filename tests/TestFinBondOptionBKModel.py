@@ -7,7 +7,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -167,7 +167,7 @@ def test_FinBondOptionAmericanConvergenceONE():
 
     # Build discount curve
     settlementDate = FinDate(1, 12, 2019)
-    discountCurve = FinFlatCurve(settlementDate, 0.05)
+    discountCurve = FinDiscountCurveFlat(settlementDate, 0.05)
 
     # Bond details
     maturityDate = FinDate(1, 9, 2025)
@@ -236,7 +236,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
 
     # Build discount curve
     settlementDate = FinDate(1, 12, 2019)
-    discountCurve = FinFlatCurve(settlementDate, 0.05,
+    discountCurve = FinDiscountCurveFlat(settlementDate, 0.05,
                                  FinFrequencyTypes.CONTINUOUS)
 
     # Bond details
@@ -325,3 +325,5 @@ def test_FinBondOptionAmericanConvergenceTWO():
 #test_FinBondOption()
 #test_FinBondOptionAmericanConvergenceONE()
 test_FinBondOptionAmericanConvergenceTWO()
+testCases.compareTestCases()
+

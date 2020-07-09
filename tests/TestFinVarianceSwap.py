@@ -12,7 +12,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.products.equity.FinEquityVarianceSwap import FinEquityVarianceSwap
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 import sys
 sys.path.append("..//..")
@@ -53,7 +53,7 @@ def test_FinEquityVarianceSwap():
     numCallOptions = 10
     numPutOptions = 10
     r = 0.05
-    discountCurve = FinFlatCurve(valuationDate, r)
+    discountCurve = FinDiscountCurveFlat(valuationDate, r)
 
     useForward = False
 

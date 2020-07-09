@@ -11,7 +11,7 @@ from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
-from ...market.curves.FinCDSCurve import FinCDSCurve
+from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 

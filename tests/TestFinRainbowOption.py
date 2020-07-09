@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOption
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOptionTypes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 from math import sqrt
@@ -28,7 +28,7 @@ def test_FinRainbowOption():
     valueDate = FinDate(2015, 1, 1)
     expiryDate = FinDate(2016, 1, 1)
     interestRate = 0.05
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     numAssets = 2
     volatilities = np.ones(numAssets) * 0.3

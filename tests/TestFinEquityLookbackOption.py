@@ -12,7 +12,7 @@ from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloa
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOptionTypes
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOptionTypes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import time
 import sys
@@ -32,7 +32,7 @@ def test_FinEquityLookBackOption():
     numPathsRange = [10000]
     stockPriceRange = range(90, 110, 2)
     numStepsPerYear = 252
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
 ###############################################################################
 

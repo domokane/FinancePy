@@ -2,36 +2,36 @@
 
 FinancePy is a library of native Python functions which covers the following functionality:
 
-* Valuation and risk of a wide range of equity, FX, interest rate and credit derivatives.
-* Valuation models for a range of bonds including callable and puttable bonds.
-* Portfolio risk measures for portfolios of the securities above.
-* Optimal Portfolio asset allocation using Markovitz and other methods.
-* Time series analysis of financial data using econometric techniques.
+* Valuation and risk models for a wide range of equity, FX, interest rate and credit derivatives.
+* Portfolio asset allocation using Markovitz and other methods.
+
+As the library is written entirely in Python, the user has the ability to examine the underlying code and its logic.
 
 The target audience for this library is intended to include:
 
-* Students, professor, or other academics seeking to teach derivative or asset pricing pricing via a library which permits the ability to dig into the underlying functions.
-* Traders wishing to price or risk manage a derivative.
-* Quantitative analysts
-* Risk managers both on the buy and sell side
+* Students wishing to learn derivative pricing and Python.
+* Professors wishing to teach derivative pricing and Python.
+* Traders wishing to price or risk-manage a derivative.
+* Quantitative analysts seeking to price or reverse engineer a price.
+* Risk managers wishing to replicate and understand a price.
 * Portfolio managers wishing to check prices or calculate risk measures
 * Fund managers wanting to value a portfolio or examine a trading strategy
 * Structurers or financial engineers seeking to examine the pricing of a derivative structure.
 
-Users would be expected to have a good, but not advanced, understanding of Python, financial derivatives and some mathematics. 
+Users are expected to have a good, but not advanced, understanding of Python.
 
-Up until now my main focus has been on financial derivatives. Subsequent versions will also include asset selection, portfolio-level risk management, regulatory calculations and market analysis tools. In general my objectives have been:
+Up until now my main focus has been on financial derivatives. In general my approach has been:
 
-1. To make the code as simple as possible so that students and those with a basic Python fluency can understand and check the code.
+1. To make the code as simple as possible so that those with a basic Python fluency can understand and check the code.
 2. To keep all the code in Python so users can look through the code to the lowest level.
 3. To offset the performance impact of (2) by leveraging Numba to make the code as fast as possible without resorting to Cython.
 4. To make the design product-based rather than model-based so someone wanting to price a specific exotic option can easily find that without having to worry too much about the model – just use the default – unless they want to.
 5. To make the library as complete as possible so a user can find all their required finance-related functionality in one place. This is better for the user as they only have to learn one interface.
-6. To avoid complex designs as I do not want to make it too hard for unskilled Python programmers to use the library.
+6. To avoid complex designs - I am OK with some code duplication, at least temporarily.
 7. To have good documentation and easy-to-follow examples.
 8. To make it easy for interested parties to contribute.
 
-In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I expect to reduce the size of such differences.
+In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I hope to reduce the size of such differences.
 
 ## The Library Design
 The underlying Python library is split into a number of major modules:
@@ -47,7 +47,6 @@ There are also two other folders which are currently fairly empty: They are:
 * Portfolio - This will be where portfolio allocation will go,
 * Risk - This is for portfolio risk analysis
 
-
 ## How to Use the Library
 
 FinancePy can be installed using pip (see instructions below). I have provided a range of template Jupyter notebooks under the github repository called FinancePy-Examples. The link is as follows:
@@ -58,25 +57,25 @@ A pdf description of functions can be found at the same repository.
 
 ## Help Needed
 
-The current version of the code is very much a beta. Hence there is no guarantee on its exactness. If you have any questions or issues then please send them to me as a matter of urgency and I will do my best to investigate as quickly as possible.
+The current version of the code is a beta. If you have any questions or issues then please send them to me. Contact me via the github page.
 
 ## Author
 
-My name is Dr. Dominic O'Kane. I am a finance professor at the EDHEC Business School in Nice, France.
+My name is Dr. Dominic O'Kane. I teach Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and 10 years of academic experience.
 
 ## Installation
 
-FinancePy can be installed from pip
+FinancePy can be installed from pip using the command:
 
 pip install financepy
 
-or to upgrade
+To upgrade an existing installation type:
 
 pip install --upgrade financepy
 
 ## Dependencies
 
-FinancePy depends on Numpy and Numba and Scipy.
+FinancePy depends on Numpy, Numba and Scipy.
 
 ## Changelog
 

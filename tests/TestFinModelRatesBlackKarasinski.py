@@ -122,3 +122,4 @@ if 1==0:
 # This has broken and needs to be repaired!!!!
 test_BlackKarasinskiExampleOne()
 # test_BlackKarasinskiExampleTwo()
+testCases.compareTestCases()

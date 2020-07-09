@@ -13,7 +13,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDate import FinDate
 import sys
@@ -45,8 +45,8 @@ def test_FinFXAmericanOption():
     strikeFXRate = 1.250
     volatility = 0.10
 
-    domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
-    forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
     model = FinFXModelBlackScholes(volatility)
 

@@ -13,8 +13,8 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
-from ...market.curves.FinCDSCurve import FinCDSCurve
-from .FinCDS import FinCDS
+from ...products.credit.FinCDSCurve import FinCDSCurve
+from ...products.credit.FinCDS import FinCDS
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
 from ...finutils.FinDate import FinDate
 

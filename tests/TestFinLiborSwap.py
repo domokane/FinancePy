@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborFRA import FinLiborFRA
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit

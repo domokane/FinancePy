@@ -20,7 +20,7 @@ def test_Imports():
 
     if 1 == 1:
         settlementDate = FinDate(1, 1, 2007)
-        curve = FinFlatCurve(settlementDate, 0.05, FinFrequencyTypes.ANNUAL)
+        curve = FinDiscountCurveFlat(settlementDate, 0.05, FinFrequencyTypes.ANNUAL)
 
         dcType = FinDayCountTypes.ACT_360
         fixedFreq = FinFrequencyTypes.SEMI_ANNUAL

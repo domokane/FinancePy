@@ -66,3 +66,4 @@ def test_FinMeanVarPortfolio():
 
 
 #test_FinMeanVarPortfolio()
+testCases.compareTestCases()

@@ -10,7 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 import numpy as np
 import sys
@@ -19,6 +19,7 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = True
+
 
 def test_FinInterpolatedForwards():
 
@@ -33,7 +34,7 @@ def test_FinInterpolatedForwards():
     print(rValues)
     print(dfValues)
 
-    curveDate = FinDate(2019,1,3)
+    curveDate = FinDate(3, 1, 2019)
     for method in FinInterpMethods:
 
         discountCurve = FinDiscountCurve(curveDate, tValues, dfValues, method)

@@ -5,7 +5,7 @@ from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
@@ -19,10 +19,15 @@ from financepy.finutils.FinHelperFunctions import checkVectorDifferences
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 import numpy as np
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
+
 ###############################################################################
 
 
-def test_Swaption():
+def test_Swaptions():
 
     startYear = 2020
     endYear = 2030
@@ -33,7 +38,7 @@ def test_Swaption():
     fixedCoupon = 0.04
 
     # DEFINE THE DISCOUNT CURVE
-    discountCurve = FinFlatCurve(valuationDate,
+    discountCurve = FinDiscountCurveFlat(valuationDate,
                                  0.04,
                                  FinFrequencyTypes.ANNUAL)
 
@@ -95,7 +100,8 @@ def test_Swaption():
         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
         valuationDate = FinDate(1, 1, 2010)
-        liborCurve = FinFlatCurve(valuationDate, r, FinFrequencyTypes.QUARTERLY)
+        liborCurve = FinDiscountCurveFlat(valuationDate, r,
+                                          FinFrequencyTypes.QUARTERLY)
         settlementDate = valuationDate
         exerciseDate = settlementDate.addMonths(a*3)
         maturityDate = settlementDate.addMonths(b*3)
@@ -146,9 +152,9 @@ def test_CapsFloors():
     capFloorRate = 0.04
 
     # DEFINE THE DISCOUNT CURVE
-    discountCurve = FinFlatCurve(valuationDate,
-                                 0.04,
-                                 FinFrequencyTypes.ANNUAL)
+    discountCurve = FinDiscountCurveFlat(valuationDate,
+                                         0.04,
+                                         FinFrequencyTypes.ANNUAL)
 
     capVol = 15.54
 
@@ -225,4 +231,5 @@ def test_CapsFloors():
 ###############################################################################
 
 # test_CapsFloors()
-test_Swaptions()
+# test_Swaptions()
+testCases.compareTestCases()

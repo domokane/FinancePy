@@ -12,7 +12,7 @@ from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierTypes
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -34,7 +34,7 @@ def test_FinEquityBarrierOption():
     drift = interestRate - dividendYield
     scheme = FinGBMNumericalScheme.NORMAL
     processType = FinProcessTypes.GBM
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     model = FinEquityModelBlackScholes(volatility)
 
     #######################################################################

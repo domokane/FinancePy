@@ -12,7 +12,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.finutils.FinOptionTypes import FinOptionTypes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDate import FinDate
 import sys
@@ -32,7 +32,7 @@ def testFinEquityAmericanOption():
     strikePrice = 50.0
 
     model = FinEquityModelBlackScholes(volatility)
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     numStepsList = [100, 200, 500, 1000, 2000]
 

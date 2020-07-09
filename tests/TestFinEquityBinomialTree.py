@@ -16,7 +16,7 @@ from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.finutils.FinDate import FinDate
 
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 import numpy as np
 import time
@@ -37,7 +37,7 @@ def test_FinBinomialTree():
     expiryDate = FinDate(2017, 1, 1)
 
     model = FinEquityModelBlackScholes(volatility)
-    discountCurve = FinFlatCurve(valueDate, riskFreeRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, riskFreeRate)
 
     numStepsList = [100, 500, 1000, 2000, 5000]
 

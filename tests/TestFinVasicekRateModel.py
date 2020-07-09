@@ -17,6 +17,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
+
 
 def test_FinModelRatesVasicek():
 
@@ -42,6 +44,9 @@ def test_FinModelRatesVasicek():
         end = time.time()
         elapsed = end - start
         testCases.print(elapsed, t, p, p_MC, p_MC2)
+
+
+###############################################################################
 
 
 test_FinModelRatesVasicek()

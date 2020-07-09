@@ -11,8 +11,8 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
 
@@ -102,8 +102,8 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
-    discountCurve = FinFlatCurve(valueDate, 0.035,
-                                 FinFrequencyTypes.SEMI_ANNUAL)
+    discountCurve = FinDiscountCurveFlat(valueDate, 0.035,
+                                         FinFrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 
@@ -163,3 +163,4 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
 test_FinBondEmbeddedOptionMATLAB()
 test_FinBondEmbeddedOptionQUANTLIB()
+testCases.compareTestCases()

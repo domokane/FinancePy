@@ -14,11 +14,11 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 from financepy.finutils.FinDate import FinDate
@@ -55,8 +55,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
-    forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
     model = FinFXModelBlackScholes(volatility)
 
@@ -127,8 +127,8 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinFlatCurve(valueDate, ccy2CCRate)
-    forDiscountCurve = FinFlatCurve(valueDate, ccy1CCRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
     model = FinFXModelBlackScholes(volatility)
 
@@ -246,8 +246,8 @@ def test_FinFXVanillaOptionHullExample():
     domInterestRate = 0.08
     forInterestRate = 0.11
     model = FinFXModelBlackScholes(volatility)
-    domDiscountCurve = FinFlatCurve(valueDate, domInterestRate)
-    forDiscountCurve = FinFlatCurve(valueDate, forInterestRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, domInterestRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, forInterestRate)
 
     numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 

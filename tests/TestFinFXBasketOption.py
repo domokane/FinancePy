@@ -10,7 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
 from financepy.finutils.FinOptionTypes import FinOptionTypes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
@@ -30,7 +30,7 @@ def test_FinBasketOption():
     expiryDate = FinDate(2016, 1, 1)
     volatility = 0.30
     interestRate = 0.05
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     ##########################################################################
     # Homogeneous Basket

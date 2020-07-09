@@ -10,7 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinOIS import FinOIS
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -47,8 +47,8 @@ def test_OIS():
 
     valueDate = FinDate(2018, 11, 30)
     marketRate = 0.05
-    indexCurve = FinFlatCurve(valueDate, marketRate, FinFrequencyTypes.ANNUAL)
-    ois.print(valueDate, indexCurve)
+    indexCurve = FinDiscountCurveFlat(valueDate, marketRate,
+                                      FinFrequencyTypes.ANNUAL)
 
     v = ois.value(startDate, indexCurve)
     testCases.header("LABEL", "VALUE")
@@ -56,4 +56,4 @@ def test_OIS():
 
 
 test_OIS()
-# testCases.compareTestCases()
+testCases.compareTestCases()

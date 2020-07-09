@@ -18,8 +18,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 
 from ...products.credit.FinCDS import FinCDS
-
-from ...market.curves.FinCDSCurve import FinCDSCurve
+from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION

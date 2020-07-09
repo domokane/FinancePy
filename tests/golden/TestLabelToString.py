@@ -5,7 +5,7 @@ from financepy.finutils.FinHelperFunctions import labelToString
 from financepy.finutils import *
 
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
 
 s = labelToString("FRED", "WILMA")

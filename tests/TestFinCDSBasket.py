@@ -11,8 +11,8 @@ from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSBasket import FinCDSBasket
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.market.curves.FinCDSCurve import FinCDSCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinMath import corrMatrixGenerator

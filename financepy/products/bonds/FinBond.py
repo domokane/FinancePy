@@ -275,7 +275,9 @@ class FinBond(object):
 
 ###############################################################################
 
-    def cleanValueFromDiscountCurve(self, settlementDate, discountCurve):
+    def cleanValueFromDiscountCurve(self,
+                                    settlementDate,
+                                    discountCurve):
         ''' Calculate the clean bond value using some discount curve to
         present-value the bond's cashflows back to the curve anchor date and
         not to the settlement date. '''
@@ -289,7 +291,9 @@ class FinBond(object):
 
 ##############################################################################
 
-    def valueBondUsingDiscountCurve(self, settlementDate, discountCurve,
+    def valueBondUsingDiscountCurve(self,
+                                    settlementDate,
+                                    discountCurve,
                                     verbose=False):
         ''' Calculate the bond *value* using some discount curve to PV the
         bond's cashflows to the curve anchor date. The anchor of the discount

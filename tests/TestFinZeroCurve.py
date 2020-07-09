@@ -12,7 +12,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinInterpolate import FinInterpMethods
-from financepy.market.curves.FinZeroCurve import FinZeroCurve
+from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 import numpy as np
 import sys
 sys.path.append("..//..")
@@ -29,12 +29,12 @@ def test_FinDiscountCurve():
     freqType = FinFrequencyTypes.ANNUAL
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
-    curve = FinZeroCurve(startDate,
-                         times,
-                         zeroRates,
-                         freqType,
-                         dayCountType,
-                         FinInterpMethods.FLAT_FORWARDS)
+    curve = FinDiscountCurveZeros(startDate,
+                                  times,
+                                  zeroRates,
+                                  freqType,
+                                  dayCountType,
+                                  FinInterpMethods.FLAT_FORWARDS)
 
     testCases.header("T", "DF")
 
@@ -66,12 +66,12 @@ def test_FinDiscountCurve():
 
         startDate = dates[0]
 
-        curve = FinZeroCurve(startDate,
-                             dates,
-                             zeroRates,
-                             freqType,
-                             dayCountType,
-                             FinInterpMethods.FLAT_FORWARDS)
+        curve = FinDiscountCurveZeros(startDate,
+                                      dates,
+                                      zeroRates,
+                                      freqType,
+                                      dayCountType,
+                                      FinInterpMethods.FLAT_FORWARDS)
 
 #    end = time.time()
 #    period = end - start

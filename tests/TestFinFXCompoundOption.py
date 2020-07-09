@@ -11,7 +11,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityCompoundOption import FinEquityCompoundOption
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 
 import sys
@@ -36,7 +36,7 @@ def test_FinEquityCompoundOption():
     dividendYield = 0.01
 
     model = FinEquityModelBlackScholes(volatility)
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     optionType1 = FinOptionTypes.EUROPEAN_CALL
     optionType2 = FinOptionTypes.EUROPEAN_PUT

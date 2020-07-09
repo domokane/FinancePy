@@ -3,6 +3,10 @@ from financepy.finutils.FinSobol import getUniformSobol, getGaussianSobol
 import time
 from numba import jit
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
 ###############################################################################
 
 
@@ -56,3 +60,4 @@ def test_FinSobolCache():
 
 test_FinSobol()
 test_FinSobolCache()
+testCases.compareTestCases()

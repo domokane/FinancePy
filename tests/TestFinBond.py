@@ -6,14 +6,14 @@
 import datetime as dt
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
 from financepy.finutils.FinHelperFunctions import dump
 
@@ -175,9 +175,6 @@ def buildLiborCurve(valueDate):
                                fras,
                                swaps)
 
-    dump(liborCurve)
-    dump(swap9)
-
     if 1 == 0:
         import numpy as np
         numSteps = 40
@@ -281,9 +278,9 @@ def test_FinBond():
 
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
-    flatCurve = FinFlatCurve(settlementDate,
-                             ytm,
-                             FinFrequencyTypes.SEMI_ANNUAL)
+    flatCurve = FinDiscountCurveFlat(settlementDate,
+                                     ytm,
+                                     FinFrequencyTypes.SEMI_ANNUAL)
 
     testCases.header("FIELD", "VALUE")
 

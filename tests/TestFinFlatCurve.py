@@ -8,8 +8,9 @@ Created on Fri Apr 08 09:26:27 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinFrequency import FinFrequencyTypes
 import numpy as np
 import sys
 sys.path.append("..//..")
@@ -23,28 +24,29 @@ def test_FinFlatCurve():
     times = np.linspace(0.0, 1.0, 5)
 
     testCases.header("COMPOUNDING", "DFS")
-    compounding = -1
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
+    compounding = FinFrequencyTypes.CONTINUOUS
+
+    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = 1
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
+    compounding = FinFrequencyTypes.ANNUAL
+    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = 2
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
+    compounding = FinFrequencyTypes.SEMI_ANNUAL
+    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = 4
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
+    compounding = FinFrequencyTypes.QUARTERLY
+    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 
-    compounding = 12
-    flatCurve = FinFlatCurve(curveDate, 0.05, compounding)
+    compounding = FinFrequencyTypes.MONTHLY
+    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(times)
     testCases.print(compounding, dfs)
 

@@ -9,11 +9,11 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.products.fx.FinFXForward import FinFXForward
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 
 from financepy.finutils.FinDate import FinDate

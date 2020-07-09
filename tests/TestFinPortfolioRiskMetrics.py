@@ -34,3 +34,4 @@ def test_FinPortfolioRiskMetrics():
 
 
 test_FinPortfolioRiskMetrics()
+testCases.compareTestCases()
