@@ -19,9 +19,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinBondConvertible():
 
-    settlementDate = FinDate(2003, 12, 31)
-    startConvertDate = FinDate(2003, 12, 31)
-    maturityDate = FinDate(2022, 3, 15)
+    settlementDate = FinDate(31, 12, 2003)
+    startConvertDate = FinDate(31, 12, 2003)
+    maturityDate = FinDate(15, 3, 2022)
     conversionRatio = 38.4615  # adjust for face
     coupon = 0.0575
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
@@ -29,15 +29,15 @@ def test_FinBondConvertible():
     face = 1000.0
 
     callPrice = 1100
-    callDates = [FinDate(2007, 3, 20),
-                 FinDate(2012, 3, 15),
-                 FinDate(2017, 3, 15)]
+    callDates = [FinDate(20, 3, 2007),
+                 FinDate(15, 3, 2012),
+                 FinDate(15, 3, 2017)]
     callPrices = np.array([callPrice, callPrice, callPrice])
 
     putPrice = 90
-    putDates = [FinDate(2007, 3, 20),
-                FinDate(2012, 3, 15),
-                FinDate(2017, 3, 15)]
+    putDates = [FinDate(20, 3, 2007),
+                FinDate(15, 3, 2012),
+                FinDate(15, 3, 2017)]
     putPrices = np.array([putPrice, putPrice, putPrice])
 
     bond = FinBondConvertible(maturityDate,
@@ -76,7 +76,7 @@ def test_FinBondConvertible():
     rate = 0.04
     discountCurve = FinFlatCurve(settlementDate,
                                  rate,
-                                 -1)
+                                 FinFrequencyTypes.CONTINUOUS)
     creditSpread = 0.00
     recoveryRate = 0.40
     numStepsPerYear = 20

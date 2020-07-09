@@ -201,14 +201,14 @@ def test_FinBond():
 #    FinBond(FinDate(1,1,2000),0.08,1, FinDayCountTypes.ACT_360)
 #    FinBond(FinDate(1,1,2000),8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
 #    FinBond(1.3,8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
-    FinBond(FinDate(1,1,2000),0.08,FinFrequencyTypes.ANNUAL, 1)
+#    FinBond(FinDate(1,1,2000),0.08,FinFrequencyTypes.ANNUAL, 1)
 
     import pandas as pd
     bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    settlement = FinDate(2012, 9, 19)
+    settlement = FinDate(19, 9, 2012)
     face = ONE_MILLION
 
     for accrualType in FinDayCountTypes:
@@ -237,8 +237,8 @@ def test_FinBond():
 
     accrualConvention = FinDayCountTypes.ACT_ACT_ICMA
     y = 0.062267
-    settlementDate = FinDate(1994, 4, 19)
-    maturityDate = FinDate(1997, 7, 15)
+    settlementDate = FinDate(19, 4, 1994)
+    maturityDate = FinDate(15, 7, 1997)
     coupon = 0.085
     face = ONE_MILLION
     freqType = FinFrequencyTypes.SEMI_ANNUAL
@@ -283,7 +283,7 @@ def test_FinBond():
     # definition
     flatCurve = FinFlatCurve(settlementDate,
                              ytm,
-                             2)
+                             FinFrequencyTypes.SEMI_ANNUAL)
 
     testCases.header("FIELD", "VALUE")
 
@@ -322,8 +322,8 @@ def test_FinBond():
 ##########################################################################
 
     testCases.banner("BLOOMBERG US TREASURY EXAMPLE")
-    settlementDate = FinDate(2017, 7, 21)
-    maturityDate = FinDate(2027, 5, 15)
+    settlementDate = FinDate(21, 7, 2017)
+    maturityDate = FinDate(15, 5, 2027)
     coupon = 0.02375
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
@@ -382,18 +382,14 @@ def test_FinBond():
 ##########################################################################
 
     testCases.banner("BLOOMBERG APPLE CORP BOND EXAMPLE")
-    settlementDate = FinDate(2017, 7, 21)
-    maturityDate = FinDate(2022, 5, 13)
+    settlementDate = FinDate(21, 7, 2017)
+    maturityDate = FinDate(13, 5, 2022)
     coupon = 0.027
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
 
-    bond = FinBond(maturityDate,
-                   coupon,
-                   freqType,
-                   accrualType,
-                   face)
+    bond = FinBond(maturityDate, coupon, freqType, accrualType, face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 101.581564

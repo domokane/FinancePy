@@ -10,7 +10,7 @@ Created on Fri Feb 12 16:51:05 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 import numpy as np
-from financepy.market.volatility.FinVolatilityCurve import FinVolatilityCurve
+from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.finutils.FinDate import FinDate
 
 import sys
@@ -26,8 +26,8 @@ def test_FinVolatilityCurve():
     strikes = np.linspace(70, 130, 7)
     vols = np.array([0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35])
     polynomial = 5
-    volCurve = FinVolatilityCurve(valueDate, expiryDate,
-                                  strikes, vols, polynomial)
+    volCurve = FinEquityVolCurve(valueDate, expiryDate,
+                                 strikes, vols, polynomial)
 
     interpStrikes = np.linspace(50, 150, 100)
     interpVols = volCurve.volatility(interpStrikes)

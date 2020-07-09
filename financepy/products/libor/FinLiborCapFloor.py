@@ -49,6 +49,12 @@ class FinLiborCapFloorModelTypes(Enum):
 
 
 class FinLiborCapFloor():
+    ''' Class for Caps and Floors. These are contracts which observe a Libor
+    reset L on a future start date and then make a payoff at the end of the
+    Libor period which is Max[L-K,0] for a cap and Max[K-L,0] for a floor.
+    This is then day count adjusted for the Libor period and then scaled by
+    the contract notional to produce a valuation. A number of models can be
+    selected from.'''
 
     def __init__(self,
                  startDate: FinDate,
@@ -62,6 +68,7 @@ class FinLiborCapFloor():
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        ''' Initialise FinLiborCapFloor object. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -99,24 +106,28 @@ class FinLiborCapFloor():
         self._valuationDate = None
         self._dayCounter = None
 
+###############################################################################
+
+    def _generateDates(self):
+
+        self._capFloorLetDates = FinSchedule(self._startDate,
+                                             self._maturityDate,
+                                             self._frequencyType,
+                                             self._calendarType,
+                                             self._busDayAdjustType,
+                                             self._dateGenRuleType).generate()
+
 ##########################################################################
 
-    def value(self,
-              valuationDate,
-              liborCurve,
-              model):
-        ''' Value the cap or floor using the chosen model. '''
-        self._valuationDate = valuationDate
+    def value(self, valuationDate, liborCurve, model):
+        ''' Value the cap or floor using the chosen model which specifies
+        the volatility of the Libor rate to the cap start date. '''
 
-        self._capFloorDates = FinSchedule(self._startDate,
-                                          self._maturityDate,
-                                          self._frequencyType,
-                                          self._calendarType,
-                                          self._busDayAdjustType,
-                                          self._dateGenRuleType).generate()
+        self._valuationDate = valuationDate
+        self._generateDates()
 
         self._dayCounter = FinDayCount(self._dayCountType)
-        numOptions = len(self._capFloorDates)
+        numOptions = len(self._capFloorLetDates)
         strikeRate = self._strikeRate
 
         if strikeRate < 0.0:
@@ -125,8 +136,6 @@ class FinLiborCapFloor():
         if numOptions <= 1:
             raise FinError("Number of options in capfloor equals 1")
 
-        #######################################################################
-
         self._capFloorLetValues = [0]
         self._capFloorLetAlphas = [0]
         self._capFloorLetFwdRates = [0]
@@ -134,14 +143,12 @@ class FinLiborCapFloor():
         self._capFloorLetDiscountFactors = [1.00]
         self._capFloorPV = [0.0]
 
-        #######################################################################
-
         capFloorValue = 0.0
         capFloorLetValue = 0.0
         # Value the first caplet or floorlet with known payoff
 
         startDate = self._startDate
-        endDate = self._capFloorDates[1]
+        endDate = self._capFloorLetDates[1]
 
         if self._lastFixing is None:
             fwdRate = liborCurve.fwdRate(startDate, endDate,
@@ -169,9 +176,10 @@ class FinLiborCapFloor():
 
         for i in range(2, numOptions):
 
-            startDate = self._capFloorDates[i - 1]
-            endDate = self._capFloorDates[i]
+            startDate = self._capFloorLetDates[i - 1]
+            endDate = self._capFloorLetDates[i]
             alpha = self._dayCounter.yearFrac(startDate, endDate)
+
             df = liborCurve.df(endDate)
             fwdRate = liborCurve.fwdRate(startDate, endDate,
                                          self._dayCountType)
@@ -183,13 +191,12 @@ class FinLiborCapFloor():
 
             intrinsicValue *= self._notional
 
-            capFloorLetValue = self.valueCapletFloorlet(valuationDate,
+            capFloorLetValue = self.valueCapletFloorLet(valuationDate,
                                                         startDate,
                                                         endDate,
                                                         liborCurve,
                                                         model)
 
-            capFloorLetValue *= self._notional * alpha
             capFloorValue += capFloorLetValue
 
             self._capFloorLetFwdRates.append(fwdRate)
@@ -201,22 +208,25 @@ class FinLiborCapFloor():
 
         return capFloorValue
 
-##########################################################################
+###############################################################################
 
-    def valueCapletFloorlet(self,
+    def valueCapletFloorLet(self,
                             valuationDate,
-                            startDate,
-                            endDate,
+                            capletStartDate,
+                            capletEndDate,
                             liborCurve,
                             model):
         ''' Value the caplet or floorlet using a specific model. '''
 
-        texp = (startDate - self._startDate) / gDaysInYear
-        tend = (endDate - self._startDate) / gDaysInYear
+        texp = (capletStartDate - self._startDate) / gDaysInYear
 
-        f = liborCurve.fwdRate(startDate, endDate, self._dayCountType)
+        alpha = self._dayCounter.yearFrac(capletStartDate, capletEndDate)
+
+        f = liborCurve.fwdRate(capletStartDate, capletEndDate,
+                               self._dayCountType)
+
         k = self._strikeRate
-        df = liborCurve.df(tend)
+        df = liborCurve.df(capletEndDate)
 
         if k == 0.0:
             k = 1e-10
@@ -268,8 +278,8 @@ class FinLiborCapFloor():
 
         elif isinstance(model, FinModelRatesHW):
 
-            tmat = (endDate - valuationDate) / gDaysInYear
-            alpha = self._dayCounter.yearFrac(startDate, endDate)
+            tmat = (capletEndDate - valuationDate) / gDaysInYear
+            alpha = self._dayCounter.yearFrac(capletStartDate, capletEndDate)
             strikePrice = 1.0/(1.0 + alpha * self._strikeRate)
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face = 1.0
@@ -287,6 +297,8 @@ class FinLiborCapFloor():
 
         else:
             raise FinError("Unknown model type " + str(model))
+
+        capFloorLetValue *= (self._notional * alpha)
 
         return capFloorLetValue
 
@@ -318,15 +330,20 @@ class FinLiborCapFloor():
 
         iFlow = 0
 
-        for paymentDate in self._capFloorDates:
-            print("%15s %10.7f  %9.5f %12.2f %12.6f %12.2f %12.2f" %
-                  (paymentDate,
-                   self._capFloorLetAlphas[iFlow],
-                   self._capFloorLetFwdRates[iFlow]*100,
-                   self._capFloorLetIntrinsic[iFlow],
-                   self._capFloorLetDiscountFactors[iFlow],
-                   self._capFloorLetValues[iFlow],
-                   self._capFloorPV[iFlow]))
+        for paymentDate in self._capFloorLetDates[iFlow:]:
+            if iFlow == 0:
+                print("%15s %10s %9s %12s %12.6f %12s %12s" %
+                      (paymentDate, "-", "-", "-",
+                       self._capFloorLetDiscountFactors[iFlow], "-", "-"))
+            else:
+                print("%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f" %
+                      (paymentDate,
+                       self._capFloorLetAlphas[iFlow],
+                       self._capFloorLetFwdRates[iFlow]*100,
+                       self._capFloorLetIntrinsic[iFlow],
+                       self._capFloorLetDiscountFactors[iFlow],
+                       self._capFloorLetValues[iFlow],
+                       self._capFloorPV[iFlow]))
 
             iFlow += 1
 

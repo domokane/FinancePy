@@ -20,7 +20,6 @@ Equities - Power options
 
 FX - Barrier bending
 FX - Breedon-Litzenburger implied distribution of terminal stock price
-FX - Fitting the skew parametrically
 
 Libor - Add OIS product to the library
 Libor - Add OIS to the Libor curve construction
@@ -37,7 +36,7 @@ Inflation - Inflation Derivative - zeros and swaps using appropriate adjustments
 Inflation - Building an inflation curve
 
 Curves - Consider adding splines 
-Models - BGM
+Models - BGM Calibration
 Models - Finite difference schemes ?
 Models - Sobol sequences implementation 
 
@@ -46,6 +45,7 @@ Equities - Variance swaps using given skew curve
 Equities - Convertible bond model with credit and equity dependence and discrete dividends
 
 ## DONE
+FX - Fitting the skew parametrically
 Equities - Vanillas
 FX - Vanilla FX options
 FX - Digital FX options

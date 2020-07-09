@@ -18,10 +18,10 @@ def test_Imports():
 
     print(dir())
 
-    if 1==1:
+    if 1 == 1:
         settlementDate = FinDate(1, 1, 2007)
-        curve = FinFlatCurve(settlementDate, 0.05, 1)
-    
+        curve = FinFlatCurve(settlementDate, 0.05, FinFrequencyTypes.ANNUAL)
+
         dcType = FinDayCountTypes.ACT_360
         fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
         swap1 = FinLiborSwap(settlementDate, FinDate(1,1,2008), 0.05, fixedFreq, dcType)
@@ -29,7 +29,7 @@ def test_Imports():
         swap3 = FinLiborSwap(settlementDate, FinDate(1,1,2010), 0.05, fixedFreq, dcType)
         swaps = [swap1, swap2, swap3]
         discountCurve = FinLiborCurve("USD_LIBOR", settlementDate, [], [], swaps)
-    
+
         print(discountCurve)
 
     maturityDate = FinDate(1, 1, 2010)

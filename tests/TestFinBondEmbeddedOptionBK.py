@@ -102,7 +102,8 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
-    discountCurve = FinFlatCurve(valueDate, 0.035, 2)
+    discountCurve = FinFlatCurve(valueDate, 0.035,
+                                 FinFrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 

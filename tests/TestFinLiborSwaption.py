@@ -249,7 +249,7 @@ def testFinLiborSwaptionMatlabExamples():
     print("=======================================")
 
     valuationDate = FinDate(1, 1, 2010)
-    liborCurve = FinFlatCurve(valuationDate, 0.06, -1)
+    liborCurve = FinFlatCurve(valuationDate, 0.06, FinFrequencyTypes.CONTINUOUS)
 
     settlementDate = FinDate(1, 1, 2011)
     exerciseDate = FinDate(1, 1, 2016)

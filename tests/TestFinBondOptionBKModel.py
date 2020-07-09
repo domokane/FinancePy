@@ -236,7 +236,8 @@ def test_FinBondOptionAmericanConvergenceTWO():
 
     # Build discount curve
     settlementDate = FinDate(1, 12, 2019)
-    discountCurve = FinFlatCurve(settlementDate, 0.05, -1)
+    discountCurve = FinFlatCurve(settlementDate, 0.05,
+                                 FinFrequencyTypes.CONTINUOUS)
 
     # Bond details
     maturityDate = FinDate(1, 9, 2025)

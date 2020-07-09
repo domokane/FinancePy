@@ -1,15 +1,17 @@
-from financepy.finutils.FinSobol import getSobol, getGaussianSobol
+from financepy.finutils.FinSobol import getUniformSobol, getGaussianSobol
 
 import time
 from numba import jit
+
+###############################################################################
 
 
 def test_FinSobol():
 
     numPoints = 1000
     dimensions = 3
-    
-    points = getSobol(numPoints, dimensions)
+
+    points = getUniformSobol(numPoints, dimensions)
 
     for d in range(dimensions):
         av = 0.0
@@ -26,26 +28,30 @@ def test_FinSobol():
         varError = abs(var - (1/3))
         assert(avError < 0.002)
         assert(varError < 0.002)
-      
+
     numRepeats = 100
     numDimensions = 10
 
     start = time.time()
     for _ in range(numRepeats):
-        getSobol(1000, numDimensions)
+        getUniformSobol(1000, numDimensions)
     end = time.time()
     print("Average time taken", (end - start) / numRepeats)
 
-    start = time.time()    
+    start = time.time()
     for _ in range(numRepeats):
         getGaussianSobol(1000, numDimensions)
     end = time.time()
     print("Average time taken", (end - start) / numRepeats)
-    
 
-@jit(cache=True, nopython=True)    
+
+###############################################################################
+
+@jit(cache=True, nopython=True)
 def test_FinSobolCache():
-    return getSobol(2,2)
+    return getUniformSobol(2, 2)
+
+###############################################################################
 
 
 test_FinSobol()

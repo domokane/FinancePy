@@ -23,6 +23,7 @@ from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.market.curves.FinZeroCurve import FinZeroCurve
 from financepy.market.curves.FinInterpolate import FinInterpMethods
+from financepy.market.curves.FinFlatCurve import FinFlatCurve
 
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.models.FinModelBachelier import FinModelBachelier
@@ -30,6 +31,12 @@ from financepy.models.FinModelBlackShifted import FinModelBlackShifted
 from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
 from financepy.models.FinModelRatesHW import FinModelRatesHW
+
+from financepy.finutils.FinGlobalVariables import gDaysInYear
+
+from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.finutils.FinError import FinError
+from financepy.finutils.FinSchedule import FinSchedule
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -77,7 +84,7 @@ def test_FinLiborCapFloor():
 
     import time
 
-    todayDate = FinDate(2019, 6, 20)
+    todayDate = FinDate(20, 6, 2019)
     valuationDate = todayDate
     startDate = todayDate.addWorkDays(2)
     maturityDate = startDate.addTenor("1Y")
@@ -167,6 +174,135 @@ def test_FinLiborCapFloor():
 ###############################################################################
 
 
+def test_FinLiborCapFloorVolCurve():
+    ''' Aim here is to price cap and caplets using cap and caplet vols and to
+    demonstrate they are the same - NOT SURE THAT HULLS BOOKS FORMULA WORKS FOR
+    OPTIONS. '''
+
+    todayDate = FinDate(20, 6, 2019)
+    valuationDate = todayDate
+    maturityDate = valuationDate.addTenor("3Y")
+    dayCountType = FinDayCountTypes.THIRTY_360
+    frequency = FinFrequencyTypes.ANNUAL
+
+    k = 0.04
+    capFloorType = FinLiborCapFloorTypes.CAP
+    capFloor = FinLiborCapFloor(valuationDate,
+                                maturityDate,
+                                capFloorType,
+                                k,
+                                None,
+                                frequency,
+                                dayCountType)
+
+    capVolDates = FinSchedule(valuationDate,
+                              valuationDate.addTenor("10Y"),
+                              frequency).generate()
+
+    flatRate = 0.04
+    liborCurve = FinFlatCurve(valuationDate,
+                              flatRate,
+                              frequency,
+                              dayCountType)
+
+    flat = False
+    if flat is True:
+        capVolatilities = [20.0] * 11
+        capVolatilities[0] = 0.0
+    else:
+        capVolatilities = [0.00, 15.50, 18.25, 17.91, 17.74, 17.27,
+                           16.79, 16.30, 16.01, 15.76, 15.54]
+
+    capVolatilities = np.array(capVolatilities)/100.0
+    capVolatilities[0] = 0.0
+
+    volCurve = FinLiborCapVolCurve(valuationDate,
+                                   capVolDates,
+                                   capVolatilities,
+                                   dayCountType)
+
+    print(volCurve._capletGammas)
+
+    # Value cap using a single flat cap volatility
+    tcap = (maturityDate - valuationDate) / gDaysInYear
+    vol = volCurve.capVol(maturityDate)
+    model = FinModelBlack(vol)
+    valueCap = capFloor.value(valuationDate, liborCurve, model)
+    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
+    print(capFloor.printLeg())
+
+    # Value cap by breaking it down into caplets using caplet vols
+    vCaplets = 0.0
+    capletStartDate = capFloor._capFloorLetDates[1]
+    for capletEndDate in capFloor._capFloorLetDates[2:]:
+        vol = volCurve.capletVol(capletEndDate)
+        modelCaplet = FinModelBlack(vol)
+        vCaplet = capFloor.valueCapletFloorLet(valuationDate,
+                                               capletStartDate,
+                                               capletEndDate,
+                                               liborCurve,
+                                               modelCaplet)
+
+        vCaplets += vCaplet
+        print("START:",
+              capletStartDate,
+              "END:",
+              capletEndDate,
+              "VOL:",
+              vol*100.0,
+              "VALUE:",
+              vCaplet)
+
+        capletStartDate = capletEndDate
+    print("CAPLETS->CAP: ", vCaplets)
+
+###############################################################################
+
+
+def test_FinLiborCapletHull():
+
+    #  Hull Page 703, example 29.3
+    todayDate = FinDate(20, 6, 2019)
+    valuationDate = todayDate
+    maturityDate = valuationDate.addTenor("2Y")
+    liborCurve = FinFlatCurve(valuationDate,
+                              0.070,
+                              FinFrequencyTypes.QUARTERLY,
+                              FinDayCountTypes.THIRTY_360)
+
+    k = 0.08
+    capFloorType = FinLiborCapFloorTypes.CAP
+    capFloor = FinLiborCapFloor(valuationDate,
+                                maturityDate,
+                                capFloorType,
+                                k,
+                                None,
+                                FinFrequencyTypes.QUARTERLY,
+                                FinDayCountTypes.THIRTY_360)
+
+    # Value cap using a single flat cap volatility
+    model = FinModelBlack(0.20)
+    capFloor.value(valuationDate, liborCurve, model)
+
+    # Value cap by breaking it down into caplets using caplet vols
+    capletStartDate = valuationDate.addTenor("1Y")
+    capletEndDate = capletStartDate.addTenor("3M")
+
+    vCaplet = capFloor.valueCapletFloorLet(valuationDate,
+                                           capletStartDate,
+                                           capletEndDate,
+                                           liborCurve,
+                                           model)
+
+    # Should equal 517.15 - use of dates makes it impossible to match Hull
+    # exactly
+
+    if abs(vCaplet - 517.15) > 0.01:
+        raise FinError("Caplet price wrong")
+
+###############################################################################
+
+
 def test_FinLiborCapFloorQLExample():
 
     valuationDate = FinDate(14, 6, 2016)
@@ -216,7 +352,11 @@ def test_FinLiborCapFloorQLExample():
     period = end - start
     print(v, period/numRepeats)
 
+###############################################################################
 
+
+test_FinLiborCapletHull()
+test_FinLiborCapFloorVolCurve()
 test_FinLiborCapFloor()
-# test_FinLiborCapFloorQLExample()
+test_FinLiborCapFloorQLExample()
 testCases.compareTestCases()

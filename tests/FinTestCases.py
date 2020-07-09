@@ -9,6 +9,7 @@ import time
 from enum import Enum
 from financepy.finutils.FinError import FinError
 
+
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
     ANALYSE_TEST_CASES = 2
@@ -74,7 +75,7 @@ class FinTestCases():
         if mode in FinTestCaseMode:
             self._mode = mode
         else:
-            raise ValueError("Unknown TestCase Mode")
+            raise FinError("Unknown TestCase Mode")
 
         if mode == FinTestCaseMode.DEBUG_TEST_CASES:
             # Don't do anything

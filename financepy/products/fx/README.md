@@ -5,11 +5,23 @@ These modules price and produce the sensitivity measures needed to hedge a range
 ## FX Forwards
 Calculate the price and breakeven forward FX Rate of an FX Forward contract.
 
-## FX Option
-This module describes a curve that is fitted to bond yields calculated from bond market prices supplied by the user. The curve is not guaranteed to fit all of the bond prices exactly and a least squares approach is used. A number of fitting forms are provided which consist of
+## FX Vanilla Option
 
-* Polynomial
-* Nelson-Siegel
-* Nelson-Siegal-Svensson
-* Cubic B-Splines
+## FX Option
+This is a class from which other classes inherit and is used to perform simple
+perturbatory calculation of option Greeks.
+
+## FX Barrier Options
+
+## FX Basket Options
+
+## FX Digital Options
+
+## FX Fixed Lookback Option
+
+## FX Float Lookback Option
+
+## FX Rainbow Option
+
+## FX Variance Swap
 

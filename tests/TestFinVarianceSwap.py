@@ -10,7 +10,7 @@ import numpy as np
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.volatility.FinVolatilityCurve import FinVolatilityCurve
+from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.products.equity.FinEquityVarianceSwap import FinEquityVarianceSwap
 from financepy.market.curves.FinFlatCurve import FinFlatCurve
 
@@ -47,7 +47,7 @@ def test_FinEquityVarianceSwap():
     skew = -0.02/5.0  # defined as dsigma/dK
     strikes = np.linspace(50.0, 135.0, 18)
     vols = volSkew(strikes, atmVol, atmK, skew)
-    volCurve = FinVolatilityCurve(valuationDate, maturityDate, strikes, vols)
+    volCurve = FinEquityVolCurve(valuationDate, maturityDate, strikes, vols)
 
     strikeSpacing = 5.0
     numCallOptions = 10

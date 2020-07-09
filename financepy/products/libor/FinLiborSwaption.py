@@ -31,7 +31,7 @@ from ...models.FinModelRatesBK import FinModelRatesBK
 
 from ...finutils.FinOptionTypes import FinOptionTypes
 
-##########################################################################
+###############################################################################
 
 from enum import Enum
 
@@ -45,7 +45,7 @@ class FinLiborSwaptionModelTypes(Enum):
     BLACK = 1
     SABR = 2
 
-##########################################################################
+###############################################################################
 
 
 class FinLiborSwaption():
@@ -98,7 +98,7 @@ class FinLiborSwaption():
         self._forwardDf = None
         self._underlyingSwap = None
 
-##########################################################################
+###############################################################################
 
     def value(self,
               valuationDate,
@@ -266,6 +266,70 @@ class FinLiborSwaption():
             swaptionPrice /= pv01
         else:
             raise FinError("Unknown swaption model " + str(model))
+
+        self._pv01 = pv01
+        self._fwdSwapRate = s
+        self._forwardDf = discountCurve.df(self._exerciseDate)
+        self._underlyingSwap = swap
+
+        # The exchange of cash occurs on the settlement date
+        dfSettle = discountCurve.df(self._settlementDate)
+        swaptionPrice = swaptionPrice * pv01 * self._notional / dfSettle
+
+        return swaptionPrice
+
+###############################################################################
+
+    def cashSettledValue(self,
+                         valuationDate,
+                         discountCurve,
+                         model):
+        ''' Valuation of a Libor European-style swaption using a cash settled
+        approach which is a market convention that used Black's model and that
+        discounts the future payments at a specified swap rate.'''
+
+        floatSpread = 0.0
+        payFixedFlag = True
+
+        swap = FinLiborSwap(self._exerciseDate,
+                            self._maturityDate,
+                            self._fixedCoupon,
+                            self._fixedFrequencyType,
+                            self._fixedDayCountType,
+                            self._notional,
+                            floatSpread,
+                            self._floatFrequencyType,
+                            self._floatDayCountType,
+                            payFixedFlag,
+                            self._calendarType,
+                            self._busDayAdjustType,
+                            self._dateGenRuleType)
+
+        k = self._fixedCoupon
+        pv01 = swap.pv01(valuationDate, discountCurve)
+        s = swap.parCoupon(valuationDate, discountCurve)
+        texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
+
+        # Discounting is done via the PV01 annuity so no discounting in Black
+        df = 1.0
+
+        if isinstance(model, FinModelBlack):
+
+            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+                swaptionPrice = model.value(s, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_CALL)
+            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+                swaptionPrice = model.value(s, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_PUT)
+
+        elif isinstance(model, FinModelBlackShifted):
+
+            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+                swaptionPrice = model.value(s, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_CALL)
+            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+                swaptionPrice = model.value(s, k, texp, df,
+                                            FinOptionTypes.EUROPEAN_PUT)
 
         self._pv01 = pv01
         self._fwdSwapRate = s

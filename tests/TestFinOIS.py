@@ -47,7 +47,7 @@ def test_OIS():
 
     valueDate = FinDate(2018, 11, 30)
     marketRate = 0.05
-    indexCurve = FinFlatCurve(valueDate, marketRate, 1)
+    indexCurve = FinFlatCurve(valueDate, marketRate, FinFrequencyTypes.ANNUAL)
     ois.print(valueDate, indexCurve)
 
     v = ois.value(startDate, indexCurve)
