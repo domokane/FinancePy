@@ -9,6 +9,8 @@ from .FinMath import isLeapYear
 
 # from numba import njit, float64, int32
 
+ENFORCE_DAY_FIRST = True
+
 ##########################################################################
 
 shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
@@ -84,7 +86,8 @@ def fromDatetime(dt):
     ''' Construct a FinDate from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. '''
 
-    finDate = FinDate(dt.year, dt.month, dt.day)
+#    finDate = FinDate(dt.year, dt.month, dt.day)
+    finDate = FinDate(dt.day, dt.month, dt.year)
     return finDate
 
 ###############################################################################
@@ -125,20 +128,15 @@ class FinDate():
 
     ###########################################################################
 
-    def __init__(self, y_or_d, m, d_or_y):
-        ''' Create a date given year, month and day of month. The order is not
-        enforced so 4th July 2019 can be created as FinDate(4,7,2019) or as
-        FinDate(2019,7,4) so long as the middle number is the month.
-        The year must be a 4-digit number greater than or equal to 1900. '''
+    def __init__(self, d, m, y):
+        ''' Create a date given a day of month, month and year. The year must
+        be a 4-digit number greater than or equal to 1900. '''
 
-        if y_or_d >= 1900:
-            y = y_or_d
-            d = d_or_y
-        elif d_or_y >= 1900:
-            y = d_or_y
-            d = y_or_d
-        else:
-            raise FinError("Invalid date: Inconsistent year and month day.")
+        if d >= 1900 and d < 2100 and y > 0 and y <= 31:
+            print("Warning: Deprecating FinDate(y, m, d) for FinDate(d, m, y). Please amend code.")
+            tmp = y
+            y = d
+            d = tmp
 
         if y < 1900 or y > 2100:
             raise FinError(
@@ -225,7 +223,7 @@ class FinDate():
         d = dt.day
         m = dt.month
         y = dt.year
-        newDt = FinDate(y, m, d)
+        newDt = FinDate(d, m, y)
         return newDt
 
     ###########################################################################
@@ -243,14 +241,14 @@ class FinDate():
         d = dt.day
         m = dt.month
         y = dt.year
-        newDt = FinDate(y, m, d)
+        newDt = FinDate(d, m, y)
 
         while numDays > 0:
             dt = dt + datetime.timedelta(days=1)
             d = dt.day
             m = dt.month
             y = dt.year
-            newDt = FinDate(y, m, d)
+            newDt = FinDate(d, m, y)
 
             if newDt.isWeekend() is False:
                 numDays = numDays - 1
@@ -274,7 +272,7 @@ class FinDate():
             m = m + 12
             y -= 1
 
-        newDt = FinDate(y, m, d)
+        newDt = FinDate(d, m, y)
         return newDt
 
     ##########################################################################
@@ -311,7 +309,7 @@ class FinDate():
         elif m == 1 or m == 2 or m == 3:
             m_cds = 3
 
-        cdsDate = FinDate(y_cds, m_cds, d_cds)
+        cdsDate = FinDate(d_cds, m_cds, y_cds)
         return cdsDate
 
     ##########################################################################
@@ -324,7 +322,7 @@ class FinDate():
         d_end = 21
 
         for d in range(d_start, d_end):
-            immDate = FinDate(y, m, d)
+            immDate = FinDate(d, m, y)
             if immDate._weekday == self.WED:
                 return d
 
@@ -363,7 +361,7 @@ class FinDate():
 
         d_imm = self.thirdWednesdayOfMonth(m_imm, y_imm)
 
-        immDate = FinDate(y_imm, m_imm, d_imm)
+        immDate = FinDate(d_imm, m_imm, y_imm)
         return immDate
 
     ###########################################################################
@@ -376,7 +374,7 @@ class FinDate():
         years. '''
 
         if type(tenor) != str:
-            raise ValueError("Tenor must be a string e.g. '5Y'")
+            raise FinError("Tenor must be a string e.g. '5Y'")
 
         tenor = tenor.upper()
         DAYS = 1
@@ -396,11 +394,11 @@ class FinDate():
         elif tenor[-1] == "Y":
             periodType = YEARS
         else:
-            raise ValueError("Unknown tenor type in " + tenor)
+            raise FinError("Unknown tenor type in " + tenor)
 
         numPeriods = int(tenor[0:-1])
 
-        newDate = FinDate(self._y, self._m, self._d)
+        newDate = FinDate(self._d, self._m, self._y)
 
         if periodType == DAYS:
             for i in range(0, numPeriods):
@@ -421,7 +419,7 @@ class FinDate():
 
     def date(self):
         ''' Returns a datetime of the date '''
-        return datetime.date(self._y, self._m, self._d)
+        return datetime.date(self._d, self._m, self._y)
 
     ###########################################################################
 

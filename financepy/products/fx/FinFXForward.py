@@ -9,7 +9,6 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -19,12 +18,11 @@ from ...finutils.FinDate import FinDate
 
 
 class FinFXForward():
-    ''' This is a contract to buy or sell currency at a forward rate decided
-    today. '''
+    ''' Contract to buy or sell currency at a forward rate decided today. '''
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: float,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
                  currencyPair: str,  # FORDOM
                  notional: float,
                  notionalCurrency: str,  # must be FOR or DOM

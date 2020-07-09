@@ -608,7 +608,7 @@ def parseEnum(lines, startLine, endLine):
         else:
             break
 
-    enumDescription.append("\\subsubsection{Enumerated Type:" + enumName + "}")
+    enumDescription.append("\\subsubsection*{Enumerated Type:" + enumName + "}")
     enumDescription.append("\n")
     enumDescription.append("\\begin{itemize}")
     enumDescription.append("\n")
@@ -629,15 +629,16 @@ buildIntro("..//README.md")
 
 if 1 == 1:
     buildChapter("..//financepy//finutils")
+    buildChapter("..//financepy//market//curves")
+    buildChapter("..//financepy//market//volatility")
     buildChapter("..//financepy//products//equity")
     buildChapter("..//financepy//products//credit")
     buildChapter("..//financepy//products//bonds")
     buildChapter("..//financepy//products//libor")
     buildChapter("..//financepy//products//fx")
     buildChapter("..//financepy//models")
-    buildChapter("..//financepy//portfolio")
-    buildChapter("..//financepy//risk")
-    buildChapter("..//financepy//market//curves")
+#    buildChapter("..//financepy//portfolio")
+#    buildChapter("..//financepy//risk")
 #    buildChapter(".//financepy//tests")
 #    buildChapter(".//financepy//docs")
 

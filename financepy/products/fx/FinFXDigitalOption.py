@@ -16,7 +16,7 @@ from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinOptionTypes import FinOptionTypes
 
-##########################################################################
+###############################################################################
 
 
 class FinFXDigitalOption():
@@ -50,7 +50,6 @@ class FinFXDigitalOption():
         if premCurrency != self._domName and premCurrency != self._forName:
             raise FinError("Notional currency not in currency pair.")
 
-###############################################################################
 ###############################################################################
 
     def value(self,
@@ -104,16 +103,16 @@ class FinFXDigitalOption():
 
             if self._optionType == FinOptionTypes.DIGITAL_CALL and \
                 self._forName == self._premCurrency:
-                v = S0 * exp(-rf * tdel) * N(d2)
+                    v = S0 * exp(-rf * tdel) * N(d2)
             elif self._optionType == FinOptionTypes.DIGITAL_PUT and \
                 self._forName == self._premCurrency:
-                v = S0 * exp(-rf * tdel) * N(-d2)
+                    v = S0 * exp(-rf * tdel) * N(-d2)
             if self._optionType == FinOptionTypes.DIGITAL_CALL and \
                 self._domName == self._premCurrency:
-                v = exp(-rd * tdel) * N(d2)
+                    v = exp(-rd * tdel) * N(d2)
             elif self._optionType == FinOptionTypes.DIGITAL_PUT and \
                 self._domName == self._premCurrency:
-                v = exp(-rd * tdel) * N(-d2)
+                    v = exp(-rd * tdel) * N(-d2)
             else:
                 raise FinError("Unknown option type")
 
@@ -121,5 +120,4 @@ class FinFXDigitalOption():
 
         return v
 
-##########################################################################
-##########################################################################
+###############################################################################

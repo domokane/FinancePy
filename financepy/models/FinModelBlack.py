@@ -5,7 +5,6 @@
 # TODO Fix this
 
 import numpy as np
-from scipy.stats import norm
 
 from ..finutils.FinMath import N
 from ..finutils.FinHelperFunctions import labelToString
@@ -13,8 +12,7 @@ from ..finutils.FinOptionTypes import FinOptionTypes
 from ..finutils.FinError import FinError
 
 ###############################################################################
-# NOTE: Need to convert option types to use enums.
-# NOTE: Perhaps just turn this into a function rather than a class.
+# TODO: Use Numba ?
 ###############################################################################
 
 
@@ -42,8 +40,14 @@ class FinModelBlack():
         ''' Price a derivative using Black's model which values in the forward
         measure following a change of measure. '''
 
-        if abs(strikeRate) < 1e-20:
-            raise FinError("Strike must not be zero")
+        if strikeRate < 0.0:
+            raise FinError("Strike must not be negative")
+
+        if timeToExpiry < 0.0:
+            raise FinError("Time to expiry is negative.")
+
+        if self._volatility < 0.0:
+            raise FinError("Volatility is negative.")
 
         f = forwardRate
         t = timeToExpiry
@@ -51,17 +55,29 @@ class FinModelBlack():
         sqrtT = np.sqrt(t)
         vol = self._volatility
 
-        d1 = (np.log((f)/(k)) + vol * vol * t / 2) / (vol * sqrtT)
+        if abs(t) < 1e-10:
+            t = 1e-10
+            sqrtT = np.sqrt(t)
+
+        if abs(vol) < 1e-10:
+            vol = 1e-10
+
+        if abs(k) < 1e-10:
+            k = 1e-10
+
+        d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrtT)
         d2 = d1 - vol*sqrtT
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
-            return df * (f * norm.cdf(d1) - k * N(d2))
+            v = df * (f * N(d1) - k * N(d2))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
-            return df * (k * norm.cdf(-d2) - f * N(-d1))
+            v = df * (k * N(-d2) - f * N(-d1))
         else:
-            raise Exception("Option type must be a European Call(C) or Put(P)")
+            raise FinError("Option type must be a European Call or Put")
 
-        return 999
+ #       print(f,t,k,vol,df,v)
+
+        return v
 
 ###############################################################################
 

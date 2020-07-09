@@ -6,6 +6,8 @@
 
 from enum import Enum
 
+###############################################################################
+
 
 class FinOptionTypes(Enum):
     EUROPEAN_CALL = 1
@@ -18,3 +20,5 @@ class FinOptionTypes(Enum):
     ASIAN_PUT = 8
     COMPOUND_CALL = 9
     COMPOUND_PUT = 10
+
+###############################################################################

@@ -4,6 +4,7 @@
 
 from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
 from .FinMath import isLeapYear
+from .FinError import FinError
 from enum import Enum
 
 # A useful source for these definitions can be found at
@@ -11,6 +12,9 @@ from enum import Enum
 # and https://en.wikipedia.org/wiki/Day_count_convention
 # http://www.fairmat.com/documentation/usermanual/topics/download/mediawiki/index.php/Day_Count_Conventions.htm
 # http://www.eclipsesoftware.biz/DayCountConventions.html
+
+###############################################################################
+
 
 class FinDayCountTypes(Enum):
     THIRTY_E_360_ISDA = 1  # AKA 30E/360 ISDA, EUROBOND (ISDA 2010)
@@ -25,8 +29,7 @@ class FinDayCountTypes(Enum):
     ACT_365_FIXED = 10
     ACT_365_LEAP = 11
 
-##########################################################################
-##########################################################################
+###############################################################################
 
 
 class FinDayCount(object):
@@ -37,11 +40,11 @@ class FinDayCount(object):
         ''' Create Day Count convention by passing in the Day Count Type. '''
 
         if dccType not in FinDayCountTypes:
-            raise ValueError("Need to pass FinDayCountType")
+            raise FinError("Need to pass FinDayCountType")
 
         self._type = dccType
 
-##########################################################################
+###############################################################################
 
     def yearFrac(self, dt1, dt2, dt3=None):
         ''' Calculate the year fraction between dates dt1 and dt2 using the
@@ -143,7 +146,7 @@ class FinDayCount(object):
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
 
             if dt3 is None:
-                raise ValueError("ACT_ACT_ICMA requires three dates")
+                raise FinError("ACT_ACT_ICMA requires three dates")
 
             num = dt2 - dt1
             den = dt3 - dt1
@@ -167,22 +170,12 @@ class FinDayCount(object):
 
             denom = 365.0
 
-            if isLeapYear(y1) and dt1 <= FinDate(
-                    y1,
-                    2,
-                    28) and dt2 > FinDate(
-                    y1,
-                    2,
-                    28):
+            if isLeapYear(y1) and dt1 <= FinDate(28, 2, y1) \
+                    and dt2 > FinDate(28, 2, y1):
                 denom = 366.0
 
-            if isLeapYear(y2) and dt1 <= FinDate(
-                    y2,
-                    2,
-                    28) and dt2 > FinDate(
-                    y2,
-                    2,
-                    28):
+            if isLeapYear(y2) and dt1 <= FinDate(28, 2, y2) \
+                    and dt2 > FinDate(28, 2, y2):
                 denom = 366.0
 
             # handle case in which period straddles year end
@@ -205,20 +198,20 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return accFactor
             else:
-                daysYear1 = FinDate(y1 + 1, 1, 1) - dt1
-                daysYear2 = dt2 - FinDate(y1 + 1, 1, 1)
+                daysYear1 = FinDate(1, 1, y1 + 1) - dt1
+                daysYear2 = dt2 - FinDate(1, 1, y1 + 1)
                 accFactor = daysYear1 / denom1
                 accFactor += daysYear2 / denom2
                 return accFactor
 
         else:
-            raise ValueError(str(self._type) +
+            raise FinError(str(self._type) +
                              " is not one of FinDayCountTypes")
 
-    ###########################################################################
+###############################################################################
 
     def __repr__(self):
         ''' Returns the calendar type as a string. '''
         return str(self._type)
 
-    ###########################################################################
+###############################################################################

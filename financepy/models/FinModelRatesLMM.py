@@ -48,11 +48,17 @@ def LMMPrintForwards(fwds):
 
     for ip in range(0, numPaths):
         for it in range(0, numTimes):
-            print(ip, it),
+
+            print("Path: %3d Time: %3d" % (ip, it), end=""),
+
+            for ifwd in range(0, it):
+                print("%8s" % ("-"), end=""),
+
             for ifwd in range(it, numFwds):
                 print("%8.4f" % (fwds[ip][it][ifwd]*100.0), end=""),
 
             print("")
+
 
 ###############################################################################
 
@@ -405,7 +411,15 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility term structure. The 3D matrix of forward rates by path, time
     and forward point is returned. This function is kept mainly for its
-    simplicity and speed. '''
+    simplicity and speed.
+
+    NB: The Gamma volatility has an initial entry of zero. This differs from
+    Hull's indexing by one and so is why I do not subtract 1 from the index as
+    Hull does in his equation 32.14.
+
+    The Number of Forwards is the number of points on the initial curve to the
+    trade maturity date. For example a cap that matures in 10 years with
+    quarterly caplets has 40 forwards. '''
 
     if len(gammas) != numForwards:
         raise FinError("Gamma vector does not have right number of forwards")
@@ -426,7 +440,6 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
     numTimes = numForwards
 
     if useSobol == 1:
-        print("Using Sobol")
         numDimensions = numTimes
         rands = getUniformSobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((numPaths, numTimes))
@@ -435,7 +448,7 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
                 u = rands[iPath, j]
                 g = norminvcdf(u)
                 gMatrix[iPath, j] = g
-                gMatrix[iPath + halfNumPaths, j] = -g     
+                gMatrix[iPath + halfNumPaths, j] = -g
     elif useSobol == 0:
         gMatrix = np.empty((numPaths, numTimes))
         for iPath in range(0, halfNumPaths):
@@ -459,7 +472,7 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
             for k in range(j, numForwards):  # FORWARDS LOOP
                 zkj = gammas[k-j]
                 muA = 0.0
- 
+
                 for i in range(j+1, k+1):
                     fi = fwd[iPath, j, i]
                     zij = gammas[i-j]
@@ -601,27 +614,28 @@ def LMMSimulateFwdsMF(numForwards, numFactors, numPaths, numeraireIndex, fwd0,
 @njit(float64[:](int64, int64, float64, float64[:], float64[:, :, :],
                  float64[:], int64),
       cache=True, fastmath=True, parallel=True)
-def LMMCapFlrPricer(numPeriods, numPaths, K, fwd0, fwds, taus, isCap):
+def LMMCapFlrPricer(numForwards, numPaths, K, fwd0, fwds, taus, isCap):
     ''' Function to price a strip of cap or floorlets in accordance with the
     simulated forward curve dynamics. '''
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0])
 
-    if numPeriods > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if numForwards > maxForwards:
+        raise FinError("NumForwards > maxForwards")
 
     if numPaths > maxPaths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-    capFlrLets = np.zeros(maxForwards)
-    capFlrLetValues = np.zeros(maxForwards)
-    numeraire = np.zeros(maxForwards)
+    discFactor = np.zeros(numForwards)
+    capFlrLets = np.zeros(numForwards-1)
+    capFlrLetValues = np.zeros(numForwards-1)
+    numeraire = np.zeros(numForwards)
 
-    # Set up initial term structure
+    # Set up initial term structure of discount factors - the first discount
+    # factor is the price of $1 paid at the end of the first caplet
     discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, maxForwards):
+    for ix in range(1, numForwards):
         discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for iPath in range(0, numPaths):
@@ -630,7 +644,9 @@ def LMMCapFlrPricer(numPeriods, numPaths, K, fwd0, fwds, taus, isCap):
         libor = fwds[iPath, 0, 0]
         capFlrLets[0] = max(K - libor, 0) * taus[0]
 
-        for j in range(1, numPeriods):  # TIME LOOP
+        # Now loop over the caplets starting with one that fixes immediately
+        # but which may have intrinsic value that cannot be ignored.
+        for j in range(0, numForwards):
 
             libor = fwds[iPath, j, j]
             if j == 1:
@@ -651,11 +667,11 @@ def LMMCapFlrPricer(numPeriods, numPaths, K, fwd0, fwds, taus, isCap):
             periodRoll = (1.0 + libor * taus[j])
             numeraire[j] = numeraire[j - 1] * periodRoll
 
-        for iFwd in range(0, numPeriods):
+        for iFwd in range(0, numForwards):
             denom = abs(numeraire[iFwd]) + 1e-12
             capFlrLetValues[iFwd] += capFlrLets[iFwd] / denom
 
-    for iFwd in range(0, numPeriods):
+    for iFwd in range(0, numForwards):
         capFlrLetValues[iFwd] /= numPaths
 
     return capFlrLetValues

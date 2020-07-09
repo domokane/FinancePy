@@ -15,6 +15,8 @@ from ...models.FinProcessSimulator import FinProcessSimulator
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
+###############################################################################
+
 
 class FinFXBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
@@ -27,7 +29,6 @@ class FinFXBarrierTypes(Enum):
     DOWN_AND_IN_PUT = 8
 
 ###############################################################################
-###############################################################################
 
 
 class FinFXBarrierOption(FinFXOption):
@@ -35,12 +36,14 @@ class FinFXBarrierOption(FinFXOption):
     def __init__(self,
                  expiryDate: FinDate,
                  strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
-                 currencyPair: str,  # FORDOM
+                 currencyPair: str,    # FORDOM
                  optionType: FinFXBarrierTypes,
                  barrierLevel: float,
                  numObservationsPerYear: int,
                  notional: float,
                  notionalCurrency: str):
+        ''' Create FX Barrier option product. This is an option that cancels if
+        the FX rate crosses a barrier during the life of the option. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -60,6 +63,8 @@ class FinFXBarrierOption(FinFXOption):
               domDiscountCurve,
               forDiscountCurve,
               model):
+        ''' Value FX Barrier Option using Black-Scholes model with closed-form
+        analytical models. '''
 
         # This prices the option using the formulae given in the paper
         # by Clewlow, Llanos and Strickland December 1994 which can be found at
@@ -167,7 +172,7 @@ class FinFXBarrierOption(FinFXOption):
             if h >= K:
                 c_ui = S0 * dq * N(x1) - K * df * N(x1 - sigmaRootT) \
                     - S0 * dq * pow(hOverS, 2.0 * ll) * (N(-y) - N(-y1)) \
-                    + K * df * pow(hOverS, 2.0 * ll - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                    + K * df * pow(hOverS, 2.0 * ll - 2.0) *(N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c_ui
             else:
                 price = c
@@ -234,8 +239,9 @@ class FinFXBarrierOption(FinFXOption):
                 processType,
                 modelParams,
                 numAnnSteps=552,
-                numPaths=20000,
+                numPaths=5000,
                 seed=4242):
+        ''' Value the FX Barrier Option using Monte Carlo. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         numTimeSteps = int(t * numAnnSteps)

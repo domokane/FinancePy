@@ -155,7 +155,7 @@ class FinCalendar(object):
         m = dt._m
         d = dt._d
 
-        startDate = FinDate(y, 1, 1)
+        startDate = FinDate(1, 1, y)
         dd = dt._excelDate - startDate._excelDate + 1
         weekday = dt._weekday
 

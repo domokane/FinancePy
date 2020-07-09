@@ -35,11 +35,14 @@ class FinFXFixedLookbackOptionTypes(Enum):
 
 
 class FinFXFixedLookbackOption():
+    ''' The Class for FX Fixed Strike Lookback options. '''
 
     def __init__(self,
                  expiryDate: FinDate,
                  optionType: FinFXFixedLookbackOptionTypes,
                  optionStrike: float):
+        ''' Create option with expiry date, option type and the option strike
+        '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -56,6 +59,8 @@ class FinFXFixedLookbackOption():
               foreignCurve,
               volatility,
               stockMinMax):
+        ''' Value FX Fixed Lookback Option using Black Scholes model and
+        analytical formulae. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         df = domesticCurve.df(t)
@@ -137,7 +142,7 @@ class FinFXFixedLookbackOption():
                     term = -expbt * N(-f1)
                 else:
                     term = ((s0 / smin)**(-w)) * N(-f1 + 2.0 *
-                                                   b * sqrt(t) / v) - expbt * N(-f1)
+                                             b * sqrt(t) / v) - expbt * N(-f1)
 
                 v = df * (k - smin) - s0 * dq * N(-f1) + \
                     smin * df * N(-f2) + s0 * df * u * term
@@ -173,6 +178,7 @@ class FinFXFixedLookbackOption():
                 numPaths=10000,
                 numStepsPerYear=252,
                 seed=4242):
+        ''' Value FX Fixed Lookback option using Monte Carlo. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         S0 = spotFXRate

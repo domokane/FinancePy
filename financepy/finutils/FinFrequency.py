@@ -3,10 +3,14 @@
 ##############################################################################
 
 from enum import Enum
+from ..finutils.FinError import FinError
+
+###############################################################################
 
 
 class FinFrequencyTypes(Enum):
     CONTINUOUS = -1
+    SIMPLE = 0
     ANNUAL = 1
     SEMI_ANNUAL = 2
     QUARTERLY = 3
@@ -21,6 +25,8 @@ def FinFrequency(frequencyType):
     if frequencyType in FinFrequencyTypes:
         if frequencyType == FinFrequencyTypes.CONTINUOUS:
             return -1
+        elif frequencyType == FinFrequencyTypes.SIMPLE:
+            return 0
         elif frequencyType == FinFrequencyTypes.ANNUAL:
             return 1
         elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
@@ -32,6 +38,6 @@ def FinFrequency(frequencyType):
     elif type(frequencyType) is int:
         return frequencyType
     else:
-        raise ValueError("Unknown frequency type")
+        raise FinError("Unknown frequency type")
 
 ###############################################################################

@@ -4,6 +4,8 @@
 
 from ...finutils.FinHelperFunctions import labelToString
 
+###############################################################################
+
 
 class FinFXModel(object):
 
@@ -17,6 +19,7 @@ class FinFXModelBlackScholes(FinFXModel):
     ''' Basic Black Scholes model. '''
 
     def __init__(self, volatility):
+        ''' Create Black Scholes FX model object which holds volatility. '''
         self._parentType = FinFXModel
         self._modelType = FinFXModel
         self._volatility = volatility
@@ -29,6 +32,8 @@ class FinFXModelHeston(FinFXModel):
     ''' Heston stochastic volatility model '''
 
     def __init__(self, volatility, meanReversion):
+        ''' Create Heston FX Model which takes in volatility and mean
+        reversion. '''
         self._modelType = FinFXModel
         self._volatility = volatility
         self._meanReversion = meanReversion
@@ -41,6 +46,8 @@ class FinFXModelSABR(FinFXModel):
     ''' SABR stochastic volatility model '''
 
     def __init__(self, alpha, beta, rho, nu, volatility):
+        ''' Create FX Model SABR which takes alpha, beta, rho, nu and
+        volatility as parameters. '''
         self._modelType = FinFXModel
         self._alpha = alpha
         self._beta = beta

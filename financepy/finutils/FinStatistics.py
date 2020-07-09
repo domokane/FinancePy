@@ -5,6 +5,7 @@
 
 from math import sqrt
 from numba import njit, float64, int32
+from .FinError import FinError
 
 ##########################################################################
 
@@ -78,7 +79,7 @@ def correlation(x1, x2):
     n2 = len(x2)
 
     if n1 != n2:
-        raise ValueError("Vectors have different lengths")
+        raise FinError("Vectors have different lengths")
 
     m1 = mean(x1)
     m2 = mean(x2)

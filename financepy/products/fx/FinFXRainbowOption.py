@@ -11,11 +11,14 @@ from ...finutils.FinMath import N, M
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
-from ...products.equities.FinOption import FinOption
+from ...products.equity.FinEquityOption import FinEquityOption
 
 from enum import Enum
 
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes
+
+###############################################################################
+
 
 class FinFXRainbowOptionTypes(Enum):
     CALL_ON_MAXIMUM = 1
@@ -93,7 +96,7 @@ def valueMCFast(t,
 ###############################################################################
 
 
-class FinRainbowOption(FinOption):
+class FinRainbowOption(FinEquityOption):
 
     def __init__(self,
                  expiryDate: FinDate,
@@ -120,19 +123,23 @@ class FinRainbowOption(FinOption):
 
         if len(stockPrices) != self._numAssets:
             raise FinError(
-                "Stock prices must be a vector of length " + str(self._numAssets))
+                "Stock prices must be a vector of length "
+                + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
             raise FinError(
-                "Dividend yields must be a vector of length " + str(self._numAssets))
+                "Dividend yields must be a vector of length "
+                + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
             raise FinError(
-                "Volatilities must be a vector of length " + str(self._numAssets))
+                "Volatilities must be a vector of length "
+                + str(self._numAssets))
 
         if len(betas) != self._numAssets:
-            raise FinError("Betas must be a vector of length " +
-                           str(self._numAssets))
+            raise FinError(
+                "Betas must be a vector of length "
+                + str(self._numAssets))
 
 ###############################################################################
 
@@ -216,23 +223,24 @@ class FinRainbowOption(FinOption):
         dq1 = exp(-q1 * t)
         dq2 = exp(-q2 * t)
         df = exp(-r * t)
+        sqrtt= sqrt(t)
 
         if self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MAXIMUM:
-            v = s1 * dq1 * M(y1, d, rho1)+s2*dq2*M(y2, -d + v*sqrt(t), rho2) \
-                - k * df * (1.0 - M(-y1 + v1*sqrt(t), -y2 + v2*sqrt(t), rho))
+            v = s1 * dq1 * M(y1, d, rho1)+s2*dq2*M(y2, -d + v*sqrtt, rho2) \
+                - k * df * (1.0 - M(-y1 + v1*sqrt(t), -y2 + v2*sqrtt, rho))
         elif self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MINIMUM:
             v = s1*dq1*M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v*sqrt(t), -rho2)\
                 - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
         elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MAXIMUM:
-            cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrt(t))
+            cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrtt)
             cmax2 = s1 * dq1 * M(y1, d, rho1) \
-                + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
-                - k*df*(1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
+                - k*df*(1.0 - M(-y1 + v1 * sqrtt, -y2 + v2 * sqrtt, rho))
             v = k * df - cmax1 + cmax2
         elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MINIMUM:
-            cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrt(t))
-            cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrt(
-                t), -rho2) - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
+            cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrtt)
+            cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v * sqrtt
+              , -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt, rho)
             v = k * df - cmin1 + cmin2
         else:
             raise FinError("Unsupported FX Rainbow option type")

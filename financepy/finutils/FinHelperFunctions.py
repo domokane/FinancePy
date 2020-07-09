@@ -4,32 +4,39 @@
 
 import numpy as np
 from numba import njit
-from typing import List, Union
+from typing import Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
 
-##########################################################################
+###############################################################################
 
-def checkVectorDifferences(x,y,tol):
+
+def checkVectorDifferences(x, y, tol):
+    ''' Compare two vectors elementwise to see if they are more different than
+    tolerance. '''
+
     n1 = len(x)
     n2 = len(y)
     if n1 != n2:
         raise FinError("Vectors x and y do not have same size.")
-        
+
     for i in range(0, n1):
         diff = x[i] - y[i]
         if abs(diff) > tol:
             print("Vector difference of:", diff, " at index: ", i)
 
-##########################################################################
+###############################################################################
+
 
 def checkDate(d):
+    ''' Check that input d is a FinDate. '''
 
     if isinstance(d, FinDate) is False:
         raise FinError("Should be a date dummy!")
 
-##########################################################################
+###############################################################################
+
 
 def dump(obj):
     ''' Get a list of all of the attributes of a class (not built in ones) '''
@@ -58,7 +65,7 @@ def dump(obj):
         x = getattr(obj, attr)
         print(attr, x)
 
-##########################################################################
+###############################################################################
 
 
 def printTree(array, depth=None):
@@ -78,16 +85,6 @@ def printTree(array, depth=None):
                 print("%10s" % '-', end="")
         print("")
 
-##########################################################################
-
-
-def inputFrequency(f):
-    ''' Function takes a frequency number and checks if it is valid. '''
-    if f in [-1, 0, 1, 2, 3, 4, 6, 12]:
-        return f
-    else:
-        raise ValueError("Unknown frequency" + str(f))
-
 ###############################################################################
 
 
@@ -101,8 +98,8 @@ def inputTime(dt, curve):
 
     def check(t):
         if t < 0.0:
-            raise ValueError("Date " + str(dt) +
-                             " is before curve date " + str(curve._curveDate))
+            raise FinError("Date " + str(dt) +
+                           " is before curve date " + str(curve._curveDate))
         elif t < small:
             t = small
         return t
@@ -116,11 +113,11 @@ def inputTime(dt, curve):
     elif isinstance(dt, np.ndarray):
         t = dt
         if np.any(t) < 0:
-            raise ValueError("Date is before curve value date.")
+            raise FinError("Date is before curve value date.")
         t = np.maximum(small, t)
         return t
     else:
-        raise ValueError("Unknown type.")
+        raise FinError("Unknown type.")
 
 ###############################################################################
 
@@ -130,7 +127,7 @@ def listdiff(a, b):
     ''' Calculate a vector of differences between two equal sized vectors. '''
 
     if len(a) != len(b):
-        raise ValueError("Cannot diff lists with different sizes")
+        raise FinError("Cannot diff lists with different sizes")
         return []
 
     diff = []
@@ -139,7 +136,7 @@ def listdiff(a, b):
 
     return diff
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -152,11 +149,12 @@ def dotproduct(xVector, yVector):
         dotprod += xVector[i] * yVector[i]
     return dotprod
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
 def frange(start, stop, step):
+    ''' fast range function that takes start value, stop value and step. '''
     x = []
     while start <= stop:
         x.append(start)
@@ -164,7 +162,7 @@ def frange(start, stop, step):
 
     return x
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -179,7 +177,7 @@ def normaliseWeights(wtVector):
         wtVector[i] = wtVector[i]/sumWts
     return wtVector
 
-##########################################################################
+###############################################################################
 
 
 def labelToString(label, value, separator="\n", listFormat=False):
@@ -203,14 +201,15 @@ def labelToString(label, value, separator="\n", listFormat=False):
     else:
         return f"{label}: {value}{separator}"
 
-##########################################################################
-    
+###############################################################################
+
+
 def tableToString(header, valueTable, floatPrecision="10.7f"):
     ''' Format a 2D array into a table-like string. '''
     if (len(valueTable) == 0 or type(valueTable) is not list):
         print(len(valueTable))
         return ""
-    
+
     numRows = len(valueTable[0])
 
     s = header + "\n"
@@ -225,7 +224,8 @@ def tableToString(header, valueTable, floatPrecision="10.7f"):
 
     return s[:-1]
 
-##########################################################################
+###############################################################################
+
 
 def toUsableType(t):
     ''' Convert a type such that it can be used with `isinstance` '''
@@ -240,11 +240,12 @@ def toUsableType(t):
     else:
         # t is a normal type
         if t is float:
-            return (int, float, np.float64) 
-    
+            return (int, float, np.float64)
+
     return t
 
-##########################################################################
+###############################################################################
+
 
 def checkArgumentTypes(func, values):
     ''' Check that all values passed into a function are of the same type
@@ -259,3 +260,5 @@ def checkArgumentTypes(func, values):
             s += f"{valueName} of type '{usableType.__name__}', however"
             s += f" a value of type '{type(value).__name__}' was given."
             raise FinError(s)
+
+###############################################################################

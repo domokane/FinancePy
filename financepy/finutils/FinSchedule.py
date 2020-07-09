@@ -25,7 +25,8 @@ class FinSchedule(object):
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
-        ''' Create FinSchedule object. '''
+        ''' Create FinSchedule object which calculates a sequence of dates in
+        line with market convention for fixed income products. '''
 
         if startDate > endDate:
             raise FinError("Start Date after End Date")
@@ -67,8 +68,8 @@ class FinSchedule(object):
 
     def generate(self):
         ''' Generate schedule of dates according to specified date generation
-        rules and also adjust these dates for holidays according to
-        the business day convention and the specified calendar. '''
+        rules and also adjust these dates for holidays according to the
+        specified business day convention and the specified calendar. '''
 
         self._adjustedDates = []
         calendar = FinCalendar(self._calendarType)
@@ -205,7 +206,8 @@ class FinSchedule(object):
 
         if len(self._adjustedDates) > 1:
             s += "\n"
-            s += labelToString("NCD", self._adjustedDates[1:], "", listFormat=True)
+            s += labelToString("NCD", self._adjustedDates[1:], "",
+                               listFormat=True)
 
         return s
 

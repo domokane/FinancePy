@@ -8,11 +8,13 @@ import scipy.optimize as optimize
 from numba import njit, float64
 
 from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
+from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 
 ###############################################################################
 
@@ -100,7 +102,7 @@ class FinCDSCurve():
                 self.validate(cdsContracts)
                 self.buildCurve()
         else:
-            pass # In some cases we allow None to be passed
+            pass  # In some cases we allow None to be passed
 
 ###############################################################################
 
@@ -108,13 +110,13 @@ class FinCDSCurve():
         ''' Ensure that contracts are in increasinbg maturity. '''
 
         if len(cdsContracts) == 0:
-            raise ValueError("No CDS contracts have been supplied.")
+            raise FinError("No CDS contracts have been supplied.")
 
         maturityDate = cdsContracts[0]._maturityDate
 
         for cds in cdsContracts[1:]:
             if cds._maturityDate <= maturityDate:
-                raise ValueError("CDS contracts not in increasing maturity.")
+                raise FinError("CDS contracts not in increasing maturity.")
 
             maturityDate = cds._maturityDate
 
@@ -132,7 +134,7 @@ class FinCDSCurve():
             t = dt
 
         if np.any(t < 0.0):
-            raise ValueError("Survival Date before curve anchor date")
+            raise FinError("Survival Date before curve anchor date")
 
         if isinstance(t, np.ndarray):
             n = len(t)
@@ -213,10 +215,10 @@ class FinCDSCurve():
         according to the specified day count convention. '''
 
         if date1 < self._curveDate:
-            raise ValueError("Date1 before curve value date.")
+            raise FinError("Date1 before curve value date.")
 
         if date2 < date1:
-            raise ValueError("Date2 must not be before Date1")
+            raise FinError("Date2 must not be before Date1")
 
         dayCount = FinDayCount(dayCountType)
         yearFrac = dayCount.yearFrac(date1, date2)
@@ -227,12 +229,14 @@ class FinCDSCurve():
 
 ##############################################################################
 
-    def zeroRate(self, dt, compoundingFreq=-1):
+    def zeroRate(self,
+                 dt,
+                 frequencyType=FinFrequencyTypes.CONTINUOUS):
         ''' Calculate the zero rate to date dt in the chosen compounding
         frequency where -1 is continuous is the default. '''
 
         t = inputTime(dt, self)
-        f = inputFrequency(compoundingFreq)
+        f = FinFrequency(frequencyType)
         df = self.df(t)
         q = self.survProb(t)
         dfq = df * q
