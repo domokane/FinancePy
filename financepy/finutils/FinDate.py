@@ -133,7 +133,7 @@ class FinDate():
         be a 4-digit number greater than or equal to 1900. '''
 
         if d >= 1900 and d < 2100 and y > 0 and y <= 31:
-            print("Warning: Deprecating FinDate(y, m, d) for FinDate(d, m, y). Please amend code.")
+#            print("Warning: Deprecating FinDate(y, m, d) for FinDate(d, m, y). Please amend code.")
             tmp = y
             y = d
             d = tmp

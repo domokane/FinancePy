@@ -5,8 +5,10 @@
 
 import numpy as np
 
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency, tableToString
+from ...finutils.FinHelperFunctions import inputTime, tableToString
+from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
+from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
@@ -18,15 +20,18 @@ from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinDiscountCurve():
-    ''' This is a curve calculated from a set of times and discount factors.
-    '''
+    ''' This is a base discount curve which has an internal representation of
+    a vector of times and discount factors and an interpolation scheme. '''
 
 ###############################################################################
 
-    def __init__(self, curveDate, times, values,
+    def __init__(self,
+                 curveDate,
+                 times,
+                 values,
                  interpMethod=FinInterpMethods.FLAT_FORWARDS):
         ''' Create the discount curve from a vector of times and discount
-        factors. '''
+        factors with an anchor date and specify an interpolation scheme. '''
 
         # Validate curve
         if len(times) < 1:
@@ -51,10 +56,12 @@ class FinDiscountCurve():
 
 ###############################################################################
 
-    def zeroRate(self, dt, compoundingFreq=-1):
+    def zeroRate(self,
+                 dt: FinDate,
+                 frequencyType=FinFrequencyTypes.CONTINUOUS):
         ''' Calculate the zero rate to maturity date. '''
         t = inputTime(dt, self)
-        f = inputFrequency(compoundingFreq)
+        f = FinFrequency(frequencyType)
         df = self.df(t)
 
         if f == 0:  # Simple interest
@@ -75,9 +82,7 @@ class FinDiscountCurve():
 ##########################################################################
 
     def survProb(self, dt):
-        t = inputTime(dt, self)
-        q = interpolate(t, self._times, self._values, self._interpMethod.value)
-        return q
+        return self.df(dt)
 
 ##########################################################################
 
@@ -103,7 +108,9 @@ class FinDiscountCurve():
             t = times[i]
             values[i] = values[i] * np.exp(-bumpSize*t)
 
-        discCurve = FinDiscountCurve(self._curveDate, times, values,
+        discCurve = FinDiscountCurve(self._curveDate,
+                                     times,
+                                     values,
                                      self._interpMethod)
 
         return discCurve

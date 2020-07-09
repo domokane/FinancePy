@@ -4,25 +4,30 @@
 
 import numpy as np
 
-##########################################################################
+###############################################################################
 
-from ...market.curves.FinCurve import inputTime
+from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount
-from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import labelToString, inputTime
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-##########################################################################
+###############################################################################
 
 
-class FinPolynomialCurve():
-    ''' Curve with zero rate of specified frequency parametrised 
+class FinDiscountCurvePoly(FinDiscountCurve):
+    ''' Curve with zero rate of specified frequency parametrised
     as a cubic polynomial. '''
 
-    def __init__(self, curveDate, coefficients,
+    def __init__(self,
+                 curveDate,
+                 coefficients,
                  compoundingType=-1):
         ''' Create cubic curve from coefficients '''
         self._curveDate = curveDate
         self._coefficients = coefficients
         self._power = len(coefficients) - 1
+
+###############################################################################
 
     def zeroRate(self, dt):
         ''' Zero rate from polynomial zero curve. '''
@@ -32,11 +37,15 @@ class FinPolynomialCurve():
             zeroRate += self._coefficients[n] * (t**n)
         return zeroRate
 
+###############################################################################
+
     def df(self, dt):
         ''' Discount factor from polynomial zero curve.'''
         t = inputTime(dt, self)
         r = self.zeroRate(t)
         return np.exp(-r * t)
+
+###############################################################################
 
     def fwd(self, dt):
         ''' Continuously compounded forward rate. '''
@@ -49,15 +58,20 @@ class FinPolynomialCurve():
         fwdRate = (zeroRate + t*dzerodt)
         return fwdRate
 
-    def fwdRate(self, date1, date2, dayCountType):
+###############################################################################
+
+    def fwdRate(self,
+                date1,
+                date2,
+                dayCountType):
         ''' Calculate the forward rate according to the specified
         day count convention. '''
 
         if date1 < self._curveDate:
-            raise ValueError("Date1 before curve date.")
+            raise FinError("Date1 before curve date.")
 
         if date2 < date1:
-            raise ValueError("Date2 must not be before Date1")
+            raise FinError("Date2 must not be before Date1")
 
         dayCount = FinDayCount(dayCountType)
         yearFrac = dayCount.yearFrac(date1, date2)
@@ -66,7 +80,7 @@ class FinPolynomialCurve():
         fwd = (df1 / df2 - 1.0) / yearFrac
         return fwd
 
-##############################################################################
+###############################################################################
 
     def __repr__(self):
         ''' Display internal parameters of curve. '''
@@ -76,10 +90,10 @@ class FinPolynomialCurve():
 
         return s
 
-##############################################################################
+###############################################################################
 
     def print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 
-##############################################################################
+###############################################################################

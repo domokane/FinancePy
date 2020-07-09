@@ -10,7 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from financepy.market.curves.FinFlatCurve import FinFlatCurve
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
@@ -29,7 +29,7 @@ def test_FinEquityDigitalOption():
     volatility = 0.30
     interestRate = 0.05
     dividendYield = 0.01
-    discountCurve = FinFlatCurve(valueDate, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     model = FinEquityModelBlackScholes(volatility)
     import time
 

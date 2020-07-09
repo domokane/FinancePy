@@ -4,45 +4,50 @@
 
 import numpy as np
 
-##########################################################################
-# TODO
-# Inherit from FinCurve and add df method
-# Put in a convention for the rate
-# Use Frequency object
-##########################################################################
-
-#from ...market.curves.FinCurve import FinCurve
-from ...market.curves.FinInterpolate import FinInterpMethods
+from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
+from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
+from ...finutils.FinMath import testMonotonicity
+from .FinInterpolate import FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
-
-##########################################################################
-##########################################################################
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 
-class FinPiecewiseLinearCurve():
-    ''' Curve is made up of a series of sections assumed to each have a constant
-    forward rate. This class needs to be checked carefully. '''
+###############################################################################
 
-    def __init__(self, curveDate, times, values):
-        ''' Curve is defined by a vector of increasing times and zero rates. '''
 
-        if len(times) != len(values):
-            raise ValueError("Times and rates vectors must have same length")
+class FinDiscountCurvePWFlat(FinDiscountCurve):
+    ''' Curve is made up of a series of zero rates assumed to each have a
+    piecewise flat constant shape OR a piecewise linear shape. '''
+
+    def __init__(self,
+                 curveDate,
+                 times,
+                 zeroRates,
+                 frequencyType=FinFrequencyTypes.CONTINUOUS,
+                 interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
+        ''' Curve is a vector of increasing times and zero rates. '''
+
+        if not isinstance(curveDate, FinDate):
+            raise FinError("CurveDate is not a date " + str(curveDate))
+
+        if len(times) != len(zeroRates):
+            raise FinError("Times and rates vectors must have same length")
 
         if len(times) == 0:
-            raise ValueError("Times and rates vectors must have length > 0")
+            raise FinError("Times and rates vectors must have length > 0")
 
-        numTimes = len(times)
-        for i in range(1, numTimes):
-            if times[i - 1] >= times[i]:
-                raise ValueError("Times must be strictly increasing")
+        if testMonotonicity(times) is False:
+            raise FinError("Times are not sorted in increasing order")
 
         self._times = times
-        self._values = values
+        self._zeroRates = zeroRates
+        self._cmpdFreq = FinFrequency(frequencyType)
+        self._interpMethod = interpolationMethod
 
-##########################################################################
+###############################################################################
 
-    def zero(self, t, interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
+    def zeroRate(self, t, compoundingFreq):
 
         l_index = 0
         r_index = 0
@@ -55,11 +60,11 @@ class FinPiecewiseLinearCurve():
 
         interpolatedZero = 0.0
 
-        if interpolationMethod == FinInterpMethods.FLAT:
+        if self._interpMethod == FinInterpMethods.FLAT_FORWARDS:
 
             interpolatedZero = self._values[l_index]
 
-        elif interpolationMethod == FinInterpMethods.LINEAR:
+        elif self._interpMethod == FinInterpMethods.LINEAR_FORWARDS:
 
             t1 = self._times[l_index]
             t2 = self._times[r_index]
@@ -67,7 +72,7 @@ class FinPiecewiseLinearCurve():
             r2 = self._values[r_index]
             interpolatedZero = r1 + (r2 - r1) * (t - t1) / (t2 - t1)
 
-        elif interpolationMethod == FinInterpMethods.LOG:
+        elif self._interpMethod == FinInterpMethods.LINEAR_ZERO_RATES:
 
             t1 = self._times[l_index]
             t2 = self._times[r_index]
@@ -76,22 +81,22 @@ class FinPiecewiseLinearCurve():
             interpolatedZero = r1 * ((r2 / r1) ** (t - t1) / (t2 - t1))
 
         else:
-            raise ValueError("Unknown interpolation scheme")
+            raise FinError("Unknown interpolation scheme")
 
         return interpolatedZero
 
-##########################################################################
+###############################################################################
 
     def fwd(self, t):
         # NEED TODO THIS
         fwdRate = self.r
         return fwdRate
 
-##########################################################################
+###############################################################################
 
     def df(self,
            t,
-           freq=0,  # This corresponds to continuous compounding
+           frequencyType=FinFrequencyTypes.CONTINUOUS,
            interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
 
         df = 1.0
@@ -102,6 +107,8 @@ class FinPiecewiseLinearCurve():
             if self._times[i] > t:
                 index = i
                 break
+
+        freq = FinFrequency(frequencyType)
 
         for i in range(1, index):
             t = self._times[i]
@@ -127,4 +134,4 @@ class FinPiecewiseLinearCurve():
 
         return df
 
-##########################################################################
+###############################################################################

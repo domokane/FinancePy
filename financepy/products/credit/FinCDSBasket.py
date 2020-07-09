@@ -19,7 +19,7 @@ from ...models.FinModelGaussianCopula1F import homogeneousBasketLossDbn
 from ...models.FinModelGaussianCopula import defaultTimesGC
 from ...models.FinModelStudentTCopula import FinModelStudentTCopula
 
-from ...market.curves.FinCDSCurve import FinCDSCurve
+from financepy.products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION

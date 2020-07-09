@@ -52,8 +52,10 @@ class FinLiborCurve(FinDiscountCurve):
     curve date. Typically it is the date on which an amount of $1 paid
     has a present value of $1.
 
-    This class inherits from FinDiscountCurve so has all of the methods
+    This class inherits from FinDiscCurve so has all of the methods
     that class has. '''
+
+###############################################################################
 
     def __init__(self,
                  name,
@@ -71,7 +73,7 @@ class FinLiborCurve(FinDiscountCurve):
         self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
         self.buildCurve()
 
-    ######################################################################
+###############################################################################
 
     def validateInputs(self,
                        liborDeposits,
@@ -94,7 +96,7 @@ class FinLiborCurve(FinDiscountCurve):
                 if nextDt <= prevDt:
                     raise FinError("Deposits must be in increasing maturity")
                 prevDt = nextDt
- 
+
         if numFRAs != 0:
             prevDt = liborFRAs[0]._maturityDate
             for fra in liborFRAs[1:]:
@@ -102,7 +104,7 @@ class FinLiborCurve(FinDiscountCurve):
                 if nextDt <= prevDt:
                     raise FinError("FRAs must be in increasing maturity")
                 prevDt = nextDt
- 
+
         if numSwaps != 0:
             prevDt = liborSwaps[0]._maturityDate
             for swap in liborSwaps[1:]:
@@ -110,7 +112,7 @@ class FinLiborCurve(FinDiscountCurve):
                 if nextDt <= prevDt:
                     raise FinError("Swaps must be in increasing maturity")
                 prevDt = nextDt
- 
+
         # Now we have ensure they are in order check for overlaps and the like
 
         lastDepositMaturityDate = FinDate(1, 1, 1900)
@@ -140,7 +142,7 @@ class FinLiborCurve(FinDiscountCurve):
         self._usedFRAs = liborFRAs
         self._usedSwaps = liborSwaps
 
-    #######################################################################
+###############################################################################
 
     def buildCurve(self):
         ''' Construct the discount curve using a bootstrap approach. '''
@@ -223,7 +225,7 @@ class FinLiborCurve(FinDiscountCurve):
                 swap.printFixedLeg(self._curveDate)
                 swap.printFloatLeg(self._curveDate)
                 raise FinError("Swap not repriced.")
-
+ 
 ###############################################################################
 
     def __repr__(self):

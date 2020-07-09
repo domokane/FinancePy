@@ -7,6 +7,7 @@ from math import exp, log, fabs
 from numba import njit, float64, int64
 import numpy as np
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinError import FinError
 
 ###############################################################################
 
@@ -33,16 +34,13 @@ def interpolate(x,
         v = vinterpolate(x, times, dfs, method)
         return v
     else:
-        raise ValueError("Unknown input type", type(x))
+        raise FinError("Unknown input type", type(x))
 
 ###############################################################################
 
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)
-def uinterpolate(t,
-                 times,
-                 dfs,
-                 method):
+def uinterpolate(t, times, dfs, method):
     ''' Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and

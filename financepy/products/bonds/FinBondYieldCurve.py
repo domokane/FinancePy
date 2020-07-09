@@ -19,9 +19,9 @@ from .FinBondYieldCurveModel import FinCurveFitBSpline
 from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
 
-##########################################################################
+###############################################################################
 # TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
-##########################################################################
+###############################################################################
 
 
 class FinBondYieldCurve():
@@ -31,7 +31,11 @@ class FinBondYieldCurve():
     FinDiscountCurve. It should only be used for visualisation and simple
     interpolation but not for full term-structure-consistent pricing. '''
 
-    def __init__(self, settlementDate, bonds, ylds, curveFit):
+    def __init__(self,
+                 settlementDate: FinDate,
+                 bonds,
+                 ylds,
+                 curveFit):
         ''' Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters. '''
@@ -94,9 +98,9 @@ class FinBondYieldCurve():
             fit._spline = spline
 
         else:
-            raise ValueError("Unrecognised curve fit type.")
+            raise FinError("Unrecognised curve fit type.")
 
-##########################################################################
+###############################################################################
 
     def interpolatedYield(self, maturityDate):
 
@@ -109,7 +113,7 @@ class FinBondYieldCurve():
         elif type(maturityDate) is float or type(maturityDate) is np.float64:
             t = maturityDate
         else:
-            raise ValueError("Unknown date type.")
+            raise FinError("Unknown date type.")
 
         fit = self._curveFit
 
@@ -136,7 +140,7 @@ class FinBondYieldCurve():
 
         return yld
 
-##########################################################################
+###############################################################################
 
     def plot(self, title):
         ''' Display yield curve. '''
@@ -158,7 +162,7 @@ class FinBondYieldCurve():
         plt.ylim((min(yld)-0.3, max(yld)*1.1))
         plt.grid(True)
 
-##########################################################################
+###############################################################################
 
     def __repr__(self):
         s = labelToString("SETTLEMENT DATE", self._settlementDate)
@@ -167,10 +171,10 @@ class FinBondYieldCurve():
         s += labelToString("CURVE FIT", self._curveFit)
         return s
 
-##########################################################################
+###############################################################################
 
     def print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 
-##########################################################################
+##############################################################################

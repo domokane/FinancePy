@@ -13,8 +13,8 @@ from financepy.market.curves.FinInterpolate import FinInterpMethods
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinLiborCurve import FinLiborCurve
-from financepy.market.curves.FinCDSCurve import FinCDSCurve
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
@@ -135,11 +135,10 @@ def test_CurveBuild():
     times = np.linspace(0.0, 10.0, 10)
     r = 0.05
     discountFactors = np.power((1.0 + r), -times)
-    liborCurve = FinDiscountCurve(
-        valuationDate,
-        times,
-        discountFactors,
-        FinInterpMethods.FLAT_FORWARDS)
+    liborCurve = FinDiscountCurve(valuationDate,
+                                  times,
+                                  discountFactors,
+                                  FinInterpMethods.FLAT_FORWARDS)
     recoveryRate = 0.40
 
     cdsContracts = []

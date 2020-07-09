@@ -21,3 +21,6 @@ This is a contract to buy or sell an option on a swap. The model includes code t
 
 ##FinOIS
 This is a contract to exchange the daily compounded Overnight index swap rate for a fixed rate agreed at contract initiation.
+
+## FinLiborCurve
+This is a discount curve that is extracted by bootstrapping a set of Libor deposits, Libor FRAs and Libor swap prices. The internal representation of the curve are discount factors on each of the deposit, FRA and swap maturity dates. Between these dates, discount factors are interpolated according to a specified scheme - see below.

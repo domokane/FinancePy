@@ -4,24 +4,23 @@
 
 import numpy as np
 
-from ...finutils.FinHelperFunctions import inputTime, inputFrequency
-
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
-from .FinInterpolate import interpolate, FinInterpMethods
+from .FinInterpolate import FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinGlobalVariables import gDaysInYear
+
 
 ###############################################################################
 # TODO: Fix up __repr__ function
 ###############################################################################
 
 
-class FinZeroCurve():
+class FinDiscountCurveZeros(FinDiscountCurve):
     ''' This is a curve calculated from a set of times and zero rates.
     '''
 
@@ -112,48 +111,6 @@ class FinZeroCurve():
 
 ###############################################################################
 
-    # NEED TO CHANGE FREQUENCY TO USE FINFREQTYPE !!!
-    def zeroRate(self, dt, compoundingFreq=-1):
-        ''' Calculate the zero rate to maturity date. '''
-        t = inputTime(dt, self)
-        f = inputFrequency(compoundingFreq)
-        df = self.df(t)
-
-        if f == 0:  # Simple interest
-            zeroRate = (1.0/df-1.0)/t
-        if f == -1:  # Continuous
-            zeroRate = -np.log(df) / t
-        else:
-            zeroRate = (df**(-1.0/t/f) - 1) * f
-        return zeroRate
-
-##########################################################################
-
-    def df(self, dt):
-        t = inputTime(dt, self)
-        z = interpolate(t, self._times, self._values, self._interpMethod.value)
-        return z
-
-##########################################################################
-
-    def survProb(self, dt):
-        t = inputTime(dt, self)
-        q = interpolate(t, self._times, self._values, self._interpMethod.value)
-        return q
-
-##########################################################################
-
-    def fwd(self, dt):
-        ''' Calculate the continuous forward rate at the forward date. '''
-        t = inputTime(dt, self)
-        dt = 0.000001
-        df1 = self.df(t)
-        df2 = self.df(t+dt)
-        fwd = np.log(df1/df2)/dt
-        return fwd
-
-##########################################################################
-
     def bump(self, bumpSize):
         ''' Calculate the continuous forward rate at the forward date. '''
 
@@ -165,31 +122,14 @@ class FinZeroCurve():
             t = times[i]
             values[i] = values[i] * np.exp(-bumpSize*t)
 
-        discCurve = FinDiscountCurve(self._curveDate, times, values,
+        discCurve = FinDiscountCurve(self._curveDate,
+                                     times,
+                                     values,
                                      self._interpMethod)
 
         return discCurve
 
-##########################################################################
-
-    def fwdRate(self, date1, date2, dayCountType):
-        ''' Calculate the forward rate according to the specified
-        day count convention. '''
-
-        if date1 < self._curveDate:
-            raise ValueError("Date1 before curve value date.")
-
-        if date2 < date1:
-            raise ValueError("Date2 must not be before Date1")
-
-        dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1, date2)
-        df1 = self.df(date1)
-        df2 = self.df(date2)
-        fwd = (df1 / df2 - 1.0) / yearFrac
-        return fwd
-
-##########################################################################
+###############################################################################
 
     def __repr__(self):
 
@@ -200,4 +140,4 @@ class FinZeroCurve():
 
         return s
 
-#######################################################################
+###############################################################################

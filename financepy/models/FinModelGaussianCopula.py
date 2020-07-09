@@ -7,7 +7,7 @@
 import numpy as np
 
 from ..finutils.FinMath import N
-from ..market.curves.FinCDSCurve import uniformToDefaultTime
+from ..products.credit.FinCDSCurve import uniformToDefaultTime
 
 ##########################################################################
 

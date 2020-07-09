@@ -4,3 +4,4 @@ from .FinCDSIndexOption import *
 from .FinCDSIndexPortfolio import *
 from .FinCDSOption import *
 from .FinCDSTranche import *
+from .FinCDSCurve import *

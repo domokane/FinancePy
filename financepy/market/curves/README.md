@@ -25,23 +25,24 @@ This module sets out a range of curve forms that can be fitted to the bond yield
 * Nelson-Siegel-Svensson functional form.
 * B-Splines
 
-### FinNelsonSiegelCurve
-Implementation of the Nelson-Siegel and the Nelson-Siegel-Svensson curves.
-
 ## Discount Curves
-These are curves that can be used to discount cashflows.
+These are curves which supply a discount factor that can be used to present-value future payments.
 
 ### FinDiscountCurve
-This is a class that holds a Numpy array of times and discount factor values that represents a discount curve. It also requires a specific interpolation scheme. A function is also provided to return a survival probability so that this class can also be used to handle term structures of survival probabilities.
+This is a curve made from a Numpy array of times and discount factor values that represents a discount curve. It also requires a specific interpolation scheme. A function is also provided to return a survival probability so that this class can also be used to handle term structures of survival probabilities. Other curves inherit from this in order to share common functionality.
 
-### FinBondZeroCurve
-This is a discount curve that is extracted by bootstrapping a zero rate curve such that it exactly reprices the set of bonds provided. The internal representation of the curve are discount factors on each of the bond maturity dates. Between these dates, discount factors are interpolated according to a specified scheme - see below.
+### FinDiscountCurveFlat
+This is a class that takes in a single flat rate. 
 
-### FinLiborCurve
-This is a discount curve that is extracted by bootstrapping a set of Libor deposits, Libor FRAs and Libor swap prices. The internal representation of the curve are discount factors on each of the deposit, FRA and swap maturity dates. Between these dates, discount factors are interpolated according to a specified scheme - see below.
+### FinDiscountCurveNS
+Implementation of the Nelson-Siegel curve parametrisation.
 
-### FinCDSCurve
-This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinLiborCurve discount curve. It also contains a LiborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
+### FinDiscountCurveNSS
+Implementation of the Nelson-Siegel-Svensson curve parametrisation.
+
+### FinDiscountCurveZeros
+This is a discount curve that is made from a vector of times and zero rates.
+
 
 ### FinInterpolate
 This module contains the interpolation function used throughout the discount curves when a discount factor needs to be interpolated. There are three interpolation methods:

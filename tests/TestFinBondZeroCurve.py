@@ -15,7 +15,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
-from financepy.market.curves.FinBondZeroCurve import FinBondZeroCurve
+from financepy.products.bonds.FinBondZeroCurve import FinBondZeroCurve
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -34,7 +34,7 @@ def test_FinBondZeroCurve():
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    settlement = FinDate(2012, 9, 19)
+    settlement = FinDate(19, 9, 2012)
 
     bonds = []
     cleanPrices = []

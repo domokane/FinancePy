@@ -6,7 +6,7 @@ from math import sqrt
 import numpy as np
 from scipy.stats import t as student
 
-from ..market.curves.FinCDSCurve import uniformToDefaultTime
+from ..products.credit.FinCDSCurve import uniformToDefaultTime
 from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
