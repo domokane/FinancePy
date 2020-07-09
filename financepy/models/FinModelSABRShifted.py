@@ -51,7 +51,7 @@ def blackVolFromShiftedSABR(alpha, beta, rho, nu, s, f, k, t):
         sigma = num / denom
 
     if sigma <= 0.0:
-        raise ValueError("SABR Volatility <= 0%.")
+        raise FinError("SABR Volatility <= 0%.")
 
     return sigma
 

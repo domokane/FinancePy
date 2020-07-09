@@ -5,15 +5,15 @@
 import numpy as np
 
 from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinGlobalVariables import gDaysInYear
 
 ##########################################################################
-# TODO: This is unfinished
+# TODO: Market calibration (fitting)
+##########################################################################
 
 
-class FinCapFloorVolCurveFn():
+class FinLiborCapVolCurveFn():
     ''' Class to manage a term structure of caplet volatilities using the
     parametric form suggested by Rebonato (1999). '''
 
@@ -40,7 +40,7 @@ class FinCapFloorVolCurveFn():
             vol = (self._a + self._b*t) * np.exp(-self._c*t) + self._d
 
         if vol < 0.0:
-            raise ValueError("Negative volatility. Not permitted.")
+            raise FinError("Negative volatility. Not permitted.")
 
         return vol
 

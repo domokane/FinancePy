@@ -4,6 +4,7 @@
 
 from typing import Union
 
+from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
@@ -42,8 +43,8 @@ class FinLiborFRA(object):
     date are the same date. This should be amended later. '''
 
     def __init__(self,
-                 startDate: FinDate,  # The date the floating rate starts to accrue
-                 maturityDateOrTenor: Union[FinDate, str],  # The end of the Libor rate period
+                 startDate: FinDate,  # The date the FRA starts to accrue
+                 maturityDateOrTenor: Union[FinDate, str],  # End of the Libor rate period
                  fraRate: float,  # The fixed contractual FRA rate
                  dayCountType: FinDayCountTypes,  # For interest period
                  notional: float = 100.0,
@@ -66,7 +67,7 @@ class FinLiborFRA(object):
                                            self._busDayAdjustType)
 
         if startDate > maturityDate:
-            raise ValueError("Settlement date after maturity date")
+            raise FinError("Settlement date after maturity date")
 
         self._startDate = startDate
         self._maturityDate = maturityDate

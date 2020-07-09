@@ -51,7 +51,7 @@ class FinBondMarkets(Enum):
 
 def getTreasuryBondMarketConventions(country):
     ''' Returns the day count convention for accrued interest, the frequency
-    and the number of days from trade date to settlement date. 
+    and the number of days from trade date to settlement date.
     This is for Treasury markets. And for secondary bond markets. '''
 
     annual = FinFrequencyTypes.ANNUAL

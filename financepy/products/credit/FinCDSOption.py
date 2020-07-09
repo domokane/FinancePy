@@ -54,10 +54,10 @@ class FinCDSOption():
         checkArgumentTypes(self.__init__, locals())
 
         if maturityDate < expiryDate:
-            raise ValueError("Maturity date must be after option expiry date")
+            raise FinError("Maturity date must be after option expiry date")
 
         if strikeCoupon < 0.0:
-            raise ValueError("Strike must be greater than zero")
+            raise FinError("Strike must be greater than zero")
 
         self._expiryDate = expiryDate
         self._maturityDate = maturityDate
@@ -83,10 +83,10 @@ class FinCDSOption():
         TODO - Should the CDS be created in the init method ? '''
 
         if valuationDate > self._expiryDate:
-            raise ValueError("Expiry date is now or in the past")
+            raise FinError("Expiry date is now or in the past")
 
         if volatility < 0.0:
-            raise ValueError("Volatility must be greater than zero")
+            raise FinError("Volatility must be greater than zero")
 
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon

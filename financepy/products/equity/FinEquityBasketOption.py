@@ -13,10 +13,13 @@ from ...models.FinGBMProcess import FinGBMProcess
 
 ##########################################################################
 
+from ...finutils.FinError import FinError
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+
+###############################################################################
 
 class FinEquityBasketOption(FinEquityOption):
 
@@ -33,7 +36,7 @@ class FinEquityBasketOption(FinEquityOption):
         self._optionType = optionType
         self._numAssets = numAssets
 
-##########################################################################
+###############################################################################
 
     def validate(self,
                  stockPrices,
@@ -42,22 +45,22 @@ class FinEquityBasketOption(FinEquityOption):
                  betas):
 
         if len(stockPrices) != self._numAssets:
-            raise ValueError(
+            raise FinError(
                 "Stock prices must be a vector of length " + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
-            raise ValueError(
+            raise FinError(
                 "Dividend yields must be a vector of length " + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
-            raise ValueError(
+            raise FinError(
                 "Volatilities must be a vector of length " + str(self._numAssets))
 
         if len(betas) != self._numAssets:
-            raise ValueError(
+            raise FinError(
                 "Betas must be a vector of length " + str(self._numAssets))
 
-##########################################################################
+###############################################################################
 
     def value(self,
               valueDate,
@@ -68,7 +71,7 @@ class FinEquityBasketOption(FinEquityOption):
               betas):
 
         if valueDate > self._expiryDate:
-            raise ValueError("Value date after expiry date.")
+            raise FinError("Value date after expiry date.")
 
         self.validate(stockPrices,
                       dividendYields,
@@ -130,8 +133,7 @@ class FinEquityBasketOption(FinEquityOption):
             v = self._strikePrice * exp(-r * t) * N(-d2)
             v = v - smean * exp(-qhat * t) * N(-d1)
         else:
-            print("Unknown option type")
-            return None
+            raise FinError("Unknown option type")
 
         return v
 
@@ -148,7 +150,7 @@ class FinEquityBasketOption(FinEquityOption):
                 seed=4242):
 
         if valueDate > self._expiryDate:
-            raise ValueError("Value date after expiry date.")
+            raise FinError("Value date after expiry date.")
 
         self.validate(stockPrices,
                       dividendYields,
@@ -184,7 +186,7 @@ class FinEquityBasketOption(FinEquityOption):
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(k - np.mean(Sall, axis=1), 0)
         else:
-            raise ValueError("Unknown option type.")
+            raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff)
         v = payoff * exp(-r * t)

@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 
 from math import exp, log, sqrt
@@ -17,6 +17,9 @@ from ...models.FinProcessSimulator import FinProcessSimulator
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
+###############################################################################
+
+
 class FinEquityBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
     DOWN_AND_IN_CALL = 2
@@ -27,9 +30,7 @@ class FinEquityBarrierTypes(Enum):
     DOWN_AND_OUT_PUT = 7
     DOWN_AND_IN_PUT = 8
 
-
 ###############################################################################
-##########################################################################
 
 class FinEquityBarrierOption(FinEquityOption):
     ''' Class to hold details of an Equity Barrier Option. It also
@@ -59,17 +60,12 @@ class FinEquityBarrierOption(FinEquityOption):
 
 ##########################################################################
 
-    def value(
-            self,
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model):
-
-        # This prices the option using the formulae given in the paper
-        # by Clewlow, Llanos and Strickland December 1994 which can be found at
-        # https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
+    def value(self, valueDate, stockPrice, discountCurve, dividendYield, 
+              model):
+        ''' This prices the option using the formulae given in the paper
+        by Clewlow, Llanos and Strickland December 1994 which can be found at
+        https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
+        '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         lnS0k = log(float(stockPrice) / self._strikePrice)
@@ -234,16 +230,8 @@ class FinEquityBarrierOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueMC(
-            self,
-            valueDate,
-            stockPrice,
-            discountCurve,
-            processType,
-            modelParams,
-            numAnnSteps=252,
-            numPaths=10000,
-            seed=4242):
+    def valueMC(self, valueDate, stockPrice, discountCurve, processType,
+                modelParams, numAnnSteps=252, numPaths=10000, seed=4242):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         numTimeSteps = int(t * numAnnSteps)

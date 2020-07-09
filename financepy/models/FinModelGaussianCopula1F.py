@@ -96,11 +96,11 @@ def homogeneousBasketLossDbn(survivalProbabilities,
     numCredits = len(survivalProbabilities)
 
     if numCredits == 0:
-        raise ValueError("Number of credits equals zero")
+        raise FinError("Number of credits equals zero")
 
     for iCredit in range(1, numCredits):
         if recoveryRates[iCredit] != recoveryRates[0]:
-            raise ValueError("Losses are not homogeneous")
+            raise FinError("Losses are not homogeneous")
 
     m = 0.0
     for i in range(0, len(betaVector)):
@@ -156,7 +156,7 @@ def trSurvProbRecursion(k1,
         return 0.0
 
     if k1 >= k2:
-        raise ValueError("K1 >= K2")
+        raise FinError("K1 >= K2")
 
     commonRecoveryFlag = 1
 
@@ -261,7 +261,7 @@ def trSurvProbGaussian(k1,
         return 0.0
 
     if k1 >= k2:
-        raise ValueError("K1 >= K2")
+        raise FinError("K1 >= K2")
 
     defaultProbs = [0.0] * numCredits
     for iCredit in range(0, numCredits):
@@ -382,7 +382,7 @@ def trSurvProbAdjBinomial(k1,
         return 0.0
 
     if k1 >= k2:
-        raise ValueError("K1 >= K2")
+        raise FinError("K1 >= K2")
 
     defaultProbs = np.zeros(numCredits)
     for iCredit in range(0, numCredits):

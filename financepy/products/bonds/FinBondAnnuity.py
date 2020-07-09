@@ -13,7 +13,6 @@ from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 
 
-
 ###############################################################################
 
 

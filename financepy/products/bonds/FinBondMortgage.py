@@ -46,7 +46,7 @@ class FinBondMortgage(object):
         checkArgumentTypes(self.__init__, locals())
 
         if startDate > endDate:
-            raise ValueError("Start Date after End Date")
+            raise FinError("Start Date after End Date")
 
         self._startDate = startDate
         self._endDate = endDate

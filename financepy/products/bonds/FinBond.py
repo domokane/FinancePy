@@ -182,7 +182,7 @@ class FinBond(object):
                 term4 = v**n
                 fp = (v**(self._alpha))*(term1 + term2 + term3 + term4)
         else:
-            raise ValueError("Unknown yield convention")
+            raise FinError("Unknown yield convention")
 
         return fp * self._par
 

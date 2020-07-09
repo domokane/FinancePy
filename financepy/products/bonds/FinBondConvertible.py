@@ -54,48 +54,48 @@ def valueConvertible(tmat,
 
     if len(couponTimes) > 0:
         if couponTimes[-1] > tmat:
-            raise ValueError("Coupon after maturity")
+            raise FinError("Coupon after maturity")
 
     if len(callTimes) > 0:
         if callTimes[-1] > tmat:
-            raise ValueError("Call times after maturity")
+            raise FinError("Call times after maturity")
 
     if len(putTimes) > 0:
         if putTimes[-1] > tmat:
-            raise ValueError("Put times after maturity")
+            raise FinError("Put times after maturity")
 
     if len(dfTimes) > 0:
         if dfTimes[-1] > tmat:
-            raise ValueError("Discount times after maturity")
+            raise FinError("Discount times after maturity")
 
     if len(dividendTimes) > 0:
         if dividendTimes[-1] > tmat:
-            raise ValueError("Dividend times after maturity")
+            raise FinError("Dividend times after maturity")
 
     if creditSpread < 0.0:
-        raise ValueError("Credit spread negative.")
+        raise FinError("Credit spread negative.")
 
     if recRate < 0.0 or recRate > 1.0:
-        raise ValueError("Recovery rate should be between 0 and 1.")
+        raise FinError("Recovery rate should be between 0 and 1.")
 
     if stockVolatility < 0.0:
-        raise ValueError("Stock volatility cannot be negative.")
+        raise FinError("Stock volatility cannot be negative.")
 
     if numStepsPerYear < 1:
-        raise ValueError("Num Steps per year must more than 1.")
+        raise FinError("Num Steps per year must more than 1.")
 
     if len(dividendTimes) > 0.0:
         if dividendTimes[-1] > tmat:
-            raise ValueError("Last dividend is after bond maturity.")
+            raise FinError("Last dividend is after bond maturity.")
 
     if recRate > 0.999 or recRate < 0.0:
-        raise ValueError("Recovery rate must be between 0 and 0.999.")
+        raise FinError("Recovery rate must be between 0 and 0.999.")
 
     numTimes = int(numStepsPerYear * tmat) + 1  # add one for today time 0
     numTimes = numStepsPerYear  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
 
     if numTimes < 5:
-        raise ValueError("Numsteps must be greater than 5.")
+        raise FinError("Numsteps must be greater than 5.")
 
     numLevels = numTimes
 
@@ -198,7 +198,7 @@ def valueConvertible(tmat,
 #        n_min = r*r / stockVolatility / stockVolatility
 
     if np.any(treeProbsUp > 1.0):
-        raise ValueError("pUp > 1.0. Increase time steps.")
+        raise FinError("pUp > 1.0. Increase time steps.")
 
     ###########################################################################
     # work backwards by first setting values at bond maturity date
@@ -261,13 +261,13 @@ class FinBondConvertible(object):
                  maturityDate: FinDate,  # bond maturity date
                  coupon: float,  # annual coupon
                  frequencyType: FinFrequencyTypes,  # coupon frequency type
-                 startConvertDate: FinDate,  # date after which conversion is possible
-                 conversionRatio: float,  # number of shares per face of notional
+                 startConvertDate: FinDate,  # conversion starts on this date
+                 conversionRatio: float,  # num shares per face of notional
                  callDates: List[FinDate],  # list of call dates
                  callPrices: List[float],  # list of call prices
                  putDates: List[FinDate],  # list of put dates
                  putPrices: List[float],  # list of put prices
-                 accrualType: FinDayCountTypes,  # day count type for accrued interest
+                 accrualType: FinDayCountTypes,  # day count type for accrued
                  face: float = 100.0  # face amount
                  ):
         ''' Create FinBond object by providing Maturity Date, Frequency,
@@ -298,11 +298,11 @@ class FinBondConvertible(object):
 
         if len(putDates) > 0:
             if putDates[-1] > maturityDate:
-                raise ValueError("Last put is after bond maturity.")
+                raise FinError("Last put is after bond maturity.")
 
         if len(callDates) > 0:
             if callDates[-1] > maturityDate:
-                raise ValueError("Last call is after bond maturity.")
+                raise FinError("Last call is after bond maturity.")
 
         self._startConvertDate = startConvertDate
 
@@ -312,7 +312,7 @@ class FinBondConvertible(object):
         self._conversionRatio = conversionRatio
 
         self._face = face
-        self._settlementDate = FinDate(1900, 1, 1)
+        self._settlementDate = FinDate(1, 1, 1900)
         ''' I do not determine cashflow dates as I do not want to require
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. '''
@@ -425,13 +425,13 @@ class FinBondConvertible(object):
         putPrices = np.array(self._putPrices)
 
         if np.any(putTimes > tmat):
-            raise ValueError("No put times can be after the maturity date.")
+            raise FinError("No put times can be after the maturity date.")
 
         if np.any(putTimes <= 0.0):
-            raise ValueError("No put times can be on or before value date.")
+            raise FinError("No put times can be on or before value date.")
 
         if len(dividendYields) != len(dividendDates):
-            raise ValueError("Number of dividend yields and dates not same.")
+            raise FinError("Number of dividend yields and dates not same.")
 
         dividendTimes = []
         for dt in dividendDates:
@@ -453,19 +453,19 @@ class FinBondConvertible(object):
         discountFactors = np.array(discountFactors)
 
         if testMonotonicity(couponTimes) is False:
-            raise ValueError("Coupon times not monotonic")
+            raise FinError("Coupon times not monotonic")
 
         if testMonotonicity(callTimes) is False:
-            raise ValueError("Coupon times not monotonic")
+            raise FinError("Coupon times not monotonic")
 
         if testMonotonicity(putTimes) is False:
-            raise ValueError("Coupon times not monotonic")
+            raise FinError("Coupon times not monotonic")
 
         if testMonotonicity(discountTimes) is False:
-            raise ValueError("Coupon times not monotonic")
+            raise FinError("Coupon times not monotonic")
 
         if testMonotonicity(dividendTimes) is False:
-            raise ValueError("Coupon times not monotonic")
+            raise FinError("Coupon times not monotonic")
 
         v1 = valueConvertible(tmat,
                               self._face,

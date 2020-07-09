@@ -46,8 +46,8 @@ class FinBondEmbeddedOption(object):
     def __init__(self,
                  maturityDate: FinDate,  # FinDate
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
-                 frequencyType: FinFrequencyTypes,  # Frequency type - see FinFrequencyTypes
-                 accrualType: FinDayCountTypes,  # Day count convention for accrued interest
+                 frequencyType: FinFrequencyTypes,
+                 accrualType: FinDayCountTypes,
                  callDates: List[FinDate],
                  callPrices: List[float],
                  putDates: List[FinDate],
@@ -55,7 +55,7 @@ class FinBondEmbeddedOption(object):
                  face: float = 100.0):
         ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. '''
-        
+
         checkArgumentTypes(self.__init__, locals())
 
         self._maturityDate = maturityDate

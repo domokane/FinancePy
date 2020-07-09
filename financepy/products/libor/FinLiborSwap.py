@@ -44,7 +44,7 @@ class FinLiborSwap(object):
             maturityDate = startDate.addTenor(maturityDateOrTenor)
 
         if startDate > maturityDate:
-            raise ValueError("Start date after maturity date")
+            raise FinError("Start date after maturity date")
 
         self._startDate = startDate
         self._maturityDate = maturityDate

@@ -5,6 +5,7 @@
 
 from math import exp
 import numpy as np
+from ..finutils.FinError import FinError
 from ..finutils.FinHelperFunctions import normaliseWeights
 from ..models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
 
@@ -27,22 +28,22 @@ class FinPortfolioCreditDefaultMode(object):
                          numPoints):
 
         if tmat < 0.0:
-            raise ValueError("Maturity must be positive")
+            raise FinError("Maturity must be positive")
 
         if len(hazardRates) != self._numCredits:
-            raise ValueError("Hazard rates dop not have " /
-                             + str(self._numCredits) + "elements.")
+            raise FinError("Hazard rates dop not have " / 
+                           + str(self._numCredits) + "elements.")
 
         if len(recoveryRates) != self._numCredits:
-            raise ValueError("Recovery rates dop not have " /
-                             + str(self._numCredits) + "elements.")
+            raise FinError("Recovery rates dop not have " /
+                           + str(self._numCredits) + "elements.")
 
         if len(betaValues) != self._numCredits:
-            raise ValueError("Beta values do not have " /
-                             + str(self._numCredits) + "elements.")
+            raise FinError("Beta values do not have " /
+                           + str(self._numCredits) + "elements.")
 
         if numPoints < 1:
-            raise ValueError("Num points must be > 0")
+            raise FinError("Num points must be > 0")
 
         self._hazardRates = hazardRates
         self._recoveryRates = recoveryRates

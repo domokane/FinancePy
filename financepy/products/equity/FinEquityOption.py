@@ -7,7 +7,6 @@ from enum import Enum
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityModelTypes import FinEquityModelBlackScholes
-from ...finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
 

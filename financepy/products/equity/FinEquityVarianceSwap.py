@@ -37,7 +37,7 @@ class FinEquityVarianceSwap(object):
             maturityDate = startDate.addTenor(maturityDateOrTenor)
 
         if startDate >= maturityDate:
-            raise ValueError("Start date after or same as maturity date")
+            raise FinError("Start date after or same as maturity date")
 
         self._startDate = startDate
         self._maturityDate = maturityDate
@@ -220,7 +220,6 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def realisedVariance(self, closePrices, useLogs=True):
-
         ''' Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns.'''
 
@@ -228,7 +227,7 @@ class FinEquityVarianceSwap(object):
 
         for i in range(0, numObservations):
             if closePrices[i] <= 0.0:
-                raise ValueError("Stock prices must be greater than zero")
+                raise FinError("Stock prices must be greater than zero")
 
         cumX2 = 0.0
 

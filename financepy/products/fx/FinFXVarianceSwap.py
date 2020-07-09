@@ -8,11 +8,11 @@ from math import log, exp, sqrt
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
-from .FinOption import FinFXModelBlackScholes
-from .FinVanillaOption import FinFXVanillaOption, FinOptionTypes
+from ...finutils.FinOptionTypes import FinOptionTypes
+from .FinFXModelTypes import FinFXModelBlackScholes
+from .FinFXVanillaOption import FinFXVanillaOption
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
@@ -36,7 +36,7 @@ class FinFXVarianceSwap(object):
             maturityDate = startDate.addTenor(maturityDateOrTenor)
 
         if startDate >= maturityDate:
-            raise ValueError("Start date after or same as maturity date")
+            raise FinError("Start date after or same as maturity date")
 
         self._startDate = startDate
         self._maturityDate = maturityDate
@@ -226,7 +226,7 @@ class FinFXVarianceSwap(object):
 
         for i in range(0, numObservations):
             if closePrices[i] <= 0.0:
-                raise ValueError("Stock prices must be greater than zero")
+                raise FinError("Stock prices must be greater than zero")
 
         cumX2 = 0.0
 

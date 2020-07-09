@@ -210,7 +210,7 @@ class FinCDS(object):
             maturityDate = stepInDate.addTenor(maturityDateOrTenor)
 
         if stepInDate > maturityDate:
-            raise ValueError("Step in date after maturity date")
+            raise FinError("Step in date after maturity date")
 
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
@@ -296,7 +296,7 @@ class FinCDS(object):
             self._adjustedDates.append(finalDate)
 
         else:
-            raise ValueError("Unknown FinDateGenRuleType:" +
+            raise FinError("Unknown FinDateGenRuleType:" +
                              str(self._dateGenRuleType))
 
 ##########################################################################
@@ -752,9 +752,8 @@ class FinCDS(object):
         accurate approximation that avoids curve building. '''
 
         if type(valuationDate) is not FinDate:
-            raise ValueError(
-                "Valuation date must be a FinDate and not " +
-                str(valuationDate))
+            raise FinError("Valuation date must be a FinDate and not " +
+                           str(valuationDate))
 
         t_mat = (self._maturityDate - valuationDate) / gDaysInYear
         t_eff = (self._stepInDate - valuationDate) / gDaysInYear

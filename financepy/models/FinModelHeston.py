@@ -11,6 +11,7 @@ from ..finutils.FinGlobalVariables import gDaysInYear
 from ..finutils.FinOptionTypes import FinOptionTypes
 from ..finutils.FinMath import norminvcdf
 from ..finutils.FinHelperFunctions import labelToString
+from ..finutils.FinError import FinError
 
 ##########################################################################
 # Heston Process
@@ -150,7 +151,7 @@ def getPaths(
                 sPaths[iPath, iStep] = exp(x)
                 vn = vnp
     else:
-        raise ValueError("Unknown FinHestonNumericalSchme")
+        raise FinError("Unknown FinHestonNumericalSchme")
 
     return sPaths
 
@@ -210,7 +211,7 @@ class FinModelHeston():
         elif option._optionType == FinOptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - sPaths[:, -1], 0)
         else:
-            raise ValueError("Unknown option type.")
+            raise FinError("Unknown option type.")
 
         payoff = np.mean(path_payoff)
         v = payoff * exp(-interestRate * tau)

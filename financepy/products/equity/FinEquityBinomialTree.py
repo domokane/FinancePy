@@ -15,6 +15,9 @@ from ...finutils.FinMath import heaviside
 
 from ...finutils.FinHelperFunctions import labelToString
 
+###############################################################################
+
+
 class FinEquityTreePayoffTypes(Enum):
     FWD_CONTRACT = 1
     VANILLA_OPTION = 2
@@ -29,7 +32,7 @@ class FinEquityTreeExerciseTypes(Enum):
     EUROPEAN = 1
     AMERICAN = 2
 
-##########################################################################
+###############################################################################
 
 
 @jit
@@ -39,7 +42,7 @@ def validatePayoff(payoffType, payoffParams):
 
     if payoffType == FinEquityTreePayoffTypes.FWD_CONTRACT.value:
         numParams = 1
-    elif payoffType == FinTreePayoffTypes.VANILLA_OPTION.value:
+    elif payoffType == FinEquityTreePayoffTypes.VANILLA_OPTION.value:
         numParams = 2
     elif payoffType == FinEquityTreePayoffTypes.DIGITAL_OPTION.value:
         numParams = 2

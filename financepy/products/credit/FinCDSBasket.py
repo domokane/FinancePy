@@ -165,7 +165,7 @@ class FinCDSBasket(object):
         numCredits = len(issuerCurves)
 
         if nToDefault > numCredits or nToDefault < 1:
-            raise ValueError("nToDefault must be 1 to numCredits")
+            raise FinError("nToDefault must be 1 to numCredits")
 
         defaultTimes = defaultTimesGC(issuerCurves,
                                       correlationMatrix,
@@ -202,7 +202,7 @@ class FinCDSBasket(object):
         numCredits = len(issuerCurves)
 
         if nToDefault > numCredits or nToDefault < 1:
-            raise ValueError("nToDefault must be 1 to numCredits")
+            raise FinError("nToDefault must be 1 to numCredits")
 
         model = FinModelStudentTCopula()
 
@@ -241,15 +241,15 @@ class FinCDSBasket(object):
         numCredits = len(issuerCurves)
 
         if numCredits == 0:
-            raise ValueError("Num Credits is zero")
+            raise FinError("Num Credits is zero")
 
         if nToDefault < 1 or nToDefault > numCredits:
-            raise ValueError("NToDefault must be 1 to numCredits")
+            raise FinError("NToDefault must be 1 to numCredits")
 
         tmat = (self._maturityDate - valuationDate) / gDaysInYear
 
         if tmat < 0.0:
-            raise ValueError("Value date is after maturity date")
+            raise FinError("Value date is after maturity date")
 
         paymentDates = self._cdsContract._adjustedDates
         numTimes = len(paymentDates)

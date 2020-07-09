@@ -6,6 +6,7 @@ from numba import njit, float64
 from ..finutils.FinOptionTypes import FinOptionTypes
 import numpy as np
 from ..finutils.FinMath import N
+from ..finutils.FinError import FinError
 
 ###############################################################################
 
@@ -15,7 +16,7 @@ from ..finutils.FinMath import N
 def blackVolFromSABR(alpha, beta, rho, nu, f, k, t):
 
     if abs(rho) >= 0.999999999:
-        raise ValueError("Rho is a correlation and must be less than 1.0")
+        raise FinError("Rho is a correlation and must be less than 1.0")
 
     b = 1.0 - beta
     fk = f * k
@@ -44,7 +45,7 @@ def blackVolFromSABR(alpha, beta, rho, nu, f, k, t):
         sigma = num / denom
 
     if sigma <= 0.0:
-        raise ValueError("SABR Volatility <= 0%.")
+        raise FinError("SABR Volatility <= 0%.")
 
     return sigma
 

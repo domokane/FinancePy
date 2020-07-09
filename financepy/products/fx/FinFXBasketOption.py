@@ -12,15 +12,18 @@ from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinGBMProcess import FinGBMProcess
 
-##########################################################################
+###############################################################################
 
 from ...products.fx.FinFXOption import FinFXOption
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
 
 
 class FinFXBasketOption(FinFXOption):
+    ''' Class to manage FX Basket Option which is an option on a portfolio of
+    FX rates. '''
 
     def __init__(self,
                  expiryDate: FinDate,
@@ -28,6 +31,8 @@ class FinFXBasketOption(FinFXOption):
                  optionType: FinOptionTypes,
                  numAssets: int,
                  notional: float = 1.0):
+        ''' Create FX Basket Option with expiry date, strike price, option
+        type, number of assets and notional. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -37,31 +42,32 @@ class FinFXBasketOption(FinFXOption):
         self._numAssets = numAssets
         self._notional = notional
 
-##########################################################################
+###############################################################################
 
     def validate(self,
                  stockPrices,
                  dividendYields,
                  volatilities,
                  betas):
+        ''' Check that there is an input for each asset in the basket. '''
 
         if len(stockPrices) != self._numAssets:
-            raise ValueError("Stock prices must be a vector of length "
-                             + str(self._numAssets))
+            raise FinError("Stock prices must be a vector of length "
+                           + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
-            raise ValueError("Dividend yields must be a vector of length "
-                             + str(self._numAssets))
+            raise FinError("Dividend yields must be a vector of length "
+                           + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
-            raise ValueError("Volatilities must be a vector of length "
-                             + str(self._numAssets))
+            raise FinError("Volatilities must be a vector of length "
+                           + str(self._numAssets))
 
         if len(betas) != self._numAssets:
-            raise ValueError("Betas must be a vector of length "
-                             + str(self._numAssets))
+            raise FinError("Betas must be a vector of length "
+                           + str(self._numAssets))
 
-##########################################################################
+###############################################################################
 
     def value(self,
               valueDate,
@@ -70,9 +76,11 @@ class FinFXBasketOption(FinFXOption):
               dividendYields,
               volatilities,
               betas):
+        ''' Value an FX Basket Option using Black-Scholes closed-form model
+        which takes into account mean and variance of underlying. '''
 
         if valueDate > self._expiryDate:
-            raise ValueError("Value date after expiry date.")
+            raise FinError("Value date after expiry date.")
 
         self.validate(stockPrices,
                       dividendYields,
@@ -134,8 +142,7 @@ class FinFXBasketOption(FinFXOption):
             v = self._strikePrice * exp(-r * t) * N(-d2)
             v = v - smean * exp(-qhat * t) * N(-d1)
         else:
-            print("Unknown option type")
-            return None
+            raise FinError("Unknown option type")
 
         return v
 
@@ -150,23 +157,21 @@ class FinFXBasketOption(FinFXOption):
                 betas,
                 numPaths=10000,
                 seed=4242):
+        ''' Value the FX Basket Option using Monte Carlo. '''
 
         if valueDate > self._expiryDate:
-            raise ValueError("Value date after expiry date.")
+            raise FinError("Value date after expiry date.")
 
         numAssets = len(stockPrices)
-
         t = (self._expiryDate - valueDate) / gDaysInYear
-
         df = domDiscountCurve.df(t)
         rd = -log(df)/t
-
         dq = forDiscountCurve.df(t)
         rf = -log(dq)/t
-
         mus = rd - rf
         K = self._strikePrice
 
+        # We jump to the expiry date as this option is not path dependent
         numTimeSteps = 2
 
         model = FinGBMProcess()
@@ -187,7 +192,7 @@ class FinFXBasketOption(FinFXOption):
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(K - np.mean(Sall, axis=1), 0)
         else:
-            raise ValueError("Unknown option type.")
+            raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff)
         v = payoff * exp(-rd * t)

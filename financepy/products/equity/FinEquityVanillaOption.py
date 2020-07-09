@@ -9,8 +9,6 @@ from scipy import optimize
 from scipy.stats import norm
 
 
-
-# from ...finutils.FinMath import N, nprime
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -84,9 +82,9 @@ class FinEquityVanillaOption(FinEquityOption):
         checkArgumentTypes(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
-         optionType != FinOptionTypes.EUROPEAN_PUT and \
-         optionType != FinOptionTypes.AMERICAN_CALL and \
-         optionType != FinOptionTypes.AMERICAN_PUT:
+            optionType != FinOptionTypes.EUROPEAN_PUT and \
+            optionType != FinOptionTypes.AMERICAN_CALL and \
+                optionType != FinOptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type" + str(optionType))
 
         self._expiryDate = expiryDate
@@ -145,15 +143,15 @@ class FinEquityVanillaOption(FinEquityOption):
             d2 = (lnS0k + (mu - v2 / 2.0) * texp) / den
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                if model._useTree == True: 
+                if model._useTree is True:
                     numStepsPerYear = model._numStepsPerYear
                     v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.EUROPEAN_CALL.value, K)['value']
+                       texp, FinOptionTypes.EUROPEAN_CALL.value, K)['value']
                 else:
                     v = stockPrice * np.exp(-q * texp) * N(d1)
                     v = v - self._strikePrice * np.exp(-r * texp) * N(d2)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                if model._useTree == True: 
+                if model._useTree is True: 
                     numStepsPerYear = model._numStepsPerYear
                     v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
                         texp, FinOptionTypes.EUROPEAN_PUT.value, K)['value']

@@ -4,6 +4,9 @@
 
 from ...finutils.FinHelperFunctions import labelToString
 
+###############################################################################
+
+
 class FinEquityModel(object):
     ''' This is a parent class for equity models. '''
 

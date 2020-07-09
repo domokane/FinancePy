@@ -10,7 +10,6 @@ from math import exp, log, sqrt
 from numba import njit
 
 
-
 from ...finutils.FinMath import N, covar
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
@@ -19,6 +18,8 @@ from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
 from ...finutils.FinDate import FinDate
+
+errorStr = "In averaging period so need to enter accrued average."
 
 ###############################################################################
 # An Asian option on an arithmetic average and strike K has a payoff
@@ -50,25 +51,17 @@ from ...finutils.FinDate import FinDate
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_NUMBA(t0, t, tau, K, n, optionType,
-                  stockPrice,
-                  interestRate,
-                  dividendYield,
-                  volatility,
-                  numPaths,
-                  seed,
-                  accruedAverage):
+def valueMC_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
+                  dividendYield, volatility, numPaths, seed, accruedAverage):
 
     # Start pricing here
     np.random.seed(seed)
-
     multiplier = 1.0
 
-    if t0 < 0:  # we are in the averaging period
+    if t0 < 0.0:  # we are in the averaging period
 
         if accruedAverage is None:
-            raise FinError(
-            "In the averaging period you need to enter the accrued average")
+            raise FinError(errorStr)
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -130,13 +123,8 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType,
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
-                       stockPrice,
-                       interestRate,
-                       dividendYield,
-                       volatility,
-                       numPaths,
-                       seed,
+def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
+                       dividendYield, volatility, numPaths, seed,
                        accruedAverage):
 
     np.random.seed(seed)
@@ -151,8 +139,7 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
     if t0 < 0:  # we are in the averaging period
 
         if accruedAverage is None:
-            raise FinError(
-                "In the averaging period you need to enter the accrued average")
+            raise FinError(errorStr)
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -207,22 +194,15 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType,
     v_a = multiplier * payoff_a * exp(- r * t) / 2.0
     return v_a
 
-##########################################################################
+###############################################################################
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
-                          stockPrice,
-                          interestRate,
-                          dividendYield,
-                          volatility,
-                          numPaths,
-                          seed,
-                          accruedAverage,
-                          v_g_exact):
+def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
+                          interestRate, dividendYield, volatility, numPaths,
+                          seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
-
     mu = interestRate - dividendYield
     v2 = volatility**2
     dt = (t - t0) / n
@@ -233,8 +213,7 @@ def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
     if t0 < 0:  # we are in the averaging period
 
         if accruedAverage is None:
-            raise FinError(
-                "In averaging period you need to enter the accrued average")
+            raise FinError(errorStr)
 
         # we adjust the strike to account for the accrued coupon
         K = (K * tau + accruedAverage * t0) / t
@@ -316,11 +295,13 @@ def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType,
 
     return v_a_cv
 
-##########################################################################
+###############################################################################
 
 
 class FinEquityAsianOption(FinEquityOption):
-    ''' Class to store an Equity Asian Option. '''
+    ''' Class for an Equity Asian Option. This is an option with a final payoff
+    linked to the average stock price. The valuation is done for both an arith-
+    metic and geometric average. '''
 
     def __init__(self,
                  startAveragingDate: FinDate,
@@ -328,6 +309,7 @@ class FinEquityAsianOption(FinEquityOption):
                  strikePrice: float,
                  optionType: FinOptionTypes,
                  numberOfObservations: int = 0):
+        ''' Creat FinEquityAsian option. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -342,15 +324,10 @@ class FinEquityAsianOption(FinEquityOption):
 
 ###############################################################################
 
-    def value(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model,
-              valuationMethod,
-              accruedAverage=None):
-        ''' Calculate the value of an Asian option. '''
+    def value(self, valueDate, stockPrice, discountCurve, dividendYield,
+              model, valuationMethod, accruedAverage=None):
+        ''' Calculate the value of an Asian option using one of the specified
+        models. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -407,26 +384,20 @@ class FinEquityAsianOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueGeometric(self,
-                       valueDate,
-                       stockPrice,
-                       discountCurve,
-                       dividendYield,
-                       model,
-                       accruedAverage):
-
-        # This is based on paper by Kemna and Vorst 1990. It calculates the
-        # Geometric Asian option price which is a lower bound on the Arithmetic
-        # option price.
-        # This should not be used as a valuation model for the Arithmetic Average
-        # option but can be used as a control variate for other approaches
+    def valueGeometric(self, valueDate, stockPrice, discountCurve,
+                       dividendYield, model, accruedAverage):
+        ''' This option valuation is based on paper by Kemna and Vorst 1990. It
+        calculates the Geometric Asian option price which is a lower bound on
+        the Arithmetic option price. This should not be used as a valuation
+        model for the Arithmetic Average option but can be used as a control
+        variate for other approaches. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate)  / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         df = discountCurve.df(t)
@@ -443,8 +414,7 @@ class FinEquityAsianOption(FinEquityOption):
         if t0 < 0:  # we are in the averaging period
 
             if accruedAverage is None:
-                raise FinError(
-                "In averaging period you need to enter the accrued average")
+                raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -479,21 +449,16 @@ class FinEquityAsianOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueCurran(self,
-                    valueDate,
-                    stockPrice,
-                    discountCurve,
-                    dividendYield,
-                    model,
-                    accruedAverage):
+    def valueCurran(self, valueDate, stockPrice, discountCurve,
+                    dividendYield, model, accruedAverage):
+        ''' Valuation of an Asian option using the result by Vorst. '''
 
-        # This is based on paper by Vorst
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate)  / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         multiplier = 1.0
@@ -512,8 +477,7 @@ class FinEquityAsianOption(FinEquityOption):
         if t0 < 0:  # we are in the averaging period
 
             if accruedAverage is None:
-                raise FinError(
-                "In averaging period you need to enter the accrued average")
+                raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -547,19 +511,13 @@ class FinEquityAsianOption(FinEquityOption):
         v = v * multiplier
         return v
 
-##########################################################################
+###############################################################################
 
-    def valueTurnbullWakeman(self,
-                             valueDate,
-                             stockPrice,
-                             discountCurve,
-                             dividendYield,
-                             model,
-                             accruedAverage):
-
-        # This is based on paper by Turnbull and Wakeman 1991 which uses
-        # the edgeworth expansion to find the first two moments of the
-        # arithmetic average
+    def valueTurnbullWakeman(self, valueDate, stockPrice, discountCurve,
+                             dividendYield, model, accruedAverage):
+        ''' Asian option valuation based on paper by Turnbull and Wakeman 1991
+        which uses the edgeworth expansion to find the first two moments of the
+        arithmetic average. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
@@ -580,8 +538,7 @@ class FinEquityAsianOption(FinEquityOption):
         if t0 < 0:  # we are in the averaging period
 
             if accruedAverage is None:
-                raise FinError(
-                "In averaging period you need to enter the accrued average")
+                raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
             K = (K * tau + accruedAverage * t0) / t
@@ -632,7 +589,7 @@ class FinEquityAsianOption(FinEquityOption):
 
         return v
 
-##############################################################################
+###############################################################################
 
     def valueMC(self,
                 valueDate,
@@ -643,18 +600,18 @@ class FinEquityAsianOption(FinEquityOption):
                 numPaths,
                 seed,
                 accruedAverage):
+        ''' Monte Carlo valuation of the Asian Average option. '''
 
         # Basic validation
         if valueDate > self._expiryDate:
             raise FinError("Value date after option expiry date.")
 
         if valueDate > self._startAveragingDate and accruedAverage is None:
-            raise FinError(
-                "In averaging period so need to enter accrued average.")
+            raise FinError(errorStr)
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate)  / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         df = discountCurve.df(t)
@@ -677,15 +634,13 @@ class FinEquityAsianOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueMC_fast(self,
-                     valueDate,
-                     stockPrice,
-                     discountCurve,
-                     dividendYield,
-                     model,
-                     numPaths,
+    def valueMC_fast(self, valueDate, stockPrice, discountCurve,
+                     dividendYield,  # Yield
+                     model,          # Model 
+                     numPaths,       # Numpaths integer
                      seed,
                      accruedAverage):
+        ''' Monte Carlo valuation of the Asian Average option. '''
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
@@ -710,7 +665,7 @@ class FinEquityAsianOption(FinEquityOption):
 
         return v
 
-##########################################################################
+###############################################################################
 
     def valueMC_fast_CV(self,
                         valueDate,
@@ -721,10 +676,12 @@ class FinEquityAsianOption(FinEquityOption):
                         numPaths,
                         seed,
                         accruedAverage):
+        ''' Monte Carlo valuation of the Asian Average option using a control
+        variate method. '''
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate)  / gDaysInYear
+        t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
@@ -754,4 +711,4 @@ class FinEquityAsianOption(FinEquityOption):
 
         return v
 
-##########################################################################
+###############################################################################

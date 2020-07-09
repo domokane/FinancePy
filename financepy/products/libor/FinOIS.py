@@ -57,7 +57,7 @@ class FinOIS(object):
         checkArgumentTypes(self.__init__, locals())
 
         if startDate > maturityDate:
-            raise ValueError("Start date after maturity date")
+            raise FinError("Start date after maturity date")
 
         self._startDate = startDate
         self._maturityDate = maturityDate
@@ -147,7 +147,7 @@ class FinOIS(object):
         ''' Calculate the OIS rate implied rate from the history of fixings. '''
 
         if len(oisDates) != len(oisFixings):
-            raise ValueError("Dates and fixings must have same length.")
+            raise FinError("Dates and fixings must have same length.")
 
         prevDt = oisDates[0]
         cmpd = 1.0

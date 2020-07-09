@@ -5,6 +5,7 @@
 
 from numba import njit, float64
 from ..finutils.FinMath import testMonotonicity
+from ..finutils.FinError import FinError
 
 small = 1e-8
 ###############################################################################
@@ -19,10 +20,10 @@ def expectedLoss(lossSizeVector,
     numLossUnits = len(lossProbabilityVector)
 
     if len(lossSizeVector) != numLossUnits:
-        raise ValueError("Loss amount and probability vectors not same length")
+        raise FinError("Loss amount and probability vectors not same length")
 
     if testMonotonicity(lossSizeVector) is False:
-        raise ValueError("Losses are not monotonic.")
+        raise FinError("Losses are not monotonic.")
 
     sumProbs = 0.0
     for i in range(0, numLossUnits):
@@ -31,7 +32,7 @@ def expectedLoss(lossSizeVector,
 
     if abs(sumProbs - 1.0) > small:
         print(sumProbs)
-        raise ValueError("Loss distribution probabilities do not sum to 1.0")
+        raise FinError("Loss distribution probabilities do not sum to 1.0")
 
     expectedLoss = 0.0
     for i in range(0, numLossUnits):
@@ -44,24 +45,24 @@ def expectedLoss(lossSizeVector,
 ###############################################################################
 
 
-@njit(float64(float64[:], float64[:], float64),fastmath=True, cache=True)
+@njit(float64(float64[:], float64[:], float64), fastmath=True, cache=True)
 def valueAtRisk(lossSizeVector,
                 lossProbabilityVector,
                 confidenceLevel):
 
     if len(lossSizeVector) < 2:
-        raise ValueError("Loss vector requires 2 or more entries.")
+        raise FinError("Loss vector requires 2 or more entries.")
 
     if confidenceLevel < 0.0 or confidenceLevel > 1.0:
-        raise ValueError("Confidence level must be [0,1]")
+        raise FinError("Confidence level must be [0,1]")
 
     if testMonotonicity(lossSizeVector) is False:
-        raise ValueError("Losses are not monotonic.")
+        raise FinError("Losses are not monotonic.")
 
     numLossUnits = len(lossProbabilityVector)
 
     if len(lossSizeVector) != numLossUnits:
-        raise ValueError("Loss amount and probability vectors not same length")
+        raise FinError("Loss amount and probability vectors not same length")
 
     sumProbs = 0.0
     for i in range(0, numLossUnits):
@@ -69,7 +70,7 @@ def valueAtRisk(lossSizeVector,
         sumProbs += prob
 
     if abs(sumProbs - 1.0) > small:
-        raise ValueError("Loss distribution probabilities do not sum to 1.0")
+        raise FinError("Loss distribution probabilities do not sum to 1.0")
 
     cumProb = 0.0
     iExceed = -1
@@ -103,18 +104,18 @@ def expectedShortfall(lossSizeVector,
                       confidenceLevel):
 
     if confidenceLevel < 0.0 or confidenceLevel > 1.0:
-        raise ValueError("Confidence level must be [0,1]")
+        raise FinError("Confidence level must be [0,1]")
 
     if len(lossSizeVector) < 2:
-        raise ValueError("Loss vector requires 2 or more entries.")
+        raise FinError("Loss vector requires 2 or more entries.")
 
     if testMonotonicity(lossSizeVector) is False:
-        raise ValueError("Losses are not monotonic.")
+        raise FinError("Losses are not monotonic.")
 
     numLossUnits = len(lossProbabilityVector)
 
     if len(lossSizeVector) != numLossUnits:
-        raise ValueError("Loss amount and probability vectors not same length")
+        raise FinError("Loss amount and probability vectors not same length")
 
     sumProbs = 0.0
     for i in range(0, numLossUnits):
@@ -122,7 +123,7 @@ def expectedShortfall(lossSizeVector,
         sumProbs += prob
 
     if abs(sumProbs - 1.0) > small:
-        raise ValueError("Loss distribution probabilities do not sum to 1.0")
+        raise FinError("Loss distribution probabilities do not sum to 1.0")
 
     cumProb = 0.0
     iExceed = -1
