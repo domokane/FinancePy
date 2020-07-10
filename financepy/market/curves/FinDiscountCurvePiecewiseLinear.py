@@ -44,7 +44,9 @@ class FinDiscountCurvePW(FinDiscountCurve):
 
 ###############################################################################
 
-    def zero(self, t, interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
+    def zero(self,
+             t,
+             interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
 
         l_index = 0
         r_index = 0

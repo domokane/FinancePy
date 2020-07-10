@@ -647,7 +647,7 @@ class FinCDS(object):
         v = protectionLegPV_NUMBA(teff,
                                   tmat,
                                   liborCurve._times,
-                                  liborCurve._values,
+                                  liborCurve._discountFactors,
                                   issuerCurve._times,
                                   issuerCurve._values,
                                   contractRecovery,
@@ -688,7 +688,7 @@ class FinCDS(object):
                                      np.array(paymentTimes),
                                      np.array(yearFracs),
                                      liborCurve._times,
-                                     liborCurve._values,
+                                     liborCurve._discountFactors,
                                      issuerCurve._times,
                                      issuerCurve._values,
                                      pv01Method)

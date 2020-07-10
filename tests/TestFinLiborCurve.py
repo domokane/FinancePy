@@ -424,9 +424,10 @@ def test_FinLiborDepositsFuturesSwaps():
 
     liborCurve = FinLiborCurve("USD_LIBOR", spotDate, depos, fras, swaps)
 
-    times = np.linspace(0.0, 2.0, 500)
-    zeroRates = liborCurve.zeroRate(times)
-    fwdRates = liborCurve.fwd(times)
+    times = np.linspace(0.0, 2.0, 25)
+    dates = spotDate.addYears(times)
+    zeroRates = liborCurve.zeroRate(dates)
+    fwdRates = liborCurve.fwd(dates)
 
     if 1 == 0:
         plt.figure(figsize=(8, 6))

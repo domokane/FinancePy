@@ -60,28 +60,6 @@ class FinDiscountCurvePoly(FinDiscountCurve):
 
 ###############################################################################
 
-    def fwdRate(self,
-                date1,
-                date2,
-                dayCountType):
-        ''' Calculate the forward rate according to the specified
-        day count convention. '''
-
-        if date1 < self._curveDate:
-            raise FinError("Date1 before curve date.")
-
-        if date2 < date1:
-            raise FinError("Date2 must not be before Date1")
-
-        dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1, date2)
-        df1 = self.df(date1)
-        df2 = self.df(date2)
-        fwd = (df1 / df2 - 1.0) / yearFrac
-        return fwd
-
-###############################################################################
-
     def __repr__(self):
         ''' Display internal parameters of curve. '''
         s = labelToString("POWER", "COEFFICIENT")

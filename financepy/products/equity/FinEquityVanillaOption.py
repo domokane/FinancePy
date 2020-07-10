@@ -117,7 +117,7 @@ class FinEquityVanillaOption(FinEquityOption):
 
         texp = np.maximum(texp, 1e-10)
 
-        df = discountCurve.df(texp)
+        df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/texp
         q = dividendYield
 
@@ -200,7 +200,7 @@ class FinEquityVanillaOption(FinEquityOption):
 
         t = np.maximum(t, 1e-10)
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         r = -np.log(df)/t
         q = dividendYield
 
@@ -254,7 +254,7 @@ class FinEquityVanillaOption(FinEquityOption):
 
         t = np.maximum(t, 1e-10)
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
@@ -304,7 +304,7 @@ class FinEquityVanillaOption(FinEquityOption):
 
         t = np.maximum(t, 1e-10)
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
@@ -353,7 +353,7 @@ class FinEquityVanillaOption(FinEquityOption):
 
         t = np.maximum(t, 1e-10)
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
         if type(model) == FinEquityModelBlackScholes:
@@ -472,14 +472,14 @@ class FinEquityVanillaOption(FinEquityOption):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         r = -np.log(df)/t
 
         K = self._strikePrice
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(terminalS - K, 0)
-        elif self._optionType == FinEquityOptionTypes.EUROPEAN_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - terminalS, 0)
         else:
             raise FinError("Unknown option type.")

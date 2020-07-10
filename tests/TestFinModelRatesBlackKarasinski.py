@@ -33,7 +33,8 @@ def test_BlackKarasinskiExampleOne():
     dfs = np.exp(-zeros*times)
 
     startDate = FinDate(1, 12, 2019)
-    curve = FinDiscountCurve(startDate, times, dfs)
+    dates = startDate.addYears(times)
+    curve = FinDiscountCurve(startDate, dates, dfs)
     endDate = FinDate(1, 12, 2022)
     sigma = 0.25
     a = 0.22

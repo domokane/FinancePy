@@ -400,8 +400,7 @@ class FinEquityAsianOption(FinEquityOption):
         t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
         volatility = model._volatility
 
         K = self._strikePrice
@@ -463,8 +462,7 @@ class FinEquityAsianOption(FinEquityOption):
 
         multiplier = 1.0
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
         volatility = model._volatility
 
         S0 = stockPrice
@@ -530,8 +528,7 @@ class FinEquityAsianOption(FinEquityOption):
         multiplier = 1.0
         n = self._numObservations
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         volatility = model._volatility
 
@@ -614,8 +611,8 @@ class FinEquityAsianOption(FinEquityOption):
         t = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
+
         volatility = model._volatility
 
         K = self._strikePrice
@@ -650,8 +647,8 @@ class FinEquityAsianOption(FinEquityOption):
         K = self._strikePrice
         n = self._numObservations
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
+
         volatility = model._volatility
 
         v = valueMC_fast_NUMBA(t0, t, tau, K, n, self._optionType,
@@ -687,8 +684,7 @@ class FinEquityAsianOption(FinEquityOption):
         K = self._strikePrice
         n = self._numObservations
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
         volatility = model._volatility
 
         # For control variate we price a Geometric average option exactly

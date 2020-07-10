@@ -95,7 +95,7 @@ class FinFXBasketOption(FinFXOption):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
 
-        df = discountCurve.df(t)
+        df = discountCurve._df(t)
         r = -np.log(df)/t
 
         smean = 0.0
@@ -164,9 +164,9 @@ class FinFXBasketOption(FinFXOption):
 
         numAssets = len(stockPrices)
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = domDiscountCurve.df(t)
+        df = domDiscountCurve._df(t)
         rd = -log(df)/t
-        dq = forDiscountCurve.df(t)
+        dq = forDiscountCurve._df(t)
         rf = -log(dq)/t
         mus = rd - rf
         K = self._strikePrice

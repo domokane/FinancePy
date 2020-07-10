@@ -15,6 +15,7 @@ from ...finutils.FinHelperFunctions import inputTime
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...finutils.FinGlobalVariables import gDaysInYear
 
 ###############################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in
@@ -22,16 +23,39 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ###############################################################################
 
 
+def timesFromDatesFlat(dt, valuationDate, dayCountType):
+
+    dayCount = FinDayCount(dayCountType)
+
+    if isinstance(dt, FinDate):
+        numDates = 1
+        times = [None]
+        times[0] = dayCount.yearFrac(valuationDate, dt)
+    elif isinstance(dt, list) and isinstance(dt[0], FinDate):
+        numDates = len(dt)
+        times = []
+        for i in range(0, numDates):
+            t = dayCount.yearFrac(valuationDate, dt[i])
+            times.append(t)
+    else:
+        raise FinError("Discount factor must take dates.")
+
+    times = np.array(times)
+    return times
+
+###############################################################################
+
+
 class FinDiscountCurveFlat(FinDiscountCurve):
-    ''' A trivially simple discount curve based on a single zero rate with its
+    ''' A very simple discount curve based on a single zero rate with its
     own specified compounding method. Hence the curve is assumed to be flat.
     It is used for quick and dirty analysis and when limited information is
-    available. '''
+    available. It inherits several methods from FinDiscountCurve. '''
 
 ###############################################################################
 
     def __init__(self,
-                 curveDate: FinDate,
+                 valuationDate: FinDate,
                  flatRate: float,
                  rateFrequencyType: FinFrequencyTypes=FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
@@ -39,79 +63,65 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         quick testing and simply requires a curve date and a rate and also a
         frequency. As we have entered a rate, a corresponding day count
         convention must be used to specify how time periods are to be measured.
+        As the curve is flat, no interpolation scheme is required.
         '''
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._curveDate = curveDate
+        self._valuationDate = valuationDate
         self._flatRate = flatRate
         self._rateFrequencyType = rateFrequencyType
-        self._rateFrequency = FinFrequency(rateFrequencyType)
         self._dayCountType = dayCountType
-        self._dayCount = FinDayCount(dayCountType)
 
-        # Some methods require these members but don't do this if rates is
-        # an array of doubles else it will fail due to vectorisations of
-        # different lengths
-
-        self._times = None
-        self._values = None
-
-        if isinstance(self._flatRate, np.ndarray) is False:
-            self._times = np.linspace(0.0, 10.0, 40)
-            self._values = self.df(self._times)
-
-###############################################################################
-
-    # def zeroRate(self,
-    #              dt: FinDate,
-    #              zeroRateFrequencyType):
-    #     ''' Return the zero rate which is simply the curve rate. '''
-
-    #     t = inputTime(dt, self)
-
-    #     if isinstance(dt, FinDate):
-    #         t = self._dayCount.yearFrac(self._curveDate, dt)
-
-    #     if zeroRateFrequencyType == self._rateFrequencyType:
-    #         return self._rate
-
-    #     if self._rateFrequencyType == FinFrequencyTypes.CONTINUOUS:
-    #         df = np.exp(-self._rate * t)
-    #     else:
-    #         df = (1.0 + self._rate/self._cmpdFreq)**(-t*self._cmpdFreq)
-
-    #     if zeroRateFrequencyType == FinFrequencyTypes.CONTINUOUS:
-    #         r = -np.log(df) / t
-    #     else:
-    #         f = FinFrequency(zeroRateFrequencyType)
-    #         r = (df**(-1.0/t) - 1) * f
-    #     return r
+        # Set up a grid of times and discount factors for functions that
+        # need a simple curve representation in order to use NUMBA
+        self._times = np.linspace(0.0, 10.0, 121)
+        self._discountFactors = self._df(self._times)
 
 ###############################################################################
 
     def bump(self, bumpSize):
-        ''' Calculate the continuous forward rate at the forward date. '''
+        ''' Creates a new FinDiscountCurveFlat object with the entire curve
+        bumped up by the bumpsize. All other parameters are preserved.'''
+
         rBumped = self._flatRate + bumpSize
-        discCurve = FinDiscountCurveFlat(self._curveDate, rBumped,
-                                         compoundingFreq=self._cmpdFreq)
+        discCurve = FinDiscountCurveFlat(self._curveDate,
+                                         rBumped,
+                                         rateFrequencyType=self._cmpdFreq,
+                                         dayCountType=self._dayCountType)
         return discCurve
 
 ###############################################################################
 
     def df(self, dt):
-        ''' Return the discount factor based on the compounding approach. '''
+        ''' Function to calculate a discount factor from a date or a
+        vector of dates. Times are calculated according to a specified
+        convention. '''
+
+        times = timesFromDatesFlat(dt, self._valuationDate, self._dayCountType)
+        dfs = self._df(times)
 
         if isinstance(dt, FinDate):
-            t = self._dayCount.yearFrac(self._curveDate, dt)
+            return dfs[0]
         else:
-            t = dt
+            return dfs
 
+###############################################################################
+
+    def _df(self, t):
+        ''' Return the discount factor given a single or vector of times. The
+        discount factor depends on the rate and this in turn depends on its
+        compounding frequency and it defaults to continuous compounding. It
+        also depends on the day count convention. This was set in the
+        construction of the curve to be ACT_ACT_ISDA. '''
+
+        f = FinFrequency(self._rateFrequencyType)
         r = self._flatRate
+
         if self._rateFrequencyType == FinFrequencyTypes.CONTINUOUS:
             df = np.exp(-r * t)
         else:
-            df = (1 + r/self._rateFrequency)**(-t*self._rateFrequency)
+            df = (1.0 + r/f)**(-t*f)
 
         return df
 

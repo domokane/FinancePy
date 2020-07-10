@@ -224,6 +224,8 @@ class FinEquityCompoundOption(FinEquityOption):
         self._optionType1 = optionType1
         self._optionType2 = optionType2
 
+###############################################################################
+
     def value(self,
               valueDate,
               stockPrice,
@@ -234,8 +236,7 @@ class FinEquityCompoundOption(FinEquityOption):
         t1 = (self._expiryDate1 - valueDate) / gDaysInYear
         t2 = (self._expiryDate2 - valueDate) / gDaysInYear
 
-        df2 = discountCurve.df(t2)
-        r = -log(df2)/t2
+        r = discountCurve.zeroRate(self._expiryDate2)
 
         if abs(t1) < gSmall:
             t1 = gSmall
@@ -312,8 +313,7 @@ class FinEquityCompoundOption(FinEquityOption):
         t1 = (self._expiryDate1 - valueDate) / gDaysInYear
         t2 = (self._expiryDate2 - valueDate) / gDaysInYear
 
-        df2 = discountCurve.df(t2)
-        riskFreeRate = -log(df2)/t2
+        riskFreeRate = discountCurve.zeroRate(self._expiryDate2)
 
         volatility = model._volatility
 

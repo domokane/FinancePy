@@ -56,8 +56,7 @@ class FinEquityDigitalOption(FinEquityOption):
         lnS0k = log(float(stockPrice) / self._strikePrice)
         sqrtT = sqrt(t)
 
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         volatility = model._volatility
 
@@ -91,8 +90,7 @@ class FinEquityDigitalOption(FinEquityOption):
 
         np.random.seed(seed)
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -np.log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         volatility = model._volatility
 

@@ -18,7 +18,9 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
+
+###############################################################################
 
 
 def test_FinInterpolatedForwards():
@@ -28,19 +30,19 @@ def test_FinInterpolatedForwards():
     tValues = np.array([0.0, 3.0, 5.0, 10.0])
     rValues = np.array([0.04, 0.07, 0.08, 0.09])
     dfValues = np.exp(-tValues*rValues)
-    tInterpValues = np.linspace(0.0, 12.0, 200)
+    tInterpValues = np.linspace(0.0, 12.0, 49)
 
-    print(tValues)
-    print(rValues)
-    print(dfValues)
+    curveDate = FinDate(1, 1, 2019)
 
-    curveDate = FinDate(3, 1, 2019)
+    tDates = curveDate.addYears(tValues)
+    tInterpDates = curveDate.addYears(tInterpValues)
+
     for method in FinInterpMethods:
 
-        discountCurve = FinDiscountCurve(curveDate, tValues, dfValues, method)
-        dfInterpValues = discountCurve.df(tInterpValues)
-        fwdInterpValues = discountCurve.fwd(tInterpValues)
-        zeroInterpValues = discountCurve.zeroRate(tInterpValues)
+        discountCurve = FinDiscountCurve(curveDate, tDates, dfValues, method)
+        dfInterpValues = discountCurve.df(tInterpDates)
+        fwdInterpValues = discountCurve.fwd(tInterpDates)
+        zeroInterpValues = discountCurve.zeroRate(tInterpDates)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(8, 6))
@@ -52,6 +54,9 @@ def test_FinInterpolatedForwards():
             plt.plot(tInterpValues, zeroInterpValues, color='b', label="ZERO:" + str(method))
             plt.plot(tValues, rValues, 'o', color='g',  label="ZERO RATES")
             plt.legend()
+
+###############################################################################
+
 
 test_FinInterpolatedForwards()
 testCases.compareTestCases()

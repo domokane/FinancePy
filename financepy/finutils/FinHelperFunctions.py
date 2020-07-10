@@ -108,7 +108,7 @@ def inputTime(dt, curve):
         t = dt
         return check(t)
     elif isinstance(dt, FinDate):
-        t = (dt - curve._curveDate) / gDaysInYear
+        t = (dt - curve._valuationDate) / gDaysInYear
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt

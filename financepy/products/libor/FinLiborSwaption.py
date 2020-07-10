@@ -204,7 +204,7 @@ class FinLiborSwaption():
             cpnFlows = np.array(cpnFlows)
 
             dfTimes = discountCurve._times
-            dfValues = discountCurve._values
+            dfValues = discountCurve._discountFactors
 
             if np.any(cpnTimes < 0.0):
                 raise FinError("No coupon times can be before the value date.")
@@ -247,7 +247,7 @@ class FinLiborSwaption():
             cpnFlows = np.array(cpnFlows)
 
             dfTimes = discountCurve._times
-            dfValues = discountCurve._values
+            dfValues = discountCurve._discountFactors
 
             if np.any(cpnTimes < 0.0):
                 raise FinError("No coupon times can be before the value date.")

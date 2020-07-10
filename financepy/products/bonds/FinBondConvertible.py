@@ -446,7 +446,7 @@ class FinBondConvertible(object):
 
         discountFactors = []
         for t in couponTimes:
-            df = discountCurve.df(t)
+            df = discountCurve._df(t)
             discountFactors.append(df)
 
         discountTimes = np.array(couponTimes)

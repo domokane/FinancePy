@@ -389,7 +389,7 @@ class FinTestCases():
                     rowNum,
                     " ERROR - ",
                     numErrors,
-                    "DIFFERENCE(S) IN ROW",
+                    " DIFFERENCE(S) IN ROW ",
                     rowNum)
 
                 if self._headerFields is None:

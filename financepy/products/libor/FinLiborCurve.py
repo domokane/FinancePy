@@ -23,7 +23,7 @@ def f(df, *args):
     valueDate = args[1]
     swap = args[2]
     numPoints = len(curve._times)
-    curve._values[numPoints - 1] = df
+    curve._discountFactors[numPoints - 1] = df
     v_swap = swap.value(valueDate, curve, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -37,7 +37,7 @@ def g(df, *args):
     valueDate = args[1]
     fra = args[2]
     numPoints = len(curve._times)
-    curve._values[numPoints - 1] = df
+    curve._discountFactors[numPoints - 1] = df
     v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
@@ -59,7 +59,7 @@ class FinLiborCurve(FinDiscountCurve):
 
     def __init__(self,
                  name,
-                 curveDate,
+                 valuationDate,
                  liborDeposits,
                  liborFRAs,
                  liborSwaps,
@@ -67,8 +67,8 @@ class FinLiborCurve(FinDiscountCurve):
 
         self._name = name
         self._times = []
-        self._values = []
-        self._curveDate = curveDate
+        self._discountFactors = []
+        self._valuationDate = valuationDate
         self._interpMethod = interpMethod
         self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
         self.buildCurve()
@@ -148,26 +148,26 @@ class FinLiborCurve(FinDiscountCurve):
         ''' Construct the discount curve using a bootstrap approach. '''
 
         self._times = np.array([])
-        self._values = np.array([])
+        self._discountFactors = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._values = np.append(self._values, dfMat)
+        self._discountFactors = np.append(self._discountFactors, dfMat)
 
         for depo in self._usedDeposits:
-            tmat = (depo._maturityDate - self._curveDate) / gDaysInYear
+            tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             dfMat = depo.maturityDf()
             self._times = np.append(self._times, tmat)
-            self._values = np.append(self._values, dfMat)
+            self._discountFactors = np.append(self._discountFactors, dfMat)
 
         oldtmat = tmat
 
         for fra in self._usedFRAs:
 
-            tset = (fra._startDate - self._curveDate) / gDaysInYear
-            tmat = (fra._maturityDate - self._curveDate) / gDaysInYear
+            tset = (fra._startDate - self._valuationDate) / gDaysInYear
+            tmat = (fra._maturityDate - self._valuationDate) / gDaysInYear
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -175,12 +175,12 @@ class FinLiborCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._values = np.append(self._values, dfMat)
+                self._discountFactors = np.append(self._discountFactors, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._values = np.append(self._values, dfMat)
+                self._discountFactors = np.append(self._discountFactors, dfMat)
 
-                argtuple = (self, self._curveDate, fra)
+                argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
                                         maxiter=50, fprime2=None)
@@ -189,12 +189,12 @@ class FinLiborCurve(FinDiscountCurve):
             # I use the lastPaymentDate in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturityDate = swap._lastPaymentDate
-            tmat = (maturityDate - self._curveDate) / gDaysInYear
+            tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._values = np.append(self._values, dfMat)
+            self._discountFactors = np.append(self._discountFactors, dfMat)
 
-            argtuple = (self, self._curveDate, swap)
+            argtuple = (self, self._valuationDate, swap)
 
             dfMat = optimize.newton(f, x0=dfMat, fprime=None, args=argtuple,
                                     tol=swaptol, maxiter=50, fprime2=None,
@@ -207,25 +207,25 @@ class FinLiborCurve(FinDiscountCurve):
     def checkRefits(self):
 
         for depo in self._usedDeposits:
-            v = depo.value(self._curveDate, self) / depo._notional
+            v = depo.value(self._valuationDate, self) / depo._notional
             if abs(v - 1.0) > swaptol:
                 print("Value", v)
                 raise FinError("Deposit not repriced.")
 
         for fra in self._usedFRAs:
-            v = fra.value(self._curveDate, self) / fra._notional
+            v = fra.value(self._valuationDate, self) / fra._notional
             if abs(v) > swaptol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")
 
         for swap in self._usedSwaps:
-            v = swap.value(self._curveDate, self, self) / swap._notional
+            v = swap.value(self._valuationDate, self, self) / swap._notional
             if abs(v) > swaptol*100:
                 print("Value", v)
-                swap.printFixedLeg(self._curveDate)
-                swap.printFloatLeg(self._curveDate)
+                swap.printFixedLeg(self._valuationDate)
+                swap.printFloatLeg(self._valuationDate)
                 raise FinError("Swap not repriced.")
- 
+
 ###############################################################################
 
     def __repr__(self):
@@ -234,7 +234,7 @@ class FinLiborCurve(FinDiscountCurve):
 
         s = labelToString("TIME", "DISCOUNT FACTOR")
         for i in range(0, numPoints):
-            s += labelToString(self._times[i], self._values[i])
+            s += labelToString(self._times[i], self._discountFactors[i])
 
         return s
 

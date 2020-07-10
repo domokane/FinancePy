@@ -99,7 +99,7 @@ class FinCDSBasket(object):
             accrualFactor = dayCount.yearFrac(dt0, dt1)
             averageAccrualFactor += accrualFactor
             rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
-                accrualFactor * liborCurve.df(t)
+                accrualFactor * liborCurve._df(t)
 
         averageAccrualFactor /= numFlows
 
@@ -134,7 +134,7 @@ class FinCDSBasket(object):
                         break
 
                 protTrial = (1.0 - issuerCurves[assetIndex]._recoveryRate)
-                protTrial *= liborCurve.df(minTau)
+                protTrial *= liborCurve._df(minTau)
 
             else:
 

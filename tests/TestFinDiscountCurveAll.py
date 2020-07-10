@@ -31,12 +31,13 @@ def test_FinDiscountCurves():
 
     # Create a curve from times and discount factors
     startDate = FinDate(1, 1, 2018)
-    times = np.linspace(0, 10.0, 10)
+    years = np.linspace(0, 10, 11)
     rate = 0.05
-    values = np.exp(-rate * times)
+    values = np.exp(-rate * years)
+    dates = startDate.addYears(years)
 
     curve = FinDiscountCurve(startDate,
-                             times,
+                             dates,
                              values,
                              FinInterpMethods.FLAT_FORWARDS)
 
@@ -46,13 +47,16 @@ def test_FinDiscountCurves():
     date2 = FinDate(1, 1, 2019)
     basisType = FinDayCountTypes.ACT_365_ISDA
 
-    for t in np.linspace(0, 10, 21):
-        df = curve.df(t)
-        zeroRate = curve.zeroRate(t, FinFrequencyTypes.ANNUAL)
-        fwd = curve.fwd(t)
+    years = np.linspace(0, 10, 11)
+    dates = startDate.addYears(years)
+
+    for dt in dates:
+        df = curve.df(dt)
+        zeroRate = curve.zeroRate(dt, FinFrequencyTypes.ANNUAL)
+        fwd = curve.fwd(dt)
         fwdRate = curve.fwdRate(date1, date2, basisType)
-        q = curve.survProb(t)
-        testCases.print(t, df, zeroRate, fwd, fwdRate, q)
+        q = curve.survProb(dt)
+        testCases.print(dt, df, zeroRate, fwd, fwdRate, q)
 
     ###########################################################################
     # Curve built from a single rate so is flat
@@ -67,13 +71,13 @@ def test_FinDiscountCurves():
     date2 = FinDate(1, 1, 2019)
     basisType = FinDayCountTypes.ACT_365_ISDA
 
-    for t in np.linspace(0, 10, 21):
-        df = curve.df(t)
-        zeroRate = curve.zeroRate(t, FinFrequencyTypes.ANNUAL)
-        fwd = curve.fwd(t)
+    for dt in dates:
+        df = curve.df(dt)
+        zeroRate = curve.zeroRate(dt, FinFrequencyTypes.ANNUAL)
+        fwd = curve.fwd(dt)
         fwdRate = curve.fwdRate(date1, date2, basisType)
-        q = curve.survProb(t)
-        testCases.print(t, df, zeroRate, fwd, fwdRate, q)
+        q = curve.survProb(dt)
+        testCases.print(dt, df, zeroRate, fwd, fwdRate, q)
 
     ###########################################################################
     # Curve Built from Zero Rates
@@ -81,13 +85,14 @@ def test_FinDiscountCurves():
 
     flatRate = 0.05
     times = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+    dates = startDate.addYears(times)
     zeroRates = []
     for i in range(0, len(times)):
         r = 0.05 + 0.0020*i
         zeroRates.append(r)
 
     curve = FinDiscountCurveZeros(startDate,
-                                  times,
+                                  dates,
                                   zeroRates)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
@@ -96,13 +101,13 @@ def test_FinDiscountCurves():
     date2 = FinDate(1, 1, 2019)
     basisType = FinDayCountTypes.ACT_365_ISDA
 
-    for t in np.linspace(0, 10, 21):
-        df = curve.df(t)
-        zeroRate = curve.zeroRate(t, FinFrequencyTypes.ANNUAL)
-        fwd = curve.fwd(t)
+    for dt in dates:
+        df = curve.df(dt)
+        zeroRate = curve.zeroRate(dt, FinFrequencyTypes.ANNUAL)
+        fwd = curve.fwd(dt)
         fwdRate = curve.fwdRate(date1, date2, basisType)
-        q = curve.survProb(t)
-        testCases.print(t, df, zeroRate, fwd, fwdRate, q)
+        q = curve.survProb(dt)
+        testCases.print(dt, df, zeroRate, fwd, fwdRate, q)
 
 ###############################################################################
 

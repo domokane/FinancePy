@@ -86,8 +86,7 @@ class FinEquityBasketOption(FinEquityOption):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
 
-        df = discountCurve.df(t)
-        r = -np.log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         smean = 0.0
         for ia in range(0, self._numAssets):
@@ -160,8 +159,7 @@ class FinEquityBasketOption(FinEquityOption):
         numAssets = len(stockPrices)
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
         mus = r - dividendYields
         k = self._strikePrice
 

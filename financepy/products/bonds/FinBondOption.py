@@ -65,7 +65,7 @@ class FinBondOption():
         texp = (self._expiryDate - valueDate) / gDaysInYear
 
         dfTimes = discountCurve._times
-        dfValues = discountCurve._values
+        dfValues = discountCurve._discountFactors
 
         # We need all of the flows in case the option is American
         self._bond.calculateFlowDates(valueDate)

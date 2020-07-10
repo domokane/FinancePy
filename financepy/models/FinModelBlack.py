@@ -68,6 +68,8 @@ class FinModelBlack():
         d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrtT)
         d2 = d1 - vol*sqrtT
 
+        print(f, k, d1, d2)
+
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
             v = df * (f * N(d1) - k * N(d2))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:

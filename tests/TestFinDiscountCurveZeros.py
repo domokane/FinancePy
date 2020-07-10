@@ -21,16 +21,17 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
-def test_FinDiscountCurve():
+def test_FinDiscountCurveZeros():
 
     startDate = FinDate(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
+    dates = startDate.addYears(times)
     zeroRates = np.linspace(5.0, 6.0, 10)/100
     freqType = FinFrequencyTypes.ANNUAL
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
     curve = FinDiscountCurveZeros(startDate,
-                                  times,
+                                  dates,
                                   zeroRates,
                                   freqType,
                                   dayCountType,
@@ -38,9 +39,11 @@ def test_FinDiscountCurve():
 
     testCases.header("T", "DF")
 
-    for t in np.linspace(0, 10, 21):
-        df = curve.df(t)
-        testCases.print(t, df)
+    years = np.linspace(0, 10, 21)
+    dates = startDate.addYears(years)
+    for dt in dates:
+        df = curve.df(dt)
+        testCases.print(dt, df)
 
 #    print(curve)
 
@@ -73,8 +76,8 @@ def test_FinDiscountCurve():
                                       dayCountType,
                                       FinInterpMethods.FLAT_FORWARDS)
 
-#    end = time.time()
-#    period = end - start
+    end = time.time()
+    period = end - start
 #    print("Time taken:", period)
 
 #    print(curve)
@@ -82,5 +85,5 @@ def test_FinDiscountCurve():
 ###############################################################################
 
 
-test_FinDiscountCurve()
+test_FinDiscountCurveZeros()
 testCases.compareTestCases()

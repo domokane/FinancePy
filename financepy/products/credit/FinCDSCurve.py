@@ -163,7 +163,7 @@ class FinCDSCurve():
         else:
             t = dt
 
-        return self._liborCurve.df(t)
+        return self._liborCurve._df(t)
 
 ###############################################################################
 

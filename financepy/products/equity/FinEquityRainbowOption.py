@@ -77,7 +77,7 @@ def valueMCFast(t,
                 seed=4242):
 
     np.random.seed(seed)
-    df = discountCurve.df(t)
+    df = discountCurve._df(t)
     r = -log(df)/t
     mus = r - dividendYields
 
@@ -193,9 +193,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiryDate - valueDate) / gDaysInYear
-
-        df = discountCurve.df(t)
-        r = -log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         q1 = dividendYields[0]
         q2 = dividendYields[1]

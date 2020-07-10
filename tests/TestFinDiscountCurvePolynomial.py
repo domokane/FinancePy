@@ -24,7 +24,7 @@ showPlots = True
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
-def test_FinPolynomialCurve():
+def test_FinDiscountCurvePolynomial():
 
     times = np.linspace(0.00, 10.0, 20)
     curveDate = FinDate(2019, 2, 2)
@@ -43,5 +43,5 @@ def test_FinPolynomialCurve():
         plt.legend(loc='best')
 
 
-test_FinPolynomialCurve()
+test_FinDiscountCurvePolynomial()
 testCases.compareTestCases()

@@ -228,11 +228,8 @@ class FinFXVanillaOption():
 
         tdel = np.maximum(tdel, 1e-10)
 
-        domDF = domDiscountCurve.df(tdel)
-        rd = -np.log(domDF)/tdel
-
-        forDF = forDiscountCurve.df(tdel)
-        rf = -np.log(forDF)/tdel
+        rd = domDiscountCurve.zeroRate(self._deliveryDate)
+        rf = forDiscountCurve.zeroRate(self._deliveryDate)
 
         S0 = spotFXRate
         K = self._strikeFXRate
@@ -381,10 +378,10 @@ class FinFXVanillaOption():
 
         tdel = np.maximum(tdel, 1e-10)
 
-        domDf = domDiscountCurve.df(tdel)
+        domDf = domDiscountCurve._df(tdel)
         rd = -np.log(domDf)/tdel
 
-        forDf = forDiscountCurve.df(tdel)
+        forDf = forDiscountCurve._df(tdel)
         rf = -np.log(forDf)/tdel
 
         S0 = spotFXRate
@@ -453,10 +450,10 @@ class FinFXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = domDiscountCurve.df(t)
+        domDf = domDiscountCurve._df(t)
         rd = -np.log(domDf)/t
 
-        forDf = forDiscountCurve.df(t)
+        forDf = forDiscountCurve._df(t)
         rf = -np.log(forDf)/t
 
         K = self._strikeFXRate
@@ -511,10 +508,10 @@ class FinFXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = domDiscountCurve.df(t)
+        domDf = domDiscountCurve._df(t)
         rd = -np.log(domDf)/t
 
-        forDf = forDiscountCurve.df(t)
+        forDf = forDiscountCurve._df(t)
         rf = -np.log(forDf)/t
 
         K = self._strikeFXRate
@@ -567,10 +564,10 @@ class FinFXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = domDiscountCurve.df(t)
+        domDf = domDiscountCurve._df(t)
         rd = -np.log(domDf)/t
 
-        forDf = forDiscountCurve.df(t)
+        forDf = forDiscountCurve._df(t)
         rf = -np.log(forDf)/t
 
         K = self._strikeFXRate

@@ -157,7 +157,7 @@ class FinBondEmbeddedOption(object):
         maturityDate = self._bond._maturityDate
         tmat = (maturityDate - settlementDate) / gDaysInYear
         dfTimes = discountCurve._times
-        dfValues = discountCurve._values
+        dfValues = discountCurve._discountFactors
 
         face = self._bond._face
 

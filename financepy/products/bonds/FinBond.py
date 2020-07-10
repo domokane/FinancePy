@@ -302,7 +302,7 @@ class FinBond(object):
         is only the correct price on the settlement date of the bond which may
         be in the future.'''
 
-        if discountCurve._curveDate > settlementDate:
+        if discountCurve._valuationDate > settlementDate:
             raise FinError("Discount curve date is after bond settlement date")
 
         self.calculateFlowDates(settlementDate)

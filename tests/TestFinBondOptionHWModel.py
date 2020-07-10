@@ -34,10 +34,10 @@ def test_FinBondOption():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
 
-    tmat = (maturityDate - settlementDate) / gDaysInYear
-    times = np.linspace(0, tmat, 20)
+    times = np.linspace(0, 10.0, 21)
     dfs = np.exp(-0.05*times)
-    discountCurve = FinDiscountCurve(settlementDate, times, dfs)
+    dates = settlementDate.addYears(times)
+    discountCurve = FinDiscountCurve(settlementDate, dates, dfs)
 
     expiryDate = settlementDate.addTenor("18m")
     strikePrice = 105.0
@@ -151,9 +151,9 @@ def test_FinBondOptionEuropeanConvergence():
     strikePrice = 100.0
 
     texp = (expiryDate - settlementDate) / gDaysInYear
-    dfExpiry = discountCurve.df(texp)
+    dfExpiry = discountCurve.df(expiryDate)
     tmat = (maturityDate - settlementDate) / gDaysInYear
-    dfMat = discountCurve.df(tmat)
+    dfMat = discountCurve.df(maturityDate)
 
     fwdValue = bond.valueBondUsingDiscountCurve(expiryDate, discountCurve)/dfExpiry
 
@@ -216,9 +216,9 @@ def test_FinBondOptionAmericanConvergenceONE():
     spotValue = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
 
     texp = (expiryDate - settlementDate) / gDaysInYear
-    dfExpiry = discountCurve.df(texp)
+    dfExpiry = discountCurve.df(expiryDate)
     tmat = (maturityDate - settlementDate) / gDaysInYear
-    dfMat = discountCurve.df(tmat)
+    dfMat = discountCurve.df(maturityDate)
 
     fwdValue = bond.valueBondUsingDiscountCurve(expiryDate, discountCurve)/dfExpiry
 

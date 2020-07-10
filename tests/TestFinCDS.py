@@ -42,13 +42,14 @@ def test_CDSFastApproximation():
 
     valueDate = FinDate(2018, 6, 20)
     # I build a discount curve that requires no bootstrap
-    times = np.linspace(0, 10.0, 10)
+    times = np.linspace(0, 10.0, 11)
     r = 0.05
 
     discountFactors = np.power((1.0 + r), -times)
+    dates = valueDate.addYears(times)
 
     liborCurve = FinDiscountCurve(valueDate,
-                                  times,
+                                  dates,
                                   discountFactors,
                                   FinInterpMethods.FLAT_FORWARDS)
 
@@ -56,7 +57,7 @@ def test_CDSFastApproximation():
 
     maturityDate = valueDate.nextCDSDate(120)
     t = (maturityDate - valueDate) / 365.242
-    z = liborCurve.df(t)
+    z = liborCurve.df(maturityDate)
     r = -log(z) / t
 
     recoveryRate = 0.40
@@ -132,11 +133,12 @@ def test_CurveBuild():
 
     valuationDate = FinDate(2018, 6, 20)
 
-    times = np.linspace(0.0, 10.0, 10)
+    times = np.linspace(0.0, 10.0, 11)
     r = 0.05
     discountFactors = np.power((1.0 + r), -times)
+    dates = valuationDate.addYears(times)
     liborCurve = FinDiscountCurve(valuationDate,
-                                  times,
+                                  dates,
                                   discountFactors,
                                   FinInterpMethods.FLAT_FORWARDS)
     recoveryRate = 0.40
@@ -442,7 +444,7 @@ def test_fullPriceCDS():
     testCases.print("INTEREST_DV01", dv)
 
     t = (maturityDate - valuationDate) / gDaysInYear
-    z = liborCurve.df(t)
+    z = liborCurve.df(maturityDate)
     r = -log(z) / t
 
     v_approx = cdsContract.valueFastApprox(valuationDate,

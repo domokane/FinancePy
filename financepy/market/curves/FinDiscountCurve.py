@@ -8,8 +8,9 @@ import numpy as np
 from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
+from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
@@ -19,39 +20,90 @@ from ...finutils.FinHelperFunctions import labelToString
 ###############################################################################
 
 
+def timesFromDates(dt, valuationDate):
+
+    if isinstance(dt, FinDate):
+        numDates = 1
+        dateList = [dt]
+        times = [None]
+        times[0] = (dt - valuationDate) / gDaysInYear
+    elif isinstance(dt, list) and isinstance(dt[0], FinDate):
+        numDates = len(dt)
+        dateList = dt
+        times = []
+        for i in range(0, numDates):
+            t = (dateList[i] - valuationDate) / gDaysInYear
+            times.append(t)
+    else:
+        raise FinError("Discount factor must take dates.")
+
+    times = np.array(times)
+    return times
+
+###############################################################################
+
+
+def pv01Times(t, f):
+    ''' Calculate a bond style pv01 by calculating remaining coupon times for a
+    bond with t years to maturity and a coupon frequency of f. The order of the
+    list is reverse time order - it starts with the last coupon date and ends
+    with the first coupon date. '''
+
+    dt = 1.0 / f
+    pv01Times = []
+
+    while t >= 0.0:
+        pv01Times.append(t)
+        t -= dt
+
+    return pv01Times
+
+###############################################################################
+
+
 class FinDiscountCurve():
     ''' This is a base discount curve which has an internal representation of
-    a vector of times and discount factors and an interpolation scheme. '''
+    a vector of times and discount factors and an interpolation scheme for
+    interpolating between these fixed points. '''
 
 ###############################################################################
 
     def __init__(self,
-                 curveDate,
-                 times,
-                 values,
+                 valuationDate: FinDate,
+                 discountFactorDates,
+                 discountFactors,
                  interpMethod=FinInterpMethods.FLAT_FORWARDS):
         ''' Create the discount curve from a vector of times and discount
-        factors with an anchor date and specify an interpolation scheme. '''
+        factors with an anchor date and specify an interpolation scheme. As we
+        are explicity linking dates and discount factors, we do not need to
+        specify any compounding convention or day count calculation since
+        discount factors are pure prices. We do however need to specify a
+        convention for interpolating the discount factors in time.'''
 
         # Validate curve
-        if len(times) < 1:
+        if len(discountFactorDates) < 1:
             raise FinError("Times has zero length")
 
-        if len(times) != len(values):
+        if len(discountFactorDates) != len(discountFactors):
             raise FinError("Times and Values are not the same")
 
-        if times[0] != 0.0:
-            raise FinError("First time is not zero")
+        self._times = [0.0]
+        self._discountFactors = [1.0]
 
-        if values[0] != 1.0:
-            raise FinError("First value is not zero" + str(values[0]))
+        numPoints = len(discountFactorDates)
 
-        if testMonotonicity(times) is False:
+        for i in range(1, numPoints):
+            t = (discountFactorDates[i] - valuationDate) / gDaysInYear
+            self._times.append(t)
+            self._discountFactors.append(discountFactors[i])
+
+        self._valuationDate = valuationDate
+        self._times = np.array(self._times)
+
+        if testMonotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-        self._curveDate = curveDate
-        self._times = np.array(times)
-        self._values = np.array(values)
+        self._discountFactors = np.array(self._discountFactors)
         self._interpMethod = interpMethod
 
 ###############################################################################
@@ -59,24 +111,128 @@ class FinDiscountCurve():
     def zeroRate(self,
                  dt: FinDate,
                  frequencyType=FinFrequencyTypes.CONTINUOUS):
-        ''' Calculate the zero rate to maturity date. '''
-        t = inputTime(dt, self)
-        f = FinFrequency(frequencyType)
-        df = self.df(t)
+        ''' Calculate the zero rate to maturity date. The compounding frequency
+        of the rate defaults to continuous which is useful for supplying a rate
+        to theoretical models such as Black-Scholes that require a continuously
+        compounded zero rate as input. '''
 
-        if f == 0:  # Simple interest
-            zeroRate = (1.0/df-1.0)/t
-        if f == -1:  # Continuous
-            zeroRate = -np.log(df) / t
+        times = timesFromDates(dt, self._valuationDate)
+        zeroRates = self._zeroRate(times, frequencyType)
+
+        if isinstance(dt, FinDate):
+            return zeroRates[0]
         else:
-            zeroRate = (df**(-1.0/t/f) - 1) * f
-        return zeroRate
+            return np.array(zeroRates)
+
+###############################################################################
+
+    def parRate(self,
+                dt: FinDate,
+                frequencyType=FinFrequencyTypes.CONTINUOUS,
+                dayCountType=FinDayCountTypes.ACT_360):
+        ''' Calculate the par rate to maturity date. This is the rate paid by a
+        bond that has a price of par today.  '''
+
+        times = timesFromDates(dt, self._valuationDate)
+        parRates = self._parRate(times, frequencyType)
+
+        if isinstance(dt, FinDate):
+            return parRates[0]
+        else:
+            return np.array(parRates)
+
+##########################################################################
+
+    def _zeroRate(self,
+                  times: list,
+                  frequencyType=FinFrequencyTypes.CONTINUOUS):
+        ''' Calculate the zero rate to maturity date but with times as inputs.
+        This function is used internally and should be discouraged for external
+        use. The compounding frequency defaults to continuous. '''
+
+        f = FinFrequency(frequencyType)
+        zerosList = []
+
+        for t in times:
+
+            if t < 0.0:
+                raise FinError("Time is negative!")
+
+            if t < 1e-6:
+                t = 1e-6
+
+            df = self._df(t)
+
+            if frequencyType == FinFrequencyTypes.SIMPLE:
+                zeroRate = (1.0/df-1.0) / t
+            elif frequencyType == FinFrequencyTypes.CONTINUOUS:
+                zeroRate = -np.log(df) / t
+            else:
+                zeroRate = (df**(-1.0/t/f) - 1) * f
+
+            zerosList.append(zeroRate)
+
+        return np.array(zerosList)
+
+##########################################################################
+
+    def _parRate(self,
+                 times: list,
+                 frequencyType=FinFrequencyTypes.ANNUAL):
+        ''' Calculate the zero rate to maturity date but with times as inputs.
+        This function is used internally and should be discouraged for external
+        use. The compounding frequency defaults to continuous. '''
+
+        if frequencyType == FinFrequencyTypes.SIMPLE:
+            raise FinError("Cannot calculate par rate with simple yield freq.")
+        elif frequencyType == FinFrequencyTypes.CONTINUOUS:
+            raise FinError("Cannot calculate par rate with continuous freq.")
+
+        f = FinFrequency(frequencyType)
+        dt = 1.0 / f
+
+        if np.any(times < 0.0):
+             raise FinError("Unable to calculate par rate as one t < 0.0")
+
+        parRateList = []
+
+        for t in times:
+
+            flowTimes = pv01Times(t, f)
+            pv01 = 0.0
+            for tFlow in flowTimes:
+                pv01 += self._df(tFlow)
+
+            pv01 = pv01 * dt
+            dft = self._df(t)
+            parRate = (1.0 - dft) / pv01
+            parRateList.append(parRate)
+
+        return np.array(parRateList)
 
 ##########################################################################
 
     def df(self, dt):
-        t = inputTime(dt, self)
-        z = interpolate(t, self._times, self._values, self._interpMethod.value)
+        ''' Function to calculate a discount factor from a date or a
+        vector of dates. '''
+
+        times = timesFromDates(dt, self._valuationDate)
+        dfs = self._df(times)
+
+        if isinstance(dt, FinDate):
+            return dfs[0]
+        else:
+            return np.array(dfs)
+
+##########################################################################
+
+    def _df(self, t):
+        ''' Hidden function to calculate a discount factor from a time or a
+        vector of times. Discourage usage in favour of passing in dates. '''
+        z = interpolate(t,
+                        self._times,
+                        self._discountFactors,
+                        self._interpMethod.value)
         return z
 
 ##########################################################################
@@ -87,12 +243,38 @@ class FinDiscountCurve():
 ##########################################################################
 
     def fwd(self, dt):
-        ''' Calculate the continuous forward rate at the forward date. '''
-        t = inputTime(dt, self)
+        ''' Calculate the continuously compounded forward rate at the forward
+        FinDate provided. This is done by perturbing the time by a small amount
+        and measuring the change in the log of the discount factor divided by
+        the time increment dt.'''
+
+        times = timesFromDates(dt, self._valuationDate)
+        fwds = self._fwd(times)
+
+        if isinstance(dt, FinDate):
+            return fwds[0]
+        else:
+            return np.array(fwds)
+
+##########################################################################
+
+    def _fwd(self, t):
+        ''' Calculate the continuously compounded forward rate at the forward
+        time provided. This is done by perturbing the time by a small amount
+        and measuring the change in the log of the discount factor divided by
+        the time increment dt.'''
         dt = 0.000001
-        df1 = self.df(t)
-        df2 = self.df(t+dt)
-        fwd = np.log(df1/df2)/dt
+
+        # Do a double sided calculation if possible
+        if np.all(t > dt):
+            df1 = self._df(t-dt)
+            df2 = self._df(t+dt)
+            fwd = np.log(df1/df2)/(2.0*dt)
+        else:
+            df1 = self._df(t)
+            df2 = self._df(t+dt)
+            fwd = np.log(df1/df2)/(dt)
+
         return fwd
 
 ##########################################################################
@@ -121,7 +303,7 @@ class FinDiscountCurve():
         ''' Calculate the forward rate according to the specified
         day count convention. '''
 
-        if date1 < self._curveDate:
+        if date1 < self._valuationDate:
             raise ValueError("Date1 before curve value date.")
 
         if date2 < date1:

@@ -219,8 +219,7 @@ class FinEquityBinomialTree():
 
         # do some validation
         timeToExpiry = (expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(timeToExpiry)
-        r = -log(df)/timeToExpiry
+        r = discountCurve.zeroRate(expiryDate)
 
         price1 = valueOnce(stockPrice,
                            r,

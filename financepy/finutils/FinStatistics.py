@@ -79,7 +79,7 @@ def correlation(x1, x2):
     n2 = len(x2)
 
     if n1 != n2:
-        raise FinError("Vectors have different lengths")
+        raise ValueError("Vectors have different lengths")
 
     m1 = mean(x1)
     m2 = mean(x2)

@@ -258,22 +258,91 @@ class FinDate():
     ###########################################################################
 
     def addMonths(self, mm):
-        ''' Returns a new date that is mm months after the FinDate. '''
+        ''' Returns a new date that is mm months after the FinDate. If mm is an
+        integer or float you get back a single date. If mm is a vector you get
+        back a vector of dates.'''
 
-        m = self._m + mm
-        y = self._y
-        d = self._d
+        numMonths = 1
+        scalarFlag = False
+        if isinstance(mm, int) or isinstance(mm, float):
+            mmVector = [mm]
+            scalarFlag = True
+        else:
+            mmVector = mm
 
-        while m > 12:
-            m = m - 12
-            y += 1
+        numMonths = len(mmVector)
 
-        while m < 1:
-            m = m + 12
-            y -= 1
+        dateList = []
 
-        newDt = FinDate(d, m, y)
-        return newDt
+        for i in range(0, numMonths):
+
+            mmi = mmVector[i]
+
+            # If I get a float I check it has no decimal places
+            if int(mmi) != mmi:
+                raise FinError("Must only pass integers or float integers.")
+
+            mmi = int(mmi)
+
+            m = self._m + mmi
+            y = self._y
+            d = self._d
+
+            while m > 12:
+                m = m - 12
+                y += 1
+
+            while m < 1:
+                m = m + 12
+                y -= 1
+
+            newDt = FinDate(d, m, y)
+            dateList.append(newDt)
+
+        if scalarFlag is True:
+            return dateList[0]
+        else:
+            return dateList
+
+    ###########################################################################
+
+    def addYears(self, yy):
+        ''' Returns a new date that is yy years after the FinDate. If yy is an
+        integer or float you get back a single date. If yy is a list you get
+        back a vector of dates.'''
+
+        numYears = 1
+        scalarFlag = False
+
+        if isinstance(yy, int) or isinstance(yy, float):
+            yyVector = [yy]
+            scalarFlag = True
+        else:
+            yyVector = yy
+
+        numYears = len(yyVector)
+
+        dateList = []
+
+        for i in range(0, numYears):
+
+            yyi = yyVector[i]
+
+            # If I get a float I check it is not a multiple of 12
+            # Machine precision can throw this off so I allow for a tolerance
+            diff = int(yyi*12+1e-10) - yyi*12
+            if abs(diff) > 1e-6:
+                raise FinError("Year of " + str(yyi) + " is " + str(diff) +
+                               " Months. Not a whole number of months.")
+
+            mmi = int(yyi*12)
+            newDt = self.addMonths(mmi)
+            dateList.append(newDt)
+
+        if scalarFlag is True:
+            return dateList[0]
+        else:
+            return dateList
 
     ##########################################################################
 

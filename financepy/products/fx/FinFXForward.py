@@ -88,7 +88,7 @@ class FinFXForward():
                                     domDiscountCurve,
                                     forDiscountCurve)
 
-        domDF = domDiscountCurve.df(t)
+        domDF = domDiscountCurve._df(t)
 
         if self._notionalCurrency == self._domName:
             self._notional_dom = self._notional
@@ -140,8 +140,8 @@ class FinFXForward():
 
         t = np.maximum(t, 1e-10)
 
-        forDF = forDiscountCurve.df(t)
-        domDF = domDiscountCurve.df(t)
+        forDF = forDiscountCurve._df(t)
+        domDF = domDiscountCurve._df(t)
 
         fwdFXRate = spotFXRate * forDF / domDF
         return fwdFXRate

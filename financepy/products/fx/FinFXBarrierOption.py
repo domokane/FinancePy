@@ -78,8 +78,8 @@ class FinFXBarrierOption(FinFXOption):
         lnS0k = log(float(S0)/K)
         sqrtT = sqrt(t)
 
-        dq = forDiscountCurve.df(t)
-        df = domDiscountCurve.df(t)
+        dq = forDiscountCurve._df(t)
+        df = domDiscountCurve._df(t)
         rd = -log(df)/t
         rf = -log(dq)/t
 

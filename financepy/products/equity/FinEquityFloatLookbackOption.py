@@ -55,8 +55,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
               stockMinMax):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -np.log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         v = volatility
         s0 = stockPrice
@@ -137,8 +136,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
             seed=4242):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(t)
-        r = -np.log(df)/t
+        r = discountCurve.zeroRate(self._expiryDate)
 
         numTimeSteps = int(t * numStepsPerYear)
         mu = r - dividendYield

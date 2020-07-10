@@ -127,7 +127,7 @@ class FinEquityVarianceSwap(object):
 
         tmat = (self._maturityDate - valuationDate)/gDaysInYear
 
-        df = discountCurve.df(tmat)
+        df = discountCurve._df(tmat)
         r = - log(df)/tmat
 
         s0 = stockPrice

@@ -95,6 +95,7 @@ def test_FinMath():
         diff2 = x_out2 - x_in
         testCases.print(x, y1, y2, x_out1, x_out2, diff1, diff2)
 
+
 ##########################################################################
 
 

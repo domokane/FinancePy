@@ -92,7 +92,7 @@ class FinCDSIndexOption(object):
         k = self._strikeCoupon
         c = self._indexCoupon
         timeToExpiry = (self._expiryDate - valuationDate) / gDaysInYear
-        df = liborCurve.df(timeToExpiry)
+        df = liborCurve.df(self._expiryDate)
         qExpiryIndex = indexCurve.survProb(timeToExpiry)
 
         cds = FinCDS(valuationDate, self._maturityDate, k)
@@ -281,7 +281,8 @@ class FinCDSIndexOption(object):
                                   liborCurve,
                                   indexRecovery):
         ''' Calculates the intrinsic value of the index payer swap and the
-        value of the index payer option which are both returned in an array. '''
+        value of the index payer option which are both returned in an array.
+        '''
 
         z = -6.0
         dz = 0.2
@@ -290,7 +291,7 @@ class FinCDSIndexOption(object):
         flowDates = self._cdsContract._adjustedDates
         numFlows = len(flowDates)
         texp = (self._expiryDate - valuationDate) / gDaysInYear
-        dfToExpiry = liborCurve.df(texp)
+        dfToExpiry = liborCurve.df(self._expiryDate)
         lgd = 1.0 - indexRecovery
 
         fwdDfs = [1.0] * (numFlows)

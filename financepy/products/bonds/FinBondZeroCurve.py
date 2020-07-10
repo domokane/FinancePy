@@ -16,6 +16,7 @@ from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 
@@ -34,11 +35,11 @@ def f(df, *args):
 ###############################################################################
 
 
-class FinBondZeroCurve():
+class FinBondZeroCurve(FinDiscountCurve):
     ''' Class to do bootstrap exact fitting of the bond zero rate curve. '''
 
     def __init__(self,
-                 settlementDate,
+                 valuationDate,
                  bonds,
                  cleanPrices,
                  interpMethod=FinInterpMethods.FLAT_FORWARDS):
@@ -48,8 +49,8 @@ class FinBondZeroCurve():
         if len(bonds) != len(cleanPrices):
             raise FinError("Num bonds does not equal number of prices.")
 
-        self._settlementDate = settlementDate
-        self._curveDate = settlementDate
+        self._settlementDate = valuationDate
+        self._valuationDate = valuationDate
         self._bonds = bonds
         self._cleanPrices = np.array(cleanPrices)
         self._discountCurve = None

@@ -234,8 +234,8 @@ class FinFXVolSurface():
             texp = (expiryDate - self._valueDate) / gDaysInYear
             self._texp[i] = texp
 
-            domDF = self._domDiscountCurve.df(texp)
-            forDF = self._forDiscountCurve.df(texp)
+            domDF = self._domDiscountCurve._df(texp)
+            forDF = self._forDiscountCurve._df(texp)
 
             F0T = S0 * forDF/domDF
             self._F0T[i] = F0T

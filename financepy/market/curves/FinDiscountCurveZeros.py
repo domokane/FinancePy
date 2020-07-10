@@ -19,29 +19,61 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 # TODO: Fix up __repr__ function
 ###############################################################################
 
+def timesFromDatesFlat(dt, valuationDate, dayCountType):
 
-class FinDiscountCurveZeros(FinDiscountCurve):
-    ''' This is a curve calculated from a set of times and zero rates.
-    '''
+    dayCount = FinDayCount(dayCountType)
+
+    if isinstance(dt, FinDate):
+        numDates = 1
+        times = [None]
+        times[0] = dayCount.yearFrac(valuationDate, dt)
+    elif isinstance(dt, list) and isinstance(dt[0], FinDate):
+        numDates = len(dt)
+        times = []
+        for i in range(0, numDates):
+            t = dayCount.yearFrac(valuationDate, dt[i])
+            times.append(t)
+    else:
+        raise FinError("Discount factor must take dates.")
+
+    times = np.array(times)
+    return times
 
 ###############################################################################
 
-    def __init__(self, curveDate,
-                 timesOrDates,
+
+class FinDiscountCurveZeros(FinDiscountCurve):
+    ''' This is a curve calculated from a set of dates and zero rates. As we
+    have rates as inputs, we need to specify the corresponding compounding
+    frequency. Also to go from rates and dates to discount factors we need to
+    compute the year fraction correctly and for this we require a day count
+    convention. Finally, we need to interpolate the zero rate for the times
+    between the zero rates given and for this we must specify an interpolation
+    convention. '''
+
+###############################################################################
+
+    def __init__(self,
+                 valuationDate,
+                 dates,
                  zeroRates,
                  frequencyType=FinFrequencyTypes.ANNUAL,
                  dayCountType=FinDayCountTypes.ACT_ACT_ISDA,
                  interpMethod=FinInterpMethods.FLAT_FORWARDS):
-        ''' Create the discount curve from a vector of times and discount
-        factors. First date is the curve anchor and first rates should be zero
-        as it starts and ends on that date and so has no impact. '''
+        ''' Create the discount curve from a vector of dates and zero rates
+        factors. The first date is the curve anchor. Then a vector of zero
+        dates and then another same-length vector of rates. The rate is to the
+        corresponding date. We must specify the compounding frequency of the
+        zero rates and also a day count convention for calculating times which
+        we must do to calculate discount factors. Finally we specify the
+        interpolation scheme. '''
 
         # Validate curve
-        if len(timesOrDates) == 0:
-            raise FinError("Times has zero length")
+        if len(dates) == 0:
+            raise FinError("Dates has zero length")
 
-        if len(timesOrDates) != len(zeroRates):
-            raise FinError("Times and Values are not the same")
+        if len(dates) != len(zeroRates):
+            raise FinError("Dates and Rates are not the same length")
 
         if frequencyType not in FinFrequencyTypes:
             raise FinError("Unknown Frequency type " + str(frequencyType))
@@ -50,64 +82,42 @@ class FinDiscountCurveZeros(FinDiscountCurve):
             raise FinError("Unknown Cap Floor DayCountRule type " +
                            str(dayCountType))
 
-        freq = FinFrequency(frequencyType)
+        self._valuationDate = valuationDate
+        self._frequencyType = frequencyType
+        self._dayCountType = dayCountType
+        self._interpMethod = interpMethod
 
-        times = []
-        values = []
+        self._times = timesFromDatesFlat(dates, valuationDate, dayCountType)
+        self._zeroRates = zeroRates
 
-        if isinstance(timesOrDates[0], float):
-
-            # We just calculate the discount factors using times as provided
-            for i in range(0, len(timesOrDates)):
-                t = timesOrDates[i]
-                if t < 0.0:
-                    raise FinError("Times must be > 0.")
-
-                r = zeroRates[i]
-
-                if freq == -1:
-                    df = np.exp(-r*t)
-                else:
-                    df = 1.0 / np.power(1.0 + r/freq, freq * t)
-
-                times.append(t)
-                values.append(df)
-
-        elif isinstance(timesOrDates[0], FinDate):
-
-            # Now extract discount factors which depend on the zero rates which
-            # have been quoted witha frequency and day count convention
-
-            dc = FinDayCount(dayCountType)
-            for i in range(0, len(timesOrDates)):
-                t = (timesOrDates[i] - curveDate) / gDaysInYear
-                if t < 0.0:
-                    raise FinError("Times must be > 0.")
-
-                alpha = dc.yearFrac(curveDate, timesOrDates[i])
-                r = zeroRates[i]
-
-                if freq == -1:
-                    df = np.exp(-r*t)
-                else:
-                    df = 1.0 / np.power(1.0 + r/freq, freq * alpha)
-
-                times.append(t)
-                values.append(df)
-        else:
-            raise FinError("Input timeOrDates must be list of times or dates")
-
-        times = np.array(times)
-
-        if testMonotonicity(times) is False:
+        if testMonotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        self._curveDate = curveDate
-        self._times = times
-        self._values = np.array(values)
-        self._dayCountType = dayCountType
-        self._frequencyType = frequencyType
-        self._interpMethod = interpMethod
+        self._buildCurvePoints()
+
+###############################################################################
+
+    def _buildCurvePoints(self):
+        ''' Hidden function to extract discount factors from zero rates. '''
+
+        f = FinFrequency(self._frequencyType)
+        values = []
+
+        # We just calculate the discount factors using times as provided
+        numTimes = len(self._times)
+
+        for i in range(0, numTimes):
+            t = self._times[i]
+            r = self._zeroRates[i]
+
+            if self._frequencyType == FinFrequencyTypes.CONTINUOUS:
+                df = np.exp(-r*t)
+            else:
+                df = 1.0 / np.power(1.0 + r/f, f * t)
+
+            values.append(df)
+
+        self._discountFactors = np.array(values)
 
 ###############################################################################
 
@@ -115,16 +125,16 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         ''' Calculate the continuous forward rate at the forward date. '''
 
         times = self._times.copy()
-        values = self._values.copy()
+        discountFactors = self._discountFactors.copy()
 
         n = len(self._times)
         for i in range(0, n):
             t = times[i]
-            values[i] = values[i] * np.exp(-bumpSize*t)
+            discountFactors[i] = discountFactors[i] * np.exp(-bumpSize*t)
 
         discCurve = FinDiscountCurve(self._curveDate,
                                      times,
-                                     values,
+                                     discountFactors,
                                      self._interpMethod)
 
         return discCurve

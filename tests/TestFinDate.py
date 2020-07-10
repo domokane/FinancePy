@@ -5,6 +5,8 @@ Created on Sat Feb 06 07:26:46 2016
 @author: Dominic O'Kane
 """
 
+import numpy as np
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate, dateRange
@@ -103,8 +105,34 @@ def test_FinDateRange():
 ###############################################################################
 
 
+def test_FinDateAddMonths():
+    startDate = FinDate(2010, 1, 1)
+
+    testCases.header("Tenor", "Dates")
+
+    months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
+    dates1 = startDate.addMonths(months)
+    months = np.array(months)
+    dates2 = startDate.addMonths(months)
+
+    years = [1, 3, 5, 7, 10]
+    dates3 = startDate.addYears(years)
+    years = np.array(years)
+    dates4 = startDate.addYears(years)
+    print(dates4)
+
+    years = [1.5, 3.25, 5.75, 7.25, 10.0]
+    dates5 = startDate.addYears(years)
+    years = np.array(years)
+    dates6 = startDate.addYears(years)
+    print(dates5)
+
+###############################################################################
+
+
 test_FinDate()
 test_FinDateTenors()
 test_FinDateRange()
+test_FinDateAddMonths()
 
 testCases.compareTestCases()

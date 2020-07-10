@@ -20,34 +20,34 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFlatCurve():
 
-    curveDate = FinDate(2019, 2, 2)
-    times = np.linspace(0.0, 1.0, 5)
-
+    curveDate = FinDate(1, 1, 2019)
+    months = range(1, 60, 3)
+    dates = curveDate.addMonths(months)
     testCases.header("COMPOUNDING", "DFS")
     compounding = FinFrequencyTypes.CONTINUOUS
 
     flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
+    dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FinFrequencyTypes.ANNUAL
     flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
+    dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FinFrequencyTypes.SEMI_ANNUAL
     flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
+    dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FinFrequencyTypes.QUARTERLY
     flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
+    dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FinFrequencyTypes.MONTHLY
     flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
-    dfs = flatCurve.df(times)
+    dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
 ###############################################################################

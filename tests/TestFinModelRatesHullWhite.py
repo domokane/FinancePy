@@ -124,9 +124,10 @@ def test_HullWhiteBondOption():
     face = 100.0
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
-    times = np.linspace(0, tmat, 20)
+    times = np.linspace(0, 10, 21)
+    dates = settlementDate.addYears(times)
     dfs = np.exp(-0.05*times)
-    curve = FinDiscountCurve(settlementDate, times, dfs)
+    curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     #price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
     #print("Spot Bond Price:", price)
@@ -232,9 +233,10 @@ def test_HullWhiteCallableBond():
     ###########################################################################
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
-    times = np.linspace(0, tmat, 20)
+    times = np.linspace(0, 10.0, 21)
+    dates = settlementDate.addYears(times)
     dfs = np.exp(-0.05*times)
-    curve = FinDiscountCurve(settlementDate, times, dfs)
+    curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     ###########################################################################
 

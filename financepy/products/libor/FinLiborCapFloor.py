@@ -284,7 +284,7 @@ class FinLiborCapFloor():
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face = 1.0
             dfTimes = liborCurve._times
-            dfValues = liborCurve._values
+            dfValues = liborCurve._discountFactors
 
             v = model.optionOnZCB(texp, tmat, strikePrice, face,
                                   dfTimes, dfValues)

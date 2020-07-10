@@ -17,6 +17,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
+
 
 def test_FinStatistics():
     seed = 1972
@@ -87,7 +89,7 @@ def test_FinStatistics():
     testCases.header("TIME")
     testCases.print(elapsed)
 
-    ##########################################################################
+###############################################################################
 
 
 test_FinStatistics()
