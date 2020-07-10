@@ -33,6 +33,8 @@ Up until now my main focus has been on financial derivatives. In general my appr
 
 In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time I hope to reduce the size of such differences.
 
+IF YOU HAVE ANY EXAMPLES YOU WOULD LIKE ME TO REPLICATE, SEND ME SCREENSHOTS OF ALL THE UNDERLYING DATA AND MODEL DETAILS
+
 ## The Library Design
 The underlying Python library is split into a number of major modules:
 
