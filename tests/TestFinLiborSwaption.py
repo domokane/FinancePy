@@ -238,6 +238,98 @@ def test_FinLiborSwaptionQLExample():
 
 ###############################################################################
 
+def testFinLiborCashSettledSwaption():
+
+    valuationDate = FinDate(1, 1, 2020)
+    settlementDate = FinDate(3, 1, 2020)
+
+    depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
+    depos = []
+    depo = FinLiborDeposit(settlementDate, "1W", 0.0023, depoDCCType)
+    depos.append(depo)
+    depo = FinLiborDeposit(settlementDate, "1M", 0.0023, depoDCCType)
+    depos.append(depo)
+    depo = FinLiborDeposit(settlementDate, "3M", 0.0023, depoDCCType)
+    depos.append(depo)
+    depo = FinLiborDeposit(settlementDate, "6M", 0.0023, depoDCCType)
+    depos.append(depo)
+
+    # No convexity correction provided so I omit interest rate futures
+
+    swaps = []
+    accType = FinDayCountTypes.ACT_365_ISDA
+    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
+
+    swap = FinLiborSwap(settlementDate, "3Y", 0.00790, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "4Y", 0.01200, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "5Y", 0.01570, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "6Y", 0.01865, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "7Y", 0.02160, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "8Y", 0.02350, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "9Y", 0.02540, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "10Y", 0.0273, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "15Y", 0.0297, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "20Y", 0.0316, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "25Y", 0.0335, fixedFreqType, accType)
+    swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "30Y", 0.0354, fixedFreqType, accType)
+    swaps.append(swap)
+
+    liborCurve = FinLiborCurve("USD_LIBOR", valuationDate, depos, [], swaps,
+                               FinInterpMethods.LINEAR_ZERO_RATES)
+
+    exerciseDate = settlementDate.addTenor("5Y")
+    swapMaturityDate = exerciseDate.addTenor("5Y")
+    swapFixedCoupon = 0.040852
+    swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    swapFixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    swapFloatFrequencyType = FinFrequencyTypes.QUARTERLY
+    swapFloatDayCountType = FinDayCountTypes.ACT_360
+    swapNotional = 1000000
+    swaptionType = FinLiborSwaptionTypes.PAYER
+
+    swaption = FinLiborSwaption(settlementDate,
+                                exerciseDate,
+                                swapMaturityDate,
+                                swaptionType,
+                                swapFixedCoupon,
+                                swapFixedFrequencyType,
+                                swapFixedDayCountType,
+                                swapNotional,
+                                swapFloatFrequencyType,
+                                swapFloatDayCountType)
+
+    model = FinModelBlack(0.1533)
+    v = swaption.value(settlementDate, liborCurve, model)
+    print("Swaption No-Arb Value:", v)
+
+    fwdSwapRate = liborCurve.swapRate(valuationDate,
+                                      exerciseDate,
+                                      swapMaturityDate,
+                                      swapFixedFrequencyType,
+                                      swapFixedDayCountType)
+
+    print("Fwd Swap Rate:", fwdSwapRate)
+    model = FinModelBlack(0.1533)
+
+    v = swaption.cashSettledValue(valuationDate,
+                                  liborCurve,
+                                  fwdSwapRate,
+                                  model)
+    print("Swaption Cash Settled Value:", v)
+
+###############################################################################
+
 
 def testFinLiborSwaptionMatlabExamples():
 
@@ -525,6 +617,7 @@ def testFinLiborSwaptionMatlabExamples():
 
 # test_FinLiborSwaption()
 # testFinLiborSwaptionModels()
-testFinLiborSwaptionMatlabExamples()
+testFinLiborCashSettledSwaption()
+# testFinLiborSwaptionMatlabExamples()
 # test_FinLiborSwaptionQLExample()
 testCases.compareTestCases()

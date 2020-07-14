@@ -283,10 +283,13 @@ class FinLiborSwaption():
     def cashSettledValue(self,
                          valuationDate,
                          discountCurve,
+                         swapRate,
                          model):
         ''' Valuation of a Libor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
-        discounts the future payments at a specified swap rate.'''
+        discounts all of the future payments at a flat swap rate. Note that the
+        Black volatility for this valuation should in general not equal the
+        Black volatility for the standard arbitrage-free valuation. '''
 
         floatSpread = 0.0
         payFixedFlag = True
@@ -306,8 +309,12 @@ class FinLiborSwaption():
                             self._dateGenRuleType)
 
         k = self._fixedCoupon
-        pv01 = swap.pv01(valuationDate, discountCurve)
-        s = swap.parCoupon(valuationDate, discountCurve)
+        s = swapRate
+
+        pv01 = swap.cashSettledPV01(valuationDate,
+                                    swapRate,
+                                    self._fixedFrequencyType)
+
         texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
@@ -322,23 +329,20 @@ class FinLiborSwaption():
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelBlackShifted):
+        else:
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                swaptionPrice = model.value(s, k, texp, df,
-                                            FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                swaptionPrice = model.value(s, k, texp, df,
-                                            FinOptionTypes.EUROPEAN_PUT)
+            raise FinError("Cash settled swaptions must be priced using"
+                           + " Black's model.")
 
-        self._pv01 = pv01
-        self._fwdSwapRate = s
+        self._fwdSwapRate = swapRate
         self._forwardDf = discountCurve.df(self._exerciseDate)
         self._underlyingSwap = swap
+        # The annuity needs to be discounted to today using the correct df
+        self._pv01 = pv01 * self._forwardDf
 
         # The exchange of cash occurs on the settlement date
         dfSettle = discountCurve.df(self._settlementDate)
-        swaptionPrice = swaptionPrice * pv01 * self._notional / dfSettle
+        swaptionPrice = swaptionPrice * self._pv01 * self._notional / dfSettle
 
         return swaptionPrice
 

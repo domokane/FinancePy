@@ -14,6 +14,9 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import interpolate, FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinCalendar import FinCalendarTypes, FinBusDayAdjustTypes
+from ...products.libor.FinLiborSwap import FinLiborSwap
+
 
 ###############################################################################
 # TODO: Allow it to take in a vector of dates
@@ -124,23 +127,6 @@ class FinDiscountCurve():
         else:
             return np.array(zeroRates)
 
-###############################################################################
-
-    def parRate(self,
-                dt: FinDate,
-                frequencyType=FinFrequencyTypes.CONTINUOUS,
-                dayCountType=FinDayCountTypes.ACT_360):
-        ''' Calculate the par rate to maturity date. This is the rate paid by a
-        bond that has a price of par today.  '''
-
-        times = timesFromDates(dt, self._valuationDate)
-        parRates = self._parRate(times, frequencyType)
-
-        if isinstance(dt, FinDate):
-            return parRates[0]
-        else:
-            return np.array(parRates)
-
 ##########################################################################
 
     def _zeroRate(self,
@@ -174,6 +160,23 @@ class FinDiscountCurve():
 
         return np.array(zerosList)
 
+###############################################################################
+
+    def parRate(self,
+                dt: FinDate,
+                frequencyType=FinFrequencyTypes.CONTINUOUS):
+        ''' Calculate the par rate to maturity date. This is the rate paid by a
+        bond that has a price of par today. For a par swap rate, use the swap
+        rate function that takes in the swap details. '''
+
+        times = timesFromDates(dt, self._valuationDate)
+        parRates = self._parRate(times, frequencyType)
+
+        if isinstance(dt, FinDate):
+            return parRates[0]
+        else:
+            return np.array(parRates)
+
 ##########################################################################
 
     def _parRate(self,
@@ -192,7 +195,7 @@ class FinDiscountCurve():
         dt = 1.0 / f
 
         if np.any(times < 0.0):
-             raise FinError("Unable to calculate par rate as one t < 0.0")
+            raise FinError("Unable to calculate par rate as one t < 0.0")
 
         parRateList = []
 
@@ -209,6 +212,29 @@ class FinDiscountCurve():
             parRateList.append(parRate)
 
         return np.array(parRateList)
+
+##########################################################################
+
+    def swapRate(self,
+                 valuationDate,
+                 settlementDate,
+                 maturityDate,
+                 fixedFrequencyType,
+                 fixedDayCountType):
+        ''' Calculate the breakeven swap rate for an interest rate swap that
+        starts on the settlement date (which may be forward starting) with a
+        specified frequenct and day count convention. Have omitted calendar and
+        other input choices for the moment so default values being used.'''
+
+        coupon = 1.0
+        swap = FinLiborSwap(settlementDate,
+                            maturityDate,
+                            coupon,
+                            fixedFrequencyType,
+                            fixedDayCountType)
+
+        swapRate = swap.parCoupon(valuationDate, self)
+        return swapRate
 
 ##########################################################################
 

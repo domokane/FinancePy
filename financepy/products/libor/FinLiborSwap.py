@@ -8,7 +8,7 @@ from typing import Union
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
+from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
@@ -250,6 +250,44 @@ class FinLiborSwap(object):
         z0 = discountCurve.df(valuationDate)
         pv = pv / z0
         return pv
+
+##########################################################################
+
+    def cashSettledPV01(self,
+                        valuationDate,
+                        flatSwapRate,
+                        frequencyType):
+        ''' Calculate the forward value of an annuity of a forward starting
+        swap using a single flat discount rate equal to the swap rate. This is
+        used in the pricing of a cash-settled swaption in the FinLiborSwaption
+        class. This method does not affect the standard valuation methods.'''
+
+        m = FinFrequency(frequencyType)
+
+        if m == 0:
+            raise FinError("Frequency cannot be zero.")
+
+        ''' The swap may have started in the past but we can only value
+        payments that have occurred after the valuation date. '''
+        startIndex = 0
+        while self._adjustedFixedDates[startIndex] < valuationDate:
+            startIndex += 1
+
+        ''' If the swap has yet to settle then we do not include the
+        start date of the swap as a coupon payment date. '''
+        if valuationDate <= self._startDate:
+            startIndex = 1
+
+        ''' Now PV fixed leg flows. '''
+        flatPV01 = 0.0
+        df = 1.0
+        alpha = 1.0 / m
+
+        for nextDt in self._adjustedFixedDates[startIndex:]:
+            df = df / (1.0 + alpha * flatSwapRate)
+            flatPV01 += df * alpha
+
+        return flatPV01
 
 ##########################################################################
 
