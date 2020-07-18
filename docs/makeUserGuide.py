@@ -498,15 +498,15 @@ def parseFunction(lines, startLine, endLine, className=""):
 
     functionLine = lines[startLine]
 
-    # Functions beginning with underscores ('_') are not to be parsed
-    isPrivate = (functionLine.find("def _") != -1)
-    if isPrivate:
-        return ""
-
     leftCol = functionLine.find("def ")
     n2 = functionLine.find("(")
     functionName = functionLine[leftCol + 4:n2]
     functionName = functionName.replace("_", r"\_")
+
+    # Functions beginning with underscores ('_') are not to be parsed
+    isPrivate = (functionLine.find("def _") != -1)
+    if isPrivate and functionName != r"\_\_init\_\_":
+        return ""
 
     # Ensure function stops before any class
     for rowNum in range(startLine + 1, endLine):
