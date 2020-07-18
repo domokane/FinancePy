@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 
 import glob
@@ -21,7 +21,7 @@ headFile = "./head.tex"
 tailFile = "./tail.tex"
 newHeadFile = "./head_" + str(VERSION) + ".tex"
 
-shutil.copyfile(headFile,newHeadFile)
+shutil.copyfile(headFile, newHeadFile)
 
 with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
     for line in file:
@@ -29,7 +29,7 @@ with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
 
 verbose = False
 
-##########################################################################
+###############################################################################
 
 
 def parseMarkdown(lines):

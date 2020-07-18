@@ -309,14 +309,14 @@ class FinDiscountCurve():
         ''' Calculate the continuous forward rate at the forward date. '''
 
         times = self._times.copy()
-        values = self._values.copy()
+        values = self._discountFactors.copy()
 
         n = len(self._times)
         for i in range(0, n):
             t = times[i]
             values[i] = values[i] * np.exp(-bumpSize*t)
 
-        discCurve = FinDiscountCurve(self._curveDate,
+        discCurve = FinDiscountCurve(self._valuationDate,
                                      times,
                                      values,
                                      self._interpMethod)
@@ -346,7 +346,7 @@ class FinDiscountCurve():
 
     def __repr__(self):
         header = "TIMES,DISCOUNT FACTORS"
-        valueTable = [self._times, self._values]
+        valueTable = [self._times, self._discountFactors]
         precision = "10.7f"
 
         return tableToString(header, valueTable, precision)

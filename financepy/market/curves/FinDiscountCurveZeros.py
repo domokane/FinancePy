@@ -12,7 +12,6 @@ from ...finutils.FinMath import testMonotonicity
 from .FinInterpolate import FinInterpMethods
 from ...finutils.FinHelperFunctions import labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinGlobalVariables import gDaysInYear
 
 
 ###############################################################################
