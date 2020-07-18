@@ -336,7 +336,7 @@ def parseModule(moduleName):
 
     for c in range(0, numFunctions):
         newLines = parseFunction(
-            lines, startFunctionLines[c], startFunctionLines[c + 1], False)
+            lines, startFunctionLines[c], startFunctionLines[c + 1])
 
         for newLine in newLines:
             f.writelines(newLine)
@@ -475,11 +475,15 @@ def parseClass(lines, startLine, endLine):
 
     startClassFunctionLines.append(endLine)
 
+    # Remove inheritance name from className
+    endClassName = className.find("(")
+    className = className[:endClassName]
+
     for c in range(0, numClassFunctions):
         newLines += parseFunction(lines,
                                   startClassFunctionLines[c],
                                   startClassFunctionLines[c + 1],
-                                  True)
+                                  className)
         newLines += "\n"
 
     return newLines
@@ -487,12 +491,18 @@ def parseClass(lines, startLine, endLine):
 ##########################################################################
 
 
-def parseFunction(lines, startLine, endLine, classFlag):
+def parseFunction(lines, startLine, endLine, className=""):
     ''' Given a set of lines and a start line I extract the function definiton
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments.'''
 
     functionLine = lines[startLine]
+
+    # Functions beginning with underscores ('_') are not to be parsed
+    isPrivate = (functionLine.find("def _") != -1)
+    if isPrivate:
+        return ""
+
     leftCol = functionLine.find("def ")
     n2 = functionLine.find("(")
     functionName = functionLine[leftCol + 4:n2]
@@ -516,9 +526,26 @@ def parseFunction(lines, startLine, endLine, classFlag):
     for rowNum in range(startLine, endLine):
         line = lines[rowNum]
         functionSignature += str(line)
-        if line.find(":") >= 0:
+        if line.find("):") >= 0:
             startLine = rowNum  # update start line to after function signature
             break
+
+    # Replace `__init__` with className and remove `self` from signatures
+    if className != "":
+        # Replace '__init__' with the function's class name
+        if functionName == r"\_\_init\_\_":
+            functionName = className
+            functionSignature = functionSignature.replace("__init__", className)
+
+        # Remove 'self' and any whitespace following it
+        functionSignature = functionSignature.replace("self", "")
+
+        unchanged = ""
+        while unchanged != functionSignature:
+            unchanged = functionSignature
+            functionSignature = functionSignature.replace("(,", "(")
+            functionSignature = functionSignature.replace("( ", "(")
+            functionSignature = functionSignature.replace("(\n", "(")
 
     functionComment = ""
     startCommentRow = startLine+1
@@ -569,7 +596,7 @@ def parseFunction(lines, startLine, endLine, classFlag):
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
     # LATEX FORMATTING
-    if classFlag:
+    if className != "":
         functionDescription = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
     else:
@@ -594,7 +621,8 @@ def parseEnum(lines, startLine, endLine):
     enumLine = lines[startLine]
     n1 = enumLine.find("class")
     n2 = enumLine.find("(")
-    enumName = enumLine[n1 + 5:n2]
+    # len("class ") == 6
+    enumName = enumLine[n1 + 6:n2]
 
     enumTypes = []
     for rowNum in range(startLine + 1, endLine):
@@ -608,7 +636,7 @@ def parseEnum(lines, startLine, endLine):
         else:
             break
 
-    enumDescription.append("\\subsubsection*{Enumerated Type:" + enumName + "}")
+    enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName + "}")
     enumDescription.append("\n")
     enumDescription.append("\\begin{itemize}")
     enumDescription.append("\n")
@@ -653,6 +681,8 @@ if 1 == 1:
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
     pdfFileName2 = '../../financepy-examples-git/' + pdfFileName1
+    # TODO: Only works if you have fincancepy-examples-git
+    # Maybe add `financepy-examples-git` as a submodule?
     print("Copying ", pdfFileName1, " to ", pdfFileName2)
     shutil.copyfile(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
