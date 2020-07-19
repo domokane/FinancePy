@@ -553,25 +553,31 @@ def parseFunction(lines, startLine, endLine, className=""):
     startComment = False
     endComment = False
 
-    for rowNum in range(startLine, endLine):
+    #print("STARTLINE", lines[startLine])
+
+    for rowNum in range(startLine+1, endLine):
         line = lines[rowNum]
 
-        if line.count("'''") == 1:
+        if line.count("'''") == 1 or line.count('"""') == 1:
+            if line.count("'''") == 1:
+                commentInit = "'''"
+            else:
+                commentInit = '"""'
+
             startCommentRow = rowNum
             startComment = True
-            startLine = rowNum + 1
+            for rowNum in range(rowNum+1, endLine):
+                line = lines[rowNum]
+                if line.find(commentInit) > 0:
+                    endCommentRow = rowNum
+                    endComment = True
+                    break
             break
 
-        if line.count("'''") == 2:
+        if line.count("'''") == 2 or line.count('"""') == 2:
             startCommentRow = rowNum
-            startComment = True
-            startLine = rowNum
-            break
-
-    for rowNum in range(startLine, endLine):
-        line = lines[rowNum]
-        if line.find("'''") > 0:
             endCommentRow = rowNum
+            startComment = True
             endComment = True
             break
 
@@ -585,7 +591,8 @@ def parseFunction(lines, startLine, endLine, className=""):
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("_", r"\_")
-            line = line.replace("'", "")
+            line = line.replace("'''", "")
+            line = line.replace('"""', '')
             line = line.replace("\n", "")
             line = line.replace("#", r"\#")
             line = line.lstrip()
