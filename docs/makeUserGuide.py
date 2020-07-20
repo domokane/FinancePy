@@ -636,7 +636,7 @@ def parseEnum(lines, startLine, endLine):
         else:
             break
 
-    enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName + "}")
+    enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
     enumDescription.append("\n")
     enumDescription.append("\\begin{itemize}")
     enumDescription.append("\n")
