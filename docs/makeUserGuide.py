@@ -553,8 +553,6 @@ def parseFunction(lines, startLine, endLine, className=""):
     startComment = False
     endComment = False
 
-    #print("STARTLINE", lines[startLine])
-
     for rowNum in range(startLine+1, endLine):
         line = lines[rowNum]
 
@@ -602,6 +600,8 @@ def parseFunction(lines, startLine, endLine, className=""):
     if functionComment == " ":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
+    paramDescription = extractParams(functionSignature)
+
     # LATEX FORMATTING
     if className != "":
         functionDescription = r"\subsubsection*{{\bf " + \
@@ -615,6 +615,7 @@ def parseFunction(lines, startLine, endLine, className=""):
     functionDescription += "\\begin{lstlisting}\n"
     functionDescription += functionSignature
     functionDescription += "\\end{lstlisting}\n"
+    functionDescription += paramDescription
 
     return functionDescription
 
@@ -659,6 +660,90 @@ def parseEnum(lines, startLine, endLine):
 ##########################################################################
 
 
+def extractParams(functionSignature):
+    ''' Parse a function signature into a table containing each function
+    argument's name, type, description and default value'''
+    # A good example to look at for testing is `FinBondConvertible`
+
+    functionSignature = functionSignature.replace("\\", "\\textbackslash ")
+    functionSignature = functionSignature.replace("_", "\_")
+    functionSignature = functionSignature.replace("%", "\%")
+
+    # Remove information that isn't to do with the parameters
+    stripedSignature = functionSignature.split("(", 1)[1].replace("):", "").strip()
+    if stripedSignature == "":
+        # The function has no parameters
+        return ""
+
+    paramDescription = "\\begin{tabular}{ |c | c | c | c |}\n"
+    paramDescription += "\\hline\n"
+    paramDescription += "Name & Type & Description & Default \\\\\n"
+    paramDescription += "\\hline\n"
+    paramDescription += "\\hline\n"
+
+    lines = stripedSignature.split("\n")
+    for line in lines:
+        # Find comment
+        # If multiple arguments are on the same line as a comment,
+        # the comment will be used for each argument on that line.
+        commentLocation = line.find("#")
+        pComment = "Unknown"
+        if commentLocation != -1:
+            pComment = line[commentLocation+1:].strip()
+            line = line[:commentLocation]
+
+        line = line.strip()
+        # Split by comma while leaving commas that are in square brackets '[]'.
+        # This allows us to parse 'Union[FinDate, str]' for maturityDateOrTenor.
+        if line.find("[") != -1:
+            # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
+            params = []
+            p = []
+            bracketLevel = 0
+            for c in line + ",":
+                if c == "," and bracketLevel == 0:
+                    params.append("".join(p))
+                    p = []
+                else:
+                    if c == "[":
+                        bracketLevel += 1
+                    elif c == "]":
+                        bracketLevel -= 1
+                    p.append(c)
+        else:
+            params = line.split(",")
+
+        for param in params:
+            param = param.strip()
+            if param == "":
+                continue
+
+            # Find default value
+            pDefault = "None"
+            defaultLocation = param.find("=")
+            if defaultLocation != -1:
+                pDefault = param[defaultLocation+1:].strip()
+                param = param[:defaultLocation]
+
+            # Find type
+            pType = "Unknown"
+            typeLocation = param.find(':')
+            if typeLocation != -1:
+                pType = param[typeLocation+1:].strip()
+                param = param[:typeLocation].strip()
+
+            # Everything remaining must be the name
+            pName = param
+
+            paramDescription += f"{pName} & {pType} & {pComment} & {pDefault} \\\\\n"
+            paramDescription += "\\hline\n"
+
+    paramDescription += "\\end{tabular}"
+    return paramDescription
+
+##########################################################################
+
+
 buildHead()
 buildIntro("..//README.md")
 
@@ -691,6 +776,6 @@ if 1 == 1:
     # TODO: Only works if you have fincancepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
     print("Copying ", pdfFileName1, " to ", pdfFileName2)
-    shutil.copyfile(pdfFileName1, pdfFileName2)
+    #shutil.copyfile(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
     open_file(pdfFileName1)
