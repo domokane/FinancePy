@@ -539,6 +539,12 @@ def parseFunction(lines, startLine, endLine, className=""):
             functionName = className
             functionSignature = functionSignature.replace("__init__", className)
 
+            missingSpaces = len(className) - len("__init__")
+            if (missingSpaces >= 0):
+                functionSignature = functionSignature.replace("\n ", "\n " + " " * (missingSpaces))
+            else:
+                functionSignature = functionSignature.replace("\n" + " " * (-missingSpaces), "\n")
+
         # Remove 'self' and any whitespace following it
         functionSignature = functionSignature.replace("self", "")
 
