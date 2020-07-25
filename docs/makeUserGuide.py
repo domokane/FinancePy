@@ -28,6 +28,7 @@ with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
         print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
 
 verbose = False
+parseDataMembers = False
 
 ###############################################################################
 
@@ -420,45 +421,46 @@ def parseClass(lines, startLine, endLine):
     ##################################################
     # Now get the data members
 
-    newLines.append("\\subsubsection*{Data Members}\n")
-#    newLines.append("The class data members are:")
 
-    dataMembers = []
+    if parseDataMembers:
+        newLines.append("\\subsubsection*{Data Members}\n")
 
-    for rowNum in range(startLine, endLine):
-        row = lines[rowNum]
-        row = row.replace(" ", "")
-        row = row.replace("_", r"\_")
-        row = row.replace("!", "")
-        row = row.replace("<", "")
-        row = row.replace(">", "")
+        dataMembers = []
 
-        n1 = row.find("self.")
-        n2 = row.find("=")
-        n3 = row.find("[")
+        for rowNum in range(startLine, endLine):
+            row = lines[rowNum]
+            row = row.replace(" ", "")
+            row = row.replace("_", r"\_")
+            row = row.replace("!", "")
+            row = row.replace("<", "")
+            row = row.replace(">", "")
 
-        if n1 != -1 and n2 > n1 and n3 == -1:
-            dataMember = row[n1:n2]
-            dataMember = dataMember.strip(" ")
-            dataMember = dataMember.strip(")")
-            dataMember = dataMember.replace("self.", "")
-            dataMembers = addToList(dataMembers, dataMember)
+            n1 = row.find("self.")
+            n2 = row.find("=")
+            n3 = row.find("[")
 
-    if len(dataMembers) > 0:
-        newLines.append("\\begin{itemize}\n")
+            if n1 != -1 and n2 > n1 and n3 == -1:
+                dataMember = row[n1:n2]
+                dataMember = dataMember.strip(" ")
+                dataMember = dataMember.strip(")")
+                dataMember = dataMember.replace("self.", "")
+                dataMembers = addToList(dataMembers, dataMember)
 
-        for dataMember in dataMembers:
-            newLines.append("\\item{" + dataMember + "}\n")
-        newLines.append("\\end{itemize}")
+        if len(dataMembers) > 0:
+            newLines.append("\\begin{itemize}\n")
+
+            for dataMember in dataMembers:
+                newLines.append("\\item{" + dataMember + "}\n")
+            newLines.append("\\end{itemize}")
+            newLines.append("\n")
+            newLines.append("\n")
+        else:
+            newLines.append("No data members found.")
+            newLines.append("\n")
+            newLines.append("\n")
+
+        newLines.append("\\subsection*{Functions}\n")
         newLines.append("\n")
-        newLines.append("\n")
-    else:
-        newLines.append("No data members found.")
-        newLines.append("\n")
-        newLines.append("\n")
-
-    newLines.append("\\subsection*{Functions}\n")
-    newLines.append("\n")
 
     # Now get the functions
     numClassFunctions = 0
@@ -536,6 +538,12 @@ def parseFunction(lines, startLine, endLine, className=""):
         if functionName == r"\_\_init\_\_":
             functionName = className
             functionSignature = functionSignature.replace("__init__", className)
+
+            missingSpaces = len(className) - len("__init__")
+            if (missingSpaces >= 0):
+                functionSignature = functionSignature.replace("\n ", "\n " + " " * (missingSpaces))
+            else:
+                functionSignature = functionSignature.replace("\n" + " " * (-missingSpaces), "\n")
 
         # Remove 'self' and any whitespace following it
         functionSignature = functionSignature.replace("self", "")
