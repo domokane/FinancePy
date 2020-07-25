@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64, int64
+from numba import njit, jit, float64, int64
 from math import ceil
 
 from ..finutils.FinError import FinError
@@ -14,64 +14,53 @@ from ..finutils.FinHelperFunctions import labelToString
 interp = FinInterpMethods.FLAT_FORWARDS.value
 
 ###############################################################################
-# TODO : Calculate accrued in bond option according to accrual convention
-# TODO : Convergence is unstable - investigate how to improve it
-# TODO : Write a fallback for gradient based alpha using bisection
-# TODO : Fix treatment of accrued interest on the option expiry date.
 ###############################################################################
-
-# (c) Dominic O'Kane - December-2019
-# Fergal O'Kane - search root function - 16-12-2019
-
+###############################################################################
+# LOTS OF FUNCTIONS TO PORT TO BDT
 ###############################################################################
 
 
-@njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
+@njit(float64(float64, int64, float64[:, :], float64[:, :],
+              float64, float64, float64),
       fastmath=True, cache=True)
-def f(alpha, nm, Q, P, dX, dt, N):
+def f(x0, m, Q, rt, dfEnd, dt, sigma):
 
-    sumQZ = 0.0
-    for j in range(-nm, nm+1):
-        x = alpha + j*dX
-        rdt = np.exp(x)*dt
-        sumQZ += Q[j+N] * np.exp(-rdt)
+    # x is the middle value on the short-rate on the tree
+    midm = int(m/2)
+    rt[m, midm] = x0
 
-    objFn = sumQZ - P
+    for i in range(midm, 0, -1):
+        rt[m, i-1] = rt[m, i] * np.exp(-2.0 * sigma * np.sqrt(dt))
+
+    for i in range(midm + 1, m + 1, 1):
+        rt[m, i] = rt[m, i-1] * np.exp(2.0 * sigma * np.sqrt(dt))
+
+    sumInner = 0.0
+    for i in range(1, m+1):
+        rd = rt[m, i-1]
+        ru = rt[m, i]
+        nextPeriodDf = 0.5 * (1.0 / ((1.0 + rd)**dt) + 1.0 / ((1.0 + ru)**dt))
+        q = Q[m-1, i-1]
+        sumInner += q * nextPeriodDf
+
+    objFn = sumInner - dfEnd
     return objFn
 
 ###############################################################################
-
-
-@njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
-      fastmath=True, cache=True)
-def fprime(alpha, nm, Q, P, dX, dt, N):
-
-    sumQZdZ = 0.0
-    for j in range(-nm, nm+1):
-        x = alpha + j*dX
-        rdt = np.exp(x)*dt
-        sumQZdZ += Q[j+N] * np.exp(-rdt) * np.exp(x)
-
-    deriv = -sumQZdZ*dt
-    return deriv
-
-###############################################################################
-# This is the secant method which is not used as I computed the derivative of
-# objective function with respect to the drift term
 ###############################################################################
 
 
-@njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
-      fastmath=True, cache=True)
-def searchRoot(x0, nm, Q, P, dX, dt, N):
+@njit(float64(float64, int64, float64[:, :], float64[:, :], float64, float64,
+              float64), fastmath=True, cache=True)
+def searchRoot(x0, m, Q, rt, dfEnd, dt, sigma):
 
     #    print("Searching for root", x0)
-    max_iter = 50
+    max_iter = 10
     max_error = 1e-8
 
     x1 = x0 * 1.0001
-    f0 = f(x0, nm, Q, P, dX, dt, N)
-    f1 = f(x1, nm, Q, P, dX, dt, N)
+    f0 = f(x0, m, Q, rt, dfEnd, dt, sigma)
+    f1 = f(x1, m, Q, rt, dfEnd, dt, sigma)
 
     for i in range(0, max_iter):
 
@@ -83,54 +72,25 @@ def searchRoot(x0, nm, Q, P, dX, dt, N):
         x = x1 - f1 * (x1-x0)/df
         x0, f0 = x1, f1
         x1 = x
-        f1 = f(x1, nm, Q, P, dX, dt, N)
+        f1 = f(x1, m, Q, rt, dfEnd, dt, sigma)
 
         if (abs(f1) <= max_error):
             return x1
 
     raise FinError("Search root deriv FAILED to find alpha.")
 
+
 ###############################################################################
-# This is Newton Raphson which is faster than the secant measure as it has the
-# analytical derivative  that is easy to calculate.
-# UPDATE IN MAY 2020: HAVING PROBLEMS WITH CONVERGENCE OF DERIVATIVE APPROACH
-# DUE TO FLATNESS OF FUNCTION AT NEGATIVE X. NEEDED LOWER LIMIT NUMTIMESTEPS
+# PORT TO BDT
 ###############################################################################
 
 
-@njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
-      fastmath=True, cache=True)
-def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
-
-    max_iter = 50
-    max_error = 1e-7
-
-    for i in range(0, max_iter):
-
-        fval = f(x0, nm, Q, P, dX, dt, N)
-
-        if abs(fval) <= max_error:
-            return x0
-
-        fderiv = fprime(x0, nm, Q, P, dX, dt, N)
-
-        if abs(fderiv) == 0.0:
-            raise FinError("Function derivative is zero.")
-
-        step = fval/fderiv
-        x0 = x0 - step
-
-    raise FinError("Search root deriv FAILED to find alpha.")
-
-###############################################################################
-
-
-@njit(fastmath=True, cache=True)
+#@njit(fastmath=True, cache=True)
 def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
                                couponTimes, couponFlows,
                                exerciseType,
                                _dfTimes, _dfValues,
-                               _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+                               _treeTimes, _Q, _rt, _dt):
     ''' Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to non-analytical bond
     price we need to extend tree out to bond maturity and take into account
@@ -141,7 +101,6 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
     ###########################################################################
 
     numTimeSteps, numNodes = _Q.shape
-    jmax = ceil(0.1835/(_a * _dt))
     expiryStep = int(texp/_dt + 0.50)
     maturityStep = int(tmat/_dt + 0.50)
 
@@ -352,6 +311,9 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
 
     return payValues[0, jmax], recValues[0, jmax]
 
+###############################################################################
+###############################################################################
+# PORT TO BDT
 ###############################################################################
 
 
@@ -605,6 +567,9 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
     return callOptionValues[0, jmax], putOptionValues[0, jmax]
 
 ###############################################################################
+###############################################################################
+# PORT TO BDT
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -775,125 +740,60 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
             'bondpure': bondValues[0, jmax]}
 
 ###############################################################################
+###############################################################################
 
+from financepy.finutils.FinHelperFunctions import printTree
 
-@njit(fastmath=True)
-def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
+#@njit(fastmath=True)
+def buildTreeFast(sigma, treeTimes, numTimeSteps, discountFactors):
+    # Unlike the BK and HK Trinomial trees, this Tree is packed into the lower
+    # diagonal of a square matrix because of its binomial nature. This means
+    # that the indexing of the arrays is different.
 
     treeMaturity = treeTimes[-1]
     dt = treeMaturity / (numTimeSteps+1)
-    dX = sigma * np.sqrt(3.0 * dt)
-    jmax = ceil(0.1835/(a * dt))
-    jmin = - jmax
-
-    if jmax > 1000:
-        raise FinError("Jmax > 1000. Increase a or dt.")
-
-    pu = np.zeros(shape=(2*jmax+1))
-    pm = np.zeros(shape=(2*jmax+1))
-    pd = np.zeros(shape=(2*jmax+1))
 
     # The short rate goes out one step extra to have the final short rate
-    # This is the BK model so x = log(r)
-    X = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
-    rt = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
+    # This is the BDT model so x = log(r)
+    Q = np.zeros(shape=(numTimeSteps, (numTimeSteps)))
+    rt = np.zeros(shape=(numTimeSteps, (numTimeSteps)))
 
-    # probabilities start at time 0 and go out to one step before T
-    # Branching is simple trinomial out to time step m=1 after which
-    # the top node and bottom node connect internally to two lower nodes
-    # and two upper nodes respectively. The probabilities only depend on j
+    r0 = (1.0 / discountFactors[1] - 1.0)/dt
 
-    for j in range(-jmax, jmax+1):
-        ajdt = a*j*dt
-        jN = j + jmax
-        if j == jmax:
-            pu[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt - 3.0*ajdt)
-            pm[jN] = -1.0/3.0 - ajdt*ajdt + 2.0*ajdt
-            pd[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt - ajdt)
-        elif j == -jmax:
-            pu[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt + ajdt)
-            pm[jN] = -1.0/3.0 - ajdt*ajdt - 2.0*ajdt
-            pd[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt + 3.0*ajdt)
-        else:
-            pu[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt - ajdt)
-            pm[jN] = 2.0/3.0 - ajdt*ajdt
-            pd[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt + ajdt)
+    rt[0, 0] = r0
+    Q[0, 0] = 1.0 / ((1.0 + rt[0, 0])**dt)
 
-    # Arrow-Debreu array
-    Q = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
+    for m in range(1, numTimeSteps):
 
-    # This is the drift adjustment to ensure no arbitrage at each time
-    alpha = np.zeros(numTimeSteps+1)
+        dfEnd = discountFactors[m+1]
+        searchRoot(r0, m, Q, rt, dfEnd, dt, sigma)
 
-    # Time zero is trivial for the Arrow-Debreu price
-    Q[0, jmax] = 1.0
-    x0 = 3.0
+        Q[m, 0] = 0.50 * Q[m-1, 0] / (1.0 + rt[m, 0]) ** dt
 
-    # Big loop over time steps
-    for m in range(0, numTimeSteps + 1):
+        for n in range(1, m):
+            Q[m, n] = 0.50 * Q[m-1, n-1] / ((1.0 + rt[m, n-1])**dt) \
+                    + 0.50 * Q[m-1, n] / ((1.0 + rt[m, n])**dt)
 
-        nm = min(m, jmax)
+        Q[m, m] = 0.50 * Q[m-1, m-1] / ((1.0 + rt[m, m])**dt)
 
-        # Need to do drift adjustment which is non-linear and so requires
-        # a root search algorithm - we NO LONGER choose to use Newton-Raphson
-        # argtuple = (m, nm, Q[m], discountFactors[m+1], dX, dt, N)
-        # MAY 2020 - DUE TO A NUMERICAL INSTABILITY IN FINDING THE ROOT I HAVE
-        # LIMITED NUM TIME STEPS AS WHEN THESE ARE LARGE ROOT SEARCHING BREAKS
-
-        alpha[m] = searchRootDeriv(x0, nm, Q[m],
-                                   discountFactors[m+1], dX, dt, jmax)
-
-        x0 = alpha[m]
-
-        for j in range(-nm, nm+1):
-            jN = j + jmax
-            X[m, jN] = alpha[m] + j*dX
-            rt[m, jN] = np.exp(X[m, jN])
-
-        # Loop over all nodes at time m to calculate next values of Q
-        for j in range(-nm, nm+1):
-            jN = j + jmax
-            rdt = np.exp(X[m, jN]) * dt
-            z = np.exp(-rdt)
-
-            if j == jmax:
-                Q[m+1, jN] += Q[m, jN] * pu[jN] * z
-                Q[m+1, jN-1] += Q[m, jN] * pm[jN] * z
-                Q[m+1, jN-2] += Q[m, jN] * pd[jN] * z
-            elif j == jmin:
-                Q[m+1, jN] += Q[m, jN] * pd[jN] * z
-                Q[m+1, jN+1] += Q[m, jN] * pm[jN] * z
-                Q[m+1, jN+2] += Q[m, jN] * pu[jN] * z
-            else:
-                Q[m+1, jN+1] += Q[m, jN] * pu[jN] * z
-                Q[m+1, jN] += Q[m, jN] * pm[jN] * z
-                Q[m+1, jN-1] += Q[m, jN] * pd[jN] * z
-
-    return (Q, pu, pm, pd, rt, dt)
+    return (Q, rt, dt)
 
 ##########################################################################
 
 
-class FinModelRatesBK():
+class FinModelRatesBDT():
 
-    def __init__(self, sigma, a, numTimeSteps=100):
-        ''' Constructs the Black Karasinski rate model. The speed of mean
-        reversion a and volatility are passed in. The short rate process
-        is given by d(log(r)) = (theta(t) - a*log(r)) * dt  + sigma * dW '''
+    def __init__(self, sigma, numTimeSteps=100):
+        ''' Constructs the Black-Derman-Toy rate model in the case when the
+        volatility is assumed to be constant. The short rate process simplifies
+        and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh '''
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
 
-        if a < 0.0:
-            raise FinError("Mean reversion speed parameter should be >= 0.")
-
-        if a < 1e-10:
-            a = 1e-10
-
-        self._a = a
         self._sigma = sigma
 
-        if numTimeSteps < 30:
+        if numTimeSteps < 3:
             raise FinError("Drift fitting requires at least 30 time steps")
 
         self._numTimeSteps = numTimeSteps
@@ -901,11 +801,51 @@ class FinModelRatesBK():
         self._Q = None
         self._rt = None
         self._treeTimes = None
-        self._pu = None
-        self._pm = None
-        self._pd = None
+        self._pu = 0.50
+        self._pd = 0.50
         self._discountCurve = None
 
+        return
+
+###############################################################################
+
+    def buildTree(self, treeMat, dfTimes, dfValues):
+
+        if isinstance(dfTimes, np.ndarray) is False:
+            raise FinError("DF TIMES must be a numpy vector")
+
+        if isinstance(dfValues, np.ndarray) is False:
+            raise FinError("DF VALUES must be a numpy vector")
+
+        interp = FinInterpMethods.FLAT_FORWARDS.value
+
+        treeMaturity = treeMat * (self._numTimeSteps+1)/self._numTimeSteps
+
+        # The vector of times goes out to this maturity
+        treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)
+        self._treeTimes = treeTimes
+
+        dfTree = np.zeros(shape=(self._numTimeSteps+2))
+        dfTree[0] = 1.0
+
+        for i in range(1, self._numTimeSteps+2):
+            t = treeTimes[i]
+            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
+
+        self._dfTimes = dfTimes
+        self._dfValues = dfValues
+
+        self._Q, self._rt, self._dt \
+            = buildTreeFast(self._sigma,
+                            treeTimes, self._numTimeSteps, dfTree)
+
+        printTree(self._Q)
+        printTree(self._rt)
+
+        return
+
+###############################################################################
+# PORT TO BDT
 ###############################################################################
 
     def bondOption(self, texp, strike,
@@ -937,6 +877,9 @@ class FinModelRatesBK():
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
+###############################################################################
+# PORT TO BDT
+###############################################################################
 
     def bermudanSwaption(self, texp, strike, face,
                          couponTimes, couponFlows, exerciseType):
@@ -954,18 +897,20 @@ class FinModelRatesBK():
 
         #######################################################################
 
-        callValue, putValue \
+        payValue, recValue \
             = bermudanSwaption_Tree_Fast(texp, tmat, strike, face,
                                          couponTimes, couponFlows,
                                          exerciseType,
                                          self._dfTimes, self._dfValues,
                                          self._treeTimes, self._Q,
-                                         self._pu, self._pm, self._pd,
                                          self._rt,
-                                         self._dt, self._a)
+                                         self._dt)
 
-        return {'call': callValue, 'put': putValue}
+        return {'pay': payValue, 'rec': recValue}
 
+###############################################################################
+###############################################################################
+# PORT TO BDT
 ###############################################################################
 
     def callablePuttableBond_Tree(self,
@@ -998,44 +943,11 @@ class FinModelRatesBK():
 
 ###############################################################################
 
-    def buildTree(self, tmat, dfTimes, dfValues):
-
-        if isinstance(dfTimes, np.ndarray) is False:
-            raise FinError("DF TIMES must be a numpy vector")
-
-        if isinstance(dfValues, np.ndarray) is False:
-            raise FinError("DF VALUES must be a numpy vector")
-
-        interp = FinInterpMethods.FLAT_FORWARDS.value
-
-        treeMaturity = tmat * (self._numTimeSteps+1)/self._numTimeSteps
-        treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)
-        self._treeTimes = treeTimes
-
-        dfTree = np.zeros(shape=(self._numTimeSteps+2))
-        dfTree[0] = 1.0
-
-        for i in range(1, self._numTimeSteps+2):
-            t = treeTimes[i]
-            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
-
-        self._dfTimes = dfTimes
-        self._dfValues = dfValues
-
-        self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
-            = buildTreeFast(self._a, self._sigma,
-                            treeTimes, self._numTimeSteps, dfTree)
-
-        return
-
-###############################################################################
-
     def __repr__(self):
         ''' Return string with class details. '''
 
-        s = "Black-Karasinski Model\n"
+        s = "Black-Derman-Toy Model\n"
         s += labelToString("Sigma", self._sigma)
-        s += labelToString("a", self._a)
         return s
 
 ###############################################################################

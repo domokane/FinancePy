@@ -7,11 +7,11 @@ from numba import njit, float64, int64
 import numpy as np
 from ..finutils.FinHelperFunctions import labelToString
 
-##########################################################################
+###############################################################################
 # CIR Process
 # dr = a(b-r) + sigma sqrt(r) dW
 # Note that r can hit zero if 2.0 * a * b < sigma*sigma:
-##########################################################################
+###############################################################################
 
 # TO DO - DECIDE WHETHER TO OO MODEL
 # CAN DO Z SCALING INSIDE NUMPY ?
@@ -27,7 +27,7 @@ class FinCIRNumericalScheme(Enum):
     KAHLJACKEL = 4
     EXACT = 5  # SAMPLES EXACT DISTRIBUTION
 
-##########################################################################
+###############################################################################
 
 # THIS CLASS IS NOT USED BUT MAY BE USED IF WE CREATE AN OO FRAMEWORK
 
@@ -39,7 +39,7 @@ class FinModelRatesCIR():
         self._b = b
         self._sigma = sigma
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -48,7 +48,7 @@ def meanr(r0, a, b, t):
     mr = r0 * exp(-a * t) + b * (1.0 - exp(-a * t))
     return mr
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -58,7 +58,7 @@ def variancer(r0, a, b, sigma, t):
     vr += b * sigma * sigma * ((1.0 - exp(-a * t))**2) / 2.0 / a
     return vr
 
-##########################################################################
+###############################################################################
 
 
 @njit(
@@ -80,7 +80,7 @@ def zeroPrice(r0, a, b, sigma, t):
     zcb = A * exp(-r0 * B)
     return zcb
 
-##########################################################################
+###############################################################################
 
 
 @njit(
@@ -96,21 +96,21 @@ def draw(rt, a, b, sigma, dt):
     ''' Draw a next rate from the CIR model in Monte Carlo. '''
     sigma2 = sigma * sigma
     d = 4.0 * a * b / sigma2
-    l = 4.0 * a * exp(-a * dt) / sigma2 / (1.0 - exp(-a * dt)) * rt
+    ll = 4.0 * a * exp(-a * dt) / sigma2 / (1.0 - exp(-a * dt)) * rt
     c = sigma2 * (1.0 - exp(-a * dt)) / 4.0 / a
 
     if d > 1:
         Z = np.random.normal()
         X = np.random.chisquare(d - 1)
-        r = c * (X + (Z + sqrt(l))**2)
+        r = c * (X + (Z + sqrt(ll))**2)
     else:
-        N = np.random.poisson(l / 2.0)
+        N = np.random.poisson(ll / 2.0)
         X = np.random.chisquare(d + 2 * N)
         r = c * X
 
     return r
 
-##########################################################################
+###############################################################################
 
 
 @njit(
@@ -208,7 +208,7 @@ def ratePath_MC(r0, a, b, sigma, t, dt, seed, scheme):
 
     return ratePath
 
-##########################################################################
+###############################################################################
 
 
 @njit(
@@ -332,4 +332,4 @@ def zeroPrice_MC(r0, a, b, sigma, t, dt, numPaths, seed, scheme):
     zcb /= numPaths
     return zcb
 
-##########################################################################
+###############################################################################

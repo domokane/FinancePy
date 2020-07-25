@@ -181,7 +181,8 @@ def test_FinBondOptionAmericanConvergenceONE():
     strikePrice = 100.0
     face = 100.0
 
-    spotValue = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    spotValue = bond.valueBondUsingDiscountCurve(settlementDate,
+                                                 discountCurve)
 
     texp = (expiryDate - settlementDate) / gDaysInYear
     dfExpiry = discountCurve.df(texp)
@@ -193,7 +194,8 @@ def test_FinBondOptionAmericanConvergenceONE():
     callPV = max(fwdValue - strikePrice, 0) * dfExpiry
     putPV = max(strikePrice - fwdValue, 0) * dfExpiry
 
-    testCases.header("PERIOD","N","PUT_AMER","PUT_EUR","CALL_AME","CALL_EUR")
+    testCases.header("PERIOD", "N", "PUT_AMER", "PUT_EUR",
+                     "CALL_AME", "CALL_EUR")
 
     timeSteps = range(10, 100, 1)
 
@@ -232,12 +234,13 @@ def test_FinBondOptionAmericanConvergenceONE():
 
 ###############################################################################
 
+
 def test_FinBondOptionAmericanConvergenceTWO():
 
     # Build discount curve
     settlementDate = FinDate(1, 12, 2019)
     discountCurve = FinDiscountCurveFlat(settlementDate, 0.05,
-                                 FinFrequencyTypes.CONTINUOUS)
+                                         FinFrequencyTypes.CONTINUOUS)
 
     # Bond details
     maturityDate = FinDate(1, 9, 2025)

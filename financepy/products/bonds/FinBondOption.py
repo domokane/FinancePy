@@ -60,7 +60,8 @@ class FinBondOption():
               valueDate,
               discountCurve,
               model):
-        ''' Value the bond option using the specified model. '''
+        ''' Value a bond option (option on a bond) using the specified model
+        which include Hull-White Tree, Black-Karasinski Tree. '''
 
         texp = (self._expiryDate - valueDate) / gDaysInYear
 

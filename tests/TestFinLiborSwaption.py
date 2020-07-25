@@ -326,6 +326,7 @@ def testFinLiborCashSettledSwaption():
                                   liborCurve,
                                   fwdSwapRate,
                                   model)
+
     print("Swaption Cash Settled Value:", v)
 
 ###############################################################################

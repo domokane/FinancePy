@@ -8,9 +8,9 @@ from ..finutils.FinOptionTypes import FinOptionTypes
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N
 
-##########################################################################
+###############################################################################
 # TODO: Should I merge this with SABR ?
-##########################################################################
+###############################################################################
 
 
 @njit(float64(float64, float64, float64, float64, float64, float64,
@@ -55,7 +55,7 @@ def blackVolFromShiftedSABR(alpha, beta, rho, nu, s, f, k, t):
 
     return sigma
 
-##########################################################################
+###############################################################################
 
 
 class FinModelSABRShifted():

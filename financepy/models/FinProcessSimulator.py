@@ -12,7 +12,7 @@ from ..finutils.FinError import FinError
 from ..finutils.FinMath import norminvcdf
 from ..finutils.FinHelperFunctions import labelToString
 
-##########################################################################
+###############################################################################
 
 
 class FinProcessTypes(Enum):
@@ -23,8 +23,7 @@ class FinProcessTypes(Enum):
     CEV = 5
     JUMP_DIFFUSION = 6
 
-##########################################################################
-##########################################################################
+###############################################################################
 
 
 class FinProcessSimulator():
@@ -86,7 +85,7 @@ class FinProcessSimulator():
         else:
             raise FinError("Unknown process" + str(processType))
 
-##########################################################################
+###############################################################################
 
 
 class FinHestonNumericalScheme(Enum):
@@ -94,7 +93,7 @@ class FinHestonNumericalScheme(Enum):
     EULERLOG = 2
     QUADEXP = 3
 
-##########################################################################
+###############################################################################
 
 
 @njit(float64[:, :](int64, int64, float64, float64, float64, float64, float64,
@@ -214,14 +213,14 @@ def getHestonPaths(numPaths,
 
     return sPaths
 
-##########################################################################
+###############################################################################
 
 
 class FinGBMNumericalScheme(Enum):
     NORMAL = 1
     ANTITHETIC = 2
 
-##########################################################################
+###############################################################################
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, int64, int64), cache=True, fastmath=True)
@@ -264,14 +263,14 @@ def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
 
     return Sall
 
-##########################################################################
+###############################################################################
 
 
 class FinVasicekNumericalScheme(Enum):
     NORMAL = 1
     ANTITHETIC = 2
 
-##########################################################################
+###############################################################################
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
@@ -315,7 +314,7 @@ def getVasicekPaths(numPaths,
                 ratePath[iPath + numPaths, iStep] = r2
     return ratePath
 
-##########################################################################
+###############################################################################
 
 
 class FinCIRNumericalScheme(Enum):
@@ -325,7 +324,7 @@ class FinCIRNumericalScheme(Enum):
     KAHLJACKEL = 4
     EXACT = 5  # SAMPLES EXACT DISTRIBUTION
 
-##########################################################################
+###############################################################################
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
@@ -400,4 +399,4 @@ def getCIRPaths(numPaths,
 
     return ratePath
 
-##########################################################################
+###############################################################################

@@ -11,184 +11,91 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
-
+from financepy.products.libor.FinLiborBermudanSwaption import FinLiborBermudanSwaption
 from financepy.models.FinModelBlack import FinModelBlack
+from financepy.models.FinModelRatesBK import FinModelRatesBK
+from financepy.models.FinModelRatesHW import FinModelRatesHW
+from financepy.models.FinModelRatesBDT import FinModelRatesBDT
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
-
-def test_FinLiborDepositsAndSwaps(valuationDate):
-
-    depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
-    depos = []
-
-    spotDays = 2
-    settlementDate = valuationDate.addWorkDays(spotDays)
-
-    depositRate = 0.030
-    maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    maturityDate = settlementDate.addMonths(9)
-    depo5 = FinLiborDeposit(
-        settlementDate,
-        maturityDate,
-        depositRate,
-        depoBasis)
-
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-
-    fras = []
-
-    swaps = []
-    fixedBasis = FinDayCountTypes.ACT_365_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
-
-    swapRate = 0.03
-    maturityDate = settlementDate.addMonths(12)
-    swap1 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap1)
-
-    swapRate = 0.034
-    maturityDate = settlementDate.addMonths(24)
-    swap2 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap2)
-
-    swapRate = 0.037
-    maturityDate = settlementDate.addMonths(36)
-    swap3 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap3)
-
-    swapRate = 0.039
-    maturityDate = settlementDate.addMonths(48)
-    swap4 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap4)
-
-    swapRate = 0.040
-    maturityDate = settlementDate.addMonths(60)
-    swap5 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapRate,
-        fixedFreq,
-        fixedBasis)
-    swaps.append(swap5)
-
-    liborCurve = FinLiborCurve("USD_LIBOR",
-                               valuationDate,
-                               depos,
-                               fras,
-                               swaps)
-
-    return liborCurve
 
 ##########################################################################
 
 
-def test_FinLiborSwaption():
+def test_FinLiborBermudanSwaptionBKModel():
+    ''' Replicate examples in paper by Leif Andersen which can be found at
+    file:///C:/Users/Dominic/Downloads/SSRN-id155208.pdf '''
 
     import time
 
     valuationDate = FinDate(2011, 1, 1)
     settlementDate = valuationDate
-    exerciseDate = FinDate(2012, 1, 1)
-    swapMaturityDate = FinDate(2017, 1, 1)
+    exerciseDate = settlementDate.addYears(1)
+    swapMaturityDate = settlementDate.addYears(4)
 
-    swapFixedCoupon = 0.030
+    swapFixedCoupon = 0.060
     swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = FinDayCountTypes.ACT_365_ISDA
 
-    liborCurve = test_FinLiborDepositsAndSwaps(valuationDate)
+    liborCurve = FinDiscountCurveFlat(valuationDate,
+                                      0.06,
+                                      FinFrequencyTypes.SEMI_ANNUAL)
 
     start = time.time()
 
-    swaptionType = FinLiborSwaptionTypes.PAYER
-    swaption = FinLiborSwaption(settlementDate,
-                                exerciseDate,
-                                swapMaturityDate,
-                                swaptionType,
-                                swapFixedCoupon,
-                                swapFixedFrequencyType,
-                                swapFixedDayCountType)
-
     model = FinModelBlack(0.25)
-    settlementDate = valuationDate.addWorkDays(2)
-    value = swaption.value(settlementDate, liborCurve, model)
 
-#    swaption.print()
+    swaptionType = FinLiborSwaptionTypes.PAYER
+    europeanSwaptionPayer = FinLiborSwaption(settlementDate,
+                                             exerciseDate,
+                                             swapMaturityDate,
+                                             swaptionType,
+                                             swapFixedCoupon,
+                                             swapFixedFrequencyType,
+                                             swapFixedDayCountType)
 
-    testCases.header("LABEL", "VALUE")
-    testCases.print("PAYER Swaption Value", value)
+    value = europeanSwaptionPayer.value(settlementDate, liborCurve, model)
+    print("European Black Payer Value:", value)
 
     swaptionType = FinLiborSwaptionTypes.RECEIVER
-    swaption = FinLiborSwaption(settlementDate,
-                                exerciseDate,
-                                swapMaturityDate,
-                                swaptionType,
-                                swapFixedCoupon,
-                                swapFixedFrequencyType,
-                                swapFixedDayCountType)
+    europeanSwaptionReceiver = FinLiborSwaption(settlementDate,
+                                                exerciseDate,
+                                                swapMaturityDate,
+                                                swaptionType,
+                                                swapFixedCoupon,
+                                                swapFixedFrequencyType,
+                                                swapFixedDayCountType)
 
-    model = FinModelBlack(0.25)
-    value = swaption.value(valuationDate, liborCurve, model)
+    value = europeanSwaptionReceiver.value(valuationDate, liborCurve, model)
+    print("Euroopean Black Recev Value:", value)
 
-#    swaption.print()
+    swaptionType = FinLiborSwaptionTypes.PAYER
+    exerciseType = FinOptionExerciseTypes.BERMUDAN
 
-    testCases.print("RECEIVER Swaption Value", value)
+    # Andersen used BDT with constant short-rate volatility
+    sigma = 0.2012
+    numTimeSteps = 5
+    model = FinModelRatesBDT(sigma, numTimeSteps)
+
+    bermudanSwaptionPayer = FinLiborBermudanSwaption(settlementDate,
+                                                     exerciseDate,
+                                                     swapMaturityDate,
+                                                     swaptionType,
+                                                     exerciseType,
+                                                     swapFixedCoupon,
+                                                     swapFixedFrequencyType,
+                                                     swapFixedDayCountType)
+
+    value = bermudanSwaptionPayer.value(valuationDate, liborCurve, model)
+
+    print("Bermudan Payer Value:", value)
 
     end = time.time()
 
@@ -198,6 +105,6 @@ def test_FinLiborSwaption():
 ##########################################################################
 
 
-test_FinLiborSwaption()
+test_FinLiborBermudanSwaptionBKModel()
 
 testCases.compareTestCases()

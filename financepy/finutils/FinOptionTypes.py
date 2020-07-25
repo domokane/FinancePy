@@ -21,4 +21,13 @@ class FinOptionTypes(Enum):
     COMPOUND_CALL = 9
     COMPOUND_PUT = 10
 
+
+###############################################################################
+
+
+class FinOptionExerciseTypes(Enum):
+    EUROPEAN = 1
+    BERMUDAN = 2
+    AMERICAN = 3
+
 ###############################################################################

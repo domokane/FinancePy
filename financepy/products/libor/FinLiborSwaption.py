@@ -19,6 +19,7 @@ from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+
 from ...products.libor.FinLiborSwap import FinLiborSwap
 
 from ...models.FinModelBlack import FinModelBlack
@@ -49,7 +50,9 @@ class FinLiborSwaptionModelTypes(Enum):
 
 
 class FinLiborSwaption():
-    ''' This is the class for the European-stype swaption. '''
+    ''' This is the class for the European-style swaption, an option to enter
+    into a swap (payer or receiver of the fixed coupon), that starts in the
+    future and with a fixed maturity, at a swap rate fixed today. '''
 
     def __init__(self,
                  settlementDate: FinDate,
@@ -68,7 +71,8 @@ class FinLiborSwaption():
         ''' Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
-        floating leg payment schedules. '''
+        floating leg payment schedules. Bermudan style swaption should be
+        priced using the FinLiborBermudanSwaption class. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -82,6 +86,7 @@ class FinLiborSwaption():
         self._exerciseDate = exerciseDate
         self._maturityDate = maturityDate
         self._swaptionType = swaptionType
+
         self._fixedCoupon = fixedCoupon
         self._fixedFrequencyType = fixedFrequencyType
         self._fixedDayCountType = fixedDayCountType
@@ -105,7 +110,8 @@ class FinLiborSwaption():
               discountCurve,
               model):
         ''' Valuation of a Libor European-style swaption using a choice of
-        models on a specified valuation date. '''
+        models on a specified valuation date. Models include FinModelBlack,
+        FinModelBlackShifted, '''
 
         floatSpread = 0.0
         payFixedFlag = True
@@ -151,23 +157,6 @@ class FinLiborSwaption():
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
-
-            # alpha = model._alpha
-            # beta = model._beta
-            # rho = model._rho
-            # nu = model._nu
-
-            # v = blackVolFromSABR(alpha, beta, rho, nu, f, k, texp)
-            # d1 = (np.log(f / k) + v * v * texp / 2.0) / v / np.sqrt(texp)
-            # d2 = d1 - v * np.sqrt(texp)
-
-            # if self._swaptionType == FinLiborSwaptionTypes.PAYER:
-            #     swaptionPrice = f * N(d1) - k * N(d2)
-            # elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-            #     swaptionPrice = k * N(-d2) - f * N(-d1)
-            # else:
-            #     raise FinError("Unknown swaption option type" +
-            #                    str(self._optionType))
 
             if self._swaptionType == FinLiborSwaptionTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
