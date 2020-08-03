@@ -9,7 +9,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
-from .FinInterpolate import FinInterpMethods
+from .FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import timesFromDates
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -36,9 +36,9 @@ class FinDiscountCurveZeros(FinDiscountCurve):
                  valuationDate: FinDate,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes=FinFrequencyTypes.ANNUAL,
-                 dayCountType: FinDayCountTypes=FinDayCountTypes.ACT_ACT_ISDA,
-                 interpMethod: FinInterpMethods=FinInterpMethods.FLAT_FORWARDS):
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
         dates and then another same-length vector of rates. The rate is to the
@@ -66,7 +66,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         self._valuationDate = valuationDate
         self._frequencyType = frequencyType
         self._dayCountType = dayCountType
-        self._interpMethod = interpMethod
+        self._interpType = interpType
 
         self._times = timesFromDates(zeroDates, valuationDate, dayCountType)
         self._zeroRates = zeroRates
@@ -108,10 +108,9 @@ class FinDiscountCurveZeros(FinDiscountCurve):
             t = times[i]
             discountFactors[i] = discountFactors[i] * np.exp(-bumpSize*t)
 
-        discCurve = FinDiscountCurve(self._valuationDate,
-                                     times,
+        discCurve = FinDiscountCurve(self._valuationDate, times,
                                      discountFactors,
-                                     self._interpMethod)
+                                     self._interpType)
 
         return discCurve
 

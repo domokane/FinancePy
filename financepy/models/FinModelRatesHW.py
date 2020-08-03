@@ -9,11 +9,11 @@ from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N, accruedInterpolator
-from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionExerciseTypes
 
-interp = FinInterpMethods.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FORWARDS.value
 
 small = 1e-10
 

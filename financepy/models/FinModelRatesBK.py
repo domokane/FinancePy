@@ -8,11 +8,11 @@ from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
-from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionExerciseTypes
 
-interp = FinInterpMethods.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FORWARDS.value
 
 ###############################################################################
 # TODO : Calculate accrued in bond option according to accrual convention
@@ -933,7 +933,7 @@ class FinModelRatesBK():
         if isinstance(dfValues, np.ndarray) is False:
             raise FinError("DF VALUES must be a numpy vector")
 
-        interp = FinInterpMethods.FLAT_FORWARDS.value
+        interp = FinInterpTypes.FLAT_FORWARDS.value
 
         treeMaturity = tmat * (self._numTimeSteps+1)/self._numTimeSteps
         treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)

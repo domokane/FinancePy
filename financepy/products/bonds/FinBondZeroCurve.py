@@ -12,7 +12,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinHelperFunctions import inputTime
 from ...finutils.FinHelperFunctions import tableToString
-from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
+from ...market.curves.FinInterpolate import FinInterpTypes, interpolate
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
@@ -42,7 +42,7 @@ class FinBondZeroCurve(FinDiscountCurve):
                  valuationDate,
                  bonds,
                  cleanPrices,
-                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Fit a discount curve to a set of bond yields using the type of
         curve specified. '''
 
@@ -54,7 +54,7 @@ class FinBondZeroCurve(FinDiscountCurve):
         self._bonds = bonds
         self._cleanPrices = np.array(cleanPrices)
         self._discountCurve = None
-        self._interpMethod = interpMethod
+        self._interpType = interpType
 
         times = []
         for bond in self._bonds:
@@ -109,15 +109,14 @@ class FinBondZeroCurve(FinDiscountCurve):
 
     def df(self, dt):
         t = inputTime(dt, self)
-        z = interpolate(t, self._times, self._values, self._interpMethod.value)
+        z = interpolate(t, self._times, self._values, self._interpType.value)
         return z
 
 ###############################################################################
 
     def survProb(self, dt):
         t = inputTime(dt, self)
-        q = interpolate(t, self._times, self._values,
-                        self._interpMethod.value)
+        q = interpolate(t, self._times, self._values, self._interpType.value)
         return q
 
 ###############################################################################

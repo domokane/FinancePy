@@ -6,16 +6,15 @@ Created on Sun Feb 07 14:31:53 2016
 """
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
-
-from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
+from financepy.market.curves.FinInterpolate import interpolate, FinInterpTypes
 import numpy as np
 import math
 import sys
 sys.path.append("..//..")
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
 
 
 def test_FinInterpolate():
@@ -37,7 +36,7 @@ def test_FinInterpolate():
 
     testCases.header("METHOD", "X", "Y_INTERPOLATED")
 
-    for method in FinInterpMethods:
+    for method in FinInterpTypes:
 
         yInterpValues = []
         start = time.time()
@@ -52,7 +51,8 @@ def test_FinInterpolate():
         import matplotlib.pyplot as plt
         plt.figure(figsize=(12, 10))
         plt.plot(xValues, yValues, color='r', marker='o')
-        plt.plot(xInterpolateValues, yInterpValues, color='b', label=str(method))
+        plt.plot(xInterpolateValues, yInterpValues, color='b',
+                 label=str(method))
         plt.legend()
 
     xp = np.array([0.2, 0.4, 0.45, 0.6, 0.82, 0.93, 0.99])
@@ -66,6 +66,8 @@ def test_FinInterpolate():
         interpolate(0.8, xp, yp, method.value)
     end = time.time()
     testCases.print("10000 Interpolations", end - start)
+
+###############################################################################
 
 
 test_FinInterpolate()

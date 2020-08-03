@@ -1,5 +1,4 @@
 # Curves
-## Overview
 These modules create a family of curve types related to the term structures of interest rates. There are two basic types of curve:
 
 1. Best fit yield curves fitting to bond prices which are used for interpolation. A range of curve shapes from polynomials to B-Splines is available.

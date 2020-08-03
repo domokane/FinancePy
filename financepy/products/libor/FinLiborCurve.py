@@ -9,7 +9,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolate import FinInterpMethods
+from ...market.curves.FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
@@ -64,7 +64,7 @@ class FinLiborCurve(FinDiscountCurve):
                  liborDeposits: list,
                  liborFRAs: list,
                  liborSwaps: list,
-                 interpMethod: FinInterpMethods = FinInterpMethods.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Create an instance of a FinLibor curve given a valuation date and
         a set of libor deposits, libor FRAs and liborSwaps. Some of these may
         be left None and the algorithm will just use what is provided. An
@@ -76,7 +76,7 @@ class FinLiborCurve(FinDiscountCurve):
         self._times = []
         self._dfValues = []
         self._valuationDate = valuationDate
-        self._interpMethod = interpMethod
+        self._interpType = interpType
         self._validateInputs(liborDeposits, liborFRAs, liborSwaps)
         self._buildCurve()
 

@@ -17,9 +17,9 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString, tableToString
-from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ...market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -40,19 +40,19 @@ standardRecovery = 0.40
         int64),
     fastmath=True,
     cache=True)
-def riskyPV01_NUMBA(teff,
-                    accrualFactorPCDToNow,
-                    paymentTimes,
-                    yearFracs,
-                    npLiborTimes,
-                    npLiborValues,
-                    npSurvTimes,
-                    npSurvValues,
-                    pv01Method):
+def _riskyPV01_NUMBA(teff,
+                     accrualFactorPCDToNow,
+                     paymentTimes,
+                     yearFracs,
+                     npLiborTimes,
+                     npLiborValues,
+                     npSurvTimes,
+                     npSurvValues,
+                     pv01Method):
     ''' Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01.'''
 
-    method = FinInterpMethods.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FORWARDS.value
 
     couponAccruedIndicator = 1
 
@@ -130,18 +130,18 @@ def riskyPV01_NUMBA(teff,
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
 def _protectionLegPV_NUMBA(teff,
-                          tmat,
-                          npLiborTimes,
-                          npLiborValues,
-                          npSurvTimes,
-                          npSurvValues,
-                          contractRecovery,
-                          numStepsPerYear,
-                          protMethod):
+                           tmat,
+                           npLiborTimes,
+                           npLiborValues,
+                           npSurvTimes,
+                           npSurvValues,
+                           contractRecovery,
+                           numStepsPerYear,
+                           protMethod):
     ''' Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. '''
 
-    method = FinInterpMethods.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FORWARDS.value
     dt = (tmat - teff) / numStepsPerYear
     t = teff
     z1 = uinterpolate(t, npLiborTimes, npLiborValues, method)
@@ -191,9 +191,9 @@ class FinCDS(object):
     generation and the valuation and risk management of CDS. '''
 
     def __init__(self,
-                 stepInDate: FinDate, #  FinDate is when protection starts (usually T+1)
-                 maturityDateOrTenor: Union[FinDate, str],  # FinDate or a FinTenor
-                 runningCoupon: float, # Annualised coupon on premium leg
+                 stepInDate: FinDate,  # Date protection starts
+                 maturityDateOrTenor: Union[FinDate, str],  # FinDate or tenor
+                 runningCoupon: float,  # Annualised coupon on premium leg
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
@@ -298,7 +298,7 @@ class FinCDS(object):
 
         else:
             raise FinError("Unknown FinDateGenRuleType:" +
-                             str(self._dateGenRuleType))
+                           str(self._dateGenRuleType))
 
 ##########################################################################
 
@@ -684,15 +684,15 @@ class FinCDS(object):
         yearFracs = self._accrualFactors
         teff = (eff - valuationDate) / gDaysInYear
 
-        valueRPV01 = riskyPV01_NUMBA(teff,
-                                     accrualFactorPCDToNow,
-                                     np.array(paymentTimes),
-                                     np.array(yearFracs),
-                                     liborCurve._times,
-                                     liborCurve._dfValues,
-                                     issuerCurve._times,
-                                     issuerCurve._values,
-                                     pv01Method)
+        valueRPV01 = _riskyPV01_NUMBA(teff,
+                                      accrualFactorPCDToNow,
+                                      np.array(paymentTimes),
+                                      np.array(yearFracs),
+                                      liborCurve._times,
+                                      liborCurve._dfValues,
+                                      issuerCurve._times,
+                                      issuerCurve._values,
+                                      pv01Method)
 
         fullRPV01 = valueRPV01[0]
         cleanRPV01 = valueRPV01[1]

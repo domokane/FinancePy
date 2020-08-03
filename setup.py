@@ -6,10 +6,12 @@ with open("README.md", "r") as fh:
 
 with open("version.py", "r") as fh:
     version_number = fh.read()
-    version_number_str = str(version_number[-6:])
+    start = version_number.find("\"")
+    end = version_number[start+1:].find("\"")
+    version_number_str = str(version_number[start+1:start+end+1])
     version_number_str = version_number_str.replace('\n', '')
 
-print(">>>", version_number_str, "<<<")
+print(">>>" + version_number_str + "<<<")
 
 ###############################################################################
 cr = "\n"
@@ -18,7 +20,7 @@ with open('financepy//__init__.template', 'r') as file:
     filedata = file.read()
 
 # Replace the target string
-filedata = filedata.replace('__version__', str(__version__))
+filedata = filedata.replace('__version__', "'" + str(__version__) + "'")
 
 # Write the file out again
 with open('./financepy//__init__.py', 'w') as file:

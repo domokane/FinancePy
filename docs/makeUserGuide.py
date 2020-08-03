@@ -12,7 +12,9 @@ import fileinput
 
 with open("../version.py", "r") as fh:
     version_number = fh.read()
-    VERSION = version_number[-6:]
+    start = version_number.find("\"")
+    end = version_number[start+1:].find("\"")
+    VERSION = str(version_number[start+1:start+end+1])
     VERSION = VERSION.replace('\n', '')
 
 fileName = "FinancePyManualV_" + str(VERSION)
@@ -104,6 +106,7 @@ def parseMarkdown(lines):
             content = content.strip()
             parsedLines.append("\n")
             parsedLines.append("\\section*{" + content + "}")
+            print(">>>>", content)
             parsedLines.append("\n")
 
         if lineFound is False:
@@ -215,8 +218,8 @@ def buildChapter(folderName):
     newLines.append("\n")
     newLines.append("\\chapter{" + chapterName + "}")
     newLines.append("\n")
-    newLines.append("\\section{Introduction}")
-    newLines.append("\n")
+#    newLines.append("\\section{Introduction}")
+#    newLines.append("\n")
 
     f = open(userGuideFileName, 'a')
     f.writelines(newLines)
@@ -726,7 +729,7 @@ def extractParams(functionSignature):
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
         # This allows us to parse 'Union[FinDate, str]' for maturityDateOrTenor.
-        if line.find("[") != -1:
+        if line.find("[") != -1 or line.find("(") != -1:
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []
             p = []
@@ -740,6 +743,12 @@ def extractParams(functionSignature):
                         bracketLevel += 1
                     elif c == "]":
                         bracketLevel -= 1
+
+                    if c == "(":
+                        bracketLevel += 1
+                    elif c == ")":
+                        bracketLevel -= 1
+
                     p.append(c)
         else:
             params = line.split(",")
@@ -785,12 +794,20 @@ def extractParams(functionSignature):
 
 
 def parseType(pType):
-
+    print(">>>", pType)
     pType = pType.replace(" ", "")
     u = pType.find("Union")
-    if u != -1:
+    b = pType.find("(")
+    if u != -1 and b == -1:
         lb = pType.find("[")
         rb = pType.find("]")
+        cm = pType.find(",")
+        s = pType[lb+1:cm] + " or " + pType[cm+1:rb]
+    elif u == -1 and b != -1:
+        # Problem as list has a comma in it and this has already been used to
+        # split the line of arguments above
+        lb = pType.find("(")
+        rb = pType.find(")")
         cm = pType.find(",")
         s = pType[lb+1:cm] + " or " + pType[cm+1:rb]
     else:
@@ -799,6 +816,7 @@ def parseType(pType):
     return s
 
 ###############################################################################
+
 
 buildHead()
 buildIntro("..//README.md")
@@ -832,6 +850,6 @@ if 1 == 1:
     # TODO: Only works if you have fincancepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
     print("Copying ", pdfFileName1, " to ", pdfFileName2)
-    #shutil.copyfile(pdfFileName1, pdfFileName2)
+    shutil.copyfile(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
     open_file(pdfFileName1)

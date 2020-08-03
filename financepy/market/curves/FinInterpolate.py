@@ -6,7 +6,6 @@
 from math import exp, log, fabs
 from numba import njit, float64, int64
 import numpy as np
-from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinError import FinError
 
 ###############################################################################
@@ -14,7 +13,7 @@ from ...finutils.FinError import FinError
 from enum import Enum
 
 
-class FinInterpMethods(Enum):
+class FinInterpTypes(Enum):
     LINEAR_ZERO_RATES = 1
     FLAT_FORWARDS = 2
     LINEAR_FORWARDS = 3
@@ -66,7 +65,7 @@ def uinterpolate(t, times, dfs, method):
     # linear interpolation of y(x)
     ###########################################################################
 
-    if method == FinInterpMethods.LINEAR_ZERO_RATES.value:
+    if method == FinInterpTypes.LINEAR_ZERO_RATES.value:
 
         if i == 1:
             r1 = -np.log(dfs[i])/times[i]
@@ -95,7 +94,7 @@ def uinterpolate(t, times, dfs, method):
     # This is also FLAT FORWARDS
     ###########################################################################
 
-    elif method == FinInterpMethods.FLAT_FORWARDS.value:
+    elif method == FinInterpTypes.FLAT_FORWARDS.value:
 
         if i == 1:
             rt1 = -np.log(dfs[i-1])
@@ -118,7 +117,7 @@ def uinterpolate(t, times, dfs, method):
 
         return yvalue
 
-    elif method == FinInterpMethods.LINEAR_FORWARDS.value:
+    elif method == FinInterpTypes.LINEAR_FORWARDS.value:
 
         if i == 1:
             y2 = -log(fabs(dfs[i]) + small)

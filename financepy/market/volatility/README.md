@@ -1,5 +1,4 @@
 # Market Volatility
-## Overview
 These modules create a family of curve types related to the market volatility. There are three types of class:
 
 1. Term structures of volatility i.e. volatility as a function of option expiry date.

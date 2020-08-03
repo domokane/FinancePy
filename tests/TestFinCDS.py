@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.market.curves.FinInterpolate import FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
@@ -51,7 +51,7 @@ def test_CDSFastApproximation():
     liborCurve = FinDiscountCurve(valueDate,
                                   dates,
                                   discountFactors,
-                                  FinInterpMethods.FLAT_FORWARDS)
+                                  FinInterpTypes.FLAT_FORWARDS)
 
     ##########################################################################
 
@@ -140,7 +140,7 @@ def test_CurveBuild():
     liborCurve = FinDiscountCurve(valuationDate,
                                   dates,
                                   discountFactors,
-                                  FinInterpMethods.FLAT_FORWARDS)
+                                  FinInterpTypes.FLAT_FORWARDS)
     recoveryRate = 0.40
 
     cdsContracts = []

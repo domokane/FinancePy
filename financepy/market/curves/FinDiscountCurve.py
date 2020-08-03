@@ -11,7 +11,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
-from .FinInterpolate import interpolate, FinInterpMethods
+from .FinInterpolate import interpolate, FinInterpTypes
 from ...products.libor.FinLiborSwap import FinLiborSwap
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinHelperFunctions import timesFromDates
@@ -33,7 +33,7 @@ class FinDiscountCurve():
                  valuationDate: FinDate,
                  dfDates: list,
                  dfValues: np.ndarray,
-                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
         are explicity linking dates and discount factors, we do not need to
@@ -74,14 +74,14 @@ class FinDiscountCurve():
 
         self._valuationDate = valuationDate
         self._dfValues = np.array(self._dfValues)
-        self._interpMethod = interpMethod
+        self._interpType = interpType
         self._frequencyType = FinFrequencyTypes.CONTINUOUS
 
 ###############################################################################
 
     def zeroRate(self,
                  dt: (list, FinDate),
-                 frequencyType: FinFrequencyTypes=FinFrequencyTypes.CONTINUOUS):
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS):
         ''' Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
         times so must use Numpy functions. Default frequency is a
@@ -215,7 +215,7 @@ class FinDiscountCurve():
         z = interpolate(t,
                         self._times,
                         self._dfValues,
-                        self._interpMethod.value)
+                        self._interpType.value)
         return z
 
 ##########################################################################
@@ -275,7 +275,7 @@ class FinDiscountCurve():
         discCurve = FinDiscountCurve(self._valuationDate,
                                      times,
                                      values,
-                                     self._interpMethod)
+                                     self._interpType)
 
         return discCurve
 
