@@ -8,11 +8,70 @@ from typing import Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
+from .FinDayCount import FinDayCountTypes, FinDayCount
 
 ###############################################################################
 
 
-def checkVectorDifferences(x, y, tol):
+def pv01Times(t: float,
+              f: float):
+    ''' Calculate a bond style pv01 by calculating remaining coupon times for a
+    bond with t years to maturity and a coupon frequency of f. The order of the
+    list is reverse time order - it starts with the last coupon date and ends
+    with the first coupon date. '''
+
+    dt = 1.0 / f
+    pv01Times = []
+
+    while t >= 0.0:
+        pv01Times.append(t)
+        t -= dt
+
+    return pv01Times
+
+###############################################################################
+
+
+def timesFromDates(dt: FinDate,
+                   valuationDate: FinDate,
+                   dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+    ''' If a single date is passed in then return the year from valuation date
+    but if a whole vector of dates is passed in then convert to a vector of
+    times from the valuation date. The output is always a numpy vector of times
+    which has only one element if the input is only one date. '''
+
+#    dcCounter = FinDayCount(dayCountType)
+
+    if isinstance(dt, FinDate):
+        numDates = 1
+        dateList = [dt]
+        times = [None]
+#        times[0] = dcCounter.yearFrac(valuationDate, dt)
+        times[0] = (dt - valuationDate) / gDaysInYear
+        return np.array(times)
+    elif isinstance(dt, list) and isinstance(dt[0], FinDate):
+        numDates = len(dt)
+        dateList = dt
+        times = []
+        for i in range(0, numDates):
+#            t = dcCounter.yearFrac(valuationDate, dateList[i])
+            t = (dateList[i]- valuationDate) / gDaysInYear
+            times.append(t)
+        return np.array(times)
+
+    elif isinstance(dt, np.ndarray):
+        raise FinError("You passed an ndarray instead of dates.")
+    else:
+        raise FinError("Discount factor must take dates.")
+
+    return None
+
+###############################################################################
+
+
+def checkVectorDifferences(x: np.ndarray,
+                           y: np.ndarray,
+                           tol: float = 1e-6):
     ''' Compare two vectors elementwise to see if they are more different than
     tolerance. '''
 
@@ -29,7 +88,7 @@ def checkVectorDifferences(x, y, tol):
 ###############################################################################
 
 
-def checkDate(d):
+def checkDate(d: FinDate):
     ''' Check that input d is a FinDate. '''
 
     if isinstance(d, FinDate) is False:
@@ -68,7 +127,8 @@ def dump(obj):
 ###############################################################################
 
 
-def printTree(array, depth=None):
+def printTree(array: np.ndarray,
+              depth: int = None):
     ''' Function that prints a binomial or trinonial tree to screen for the
     purpose of debugging. '''
     n1, n2 = array.shape
@@ -88,7 +148,8 @@ def printTree(array, depth=None):
 ###############################################################################
 
 
-def inputTime(dt, curve):
+def inputTime(dt: FinDate,
+              curve):
     ''' Validates a time input in relation to a curve. If it is a float then
     it returns a float as long as it is positive. If it is a FinDate then it
     converts it to a float. If it is a Numpy array then it returns the array
@@ -123,12 +184,12 @@ def inputTime(dt, curve):
 
 
 @njit(fastmath=True, cache=True)
-def listdiff(a, b):
+def listdiff(a: np.ndarray,
+             b: np.ndarray):
     ''' Calculate a vector of differences between two equal sized vectors. '''
 
     if len(a) != len(b):
         raise FinError("Cannot diff lists with different sizes")
-        return []
 
     diff = []
     for x, y in zip(a, b):
@@ -140,7 +201,8 @@ def listdiff(a, b):
 
 
 @njit(fastmath=True, cache=True)
-def dotproduct(xVector, yVector):
+def dotproduct(xVector: np.ndarray,
+               yVector: np.ndarray):
     ''' Fast calculation of dot product using Numba. '''
 
     dotprod = 0.0
@@ -153,7 +215,9 @@ def dotproduct(xVector, yVector):
 
 
 @njit(fastmath=True, cache=True)
-def frange(start, stop, step):
+def frange(start: int,
+           stop: int,
+           step: int):
     ''' fast range function that takes start value, stop value and step. '''
     x = []
     while start <= stop:
@@ -166,7 +230,7 @@ def frange(start, stop, step):
 
 
 @njit(fastmath=True, cache=True)
-def normaliseWeights(wtVector):
+def normaliseWeights(wtVector: np.ndarray):
     ''' Normalise a vector of weights so that they sum up to 1.0. '''
 
     n = len(wtVector)
@@ -180,7 +244,10 @@ def normaliseWeights(wtVector):
 ###############################################################################
 
 
-def labelToString(label, value, separator="\n", listFormat=False):
+def labelToString(label: str,
+                  value: float,
+                  separator: str = "\n",
+                  listFormat: bool = False):
     ''' Format label/value pairs for a unified formatting. '''
     # Format option for lists such that all values are aligned:
     # Label: value1
@@ -204,7 +271,9 @@ def labelToString(label, value, separator="\n", listFormat=False):
 ###############################################################################
 
 
-def tableToString(header, valueTable, floatPrecision="10.7f"):
+def tableToString(header: str,
+                  valueTable,
+                  floatPrecision="10.7f"):
     ''' Format a 2D array into a table-like string. '''
     if (len(valueTable) == 0 or type(valueTable) is not list):
         print(len(valueTable))

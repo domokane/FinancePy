@@ -34,9 +34,10 @@ def interpolate(x,
         v = vinterpolate(x, times, dfs, method)
         return v
     else:
-        raise FinError("Unknown input type", type(x))
+        raise FinError("Unknown input type" + type(x))
 
 ###############################################################################
+
 
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)

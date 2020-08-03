@@ -34,7 +34,10 @@ class FinLiborSwap(object):
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create an interest rate swap contract. '''
+        ''' Create an interest rate swap contract giving the contract start
+        date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
+        count convention and notional. The floating leg parameters have default
+        values that can be overwritten if needed. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -49,7 +52,6 @@ class FinLiborSwap(object):
         self._startDate = startDate
         self._maturityDate = maturityDate
         self._notional = notional
-        self._payFixedLeg = payFixedFlag
 
         self._fixedCoupon = fixedCoupon
         self._floatSpread = floatSpread
@@ -60,7 +62,7 @@ class FinLiborSwap(object):
         self._fixedDayCountType = fixedDayCountType
         self._floatDayCountType = floatDayCountType
 
-        self._payFixedFlag = payFixedFlag  ## IS THIS A DUPLICATE OF ABOVE
+        self._payFixedFlag = payFixedFlag
 
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
@@ -117,7 +119,7 @@ class FinLiborSwap(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._payFixedLeg is True:
+        if self._payFixedFlag is True:
             value = value * (-1.0)
 
         return value
@@ -453,14 +455,13 @@ class FinLiborSwap(object):
         s = labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("PAY FIXED LEG", self._payFixedLeg)
+        s += labelToString("PAY FIXED FLAG", self._payFixedFlag)
         s += labelToString("FIXED COUPON", self._fixedCoupon)
         s += labelToString("FLOAT SPREAD", self._floatSpread)
         s += labelToString("FIXED FREQUENCY", self._fixedFrequencyType)
         s += labelToString("FLOAT FREQUENCY", self._floatFrequencyType)
         s += labelToString("FIXED DAY COUNT", self._fixedDayCountType)
         s += labelToString("FLOAT DAY COUNT", self._floatDayCountType)
-        s += labelToString("PAY FIXED FLAG", self._payFixedFlag)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUS DAY ADJUST", self._busDayAdjustType)
         s += labelToString("DATE GEN TYPE", self._dateGenRuleType)

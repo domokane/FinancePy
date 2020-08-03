@@ -4,14 +4,14 @@
 
 
 from math import sqrt
+from numpy import ndarray
 from numba import njit, float64, int32
-from .FinError import FinError
 
 ##########################################################################
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def mean(x):
+def mean(x: float):
     ''' Calculate the arithmetic mean of a vector of numbers x. '''
     n = len(x)
     m = 0.0
@@ -24,7 +24,7 @@ def mean(x):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def stdev(x):
+def stdev(x: ndarray):
     ''' Calculate the standard deviation of a vector of numbers x. '''
     n = len(x)
     m = mean(x)
@@ -38,7 +38,7 @@ def stdev(x):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def stderr(x):
+def stderr(x: ndarray):
     ''' Calculate the standard error estimate of a vector of numbers x. '''
     n = len(x)
     s = stdev(x)
@@ -49,7 +49,7 @@ def stderr(x):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def var(x):
+def var(x: ndarray):
     ''' Calculate the variance of a vector of numbers x. '''
     s = stdev(x)
     v = s * s
@@ -59,7 +59,8 @@ def var(x):
 
 
 @njit(float64(float64[:], int32), fastmath=True, cache=True)
-def moment(x, m):
+def moment(x: ndarray,
+           m: int):
     ''' Calculate the m-th moment of a vector of numbers x. '''
     n = len(x)
     s = 0.0
@@ -72,7 +73,8 @@ def moment(x, m):
 
 
 @njit(float64(float64[:], float64[:]), fastmath=True, cache=True)
-def correlation(x1, x2):
+def correlation(x1: ndarray,
+                x2: ndarray):
     ''' Calculate the correlation between two series x1 and x2. '''
 
     n1 = len(x1)

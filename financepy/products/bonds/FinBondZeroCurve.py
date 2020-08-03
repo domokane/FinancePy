@@ -21,7 +21,7 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ###############################################################################
 
 
-def f(df, *args):
+def _f(df, *args):
     curve = args[0]
     valueDate = args[1]
     bond = args[2]
@@ -67,11 +67,11 @@ class FinBondZeroCurve(FinDiscountCurve):
 
         self._yearsToMaturity = np.array(times)
 
-        self.bootstrapZeroRates()
+        self._bootstrapZeroRates()
 
 ###############################################################################
 
-    def bootstrapZeroRates(self):
+    def _bootstrapZeroRates(self):
 
         self._times = np.array([0.0])
         self._values = np.array([1.0])
@@ -86,7 +86,7 @@ class FinBondZeroCurve(FinDiscountCurve):
             self._times = np.append(self._times, tmat)
             self._values = np.append(self._values, df)
 
-            optimize.newton(f, x0=df, fprime=None, args=argtuple,
+            optimize.newton(_f, x0=df, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
 
 ###############################################################################

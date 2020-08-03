@@ -1,4 +1,4 @@
-# from version import __version__
+from version import __version__
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -10,6 +10,21 @@ with open("version.py", "r") as fh:
     version_number_str = version_number_str.replace('\n', '')
 
 print(">>>", version_number_str, "<<<")
+
+###############################################################################
+cr = "\n"
+
+with open('financepy//__init__.template', 'r') as file:
+    filedata = file.read()
+
+# Replace the target string
+filedata = filedata.replace('__version__', str(__version__))
+
+# Write the file out again
+with open('./financepy//__init__.py', 'w') as file:
+    file.write(filedata)
+
+###############################################################################
 
 setuptools.setup(
     name="financepy",

@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
@@ -10,7 +10,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
-##########################################################################
+###############################################################################
 
 
 class FinBondFuture(object):
@@ -32,7 +32,7 @@ class FinBondFuture(object):
         self._contractSize = contractSize
         self._coupon = coupon
 
-##########################################################################
+###############################################################################
 
     def conversionFactor(self, bond):
         ''' Determine the conversion factor for a specific bond using CME
@@ -62,7 +62,7 @@ class FinBondFuture(object):
         p = round(p, 4)
         return p
 
-##########################################################################
+###############################################################################
 
     def principalInvoicePrice(self,
                               bond,
@@ -73,7 +73,7 @@ class FinBondFuture(object):
         pip = round(pip, 2)
         return pip
 
-##########################################################################
+###############################################################################
 
     def totalInvoiceAmount(self,
                            settlementDate,
@@ -92,7 +92,7 @@ class FinBondFuture(object):
         tia = round(tia, 2)
         return tia
 
-##########################################################################
+###############################################################################
 
     def cheapestToDeliver(self,
                           bonds,
@@ -112,7 +112,7 @@ class FinBondFuture(object):
 
         return ctdBond
 
-##########################################################################
+###############################################################################
 
     def deliveryGainLoss(self,
                          bond,
@@ -124,7 +124,7 @@ class FinBondFuture(object):
         net = receiveOnFuture - payForBond
         return net, payForBond, receiveOnFuture
 
-##########################################################################
+###############################################################################
 
     def __repr__(self):
 
@@ -135,12 +135,10 @@ class FinBondFuture(object):
         s += labelToString("COUPON", self._coupon)
         return s
 
-##########################################################################
+###############################################################################
 
     def print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 
 ###############################################################################
-
-##########################################################################

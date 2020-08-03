@@ -8,13 +8,14 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
+
+from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -190,7 +190,7 @@ def buildIntro(introfile):
 
     f = open(userGuideFileName, 'a')
 
-    f.write("\chapter{Introduction to FinancePy}")
+    f.write("\\chapter{Introduction to FinancePy}")
     f.writelines(parsedLines)
     f.close()
 
@@ -407,11 +407,16 @@ def parseClass(lines, startLine, endLine):
         #  print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
+
             line = line.replace("'", "")
             line = line.replace("_", r"\_")
-            line = line.replace("\n", "")
+            line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
+
+            if len(line) == 0:
+                line = "\n"
+
             classComment += line + " "
 
     newLines.append(classComment)
@@ -420,7 +425,6 @@ def parseClass(lines, startLine, endLine):
 
     ##################################################
     # Now get the data members
-
 
     if parseDataMembers:
         newLines.append("\\subsubsection*{Data Members}\n")
@@ -499,10 +503,21 @@ def parseFunction(lines, startLine, endLine, className=""):
     TODO: Add parsing of function arguments and any comments.'''
 
     functionLine = lines[startLine]
-
     leftCol = functionLine.find("def ")
+    indent = leftCol
+
+    # Do not include a commented out function
+    hashCol = functionLine.find("#")
+    if hashCol < leftCol and hashCol != -1:
+        return ""
+
     n2 = functionLine.find("(")
     functionName = functionLine[leftCol + 4:n2]
+
+    # If the function name starts with a _ and is not init then ignore it
+    if functionName[0] == "_" and functionName != "__init__":
+        return ""
+
     functionName = functionName.replace("_", r"\_")
 
     # Functions beginning with underscores ('_') are not to be parsed
@@ -526,7 +541,7 @@ def parseFunction(lines, startLine, endLine, className=""):
 
     functionSignature = ""
     for rowNum in range(startLine, endLine):
-        line = lines[rowNum]
+        line = lines[rowNum][indent:]
         functionSignature += str(line)
         if line.find("):") >= 0:
             startLine = rowNum  # update start line to after function signature
@@ -537,11 +552,12 @@ def parseFunction(lines, startLine, endLine, className=""):
         # Replace '__init__' with the function's class name
         if functionName == r"\_\_init\_\_":
             functionName = className
-            functionSignature = functionSignature.replace("__init__", className)
+            functionSignature = functionSignature.replace("__init__",
+                                                          className)
 
             missingSpaces = len(className) - len("__init__")
             if (missingSpaces >= 0):
-                functionSignature = functionSignature.replace("\n ", "\n " + " " * (missingSpaces))
+                functionSignature = functionSignature.replace("\n ","\n " + " " * (missingSpaces))
             else:
                 functionSignature = functionSignature.replace("\n" + " " * (-missingSpaces), "\n")
 
@@ -599,7 +615,7 @@ def parseFunction(lines, startLine, endLine, className=""):
             line = line.replace("_", r"\_")
             line = line.replace("'''", "")
             line = line.replace('"""', '')
-            line = line.replace("\n", "")
+            line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
             # This is because we remove trailing whitespace
@@ -618,13 +634,19 @@ def parseFunction(lines, startLine, endLine, className=""):
         functionDescription = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
 
-    functionDescription += functionComment + "\n"
+    functionDescription += "{\\it "
+    functionDescription += functionComment
+    functionDescription += "}"
     functionDescription += "\n"
+    functionDescription += "\\vspace{0.25cm}\n"
     functionDescription += "\\begin{lstlisting}\n"
     functionDescription += functionSignature
     functionDescription += "\\end{lstlisting}\n"
+    functionDescription += "\\vspace{0.25cm}\n"
+    functionDescription += "\\noindent \n"
+    functionDescription += "The function arguments are described in the following table.\n"
+    functionDescription += "\\vspace{0.25cm}\n"
     functionDescription += paramDescription
-
     return functionDescription
 
 ##########################################################################
@@ -654,7 +676,8 @@ def parseEnum(lines, startLine, endLine):
 
     enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
     enumDescription.append("\n")
-    enumDescription.append("\\begin{itemize}")
+    enumDescription.append("This enumerated type has the following values:")
+    enumDescription.append("\\begin{itemize}[nosep]")
     enumDescription.append("\n")
     for enumType in enumTypes:
         enumDescription.append("\\item{" + enumType + "}")
@@ -683,10 +706,10 @@ def extractParams(functionSignature):
         # The function has no parameters
         return ""
 
-    paramDescription = "\\begin{tabular}{ |c | c | c | c |}\n"
+    paramDescription = "\\begin{center}\n"
+    paramDescription += "\\begin{tabular}{ c  c  c  c }\n"
     paramDescription += "\\hline\n"
-    paramDescription += "Name & Type & Description & Default \\\\\n"
-    paramDescription += "\\hline\n"
+    paramDescription += "{ \\bf Argument Name} & { \\bf Type} & {\\bf Description} & {\\bf Default Value} \\\\\n"
     paramDescription += "\\hline\n"
 
     lines = stripedSignature.split("\n")
@@ -695,7 +718,7 @@ def extractParams(functionSignature):
         # If multiple arguments are on the same line as a comment,
         # the comment will be used for each argument on that line.
         commentLocation = line.find("#")
-        pComment = "Unknown"
+        pComment = "-"
         if commentLocation != -1:
             pComment = line[commentLocation+1:].strip()
             line = line[:commentLocation]
@@ -727,17 +750,24 @@ def extractParams(functionSignature):
                 continue
 
             # Find default value
-            pDefault = "None"
+            pDefault = "-"
             defaultLocation = param.find("=")
             if defaultLocation != -1:
                 pDefault = param[defaultLocation+1:].strip()
+
+                # Rip the type name out if it's an enumerated type
+                if pDefault[0:3] == "Fin":
+                    dotCol = pDefault.find(".")
+                    pDefault = pDefault[dotCol+1:]
+
                 param = param[:defaultLocation]
 
             # Find type
-            pType = "Unknown"
+            pType = "-"
             typeLocation = param.find(':')
             if typeLocation != -1:
                 pType = param[typeLocation+1:].strip()
+                pType = parseType(pType)
                 param = param[:typeLocation].strip()
 
             # Everything remaining must be the name
@@ -747,10 +777,28 @@ def extractParams(functionSignature):
             paramDescription += "\\hline\n"
 
     paramDescription += "\\end{tabular}"
+    paramDescription += "\\end{center}\n"
+
     return paramDescription
 
-##########################################################################
+###############################################################################
 
+
+def parseType(pType):
+
+    pType = pType.replace(" ", "")
+    u = pType.find("Union")
+    if u != -1:
+        lb = pType.find("[")
+        rb = pType.find("]")
+        cm = pType.find(",")
+        s = pType[lb+1:cm] + " or " + pType[cm+1:rb]
+    else:
+        s = pType
+
+    return s
+
+###############################################################################
 
 buildHead()
 buildIntro("..//README.md")

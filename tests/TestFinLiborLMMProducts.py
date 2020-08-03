@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import time as time
 from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -13,8 +12,6 @@ from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
 
 from financepy.products.libor.FinLiborLMMProducts import FinLiborLMMProducts
-from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinHelperFunctions import checkVectorDifferences
 
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 import numpy as np

@@ -52,70 +52,13 @@ longMonthNames = [
 monthDaysNotLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-###############################################################################
-# Date functions that are not class members but are useful
-###############################################################################
 
-
-def dailyWorkingDaySchedule(self, startDate, endDate):
-    ''' Returns a list of working dates between startDate and endDate.
-    This function should be replaced by dateRange once addTenor allows
-    for working days. '''
-    dateList = []
-
-    dt = startDate
-    dateList.append(dt)
-    while dt < endDate:
-        dt = dt.addWorkDays(1)
-        dateList.append(dt)
-
-    return dateList
-
-###############################################################################
-
-
-def datediff(d1, d2):
-    ''' Calculate the number of days between two dates. '''
-    dd = (d2._excelDate - d1._excelDate)
-    return dd
-
-###############################################################################
-
-
-def fromDatetime(dt):
-    ''' Construct a FinDate from a datetime as this is often needed if we
-    receive inputs from other Python objects such as Pandas dataframes. '''
-
-#    finDate = FinDate(dt.year, dt.month, dt.day)
-    finDate = FinDate(dt.day, dt.month, dt.year)
-    return finDate
-
-###############################################################################
-
-
-def dateRange(startDate, endDate, tenor="1D"):
-    ''' Returns a list of dates between startDate (inclusive)
-    and endDate (inclusive). The tenor represents the distance between two
-    consecutive dates and is set to daily by default. '''
-
-    if startDate > endDate:
-        return []
-
-    dateList = []
-
-    dt = startDate
-    while dt < endDate:
-        dateList.append(dt)
-        dt = dt.addTenor(tenor)
-    dateList.append(endDate)
-
-    return dateList
 
 ###############################################################################
 
 
 class FinDate():
-    ''' Date class to manage dates that is simple to use and includes a
+    ''' A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. '''
 
     MON = 0
@@ -128,9 +71,13 @@ class FinDate():
 
     ###########################################################################
 
-    def __init__(self, d, m, y):
-        ''' Create a date given a day of month, month and year. The year must
-        be a 4-digit number greater than or equal to 1900. '''
+    def __init__(self,
+                 d: int,  # Day number in month with values from 1 to 31
+                 m: int,  # Month number where January = 1, ..., December = 12
+                 y: int):  # Year number which must be between 1900 and 2100
+        ''' Create a date given a day of month, month and year. The arguments
+        must be in the order of day (of month), month number and then the year.
+        The year must be a 4-digit number greater than or equal to 1900. '''
 
         if d >= 1900 and d < 2100 and y > 0 and y <= 31:
 #            print("Warning: Deprecating FinDate(y, m, d) for FinDate(d, m, y). Please amend code.")
@@ -215,7 +162,8 @@ class FinDate():
 
     ###########################################################################
 
-    def addDays(self, numDays):
+    def addDays(self,
+                numDays: int):
         ''' Returns a new date that is numDays after the FinDate. '''
 
         dt = datetime.date(self._y, self._m, self._d)
@@ -228,7 +176,8 @@ class FinDate():
 
     ###########################################################################
 
-    def addWorkDays(self, numDays):
+    def addWorkDays(self,
+                    numDays: int):
         ''' Returns a new date that is numDays working days after FinDate. '''
 
         if type(numDays) is not int:
@@ -257,7 +206,8 @@ class FinDate():
 
     ###########################################################################
 
-    def addMonths(self, mm):
+    def addMonths(self,
+                  mm: int):
         ''' Returns a new date that is mm months after the FinDate. If mm is an
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates.'''
@@ -306,7 +256,8 @@ class FinDate():
 
     ###########################################################################
 
-    def addYears(self, yy):
+    def addYears(self,
+                 yy: int):
         ''' Returns a new date that is yy years after the FinDate. If yy is an
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates.'''
@@ -331,7 +282,7 @@ class FinDate():
             # If I get a float I check it is not a multiple of 12
             # Machine precision can throw this off so I allow for a tolerance
             diff = int(yyi*12+1e-10) - yyi*12
-            if abs(diff) > 1e-6:
+            if abs(diff) > 1e-1:
                 raise FinError("Year of " + str(yyi) + " is " + str(diff) +
                                " Months. Not a whole number of months.")
 
@@ -346,7 +297,8 @@ class FinDate():
 
     ##########################################################################
 
-    def nextCDSDate(self, mm=0):
+    def nextCDSDate(self,
+                    mm: int = 0):
         ''' Returns a CDS date that is mm months after the FinDate. If no
         argument is supplied then the next CDS date after today is returned.'''
 
@@ -383,7 +335,9 @@ class FinDate():
 
     ##########################################################################
 
-    def thirdWednesdayOfMonth(self, m, y):
+    def thirdWednesdayOfMonth(self,
+                              m: int,  # Month number
+                              y: int):  # Year number
         ''' For a specific month and year this returns the day number of the
             3rd Wednesday by scanning through dates in the third week. '''
 
@@ -435,7 +389,8 @@ class FinDate():
 
     ###########################################################################
 
-    def addTenor(self, tenor):
+    def addTenor(self,
+                 tenor: str):
         ''' Return the date following the FinDate by a period given by the
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
@@ -508,3 +463,70 @@ class FinDate():
         print(self)
 
     ###########################################################################
+
+
+###############################################################################
+# Date functions that are not class members but are useful
+###############################################################################
+
+
+def dailyWorkingDaySchedule(self,
+                            startDate: FinDate,
+                            endDate: FinDate):
+    ''' Returns a list of working dates between startDate and endDate.
+    This function should be replaced by dateRange once addTenor allows
+    for working days. '''
+    dateList = []
+
+    dt = startDate
+    dateList.append(dt)
+    while dt < endDate:
+        dt = dt.addWorkDays(1)
+        dateList.append(dt)
+
+    return dateList
+
+###############################################################################
+
+
+def datediff(d1: FinDate,
+             d2: FinDate):
+    ''' Calculate the number of days between two Findates. '''
+    dd = (d2._excelDate - d1._excelDate)
+    return dd
+
+###############################################################################
+
+
+def fromDatetime(dt: FinDate):
+    ''' Construct a FinDate from a datetime as this is often needed if we
+    receive inputs from other Python objects such as Pandas dataframes. '''
+
+#    finDate = FinDate(dt.year, dt.month, dt.day)
+    finDate = FinDate(dt.day, dt.month, dt.year)
+    return finDate
+
+###############################################################################
+
+
+def dateRange(startDate: FinDate,
+              endDate: FinDate,
+              tenor: str = "1D"):
+    ''' Returns a list of dates between startDate (inclusive)
+    and endDate (inclusive). The tenor represents the distance between two
+    consecutive dates and is set to daily by default. '''
+
+    if startDate > endDate:
+        return []
+
+    dateList = []
+
+    dt = startDate
+    while dt < endDate:
+        dateList.append(dt)
+        dt = dt.addTenor(tenor)
+    dateList.append(endDate)
+
+    return dateList
+
+###############################################################################

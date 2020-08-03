@@ -6,14 +6,14 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinHelperFunctions import printTree
-from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.products.bonds.FinBond import FinBond
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
+from financepy.models.FinModelRatesBK import FinModelRatesBK
+from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
 import matplotlib.pyplot as plt
 import time
@@ -23,7 +23,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-def test_BlackKarasinskiExampleOne():
+def test_BKExampleOne():
     # HULL BOOK INITIAL EXAMPLE SECTION 28.7 HW EDITION 6
 
     times = [0.0, 0.5000, 1.00000, 1.50000, 2.00000, 2.500000, 3.00000]
@@ -33,8 +33,6 @@ def test_BlackKarasinskiExampleOne():
     dfs = np.exp(-zeros*times)
 
     startDate = FinDate(1, 12, 2019)
-    dates = startDate.addYears(times)
-    curve = FinDiscountCurve(startDate, dates, dfs)
     endDate = FinDate(1, 12, 2022)
     sigma = 0.25
     a = 0.22
@@ -50,7 +48,7 @@ def test_BlackKarasinskiExampleOne():
 ###############################################################################
 
 
-def test_BlackKarasinskiExampleTwo():
+def test_BKExampleTwo():
     # Valuation of a European option on a coupon bearing bond
     # This follows example in Fig 28.11 of John Hull's book but does not
     # have the exact same dt so there are some differences
@@ -63,7 +61,7 @@ def test_BlackKarasinskiExampleTwo():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
 
-    bond.calculateFlowDates(settlementDate)
+    bond._calculateFlowDates(settlementDate)
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
@@ -80,9 +78,10 @@ def test_BlackKarasinskiExampleTwo():
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
     texp = (expiryDate - settlementDate) / gDaysInYear
-    times = np.linspace(0, tmat, 20)
+    times = np.linspace(0, tmat, 11)
+    dates = settlementDate.addYears(times)
     dfs = np.exp(-0.05*times)
-    curve = FinDiscountCurve(settlementDate, times, dfs)
+    curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
     print("Fixed Income Price:", price)
@@ -91,8 +90,8 @@ def test_BlackKarasinskiExampleTwo():
     a = 0.05
 
     # Test convergence
-    numStepsList = [100] #,101,200,300,400,500,600,700,800,900,1000]
-    isAmerican = True
+    numStepsList = [100]  # 101,200,300,400,500,600,700,800,900,1000]
+    exerciseType = FinOptionExerciseTypes.AMERICAN
 
     treeVector = []
     for numTimeSteps in numStepsList:
@@ -100,27 +99,26 @@ def test_BlackKarasinskiExampleTwo():
         model = FinModelRatesBK(sigma, a, numTimeSteps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strikePrice,
-                             face, couponTimes, couponFlows, isAmerican)
+                             face, couponTimes, couponFlows, exerciseType)
         end = time.time()
         period = end-start
-        treeVector.append(v[0])
+        treeVector.append(v)
         print(numTimeSteps, v, period)
 
 #    plt.plot(numStepsList, treeVector)
 
-    # The value in Hill converges to 0.699 with 100 time steps while I get 0.700
+    # Value in Hill converges to 0.699 with 100 time steps while I get 0.700
 
-if 1==0:
-    print("RT")
-#    printTree(model._rt, 5)
-    print("BOND")
-#    printTree(model._bondValues, 5)
-    print("OPTION")
-#    printTree(model._optionValues, 5)
+    if 1 == 0:
+        print("RT")
+        printTree(model._rt, 5)
+        print("Q")
+        printTree(model._Q, 5)
 
 ###############################################################################
 
 # This has broken and needs to be repaired!!!!
-test_BlackKarasinskiExampleOne()
-# test_BlackKarasinskiExampleTwo()
+
+test_BKExampleOne()
+test_BKExampleTwo()
 testCases.compareTestCases()

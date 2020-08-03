@@ -9,6 +9,7 @@ from math import exp, log
 from typing import Union
 
 from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
 from ...finutils.FinCalendar import FinCalendar, FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -67,7 +68,7 @@ def riskyPV01_NUMBA(teff,
     q1 = uinterpolate(tncd, npSurvTimes, npSurvValues, method)
     z1 = uinterpolate(tncd, npLiborTimes, npLiborValues, method)
 
-    # this is the part of the coupon accrued from the previous coupon date to now
+    # this is the part of the coupon accrued from previous coupon date to now
     # accrualFactorPCDToNow = dayCount.yearFrac(pcd,teff)
 
     # reference credit survives to the premium payment date
@@ -81,7 +82,8 @@ def riskyPV01_NUMBA(teff,
     # future accrued from now to coupon payment date assuming default roughly
     # midway
     fullRPV01 += 0.5 * z1 * \
-        (qeff - q1) * (yearFracs[1] - accrualFactorPCDToNow) * couponAccruedIndicator
+        (qeff - q1) * (yearFracs[1] - accrualFactorPCDToNow) \
+        * couponAccruedIndicator
 
     for it in range(2, len(paymentTimes)):
 
@@ -127,7 +129,7 @@ def riskyPV01_NUMBA(teff,
 
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
-def protectionLegPV_NUMBA(teff,
+def _protectionLegPV_NUMBA(teff,
                           tmat,
                           npLiborTimes,
                           npLiborValues,
@@ -181,8 +183,7 @@ def protectionLegPV_NUMBA(teff,
     protPV = protPV * (1.0 - contractRecovery)
     return protPV
 
-##########################################################################
-##########################################################################
+###############################################################################
 
 
 class FinCDS(object):
@@ -223,12 +224,12 @@ class FinCDS(object):
         self._frequencyType = frequencyType
         self._busDayAdjustType = busDayAdjustType
 
-        self.generateAdjustedCDSPaymentDates()
-        self.calcFlows()
+        self._generateAdjustedCDSPaymentDates()
+        self._calcFlows()
 
 ##########################################################################
 
-    def generateAdjustedCDSPaymentDates(self):
+    def _generateAdjustedCDSPaymentDates(self):
         ''' Generate CDS payment dates which have been holiday adjusted.'''
         frequency = FinFrequency(self._frequencyType)
         calendar = FinCalendar(self._calendarType)
@@ -301,7 +302,7 @@ class FinCDS(object):
 
 ##########################################################################
 
-    def calcFlows(self):
+    def _calcFlows(self):
         ''' Calculate cash flow amounts on premium leg. '''
         paymentDates = self._adjustedDates
         dayCount = FinDayCount(self._dayCountType)
@@ -644,15 +645,15 @@ class FinCDS(object):
 
         liborCurve = issuerCurve._liborCurve
 
-        v = protectionLegPV_NUMBA(teff,
-                                  tmat,
-                                  liborCurve._times,
-                                  liborCurve._discountFactors,
-                                  issuerCurve._times,
-                                  issuerCurve._values,
-                                  contractRecovery,
-                                  numStepsPerYear,
-                                  protMethod)
+        v = _protectionLegPV_NUMBA(teff,
+                                   tmat,
+                                   liborCurve._times,
+                                   liborCurve._dfValues,
+                                   issuerCurve._times,
+                                   issuerCurve._values,
+                                   contractRecovery,
+                                   numStepsPerYear,
+                                   protMethod)
 
         return v * self._notional
 
@@ -688,7 +689,7 @@ class FinCDS(object):
                                      np.array(paymentTimes),
                                      np.array(yearFracs),
                                      liborCurve._times,
-                                     liborCurve._discountFactors,
+                                     liborCurve._dfValues,
                                      issuerCurve._times,
                                      issuerCurve._values,
                                      pv01Method)
@@ -772,10 +773,12 @@ class FinCDS(object):
         # This is the clean RPV01 as it treats the PV01 stream as though it
         # pays just the accrued for the time between 0 and the maturity
         # It therefore omits the part that has accrued
-        cleanRPV01 = (exp(-(r + h) * t_eff) - exp(-(r + h)
-                                                  * t_mat)) / (h + r) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-(r + h) * \
-                      t_eff) - exp(-(r + h) * t_mat)) / (r + h) * self._notional
+
+        w = r + h
+
+        cleanRPV01 = ((exp(-w * t_eff) - exp(-w * t_mat)) / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
+            / w * self._notional
         cleanPV = fwdDf * longProtection * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
         fullPV = cleanPV + fwdDf * longProtection * accrued
@@ -784,21 +787,25 @@ class FinCDS(object):
 
         h = (flatCDSCurveSpread + bumpSize) / (1.0 - contractRecovery)
         r = flatContinuousInterestRate
-        cleanRPV01 = (exp(-(r + h) * t_eff) - exp(-(r + h)
-                                                  * t_mat)) / (h + r) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-(r + h) * \
-                      t_eff) - exp(-(r + h) * t_mat)) / (r + h) * self._notional
+
+        w = r + h
+
+        cleanRPV01 = ((exp(-w*t_eff) - exp(-w*t_mat)) / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat)) \
+            / w * self._notional
         cleanPV_credit_bumped = fwdDf * longProtection * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
-        fullPV_credit_bumped = cleanPV_credit_bumped + fwdDf * longProtection * accrued
+        fullPV_credit_bumped = cleanPV_credit_bumped \
+            + fwdDf * longProtection * accrued
         credit01 = fullPV_credit_bumped - fullPV
 
         h = flatCDSCurveSpread / (1.0 - contractRecovery)
         r = flatContinuousInterestRate + bumpSize
-        cleanRPV01 = (exp(-(r + h) * t_eff) - exp(-(r + h)
-                                                  * t_mat)) / (h + r) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-(r + h) * \
-                      t_eff) - exp(-(r + h) * t_mat)) / (r + h) * self._notional
+
+        w = r + h
+        cleanRPV01 = ((exp(-w * t_eff) - exp(-w * t_mat)) / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
+            / w * self._notional
         cleanPV_ir_bumped = fwdDf * longProtection * \
             (protPV - self._coupon * cleanRPV01 * self._notional)
         fullPV_ir_bumped = cleanPV_ir_bumped + fwdDf * longProtection * accrued
@@ -806,7 +813,24 @@ class FinCDS(object):
 
         return (fullPV, cleanPV, credit01, ir01)
 
-##########################################################################
+###############################################################################
+
+    def printFlows(self, issuerCurve):
+
+        numFlows = len(self._adjustedDates)
+
+        print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
+
+        for it in range(1, numFlows):
+            dt = self._adjustedDates[it]
+            accFactor = self._accrualFactors[it]
+            flow = self._flows[it]
+            z = issuerCurve.df(dt)
+            q = issuerCurve.survProb(dt)
+            print("%15s %10.6f %12.2f %12.6f %12.6f %12.2f" %
+                  (dt, accFactor, flow, z, q, flow * z * q))
+
+###############################################################################
 
     def __repr__(self):
         ''' print out details of the CDS contract and all of the calculated
@@ -830,49 +854,10 @@ class FinCDS(object):
 
         return s
 
-##########################################################################
+###############################################################################
 
-    def print(self, valuationDate):
-        ''' print out details of the CDS contract and all of the calculated
-        cashflows '''
-        print("STEPINDATE: ", str(self._stepInDate))
-        print("MATURITY: ", str(self._maturityDate))
-        print("NOTIONAL:", str(self._notional))
-        print("RUNNING COUPON: ", str(self._coupon * 10000), "bp")
-        print("DAYCOUNT: ", str(self._dayCountType))
-        print("FREQUENCY: ", str(self._frequencyType))
-        print("CALENDAR: ", str(self._calendarType))
-        print("BUSDAYRULE: ", str(self._busDayAdjustType))
-        print("DATEGENRULE: ", str(self._dateGenRuleType))
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
-        accruedDays = self.accruedDays()
-        print("ACCRUED DAYS:", str(accruedDays))
-
-        numFlows = len(self._adjustedDates)
-
-        print("PAYMENT_DATE      YEAR_FRAC      FLOW")
-
-        for it in range(1, numFlows):
-            dt = self._adjustedDates[it]
-            accFactor = self._accrualFactors[it]
-            flow = self._flows[it]
-            print("%15s %10.6f %12.2f" % (dt, accFactor, flow))
-
-##########################################################################
-
-    def printFlows(self, issuerCurve):
-
-        numFlows = len(self._adjustedDates)
-
-        print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
-
-        for it in range(1, numFlows):
-            dt = self._adjustedDates[it]
-            accFactor = self._accrualFactors[it]
-            flow = self._flows[it]
-            z = issuerCurve.df(dt)
-            q = issuerCurve.survProb(dt)
-            print("%15s %10.6f %12.2f %12.6f %12.6f %12.2f" %
-                  (dt, accFactor, flow, z, q, flow * z * q))
-
-##########################################################################
+###############################################################################

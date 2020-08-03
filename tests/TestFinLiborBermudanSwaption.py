@@ -35,7 +35,7 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     import time
 
-    valuationDate = FinDate(2011, 1, 1)
+    valuationDate = FinDate(1, 1, 2011)
     settlementDate = valuationDate
     exerciseDate = settlementDate.addYears(1)
     swapMaturityDate = settlementDate.addYears(4)
@@ -50,57 +50,134 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     start = time.time()
 
+    ###########################################################################
+    # BLACK'S MODEL
+    ###########################################################################
+
     model = FinModelBlack(0.25)
 
     swaptionType = FinLiborSwaptionTypes.PAYER
-    europeanSwaptionPayer = FinLiborSwaption(settlementDate,
-                                             exerciseDate,
-                                             swapMaturityDate,
-                                             swaptionType,
-                                             swapFixedCoupon,
-                                             swapFixedFrequencyType,
-                                             swapFixedDayCountType)
+    europeanSwaptionPay = FinLiborSwaption(settlementDate,
+                                           exerciseDate,
+                                           swapMaturityDate,
+                                           swaptionType,
+                                           swapFixedCoupon,
+                                           swapFixedFrequencyType,
+                                           swapFixedDayCountType)
 
-    value = europeanSwaptionPayer.value(settlementDate, liborCurve, model)
-    print("European Black Payer Value:", value)
+    value = europeanSwaptionPay.value(settlementDate, liborCurve, model)
+    print("EUROPEAN BLACK PAY VALUE:", value)
 
     swaptionType = FinLiborSwaptionTypes.RECEIVER
-    europeanSwaptionReceiver = FinLiborSwaption(settlementDate,
-                                                exerciseDate,
-                                                swapMaturityDate,
-                                                swaptionType,
-                                                swapFixedCoupon,
-                                                swapFixedFrequencyType,
-                                                swapFixedDayCountType)
+    europeanSwaptionRec = FinLiborSwaption(settlementDate,
+                                           exerciseDate,
+                                           swapMaturityDate,
+                                           swaptionType,
+                                           swapFixedCoupon,
+                                           swapFixedFrequencyType,
+                                           swapFixedDayCountType)
 
-    value = europeanSwaptionReceiver.value(valuationDate, liborCurve, model)
-    print("Euroopean Black Recev Value:", value)
+    value = europeanSwaptionRec.value(settlementDate, liborCurve, model)
+    print("EUROPEAN BLACK REC VALUE:", value)
+
+    ###########################################################################
+    # BK MODEL
+    ###########################################################################
+
+    # Andersen used BDT with constant short-rate volatility
+    sigma = 0.2012
+    a = 0.01
+    numTimeSteps = 100
+    model = FinModelRatesBK(sigma, a, numTimeSteps)
+
+    value = europeanSwaptionPay.value(valuationDate, liborCurve, model)
+    print("EUROPEAN BK PAY VALUE:", value)
+
+    value = europeanSwaptionRec.value(valuationDate, liborCurve, model)
+    print("EUROPEAN BK REC VALUE:", value)
+
+    ###########################################################################
+    # BDT MODEL
+    ###########################################################################
+
+    # Andersen used BDT with constant short-rate volatility
+    sigma = 0.2012
+    numTimeSteps = 100
+    model = FinModelRatesBDT(sigma, numTimeSteps)
+
+    value = europeanSwaptionPay.value(valuationDate, liborCurve, model)
+    print("EUROPEAN BK PAY VALUE:", value)
+
+    value = europeanSwaptionRec.value(valuationDate, liborCurve, model)
+    print("EUROPEAN BK REC VALUE:", value)
+
+    ###########################################################################
 
     swaptionType = FinLiborSwaptionTypes.PAYER
     exerciseType = FinOptionExerciseTypes.BERMUDAN
 
+    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+                                                   exerciseDate,
+                                                   swapMaturityDate,
+                                                   swaptionType,
+                                                   exerciseType,
+                                                   swapFixedCoupon,
+                                                   swapFixedFrequencyType,
+                                                   swapFixedDayCountType)
+
+    swaptionType = FinLiborSwaptionTypes.RECEIVER
+    exerciseType = FinOptionExerciseTypes.BERMUDAN
+
+    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+                                                   exerciseDate,
+                                                   swapMaturityDate,
+                                                   swaptionType,
+                                                   exerciseType,
+                                                   swapFixedCoupon,
+                                                   swapFixedFrequencyType,
+                                                   swapFixedDayCountType)
+
+    ###########################################################################
+    # USING BK MODEL
+    ###########################################################################
+
+    sigma = 0.2012
+    a = 0.1
+    numTimeSteps = 100
+    model = FinModelRatesBK(sigma, a, numTimeSteps)
+
+    value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
+    print("Bermudan BK PAY Value:", value)
+    value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
+    print("Bermudan BK REC Value:", value)
+
+    ###########################################################################
+    # BDT MODEL
+    ###########################################################################
+
     # Andersen used BDT with constant short-rate volatility
     sigma = 0.2012
-    numTimeSteps = 5
+    numTimeSteps = 100
     model = FinModelRatesBDT(sigma, numTimeSteps)
 
-    bermudanSwaptionPayer = FinLiborBermudanSwaption(settlementDate,
-                                                     exerciseDate,
-                                                     swapMaturityDate,
-                                                     swaptionType,
-                                                     exerciseType,
-                                                     swapFixedCoupon,
-                                                     swapFixedFrequencyType,
-                                                     swapFixedDayCountType)
+    value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
+    print("Bermudan BDT PAY Value:", value)
+    value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
+    print("Bermudan BDT REC Value:", value)
 
-    value = bermudanSwaptionPayer.value(valuationDate, liborCurve, model)
+    ###########################################################################
+    # USING HW MODEL
+    ###########################################################################
 
-    print("Bermudan Payer Value:", value)
+    sigma = 0.01
+    a = 0.1
+    numTimeSteps = 100
+    model = FinModelRatesHW(sigma, a, numTimeSteps)
 
-    end = time.time()
-
-    testCases.header("TIME")
-    testCases.print(end - start)
+    value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
+    print("Bermudan HW PAY Value:", value)
+    value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
+    print("Bermudan HW REC Value:", value)
 
 ##########################################################################
 

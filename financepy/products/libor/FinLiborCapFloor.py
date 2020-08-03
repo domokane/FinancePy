@@ -284,7 +284,7 @@ class FinLiborCapFloor():
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face = 1.0
             dfTimes = liborCurve._times
-            dfValues = liborCurve._discountFactors
+            dfValues = liborCurve._dfValues
 
             v = model.optionOnZCB(texp, tmat, strikePrice, face,
                                   dfTimes, dfValues)
@@ -305,7 +305,7 @@ class FinLiborCapFloor():
 ###############################################################################
 
     def printLeg(self):
-        ''' Prints the cap floor amounts. '''
+        ''' Prints the cap floor payment amounts. '''
 
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)

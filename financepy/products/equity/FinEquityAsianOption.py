@@ -51,8 +51,8 @@ errorStr = "In averaging period so need to enter accrued average."
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
-                  dividendYield, volatility, numPaths, seed, accruedAverage):
+def _valueMC_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
+                   dividendYield, volatility, numPaths, seed, accruedAverage):
 
     # Start pricing here
     np.random.seed(seed)
@@ -123,9 +123,9 @@ def valueMC_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
-                       dividendYield, volatility, numPaths, seed,
-                       accruedAverage):
+def _valueMC_fast_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
+                        dividendYield, volatility, numPaths, seed,
+                        accruedAverage):
 
     np.random.seed(seed)
 
@@ -198,9 +198,9 @@ def valueMC_fast_NUMBA(t0, t, tau, K, n, optionType, stockPrice, interestRate,
 
 
 @njit(cache=True, fastmath=True)
-def valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
-                          interestRate, dividendYield, volatility, numPaths,
-                          seed, accruedAverage, v_g_exact):
+def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
+                           interestRate, dividendYield, volatility, numPaths,
+                           seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
     mu = interestRate - dividendYield
@@ -618,14 +618,14 @@ class FinEquityAsianOption(FinEquityOption):
         K = self._strikePrice
         n = self._numObservations
 
-        v = valueMC_NUMBA(t0, t, tau, K, n, self._optionType,
-                          stockPrice,
-                          r,
-                          dividendYield,
-                          volatility,
-                          numPaths,
-                          seed,
-                          accruedAverage)
+        v = _valueMC_NUMBA(t0, t, tau, K, n, self._optionType,
+                           stockPrice,
+                           r,
+                           dividendYield,
+                           volatility,
+                           numPaths,
+                           seed,
+                           accruedAverage)
 
         return v
 
@@ -633,7 +633,7 @@ class FinEquityAsianOption(FinEquityOption):
 
     def valueMC_fast(self, valueDate, stockPrice, discountCurve,
                      dividendYield,  # Yield
-                     model,          # Model 
+                     model,          # Model
                      numPaths,       # Numpaths integer
                      seed,
                      accruedAverage):
@@ -651,14 +651,14 @@ class FinEquityAsianOption(FinEquityOption):
 
         volatility = model._volatility
 
-        v = valueMC_fast_NUMBA(t0, t, tau, K, n, self._optionType,
-                               stockPrice,
-                               r,
-                               dividendYield,
-                               volatility,
-                               numPaths,
-                               seed,
-                               accruedAverage)
+        v = _valueMC_fast_NUMBA(t0, t, tau, K, n, self._optionType,
+                                stockPrice,
+                                r,
+                                dividendYield,
+                                volatility,
+                                numPaths,
+                                seed,
+                                accruedAverage)
 
         return v
 
@@ -695,15 +695,15 @@ class FinEquityAsianOption(FinEquityOption):
                                         model,
                                         accruedAverage)
 
-        v = valueMC_fast_CV_NUMBA(t0, t, tau, K, n, self._optionType,
-                                  stockPrice,
-                                  r,
-                                  dividendYield,
-                                  volatility,
-                                  numPaths,
-                                  seed,
-                                  accruedAverage,
-                                  v_g_exact)
+        v = _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, self._optionType,
+                                   stockPrice,
+                                   r,
+                                   dividendYield,
+                                   volatility,
+                                   numPaths,
+                                   seed,
+                                   accruedAverage,
+                                   v_g_exact)
 
         return v
 

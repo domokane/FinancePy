@@ -765,7 +765,7 @@ def LMMSwaptionPricer(strike, a, b, numPaths, fwd0, fwds, taus, isPayer):
         raise FinError("NumPaths > MaxPaths")
 
     discFactor = np.zeros(maxForwards)
-    pv01 = np.zeros(maxForwards)
+#    pv01 = np.zeros(maxForwards)
 
     # Set up initial term structure
     discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])

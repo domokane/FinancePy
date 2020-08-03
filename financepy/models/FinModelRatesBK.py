@@ -10,6 +10,7 @@ from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
 from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
+from ..finutils.FinOptionTypes import FinOptionExerciseTypes
 
 interp = FinInterpMethods.FLAT_FORWARDS.value
 
@@ -22,6 +23,22 @@ interp = FinInterpMethods.FLAT_FORWARDS.value
 
 # (c) Dominic O'Kane - December-2019
 # Fergal O'Kane - search root function - 16-12-2019
+
+###############################################################################
+
+###############################################################################
+
+
+def optionExerciseTypesToInt(optionExerciseType):
+
+    if optionExerciseType == FinOptionExerciseTypes.EUROPEAN:
+        return 1
+    if optionExerciseType == FinOptionExerciseTypes.BERMUDAN:
+        return 2
+    if optionExerciseType == FinOptionExerciseTypes.AMERICAN:
+        return 3
+    else:
+        raise FinError("Unknown option exercise type.")
 
 ###############################################################################
 
@@ -126,17 +143,17 @@ def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 
 
 @njit(fastmath=True, cache=True)
-def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
+def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice, face,
                                couponTimes, couponFlows,
-                               exerciseType,
+                               exerciseTypeInt,
                                _dfTimes, _dfValues,
                                _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
     ''' Option to enter into a swap that can be exercised on coupon payment
-    dates after the start of the exercise period. Due to non-analytical bond
-    price we need to extend tree out to bond maturity and take into account
+    dates after the start of the exercise period. Due to multiple exercise
+    times we need to extend tree out to bond maturity and take into account
     cash flows through time. '''
 
-    DEBUG = False
+#    DEBUG = False  # True
 
     ###########################################################################
 
@@ -150,9 +167,9 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
     treeFlows = np.zeros(numTimeSteps)
     numCoupons = len(couponTimes)
 
-    if DEBUG:
-        filename = "swapoptBK_" + str(numTimeSteps) + ".txt"
-        outfile = open(filename, "w")
+    # if DEBUG:
+    #     filename = "swaptionBK_" + str(numTimeSteps) + ".txt"
+    #     outfile = open(filename, "w")
 
     # Tree flows go all the way out to the bond maturity date
     for i in range(0, numCoupons):
@@ -163,38 +180,34 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
         df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
-    if DEBUG:
-        for i in range(0, len(_treeTimes)):
-            t = _treeTimes[i]
-            f = treeFlows[i]
-            outfile.write("t: %9.5f  flow: %9.5f\n" % (t, f))
-
     ###########################################################################
-    accrued = np.zeros(numTimeSteps)
+    # Mapped times stores the mapped times and flows and is used to calculate
+    # accrued interest in a consistent manner as using actual flows will
+    # result in some convergence noise issues as it is inconsistent
+    ###########################################################################
 
-    mappedTimes = [0.0]
-    mappedAmounts = [0.0]
+    mappedTimes = np.array([0.0])
+    mappedAmounts = np.array([0.0])
     for n in range(1, len(_treeTimes)):
-
-        # I AM ENFORCING ZERO ACCRUED ON THE EXPIRY DATE OF THE OPTION
-        # THIS NEEDS FURTHER WORK. I SHOULD CALCULATE THE EXPIRY ACCD EXACTLY
-        # AND SET IT EQUAL TO THAT AMOUNT - !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         accdAtExpiry = 0.0
         if _treeTimes[n-1] < texp and _treeTimes[n] >= texp:
-            mappedTimes.append(texp)
-            mappedAmounts.append(accdAtExpiry)
+            np.append(mappedTimes, texp)
+            np.append(mappedAmounts, accdAtExpiry)
 
         if treeFlows[n] > 0.0:
-            mappedTimes.append(_treeTimes[n])
-            mappedAmounts.append(treeFlows[n])
+            np.append(mappedTimes, _treeTimes[n])
+            np.append(mappedAmounts, treeFlows[n])
 
+    ###########################################################################
+
+    accrued = np.zeros(numTimeSteps)
     for m in range(0, maturityStep+1):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, mappedTimes, mappedAmounts)
 
-        if DEBUG:
-            print("==>", m, ttree, accrued[m])
+        # if DEBUG:
+        #     print("==>", m, ttree, accrued[m])
 
         accrued[m] *= face
 
@@ -203,14 +216,14 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
         if treeFlows[m] > 0.0:
             accrued[m] = treeFlows[m] * face
 
-    if DEBUG:
-        print("TEXP", texp)
-        print("TREE TIMES", _treeTimes)
-        print("TREE FLOWS", treeFlows)
-        print("MAPPED TIMES:", mappedTimes)
-        print("MAPPED AMOUNTS:", mappedAmounts)
-        print("ACCD TIMES", _treeTimes)
-        print("ACCD AMOUNT", accrued)
+    # if DEBUG:
+    #     print("TEXP", texp)
+    #     print("TREE TIMES", _treeTimes)
+    #     print("TREE FLOWS", treeFlows)
+    #     print("MAPPED TIMES:", mappedTimes)
+    #     print("MAPPED AMOUNTS:", mappedAmounts)
+    #     print("ACCD TIMES", _treeTimes)
+    #     print("ACCD AMOUNT", accrued)
 
     #######################################################################
 
@@ -222,9 +235,9 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
     for k in range(0, numNodes):
         swapValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
 
-    if DEBUG:
-        outfile.write("m: %d k: %d EXPIRY: %9.5f\n" %
-                      (maturityStep, k, swapValues[maturityStep, k]))
+    # if DEBUG:
+    #     outfile.write("m: %d k: %d EXPIRY: %9.5f\n" %
+    #                   (maturityStep, k, swapValues[maturityStep, k]))
 
     N = jmax
 
@@ -235,7 +248,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
 
         for k in range(-nm, nm+1):
             kN = k + N
-            df = np.exp(-_rt[m, kN] * _dt)
+            rt = _rt[m, kN]
+            df = np.exp(-rt * _dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
@@ -299,56 +313,52 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
 
             recValues[m, kN] = vrec
 
-            if exerciseType == 1 and m == expiryStep:
+            cleanPrice = swapValues[m, kN] - accrued[m]
+            payExercise = max(strikePrice - cleanPrice, 0.0)
+            recExercise = max(cleanPrice - strikePrice, 0.0)
+
+            holdPay = payValues[m, kN]
+            holdRec = recValues[m, kN]
+
+            if exerciseTypeInt == 1 and m == expiryStep:
                 # European style on expiry date
 
-                cleanPrice = swapValues[m, kN] - accrued[m]
-                payExercise = max(strikePrice - cleanPrice, 0.0)
-                recExercise = max(cleanPrice - strikePrice, 0.0)
+                payValues[m, kN] = max(payExercise, holdPay)
+                recValues[m, kN] = max(recExercise, holdRec)
 
-                hold = payValues[m, kN]
-                payValues[m, kN] = max(payExercise, hold)
+            elif exerciseTypeInt == 2 and m == expiryStep:
+                # Bermudan style on expiry date (which has no coupon)
 
-                hold = recValues[m, kN]
-                recValues[m, kN] = max(recExercise, hold)
+                payValues[m, k] = max(payExercise, holdPay)
+                recValues[m, k] = max(recExercise, holdRec)
 
-            elif exerciseType == 2 and flow > 0.0 and m >= expiryStep:
+            elif exerciseTypeInt == 2 and flow > 0.0 and m >= expiryStep:
                 # Bermudan style on coupon dates after expiry date
 
-                cleanPrice = swapValues[m, kN] - accrued[m]
-                payExercise = max(strikePrice - cleanPrice, 0.0)
-                recExercise = max(cleanPrice - strikePrice, 0.0)
+                payValues[m, kN] = max(payExercise, holdPay)
+                recValues[m, kN] = max(recExercise, holdRec)
 
-                hold = payValues[m, kN]
-                payValues[m, kN] = max(payExercise, hold)
-
-                hold = recValues[m, kN]
-                recValues[m, kN] = max(recExercise, hold)
-
-            elif exerciseType == 3 and m >= expiryStep:
+            elif exerciseTypeInt == 3 and m >= expiryStep:
                 # American style on all dates after expiry date
 
-                cleanPrice = swapValues[m, kN] - accrued[m]
-                payExercise = max(strikePrice - cleanPrice, 0.0)
-                recExercise = max(cleanPrice - strikePrice, 0.0)
+                payValues[m, kN] = max(payExercise, holdPay)
+                recValues[m, kN] = max(recExercise, holdRec)
 
-                hold = payValues[m, kN]
-                payValues[m, kN] = max(payExercise, hold)
+    #     if DEBUG:
+    #         outfile.write("STEP: %5d %5d %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f
+    #   %9.5f\n" % \
+    #                       (m,
+    #                        k,
+    #                        _treeTimes[m],
+    #                        treeFlows[m],
+    #                        swapValues[m, kN],
+    #                        cleanPrice,
+    #                        accrued[m],
+    #                        payValues[m, kN],
+    #                        recValues[m, kN]))
 
-                hold = recValues[m, kN]
-                recValues[m, kN] = max(recExercise, hold)
-
-        if DEBUG:
-            outfile.write("PAY: %5d %5d %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f\n" % \
-                          (m,
-                           k,
-                           _treeTimes[m],
-                           treeFlows[m],
-                           swapValues[m, kN],
-                           cleanPrice,
-                           accrued[m],
-                           payValues[m, kN],
-                           recValues[m, kN]))
+    # if DEBUG:
+    #     outfile.close()
 
     return payValues[0, jmax], recValues[0, jmax]
 
@@ -358,14 +368,17 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice,  face,
 @njit(fastmath=True, cache=True)
 def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
                                  couponTimes, couponFlows,
-                                 americanExercise,
+                                 exerciseTypeInt,
                                  _dfTimes, _dfValues,
-                                 _treeTimes, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+                                 _treeTimes, _Q,
+                                 _pu, _pm, _pd,
+                                 _rt,
+                                 _dt, _a):
     ''' Option that can be exercised at any time over the exercise period.
     Due to non-analytical bond price we need to extend tree out to bond
     maturity and take into account cash flows through time. '''
 
-    DEBUG = False
+    # DEBUG = False
 
     ###########################################################################
 
@@ -379,9 +392,9 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
     treeFlows = np.zeros(numTimeSteps)
     numCoupons = len(couponTimes)
 
-    if DEBUG:
-        filename = "bondOptBK_" + str(numTimeSteps) + ".txt"
-        outfile = open(filename, "w")
+    # if DEBUG:
+    #     filename = "bondOptBK_" + str(numTimeSteps) + ".txt"
+    #     outfile = open(filename, "w")
 
     # Tree flows go all the way out to the bond maturity date
     for i in range(0, numCoupons):
@@ -392,11 +405,11 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
         df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
-    if DEBUG:
-        for i in range(0, len(_treeTimes)):
-            t = _treeTimes[i]
-            f = treeFlows[i]
-            outfile.write("t: %9.5f  flow: %9.5f\n" % (t, f))
+    # if DEBUG:
+    #     for i in range(0, len(_treeTimes)):
+    #         t = _treeTimes[i]
+    #         f = treeFlows[i]
+    #         outfile.write("t: %9.5f  flow: %9.5f\n" % (t, f))
 
     ###########################################################################
     accrued = np.zeros(numTimeSteps)
@@ -418,13 +431,6 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
             mappedTimes.append(_treeTimes[n])
             mappedAmounts.append(treeFlows[n])
 
-    # I HAVE REMOVED THIS
-    # Need cashflows which are exact time and size for accrued at texp
-#    for n in range(0, numCoupons):
-#        if couponTimes[n] > texp:
-#            mappedTimes.append(couponTimes[n])
-#            mappedAmounts.append(couponFlows[n])
-
     for m in range(0, maturityStep+1):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, mappedTimes, mappedAmounts)
@@ -436,14 +442,14 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
         if treeFlows[m] > 0.0:
             accrued[m] = treeFlows[m] * face
 
-    if DEBUG:
-        print("TEXP", texp)
-        print("TREE TIMES", _treeTimes)
-        print("TREE FLOWS", treeFlows)
-        print("MAPPED TIMES:", mappedTimes)
-        print("MAPPED AMOUNTS:", mappedAmounts)
-        print("ACCD TIMES", _treeTimes)
-        print("ACCD AMOUNT", accrued)
+    # if DEBUG:
+    #     print("TEXP", texp)
+    #     print("TREE TIMES", _treeTimes)
+    #     print("TREE FLOWS", treeFlows)
+    #     print("MAPPED TIMES:", mappedTimes)
+    #     print("MAPPED AMOUNTS:", mappedAmounts)
+    #     print("ACCD TIMES", _treeTimes)
+    #     print("ACCD AMOUNT", accrued)
 
     #######################################################################
 
@@ -455,9 +461,9 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
     for k in range(0, numNodes):
         bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) * face
 
-    if DEBUG:
-        outfile.write("m: %d k: %d EXPIRY: %9.5f\n" %
-                      (maturityStep, k, bondValues[maturityStep, k]))
+    # if DEBUG:
+    #     outfile.write("m: %d k: %d EXPIRY: %9.5f\n" %
+    #                   (maturityStep, k, bondValues[maturityStep, k]))
 
     N = jmax
 
@@ -494,9 +500,9 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
 
             bondValues[m, kN] += flow
 
-        if DEBUG:
-            outfile.write("m: %d k: %d flow: %9.5f BOND VALUE: %9.5f\n" %
-                          (m, k, flow, bondValues[m, kN]))
+        # if DEBUG:
+        #     outfile.write("m: %d k: %d flow: %9.5f BOND VALUE: %9.5f\n" %
+        #                   (m, k, flow, bondValues[m, kN]))
 
     # Now consider exercise of the option on the expiry date
     # Start with the value of the bond at maturity and overwrite values
@@ -508,11 +514,12 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
         callOptionValues[expiryStep, kN] = max(cleanPrice - strikePrice, 0.0)
         putOptionValues[expiryStep, kN] = max(strikePrice - cleanPrice, 0.0)
 
-    if DEBUG:
-        outfile.write("k: %d cleanPrice: %9.5f accd: %9.5f \n" % (k, cleanPrice, accd))
+    # if DEBUG:
+    #     outfile.write("k: %d cleanPrice: %9.5f accd: %9.5f \n" % \
+    #                   (k, cleanPrice, accd))
 
-    if DEBUG:
-        outfile.write("OPTION    m    k     treeT      treeF  bondVal   cleanPx     Accd    CallVal    PutVal\n")
+    # if DEBUG:
+    #     outfile.write("OPTION    m    k     treeT      treeF  bondVal   cleanPx     Accd    CallVal    PutVal\n")
 
     # Now step back to today considering early exercise
     for m in range(expiryStep-1, -1, -1):
@@ -585,7 +592,8 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
 
             putOptionValues[m, kN] = vput
 
-            if americanExercise is True:
+            if exerciseTypeInt == 1:
+                # European Exercise
                 cleanPrice = bondValues[m, kN] - accrued[m]
                 callExercise = max(cleanPrice - strikePrice, 0.0)
                 putExercise = max(strikePrice - cleanPrice, 0.0)
@@ -596,11 +604,20 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
                 hold = putOptionValues[m, kN]
                 putOptionValues[m, kN] = max(putExercise, hold)
 
-        if DEBUG:
-            outfile.write("CALL: %5d %5d %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f\n" % \
-                    (m, k, _treeTimes[m], treeFlows[m], bondValues[m,kN],\
-                     cleanPrice, accrued[m],\
-                     callOptionValues[m,kN], putOptionValues[m,kN]))
+    #     if DEBUG:
+    #         outfile.write("STEP: %5d %5d %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f %9.5f\n" % \
+    #                       (m,
+    #                        k,
+    #                        _treeTimes[m],
+    #                        treeFlows[m],
+    #                        bondValues[m, kN],
+    #                        cleanPrice,
+    #                        accrued[m],
+    #                        callOptionValues[m, kN],
+    #                        putOptionValues[m, kN]))
+
+    # if DEBUG:
+    #     outfile.close()
 
     return callOptionValues[0, jmax], putOptionValues[0, jmax]
 
@@ -908,11 +925,45 @@ class FinModelRatesBK():
 
 ###############################################################################
 
+    def buildTree(self, tmat, dfTimes, dfValues):
+
+        if isinstance(dfTimes, np.ndarray) is False:
+            raise FinError("DF TIMES must be a numpy vector")
+
+        if isinstance(dfValues, np.ndarray) is False:
+            raise FinError("DF VALUES must be a numpy vector")
+
+        interp = FinInterpMethods.FLAT_FORWARDS.value
+
+        treeMaturity = tmat * (self._numTimeSteps+1)/self._numTimeSteps
+        treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)
+        self._treeTimes = treeTimes
+
+        dfTree = np.zeros(shape=(self._numTimeSteps+2))
+        dfTree[0] = 1.0
+
+        for i in range(1, self._numTimeSteps+2):
+            t = treeTimes[i]
+            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
+
+        self._dfTimes = dfTimes
+        self._dfValues = dfValues
+
+        self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
+            = buildTreeFast(self._a, self._sigma,
+                            treeTimes, self._numTimeSteps, dfTree)
+
+        return
+
+###############################################################################
+
     def bondOption(self, texp, strike,
-                   face, couponTimes, couponFlows, americanExercise):
+                   face, couponTimes, couponFlows, exerciseType):
         ''' Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
         maturity and take into account cash flows through time. '''
+
+        exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
 
         tmat = couponTimes[-1]
 
@@ -927,7 +978,7 @@ class FinModelRatesBK():
         callValue, putValue \
             = americanBondOption_Tree_Fast(texp, tmat, strike, face,
                                            couponTimes, couponFlows,
-                                           americanExercise,
+                                           exerciseTypeInt,
                                            self._dfTimes, self._dfValues,
                                            self._treeTimes, self._Q,
                                            self._pu, self._pm, self._pd,
@@ -938,13 +989,16 @@ class FinModelRatesBK():
 
 ###############################################################################
 
-    def bermudanSwaption(self, texp, strike, face,
+    def bermudanSwaption(self, texp, tmat, strike, face,
                          couponTimes, couponFlows, exerciseType):
         ''' Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. '''
 
-        tmat = couponTimes[-1]
+        exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
+
+        if abs(tmat - couponTimes[-1]) > 1.0/365.0:
+            raise FinError("Tmat does not equal couponTimes[-1]")
 
         if texp > tmat:
             raise FinError("Option expiry after bond matures.")
@@ -954,17 +1008,17 @@ class FinModelRatesBK():
 
         #######################################################################
 
-        callValue, putValue \
+        payValue, recValue \
             = bermudanSwaption_Tree_Fast(texp, tmat, strike, face,
                                          couponTimes, couponFlows,
-                                         exerciseType,
+                                         exerciseTypeInt,
                                          self._dfTimes, self._dfValues,
                                          self._treeTimes, self._Q,
                                          self._pu, self._pm, self._pd,
                                          self._rt,
                                          self._dt, self._a)
 
-        return {'call': callValue, 'put': putValue}
+        return {'pay': payValue, 'rec': recValue}
 
 ###############################################################################
 
@@ -995,38 +1049,6 @@ class FinModelRatesBK():
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}
-
-###############################################################################
-
-    def buildTree(self, tmat, dfTimes, dfValues):
-
-        if isinstance(dfTimes, np.ndarray) is False:
-            raise FinError("DF TIMES must be a numpy vector")
-
-        if isinstance(dfValues, np.ndarray) is False:
-            raise FinError("DF VALUES must be a numpy vector")
-
-        interp = FinInterpMethods.FLAT_FORWARDS.value
-
-        treeMaturity = tmat * (self._numTimeSteps+1)/self._numTimeSteps
-        treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)
-        self._treeTimes = treeTimes
-
-        dfTree = np.zeros(shape=(self._numTimeSteps+2))
-        dfTree[0] = 1.0
-
-        for i in range(1, self._numTimeSteps+2):
-            t = treeTimes[i]
-            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
-
-        self._dfTimes = dfTimes
-        self._dfValues = dfValues
-
-        self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
-            = buildTreeFast(self._a, self._sigma,
-                            treeTimes, self._numTimeSteps, dfTree)
-
-        return
 
 ###############################################################################
 

@@ -125,7 +125,7 @@ class FinBondEmbeddedOption(object):
         model and a discount curve. '''
 
         # Generate bond coupon flow schedule
-        self._bond.calculateFlowDates(settlementDate)
+        self._bond._calculateFlowDates(settlementDate)
         cpn = self._bond._coupon/self._bond._frequency
         cpnTimes = []
         cpnAmounts = []
@@ -157,7 +157,7 @@ class FinBondEmbeddedOption(object):
         maturityDate = self._bond._maturityDate
         tmat = (maturityDate - settlementDate) / gDaysInYear
         dfTimes = discountCurve._times
-        dfValues = discountCurve._discountFactors
+        dfValues = discountCurve._dfValues
 
         face = self._bond._face
 

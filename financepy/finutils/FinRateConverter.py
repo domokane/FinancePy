@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# THIS IS NOT BEING USED SO REMOVE ?
 
 from ..finutils.FinError import FinError
 
@@ -13,6 +14,8 @@ class FinRateConverter(object):
     used. '''
 
     def __init__(self, frequency):
+        ''' Set the base rate frequency for the converter. This is not used so
+        will be depracated next version. '''
 
         # we permit frequency to be entered as a string or integer
         if isinstance(frequency, int):

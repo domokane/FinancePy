@@ -25,6 +25,7 @@ from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
 from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.models.FinModelRatesBK import FinModelRatesBK
+from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 
 from financepy.finutils.FinCalendar import *
 
@@ -613,12 +614,64 @@ def testFinLiborSwaptionMatlabExamples():
     print("MATLAB Prix:", v_matlab)
     print("DIFF:", v_finpy - v_matlab)
 
-#    print(swaption)
+###############################################################################
+
+    print("====================================")
+    print("MATLAB EXAMPLE WITH BLACK-DERMAN-TOY")
+    print("====================================")
+
+    # https://fr.mathworks.com/help/fininst/swaptionbybdt.html
+
+    valuationDate = FinDate(1, 1, 2007)
+
+    dates = [FinDate(1, 1, 2007), FinDate(1, 7, 2007), FinDate(1, 1, 2008),
+             FinDate(1, 7, 2008), FinDate(1, 1, 2009), FinDate(1, 7, 2009),
+             FinDate(1, 1, 2010), FinDate(1, 7, 2010),
+             FinDate(1, 1, 2011), FinDate(1, 7, 2011), FinDate(1, 1, 2012)]
+
+    zeroRates = np.array([0.06] * 11)
+
+    interpMethod = FinInterpMethods.FLAT_FORWARDS
+    dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    contFreq = FinFrequencyTypes.ANNUAL
+
+    liborCurve = FinDiscountCurveZeros(valuationDate, dates, zeroRates,
+                                       contFreq,
+                                       dayCountType, interpMethod)
+
+    settlementDate = valuationDate
+    exerciseDate = FinDate(1, 1, 2012)
+    maturityDate = FinDate(1, 1, 2015)
+
+    fixedFrequencyType = FinFrequencyTypes.ANNUAL
+    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    notional = 100.0
+
+    fixedCoupon = 0.062
+    swaptionType = FinLiborSwaptionTypes.PAYER
+    swaption = FinLiborSwaption(settlementDate,
+                                exerciseDate,
+                                maturityDate,
+                                swaptionType,
+                                fixedCoupon,
+                                fixedFrequencyType,
+                                fixedDayCountType,
+                                notional)
+
+    model = FinModelRatesBDT(0.20, 200)
+    v_finpy = swaption.value(valuationDate, liborCurve, model)
+    v_matlab = 2.0592
+
+    print("FP Price:", v_finpy)
+    print("MATLAB Prix:", v_matlab)
+    print("DIFF:", v_finpy - v_matlab)
+
+    print(swaption)
 ###############################################################################
 
 # test_FinLiborSwaption()
 # testFinLiborSwaptionModels()
-testFinLiborCashSettledSwaption()
-# testFinLiborSwaptionMatlabExamples()
+# testFinLiborCashSettledSwaption()
+testFinLiborSwaptionMatlabExamples()
 # test_FinLiborSwaptionQLExample()
 testCases.compareTestCases()

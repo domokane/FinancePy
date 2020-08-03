@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-
+from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
@@ -12,6 +12,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinDate import FinDate, dailyWorkingDaySchedule
 from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 ###############################################################################
@@ -22,7 +23,7 @@ class FinOIS(object):
     which a fixed payment leg is exchanged for a floating coupon leg. There
     is no exchange of par.
 
-    The contract lasts from a start date to a specified maturity date. 
+    The contract lasts from a start date to a specified maturity date.
     The fixed coupon is the OIS fixed rate which is set at contract initiation.
 
     The floating rate is not known until the end of each payment period. It is
@@ -123,7 +124,8 @@ class FinOIS(object):
     ###########################################################################
 
     def generateFloatLegFlows(self, valueDate, indexCurve):
-        ''' Generate the payment amounts on floating leg implied by index curve '''
+        ''' Generate the payment amounts on floating leg implied by index
+        curve '''
         self.generatePaymentDates(valueDate)
 
         dayCounter = FinDayCount(self._floatDayCountType)
@@ -144,7 +146,8 @@ class FinOIS(object):
     ###########################################################################
 
     def rate(self, oisDates, oisFixings):
-        ''' Calculate the OIS rate implied rate from the history of fixings. '''
+        ''' Calculate the OIS rate implied rate from the history of fixings.
+        '''
 
         if len(oisDates) != len(oisFixings):
             raise FinError("Dates and fixings must have same length.")
@@ -228,7 +231,7 @@ class FinOIS(object):
         pv = pv + df * principal
         return pv
 
-    ########################################################################
+    ###########################################################################
 
     def df(self,
            oisRate,
@@ -247,7 +250,8 @@ class FinOIS(object):
 
     ###########################################################################
 
-    def print(self, valueDate, indexCurve):
+    def printFlows(self, valueDate, indexCurve):
+        ''' Print the dates and cash flows on the OIS. '''
         print("StartDate:", self._startDate)
         print("MaturityDate:", self._maturityDate)
         print("OISFixedRate:", self._fixedRate)
@@ -269,4 +273,24 @@ class FinOIS(object):
         for dt in self._adjustedFloatDates:
             print(dt)
 
-    ##########################################################################
+    ###########################################################################
+
+    def __repr__(self):
+        ''' Print the dates and cash flows on the OIS. '''
+        s = labelToString("StartDate:", self._startDate)
+        s += labelToString("MaturityDate:", self._maturityDate)
+        s += labelToString("OISFixedRate:", self._fixedRate)
+        s += labelToString("PayFixedLeg:", self._payFixedLeg)
+        s += labelToString("Notional:", self._notional)
+        s += labelToString("FixedDayCountType:", self._fixedDayCountType)
+        s += labelToString("FixedFrequencyType:", self._fixedFrequencyType)
+        s += labelToString("FloatDayCountType:", self._floatDayCountType)
+        s += labelToString("FloatFrequencyType:", self._floatFrequencyType)
+        return s
+
+    ###########################################################################
+
+    def print(self):
+        print(self)
+
+###############################################################################

@@ -8,7 +8,7 @@
 
 ''' This module implements the LMM in the spot measure. It combines both model
 and product specific code - I am not sure if it is better to separate these. At
-the moment this seems to work ok. 
+the moment this seems to work ok.
 
 THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE. '''
 
@@ -19,20 +19,17 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
-from ...products.libor.FinLiborSwap import FinLiborSwap
 
-from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelRatesLMM import LMMSimulateFwds1F
 from ...models.FinModelRatesLMM import LMMSimulateFwdsMF
 from ...models.FinModelRatesLMM import LMMSimulateFwdsNF
 from ...models.FinModelRatesLMM import FinRateModelLMMModelTypes
 from ...models.FinModelRatesLMM import LMMCapFlrPricer
-from ...models.FinModelRatesLMM import LMMSwaptionPricer
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
@@ -342,9 +339,10 @@ class FinLiborLMMProducts():
         if b == 0:
             raise FinError("Swaption swap maturity date is today.")
 
-        v = LMMSwaptionPricer(fixedCoupon, a, b, numPaths,
-                              fwd0, fwds, taus, isPayer)
-
+        numPaths = 1000
+#        v = LMMSwaptionPricer(fixedCoupon, a, b, numPaths,
+#                              fwd0, fwds, taus, isPayer)
+        v = 0.0
         return v
 
 ###############################################################################

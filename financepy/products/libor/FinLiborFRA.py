@@ -26,9 +26,8 @@ class FinLiborFRA(object):
     notional amount. This period starts on the settlement date of the
     FRA and ends on the maturity date of the FRA. For example a 1x4 FRA
     relates to a Libor starting in 1 month for a loan period ending in 4
-    months. Hence it linkes to 3-month Libor rate.
-
-    The amount received by a payer of fixed rate at settlement is
+    months. Hence it links to 3-month Libor rate. The amount received by a 
+    payer of fixed rate at settlement is:
 
         acc(1,2) * (Libor(1,2) - FRA RATE) / (1 + acc(0,1) x Libor(0,1))
 
@@ -37,10 +36,9 @@ class FinLiborFRA(object):
         acc(1,2) * (FWD Libor(1,2) - FRA RATE) x df(0,2)
 
     If the base date of the curve is before the value date then we
-    forward adjust this amount to that value date.
-
-    For simplicity I have assumed that the fixing date and the settlement
-    date are the same date. This should be amended later. '''
+    forward adjust this amount to that value date. For simplicity I have
+    assumed that the fixing date and the settlement date are the same date.
+    This should be amended later. '''
 
     def __init__(self,
                  startDate: FinDate,  # The date the FRA starts to accrue

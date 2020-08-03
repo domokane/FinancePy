@@ -109,7 +109,7 @@ def test_HullWhiteBondOption():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
 
-    bond.calculateFlowDates(settlementDate)
+    bond._calculateFlowDates(settlementDate)
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
@@ -189,7 +189,7 @@ def test_HullWhiteCallableBond():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
 
-    bond.calculateFlowDates(settlementDate)
+    bond._calculateFlowDates(settlementDate)
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency

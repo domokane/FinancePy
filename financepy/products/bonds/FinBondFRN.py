@@ -20,7 +20,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-def f(dm, *args):
+def _f(dm, *args):
     ''' Function used to do solve root search in DM calculation '''
 
     self = args[0]
@@ -77,7 +77,7 @@ class FinBondFRN(object):
 
 ###############################################################################
 
-    def calculateFlowDates(self, settlementDate):
+    def _calculateFlowDates(self, settlementDate):
         ''' Determine the bond cashflow payment dates. '''
 
         # No need to generate flows if settlement date has not changed
@@ -110,7 +110,7 @@ class FinBondFRN(object):
         ''' Calculate the full price of the bond from its discount margin and
         making assumptions about the future Libor rates. '''
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dc = self._ncd - settlementDate
@@ -171,7 +171,7 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -203,7 +203,7 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -321,7 +321,7 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dy = 0.0001
@@ -403,7 +403,7 @@ class FinBondFRN(object):
                        cleanPrice):
         ''' Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. '''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         # Needs to be adjusted to par notional
@@ -414,7 +414,7 @@ class FinBondFRN(object):
         argtuple = (self, settlementDate, resetLibor, currentLibor,
                     futureLibor, fullPrice)
 
-        dm = optimize.newton(f,
+        dm = optimize.newton(_f,
                              x0=0.01,  # initial value of 10%
                              fprime=None,
                              args=argtuple,
@@ -429,7 +429,7 @@ class FinBondFRN(object):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -447,7 +447,7 @@ class FinBondFRN(object):
     def printFlows(self, settlementDate):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         for dt in self._flowDates[1:-1]:
             print(dt)
 
