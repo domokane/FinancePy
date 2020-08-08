@@ -241,6 +241,8 @@ def toUsableType(t):
         # t is a normal type
         if t is float:
             return (int, float, np.float64)
+        if isinstance(t, tuple):
+            return tuple(toUsableType(tp) for tp in t)
 
     return t
 
