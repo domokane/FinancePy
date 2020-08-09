@@ -11,7 +11,7 @@ from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
-
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 
@@ -56,7 +56,9 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def cleanPriceFromDiscountCurve(self, settlementDate, discountCurve):
+    def cleanPriceFromDiscountCurve(self,
+                                    settlementDate: FinDate,
+                                    discountCurve: FinDiscountCurve):
         ''' Calculate the bond price using some discount curve to present-value
         the bond's cashflows. '''
 
@@ -68,7 +70,9 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def fullPriceFromDiscountCurve(self, settlementDate, discountCurve):
+    def fullPriceFromDiscountCurve(self,
+                                   settlementDate: FinDate,
+                                   discountCurve: FinDiscountCurve):
         ''' Calculate the bond price using some discount curve to present-value
         the bond's cashflows. '''
 
@@ -87,7 +91,8 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def calculateFlowDatesPayments(self, settlementDate):
+    def calculateFlowDatesPayments(self,
+                                   settlementDate: FinDate):
 
         # No need to generate flows if settlement date has not changed
         if settlementDate == self._settlementDate:
@@ -125,7 +130,8 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def _calcAccruedInterest(self, settlementDate):
+    def _calcAccruedInterest(self,
+                             settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
@@ -153,7 +159,8 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def printFlows(self, settlementDate):
+    def printFlows(self,
+                   settlementDate: FinDate):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
 

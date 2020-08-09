@@ -8,6 +8,7 @@ from ...models.FinModelRatesBK import FinModelRatesBK
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from .FinBond import FinBond
 from ...finutils.FinOptionTypes import FinOptionExerciseTypes
 from enum import Enum
@@ -57,8 +58,8 @@ class FinBondOption():
 ###############################################################################
 
     def value(self,
-              valueDate,
-              discountCurve,
+              valueDate: FinDate,
+              discountCurve: FinDiscountCurve,
               model):
         ''' Value a bond option (option on a bond) using the specified model
         which include Hull-White Tree, Black-Karasinski Tree. '''

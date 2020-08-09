@@ -21,7 +21,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinDate():
 
-    startDate = FinDate(2018, 1, 1)
+    startDate = FinDate(1, 1, 2018)
 
     testCases.header("DATE", "MONTHS", "CDS DATE")
 
@@ -29,7 +29,7 @@ def test_FinDate():
         nextCDSDate = startDate.nextCDSDate(numMonths)
         testCases.print(str(startDate), numMonths, str(nextCDSDate))
 
-    startDate = FinDate(2018, 1, 1)
+    startDate = FinDate(1, 1, 2018)
 
     testCases.header("STARTDATE", "MONTHS", "CDS DATE")
 
@@ -43,7 +43,7 @@ def test_FinDate():
 
 def test_FinDateTenors():
 
-    startDate = FinDate(2018, 2, 23)
+    startDate = FinDate(23, 2, 2018)
 
     testCases.header("TENOR", "DATE")
     tenor = "5d"
@@ -80,7 +80,8 @@ def test_FinDateTenors():
 
 
 def test_FinDateRange():
-    startDate = FinDate(2010, 1, 1)
+
+    startDate = FinDate(1, 1, 2010)
 
     testCases.header("Tenor", "Dates")
 
@@ -106,33 +107,49 @@ def test_FinDateRange():
 
 
 def test_FinDateAddMonths():
-    startDate = FinDate(2010, 1, 1)
 
-    testCases.header("Tenor", "Dates")
+    startDate = FinDate(1, 1, 2010)
+
+    testCases.header("Months", "Dates")
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
     dates1 = startDate.addMonths(months)
-    months = np.array(months)
-    dates2 = startDate.addMonths(months)
-
-    years = [1, 3, 5, 7, 10]
-    dates3 = startDate.addYears(years)
-    years = np.array(years)
-    dates4 = startDate.addYears(years)
-    print(dates4)
-
-    years = [1.5, 3.25, 5.75, 7.25, 10.0]
-    dates5 = startDate.addYears(years)
-    years = np.array(years)
-    dates6 = startDate.addYears(years)
-    print(dates5)
+    print(dates1)
 
 ###############################################################################
 
 
-test_FinDate()
-test_FinDateTenors()
-test_FinDateRange()
-test_FinDateAddMonths()
+def test_FinDateAddYears():
+
+    startDate = FinDate(1, 1, 2010)
+
+    testCases.header("Years", "Dates")
+
+    years = [1, 3, 5, 7, 10]
+    dates1 = startDate.addYears(years)
+    print(startDate, dates1)
+
+    years = np.array([1, 3, 5, 7, 10])
+    dates2 = startDate.addYears(years)
+    print(startDate, dates2)
+
+    years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
+    dates3 = startDate.addYears(years)
+    print(startDate, dates3)
+
+    dt = 1.0/365.0
+    years = np.array([1.5+2.0*dt, 3.5-6*dt, 5.75+3*dt, 7.25+dt, 10.0+dt])
+    dates4 = startDate.addYears(years)
+
+    print(startDate, dates4)
+
+###############################################################################
+
+
+#test_FinDate()
+#test_FinDateTenors()
+#test_FinDateRange()
+#test_FinDateAddMonths()
+test_FinDateAddYears()
 
 testCases.compareTestCases()

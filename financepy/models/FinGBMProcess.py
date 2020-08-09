@@ -5,7 +5,7 @@
 import numpy as np
 from math import sqrt, exp
 from numba import njit, float64, int64
-from ..finutils.FinHelperFunctions import labelToString
+from numpy.linalg import cholesky
 
 ###############################################################################
 
@@ -47,7 +47,7 @@ def getPathsAssets(numAssets,
                    mus,
                    stockPrices,
                    volatilities,
-                   betas,
+                   corrMatrix,
                    seed):
 
     np.random.seed(seed)
@@ -57,8 +57,9 @@ def getPathsAssets(numAssets,
 
     Sall = np.empty((2 * numPaths, numTimeSteps + 1, numAssets))
 
-    g2D = np.random.standard_normal((numPaths, numTimeSteps + 1))
-    g3D = np.random.standard_normal((numPaths, numTimeSteps + 1, numAssets))
+    g = np.random.standard_normal((numPaths, numTimeSteps + 1, numAssets))
+    c = cholesky(corrMatrix)
+    gCorr = np.dot(c, g)
 
     for ip in range(0, numPaths):
         for ia in range(0, numAssets):
@@ -67,14 +68,13 @@ def getPathsAssets(numAssets,
 
     for ip in range(0, numPaths):
         for it in range(1, numTimeSteps + 1):
-            zmkt = g2D[ip, it]
             for ia in range(0, numAssets):
-                zidio = g3D[ip, it, ia]
-                z = betas[ia] * zmkt + sqrt(1.0 - betas[ia]**2) * zidio
+                z = gCorr[ip, it, ia]
                 w = exp(z * vsqrtdts[ia])
-                Sall[ip, it, ia] = Sall[ip, it - 1, ia] * m[ia] * w
-                Sall[ip + numPaths, it, ia] = Sall[ip + \
-                    numPaths, it - 1, ia] * m[ia] / w
+                v = m[ia]
+                Sall[ip, it, ia] = Sall[ip, it - 1, ia] * v*w
+                Sall[ip + numPaths, it, ia] = Sall[ip +
+                                                   numPaths, it - 1, ia] * v/w
 
     return Sall
 
@@ -88,7 +88,7 @@ def getAssets(numAssets,
               mus,
               stockPrices,
               volatilities,
-              betas,
+              corrMatrix,
               seed):
 
     np.random.seed(seed)
@@ -96,15 +96,13 @@ def getAssets(numAssets,
     m = np.exp((mus - volatilities * volatilities / 2.0) * t)
 
     Sall = np.empty((2 * numPaths, numAssets))
-
-    g2D = np.random.standard_normal((numPaths))
-    g3D = np.random.standard_normal((numPaths, numAssets))
+    g = np.random.standard_normal((numPaths, numAssets))
+    c = cholesky(corrMatrix)
+    gCorr = np.dot(g, c)
 
     for ip in range(0, numPaths):
-        zmkt = g2D[ip]
         for ia in range(0, numAssets):
-            zidio = g3D[ip, ia]
-            z = betas[ia] * zmkt + sqrt(1.0 - betas[ia]**2) * zidio
+            z = gCorr[ip, ia]
             w = exp(z * vsqrtdts[ia])
             Sall[ip, ia] = stockPrices[ia] * m[ia] * w
             Sall[ip + numPaths, ia] = stockPrices[ia] * m[ia] / w

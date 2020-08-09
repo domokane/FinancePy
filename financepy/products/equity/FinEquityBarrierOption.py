@@ -2,20 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-
-from math import exp, log, sqrt
 import numpy as np
 from enum import Enum
 
-
 from ...finutils.FinError import FinError
-from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.FinProcessSimulator import FinProcessSimulator
-
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+
+
+from scipy.stats import norm
+N = norm.cdf
 
 ###############################################################################
 
@@ -31,6 +31,7 @@ class FinEquityBarrierTypes(Enum):
     DOWN_AND_IN_PUT = 8
 
 ###############################################################################
+
 
 class FinEquityBarrierOption(FinEquityOption):
     ''' Class to hold details of an Equity Barrier Option. It also
@@ -58,18 +59,55 @@ class FinEquityBarrierOption(FinEquityOption):
         self._optionType = optionType
         self._notional = notional
 
-##########################################################################
+###############################################################################
 
-    def value(self, valueDate, stockPrice, discountCurve, dividendYield, 
+    def value(self,
+              valueDate: FinDate,
+              stockPrice: (float, np.ndarray),
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
               model):
         ''' This prices the option using the formulae given in the paper
         by Clewlow, Llanos and Strickland December 1994 which can be found at
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         '''
 
+        if isinstance(stockPrice, float):
+            stockPrices = [stockPrice]
+        else:
+            stockPrices = stockPrice
+
+        values = []
+        for s in stockPrices:
+            v = self._valueOne(valueDate, s, discountCurve,
+                               dividendYield, model)
+            values.append(v)
+
+        if isinstance(stockPrice, float):
+            return values[0]
+        else:
+            return np.array(values)
+
+###############################################################################
+
+    def _valueOne(self,
+                  valueDate: FinDate,
+                  stockPrice: (float, np.ndarray),
+                  discountCurve: FinDiscountCurve,
+                  dividendYield: float,
+                  model):
+        ''' This values a single option. Because of its structure it cannot
+        easily be vectorised which is why it has been wrapped. '''
+
         t = (self._expiryDate - valueDate) / gDaysInYear
-        lnS0k = log(float(stockPrice) / self._strikePrice)
-        sqrtT = sqrt(t)
+
+        if t < 0:
+            raise FinError("Option expires before value date.")
+
+        t = max(t, 1e-6)
+
+        lnS0k = np.log(stockPrice / self._strikePrice)
+        sqrtT = np.sqrt(t)
 
         r = discountCurve.zeroRate(self._expiryDate)
 
@@ -83,8 +121,8 @@ class FinEquityBarrierOption(FinEquityOption):
         mu = r - dividendYield
         d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigmaRootT
         d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigmaRootT
-        df = exp(-r * t)
-        dq = exp(-dividendYield * t)
+        df = np.exp(-r * t)
+        dq = np.exp(-dividendYield * t)
 
         c = s * dq * N(d1) - k * df * N(d2)
         p = k * df * N(-d2) - s * dq * N(-d1)
@@ -107,27 +145,27 @@ class FinEquityBarrierOption(FinEquityOption):
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT and s <= h:
             return p
 
-        numObservations = t * self._numObservationsPerYear
+        numObservations = 1 + t * self._numObservationsPerYear
 
         # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
         # Adjusts the barrier for discrete and not continuous observations
         h_adj = h
         if self._optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL:
-            h_adj = h * exp(-0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL:
-            h_adj = h * exp(-0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_IN_CALL:
-            h_adj = h * exp(0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_OUT_CALL:
-            h_adj = h * exp(0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_IN_PUT:
-            h_adj = h * exp(0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT:
-            h_adj = h * exp(0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT:
-            h_adj = h * exp(-0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT:
-            h_adj = h * exp(-0.5826 * volatility * sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
         else:
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))
@@ -138,9 +176,9 @@ class FinEquityBarrierOption(FinEquityOption):
             volatility = 1e-5
 
         l = (mu + v2 / 2.0) / v2
-        y = log(h * h / (s * k)) / sigmaRootT + l * sigmaRootT
-        x1 = log(s / h) / sigmaRootT + l * sigmaRootT
-        y1 = log(h / s) / sigmaRootT + l * sigmaRootT
+        y = np.log(h * h / (s * k)) / sigmaRootT + l * sigmaRootT
+        x1 = np.log(s / h) / sigmaRootT + l * sigmaRootT
+        y1 = np.log(h / s) / sigmaRootT + l * sigmaRootT
         hOverS = h / s
 
         if self._optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL:
@@ -273,22 +311,18 @@ class FinEquityBarrierOption(FinEquityOption):
 
         if simpleCall:
             c = (np.maximum(Sall[:, -1] - K, 0)).mean()
-            c = c * exp(-r * t)
+            c = c * np.exp(-r * t)
             return c
 
         if simplePut:
             p = (np.maximum(K - Sall[:, -1], 0)).mean()
-            p = p * exp(-r * t)
+            p = p * np.exp(-r * t)
             return p
 
         # Get full set of paths
-        Sall = process.getProcess(
-            processType,
-            t,
-            modelParams,
-            numTimeSteps,
-            numPaths,
-            seed)
+        Sall = process.getProcess(processType, t, modelParams, numTimeSteps,
+                                  numPaths, seed)
+
         (numPaths, numTimeSteps) = Sall.shape
 
         if optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL or \
@@ -337,8 +371,25 @@ class FinEquityBarrierOption(FinEquityOption):
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))
 
-        v = payoff.mean() * exp(- r * t)
+        v = payoff.mean() * np.exp(- r * t)
 
         return v * self._notional
 
-##########################################################################
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE PRICE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("BARRIER LEVEL", self._barrierLevel)
+        s += labelToString("NUM OBSERVATIONS", self._numObservationsPerYear)
+        s += labelToString("NOTIONAL", self._notional, "")
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+###############################################################################

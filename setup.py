@@ -39,6 +39,8 @@ setuptools.setup(
     url="https://github.com/domokane/FinancePy",
     keywords=['FINANCE', 'OPTIONS', 'BONDS', 'VALUATION', 'DERIVATIVES'],
     install_requires=['numpy', 'numba', 'scipy'],
+    package_data={'': ['*.npz'], },
+    include_package_date=True,
     packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

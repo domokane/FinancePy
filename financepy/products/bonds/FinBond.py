@@ -25,6 +25,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from typing import List
 from scipy import optimize
@@ -32,6 +33,9 @@ from scipy import optimize
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
 # JAPANESE SIMPLE YIELD
+
+###############################################################################
+
 
 from enum import Enum
 
@@ -106,7 +110,8 @@ class FinBond(object):
 
 ##########################################################################
 
-    def _calculateFlowDates(self, settlementDate):
+    def _calculateFlowDates(self,
+                            settlementDate: FinDate):
         ''' Determine the bond cashflow payment dates. '''
 
         # No need to generate flows if settlement date has not changed
@@ -131,8 +136,10 @@ class FinBond(object):
 
 ###############################################################################
 
-    def fullPriceFromYield(self, settlementDate, y,
-                           convention=FinYieldConventions.UK_DMO):
+    def fullPriceFromYield(self,
+                           settlementDate: FinDate,
+                           y: float,
+                           convention: FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the full price of bond from its yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
@@ -189,9 +196,9 @@ class FinBond(object):
 ###############################################################################
 
     def principal(self,
-                  settlementDate,
-                  y,
-                  convention):
+                  settlementDate: FinDate,
+                  y: float,
+                  convention: FinYieldConventions):
         ''' Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Libor rates. '''
@@ -205,9 +212,9 @@ class FinBond(object):
 ###############################################################################
 
     def dollarDuration(self,
-                       settlementDate,
-                       ytm,
-                       convention=FinYieldConventions.UK_DMO):
+                       settlementDate: FinDate,
+                       ytm: float,
+                       convention:FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the risk or dP/dy of the bond by bumping. '''
 
         self._calculateFlowDates(settlementDate)
@@ -220,9 +227,9 @@ class FinBond(object):
 ###############################################################################
 
     def macauleyDuration(self,
-                         settlementDate,
-                         ytm,
-                         convention=FinYieldConventions.UK_DMO):
+                         settlementDate: FinDate,
+                         ytm: float,
+                         convention: FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the Macauley duration of the bond on a settlement date
         given its yield to maturity. '''
 
@@ -234,9 +241,9 @@ class FinBond(object):
 ###############################################################################
 
     def modifiedDuration(self,
-                         settlementDate,
-                         ytm,
-                         convention=FinYieldConventions.UK_DMO):
+                         settlementDate: FinDate,
+                         ytm: float,
+                         convention:FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. '''
 
@@ -248,9 +255,9 @@ class FinBond(object):
 ###############################################################################
 
     def convexityFromYield(self,
-                           settlementDate,
-                           ytm,
-                           convention=FinYieldConventions.UK_DMO):
+                           settlementDate: FinDate,
+                           ytm: float,
+                           convention: FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
@@ -264,8 +271,10 @@ class FinBond(object):
 
 ###############################################################################
 
-    def cleanPriceFromYield(self, settlementDate, ytm,
-                            convention=FinYieldConventions.UK_DMO):
+    def cleanPriceFromYield(self,
+                            settlementDate: FinDate,
+                            ytm: float,
+                            convention: FinYieldConventions=FinYieldConventions.UK_DMO):
         ''' Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
@@ -276,8 +285,8 @@ class FinBond(object):
 ###############################################################################
 
     def cleanValueFromDiscountCurve(self,
-                                    settlementDate,
-                                    discountCurve):
+                                    settlementDate: FinDate,
+                                    discountCurve: FinDiscountCurve):
         ''' Calculate the clean bond value using some discount curve to
         present-value the bond's cashflows back to the curve anchor date and
         not to the settlement date. '''
@@ -292,8 +301,8 @@ class FinBond(object):
 ##############################################################################
 
     def valueBondUsingDiscountCurve(self,
-                                    settlementDate,
-                                    discountCurve,
+                                    settlementDate: FinDate,
+                                    discountCurve: FinDiscountCurve,
                                     verbose=False):
         ''' Calculate the bond *value* using some discount curve to PV the
         bond's cashflows to the curve anchor date. The anchor of the discount
@@ -335,9 +344,9 @@ class FinBond(object):
 ###############################################################################
 
     def yieldToMaturity(self,
-                        settlementDate,
-                        cleanPrice,
-                        convention=FinYieldConventions.US_TREASURY):
+                        settlementDate: FinDate,
+                        cleanPrice: float,
+                        convention:FinYieldConventions=FinYieldConventions.US_TREASURY):
         ''' Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. '''
 
@@ -374,7 +383,8 @@ class FinBond(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self, settlementDate):
+    def calcAccruedInterest(self,
+                            settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
@@ -404,9 +414,9 @@ class FinBond(object):
 
     def assetSwapSpread(
             self,
-            settlementDate,
-            cleanPrice,
-            discountCurve,
+            settlementDate: FinDate,
+            cleanPrice: float,
+            discountCurve: FinDiscountCurve,
             swapFloatDayCountConventionType=FinDayCountTypes.ACT_360,
             swapFloatFrequencyType=FinFrequencyTypes.SEMI_ANNUAL,
             swapFloatCalendarType=FinCalendarTypes.WEEKEND,
@@ -455,9 +465,9 @@ class FinBond(object):
 ###############################################################################
 
     def fullPriceFromOAS(self,
-                         settlementDate,
-                         discountCurve,
-                         oas):
+                         settlementDate: FinDate,
+                         discountCurve: FinDiscountCurve,
+                         oas: float):
         ''' Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. '''
 
@@ -482,9 +492,9 @@ class FinBond(object):
 ###############################################################################
 
     def optionAdjustedSpread(self,
-                             settlementDate,
-                             cleanPrice,
-                             discountCurve):
+                             settlementDate: FinDate,
+                             cleanPrice: float,
+                             discountCurve: FinDiscountCurve):
         ''' Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed. '''
 
@@ -521,7 +531,8 @@ class FinBond(object):
 
 ###############################################################################
 
-    def printFlows(self, settlementDate):
+    def printFlows(self,
+                   settlementDate: FinDate):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
         self._calculateFlowDates(settlementDate)
@@ -535,9 +546,9 @@ class FinBond(object):
 ###############################################################################
 
     def priceFromSurvivalCurve(self,
-                               discountCurve,
-                               survivalCurve,
-                               recoveryRate):
+                               discountCurve: FinDiscountCurve,
+                               survivalCurve: FinDiscountCurve,
+                               recoveryRate: float):
         ''' Calculate discounted present value of flows assuming default model.
         This has not been completed. '''
         pass

@@ -8,7 +8,7 @@ from typing import Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
-from .FinDayCount import FinDayCountTypes, FinDayCount
+from .FinDayCount import FinDayCountTypes
 
 ###############################################################################
 

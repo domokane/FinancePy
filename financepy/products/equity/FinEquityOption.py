@@ -8,7 +8,7 @@ from enum import Enum
 from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityModelTypes import FinEquityModelBlackScholes
 
-##########################################################################
+###############################################################################
 
 bump = 1e-4
 
@@ -30,11 +30,14 @@ class FinEquityOptionModelTypes(Enum):
     BLACKSCHOLES = 1
     ANOTHER = 2
 
-##########################################################################
-##########################################################################
+###############################################################################
 
 
 class FinEquityOption(object):
+    ''' This class is a parent class for all option classes that require any
+    perturbatory risk. '''
+
+###############################################################################
 
     def delta(
             self,
@@ -62,6 +65,8 @@ class FinEquityOption(object):
             delta = (vBumped - v) / bump
 
         return delta
+
+###############################################################################
 
     def gamma(
             self,
@@ -96,6 +101,8 @@ class FinEquityOption(object):
 
         return gamma
 
+###############################################################################
+
     def vega(
             self,
             valueDate,
@@ -123,6 +130,8 @@ class FinEquityOption(object):
 
         return vega
 
+###############################################################################
+
     def theta(
             self,
             valueDate,
@@ -130,20 +139,27 @@ class FinEquityOption(object):
             discountCurve,
             dividendYield,
             model):
+
         v = self.value(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model)
+                valueDate,
+                stockPrice,
+                discountCurve,
+                dividendYield,
+                model)
+
         nextDate = valueDate.addDays(1)
-        bump = 1.0 / gDaysInYear
+        # Need to do this carefully.
+        discountCurve._valuationDate = nextDate
+        bump = (nextDate - valueDate) / gDaysInYear
+
         vBumped = self.value(
-            nextDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model)
+                nextDate,
+                stockPrice,
+                discountCurve,
+                dividendYield,
+                model)
+
+        discountCurve._valuationDate = valueDate
 
         if type(v) is dict:
             theta = (vBumped['value'] - v['value']) / bump
@@ -151,6 +167,8 @@ class FinEquityOption(object):
             theta = (vBumped - v) / bump
 
         return theta
+
+###############################################################################
 
     def rho(
             self,
@@ -166,6 +184,7 @@ class FinEquityOption(object):
             discountCurve,
             dividendYield,
             model)
+
         vBumped = self.value(
             valueDate,
             stockPrice,
@@ -180,5 +199,4 @@ class FinEquityOption(object):
 
         return rho
 
-##########################################################################
-##########################################################################
+###############################################################################

@@ -34,7 +34,8 @@ class FinBondFuture(object):
 
 ###############################################################################
 
-    def conversionFactor(self, bond):
+    def conversionFactor(self,
+                         bond: FinBond):
         ''' Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
         must round the bond maturity (starting its life on the first delivery
@@ -65,8 +66,8 @@ class FinBondFuture(object):
 ###############################################################################
 
     def principalInvoicePrice(self,
-                              bond,
-                              futuresPrice):
+                              bond: FinBond,
+                              futuresPrice: float):
         ' The principal invoice price as defined by the CME.'''
         cf = self.conversionFactor(bond)
         pip = self._contractSize * (futuresPrice * cf) / 100.0
@@ -76,9 +77,9 @@ class FinBondFuture(object):
 ###############################################################################
 
     def totalInvoiceAmount(self,
-                           settlementDate,
-                           bond,
-                           futuresPrice):
+                           settlementDate: FinDate,
+                           bond: FinBond,
+                           futuresPrice: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accruedInterest is None:
@@ -95,9 +96,9 @@ class FinBondFuture(object):
 ###############################################################################
 
     def cheapestToDeliver(self,
-                          bonds,
-                          bondCleanPrices,
-                          futuresPrice):
+                          bonds: list,
+                          bondCleanPrices: list,
+                          futuresPrice: float):
         ''' Determination of CTD as deliverable bond with lowest cost to buy
         versus what is received when the bond is delivered. '''
         ctdBond = None
@@ -115,9 +116,9 @@ class FinBondFuture(object):
 ###############################################################################
 
     def deliveryGainLoss(self,
-                         bond,
-                         bondCleanPrice,
-                         futuresPrice):
+                         bond: FinBond,
+                         bondCleanPrice: float,
+                         futuresPrice: float):
         ''' Determination of what is received when the bond is delivered. '''
         receiveOnFuture = self.principalInvoicePrice(bond, futuresPrice)
         payForBond = self._contractSize * bondCleanPrice / 100.0

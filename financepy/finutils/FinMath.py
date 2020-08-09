@@ -4,7 +4,7 @@
 
 
 from math import exp, sqrt, fabs, log
-from numba import jit, njit, boolean, int64, float64
+from numba import njit, boolean, int64, float64
 import numpy as np
 from .FinError import FinError
 

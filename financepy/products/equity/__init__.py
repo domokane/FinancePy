@@ -1,4 +1,5 @@
 from .FinEquityAsianOption import *
+from .FinEquityAmericanOption import *
 from .FinEquityBarrierOption import *
 from .FinEquityBasketOption import *
 from .FinEquityBinomialTree import *

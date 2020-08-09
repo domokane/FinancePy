@@ -22,6 +22,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 
 ###############################################################################
@@ -319,7 +320,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def _calculateFlowDates(self, settlementDate):
+    def _calculateFlowDates(self,
+                            settlementDate: FinDate):
         ''' Determine the convertible bond cashflow payment dates. '''
 
         # No need to generate flows if settlement date has not changed
@@ -345,15 +347,15 @@ class FinBondConvertible(object):
 ##########################################################################
 
     def value(self,
-              settlementDate,
-              stockPrice,
-              stockVolatility,
-              dividendDates,
-              dividendYields,
-              discountCurve,
-              creditSpread,
-              recoveryRate=0.40,
-              numStepsPerYear=100):
+              settlementDate: FinDate,
+              stockPrice: float,
+              stockVolatility: float,
+              dividendDates: List[FinDate],
+              dividendYields: List[float],
+              discountCurve: FinDiscountCurve,
+              creditSpread: float,
+              recoveryRate: float = 0.40,
+              numStepsPerYear: int = 100):
         '''
         A binomial tree valuation model for a convertible bond that captures
         the embedded equity option due to the existence of a conversion option
@@ -524,7 +526,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def accruedDays(self, settlementDate):
+    def accruedDays(self, 
+                    settlementDate: FinDate):
         ''' Calculate number days from previous coupon date to settlement.'''
         self.calculateFlowDates(settlementDate)
 
@@ -535,7 +538,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def _accruedInterest(self, settlementDate):
+    def _accruedInterest(self,
+                         settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
@@ -560,7 +564,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def currentYield(self, cleanPrice):
+    def currentYield(self,
+                     cleanPrice: float):
         ''' Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)'''
 

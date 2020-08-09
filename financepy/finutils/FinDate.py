@@ -6,6 +6,7 @@
 import datetime
 from .FinError import FinError
 from .FinMath import isLeapYear
+import numpy as np
 
 # from numba import njit, float64, int32
 
@@ -53,7 +54,6 @@ monthDaysNotLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
-
 ###############################################################################
 
 
@@ -80,7 +80,6 @@ class FinDate():
         The year must be a 4-digit number greater than or equal to 1900. '''
 
         if d >= 1900 and d < 2100 and y > 0 and y <= 31:
-#            print("Warning: Deprecating FinDate(y, m, d) for FinDate(d, m, y). Please amend code.")
             tmp = y
             y = d
             d = tmp
@@ -257,7 +256,7 @@ class FinDate():
     ###########################################################################
 
     def addYears(self,
-                 yy: int):
+                 yy: (np.ndarray, float)):
         ''' Returns a new date that is yy years after the FinDate. If yy is an
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates.'''
@@ -279,15 +278,15 @@ class FinDate():
 
             yyi = yyVector[i]
 
-            # If I get a float I check it is not a multiple of 12
-            # Machine precision can throw this off so I allow for a tolerance
-            diff = int(yyi*12+1e-10) - yyi*12
-            if abs(diff) > 1e-1:
-                raise FinError("Year of " + str(yyi) + " is " + str(diff) +
-                               " Months. Not a whole number of months.")
+            # If yyi is not a whole month I adjust for days using average
+            # number of days in a month which is 365.242/12
+            daysInMonth = 365.242/12.0
 
-            mmi = int(yyi*12)
+            mmi = int(yyi * 12.0)
+            ddi = int((yyi * 12.0 - mmi) * daysInMonth)
             newDt = self.addMonths(mmi)
+            newDt = newDt.addDays(ddi)
+
             dateList.append(newDt)
 
         if scalarFlag is True:

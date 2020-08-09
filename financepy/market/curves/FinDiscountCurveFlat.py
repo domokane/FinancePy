@@ -61,7 +61,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         bumped up by the bumpsize. All other parameters are preserved.'''
 
         rBumped = self._flatRate + bumpSize
-        discCurve = FinDiscountCurveFlat(self._curveDate,
+        discCurve = FinDiscountCurveFlat(self._valuationDate,
                                          rBumped,
                                          frequencyType=self._frequencyType,
                                          dayCountType=self._dayCountType)

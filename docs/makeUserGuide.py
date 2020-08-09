@@ -106,7 +106,6 @@ def parseMarkdown(lines):
             content = content.strip()
             parsedLines.append("\n")
             parsedLines.append("\\section*{" + content + "}")
-            print(">>>>", content)
             parsedLines.append("\n")
 
         if lineFound is False:
@@ -794,7 +793,6 @@ def extractParams(functionSignature):
 
 
 def parseType(pType):
-    print(">>>", pType)
     pType = pType.replace(" ", "")
     u = pType.find("Union")
     b = pType.find("(")

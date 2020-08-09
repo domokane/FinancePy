@@ -387,7 +387,7 @@ class FinCDS(object):
         bump = 0.0001
         for cds in issuerCurve._cdsContracts:
             cds._coupon += bump
-        issuerCurve.buildCurve()
+        issuerCurve._buildCurve()
 
         v1 = self.value(valuationDate,
                         issuerCurve,
@@ -433,7 +433,7 @@ class FinCDS(object):
             fra._fraRate += bump
         for swap in issuerCurve._liborCurve._usedSwaps:
             swap._fixedCoupon += bump
-        issuerCurve._liborCurve.buildCurve()
+        issuerCurve._liborCurve._buildCurve()
         issuerCurve.buildCurve()
 
         v1 = self.value(valuationDate,

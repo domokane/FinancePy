@@ -21,7 +21,7 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-##########################################################################
+###############################################################################
 
 
 def test_FinEquityVanillaOption():
@@ -61,12 +61,13 @@ def test_FinEquityVanillaOption():
         duration = end - start
         testCases.print(numPaths, value, valueMC, duration)
 
-##########################################################################
+###############################################################################
 
     stockPrices = range(80, 120, 2)
     numPaths = 100000
 
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
+    useSobol = True
 
     for stockPrice in stockPrices:
 
@@ -79,18 +80,30 @@ def test_FinEquityVanillaOption():
             dividendYield,
             model)
         start = time.time()
-        valueMC = callOption.valueMC(
+
+        useSobol = False
+        valueMC1 = callOption.valueMC(
             valueDate,
             stockPrice,
             discountCurve,
             dividendYield,
             model,
-            numPaths)
+            numPaths, useSobol)
+
+        useSobol = True
+        valueMC2 = callOption.valueMC(
+            valueDate,
+            stockPrice,
+            discountCurve,
+            dividendYield,
+            model,
+            numPaths, useSobol)
+
         end = time.time()
         duration = end - start
         testCases.print(numPaths, value, valueMC, duration)
 
-##########################################################################
+###############################################################################
 
     stockPrices = range(80, 120, 2)
     numPaths = 100000
@@ -119,7 +132,7 @@ def test_FinEquityVanillaOption():
         duration = end - start
         testCases.print(stockPrice, value, valueMC, duration)
 
-##########################################################################
+###############################################################################
 
     stockPrices = range(80, 120, 2)
 
@@ -202,7 +215,7 @@ def test_FinEquityVanillaOption():
         rho = 999
         testCases.print(stockPrice, value, delta, vega, theta, rho)
 
-##########################################################################
+###############################################################################
 
     testCases.header("STOCK PRICE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 
@@ -220,6 +233,8 @@ def test_FinEquityVanillaOption():
         impliedVol = callOption.impliedVolatility(
             valueDate, stockPrice, discountCurve, dividendYield, value)
         testCases.print(stockPrice, value, volatility, impliedVol)
+
+###############################################################################
 
 
 test_FinEquityVanillaOption()

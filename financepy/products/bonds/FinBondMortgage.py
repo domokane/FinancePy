@@ -66,7 +66,8 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def repaymentAmount(self, zeroRate):
+    def repaymentAmount(self,
+                        zeroRate: float):
         ''' Determine monthly repayment amount based on current zero rate. '''
 
         frequency = FinFrequency(self._frequencyType)
@@ -79,7 +80,9 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def generateFlows(self, zeroRate, mortgageType):
+    def generateFlows(self,
+                      zeroRate: float,
+                      mortgageType: FinBondMortgageTypes):
         ''' Generate the bond flow amounts. '''
 
         self._mortgageType = mortgageType

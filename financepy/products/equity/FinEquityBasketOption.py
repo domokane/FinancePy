@@ -14,20 +14,27 @@ from ...models.FinGBMProcess import FinGBMProcess
 ##########################################################################
 
 from ...finutils.FinError import FinError
-from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
 ###############################################################################
 
-class FinEquityBasketOption(FinEquityOption):
+
+class FinEquityBasketOption():
+    ''' A FinEquityBasketOption is a contract to buy a put or a call option on
+    an equally weighted portfolio of different stocks, each with its own price,
+    volatility and dividend yield. An analytical and monte-carlo pricing model
+    have been implemented for a European style option. '''
 
     def __init__(self,
                  expiryDate: FinDate,
                  strikePrice: float,
                  optionType: FinOptionTypes,
                  numAssets: int):
+        ''' Define the FinEquityBasket option by specifying its expiry date,
+        its strike price, whether it is a put or call, and the number of
+        underlying stocks in the basket. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -42,23 +49,41 @@ class FinEquityBasketOption(FinEquityOption):
                  stockPrices,
                  dividendYields,
                  volatilities,
-                 betas):
+                 correlations):
 
         if len(stockPrices) != self._numAssets:
             raise FinError(
-                "Stock prices must be a vector of length " + str(self._numAssets))
+                "Stock prices must have a length " + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
             raise FinError(
-                "Dividend yields must be a vector of length " + str(self._numAssets))
+                "Dividend yields must have a length " + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
             raise FinError(
-                "Volatilities must be a vector of length " + str(self._numAssets))
+                "Volatilities must have a length " + str(self._numAssets))
 
-        if len(betas) != self._numAssets:
+        if len(correlations) != self._numAssets:
             raise FinError(
-                "Betas must be a vector of length " + str(self._numAssets))
+                "Correlation cols must have a length " + str(self._numAssets))
+
+        if len(correlations[0]) != self._numAssets:
+            raise FinError(
+                "correlation rows must have a length " + str(self._numAssets))
+
+        for i in range(0, self._numAssets):
+            if correlations[i, i] != 1.0:
+                raise FinError("Corr matrix must have 1.0 on the diagonal")
+
+            for j in range(0, i):
+                if abs(correlations[i, j]) > 1.0:
+                    raise FinError("Correlations must be [-1, +1]")
+
+                if abs(correlations[j, i]) > 1.0:
+                    raise FinError("Correlations must be [-1, +1]")
+
+                if correlations[i, j] != correlations[j, i]:
+                    raise FinError("Correlation matrix must be symmetric")
 
 ###############################################################################
 
@@ -68,7 +93,11 @@ class FinEquityBasketOption(FinEquityOption):
               discountCurve,
               dividendYields,
               volatilities,
-              betas):
+              correlations):
+        ''' Basket valuation using a moment matching method to approximate the
+        effective variance of the underlying basket value. '''
+
+    # https://pdfs.semanticscholar.org/16ed/c0e804379e22ff36dcbab7e9bb06519faa43.pdf
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
@@ -76,17 +105,16 @@ class FinEquityBasketOption(FinEquityOption):
         self.validate(stockPrices,
                       dividendYields,
                       volatilities,
-                      betas)
+                      correlations)
 
         q = dividendYields
         v = volatilities
         s = stockPrices
 
         a = np.ones(self._numAssets) * (1.0 / self._numAssets)
-
         t = (self._expiryDate - valueDate) / gDaysInYear
-
-        r = discountCurve.zeroRate(self._expiryDate)
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df) / t
 
         smean = 0.0
         for ia in range(0, self._numAssets):
@@ -107,7 +135,7 @@ class FinEquityBasketOption(FinEquityOption):
         vnum = 0.0
         for ia in range(0, self._numAssets):
             for ja in range(0, ia):
-                rhoSigmaSigma = v[ia] * v[ja] * betas[ia] * betas[ja]
+                rhoSigmaSigma = v[ia] * v[ja] * correlations[ia, ja]
                 expTerm = (q[ia] + q[ja] - rhoSigmaSigma) * t
                 vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * exp(-expTerm)
 
@@ -144,7 +172,7 @@ class FinEquityBasketOption(FinEquityOption):
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths=10000,
                 seed=4242):
 
@@ -154,7 +182,7 @@ class FinEquityBasketOption(FinEquityOption):
         self.validate(stockPrices,
                       dividendYields,
                       volatilities,
-                      betas)
+                      corrMatrix)
 
         numAssets = len(stockPrices)
 
@@ -176,7 +204,7 @@ class FinEquityBasketOption(FinEquityOption):
             mus,
             stockPrices,
             volatilities,
-            betas,
+            corrMatrix,
             seed)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
@@ -189,5 +217,20 @@ class FinEquityBasketOption(FinEquityOption):
         payoff = np.mean(payoff)
         v = payoff * exp(-r * t)
         return v
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE PRICE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("NUM ASSETS", self._numAssets, "")
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################
