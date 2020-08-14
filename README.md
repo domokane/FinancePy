@@ -3,7 +3,6 @@
 FinancePy is a library of native Python functions which covers the following functionality:
 
 * Valuation and risk models for a wide range of equity, FX, interest rate and credit derivatives.
-* Portfolio asset allocation using Markovitz and other methods.
 
 It is written entirely in Python. As a result the user has the ability to examine the underlying code and its logic. The target audience for this library is intended to include:
 
