@@ -10,6 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
@@ -18,19 +19,6 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
-
-
-def betaToCorrMatrix(betas):
-    numAssets = len(betas)
-    correlation = np.ones(shape=(numAssets, numAssets))
-    for i in range(0, numAssets):
-        for j in range(0, i):
-            c = betas[i] * betas[j]
-            correlation[i, j] = c
-            correlation[j, i] = c
-
-    return np.array(correlation)
 
 ###############################################################################
 
@@ -63,8 +51,7 @@ def test_FinEquityBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
-            corrMatrix = betaToCorrMatrix(betas)
-            print(corrMatrix)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -74,6 +61,7 @@ def test_FinEquityBasketOption():
                 dividendYields,
                 volatilities,
                 corrMatrix)
+
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
@@ -106,8 +94,7 @@ def test_FinEquityBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
-
-            corrMatrix = betaToCorrMatrix(betas)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -146,8 +133,7 @@ def test_FinEquityBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
-
-            corrMatrix = betaToCorrMatrix(betas)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -188,8 +174,7 @@ def test_FinEquityBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
-
-            corrMatrix = betaToCorrMatrix(betas)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(

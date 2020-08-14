@@ -2,21 +2,24 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# TODO: Consider risk management
+# TODO: Consider using Sobol
+# TODO: Consider allowing weights on the individual basket assets
+# TODO: Extend monte carlo to handle American options
 
-from math import exp, log, sqrt
 import numpy as np
 
-
-from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinGBMProcess import FinGBMProcess
-
-##########################################################################
 
 from ...finutils.FinError import FinError
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
+
+from scipy.stats import norm
+N = norm.cdf
 
 ###############################################################################
 
@@ -45,11 +48,11 @@ class FinEquityBasketOption():
 
 ###############################################################################
 
-    def validate(self,
-                 stockPrices,
-                 dividendYields,
-                 volatilities,
-                 correlations):
+    def _validate(self,
+                  stockPrices,
+                  dividendYields,
+                  volatilities,
+                  correlations):
 
         if len(stockPrices) != self._numAssets:
             raise FinError(
@@ -63,11 +66,15 @@ class FinEquityBasketOption():
             raise FinError(
                 "Volatilities must have a length " + str(self._numAssets))
 
-        if len(correlations) != self._numAssets:
+        if correlations.ndim != 2:
+            raise FinError(
+                "Correlation must be a 2D matrix ")
+
+        if correlations.shape[0] != self._numAssets:
             raise FinError(
                 "Correlation cols must have a length " + str(self._numAssets))
 
-        if len(correlations[0]) != self._numAssets:
+        if correlations.shape[1] != self._numAssets:
             raise FinError(
                 "correlation rows must have a length " + str(self._numAssets))
 
@@ -88,24 +95,26 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def value(self,
-              valueDate,
-              stockPrices,
-              discountCurve,
-              dividendYields,
-              volatilities,
-              correlations):
+              valueDate: FinDate,
+              stockPrices: np.ndarray,
+              discountCurve: FinDiscountCurve,
+              dividendYields: np.ndarray,
+              volatilities: np.ndarray,
+              correlations: np.ndarray):
         ''' Basket valuation using a moment matching method to approximate the
-        effective variance of the underlying basket value. '''
+        effective variance of the underlying basket value. This approach is
+        able to handle a full rank correlation structure between the individual
+        assets. '''
 
     # https://pdfs.semanticscholar.org/16ed/c0e804379e22ff36dcbab7e9bb06519faa43.pdf
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stockPrices,
-                      dividendYields,
-                      volatilities,
-                      correlations)
+        self._validate(stockPrices,
+                       dividendYields,
+                       volatilities,
+                       correlations)
 
         q = dividendYields
         v = volatilities
@@ -120,16 +129,16 @@ class FinEquityBasketOption():
         for ia in range(0, self._numAssets):
             smean = smean + s[ia] * a[ia]
 
-        lnS0k = log(smean / self._strikePrice)
-        sqrtT = sqrt(t)
+        lnS0k = np.log(smean / self._strikePrice)
+        sqrtT = np.sqrt(t)
 
         # Moment matching - starting with dividend
         qnum = 0.0
         qden = 0.0
         for ia in range(0, self._numAssets):
-            qnum = qnum + a[ia] * s[ia] * exp(-q[ia] * t)
+            qnum = qnum + a[ia] * s[ia] * np.exp(-q[ia] * t)
             qden = qden + a[ia] * s[ia]
-        qhat = -log(qnum / qden) / t
+        qhat = -np.log(qnum / qden) / t
 
         # Moment matching - matching volatility
         vnum = 0.0
@@ -137,28 +146,28 @@ class FinEquityBasketOption():
             for ja in range(0, ia):
                 rhoSigmaSigma = v[ia] * v[ja] * correlations[ia, ja]
                 expTerm = (q[ia] + q[ja] - rhoSigmaSigma) * t
-                vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * exp(-expTerm)
+                vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * np.exp(-expTerm)
 
         vnum *= 2.0
 
         for ia in range(0, self._numAssets):
             rhoSigmaSigma = v[ia] ** 2
             expTerm = (2.0 * q[ia] - rhoSigmaSigma) * t
-            vnum = vnum + ((a[ia] * s[ia]) ** 2) * exp(-expTerm)
+            vnum = vnum + ((a[ia] * s[ia]) ** 2) * np.exp(-expTerm)
 
-        vhat2 = log(vnum / qnum / qnum) / t
+        vhat2 = np.log(vnum / qnum / qnum) / t
 
-        den = sqrt(vhat2) * sqrtT
+        den = np.sqrt(vhat2) * sqrtT
         mu = r - qhat
         d1 = (lnS0k + (mu + vhat2 / 2.0) * t) / den
         d2 = (lnS0k + (mu - vhat2 / 2.0) * t) / den
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            v = smean * exp(-qhat * t) * N(d1)
-            v = v - self._strikePrice * exp(-r * t) * N(d2)
+            v = smean * np.exp(-qhat * t) * N(d1)
+            v = v - self._strikePrice * np.exp(-r * t) * N(d2)
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            v = self._strikePrice * exp(-r * t) * N(-d2)
-            v = v - smean * exp(-qhat * t) * N(-d1)
+            v = self._strikePrice * np.exp(-r * t) * N(-d2)
+            v = v - smean * np.exp(-qhat * t) * N(-d1)
         else:
             raise FinError("Unknown option type")
 
@@ -167,27 +176,33 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
-                stockPrices,
-                discountCurve,
-                dividendYields,
-                volatilities,
-                corrMatrix,
+                valueDate: FinDate,
+                stockPrices: np.ndarray,
+                discountCurve: FinDiscountCurve,
+                dividendYields: np.ndarray,
+                volatilities: np.ndarray,
+                corrMatrix: np.ndarray,
                 numPaths=10000,
                 seed=4242):
+        ''' Valuation of the EquityBasketOption using a Monte-Carlo simulation
+        of stock prices assuming a GBM distribution. Cholesky decomposition is
+        used to handle a full rank correlation structure between the individual
+        assets. The numPaths and seed are pre-set to default values but can be
+        overwritten. '''
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stockPrices,
-                      dividendYields,
-                      volatilities,
-                      corrMatrix)
+        self._validate(stockPrices,
+                       dividendYields,
+                       volatilities,
+                       corrMatrix)
 
         numAssets = len(stockPrices)
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        r = discountCurve.zeroRate(self._expiryDate)
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
         mus = r - dividendYields
         k = self._strikePrice
 
@@ -196,16 +211,15 @@ class FinEquityBasketOption():
         model = FinGBMProcess()
         np.random.seed(seed)
 
-        Sall = model.getPathsAssets(
-            numAssets,
-            numPaths,
-            numTimeSteps,
-            t,
-            mus,
-            stockPrices,
-            volatilities,
-            corrMatrix,
-            seed)
+        Sall = model.getPathsAssets(numAssets,
+                                    numPaths,
+                                    numTimeSteps,
+                                    t,
+                                    mus,
+                                    stockPrices,
+                                    volatilities,
+                                    corrMatrix,
+                                    seed)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(Sall, axis=1) - k, 0)
@@ -215,7 +229,7 @@ class FinEquityBasketOption():
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff)
-        v = payoff * exp(-r * t)
+        v = payoff * np.exp(-r * t)
         return v
 
 ###############################################################################

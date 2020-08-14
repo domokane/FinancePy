@@ -8,7 +8,6 @@ Created on Mon Sep 09 14:31:53 2019
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinStatistics import mean, stdev, correlation
-from math import sqrt
 import numpy as np
 import time
 import sys
@@ -49,7 +48,7 @@ def test_FinStatistics():
     testCases.header("Corr", "Measured")
 
     for beta in np.linspace(0.0, 1.0, num=11):
-        z = x * beta + y * sqrt(1.0 - beta * beta)
+        z = x * beta + y * np.sqrt(1.0 - beta * beta)
         c = np.corrcoef(x, z)[0, 1]
         testCases.print(beta, c)
 
@@ -80,7 +79,7 @@ def test_FinStatistics():
     testCases.header("Corr", "Measured")
 
     for beta in np.linspace(0.0, 1.0, num=11):
-        z = x * beta + y * sqrt(1.0 - beta * beta)
+        z = x * beta + y * np.sqrt(1.0 - beta * beta)
         c = correlation(x, z)
         testCases.print(beta, c)
 

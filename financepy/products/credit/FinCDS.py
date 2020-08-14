@@ -6,7 +6,6 @@
 import numpy as np
 from numba import njit, float64, int64
 from math import exp, log
-from typing import Union
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
@@ -192,7 +191,7 @@ class FinCDS(object):
 
     def __init__(self,
                  stepInDate: FinDate,  # Date protection starts
-                 maturityDateOrTenor: Union[FinDate, str],  # FinDate or tenor
+                 maturityDateOrTenor: (FinDate, str),  # FinDate or tenor
                  runningCoupon: float,  # Annualised coupon on premium leg
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,

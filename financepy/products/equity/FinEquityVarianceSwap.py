@@ -5,8 +5,8 @@
 
 import numpy as np
 from math import log, exp, sqrt
-from typing import Union
 
+from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -23,7 +23,7 @@ class FinEquityVarianceSwap(object):
 
     def __init__(self,
                  startDate: FinDate,
-                 maturityDateOrTenor: Union[FinDate, str],
+                 maturityDateOrTenor: (FinDate, str),
                  strikeVariance: float,
                  notional: float = ONE_MILLION,
                  payStrikeFlag: bool = True):
@@ -43,7 +43,7 @@ class FinEquityVarianceSwap(object):
         self._maturityDate = maturityDate
         self._strikeVariance = strikeVariance
         self._notional = notional
-        self._payStrike = payStrikeFlag
+        self._payStrikeFlag = payStrikeFlag
 
         # Replication portfolio is stored
         self._numPutOptions = 0
@@ -99,7 +99,7 @@ class FinEquityVarianceSwap(object):
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
         b = f * dvol / dK
-        var = (atmVol**2) * sqrt(1.0+3.0*tmat*(b**2))
+        var = (atmVol**2) * sqrt(1.0 + 3.0*tmat*(b**2))
         return var
 
 ###############################################################################
@@ -198,7 +198,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, putType)
             model = FinEquityModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)['value']
+                          dividendYield, model)
             piPut += v * self._putWts[n]
 
         piCall = 0.0
@@ -208,7 +208,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, callType)
             model = FinEquityModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)['value']
+                          dividendYield, model)
             piCall += v * self._callWts[n]
 
         pi = piCall + piPut
@@ -246,13 +246,14 @@ class FinEquityVarianceSwap(object):
 
 ###############################################################################
 
-    def print(self):
+    def printWeights(self):
 
         if self._numPutOptions == 0 and self._numCallOptions == 0:
+            print("No call or put options generated.")
             return
 
         print("TYPE", "STRIKE", "WEIGHT")
-        for n in range(0, self._numPutOptions):
+        for n in range(self._numPutOptions-1, -1, -1):
             k = self._putStrikes[n]
             wt = self._putWts[n]*self._notional
             print("PUT %7.2f %10.3f" % (k, wt))
@@ -261,5 +262,21 @@ class FinEquityVarianceSwap(object):
             k = self._callStrikes[n]
             wt = self._callWts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("STRIKE VARIANCE", self._strikeVariance)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("PAY STRIKE FLAG", self._payStrike, "")
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

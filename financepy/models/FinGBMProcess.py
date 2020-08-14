@@ -3,7 +3,6 @@
 ##############################################################################
 
 import numpy as np
-from math import sqrt, exp
 from numba import njit, float64, int64
 from numpy.linalg import cholesky
 
@@ -21,8 +20,8 @@ def getPaths(numPaths,
 
     np.random.seed(seed)
     dt = t / numTimeSteps
-    vsqrtdt = volatility * sqrt(dt)
-    m = exp((mu - volatility * volatility / 2.0) * dt)
+    vsqrtdt = volatility * np.sqrt(dt)
+    m = np.exp((mu - volatility * volatility / 2.0) * dt)
     Sall = np.empty((2 * numPaths, numTimeSteps + 1))
 
     # This should be less memory intensive as we only generate randoms per step
@@ -36,7 +35,7 @@ def getPaths(numPaths,
 
     return Sall
 
-##########################################################################
+###############################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -52,14 +51,14 @@ def getPathsAssets(numAssets,
 
     np.random.seed(seed)
     dt = t / numTimeSteps
-    vsqrtdts = volatilities * sqrt(dt)
+    vsqrtdts = volatilities * np.sqrt(dt)
     m = np.exp((mus - volatilities * volatilities / 2.0) * dt)
 
     Sall = np.empty((2 * numPaths, numTimeSteps + 1, numAssets))
 
     g = np.random.standard_normal((numPaths, numTimeSteps + 1, numAssets))
     c = cholesky(corrMatrix)
-    gCorr = np.dot(c, g)
+    gCorr = np.dot(g, c.transpose())
 
     for ip in range(0, numPaths):
         for ia in range(0, numAssets):
@@ -70,7 +69,7 @@ def getPathsAssets(numAssets,
         for it in range(1, numTimeSteps + 1):
             for ia in range(0, numAssets):
                 z = gCorr[ip, it, ia]
-                w = exp(z * vsqrtdts[ia])
+                w = np.exp(z * vsqrtdts[ia])
                 v = m[ia]
                 Sall[ip, it, ia] = Sall[ip, it - 1, ia] * v*w
                 Sall[ip + numPaths, it, ia] = Sall[ip +
@@ -78,7 +77,7 @@ def getPathsAssets(numAssets,
 
     return Sall
 
-##########################################################################
+###############################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -92,51 +91,62 @@ def getAssets(numAssets,
               seed):
 
     np.random.seed(seed)
-    vsqrtdts = volatilities * sqrt(t)
+    vsqrtdts = volatilities * np.sqrt(t)
     m = np.exp((mus - volatilities * volatilities / 2.0) * t)
-
     Sall = np.empty((2 * numPaths, numAssets))
     g = np.random.standard_normal((numPaths, numAssets))
     c = cholesky(corrMatrix)
-    gCorr = np.dot(g, c)
+    gCorr = np.dot(g, c.transpose())
 
     for ip in range(0, numPaths):
         for ia in range(0, numAssets):
             z = gCorr[ip, ia]
-            w = exp(z * vsqrtdts[ia])
+            w = np.exp(z * vsqrtdts[ia])
             Sall[ip, ia] = stockPrices[ia] * m[ia] * w
             Sall[ip + numPaths, ia] = stockPrices[ia] * m[ia] / w
 
     return Sall
 
-##########################################################################
+###############################################################################
 
 
 class FinGBMProcess():
 
     def getPaths(
             self,
-            numPaths,
-            numTimeSteps,
-            t,
-            mu,
-            stockPrice,
-            volatility,
-            seed):
+            numPaths: int,
+            numTimeSteps: int,
+            t: float,
+            mu: float,
+            stockPrice: float,
+            volatility: float,
+            seed: int):
+
         paths = getPaths(numPaths, numTimeSteps,
                          t, mu, stockPrice, volatility, seed)
         return paths
 
-    def getPathsAssets(self, numAssets, numPaths, numTimeSteps,
-                       t, mus, stockPrices, volatilities, betas, seed):
+###############################################################################
+
+    def getPathsAssets(self,
+                       numAssets,
+                       numPaths,
+                       numTimeSteps,
+                       t,
+                       mus,
+                       stockPrices,
+                       volatilities,
+                       betas,
+                       seed):
 
         if numTimeSteps == 2:
             paths = getAssets(numAssets, numPaths,
-                              t, mus, stockPrices, volatilities, betas, seed)
+                              t, mus, stockPrices,
+                              volatilities, betas, seed)
         else:
             paths = getPathsAssets(numAssets, numPaths, numTimeSteps,
                                    t, mus, stockPrices,
                                    volatilities, betas, seed)
         return paths
 
-##########################################################################
+###############################################################################

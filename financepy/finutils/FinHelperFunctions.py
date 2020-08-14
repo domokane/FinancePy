@@ -13,6 +13,23 @@ from .FinDayCount import FinDayCountTypes
 ###############################################################################
 
 
+def betaVectorToCorrMatrix(betas):
+    ''' Convert a one-factor vector of factor weights to a square correlation
+    matrix. '''
+
+    numAssets = len(betas)
+    correlation = np.ones(shape=(numAssets, numAssets))
+    for i in range(0, numAssets):
+        for j in range(0, i):
+            c = betas[i] * betas[j]
+            correlation[i, j] = c
+            correlation[j, i] = c
+
+    return np.array(correlation)
+
+###############################################################################
+
+
 def pv01Times(t: float,
               f: float):
     ''' Calculate a bond style pv01 by calculating remaining coupon times for a

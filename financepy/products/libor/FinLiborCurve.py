@@ -50,11 +50,9 @@ class FinLiborCurve(FinDiscountCurve):
     ''' Constructs a discount curve as implied by the prices of Libor
     deposits, FRAs and IRS. The curve date is the date on which we
     are performing the valuation based on the information available on the
-    curve date. Typically it is the date on which an amount of $1 paid
-    has a present value of $1.
-
-    This class inherits from FinDiscountCurve so has all of the methods
-    that class has. '''
+    curve date. Typically it is the date on which an amount of 1 unit paid
+    has a present value of 1. This class inherits from FinDiscountCurve and so
+    has all of the methods that class has. '''
 
 ###############################################################################
 

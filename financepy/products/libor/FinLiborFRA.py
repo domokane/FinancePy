@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from typing import Union
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
@@ -42,7 +41,7 @@ class FinLiborFRA(object):
 
     def __init__(self,
                  startDate: FinDate,  # The date the FRA starts to accrue
-                 maturityDateOrTenor: Union[FinDate, str],  # End of the Libor rate period
+                 maturityDateOrTenor: (FinDate, str),  # End of the Libor rate period
                  fraRate: float,  # The fixed contractual FRA rate
                  dayCountType: FinDayCountTypes,  # For interest period
                  notional: float = 100.0,

@@ -26,7 +26,7 @@ N = norm.cdf
 ###############################################################################
 
 
-def f(volatility, *args):
+def _f(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
@@ -51,7 +51,7 @@ def f(volatility, *args):
 ###############################################################################
 
 
-def fvega(volatility, *args):
+def _fvega(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
@@ -102,6 +102,7 @@ class FinEquityVanillaOption():
               discountCurve: FinDiscountCurve,
               dividendYield: float,
               model):
+        ''' Option valuation using Black-Scholes model. '''
 
         if type(valueDate) == FinDate:
             texp = (self._expiryDate - valueDate) / gDaysInYear
@@ -128,12 +129,12 @@ class FinEquityVanillaOption():
 
         if type(model) == FinEquityModelBlackScholes:
 
+            ''' SWITCH THIS TO USE FINMODELBLACKSCHOLES function !!! '''
+
             volatility = model._volatility
 
             if np.any(volatility) < 0.0:
                 raise FinError("Volatility should not be negative.")
-
-            volatility = np.maximum(volatility, 1e-10)
 
             lnS0k = np.log(S0 / K)
             sqrtT = np.sqrt(texp)
@@ -452,10 +453,11 @@ class FinEquityVanillaOption():
         argtuple = (self, valueDate, stockPrice,
                     discountCurve, dividendYield, price)
 
-        sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
+        sigma = optimize.newton(_f, x0=0.2, fprime=_fvega, args=argtuple,
                                 tol=1e-5, maxiter=50, fprime2=None)
         return sigma
 
+# 
 ###############################################################################
 
     def valueMC(self,

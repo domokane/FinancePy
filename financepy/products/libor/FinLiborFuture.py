@@ -6,8 +6,7 @@
 # TODO: Write test function
 # TODO: Handle 1 month futures contracts
 
-from math import exp
-
+import numpy as np
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDayCount import FinDayCountTypes
@@ -119,9 +118,9 @@ class FinLiborFuture(object):
         # this numnerical limit
         if abs(a) > 1e-10:
 
-            bt1t2 = (1.0 - exp(-a * (t2 - t1))) / a
-            bt0t1 = (1.0 - exp(-a * (t1 - t0))) / a
-            w = 1.0 - exp(-2.0 * a * t1)
+            bt1t2 = (1.0 - np.exp(-a * (t2 - t1))) / a
+            bt0t1 = (1.0 - np.exp(-a * (t1 - t0))) / a
+            w = 1.0 - np.exp(-2.0 * a * t1)
             term = bt1t2 * w + 2.0 * a * (bt0t1**2)
             c = bt1t2 * (volatility**2) * term / (t2 - t1) / 4.0 / a
 

@@ -43,8 +43,11 @@ class FinEquityBarrierOption(FinEquityOption):
                  strikePrice: float,
                  optionType: FinEquityBarrierTypes,
                  barrierLevel: float,
-                 numObservationsPerYear: int,
+                 numObservationsPerYear: int = 252,
                  notional: float = 1.0):
+        ''' Create the FinEquityBarrierOption by specifying the expiry date,
+        strike price, option type, barrier level, the number of observations
+        per year and the notional. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -67,10 +70,15 @@ class FinEquityBarrierOption(FinEquityOption):
               discountCurve: FinDiscountCurve,
               dividendYield: float,
               model):
-        ''' This prices the option using the formulae given in the paper
-        by Clewlow, Llanos and Strickland December 1994 which can be found at
+        ''' This prices an Equity Barrier option using the formulae given in
+        the paper by Clewlow, Llanos and Strickland December 1994 which can be
+        found at
+
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         '''
+
+        if isinstance(stockPrice, int):
+            stockPrice = float(stockPrice)
 
         if isinstance(stockPrice, float):
             stockPrices = [stockPrice]
@@ -267,11 +275,23 @@ class FinEquityBarrierOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueMC(self, valueDate, stockPrice, discountCurve, processType,
-                modelParams, numAnnSteps=252, numPaths=10000, seed=4242):
+    def valueMC(self,
+                valueDate: FinDate,
+                stockPrice: float,
+                discountCurve: FinDiscountCurve,
+                processType,
+                modelParams,
+                numAnnObs: int = 252,
+                numPaths: int = 10000,
+                seed: int = 4242):
+        ''' A Monte-Carlo based valuation of the barrier option which simulates
+        the evolution of the stock price of at a specified number of annual
+        observation times until expiry to examine if the barrier has been
+        crossed and the corresponding value of the final payoff, if any. It
+        assumes a GBM model for the stock price. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        numTimeSteps = int(t * numAnnSteps)
+        numTimeSteps = int(t * numAnnObs)
         K = self._strikePrice
         B = self._barrierLevel
         optionType = self._optionType

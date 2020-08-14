@@ -7,12 +7,12 @@ from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
-#from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import N, M
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
@@ -105,7 +105,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
         checkArgumentTypes(self.__init__, locals())
 
-        self.validatePayoff(payoffType, payoffParams, numAssets)
+        self._validatePayoff(payoffType, payoffParams, numAssets)
 
         self._expiryDate = expiryDate
         self._payoffType = payoffType
@@ -114,23 +114,26 @@ class FinEquityRainbowOption(FinEquityOption):
 
 ###############################################################################
 
-    def validate(self,
-                 stockPrices,
-                 dividendYields,
-                 volatilities,
-                 betas):
+    def _validate(self,
+                  stockPrices,
+                  dividendYields,
+                  volatilities,
+                  betas):
 
         if len(stockPrices) != self._numAssets:
             raise FinError(
-                "Stock prices must be a vector of length " + str(self._numAssets))
+                "Stock prices must be a vector of length "
+                + str(self._numAssets))
 
         if len(dividendYields) != self._numAssets:
             raise FinError(
-                "Dividend yields must be a vector of length " + str(self._numAssets))
+                "Dividend yields must be a vector of length "
+                + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
             raise FinError(
-                "Volatilities must be a vector of length " + str(self._numAssets))
+                "Volatilities must be a vector of length "
+                + str(self._numAssets))
 
         if len(betas) != self._numAssets:
             raise FinError("Betas must be a vector of length " +
@@ -138,7 +141,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
 ###############################################################################
 
-    def validatePayoff(self, payoffType, payoffParams, numAssets):
+    def _validatePayoff(self, payoffType, payoffParams, numAssets):
 
         numParams = 0
 
@@ -164,32 +167,41 @@ class FinEquityRainbowOption(FinEquityOption):
                 " must be " +
                 str(numParams))
 
-        if payoffType == FinEquityRainbowOptionTypes.CALL_ON_NTH or payoffType == FinEquityRainbowOptionTypes.PUT_ON_NTH:
+        if payoffType == FinEquityRainbowOptionTypes.CALL_ON_NTH \
+           or payoffType == FinEquityRainbowOptionTypes.PUT_ON_NTH:
             n = payoffParams[0]
             if n < 1 or n > numAssets:
                 raise FinError("Nth parameter must be 1 to " + str(numAssets))
 
 ###############################################################################
 
-    def value(self, 
-              valueDate, 
-              expiryDate, 
-              stockPrices, 
-              discountCurve,
-              dividendYields, 
-              volatilities, 
-              betas):
+    def value(self,
+              valueDate: FinDate,
+              stockPrices: np.ndarray,
+              discountCurve: FinDiscountCurve,
+              dividendYields: np.ndarray,
+              volatilities: np.ndarray,
+              corrMatrix: np.ndarray):
 
         if self._numAssets != 2:
             raise FinError("Analytical results for two assets only.")
 
+        if corrMatrix.ndim != 2:
+            raise FinError("Corr matrix must be of size 2x2")
+
+        if corrMatrix.shape[0] != 2:
+            raise FinError("Corr matrix must be of size 2x2")
+
+        if corrMatrix.shape[1] != 2:
+            raise FinError("Corr matrix must be of size 2x2")
+
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stockPrices,
-                      dividendYields,
-                      volatilities,
-                      betas)
+        self._validate(stockPrices,
+                       dividendYields,
+                       volatilities,
+                       corrMatrix)
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiryDate - valueDate) / gDaysInYear
@@ -197,7 +209,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
         q1 = dividendYields[0]
         q2 = dividendYields[1]
-        rho = betas[0]**2
+        rho = corrMatrix[0][1]
         s1 = stockPrices[0]
         s2 = stockPrices[1]
         b1 = r - q1
@@ -241,21 +253,20 @@ class FinEquityRainbowOption(FinEquityOption):
 
     def valueMC(self,
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths=10000,
                 seed=4242):
 
-        self.validate(stockPrices,
-                      dividendYields,
-                      volatilities,
-                      betas)
+        self._validate(stockPrices,
+                       dividendYields,
+                       volatilities,
+                       corrMatrix)
 
-        if valueDate > expiryDate:
+        if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
         t = (self._expiryDate - valueDate) / gDaysInYear
@@ -265,7 +276,7 @@ class FinEquityRainbowOption(FinEquityOption):
                         discountCurve,
                         dividendYields,
                         volatilities,
-                        betas,
+                        corrMatrix,
                         self._numAssets,
                         self._payoffType,
                         self._payoffParams,
@@ -273,5 +284,20 @@ class FinEquityRainbowOption(FinEquityOption):
                         seed)
 
         return v
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("PAYOFF TYPE", self._payoffType)
+        s += labelToString("PAYOFF PARAMS", self._payoffParams)
+        s += labelToString("NUM ASSETS TYPE", self._numAssets, "")
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

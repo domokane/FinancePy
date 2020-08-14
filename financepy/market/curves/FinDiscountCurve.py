@@ -222,6 +222,11 @@ class FinDiscountCurve():
 
     def survProb(self,
                  dt: FinDate):
+        ''' This returns a survival probability to a specified date based on
+        the assumption that the continuously compounded rate is a default
+        hazard rate in which case the survival probability is directly
+        analagous to a discount factor. '''
+
         return self.df(dt)
 
 ##########################################################################
@@ -262,7 +267,9 @@ class FinDiscountCurve():
 
     def bump(self,
              bumpSize: float):
-        ''' Calculate the continuous forward rate at the forward date. '''
+        ''' Adjust the continuously compounded forward rates by a perturbation
+        upward equal to the bump size and return a curve objet with this bumped
+        curve. This is used for interest rate risk. '''
 
         times = self._times.copy()
         values = self._discountFactors.copy()
@@ -285,8 +292,8 @@ class FinDiscountCurve():
                 startDate: (list, FinDate),
                 endDate: (list, FinDate),
                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
-        ''' Calculate the forward rate between two foreward dates according to
-        the specified day count convention. '''
+        ''' Calculate the forward rate between two forward dates according to
+        the specified day count convention. This defaults to Actual 360. '''
 
         if isinstance(startDate, FinDate) and isinstance(endDate, FinDate):
             startDates = []

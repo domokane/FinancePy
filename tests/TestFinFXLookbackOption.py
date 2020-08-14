@@ -7,11 +7,9 @@ Created on Fri Feb 12 16:51:05 2016
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-
-from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOption
-from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOptionTypes
-from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption
-from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOptionTypes
+from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.products.fx.FinFXFloatLookbackOption import FinFXFloatLookbackOption
+from financepy.products.fx.FinFXFixedLookbackOption import FinFXFixedLookbackOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import time
@@ -27,12 +25,15 @@ def test_FinEquityLookBackOption():
     expiryDate = FinDate(2016, 1, 1)
     stockPrice = 100.0
     volatility = 0.3
-    interestRate = 0.05
-    dividendYield = 0.01
     numPathsRange = [10000]
     stockPriceRange = range(90, 110, 2)
     numStepsPerYear = 252
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+
+    domesticRate = 0.05
+    domesticCurve = FinDiscountCurveFlat(valueDate, domesticRate)
+
+    foreignRate = 0.02
+    foreignCurve = FinDiscountCurveFlat(valueDate, foreignRate)
 
 ###############################################################################
 
@@ -46,24 +47,24 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFloatLookbackOptionTypes.FLOATING_CALL
+    optionType = FinOptionTypes.EUROPEAN_CALL
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFloatLookbackOption(expiryDate, optionType)
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -91,24 +92,24 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFloatLookbackOptionTypes.FLOATING_CALL
+    optionType = FinOptionTypes.EUROPEAN_CALL
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFloatLookbackOption(expiryDate, optionType)
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
             stockMin = stockPrice - 10
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -136,24 +137,24 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFloatLookbackOptionTypes.FLOATING_PUT
+    optionType = FinOptionTypes.EUROPEAN_PUT
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFloatLookbackOption(expiryDate, optionType)
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -181,24 +182,24 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFloatLookbackOptionTypes.FLOATING_PUT
+    optionType = FinOptionTypes.EUROPEAN_PUT
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFloatLookbackOption(expiryDate, optionType)
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
             stockMax = stockPrice + 10
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -233,25 +234,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_CALL
+    optionType = FinOptionTypes.EUROPEAN_CALL
     k = 95.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -281,25 +282,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_CALL
+    optionType = FinOptionTypes.EUROPEAN_CALL
     k = 100.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -329,25 +330,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_CALL
+    optionType = FinOptionTypes.EUROPEAN_CALL
     k = 105.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMax = stockPrice + 10.0
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -377,25 +378,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_PUT
+    optionType = FinOptionTypes.EUROPEAN_PUT
     k = 95.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -425,25 +426,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_PUT
+    optionType = FinOptionTypes.EUROPEAN_PUT
     k = 100.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -473,25 +474,25 @@ def test_FinEquityLookBackOption():
         "DIFF",
         "TIME")
 
-    optionType = FinEquityFixedLookbackOptionTypes.FIXED_PUT
+    optionType = FinOptionTypes.EUROPEAN_PUT
     k = 105.0
     for stockPrice in stockPriceRange:
         for numPaths in numPathsRange:
-            option = FinEquityFixedLookbackOption(expiryDate, optionType, k)
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
             stockMin = stockPrice - 10.0
             value = option.value(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
                 valueDate,
                 stockPrice,
-                discountCurve,
-                dividendYield,
+                domesticCurve,
+                foreignCurve,
                 volatility,
                 stockMin,
                 numPaths,

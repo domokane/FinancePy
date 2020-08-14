@@ -5,7 +5,6 @@ Created on Sat Aug  3 21:57:13 2019
 @author: Dominic
 """
 
-from math import exp
 import numpy as np
 
 # TODO Set up test cases correctly
@@ -49,7 +48,7 @@ def test_FinPortfolioCreditDefaultMode():
 #    plt.plot(support, dbn)
 #    plt.show()
 
-    el1 = (1.0 - exp(-hazardRate*tmat)) * (1.0 - recoveryRate)
+    el1 = (1.0 - np.exp(-hazardRate*tmat)) * (1.0 - recoveryRate)
     el2 = expectedLoss(support, dbn)
     testCases.header("EL THEORY", "EL ACTUAL")
     testCases.print(el1, el2)

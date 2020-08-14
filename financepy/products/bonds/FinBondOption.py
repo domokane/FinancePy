@@ -10,7 +10,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from .FinBond import FinBond
-from ...finutils.FinOptionTypes import FinOptionExerciseTypes
+from ...finutils.FinOptionTypes import FinOptionTypes, FinOptionExerciseTypes
 from enum import Enum
 import numpy as np
 
@@ -27,16 +27,6 @@ class FinBondModelTypes(Enum):
 ###############################################################################
 
 
-class FinBondOptionTypes(Enum):
-    EUROPEAN_CALL = 1
-    EUROPEAN_PUT = 2
-    AMERICAN_CALL = 3
-    AMERICAN_PUT = 4
-
-
-###############################################################################
-
-
 class FinBondOption():
     ''' Class for options on fixed coupon bonds. '''
 
@@ -45,7 +35,7 @@ class FinBondOption():
                  expiryDate: FinDate,
                  strikePrice: float,
                  face: float,
-                 optionType: FinBondOptionTypes):
+                 optionType: FinOptionTypes):
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -89,7 +79,7 @@ class FinBondOption():
 
         if isinstance(model, FinModelRatesHW):
 
-            if self._optionType == FinBondOptionTypes.EUROPEAN_CALL \
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL \
                     and model._useJamshidian is True:
 
                 v = model.europeanBondOption_Jamshidian(texp,
@@ -101,7 +91,7 @@ class FinBondOption():
 
                 return v['call']
 
-            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT  \
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT  \
                     and model._useJamshidian is True:
 
                 v = model.europeanBondOption_Jamshidian(texp,
@@ -113,11 +103,11 @@ class FinBondOption():
 
                 return v['put']
 
-            elif self._optionType == FinBondOptionTypes.EUROPEAN_CALL  \
+            elif self._optionType == FinOptionTypes.EUROPEAN_CALL  \
                     and model._useJamshidian is False:
 
                 model.buildTree(texp, dfTimes, dfValues)
-                exerciseType = FinOptionExerciseTypes.EUROPEAN
+                exerciseType = FinOptionTypes.EUROPEAN_CALL
                 v1 = model.americanBondOption_Tree(texp,
                                                    self._strikePrice,
                                                    self._face,
@@ -137,7 +127,7 @@ class FinBondOption():
                 v = (v1['call'] + v2['call'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT  \
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT  \
                     and model._useJamshidian is False:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
@@ -158,7 +148,7 @@ class FinBondOption():
                 v = (v1['put'] + v2['put'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.AMERICAN_CALL:
+            elif self._optionType == FinOptionTypes.AMERICAN_CALL:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
 
@@ -179,7 +169,7 @@ class FinBondOption():
                 v = (v1['call'] + v2['call'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.AMERICAN_PUT:
+            elif self._optionType == FinOptionTypes.AMERICAN_PUT:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
                 model.buildTree(texp, dfTimes, dfValues)
@@ -204,7 +194,7 @@ class FinBondOption():
             maturityDate = self._bond._maturityDate
             tmat = (maturityDate - valueDate) / gDaysInYear
 
-            if self._optionType == FinBondOptionTypes.EUROPEAN_CALL:
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
 
                 exerciseType = FinOptionExerciseTypes.EUROPEAN
                 model.buildTree(tmat, dfTimes, dfValues)
@@ -218,7 +208,7 @@ class FinBondOption():
                 v = (v1['call'] + v2['call'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.EUROPEAN_PUT:
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
 
                 exerciseType = FinOptionExerciseTypes.EUROPEAN
                 model.buildTree(tmat, dfTimes, dfValues)
@@ -233,7 +223,7 @@ class FinBondOption():
                 v = (v1['put'] + v2['put'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.AMERICAN_CALL:
+            elif self._optionType == FinOptionTypes.AMERICAN_CALL:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
 
@@ -249,7 +239,7 @@ class FinBondOption():
                 v = (v1['call'] + v2['call'])/2.0
                 return v
 
-            elif self._optionType == FinBondOptionTypes.AMERICAN_PUT:
+            elif self._optionType == FinOptionTypes.AMERICAN_PUT:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
 

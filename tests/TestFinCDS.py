@@ -23,7 +23,6 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 import numpy as np
-from math import log
 import sys
 sys.path.append("..//..")
 
@@ -58,7 +57,7 @@ def test_CDSFastApproximation():
     maturityDate = valueDate.nextCDSDate(120)
     t = (maturityDate - valueDate) / 365.242
     z = liborCurve.df(maturityDate)
-    r = -log(z) / t
+    r = -np.log(z) / t
 
     recoveryRate = 0.40
 
@@ -445,7 +444,7 @@ def test_fullPriceCDS():
 
     t = (maturityDate - valuationDate) / gDaysInYear
     z = liborCurve.df(maturityDate)
-    r = -log(z) / t
+    r = -np.log(z) / t
 
     v_approx = cdsContract.valueFastApprox(valuationDate,
                                            r,

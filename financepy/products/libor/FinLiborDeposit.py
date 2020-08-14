@@ -2,8 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from typing import Union
-
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinCalendar import FinCalendar
@@ -25,7 +23,7 @@ class FinLiborDeposit(object):
 
     def __init__(self,
                  settlementDate: FinDate,
-                 maturityDateOrTenor: Union[FinDate, str],
+                 maturityDateOrTenor: (FinDate, str),
                  depositRate: float,
                  dayCountType: FinDayCountTypes,
                  notional: float = 100.0,

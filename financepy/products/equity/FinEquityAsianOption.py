@@ -377,10 +377,10 @@ class FinEquityAsianOption():
         ''' Calculate the value of an Asian option using one of the specified
         analytical approximations for an average rate option. These are the
         three enumerated values in the enum FinAsianOptionValuationMethods. The
-        choices of approximation are GEOMETRIC - value as if the average was a
-        geometric one using work by Kenna and Worst (1990), TURNBULL_WAKEMAN -
+        choices of approximation are (i) GEOMETRIC - the average is a geometric
+        one as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
         this is a value based on an edgeworth expansion of the moments of the
-        arithmetic average, and CURRAN which is another approximative approach
+        arithmetic average, and (iii) CURRAN - another approximative approach
         by Curran based on conditioning on the geometric mean price. Just
         choose the corresponding enumerated value to switch between these
         different approaches.

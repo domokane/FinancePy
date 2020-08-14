@@ -3,7 +3,6 @@
 ##############################################################################
 
 
-from math import exp
 import numpy as np
 from ..finutils.FinError import FinError
 from ..finutils.FinHelperFunctions import normaliseWeights
@@ -53,7 +52,7 @@ class FinPortfolioCreditDefaultMode(object):
         defaultProbs = np.zeros(self._numCredits)
 
         for j in range(0, self._numCredits):
-            defaultProbs[j] = 1.0 - exp(-hazardRates[j] * tmat)
+            defaultProbs[j] = 1.0 - np.exp(-hazardRates[j] * tmat)
 
         totalLoss = 0.0
         for i in range(0, self._numCredits):

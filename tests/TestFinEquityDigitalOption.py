@@ -8,7 +8,7 @@ Created on Fri Feb 12 16:51:05 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinOptionTypes import FinOptionTypes
-from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption
+from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption, FinDigitalOptionTypes
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
@@ -22,6 +22,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_FinEquityDigitalOption():
+
+    underlyingType = FinDigitalOptionTypes.CASH_OR_NOTHING
 
     valueDate = FinDate(2015, 1, 1)
     expiryDate = FinDate(2016, 1, 1)
@@ -51,7 +53,7 @@ def test_FinEquityDigitalOption():
     for numPaths in numPathsList:
 
         callOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinOptionTypes.DIGITAL_CALL)
+            expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, underlyingType)
         value = callOption.value(
             valueDate,
             stockPrice,
@@ -89,7 +91,7 @@ def test_FinEquityDigitalOption():
 
     for stockPrice in stockPrices:
         callOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinOptionTypes.DIGITAL_CALL)
+            expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, underlyingType)
         value = callOption.value(
             valueDate,
             stockPrice,
@@ -126,7 +128,7 @@ def test_FinEquityDigitalOption():
 
     for stockPrice in stockPrices:
         putOption = FinEquityDigitalOption(
-            expiryDate, 100.0, FinOptionTypes.DIGITAL_PUT)
+            expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, underlyingType)
         value = putOption.value(
             valueDate,
             stockPrice,

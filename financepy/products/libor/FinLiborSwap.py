@@ -2,9 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
-from typing import Union
-
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
@@ -22,7 +19,7 @@ class FinLiborSwap(object):
 
     def __init__(self,
                  startDate: FinDate,  # This is typically T+2 on a new swap
-                 maturityDateOrTenor: Union[FinDate, str],
+                 maturityDateOrTenor: (FinDate, str),
                  fixedCoupon: float,
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,

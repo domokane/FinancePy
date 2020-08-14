@@ -106,11 +106,11 @@ class FinDate():
         self._excelDate = 0
 
         # update the excel date used for doing lots of financial calculations
-        self.refresh()
+        self._refresh()
 
     ###########################################################################
 
-    def refresh(self):
+    def _refresh(self):
         ''' Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. '''
 
@@ -440,7 +440,7 @@ class FinDate():
 
     ###########################################################################
 
-    def date(self):
+    def datetime(self):
         ''' Returns a datetime of the date '''
         return datetime.date(self._d, self._m, self._y)
 
