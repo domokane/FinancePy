@@ -30,10 +30,11 @@ class FinDigitalOptionTypes(Enum):
 
 class FinEquityDigitalOption(FinEquityOption):
     ''' A FinEquityDigitalOption is an option in which the buyer receives some
-    payment if the stock price has crossed a barrier at expiry and zero
+    payment if the stock price has crossed a barrier ONLY at expiry and zero
     otherwise. There are two types: cash-or-nothing and the asset-or-nothing
     option. We do not care whether the stock price has crossed the barrier
-    today, we only care about the barrier at option expiry. '''
+    today, we only care about the barrier at option expiry. For a continuously-
+    monitored barrier, use the FinEquityOneTouchOption class. '''
 
     def __init__(self,
                  expiryDate: FinDate,
@@ -118,7 +119,7 @@ class FinEquityDigitalOption(FinEquityOption):
                 numPaths: int = 10000,
                 seed: int = 4242):
         ''' Digital Option valuation using the Black-Scholes model and Monte
-        Carlo simulation. Product assumes a barrier at expiry. Monte Carlo
+        Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
         handles both a cash-or-nothing and an asset-or-nothing option.'''
 
         np.random.seed(seed)

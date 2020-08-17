@@ -247,6 +247,8 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def printWeights(self):
+        ''' Print the list of puts and calls used to replicate the static
+        replication component of the variance swap hedge. '''
 
         if self._numPutOptions == 0 and self._numCallOptions == 0:
             print("No call or put options generated.")

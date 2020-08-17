@@ -7,7 +7,7 @@ from numba import jit, njit, float64, int64
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
-from ..market.curves.FinInterpolate import FinInterpTypes, uinterpolate
+from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionExerciseTypes
 

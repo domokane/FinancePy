@@ -21,26 +21,29 @@ class FinInterpTypes(Enum):
 ###############################################################################
 
 
-def interpolate(x,
-                times,
-                dfs,
-                method):
+def interpolate(t: (float, np.ndarray),  # time
+                times: np.ndarray,  # Vector of times
+                dfs: np.ndarray,  # Vector of discount factors
+                method: int):  # Interpolation method
+    ''' Fast interpolation of discount factors at time x given discount factors
+    at times provided using one of the methods in the enum FinInterpTypes. The
+    value of x can be an array so that the function is vectorised. '''
 
-    if type(x) is float or type(x) is np.float64:
-        u = uinterpolate(x, times, dfs, method)
+    if type(t) is float or type(t) is np.float64:
+        u = _uinterpolate(t, times, dfs, method)
         return u
-    elif type(x) is np.ndarray:
-        v = vinterpolate(x, times, dfs, method)
+    elif type(t) is np.ndarray:
+        v = _vinterpolate(t, times, dfs, method)
         return v
     else:
-        raise FinError("Unknown input type" + type(x))
+        raise FinError("Unknown input type" + type(t))
 
 ###############################################################################
 
 
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)
-def uinterpolate(t, times, dfs, method):
+def _uinterpolate(t, times, dfs, method):
     ''' Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
@@ -143,7 +146,7 @@ def uinterpolate(t, times, dfs, method):
 
 #@njit(float64[:](float64[:], float64[:], float64[:], int64),
 #      fastmath=True, cache=True, nogil=True)
-def vinterpolate(xValues,
+def _vinterpolate(xValues,
                  xvector,
                  dfs,
                  method):
@@ -155,7 +158,7 @@ def vinterpolate(xValues,
     n = xValues.size
     yvalues = np.empty(n)
     for i in range(0, n):
-        yvalues[i] = uinterpolate(xValues[i], xvector, dfs, method)
+        yvalues[i] = _uinterpolate(xValues[i], xvector, dfs, method)
 
     return yvalues
 
