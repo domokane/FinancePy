@@ -22,7 +22,7 @@ Users should have a good, but not advanced, understanding of Python. In terms of
 1. To make the code as simple as possible so that those with a basic Python fluency can understand and check the code.
 2. To keep all the code in Python so users can look through the code to the lowest level.
 3. To offset the performance impact of (2) by leveraging Numba to make the code as fast as possible without resorting to Cython.
-4. To make the design product-based rather than model-based so someone wanting to price a specific product can easily find that without having to worry too much about the model – just use the default – unless they want to. For most products, a Monte-Carl implementation has been provided both as a reference for testing and as a way to better understand how the product functions in terms of payments, their timings and conditions. 
+4. To make the design product-based rather than model-based so someone wanting to price a specific product can easily find that without having to worry too much about the model – just use the default – unless they want to. For most products, a Monte-Carlo implementation has been provided both as a reference for testing and as a way to better understand how the product functions in terms of payments, their timings and conditions.
 5. To make the library as complete as possible so a user can find all their required finance-related functionality in one place. This is better for the user as they only have to learn one interface.
 6. To avoid complex designs. Some code duplication is OK, at least temporarily.
 7. To have good documentation and easy-to-follow examples.
@@ -34,6 +34,7 @@ Important Note:
 * IF YOU HAVE ANY PRICING OR RISK EXAMPLES YOU WOULD LIKE REPLICATED, SEND SCREENSHOTS OF ALL THE UNDERLYING DATA, MODEL DETAILS AND VALUATION.
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
+
 In all cases I will seek to be as helpful as possible, subject to constraints.
 
 ## The Library Design
