@@ -4,10 +4,7 @@
 
 
 import numpy as np
-from scipy import optimize
-from numba import njit
 
-from ...finutils.FinMath import M
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
@@ -16,7 +13,13 @@ from ...products.equity.FinEquityOption import FinEquityOption
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...models.FinModelBlackScholes import bsValue
+from ...finutils.FinCalendar import FinBusDayAdjustTypes
+from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...finutils.FinSchedule import FinSchedule
+from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from ...finutils.FinOptionTypes import FinOptionTypes
 
 from scipy.stats import norm
 N = norm.cdf
@@ -28,26 +31,6 @@ N = norm.cdf
 ###############################################################################
 
 
-def _f(ss, *args):
-    ''' Complex chooser option solve for critical stock price that makes the
-    forward starting call and put options have the same price on the chooser
-    date. '''
-
-    t = args[0]
-    tc = args[1]
-    tp = args[2]
-    rtc = args[3]
-    rtp = args[4]
-    kc = args[5]
-    kp = args[6]
-    v = args[7]
-    q = args[8]
-
-    v_call = bsValue(ss, tc-t, kc, rtc, q, v, +1.0)
-    v_put = bsValue(ss, tp-t, kp, rtp, q, v, -1.0)
-    v = v_call - v_put
-    return v
-
 ###############################################################################
 
 
@@ -58,27 +41,41 @@ class FinEquityCliquetOption(FinEquityOption):
 
     def __init__(self,
                  startDate: FinDate,
-                 expiryDate: FinDate,
+                 finalExpiryDate: FinDate,
+                 optionType: FinOptionTypes,
                  frequencyType: FinFrequencyTypes,
-                 callStrikePrice: float,
-                 putStrikePrice: float):
-        ''' Create the FinEquityChooserOption by passing in the chooser date
-        and then the put and call expiry dates as well as the corresponding put
-        and call strike prices. '''
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        ''' Create the FinEquityCliquetOption by passing in the start date
+        and the end date and whether it is a call or a put. Some additional
+        data is needed in order to calculate the individual payments. '''
 
         checkArgumentTypes(self.__init__, locals())
 
-        if chooseDate > callExpiryDate:
-            raise FinError("Expiry date must precede call option expiry date")
+        if optionType != FinOptionTypes.EUROPEAN_CALL and \
+           optionType != FinOptionTypes.EUROPEAN_PUT:
+            raise FinError("Unknown Option Type" + str(optionType))
 
-        if chooseDate > putExpiryDate:
-            raise FinError("Expiry date must precede put option expiry date")
+        if finalExpiryDate < startDate:
+            raise FinError("Expiry date precedes start date")
 
-        self._chooseDate = chooseDate
-        self._callExpiryDate = callExpiryDate
-        self._putExpiryDate = putExpiryDate
-        self._callStrike = float(callStrikePrice)
-        self._putStrike = float(putStrikePrice)
+        self._startDate = startDate
+        self._finalExpiryDate = finalExpiryDate
+        self._optionType = optionType
+        self._frequencyType = frequencyType
+        self._dayCountType = dayCountType
+        self._calendarType = calendarType
+        self._busDayAdjustType = busDayAdjustType
+        self._dateGenRuleType = dateGenRuleType
+
+        self._expiryDates = FinSchedule(self._startDate,
+                                        self._finalExpiryDate,
+                                        self._frequencyType,
+                                        self._calendarType,
+                                        self._busDayAdjustType,
+                                        self._dateGenRuleType).generate()
 
 ###############################################################################
 
@@ -88,145 +85,75 @@ class FinEquityCliquetOption(FinEquityOption):
               discountCurve: FinDiscountCurve,
               dividendYield: float,
               model):
-        ''' Value the complex chooser option using an approach by Rubinstein
-        (1991). See also Haug page 129 for complex chooser options. '''
+        ''' Value the cliquet option as a sequence of options using the Black-
+        Scholes model. '''
 
-        if valueDate > self._chooseDate:
-            raise FinError("Value date after choose date.")
-
-        DEBUG_MODE = False
-
-        t = (self._chooseDate - valueDate) / gDaysInYear
-        tc = (self._callExpiryDate - valueDate) / gDaysInYear
-        tp = (self._putExpiryDate - valueDate) / gDaysInYear
-
-        dft = discountCurve.df(self._chooseDate)
-        dftc = discountCurve.df(self._callExpiryDate)
-        dftp = discountCurve.df(self._putExpiryDate)
-
-        rt = -np.log(dft) / t
-        rtc = -np.log(dftc) / tc
-        rtp = -np.log(dftp) / tp
-
-        t = max(t, 1e-6)
-        tc = max(tc, 1e-6)
-        tp = max(tp, 1e-6)
-
-        v = model._volatility
-        v = max(v, 1e-6)
+        if valueDate > self._finalExpiryDate:
+            raise FinError("Value date after final expiry date.")
 
         s0 = stockPrice
         q = dividendYield
-        xc = self._callStrike
-        xp = self._putStrike
-        bt = rt - q
-        btc = rtc - q
-        btp = rtp - q
+        v_cliquet = 0.0
 
-        argtuple = (t, tc, tp, rtc, rtp, xc, xp, v, q)
-        if DEBUG_MODE:
-            print("args", argtuple)
+        self._v_options = []
+        self._dfs = []
+        self._actualDates = []
 
-        istar = optimize.newton(_f, x0=s0, args=argtuple, tol=1e-8,
-                                maxiter=50, fprime2=None)
+        if type(model) == FinEquityModelBlackScholes:
 
-        if DEBUG_MODE:
-            print("istar", istar)
+            vol = model._volatility
+            vol = max(vol, 1e-6)
+            tprev = 0.0
 
-        d1 = (np.log(s0/istar) + (bt + v*v/2)*t) / v / np.sqrt(t)
-        d2 = d1 - v * np.sqrt(t)
+            for dt in self._expiryDates:
 
-        if DEBUG_MODE:
-            print("d1", d1)
-            print("d2", d2)
+                if dt > valueDate:
+                    df = discountCurve.df(dt)
+                    t = (dt - valueDate) / gDaysInYear
+                    r = -np.log(df) / t
+                    texp = t - tprev
+                    dq = np.exp(-q * tprev)
 
-        y1 = (np.log(s0/xc) + (btc + v*v/2)*tc) / v / np.sqrt(tc)
-        y2 = (np.log(s0/xp) + (btp + v*v/2)*tp) / v / np.sqrt(tp)
+                    if self._optionType == FinOptionTypes.EUROPEAN_CALL:
+                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, 1.0)
+                        v_cliquet += v
+                    elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
+                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, 1.0)
+                        v_cliquet += v
+                    else:
+                        raise FinError("Unknown option type")
 
-        if DEBUG_MODE:
-            print("y1", y1)
-            print("y2", y2)
+                    self._dfs.append(df)
+                    self._v_options.append(v)
+                    self._actualDates.append(dt)
+                    tprev = t
 
-        rho1 = np.sqrt(t/tc)
-        rho2 = np.sqrt(t/tp)
+        else:
+            raise FinError("Unknown Model Type")
 
-        if DEBUG_MODE:
-            print("rho1", rho1)
-            print("rho2", rho2)
-
-        w = s0 * np.exp(-q * tc) * M(d1, y1, rho1)
-        w = w - xc * np.exp(-rtc * tc) * M(d2, y1 - v * np.sqrt(tc), rho1)
-        w = w - s0 * np.exp(-q * tp) * M(-d1, -y2, rho2)
-        w = w + xp * np.exp(-rtp * tp) * M(-d2, -y2 + v * np.sqrt(tp), rho2)
-        return w
+        return v_cliquet
 
 ###############################################################################
 
-    def valueMC(self,
-                valueDate: FinDate,
-                stockPrice: float,
-                discountCurve: FinDiscountCurve,
-                dividendYield: float,
-                model,
-                numPaths: int = 10000,
-                seed: int = 4242):
-        ''' Value the complex chooser option Monte Carlo. '''
+    def printFlows(self):
+        numOptions = len(self._v_options)
+        for i in range(0, numOptions):
+            print(self._actualDates[i], self._dfs[i], self._v_options[i])
 
-        dft = discountCurve.df(self._chooseDate)
-        dftc = discountCurve.df(self._callExpiryDate)
-        dftp = discountCurve.df(self._putExpiryDate)
-
-        t = (self._chooseDate - valueDate) / gDaysInYear
-        tc = (self._callExpiryDate - valueDate) / gDaysInYear
-        tp = (self._putExpiryDate - valueDate) / gDaysInYear
-
-        rt = -np.log(dft) / t
-        rtc = -np.log(dftc) / tc
-        rtp = -np.log(dftp) / tp
-
-        t = max(t, 1e-6)
-        tc = max(tc, 1e-6)
-        tp = max(tp, 1e-6)
-
-        v = model._volatility
-        v = max(v, 1e-6)
-
-        q = dividendYield
-        kc = self._callStrike
-        kp = self._putStrike
-
-        np.random.seed(seed)
-        sqrtdt = np.sqrt(t)
-
-        # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, numPaths))
-        s = stockPrice * np.exp((rt - q - v*v / 2.0) * t)
-        m = np.exp(g * sqrtdt * v)
-
-        s_1 = s * m
-        s_2 = s / m
-
-        v_call_1 = bsValue(s_1, tc-t, kc, rtc, q, v, +1.0)
-        v_put_1 = bsValue(s_1, tp-t, kp, rtp, q, v, -1.0)
-
-        v_call_2 = bsValue(s_2, tc-t, kc, rtc, q, v, +1.0)
-        v_put_2 = bsValue(s_2, tp-t, kp, rtp, q, v, -1.0)
-
-        payoff_1 = np.maximum(v_call_1, v_put_1)
-        payoff_2 = np.maximum(v_call_2, v_put_2)
-
-        payoff = np.mean(payoff_1) + np.mean(payoff_2)
-        v = payoff * dft / 2.0
-        return v
+#           print("%20s  %9.5f  %9.5f" %
+#                  self._expiryDates[i], self._dfs[i], self._v_options[i])
 
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("CHOOSER DATE", self._chooseDate)
-        s += labelToString("CALL EXPIRY DATE", self._callExpiryDate)
-        s += labelToString("CALL STRIKE PRICE", self._callStrike)
-        s += labelToString("PUT EXPIRY DATE", self._putExpiryDate)
-        s += labelToString("PUT STRIKE PRICE", self._putStrike, "")
+        s = labelToString("START DATE", self._startDate)
+        s += labelToString("FINAL EXPIRY DATE", self._finalExpiryDate)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("FREQUENCY TYPE", self._frequencyType)
+        s += labelToString("DAY COUNT TYPE", self._dayCountType)
+        s += labelToString("CALENDAR TYPE", self._calendarType)
+        s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)
+        s += labelToString("DATE GEN RULE TYPE", self._dateGenRuleType, "")
         return s
 
 ###############################################################################

@@ -12,6 +12,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
+from ...models.FinModelBlackScholes import bsValue
 from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...finutils.FinOptionTypes import FinOptionTypes
@@ -101,7 +102,7 @@ class FinEquityVanillaOption():
               stockPrice: (np.ndarray, float),
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model):
+              model: FinEquityModel):
         ''' Option valuation using Black-Scholes model. '''
 
         if type(valueDate) == FinDate:
@@ -112,51 +113,36 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
+        if isinstance(model, FinEquityModel) is False:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        texp = np.maximum(texp, 1e-10)
-
         df = discountCurve.df(self._expiryDate)
+        texp = np.maximum(texp, 1e-10)
+        s0 = stockPrice
         r = -np.log(df)/texp
         q = dividendYield
-
-        S0 = stockPrice
-        K = self._strikePrice
+        k = self._strikePrice
 
         if type(model) == FinEquityModelBlackScholes:
 
-            ''' SWITCH THIS TO USE FINMODELBLACKSCHOLES function !!! '''
+            v = model._volatility
 
-            volatility = model._volatility
-
-            if np.any(volatility) < 0.0:
+            if np.any(v) < 0.0:
                 raise FinError("Volatility should not be negative.")
 
-            lnS0k = np.log(S0 / K)
-            sqrtT = np.sqrt(texp)
-            den = volatility * sqrtT
-            mu = r - q
-            v2 = volatility * volatility
-
-            d1 = (lnS0k + (mu + v2 / 2.0) * texp) / den
-            d2 = (lnS0k + (mu - v2 / 2.0) * texp) / den
-
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                v = stockPrice * np.exp(-q * texp) * N(d1)
-                v = v - self._strikePrice * np.exp(-r * texp) * N(d2)
+                v_opt = bsValue(s0, texp, k, r, q, v, +1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                v = self._strikePrice * np.exp(-r * texp) * N(-d2)
-                v = v - stockPrice * np.exp(-q * texp) * N(-d1)
+                v_opt = bsValue(s0, texp, k, r, q, v, -1)
             else:
                 raise FinError("Unknown option type")
         else:
             raise FinError("Unknown Model Type")
 
-        v = v * self._numOptions
+        v = v_opt * self._numOptions
         return v
 
 ###############################################################################
