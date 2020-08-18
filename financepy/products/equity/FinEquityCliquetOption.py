@@ -25,8 +25,7 @@ from scipy.stats import norm
 N = norm.cdf
 
 ###############################################################################
-# TODO: Vectorise pricer
-# TODO: NUMBA ??
+# TODO: Do we need to day count adjust option payoffs ?
 # TODO: Monte Carlo pricer
 ###############################################################################
 
