@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
+import os
 import datetime as dt
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -201,7 +201,8 @@ def test_FinBond():
 #    FinBond(FinDate(1,1,2000),0.08,FinFrequencyTypes.ANNUAL, 1)
 
     import pandas as pd
-    bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')
+    path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
+    bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
