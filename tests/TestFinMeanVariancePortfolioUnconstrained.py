@@ -8,6 +8,7 @@ reduced covariance matrix.
 
 """
 import sys
+from os.path import dirname, join
 
 import numpy as np
 import pandas as pd
@@ -30,8 +31,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_MeanVarianceOptimisation():
 
-    ff_factors = pd.read_pickle('data/ff_factors.pkl')
-    ff_assets = pd.read_pickle('data/ff_assets.pkl')
+    ff_factors = pd.read_pickle(join(dirname(__file__), './data/ff_factors.pkl'))
+    ff_assets = pd.read_pickle(join(dirname(__file__), './data/ff_assets.pkl'))
 
     num_times = len(ff_factors)
 
