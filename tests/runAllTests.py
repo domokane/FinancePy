@@ -3,13 +3,13 @@
 ###############################################################################
 
 import glob
-from os.path import dirname
+from os.path import dirname, basename, join
 
 import sys
-sys.path.append("..//..")
+sys.path.append("..//financepy")
 
 print("Looking in folder:", dirname(__file__))
-modules = glob.glob("TestFin*.py")
+modules = glob.glob(join(dirname(__file__), "TestFin*.py"))
 
 numModules = len(modules)
 
@@ -20,8 +20,7 @@ n = 0
 for moduleFileName in modules[n:]:
 
     n = n + 1
-    ll = moduleFileName.find("\\TestFin")
-    moduleTextName = moduleFileName[ll + 1:-3]
+    moduleTextName = basename(moduleFileName[:-3])
 
     print("==================================================================")
     print("TEST CASE ANALYSIS OF MODULE: ", moduleTextName)
