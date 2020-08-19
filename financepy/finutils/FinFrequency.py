@@ -37,7 +37,7 @@ def FinFrequency(frequencyType):
             return 4
         elif frequencyType == FinFrequencyTypes.MONTHLY:
             return 12
-    elif type(frequencyType) is int:
+    elif isinstance(frequencyType, int):
         return frequencyType
     else:
         raise FinError("Unknown frequency type")

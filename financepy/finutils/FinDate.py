@@ -396,7 +396,7 @@ class FinDate():
         independent. For example 10Y means 10 years while 120m also means 10
         years. '''
 
-        if type(tenor) != str:
+        if isinstance(tenor, str) is False:
             raise FinError("Tenor must be a string e.g. '5Y'")
 
         tenor = tenor.upper()
