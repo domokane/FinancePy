@@ -6,27 +6,28 @@
 import numpy as np
 
 from scipy import optimize
-from scipy.stats import norm
 
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...products.equity.FinEquityOption import FinEquityOption
+from ...models.FinModelBlackScholes import bsValue
 from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from ...models.FinModelCRRTree import crrTreeValAvg
 from ...finutils.FinOptionTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
+from financepy.finutils.FinSobol import getGaussianSobol
+
+from scipy.stats import norm
 N = norm.cdf
 
 ###############################################################################
 
 
-def f(volatility, *args):
+def _f(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
@@ -41,9 +42,9 @@ def f(volatility, *args):
                        stockPrice,
                        discountCurve,
                        dividendYield,
-                       model)['value']
+                       model)
 
-    objFn = objFn - price['value']
+    objFn = objFn - price
 
 #    print(volatility, price, objFn)
     return objFn
@@ -51,7 +52,7 @@ def f(volatility, *args):
 ###############################################################################
 
 
-def fvega(volatility, *args):
+def _fvega(volatility, *args):
 
     self = args[0]
     valueDate = args[1]
@@ -71,20 +72,22 @@ def fvega(volatility, *args):
 ###############################################################################
 
 
-class FinEquityVanillaOption(FinEquityOption):
+class FinEquityVanillaOption():
+    ''' Class for managing plain vanilla European calls and puts on equities.
+    For American calls and puts see the FinEquityAmericanOption class. '''
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikePrice: float,
+                 strikePrice: (float, np.ndarray),
                  optionType: FinOptionTypes,
                  numOptions: float = 1.0):
+        ''' Create the Equity Vanilla option object by specifying the expiry
+        date, the option strike, the option type and the number of options. '''
 
         checkArgumentTypes(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
-            optionType != FinOptionTypes.EUROPEAN_PUT and \
-            optionType != FinOptionTypes.AMERICAN_CALL and \
-                optionType != FinOptionTypes.AMERICAN_PUT:
+           optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(optionType))
 
         self._expiryDate = expiryDate
@@ -95,11 +98,12 @@ class FinEquityVanillaOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+              valueDate: FinDate,
+              stockPrice: (np.ndarray, float),
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model: FinEquityModel):
+        ''' Option valuation using Black-Scholes model. '''
 
         if type(valueDate) == FinDate:
             texp = (self._expiryDate - valueDate) / gDaysInYear
@@ -109,80 +113,47 @@ class FinEquityVanillaOption(FinEquityOption):
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
+        if isinstance(model, FinEquityModel) is False:
             raise FinError("Model is not inherited off type FinEquityModel.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        texp = np.maximum(texp, 1e-10)
-
         df = discountCurve.df(self._expiryDate)
+        texp = np.maximum(texp, 1e-10)
+        s0 = stockPrice
         r = -np.log(df)/texp
         q = dividendYield
-
-        S0 = stockPrice
-        K = self._strikePrice
+        k = self._strikePrice
 
         if type(model) == FinEquityModelBlackScholes:
 
-            volatility = model._volatility
+            v = model._volatility
 
-            if np.any(volatility) < 0.0:
+            if np.any(v) < 0.0:
                 raise FinError("Volatility should not be negative.")
 
-            volatility = np.maximum(volatility, 1e-10)
-
-            lnS0k = np.log(S0 / K)
-            sqrtT = np.sqrt(texp)
-            den = volatility * sqrtT
-            mu = r - q
-            v2 = volatility * volatility
-
-            d1 = (lnS0k + (mu + v2 / 2.0) * texp) / den
-            d2 = (lnS0k + (mu - v2 / 2.0) * texp) / den
-
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                if model._useTree is True:
-                    numStepsPerYear = model._numStepsPerYear
-                    v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
-                       texp, FinOptionTypes.EUROPEAN_CALL.value, K)['value']
-                else:
-                    v = stockPrice * np.exp(-q * texp) * N(d1)
-                    v = v - self._strikePrice * np.exp(-r * texp) * N(d2)
+                v_opt = bsValue(s0, texp, k, r, q, v, +1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                if model._useTree is True: 
-                    numStepsPerYear = model._numStepsPerYear
-                    v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.EUROPEAN_PUT.value, K)['value']
-                else:
-                    v = self._strikePrice * np.exp(-r * texp) * N(-d2)
-                    v = v - stockPrice * np.exp(-q * texp) * N(-d1)
-            elif self._optionType == FinOptionTypes.AMERICAN_CALL:
-                numStepsPerYear = model._numStepsPerYear
-                v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
-            elif self._optionType == FinOptionTypes.AMERICAN_PUT:
-                numStepsPerYear = model._numStepsPerYear
-                v = crrTreeValAvg(S0, r, q, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
+                v_opt = bsValue(s0, texp, k, r, q, v, -1)
             else:
                 raise FinError("Unknown option type")
-
         else:
             raise FinError("Unknown Model Type")
 
-        v = v * self._numOptions
-        return {'value': v}
+        v = v_opt * self._numOptions
+        return v
 
 ###############################################################################
 
-    def xdelta(self,
-               valueDate,
-               stockPrice,
-               discountCurve,
-               dividendYield,
-               model):
+    def delta(self,
+              valueDate: FinDate,
+              stockPrice: float,
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model):
+        ''' Calculate the analytical delta of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -231,12 +202,13 @@ class FinEquityVanillaOption(FinEquityOption):
 
 ###############################################################################
 
-    def xgamma(self,
-               valueDate,
-               stockPrice,
-               discountCurve,
-               dividendYield,
-               model):
+    def gamma(self,
+              valueDate: FinDate,
+              stockPrice: float,
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model):
+        ''' Calculate the analytical gamma of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -281,12 +253,13 @@ class FinEquityVanillaOption(FinEquityOption):
 
 ###############################################################################
 
-    def xvega(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+    def vega(self,
+             valueDate: FinDate,
+             stockPrice: float,
+             discountCurve: FinDiscountCurve,
+             dividendYield: float,
+             model):
+        ''' Calculate the analytical vega of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -330,12 +303,13 @@ class FinEquityVanillaOption(FinEquityOption):
 
 ###############################################################################
 
-    def xtheta(self,
-               valueDate,
-               stockPrice,
-               discountCurve,
-               dividendYield,
-               model):
+    def theta(self,
+              valueDate: FinDate,
+              stockPrice: float,
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model):
+        ''' Calculate the analytical theta of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -377,14 +351,14 @@ class FinEquityVanillaOption(FinEquityOption):
                 v = - stockPrice * np.exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrtT
                 v = v - interestRate * self._strikePrice * \
-                    np.exp(-interestRate * t) * N(d2)
+                    df * N(d2)
                 v = v + dividendYield * stockPrice * \
                     np.exp(-dividendYield * t) * N(d1)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
                 v = - stockPrice * np.exp(-dividendYield * t) * \
                     nprime(d1) * volatility / 2.0 / sqrtT
                 v = v + interestRate * self._strikePrice * \
-                    np.exp(-interestRate * t) * N(-d2)
+                    df * N(-d2)
                 v = v - dividendYield * stockPrice * \
                     np.exp(-dividendYield * t) * N(-d1)
             else:
@@ -397,35 +371,101 @@ class FinEquityVanillaOption(FinEquityOption):
 
 ###############################################################################
 
+    def rho(self,
+            valueDate: FinDate,
+            stockPrice: float,
+            discountCurve: FinDiscountCurve,
+            dividendYield: float,
+            model):
+        ''' Calculate the analytical rho of a European vanilla option. '''
+
+        if type(valueDate) == FinDate:
+            t = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            t = valueDate
+
+        if np.any(stockPrice <= 0.0):
+            raise FinError("Stock price must be greater than zero.")
+
+        if model._parentType != FinEquityModel:
+            raise FinError("Model is not inherited off type FinEquityModel.")
+
+        if np.any(t < 0.0):
+            raise FinError("Time to expiry must be positive.")
+
+        t = np.maximum(t, 1e-10)
+
+        df = discountCurve._df(t)
+        interestRate = -np.log(df)/t
+
+        if type(model) == FinEquityModelBlackScholes:
+
+            volatility = model._volatility
+
+            if np.any(volatility) < 0.0:
+                raise FinError("Volatility should not be negative.")
+
+            volatility = np.maximum(volatility, 1e-10)
+
+            lnS0k = np.log(stockPrice / self._strikePrice)
+            K = self._strikePrice
+            sqrtT = np.sqrt(t)
+            den = volatility * sqrtT
+            mu = interestRate - dividendYield
+            v2 = volatility * volatility
+            d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
+
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
+                v = K * t * df * N(d2)
+            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
+                v = -K * t * df * N(-d2)
+            else:
+                raise FinError("Unknown option type")
+
+        else:
+            raise FinError("Unknown Model Type")
+
+        return v
+###############################################################################
+
     def impliedVolatility(self,
-                          valueDate,
-                          stockPrice,
-                          discountCurve,
-                          dividendYield,
+                          valueDate: FinDate,
+                          stockPrice: (float, list, np.ndarray),
+                          discountCurve: FinDiscountCurve,
+                          dividendYield: float,
                           price):
+        ''' Calculate the implied volatility of a European vanilla option. '''
 
         argtuple = (self, valueDate, stockPrice,
                     discountCurve, dividendYield, price)
 
-        sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
+        sigma = optimize.newton(_f, x0=0.2, fprime=_fvega, args=argtuple,
                                 tol=1e-5, maxiter=50, fprime2=None)
         return sigma
 
+# 
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
-                stockPrice,
-                discountCurve,
-                dividendYield,
+                valueDate: FinDate,
+                stockPrice: float,
+                discountCurve: FinDiscountCurve,
+                dividendYield: float,
                 model,
-                numPaths=10000,
-                seed=4242):
+                numPaths: int = 10000,
+                seed: int = 4242,
+                useSobol: bool = False):
+        ''' Value European style call or put option using Monte Carlo. This is
+        mainly for educational purposes. Sobol numbers can be used. '''
 
         if model._parentType == FinEquityModel:
             volatility = model._volatility
         else:
             raise FinError("Model Type invalid")
+
+        if self._optionType != FinOptionTypes.EUROPEAN_CALL and \
+           self._optionType != FinOptionTypes.EUROPEAN_PUT:
+            raise FinError("Can only value European call or put.")
 
         np.random.seed(seed)
         t = (self._expiryDate - valueDate) / gDaysInYear
@@ -439,12 +479,17 @@ class FinEquityVanillaOption(FinEquityOption):
         sqrtdt = np.sqrt(t)
 
         # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, numPaths))
+        if useSobol is True:
+            g = getGaussianSobol(numPaths, 1)
+        else:
+            g = np.random.normal(0.0, 1.0, size=(1, numPaths))
+
         s = stockPrice * np.exp((mu - v2 / 2.0) * t)
         m = np.exp(g * sqrtdt * volatility)
         s_1 = s * m
         s_2 = s / m
 
+        # Not sure if it is correct to do antithetics with sobols but why not ?
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             payoff_a_1 = np.maximum(s_1 - K, 0)
             payoff_a_2 = np.maximum(s_2 - K, 0)
@@ -455,37 +500,22 @@ class FinEquityVanillaOption(FinEquityOption):
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * np.exp(-r * t) / 2.0
+        v = payoff * df / 2.0
         return v
 
 ###############################################################################
 
-    def value_MC_OLD(self,
-                     valueDate,
-                     stockPrice,
-                     discountCurve,
-                     dividendYield,
-                     terminalS,
-                     seed=4242):
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE PRICE", self._strikePrice)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("NUMBER", self._numOptions, "")
+        return s
 
-        self.validate(valueDate, stockPrice, discountCurve, dividendYield, 0.1)
+###############################################################################
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
-
-        df = discountCurve._df(t)
-        r = -np.log(df)/t
-
-        K = self._strikePrice
-
-        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            path_payoff = np.maximum(terminalS - K, 0)
-        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            path_payoff = np.maximum(K - terminalS, 0)
-        else:
-            raise FinError("Unknown option type.")
-
-        payoff = np.mean(path_payoff)
-        v = payoff * np.exp(-r * t)
-        return v
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

@@ -13,14 +13,16 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION, N
 from ...products.credit.FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinHelperFunctions import checkArgumentTypes 
 from ...finutils.FinDate import FinDate
+from ...finutils.FinError import FinError
 
 ##########################################################################
 
 
 def fvol(volatility, *args):
-    ''' Root searching function in the calculation of the CDS implied volatility. '''
+    ''' Root searching function in the calculation of the CDS implied
+    volatility. '''
 
     self = args[0]
     valuationDate = args[1]
@@ -36,7 +38,12 @@ def fvol(volatility, *args):
 
 
 class FinCDSOption():
-    ''' Class to manage the pricing and risk-management of options on a CDS. '''
+    ''' Class to manage the pricing and risk-management of an option on a
+    single-name CDS. This is a contract in which the option buyer pays for an
+    option to either buy or sell protection on the underlying CDS at a fixed
+    spread agreed today and to be exercised in the future on a specified expiry
+    date. The option may or may not cancel if there is a credit event before
+    option expiry. This needs to be specified. '''
 
     def __init__(self,
                  expiryDate: FinDate,
@@ -50,6 +57,10 @@ class FinCDSOption():
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        ''' Create a FinCDSOption object with the option expiry date, the
+        maturity date of the underlying CDS, the option strike coupon,
+        notional, whether the option knocks out or not in the event of a credit
+        event before expiry and the payment details of the underlying CDS. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -122,10 +133,10 @@ class FinCDSOption():
 
         optionValue = optionValue * forwardRPV01
 
-       # If the option does not knockout on a default before expiry then we
-       # need to include the cost of protection which is provided between
-       # the value date and the expiry date
-        if self._knockoutFlag == False and self._longProtection == True:
+        # If the option does not knockout on a default before expiry then we
+        # need to include the cost of protection which is provided between
+        # the value date and the expiry date
+        if self._knockoutFlag is False and self._longProtection is True:
 
             df = issuerCurve.getDF(timeToExpiry)
             q = issuerCurve.getSurvProb(timeToExpiry)

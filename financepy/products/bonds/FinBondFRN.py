@@ -14,13 +14,14 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 # TODO: Need to complete and verify the risk sensitity calculations.
 
 ###############################################################################
 
 
-def f(dm, *args):
+def _f(dm, *args):
     ''' Function used to do solve root search in DM calculation '''
 
     self = args[0]
@@ -77,7 +78,8 @@ class FinBondFRN(object):
 
 ###############################################################################
 
-    def calculateFlowDates(self, settlementDate):
+    def _calculateFlowDates(self,
+                            settlementDate: FinDate):
         ''' Determine the bond cashflow payment dates. '''
 
         # No need to generate flows if settlement date has not changed
@@ -102,15 +104,15 @@ class FinBondFRN(object):
 ###############################################################################
 
     def fullPriceFromDiscountMargin(self,
-                                    settlementDate,
-                                    resetLibor,
-                                    currentLibor,
-                                    futureLibor,
-                                    dm):
+                                    settlementDate: FinDate,
+                                    resetLibor: float,
+                                    currentLibor: float,
+                                    futureLibor: float,
+                                    dm: float):
         ''' Calculate the full price of the bond from its discount margin and
         making assumptions about the future Libor rates. '''
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dc = self._ncd - settlementDate
@@ -139,11 +141,11 @@ class FinBondFRN(object):
 ###############################################################################
 
     def principal(self,
-                  settlementDate,
-                  resetLibor,
-                  currentLibor,
-                  futureLibor,
-                  dm):
+                  settlementDate: FinDate,
+                  resetLibor: float,
+                  currentLibor: float,
+                  futureLibor: float,
+                  dm: float):
         ''' Calculate the clean trade price of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Libor rates. '''
@@ -161,17 +163,17 @@ class FinBondFRN(object):
 ###############################################################################
 
     def dollarRateDuration(self,
-                           settlementDate,
-                           resetLibor,
-                           currentLibor,
-                           futureLibor,
-                           dm):
+                           settlementDate: FinDate,
+                           resetLibor: float,
+                           currentLibor: float,
+                           futureLibor: float,
+                           dm: float):
         ''' Calculate the risk or dP/dy of the bond by bumping. '''
 
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -193,17 +195,17 @@ class FinBondFRN(object):
 ###############################################################################
 
     def dollarCreditDuration(self,
-                             settlementDate,
-                             resetLibor,
-                             currentLibor,
-                             futureLibor,
-                             dm):
+                             settlementDate: FinDate,
+                             resetLibor: float,
+                             currentLibor: float,
+                             futureLibor: float,
+                             dm: float):
         ''' Calculate the risk or dP/dy of the bond by bumping. '''
 
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -225,11 +227,11 @@ class FinBondFRN(object):
 ###############################################################################
 
     def macauleyRateDuration(self,
-                             settlementDate,
-                             resetLibor,
-                             currentLibor,
-                             futureLibor,
-                             dm):
+                             settlementDate: FinDate,
+                             resetLibor: float,
+                             currentLibor: float,
+                             futureLibor: float,
+                             dm: float):
         ''' Calculate the Macauley duration of the FRN on a settlement date
         given its yield to maturity. '''
 
@@ -254,11 +256,11 @@ class FinBondFRN(object):
 ###############################################################################
 
     def modifiedRateDuration(self,
-                             settlementDate,
-                             resetLibor,
-                             currentLibor,
-                             futureLibor,
-                             dm):
+                             settlementDate: FinDate,
+                             resetLibor: float,
+                             currentLibor: float,
+                             futureLibor: float,
+                             dm: float):
         ''' Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. '''
 
@@ -282,11 +284,11 @@ class FinBondFRN(object):
 ###############################################################################
 
     def modifiedCreditDuration(self,
-                               settlementDate,
-                               resetLibor,
-                               currentLibor,
-                               futureLibor,
-                               dm):
+                               settlementDate: FinDate,
+                               resetLibor: float,
+                               currentLibor: float,
+                               futureLibor: float,
+                               dm: float):
         ''' Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. '''
 
@@ -310,18 +312,18 @@ class FinBondFRN(object):
 ###############################################################################
 
     def convexityFromDiscountMargin(self,
-                                    settlementDate,
-                                    resetLibor,
-                                    currentLibor,
-                                    futureLibor,
-                                    dm):
+                                    settlementDate: FinDate,
+                                    resetLibor: float,
+                                    currentLibor: float,
+                                    futureLibor: float,
+                                    dm: float):
         ''' Calculate the bond convexity from the discount margin using a
         numerical bump of size 1 basis point and taking second differences. '''
 
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dy = 0.0001
@@ -351,11 +353,11 @@ class FinBondFRN(object):
 ###############################################################################
 
     def cleanPriceFromDiscountMargin(self,
-                                     settlementDate,
-                                     resetLibor,
-                                     currentLibor,
-                                     futureLibor,
-                                     dm):
+                                     settlementDate: FinDate,
+                                     resetLibor: float,
+                                     currentLibor: float,
+                                     futureLibor: float,
+                                     dm: float):
         ''' Calculate the bond clean price from the yield. '''
 
         if dm > 10.0:
@@ -376,9 +378,9 @@ class FinBondFRN(object):
 ###############################################################################
 
     def fullPriceFromDiscountCurve(self,
-                                   settlementDate,
-                                   indexCurve,
-                                   discountCurve):
+                                   settlementDate: FinDate,
+                                   indexCurve: FinDiscountCurve,
+                                   discountCurve: FinDiscountCurve):
         ''' Calculate the bond price using some discount curve to present-value
         the bond's cashflows. THIS IS NOT COMPLETE. '''
         self.calculateFlowDates(settlementDate)
@@ -396,14 +398,14 @@ class FinBondFRN(object):
 ###############################################################################
 
     def discountMargin(self,
-                       settlementDate,
-                       resetLibor,
-                       currentLibor,
-                       futureLibor,
-                       cleanPrice):
+                       settlementDate: FinDate,
+                       resetLibor: float,
+                       currentLibor: float,
+                       futureLibor: float,
+                       cleanPrice: float):
         ''' Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. '''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         # Needs to be adjusted to par notional
@@ -414,7 +416,7 @@ class FinBondFRN(object):
         argtuple = (self, settlementDate, resetLibor, currentLibor,
                     futureLibor, fullPrice)
 
-        dm = optimize.newton(f,
+        dm = optimize.newton(_f,
                              x0=0.01,  # initial value of 10%
                              fprime=None,
                              args=argtuple,
@@ -425,11 +427,13 @@ class FinBondFRN(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self, settlementDate, resetLibor):
+    def calcAccruedInterest(self,
+                            settlementDate: FinDate,
+                            resetLibor: float):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -444,10 +448,11 @@ class FinBondFRN(object):
 
 ###############################################################################
 
-    def printFlows(self, settlementDate):
+    def printFlows(self,
+                   settlementDate: FinDate):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         for dt in self._flowDates[1:-1]:
             print(dt)
 

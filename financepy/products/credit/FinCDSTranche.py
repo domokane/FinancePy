@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+# TODO: Add __repr__ method
 
 import numpy as np
 from math import sqrt
@@ -22,10 +23,10 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...market.curves.FinInterpolate import interpolate, FinInterpMethods
+from ...market.curves.FinInterpolate import interpolate, FinInterpTypes
 from ...finutils.FinError import FinError
 
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
 ###############################################################################
@@ -160,18 +161,22 @@ class FinCDSTranche(object):
                 qRow = issuerCurve._values
                 recoveryRates[j] = issuerCurve._recoveryRate
                 qVector[j] = interpolate(
-                    t, vTimes, qRow, FinInterpMethods.FLAT_FORWARDS.value)
+                    t, vTimes, qRow, FinInterpTypes.FLAT_FORWARDS.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
                 qt1[i] = trSurvProbRecursion(
-                    0.0, k1, numCredits, qVector, recoveryRates, betaVector1, numPoints)
+                    0.0, k1, numCredits, qVector, recoveryRates,
+                    betaVector1, numPoints)
                 qt2[i] = trSurvProbRecursion(
-                    0.0, k2, numCredits, qVector, recoveryRates, betaVector2, numPoints)
+                    0.0, k2, numCredits, qVector, recoveryRates,
+                    betaVector2, numPoints)
             elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
                 qt1[i] = trSurvProbAdjBinomial(
-                    0.0, k1, numCredits, qVector, recoveryRates, betaVector1, numPoints)
+                    0.0, k1, numCredits, qVector, recoveryRates,
+                    betaVector1, numPoints)
                 qt2[i] = trSurvProbAdjBinomial(
-                    0.0, k2, numCredits, qVector, recoveryRates, betaVector2, numPoints)
+                    0.0, k2, numCredits, qVector, recoveryRates,
+                    betaVector2, numPoints)
             elif model == FinLossDistributionBuilder.GAUSSIAN:
                 qt1[i] = trSurvProbGaussian(
                     0.0,

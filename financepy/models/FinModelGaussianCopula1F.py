@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import sqrt, exp
 from numba import njit, float64, int64
 import numpy as np
 
@@ -61,7 +60,7 @@ def lossDbnRecursionGCD(numCredits,
     for iStep in range(0, numIntegrationSteps):
         for iCredit in range(0, numCredits):
             beta = betaVector[iCredit]
-            denom = sqrt(1.0 - beta * beta)
+            denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
 
@@ -69,7 +68,7 @@ def lossDbnRecursionGCD(numCredits,
                                             condDefaultProbs,
                                             lossUnits)
 
-        gaussWt = exp(-(z*z)/2.0)
+        gaussWt = np.exp(-(z*z)/2.0)
 
         for iLossUnit in range(0, numLossUnits):
             uncondLossDbn[iLossUnit] += indepDbn[iLossUnit] * gaussWt
@@ -226,8 +225,8 @@ def gaussApproxTrancheLoss(k1, k2, mu, sigma):
         d2 = (mu - k2) / sigma
 
         gaussApproxTrancheLoss = (mu - k1) * N(d1) - (mu - k2) * N(d2)
-        + sigma * exp(-0.5 * d1 * d1) * INVROOT2PI
-        - sigma * exp(-0.5 * d2 * d2) * INVROOT2PI
+        + sigma * np.exp(-0.5 * d1 * d1) * INVROOT2PI
+        - sigma * np.exp(-0.5 * d2 * d2) * INVROOT2PI
 
     return gaussApproxTrancheLoss
 
@@ -287,15 +286,15 @@ def trSurvProbGaussian(k1,
         # calculate the mean and variance of the conditional loss distribution
         for iCredit in range(0, numCredits):
             beta = betaVector[iCredit]
-            denom = sqrt(1.0 - beta * beta)
+            denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condprob = N(argz)
             mu += condprob * losses[iCredit]
             var += (losses[iCredit]**2) * condprob * (1.0 - condprob)
 
-        sigma = sqrt(var)
+        sigma = np.sqrt(var)
         el = gaussApproxTrancheLoss(k1, k2, mu, sigma)
-        gaussWt = exp(-(z**2) / 2.0)
+        gaussWt = np.exp(-(z**2) / 2.0)
 
         v += el * gaussWt
         z += dz
@@ -332,7 +331,7 @@ def lossDbnHeterogeneousAdjBinomial(numCredits,
     for iStep in range(0, numIntegrationSteps):
         for iCredit in range(0, numCredits):
             beta = betaVector[iCredit]
-            denom = sqrt(1.0 - beta * beta)
+            denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
 
@@ -340,7 +339,7 @@ def lossDbnHeterogeneousAdjBinomial(numCredits,
                                                         condDefaultProbs,
                                                         lossRatio)
 
-        gaussWt = exp(-(z**2) / 2.0)
+        gaussWt = np.exp(-(z**2) / 2.0)
 
         for iLossUnit in range(0, numLossUnits):
             uncondLossDbn[iLossUnit] += indepDbn[iLossUnit] * gaussWt

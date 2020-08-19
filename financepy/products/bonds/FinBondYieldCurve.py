@@ -6,6 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import scale
@@ -33,8 +34,8 @@ class FinBondYieldCurve():
 
     def __init__(self,
                  settlementDate: FinDate,
-                 bonds,
-                 ylds,
+                 bonds: list,
+                 ylds: (np.ndarray, list),
                  curveFit):
         ''' Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
@@ -102,7 +103,8 @@ class FinBondYieldCurve():
 
 ###############################################################################
 
-    def interpolatedYield(self, maturityDate):
+    def interpolatedYield(self,
+                          maturityDate: FinDate):
 
         if type(maturityDate) is FinDate:
             t = (maturityDate - self._settlementDate) / gDaysInYear
@@ -142,7 +144,8 @@ class FinBondYieldCurve():
 
 ###############################################################################
 
-    def plot(self, title):
+    def plot(self,
+             title):
         ''' Display yield curve. '''
 
         plt.figure(figsize=(12, 6))

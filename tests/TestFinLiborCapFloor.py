@@ -22,7 +22,7 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolate import FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.models.FinModelBlack import FinModelBlack
@@ -326,7 +326,7 @@ def test_FinLiborCapFloorQLExample():
                                           rates,
                                           frequencyType,
                                           dayCountType,
-                                          FinInterpMethods.LINEAR_ZERO_RATES)
+                                          FinInterpTypes.LINEAR_ZERO_RATES)
 
     startDate = FinDate(14, 6, 2016)
     endDate = FinDate(14, 6, 2026)

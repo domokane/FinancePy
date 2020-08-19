@@ -68,7 +68,8 @@ class FinCalendar(object):
     a regional or country-specific calendar convention specified by the user.
     '''
 
-    def __init__(self, calendarType):
+    def __init__(self,
+                 calendarType: FinCalendarTypes):
         ''' Create a calendar based on a specified calendar type. '''
 
         if calendarType not in FinCalendarTypes:
@@ -80,7 +81,9 @@ class FinCalendar(object):
 
     ###########################################################################
 
-    def adjust(self, dt, busDayConventionType):
+    def adjust(self,
+               dt: FinDate,
+               busDayConventionType: FinBusDayAdjustTypes):
         ''' Adjust a payment date if it falls on a holiday according to the
         specified business day convention. '''
 
@@ -147,7 +150,8 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def isBusinessDay(self, dt):
+    def isBusinessDay(self,
+                      dt: FinDate):
         ''' Determines if a date is a business day according to the specified
         calendar. If it is it returns True, otherwise False. '''
 
@@ -366,7 +370,8 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def getHolidayList(self, year):
+    def getHolidayList(self,
+                       year: float):
         ''' generates a list of holidays in a specific year for the specified
         calendar. Useful for diagnostics. '''
         startDate = FinDate(1, 1, year)
@@ -383,16 +388,17 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def easterMonday(self, y):
+    def easterMonday(self,
+                     year: float):
         ''' Get the day in a given year that is Easter Monday. This is not
         easy to compute so we rely on a pre-calculated array. '''
 
-        if y > 2100:
+        if year > 2100:
             raise FinError(
-                "Unable to determine Easter monday in year " + str(y))
+                "Unable to determine Easter monday in year " + str(year))
 
-        emDays = easterMondayDay[y - 1901]
-        startDate = FinDate(1, 1, y)
+        emDays = easterMondayDay[year - 1901]
+        startDate = FinDate(1, 1, year)
         em = startDate.addDays(emDays-1)
         return em
 

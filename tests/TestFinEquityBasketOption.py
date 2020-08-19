@@ -10,6 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.finutils.FinDate import FinDate
 import numpy as np
 import sys
@@ -18,10 +19,11 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+
 ###############################################################################
 
 
-def test_FinBasketOption():
+def test_FinEquityBasketOption():
 
     import time
 
@@ -49,6 +51,8 @@ def test_FinBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
+            corrMatrix = betaVectorToCorrMatrix(betas)
+
             start = time.time()
             v = callOption.value(
                 valueDate,
@@ -56,14 +60,15 @@ def test_FinBasketOption():
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
+
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
             end = time.time()
             duration = end - start
@@ -89,6 +94,8 @@ def test_FinBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
             betas = np.ones(numAssets) * beta
+            corrMatrix = betaVectorToCorrMatrix(betas)
+
             start = time.time()
             v = callOption.value(
                 valueDate,
@@ -96,14 +103,14 @@ def test_FinBasketOption():
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
             end = time.time()
             duration = end - start
@@ -126,6 +133,8 @@ def test_FinBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
+            corrMatrix = betaVectorToCorrMatrix(betas)
+
             start = time.time()
             v = callOption.value(
                 valueDate,
@@ -133,14 +142,14 @@ def test_FinBasketOption():
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
             end = time.time()
             duration = end - start
@@ -165,6 +174,8 @@ def test_FinBasketOption():
             callOption = FinEquityBasketOption(
                 expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
             betas = np.ones(numAssets) * beta
+            corrMatrix = betaVectorToCorrMatrix(betas)
+
             start = time.time()
             v = callOption.value(
                 valueDate,
@@ -172,19 +183,22 @@ def test_FinBasketOption():
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
             end = time.time()
             duration = end - start
             testCases.print(numPaths, beta, v, vMC, duration)
 
 
-test_FinBasketOption()
+###############################################################################
+
+
+test_FinEquityBasketOption()
 testCases.compareTestCases()

@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
@@ -79,7 +78,7 @@ def valueMCFast(t,
 
     np.random.seed(seed)
     df = discountCurve._df(t)
-    r = -log(df)/t
+    r = -np.log(df)/t
     mus = r - dividendYields
 
     model = FinGBMProcess()
@@ -90,7 +89,7 @@ def valueMCFast(t,
 
     payoff = payoffValue(Sall, payoffType.value, payoffParams)
     payoff = np.mean(payoff)
-    v = payoff * exp(-r * t)
+    v = payoff * np.exp(-r * t)
     return v
 
 ###############################################################################
@@ -201,7 +200,7 @@ class FinRainbowOption(FinEquityOption):
         t = (self._expiryDate - valueDate) / gDaysInYear
 
         df = discountCurve._df(t)
-        r = -log(df)/t
+        r = -np.log(df)/t
 
         q1 = dividendYields[0]
         q2 = dividendYields[1]
@@ -214,23 +213,23 @@ class FinRainbowOption(FinEquityOption):
         v2 = volatilities[1]
         k = self._payoffParams[0]
 
-        v = sqrt(v1 * v1 + v2 * v2 - 2 * rho * v1 * v2)
-        d = (log(s1 / s2) + (b1 - b2 + v * v / 2) * t) / v / sqrt(t)
-        y1 = (log(s1 / k) + (b1 + v1 * v1 / 2) * t) / v1 / sqrt(t)
-        y2 = (log(s2 / k) + (b2 + v2 * v2 / 2) * t) / v2 / sqrt(t)
+        v = np.sqrt(v1 * v1 + v2 * v2 - 2 * rho * v1 * v2)
+        d = (np.log(s1 / s2) + (b1 - b2 + v * v / 2) * t) / v / np.sqrt(t)
+        y1 = (np.log(s1 / k) + (b1 + v1 * v1 / 2) * t) / v1 / np.sqrt(t)
+        y2 = (np.log(s2 / k) + (b2 + v2 * v2 / 2) * t) / v2 / np.sqrt(t)
         rho1 = (v1 - rho * v2) / v
         rho2 = (v2 - rho * v1) / v
-        dq1 = exp(-q1 * t)
-        dq2 = exp(-q2 * t)
-        df = exp(-r * t)
-        sqrtt= sqrt(t)
+        dq1 = np.exp(-q1 * t)
+        dq2 = np.exp(-q2 * t)
+        df = np.exp(-r * t)
+        sqrtt= np.sqrt(t)
 
         if self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MAXIMUM:
             v = s1 * dq1 * M(y1, d, rho1)+s2*dq2*M(y2, -d + v*sqrtt, rho2) \
-                - k * df * (1.0 - M(-y1 + v1*sqrt(t), -y2 + v2*sqrtt, rho))
+                - k * df * (1.0 - M(-y1 + v1*np.sqrt(t), -y2 + v2*sqrtt, rho))
         elif self._payoffType == FinFXRainbowOptionTypes.CALL_ON_MINIMUM:
-            v = s1*dq1*M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v*sqrt(t), -rho2)\
-                - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
+            v = s1*dq1*M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v*np.sqrt(t), -rho2)\
+                - k * df * M(y1 - v1 * np.sqrt(t), y2 - v2 * np.sqrt(t), rho)
         elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrtt)
             cmax2 = s1 * dq1 * M(y1, d, rho1) \
@@ -240,7 +239,7 @@ class FinRainbowOption(FinEquityOption):
         elif self._payoffType == FinFXRainbowOptionTypes.PUT_ON_MINIMUM:
             cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrtt)
             cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d-v * sqrtt
-              , -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt, rho)
+, -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt, rho)
             v = k * df - cmin1 + cmin2
         else:
             raise FinError("Unsupported FX Rainbow option type")

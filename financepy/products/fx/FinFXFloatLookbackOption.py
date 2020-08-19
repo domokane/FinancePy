@@ -3,28 +3,25 @@
 ##############################################################################
 
 import numpy as np
-from math import exp, log, sqrt
 from enum import Enum
 
 from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
-from ...products.equity.FinEquityOption import FinEquityOption
+from ...products.fx.FinFXOption import FinFXOption
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinOptionTypes import FinOptionTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ##########################################################################
-# TODO
-# Attempt control variate adjustment to monte carlo
-# Adjust for finite sampling in Monte Carlo or Analytic
-# TIGHTEN UP LIMIT FOR W FROM 100
+# TODO: Attempt control variate adjustment to monte carlo
+# TODO: Sobol for Monte Carlo
+# TODO: TIGHTEN UP LIMIT FOR W FROM 100
+# TODO: Vectorise the analytical pricing formula
 ##########################################################################
 
-
-class FinFloatLookbackOptionTypes(Enum):
-    FLOATING_CALL = 1
-    FLOATING_PUT = 2
 
 ##########################################################################
 # FLOAT STRIKE LOOKBACK CALL PAYS MAX(S(T)-SMIN,0)
@@ -32,11 +29,16 @@ class FinFloatLookbackOptionTypes(Enum):
 ##########################################################################
 
 
-class FinFloatLookbackOption(FinEquityOption):
+class FinFXFloatLookbackOption(FinFXOption):
+    ''' This is an FX option in which the strike of the option is not fixed
+    but is set at expiry to equal the minimum fx rate in the case of a call
+    or the maximum fx rate in the case of a put. '''
 
     def __init__(self,
                  expiryDate: FinDate,
-                 optionType: FinFloatLookbackOptionTypes):
+                 optionType: FinOptionTypes):
+        ''' Create the FloatLookbackOption by specifying the expiry date and
+        the option type. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -46,29 +48,34 @@ class FinFloatLookbackOption(FinEquityOption):
 ##########################################################################
 
     def value(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              volatility,
-              stockMinMax):
+              valueDate: FinDate,
+              stockPrice: float,
+              domesticCurve: FinDiscountCurve,
+              foreignCurve: FinDiscountCurve,
+              volatility: float,
+              stockMinMax: float):
+        ''' Valuation of the Floating Lookback option using Black-Scholes using
+        the formulae derived by Goldman, Sosin and Gatto (1979). '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve._df(t)
+
+        df = domesticCurve._df(t)
         r = -np.log(df)/t
+
+        dq = foreignCurve._df(t)
+        q = -np.log(dq)/t
 
         v = volatility
         s0 = stockPrice
-        q = dividendYield
         smin = 0.0
         smax = 0.0
 
-        if self._optionType == FinFloatLookbackOptionTypes.FLOATING_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smin = stockMinMax
             if smin > s0:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._optionType == FinFloatLookbackOptionTypes.FLOATING_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smax = stockMinMax
             if smax < s0:
                 raise FinError(
@@ -77,41 +84,41 @@ class FinFloatLookbackOption(FinEquityOption):
         if abs(r - q) < gSmall:
             q = r + gSmall
 
-        dq = exp(-q * t)
-        df = exp(-r * t)
+        dq = np.exp(-q * t)
+        df = np.exp(-r * t)
         b = r - q
         u = v * v / 2.0 / b
         w = 2.0 * b / v / v
-        expbt = exp(b * t)
+        expbt = np.exp(b * t)
 
         # Taken from Haug Page 142
-        if self._optionType == FinFloatLookbackOptionTypes.FLOATING_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
 
-            a1 = (log(s0 / smin) + (b + (v**2) / 2.0) * t) / v / sqrt(t)
-            a2 = a1 - v * sqrt(t)
+            a1 = (np.log(s0 / smin) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
+            a2 = a1 - v * np.sqrt(t)
 
             if smin == s0:
-                term = N(-a1 + 2.0 * b * sqrt(t) / v) - expbt * N(-a1)
+                term = N(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * N(-a1)
             elif s0 < smin and w < -100:
                 term = - expbt * N(-a1)
             else:
                 term = ((s0 / smin)**(-w))*N(-a1 + 2.0 *
-                                             b*sqrt(t) / v) - expbt * N(-a1)
+                                             b*np.sqrt(t) / v) - expbt * N(-a1)
 
             v = s0 * dq * N(a1) - smin * df * N(a2) + s0 * df * u * term
 
-        elif self._optionType == FinFloatLookbackOptionTypes.FLOATING_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
 
-            b1 = (log(s0 / smax) + (b + (v**2) / 2.0) * t) / v / sqrt(t)
-            b2 = b1 - v * sqrt(t)
+            b1 = (np.log(s0 / smax) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
+            b2 = b1 - v * np.sqrt(t)
 
             if smax == s0:
-                term = -N(b1 - 2.0 * b * sqrt(t) / v) + expbt * N(b1)
+                term = -N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
             elif s0 < smax and w > 100:
                 term = expbt * N(b1)
             else:
                 term = (-(s0 / smax)**(-w)) * \
-                    N(b1 - 2.0 * b * sqrt(t) / v) + expbt * N(b1)
+                    N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
 
             v = smax * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
 
@@ -127,8 +134,8 @@ class FinFloatLookbackOption(FinEquityOption):
             self,
             valueDate,
             stockPrice,
-            discountCurve,
-            dividendYield,
+            domesticCurve,
+            foreignCurve,
             volatility,
             stockMinMax,
             numPaths=10000,
@@ -136,22 +143,25 @@ class FinFloatLookbackOption(FinEquityOption):
             seed=4242):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve._df(t)
+        df = domesticCurve._df(t)
         r = -np.log(df)/t
 
+        dq = domesticCurve._df(t)
+        q = -np.log(dq)/t
+
         numTimeSteps = int(t * numStepsPerYear)
-        mu = r - dividendYield
+        mu = r - q
 
         optionType = self._optionType
         smin = 0.0
         smax = 0.0
 
-        if self._optionType == FinFloatLookbackOptionTypes.FLOATING_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smin = stockMinMax
             if smin > stockPrice:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._optionType == FinFloatLookbackOptionTypes.FLOATING_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smax = stockMinMax
             if smax < stockPrice:
                 raise FinError(
@@ -171,18 +181,18 @@ class FinFloatLookbackOption(FinEquityOption):
         numPaths = 2 * numPaths
         payoff = np.zeros(numPaths)
 
-        if optionType == FinFloatLookbackOptionTypes.FLOATING_CALL:
+        if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)
             SMin = np.minimum(SMin, smin)
             payoff = np.maximum(Sall[:, -1] - SMin, 0)
-        elif optionType == FinFloatLookbackOptionTypes.FLOATING_PUT:
+        elif optionType == FinOptionTypes.EUROPEAN_PUT:
             SMax = np.max(Sall, axis=1)
             SMax = np.maximum(SMax, smax)
             payoff = np.maximum(SMax - Sall[:, -1], 0)
         else:
             raise FinError("Unknown lookback option type:" + str(optionType))
 
-        v = payoff.mean() * exp(-r * t)
+        v = payoff.mean() * np.exp(-r * t)
         return v
 
 ##########################################################################

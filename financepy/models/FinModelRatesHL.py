@@ -7,14 +7,14 @@ from numba import njit
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N
-from ..market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ..market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 from ...finutils.FinHelperFunctions import labelToString
 
-interp = FinInterpMethods.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FORWARDS.value
 
-##########################################################################
+###############################################################################
 # dr = theta(t) dt + sigma * dW
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)

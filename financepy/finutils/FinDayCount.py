@@ -36,7 +36,8 @@ class FinDayCount(object):
     ''' Calculate the fractional day count between two dates according to a
     specified day count convention. '''
 
-    def __init__(self, dccType):
+    def __init__(self,
+                 dccType: FinDayCountTypes):
         ''' Create Day Count convention by passing in the Day Count Type. '''
 
         if dccType not in FinDayCountTypes:
@@ -46,7 +47,10 @@ class FinDayCount(object):
 
 ###############################################################################
 
-    def yearFrac(self, dt1, dt2, dt3=None):
+    def yearFrac(self,
+                 dt1: FinDate,
+                 dt2: FinDate,
+                 dt3: FinDate = None):
         ''' Calculate the year fraction between dates dt1 and dt2 using the
         specified day count convention. '''
 
@@ -206,7 +210,7 @@ class FinDayCount(object):
 
         else:
             raise FinError(str(self._type) +
-                             " is not one of FinDayCountTypes")
+                           " is not one of FinDayCountTypes")
 
 ###############################################################################
 

@@ -19,7 +19,9 @@ ONE_BILLION = 1000000000
 
 
 @njit(fastmath=True, cache=True)
-def accruedInterpolator(tset, couponTimes, couponAmounts):
+def accruedInterpolator(tset: float,  # Settlement time in years
+                        couponTimes: np.ndarray,
+                        couponAmounts: np.ndarray):
     ''' Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. '''
 
@@ -50,7 +52,7 @@ def accruedInterpolator(tset, couponTimes, couponAmounts):
 
 
 @njit(boolean(int64), fastmath=True, cache=True)
-def isLeapYear(y):
+def isLeapYear(y: int):
     ''' Test whether year y is a leap year - if so return True, else False '''
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
     return leapYear
@@ -59,7 +61,8 @@ def isLeapYear(y):
 
 
 @njit(float64[:](float64[:], float64), fastmath=True, cache=True)
-def scale(x, factor):
+def scale(x: np.ndarray,
+          factor: float):
     ''' Scale all of the elements of an array by the same amount factor. '''
     x_scale = np.empty(len(x))
     for i in range(0, len(x)):
@@ -70,7 +73,7 @@ def scale(x, factor):
 
 
 @njit(boolean(float64[:]), fastmath=True, cache=True)
-def testMonotonicity(x):
+def testMonotonicity(x: np.ndarray):
     ''' Check that an array of doubles is monotonic and strictly increasing.'''
     for i in range(1, len(x)):
         if x[i] <= x[i-1]:
@@ -81,7 +84,9 @@ def testMonotonicity(x):
 
 
 @njit(fastmath=True, cache=True)
-def testRange(x, lower, upper):
+def testRange(x: np.ndarray,
+              lower: float,
+              upper: float):
     ''' Check that all of the values of an array fall between a lower and
     upper bound. '''
     for i in range(0, len(x)):
@@ -94,7 +99,8 @@ def testRange(x, lower, upper):
 
 
 @njit(fastmath=True, cache=True)
-def maximum(a, b):
+def maximum(a: np.ndarray,
+            b: np.ndarray):
     ''' Determine the array in which each element is the maximum of the
     corresponding element in two equally length arrays a and b. '''
 
@@ -113,7 +119,7 @@ def maximum(a, b):
 
 
 @njit(float64[:](float64[:, :]), fastmath=True, cache=True)
-def maxaxis(s):
+def maxaxis(s: np.ndarray):
     ''' Perform a search for the vector of maximum values over an axis of a
     2D Numpy Array '''
 
@@ -136,7 +142,7 @@ def maxaxis(s):
 
 
 @njit(float64[:](float64[:, :]), fastmath=True, cache=True)
-def minaxis(s):
+def minaxis(s: np.ndarray):
     ''' Perform a search for the vector of minimum values over an axis of a
     2D Numpy Array '''
     shp = s.shape
@@ -158,7 +164,8 @@ def minaxis(s):
 
 
 @njit(fastmath=True, cache=True)
-def covar(a, b):
+def covar(a: np.ndarray,
+          b: np.ndarray):
     ''' Calculate the Covariance of two arrays of numbers.
     TODO: check that this works well for Numpy Arrays and add NUMBA function
     signature to code. Do test of timings against Numpy. '''
@@ -198,7 +205,8 @@ def covar(a, b):
 
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
-def pairGCD(v1, v2):
+def pairGCD(v1: float,
+            v2: float):
     ''' Determine the Greatest Common Divisor of two integers using Euclid's
     algorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine
     to see if I should not be declaring inputs as integers for NUMBA. '''
@@ -219,7 +227,7 @@ def pairGCD(v1, v2):
 
 
 @njit(fastmath=True, cache=True)
-def nprime(x):
+def nprime(x: float):
     '''Calculate the first derivative of the Cumulative Normal CDF which is
     simply the PDF of the Normal Distribution '''
     return normpdf(x)
@@ -228,7 +236,7 @@ def nprime(x):
 
 
 @njit(fastmath=True, cache=True)
-def heaviside(x):
+def heaviside(x: float):
     ''' Calculate the Heaviside function for x '''
     if x >= 0.0:
         return 1.0
@@ -238,7 +246,11 @@ def heaviside(x):
 
 
 @njit(fastmath=True, cache=True)
-def frange(start, stop, step):
+def frange(start: int,
+           stop: int,
+           step: int):
+    ''' Calculate a range of values from start in steps of size step. Ends as
+    soon as the value equals or exceeds stop. '''
     x = []
     while start <= stop:
         x.append(start)
@@ -250,7 +262,7 @@ def frange(start, stop, step):
 
 
 @njit(fastmath=True, cache=True)
-def normpdf(x):
+def normpdf(x: float):
     ''' Calculate the probability density function for a Gaussian (Normal)
     function at value x'''
     InvRoot2Pi = 0.3989422804014327
@@ -260,7 +272,7 @@ def normpdf(x):
 
 
 @njit(float64(float64), fastmath=True, cache=True)
-def normcdf_fast(x):
+def normcdf_fast(x: float):
     ''' Fast Normal CDF function based on XXX '''
     a1 = 0.319381530
     a2 = -0.356563782
@@ -287,7 +299,7 @@ def normcdf_fast(x):
 
 
 @njit(float64(float64), fastmath=True, cache=True)
-def normcdf_integrate(x):
+def normcdf_integrate(x: float):
     ''' Calculation of Normal Distribution CDF by simple integration
     which can become exact in the limit of the number of steps tending
     towards infinity. This function is used for checking as it is slow
@@ -318,7 +330,7 @@ def normcdf_integrate(x):
 
 
 @njit(float64(float64), fastmath=True, cache=True)
-def normcdf_slow(z):
+def normcdf_slow(z: float):
     '''  Calculation of Normal Distribution CDF accurate to 1d-15. This
     method is faster than integration but slower than other approximations.
     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. '''
@@ -379,7 +391,8 @@ def normcdf_slow(z):
 
 
 @njit(float64(float64, int64), fastmath=True, cache=True)
-def normcdf(x, fastFlag):
+def normcdf(x: float,
+            fastFlag: int):
     ''' This is the Normal CDF function which forks to one of three of the
     implemented approximations. This is based on the choice of the fast flag
     variable. A value of 1 is the fast routine, 2 is the slow and 3 is the
@@ -398,7 +411,7 @@ def normcdf(x, fastFlag):
 
 
 @njit(float64(float64), fastmath=True, cache=True)
-def N(x):
+def N(x: float):
     ''' This is the shortcut to the default Normal CDF function and currently
     is hardcoded to the fastest of the implemented routines. This is the most
     widely used way to access the Normal CDF. '''
@@ -408,7 +421,12 @@ def N(x):
 
 
 @njit(fastmath=True, cache=True)
-def phi3(b1, b2, b3, r12, r13, r23):
+def phi3(b1: float,
+         b2: float,
+         b3: float,
+         r12: float,
+         r13: float,
+         r23: float):
     ''' Bivariate Normal CDF function to upper limits $b1$ and $b2$ which uses
     integration to perform the innermost integral. This may need further
     refinement to ensure it is optimal as the current range of integration is

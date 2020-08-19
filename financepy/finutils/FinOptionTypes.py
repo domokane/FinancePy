@@ -22,3 +22,18 @@ class FinOptionTypes(Enum):
     COMPOUND_PUT = 10
 
 ###############################################################################
+
+
+class FinLiborSwaptionTypes(Enum):
+    PAYER = 1
+    RECEIVER = 2
+
+###############################################################################
+
+
+class FinOptionExerciseTypes(Enum):
+    EUROPEAN = 1
+    BERMUDAN = 2
+    AMERICAN = 3
+
+###############################################################################

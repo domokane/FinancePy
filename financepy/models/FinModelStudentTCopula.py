@@ -9,7 +9,7 @@ from scipy.stats import t as student
 from ..products.credit.FinCDSCurve import uniformToDefaultTime
 from ..finutils.FinHelperFunctions import labelToString
 
-##########################################################################
+###############################################################################
 
 
 class FinModelStudentTCopula():
@@ -46,4 +46,4 @@ class FinModelStudentTCopula():
 
         return corrTimes
 
-##########################################################################
+###############################################################################

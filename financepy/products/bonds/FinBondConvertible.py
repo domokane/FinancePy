@@ -22,35 +22,36 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
-from ...market.curves.FinInterpolate import FinInterpMethods, uinterpolate
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...market.curves.FinInterpolate import FinInterpTypes, uinterpolate
 
 ###############################################################################
 
 
 @njit(fastmath=True, cache=True)
-def valueConvertible(tmat,
-                     face,
-                     couponTimes,
-                     couponFlows,
-                     callTimes,
-                     callPrices,
-                     putTimes,
-                     putPrices,
-                     convRatio,
-                     startConvertTime,
-                     # Market inputs
-                     stockPrice,
-                     dfTimes,
-                     dfValues,
-                     dividendTimes,
-                     dividendYields,
-                     stockVolatility,
-                     creditSpread,
-                     recRate,
-                     # Tree details
-                     numStepsPerYear):
+def _valueConvertible(tmat,
+                      face,
+                      couponTimes,
+                      couponFlows,
+                      callTimes,
+                      callPrices,
+                      putTimes,
+                      putPrices,
+                      convRatio,
+                      startConvertTime,
+                      # Market inputs
+                      stockPrice,
+                      dfTimes,
+                      dfValues,
+                      dividendTimes,
+                      dividendYields,
+                      stockVolatility,
+                      creditSpread,
+                      recRate,
+                      # Tree details
+                      numStepsPerYear):
 
-    interp = FinInterpMethods.FLAT_FORWARDS.value
+    interp = FinInterpTypes.FLAT_FORWARDS.value
 
     if len(couponTimes) > 0:
         if couponTimes[-1] > tmat:
@@ -319,8 +320,9 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def calculateFlowDates(self, settlementDate):
-        ''' Determine the bond cashflow payment dates. '''
+    def _calculateFlowDates(self,
+                            settlementDate: FinDate):
+        ''' Determine the convertible bond cashflow payment dates. '''
 
         # No need to generate flows if settlement date has not changed
         if settlementDate == self._settlementDate:
@@ -345,15 +347,15 @@ class FinBondConvertible(object):
 ##########################################################################
 
     def value(self,
-              settlementDate,
-              stockPrice,
-              stockVolatility,
-              dividendDates,
-              dividendYields,
-              discountCurve,
-              creditSpread,
-              recoveryRate=0.40,
-              numStepsPerYear=100):
+              settlementDate: FinDate,
+              stockPrice: float,
+              stockVolatility: float,
+              dividendDates: List[FinDate],
+              dividendYields: List[float],
+              discountCurve: FinDiscountCurve,
+              creditSpread: float,
+              recoveryRate: float = 0.40,
+              numStepsPerYear: int = 100):
         '''
         A binomial tree valuation model for a convertible bond that captures
         the embedded equity option due to the existence of a conversion option
@@ -381,7 +383,7 @@ class FinBondConvertible(object):
         if stockVolatility <= 0.0:
             stockVolatility = 1e-10  # Avoid overflows in delta calc
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
         tmat = (self._maturityDate - settlementDate) / gDaysInYear
         if tmat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
@@ -467,49 +469,49 @@ class FinBondConvertible(object):
         if testMonotonicity(dividendTimes) is False:
             raise FinError("Coupon times not monotonic")
 
-        v1 = valueConvertible(tmat,
-                              self._face,
-                              couponTimes,
-                              couponFlows,
-                              callTimes,
-                              callPrices,
-                              putTimes,
-                              putPrices,
-                              self._conversionRatio,
-                              tconv,
-                              # Market inputs
-                              stockPrice,
-                              discountTimes,
-                              discountFactors,
-                              dividendTimes,
-                              dividendYields,
-                              stockVolatility,
-                              creditSpread,
-                              recoveryRate,
-                              # Tree details
-                              numStepsPerYear)
+        v1 = _valueConvertible(tmat,
+                               self._face,
+                               couponTimes,
+                               couponFlows,
+                               callTimes,
+                               callPrices,
+                               putTimes,
+                               putPrices,
+                               self._conversionRatio,
+                               tconv,
+                               # Market inputs
+                               stockPrice,
+                               discountTimes,
+                               discountFactors,
+                               dividendTimes,
+                               dividendYields,
+                               stockVolatility,
+                               creditSpread,
+                               recoveryRate,
+                               # Tree details
+                               numStepsPerYear)
 
-        v2 = valueConvertible(tmat,
-                              self._face,
-                              couponTimes,
-                              couponFlows,
-                              callTimes,
-                              callPrices,
-                              putTimes,
-                              putPrices,
-                              self._conversionRatio,
-                              tconv,
-                              # Market inputs
-                              stockPrice,
-                              discountTimes,
-                              discountFactors,
-                              dividendTimes,
-                              dividendYields,
-                              stockVolatility,
-                              creditSpread,
-                              recoveryRate,
-                              # Tree details
-                              numStepsPerYear + 1)
+        v2 = _valueConvertible(tmat,
+                               self._face,
+                               couponTimes,
+                               couponFlows,
+                               callTimes,
+                               callPrices,
+                               putTimes,
+                               putPrices,
+                               self._conversionRatio,
+                               tconv,
+                               # Market inputs
+                               stockPrice,
+                               discountTimes,
+                               discountFactors,
+                               dividendTimes,
+                               dividendYields,
+                               stockVolatility,
+                               creditSpread,
+                               recoveryRate,
+                               # Tree details
+                               numStepsPerYear + 1)
 
         cbprice = (v1[0] + v2[0])/2.0
         bond = (v1[1] + v2[1])/2.0
@@ -524,7 +526,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def accruedDays(self, settlementDate):
+    def accruedDays(self, 
+                    settlementDate: FinDate):
         ''' Calculate number days from previous coupon date to settlement.'''
         self.calculateFlowDates(settlementDate)
 
@@ -535,11 +538,12 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def _accruedInterest(self, settlementDate):
+    def _accruedInterest(self,
+                         settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -560,7 +564,8 @@ class FinBondConvertible(object):
 
 ##########################################################################
 
-    def currentYield(self, cleanPrice):
+    def currentYield(self,
+                     cleanPrice: float):
         ''' Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)'''
 

@@ -7,13 +7,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import optimize
 
+from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import scale, testMonotonicity
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDayCount import FinDayCount
+from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinHelperFunctions import inputTime
 from ...finutils.FinHelperFunctions import tableToString
-from ...market.curves.FinInterpolate import FinInterpMethods, interpolate
-from ...finutils.FinHelperFunctions import labelToString
+from ...market.curves.FinInterpolate import FinInterpTypes, interpolate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -21,7 +21,7 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ###############################################################################
 
 
-def f(df, *args):
+def _f(df, *args):
     curve = args[0]
     valueDate = args[1]
     bond = args[2]
@@ -39,10 +39,10 @@ class FinBondZeroCurve(FinDiscountCurve):
     ''' Class to do bootstrap exact fitting of the bond zero rate curve. '''
 
     def __init__(self,
-                 valuationDate,
-                 bonds,
-                 cleanPrices,
-                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
+                 valuationDate: FinDate,
+                 bonds: list,
+                 cleanPrices: list,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Fit a discount curve to a set of bond yields using the type of
         curve specified. '''
 
@@ -54,7 +54,7 @@ class FinBondZeroCurve(FinDiscountCurve):
         self._bonds = bonds
         self._cleanPrices = np.array(cleanPrices)
         self._discountCurve = None
-        self._interpMethod = interpMethod
+        self._interpType = interpType
 
         times = []
         for bond in self._bonds:
@@ -67,11 +67,11 @@ class FinBondZeroCurve(FinDiscountCurve):
 
         self._yearsToMaturity = np.array(times)
 
-        self.bootstrapZeroRates()
+        self._bootstrapZeroRates()
 
 ###############################################################################
 
-    def bootstrapZeroRates(self):
+    def _bootstrapZeroRates(self):
 
         self._times = np.array([0.0])
         self._values = np.array([1.0])
@@ -86,12 +86,14 @@ class FinBondZeroCurve(FinDiscountCurve):
             self._times = np.append(self._times, tmat)
             self._values = np.append(self._values, df)
 
-            optimize.newton(f, x0=df, fprime=None, args=argtuple,
+            optimize.newton(_f, x0=df, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
 
 ###############################################################################
 
-    def zeroRate(self, dt, frequencyType=FinFrequencyTypes.CONTINUOUS):
+    def zeroRate(self,
+                 dt: FinDate,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS):
         ''' Calculate the zero rate to maturity date. '''
         t = inputTime(dt, self)
         f = FinFrequency(frequencyType)
@@ -107,22 +109,24 @@ class FinBondZeroCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def df(self, dt):
+    def df(self,
+           dt: FinDate):
         t = inputTime(dt, self)
-        z = interpolate(t, self._times, self._values, self._interpMethod.value)
+        z = interpolate(t, self._times, self._values, self._interpType.value)
         return z
 
 ###############################################################################
 
-    def survProb(self, dt):
+    def survProb(self,
+                 dt: FinDate):
         t = inputTime(dt, self)
-        q = interpolate(t, self._times, self._values,
-                        self._interpMethod.value)
+        q = interpolate(t, self._times, self._values, self._interpType.value)
         return q
 
 ###############################################################################
 
-    def fwd(self, dt):
+    def fwd(self,
+            dt: FinDate):
         ''' Calculate the continuous forward rate at the forward date. '''
         t = inputTime(dt, self)
         dt = 0.000001
@@ -133,7 +137,10 @@ class FinBondZeroCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def fwdRate(self, date1, date2, dayCountType):
+    def fwdRate(self,
+                date1: FinDate,
+                date2: FinDate,
+                dayCountType: FinDayCountTypes):
         ''' Calculate the forward rate according to the specified
         day count convention. '''
 
@@ -152,7 +159,8 @@ class FinBondZeroCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def plot(self, title):
+    def plot(self,
+             title: str):
         ''' Display yield curve. '''
 
         plt.figure(figsize=(12, 6))

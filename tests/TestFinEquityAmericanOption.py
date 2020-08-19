@@ -9,7 +9,7 @@ import time
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.finutils.FinOptionTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -38,7 +38,7 @@ def testFinEquityAmericanOption():
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
-    putOption = FinEquityVanillaOption(
+    putOption = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_PUT)
@@ -70,7 +70,7 @@ def testFinEquityAmericanOption():
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
-    option = FinEquityVanillaOption(
+    option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_PUT)
@@ -97,7 +97,7 @@ def testFinEquityAmericanOption():
 
     testCases.banner("================== AMERICAN PUT =======================")
 
-    option = FinEquityVanillaOption(
+    option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.AMERICAN_PUT)
@@ -125,7 +125,7 @@ def testFinEquityAmericanOption():
     testCases.banner(
         "================== EUROPEAN CALL =======================")
 
-    callOption = FinEquityVanillaOption(
+    callOption = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
@@ -157,7 +157,7 @@ def testFinEquityAmericanOption():
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
 
-    option = FinEquityVanillaOption(
+    option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
@@ -189,7 +189,7 @@ def testFinEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    option = FinEquityVanillaOption(
+    option = FinEquityAmericanOption(
         expiryDate,
         strikePrice,
         FinOptionTypes.AMERICAN_CALL)

@@ -15,7 +15,7 @@ from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...products.credit.FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
@@ -133,7 +133,7 @@ class FinCDSIndexOption(object):
                       indexRecovery,
                       sigma):
         ''' This function values a CDS index option following approach by
-        Anderson (2006). This ensures that the no-arbitrage relationship between
+        Anderson (2006). This ensures that a no-arbitrage relationship between
         the consituent CDS contract and the CDS index is enforced. It models
         the forward spread as a log-normally distributed quantity and uses the
         credit triangle to compute the forward RPV01. '''
@@ -177,20 +177,20 @@ class FinCDSIndexOption(object):
 
         expH = (h1 + h2) / numCredits
 
-        x = self.solveForX(valuationDate,
-                           sigma,
-                           c,
-                           indexRecovery,
-                           liborCurve,
-                           expH)
+        x = self._solveForX(valuationDate,
+                            sigma,
+                            c,
+                            indexRecovery,
+                            liborCurve,
+                            expH)
 
-        v = self.calcIndexPayerOptionPrice(valuationDate,
-                                           x,
-                                           sigma,
-                                           c,
-                                           strikeValue,
-                                           liborCurve,
-                                           indexRecovery)
+        v = self._calcIndexPayerOptionPrice(valuationDate,
+                                            x,
+                                            sigma,
+                                            c,
+                                            strikeValue,
+                                            liborCurve,
+                                            indexRecovery)
 
         v = v[1]
         v_pay = v * self._notional
@@ -202,13 +202,13 @@ class FinCDSIndexOption(object):
 
 ###############################################################################
 
-    def solveForX(self,
-                  valuationDate,
-                  sigma,
-                  indexCoupon,
-                  indexRecovery,
-                  liborCurve,
-                  expH):
+    def _solveForX(self,
+                   valuationDate,
+                   sigma,
+                   indexCoupon,
+                   indexRecovery,
+                   liborCurve,
+                   expH):
         ''' Function to solve for the arbitrage free '''
         x1 = 0.0
         x2 = 0.9999
@@ -217,11 +217,11 @@ class FinCDSIndexOption(object):
         xacc = 0.000000001
         rtb = 999999
 
-        f = self.calcObjFunc(x1, valuationDate, sigma, indexCoupon,
-                             indexRecovery, liborCurve) - expH
+        f = self._calcObjFunc(x1, valuationDate, sigma, indexCoupon,
+                              indexRecovery, liborCurve) - expH
 
-        fmid = self.calcObjFunc(x2, valuationDate, sigma, indexCoupon,
-                                indexRecovery, liborCurve) - expH
+        fmid = self._calcObjFunc(x2, valuationDate, sigma, indexCoupon,
+                                 indexRecovery, liborCurve) - expH
 
         if f * fmid >= 0.0:
             raise FinError("Solution not bracketed.")
@@ -236,8 +236,8 @@ class FinCDSIndexOption(object):
         for j in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self.calcObjFunc(xmid, valuationDate, sigma, indexCoupon,
-                                    indexRecovery, liborCurve) - expH
+            fmid = self._calcObjFunc(xmid, valuationDate, sigma, indexCoupon,
+                                     indexRecovery, liborCurve) - expH
             if fmid <= 0.0:
                 rtb = xmid
             if abs(dx) < xacc or abs(fmid) < ftol:
@@ -247,39 +247,39 @@ class FinCDSIndexOption(object):
 
 ###############################################################################
 
-    def calcObjFunc(self,
-                    x,
-                    valuationDate,
-                    sigma,
-                    indexCoupon,
-                    indexRecovery,
-                    liborCurve):
+    def _calcObjFunc(self,
+                     x,
+                     valuationDate,
+                     sigma,
+                     indexCoupon,
+                     indexRecovery,
+                     liborCurve):
         ''' An internal function used in the Anderson valuation. '''
 
         # The strike value is not relevant here as we want the zeroth element
         # of the return value
         strikeValue = 0.0
 
-        values = self.calcIndexPayerOptionPrice(valuationDate,
-                                                x,
-                                                sigma,
-                                                self._indexCoupon,
-                                                strikeValue,
-                                                liborCurve,
-                                                indexRecovery)
+        values = self._calcIndexPayerOptionPrice(valuationDate,
+                                                 x,
+                                                 sigma,
+                                                 self._indexCoupon,
+                                                 strikeValue,
+                                                 liborCurve,
+                                                 indexRecovery)
 
         return values[0]
 
 ###############################################################################
 
-    def calcIndexPayerOptionPrice(self,
-                                  valuationDate,
-                                  x,
-                                  sigma,
-                                  indexCoupon,
-                                  strikeValue,
-                                  liborCurve,
-                                  indexRecovery):
+    def _calcIndexPayerOptionPrice(self,
+                                   valuationDate,
+                                   x,
+                                   sigma,
+                                   indexCoupon,
+                                   strikeValue,
+                                   liborCurve,
+                                   indexRecovery):
         ''' Calculates the intrinsic value of the index payer swap and the
         value of the index payer option which are both returned in an array.
         '''

@@ -12,7 +12,9 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...products.credit.FinCDSCurve import FinCDSCurve
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes
+
+###############################################################################
 
 
 class FinCDSIndexPortfolio():
@@ -331,8 +333,8 @@ class FinCDSIndexPortfolio():
                                                       recoveryRate)
 
                     indexProtectionPV = cdsIndex.protectionLegPV(valuationDate,
-                                                    adjustedIssuerCurve,
-                                                    indexRecoveryRate)
+                                                                 adjustedIssuerCurve,
+                                                                 indexRecoveryRate)
 
                     cleanRPV01 = cdsIndex.riskyPV01(valuationDate, 
                                                     adjustedIssuerCurve)['clean_rpv01']

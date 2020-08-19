@@ -17,6 +17,7 @@
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{wordlike}
+\usepackage{enumitem}
 
 \usepackage{hyperref}
 \hypersetup{
@@ -26,7 +27,18 @@
     linkcolor=black,
     urlcolor=black
 }
-\lstset{language=Python}
+
+\definecolor{lightgray}{rgb}{0.9,0.9,0.9}
+
+\lstset{language=Python, 
+        backgroundcolor=\color{lightgray}, 
+        basicstyle=\ttfamily,
+        keywordstyle=\color{red},
+        commentstyle=\color{blue},
+        frame=single,
+        otherkeywords = {FinDate, FinCalendarTypes, FinBusDayAdjustTypes, FinDateGenRuleTypes, FinDayCountTypes, FinFrequencyTypes, 
+        FinLiborSwaptionTypes, FinOptionExerciseTypes, FinOptionTypes, FinEquityBarrierTypes, FinEquityRainbowOptionTypes, List}
+        }
  
 %\makeindex
 
@@ -96,6 +108,7 @@
 \itemindent=0pt
 
 
+\usepackage{xcolor}
 \usepackage{courier}
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
 

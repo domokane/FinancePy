@@ -10,23 +10,17 @@ from ...finutils.FinMath import N
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
-#from ...products.equities.FinOption import FinOption
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinOptionTypes import FinOptionTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ##########################################################################
-# TODO
-# Attempt control variate adjustment to monte carlo
-# Adjust for finite sampling in Monte Carlo or Analytic
-# TIGHTEN UP LIMIT FOR W FROM 100
+# TODO: Attempt control variate adjustment to monte carlo
+# TODO: Sobol for Monte Carlo
+# TODO: TIGHTEN UP LIMIT FOR W FROM 100
+# TODO: Vectorise the analytical pricing formula
 ##########################################################################
-
-from enum import Enum
-
-
-class FinFXFixedLookbackOptionTypes(Enum):
-    FIXED_CALL = 1
-    FIXED_PUT = 2
 
 ##########################################################################
 # FIXED STRIKE LOOKBACK CALL PAYS MAX(SMAX-K,0)
@@ -39,7 +33,7 @@ class FinFXFixedLookbackOption():
 
     def __init__(self,
                  expiryDate: FinDate,
-                 optionType: FinFXFixedLookbackOptionTypes,
+                 optionType: FinOptionTypes,
                  optionStrike: float):
         ''' Create option with expiry date, option type and the option strike
         '''
@@ -53,20 +47,21 @@ class FinFXFixedLookbackOption():
 ##########################################################################
 
     def value(self,
-              valueDate,
-              stockPrice,
-              domesticCurve,
-              foreignCurve,
-              volatility,
-              stockMinMax):
+              valueDate: FinDate,
+              stockPrice: float,
+              domesticCurve: FinDiscountCurve,
+              foreignCurve: FinDiscountCurve,
+              volatility: float,
+              stockMinMax: float):
         ''' Value FX Fixed Lookback Option using Black Scholes model and
         analytical formulae. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = domesticCurve.df(t)
+
+        df = domesticCurve.df(self._expiryDate)
         r = -np.log(df)/t
 
-        dq = foreignCurve.df(t)
+        dq = foreignCurve.df(self._expiryDate)
         q = -np.log(dq)/t
 
         v = volatility
@@ -75,12 +70,12 @@ class FinFXFixedLookbackOption():
         smin = 0.0
         smax = 0.0
 
-        if self._optionType == FinFXFixedLookbackOptionTypes.FIXED_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smax = stockMinMax
             if smax < s0:
                 raise FinError(
                     "The Smax value must be >= the stock price.")
-        elif self._optionType == FinFXFixedLookbackOptionTypes.FIXED_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smin = stockMinMax
             if smin > s0:
                 raise FinError(
@@ -99,7 +94,7 @@ class FinFXFixedLookbackOption():
         expbt = exp(b * t)
 
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
-        if self._optionType == FinFXFixedLookbackOptionTypes.FIXED_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
 
             if k > smax:
                 d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
@@ -130,7 +125,7 @@ class FinFXFixedLookbackOption():
                 v = df * (smax - k) + s0 * dq * N(e1) - \
                     smax * df * N(e2) + s0 * df * u * term
 
-        elif self._optionType == FinFXFixedLookbackOptionTypes.FIXED_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
 
             if k >= smin:
                 f1 = (log(s0 / smin) + (b + v * v / 2.0) * t) / v / sqrt(t)
@@ -169,24 +164,24 @@ class FinFXFixedLookbackOption():
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
-                spotFXRate,  # FORDOM
-                domesticCurve,
-                foreignCurve,
-                volatility,
-                spotFXRateMinMax,
-                numPaths=10000,
-                numStepsPerYear=252,
-                seed=4242):
+                valueDate: FinDate,
+                spotFXRate: float,  # FORDOM
+                domesticCurve: FinDiscountCurve,
+                foreignCurve: FinDiscountCurve,
+                volatility: float,
+                spotFXRateMinMax: float,
+                numPaths:int = 10000,
+                numStepsPerYear: int =252,
+                seed: int =4242):
         ''' Value FX Fixed Lookback option using Monte Carlo. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         S0 = spotFXRate
 
-        df = domesticCurve.df(t)
+        df = domesticCurve._df(t)
         rd = -np.log(df)/t
 
-        dq = foreignCurve.df(t)
+        dq = foreignCurve._df(t)
         rf = -np.log(dq)/t
 
         mu = rd - rf
@@ -199,12 +194,12 @@ class FinFXFixedLookbackOption():
         smin = 0.0
         smax = 0.0
 
-        if self._optionType == FinFXFixedLookbackOptionTypes.FIXED_CALL:
+        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smax = spotFXRateMinMax
             if smax < S0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
-        elif self._optionType == FinFXFixedLookbackOptionTypes.FIXED_PUT:
+        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smin = spotFXRateMinMax
             if smin > S0:
                 raise FinError(
@@ -224,12 +219,12 @@ class FinFXFixedLookbackOption():
         numPaths = 2 * numPaths
         payoff = np.zeros(numPaths)
 
-        if optionType == FinFXFixedLookbackOptionTypes.FIXED_CALL:
+        if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMax = np.max(Sall, axis=1)
             smaxs = np.ones(numPaths) * smax
             payoff = np.maximum(SMax - k, 0)
             payoff = np.maximum(payoff, smaxs - k)
-        elif optionType == FinFXFixedLookbackOptionTypes.FIXED_PUT:
+        elif optionType == FinOptionTypes.EUROPEAN_PUT:
             SMin = np.min(Sall, axis=1)
             smins = np.ones(numPaths) * smin
             payoff = np.maximum(k - SMin, 0)

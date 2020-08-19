@@ -17,14 +17,18 @@ from ...finutils.FinOptionTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes 
+from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
 ###############################################################################
+# TODO: Vectorise pricer
+# TODO: Monte Carlo pricer
+###############################################################################
 
 
-def f(s0, *args):
+def _f(s0, *args):
 
     self = args[0]
     valueDate = args[1]
@@ -41,7 +45,7 @@ def f(s0, *args):
         s0,
         discountCurve,
         dividendYield,
-        model)['value'] - value
+        model) - value
 
     return objFn
 
@@ -49,17 +53,17 @@ def f(s0, *args):
 
 
 @njit(fastmath=True, cache=True, nogil=True)
-def valueOnce(stockPrice,
-              riskFreeRate,
-              dividendYield,
-              volatility,
-              t1,
-              t2,
-              optionType1,
-              optionType2,
-              k1,
-              k2,
-              numSteps):
+def _valueOnce(stockPrice,
+               riskFreeRate,
+               dividendYield,
+               volatility,
+               t1,
+               t2,
+               optionType1,
+               optionType2,
+               k1,
+               k2,
+               numSteps):
 
     if numSteps < 3:
         numSteps = 3
@@ -73,7 +77,6 @@ def valueOnce(stockPrice,
     dt2 = dt
     r = riskFreeRate
     q = dividendYield
-
     # print("T1:",t1,"T2:",t2,"dt:",dt,"N1*dt",numSteps1*dt,"N*dt",numSteps*dt)
 
     # the number of nodes on the tree
@@ -124,9 +127,11 @@ def valueOnce(stockPrice,
 
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
-        if optionType2 == FinOptionTypes.EUROPEAN_CALL:
+        if optionType2 == FinOptionTypes.EUROPEAN_CALL\
+          or optionType2 == FinOptionTypes.AMERICAN_CALL:
             optionValues[index + iNode] = max(s - k2, 0)
-        elif optionType2 == FinOptionTypes.EUROPEAN_PUT:
+        elif optionType2 == FinOptionTypes.EUROPEAN_PUT\
+          or optionType2 == FinOptionTypes.AMERICAN_PUT:
             optionValues[index + iNode] = max(k2 - s, 0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
@@ -141,7 +146,15 @@ def valueOnce(stockPrice,
             futureExpectedValue = probs[iTime] * vUp
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
-            optionValues[index + iNode] = holdValue
+
+            exerciseValue = 0.0
+
+            if optionType1 == FinOptionTypes.AMERICAN_CALL:
+                exerciseValue = max(s - k2, 0)
+            elif optionType1 == FinOptionTypes.AMERICAN_PUT:
+                exerciseValue = max(k2 - s, 0)
+
+            optionValues[index + iNode] = max(exerciseValue, holdValue)
 
     # Now do payoff at the end of the first expiry period at t1
     iTime = numSteps1
@@ -156,9 +169,11 @@ def valueOnce(stockPrice,
         futureExpectedValue += (1.0 - probs[iTime]) * vDn
         holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-        if optionType1 == FinOptionTypes.EUROPEAN_CALL:
+        if optionType1 == FinOptionTypes.EUROPEAN_CALL\
+          or optionType1 == FinOptionTypes.AMERICAN_CALL:
             optionValues[index + iNode] = max(holdValue - k1, 0)
-        elif optionType1 == FinOptionTypes.EUROPEAN_PUT:
+        elif optionType1 == FinOptionTypes.EUROPEAN_PUT\
+          or optionType1 == FinOptionTypes.AMERICAN_PUT:
             optionValues[index + iNode] = max(k1 - holdValue, 0)
 
     # begin backward steps from t1 expiry to value date
@@ -174,7 +189,13 @@ def valueOnce(stockPrice,
             futureExpectedValue = probs[iTime] * vUp
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
-            optionValues[index + iNode] = holdValue
+
+            if optionType1 == FinOptionTypes.AMERICAN_CALL:
+                exerciseValue = max(holdValue - k1, 0)
+            elif optionType1 == FinOptionTypes.AMERICAN_PUT:
+                exerciseValue = max(k1 - holdValue, 0)
+
+            optionValues[index + iNode] = max(exerciseValue, holdValue)
 
     verbose = False
     if verbose:
@@ -203,6 +224,10 @@ def valueOnce(stockPrice,
 
 
 class FinEquityCompoundOption(FinEquityOption):
+    ''' A FinEquityCompoundOption is an option which allows the holder to
+    either enter buy or sell another option on a first expiry date that itself
+    expires on a second expiry date, with both strikes set at trade initiation.
+    '''
 
     def __init__(self,
                  expiryDate1: FinDate,
@@ -211,11 +236,26 @@ class FinEquityCompoundOption(FinEquityOption):
                  strikePrice2: float,
                  optionType1: FinOptionTypes,
                  optionType2: FinOptionTypes):
+        ''' Create the FinEquityCompoundOption by passing in the first and
+        second expiry dates as well as the corresponding strike prices and
+        option types. '''
 
         checkArgumentTypes(self.__init__, locals())
 
         if expiryDate1 > expiryDate2:
             raise FinError("Expiry date 1 must preced expiry date 2")
+
+        if optionType1 != FinOptionTypes.EUROPEAN_CALL and \
+            optionType1 != FinOptionTypes.AMERICAN_CALL and \
+            optionType1 != FinOptionTypes.EUROPEAN_PUT and \
+            optionType1 != FinOptionTypes.AMERICAN_PUT:
+                raise FinError("Option 1 must be European or American call or put.")
+
+        if optionType2 != FinOptionTypes.EUROPEAN_CALL and \
+            optionType2 != FinOptionTypes.AMERICAN_CALL and \
+            optionType2 != FinOptionTypes.EUROPEAN_PUT and \
+            optionType2 != FinOptionTypes.AMERICAN_PUT:
+                raise FinError("Option 2 must be European or American call or put.")
 
         self._expiryDate1 = expiryDate1
         self._expiryDate2 = expiryDate2
@@ -227,11 +267,31 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate,
-              stockPrice,
-              discountCurve,
-              dividendYield,
-              model):
+              valueDate: FinDate,
+              stockPrice: float,
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model,
+              numSteps: int = 200):
+        ''' Value the compound option using an analytical approach if it is
+        entirely European style. Otherwise use a Tree approach to handle the
+        early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
+        Rubinstein (1991). See also Haug page 132. '''
+
+        # If the option has any American feature then use the tree
+        if self._optionType1 == FinOptionTypes.AMERICAN_CALL or\
+            self._optionType2 == FinOptionTypes.AMERICAN_CALL or\
+            self._optionType1 == FinOptionTypes.AMERICAN_PUT or\
+                self._optionType2 == FinOptionTypes.AMERICAN_PUT:
+
+            v = self._valueTree(valueDate,
+                                stockPrice,
+                                discountCurve,
+                                dividendYield,
+                                model,
+                                numSteps)
+
+            return v[0]
 
         t1 = (self._expiryDate1 - valueDate) / gDaysInYear
         t2 = (self._expiryDate2 - valueDate) / gDaysInYear
@@ -254,16 +314,11 @@ class FinEquityCompoundOption(FinEquityOption):
         k1 = self._strikePrice1
         k2 = self._strikePrice2
 
-        sstar = self.impliedStockPrice(
-            s0,
-            self._expiryDate1,
-            self._expiryDate2,
-            k1,
-            k2,
-            self._optionType2,
-            r,
-            q,
-            model)
+        sstar = self._impliedStockPrice(s0,
+                                        self._expiryDate1, self._expiryDate2,
+                                        k1, k2,
+                                        self._optionType2,
+                                        r, q, model)
 
         a1 = (log(s0 / sstar) + (r - q + (v**2) / 2.0) * t1) / v / sqrt(t1)
         a2 = a1 - v * sqrt(t1)
@@ -299,13 +354,14 @@ class FinEquityCompoundOption(FinEquityOption):
 
 ###############################################################################
 
-    def valueTree(self,
-                  valueDate,
-                  stockPrice,
-                  discountCurve,
-                  dividendYield,
-                  model,
-                  numSteps=200):
+    def _valueTree(self,
+                   valueDate,
+                   stockPrice,
+                   discountCurve,
+                   dividendYield,
+                   model,
+                   numSteps=200):
+        ''' This function is called if the option has American features. '''
 
         if valueDate > self._expiryDate1:
             raise FinError("Value date is after expiry date.")
@@ -317,62 +373,70 @@ class FinEquityCompoundOption(FinEquityOption):
 
         volatility = model._volatility
 
-        v1 = valueOnce(stockPrice,
-                       riskFreeRate,
-                       dividendYield,
-                       volatility,
-                       t1, t2,
-                       self._optionType1,
-                       self._optionType2,
-                       self._strikePrice1,
-                       self._strikePrice2,
-                       numSteps)
+        v1 = _valueOnce(stockPrice,
+                        riskFreeRate,
+                        dividendYield,
+                        volatility,
+                        t1, t2,
+                        self._optionType1,
+                        self._optionType2,
+                        self._strikePrice1,
+                        self._strikePrice2,
+                        numSteps)
 
-        v2 = valueOnce(stockPrice,
-                       riskFreeRate,
-                       dividendYield,
-                       volatility,
-                       t1, t2,
-                       self._optionType1,
-                       self._optionType2,
-                       self._strikePrice1,
-                       self._strikePrice2,
-                       numSteps + 1)
+        return v1
+        # v2 = valueOnce(stockPrice,
+        #                riskFreeRate,
+        #                dividendYield,
+        #                volatility,
+        #                t1, t2,
+        #                self._optionType1,
+        #                self._optionType2,
+        #                self._strikePrice1,
+        #                self._strikePrice2,
+        #                numSteps + 1)
 
-        return (v1 + v2) / 2.0
+        # return (v1 + v2) / 2.0
 
 ###############################################################################
 
-    def impliedStockPrice(self,
-                          stockPrice,
-                          expiryDate1,
-                          expiryDate2,
-                          strikePrice1,
-                          strikePrice2,
-                          optionType2,
-                          interestRate,
-                          dividendYield,
-                          model):
+    def _impliedStockPrice(self,
+                           stockPrice,
+                           expiryDate1,
+                           expiryDate2,
+                           strikePrice1,
+                           strikePrice2,
+                           optionType2,
+                           interestRate,
+                           dividendYield,
+                           model):
 
         option = FinEquityVanillaOption(expiryDate2, strikePrice2, optionType2)
 
         discountCurve = FinDiscountCurveFlat(expiryDate1, interestRate)
 
-        argtuple = (
-            option,
-            expiryDate1,
-            discountCurve,
-            dividendYield,
-            model,
-            strikePrice1)
+        argtuple = (option, expiryDate1, discountCurve, dividendYield,
+                    model, strikePrice1)
 
-        sigma = optimize.newton(
-            f,
-            x0=stockPrice,
-            args=argtuple,
-            tol=1e-8,
-            maxiter=50,
-            fprime2=None)
+        sigma = optimize.newton(_f, x0=stockPrice, args=argtuple, tol=1e-8,
+                                maxiter=50, fprime2=None)
         return sigma
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("EXPIRY DATE 1", self._expiryDate1)
+        s += labelToString("STRIKE PRICE 1", self._strikePrice1)
+        s += labelToString("OPTION TYPE 1", self._optionType1)
+        s += labelToString("EXPIRY DATE 2", self._expiryDate2)
+        s += labelToString("STRIKE PRICE 2", self._strikePrice2)
+        s += labelToString("OPTION TYPE 2", self._optionType2, "")
+        return s
+
+###############################################################################
+
+    def print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

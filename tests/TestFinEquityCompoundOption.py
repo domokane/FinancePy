@@ -24,9 +24,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityCompoundOption():
 
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate1 = FinDate(2017, 1, 1)
-    expiryDate2 = FinDate(2018, 1, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate1 = FinDate(1, 1, 2017)
+    expiryDate2 = FinDate(1, 1, 2018)
     k1 = 5.0
     k2 = 95.0
     stockPrice = 85.0
@@ -80,7 +80,7 @@ def test_FinEquityCompoundOption():
             discountCurve,
             dividendYield,
             model)
-        values = cmpdOption.valueTree(
+        values = cmpdOption._valueTree(
             valueDate,
             stockPrice,
             discountCurve,
@@ -148,9 +148,9 @@ def test_FinEquityCompoundOption():
                     dividendYield,
                     model)
 
-                values = cmpdOption.valueTree(valueDate, stockPrice,
-                                              discountCurve, dividendYield,
-                                              model)
+                values = cmpdOption._valueTree(valueDate, stockPrice,
+                                               discountCurve, dividendYield,
+                                               model)
 
                 diff = value - values[0]
 

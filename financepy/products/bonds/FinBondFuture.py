@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
@@ -10,7 +10,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
-##########################################################################
+###############################################################################
 
 
 class FinBondFuture(object):
@@ -32,9 +32,10 @@ class FinBondFuture(object):
         self._contractSize = contractSize
         self._coupon = coupon
 
-##########################################################################
+###############################################################################
 
-    def conversionFactor(self, bond):
+    def conversionFactor(self,
+                         bond: FinBond):
         ''' Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
         must round the bond maturity (starting its life on the first delivery
@@ -62,23 +63,23 @@ class FinBondFuture(object):
         p = round(p, 4)
         return p
 
-##########################################################################
+###############################################################################
 
     def principalInvoicePrice(self,
-                              bond,
-                              futuresPrice):
+                              bond: FinBond,
+                              futuresPrice: float):
         ' The principal invoice price as defined by the CME.'''
         cf = self.conversionFactor(bond)
         pip = self._contractSize * (futuresPrice * cf) / 100.0
         pip = round(pip, 2)
         return pip
 
-##########################################################################
+###############################################################################
 
     def totalInvoiceAmount(self,
-                           settlementDate,
-                           bond,
-                           futuresPrice):
+                           settlementDate: FinDate,
+                           bond: FinBond,
+                           futuresPrice: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accruedInterest is None:
@@ -92,12 +93,12 @@ class FinBondFuture(object):
         tia = round(tia, 2)
         return tia
 
-##########################################################################
+###############################################################################
 
     def cheapestToDeliver(self,
-                          bonds,
-                          bondCleanPrices,
-                          futuresPrice):
+                          bonds: list,
+                          bondCleanPrices: list,
+                          futuresPrice: float):
         ''' Determination of CTD as deliverable bond with lowest cost to buy
         versus what is received when the bond is delivered. '''
         ctdBond = None
@@ -112,19 +113,19 @@ class FinBondFuture(object):
 
         return ctdBond
 
-##########################################################################
+###############################################################################
 
     def deliveryGainLoss(self,
-                         bond,
-                         bondCleanPrice,
-                         futuresPrice):
+                         bond: FinBond,
+                         bondCleanPrice: float,
+                         futuresPrice: float):
         ''' Determination of what is received when the bond is delivered. '''
         receiveOnFuture = self.principalInvoicePrice(bond, futuresPrice)
         payForBond = self._contractSize * bondCleanPrice / 100.0
         net = receiveOnFuture - payForBond
         return net, payForBond, receiveOnFuture
 
-##########################################################################
+###############################################################################
 
     def __repr__(self):
 
@@ -135,12 +136,10 @@ class FinBondFuture(object):
         s += labelToString("COUPON", self._coupon)
         return s
 
-##########################################################################
+###############################################################################
 
     def print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 
 ###############################################################################
-
-##########################################################################

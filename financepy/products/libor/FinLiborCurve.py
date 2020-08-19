@@ -9,21 +9,22 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolate import FinInterpMethods
+from ...market.curves.FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 
 swaptol = 1e-8
 
 ##############################################################################
 
 
-def f(df, *args):
+def _f(df, *args):
     ''' Root search objective function for swaps '''
     curve = args[0]
     valueDate = args[1]
     swap = args[2]
     numPoints = len(curve._times)
-    curve._discountFactors[numPoints - 1] = df
+    curve._dfValues[numPoints - 1] = df
     v_swap = swap.value(valueDate, curve, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -31,13 +32,13 @@ def f(df, *args):
 ###############################################################################
 
 
-def g(df, *args):
+def _g(df, *args):
     ''' Root search objective function for swaps '''
     curve = args[0]
     valueDate = args[1]
     fra = args[2]
     numPoints = len(curve._times)
-    curve._discountFactors[numPoints - 1] = df
+    curve._dfValues[numPoints - 1] = df
     v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
@@ -49,37 +50,41 @@ class FinLiborCurve(FinDiscountCurve):
     ''' Constructs a discount curve as implied by the prices of Libor
     deposits, FRAs and IRS. The curve date is the date on which we
     are performing the valuation based on the information available on the
-    curve date. Typically it is the date on which an amount of $1 paid
-    has a present value of $1.
-
-    This class inherits from FinDiscCurve so has all of the methods
-    that class has. '''
+    curve date. Typically it is the date on which an amount of 1 unit paid
+    has a present value of 1. This class inherits from FinDiscountCurve and so
+    has all of the methods that class has. '''
 
 ###############################################################################
 
     def __init__(self,
-                 name,
-                 valuationDate,
-                 liborDeposits,
-                 liborFRAs,
-                 liborSwaps,
-                 interpMethod=FinInterpMethods.FLAT_FORWARDS):
+                 name: str,
+                 valuationDate: FinDate,
+                 liborDeposits: list,
+                 liborFRAs: list,
+                 liborSwaps: list,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+        ''' Create an instance of a FinLibor curve given a valuation date and
+        a set of libor deposits, libor FRAs and liborSwaps. Some of these may
+        be left None and the algorithm will just use what is provided. An
+        interpolation method has also to be provided. '''
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._name = name
         self._times = []
-        self._discountFactors = []
+        self._dfValues = []
         self._valuationDate = valuationDate
-        self._interpMethod = interpMethod
-        self.validateInputs(liborDeposits, liborFRAs, liborSwaps)
-        self.buildCurve()
+        self._interpType = interpType
+        self._validateInputs(liborDeposits, liborFRAs, liborSwaps)
+        self._buildCurve()
 
 ###############################################################################
 
-    def validateInputs(self,
-                       liborDeposits,
-                       liborFRAs,
-                       liborSwaps):
-        ''' Construct the discount curve using a bootstrap approach. '''
+    def _validateInputs(self,
+                        liborDeposits,
+                        liborFRAs,
+                        liborSwaps):
+        ''' Validate the inputs. '''
 
         numDepos = len(liborDeposits)
         numFRAs = len(liborFRAs)
@@ -144,23 +149,23 @@ class FinLiborCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def buildCurve(self):
+    def _buildCurve(self):
         ''' Construct the discount curve using a bootstrap approach. '''
 
         self._times = np.array([])
-        self._discountFactors = np.array([])
+        self._dfValues = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._discountFactors = np.append(self._discountFactors, dfMat)
+        self._dfValues = np.append(self._dfValues, dfMat)
 
         for depo in self._usedDeposits:
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             dfMat = depo.maturityDf()
             self._times = np.append(self._times, tmat)
-            self._discountFactors = np.append(self._discountFactors, dfMat)
+            self._dfValues = np.append(self._dfValues, dfMat)
 
         oldtmat = tmat
 
@@ -175,13 +180,13 @@ class FinLiborCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._discountFactors = np.append(self._discountFactors, dfMat)
+                self._dfValues = np.append(self._dfValues, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._discountFactors = np.append(self._discountFactors, dfMat)
+                self._dfValues = np.append(self._dfValues, dfMat)
 
                 argtuple = (self, self._valuationDate, fra)
-                dfMat = optimize.newton(g, x0=dfMat, fprime=None,
+                dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
                                         maxiter=50, fprime2=None)
 
@@ -192,20 +197,20 @@ class FinLiborCurve(FinDiscountCurve):
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._discountFactors = np.append(self._discountFactors, dfMat)
+            self._dfValues = np.append(self._dfValues, dfMat)
 
             argtuple = (self, self._valuationDate, swap)
 
-            dfMat = optimize.newton(f, x0=dfMat, fprime=None, args=argtuple,
+            dfMat = optimize.newton(_f, x0=dfMat, fprime=None, args=argtuple,
                                     tol=swaptol, maxiter=50, fprime2=None,
                                     full_output=False)
 
-        self.checkRefits()
+        self._checkRefits()
 
 ###############################################################################
 
-    def checkRefits(self):
-
+    def _checkRefits(self):
+        ''' Ensure that the Libor curve refits the calibration instruments. '''
         for depo in self._usedDeposits:
             v = depo.value(self._valuationDate, self) / depo._notional
             if abs(v - 1.0) > swaptol:
@@ -234,7 +239,7 @@ class FinLiborCurve(FinDiscountCurve):
 
         s = labelToString("TIME", "DISCOUNT FACTOR")
         for i in range(0, numPoints):
-            s += labelToString(self._times[i], self._discountFactors[i])
+            s += labelToString(self._times[i], self._dfValues[i])
 
         return s
 

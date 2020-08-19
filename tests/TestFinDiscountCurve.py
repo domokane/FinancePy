@@ -8,9 +8,8 @@ Created on Fri Feb 12 16:51:05 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.market.curves.FinInterpolate import FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpTypes
 
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 
@@ -39,7 +38,7 @@ def test_FinDiscountCurve():
     dfs = np.exp(-rate * years)
     dates = start.addYears(years)
 
-    curve = FinDiscountCurve(start, dates, dfs, FinInterpMethods.FLAT_FORWARDS)
+    curve = FinDiscountCurve(start, dates, dfs, FinInterpTypes.FLAT_FORWARDS)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
@@ -69,7 +68,7 @@ def test_FinDiscountCurve():
 
     # Examine dependency of fwd curve on the interpolation scheme
 
-    for interp in FinInterpMethods:
+    for interp in FinInterpTypes:
 
         curve = FinDiscountCurve(start, dates, dfs, interp)
         fwdRates = curve.fwd(plotDates)

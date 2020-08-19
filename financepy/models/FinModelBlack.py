@@ -77,8 +77,6 @@ class FinModelBlack():
         else:
             raise FinError("Option type must be a European Call or Put")
 
- #       print(f,t,k,vol,df,v)
-
         return v
 
 ###############################################################################

@@ -12,7 +12,7 @@ from ...products.bonds.FinBond import FinBond
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from enum import Enum
 import numpy as np
@@ -117,15 +117,15 @@ class FinBondEmbeddedOption(object):
 ###############################################################################
 
     def value(self,
-              settlementDate,
-              discountCurve,
+              settlementDate: FinDate,
+              discountCurve: FinDiscountCurve,
               model):
         ''' Value the bond that settles on the specified date that can have
         both embedded call and put options. This is done using the specified
         model and a discount curve. '''
 
         # Generate bond coupon flow schedule
-        self._bond.calculateFlowDates(settlementDate)
+        self._bond._calculateFlowDates(settlementDate)
         cpn = self._bond._coupon/self._bond._frequency
         cpnTimes = []
         cpnAmounts = []
@@ -157,7 +157,7 @@ class FinBondEmbeddedOption(object):
         maturityDate = self._bond._maturityDate
         tmat = (maturityDate - settlementDate) / gDaysInYear
         dfTimes = discountCurve._times
-        dfValues = discountCurve._discountFactors
+        dfValues = discountCurve._dfValues
 
         face = self._bond._face
 

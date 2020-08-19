@@ -68,7 +68,7 @@ def getGaussianSobol(numPoints, dimension):
 
 @njit(cache=True)
 def getUniformSobol(numPoints, dimension):
-    ''' Sobol uniform quasi random points generator based on graycode order. '''
+    ''' Sobol uniform quasi random points generator based on graycode order.'''
     global sArr
     global aArr
     global m_i

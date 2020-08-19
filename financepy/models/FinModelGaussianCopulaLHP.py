@@ -2,8 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import sqrt
 from numba import njit
+import numpy as np
 
 ###############################################################################
 
@@ -84,7 +84,7 @@ def portfolioCDF_LHP(k, numCredits, qvector, recoveryRates, beta, numPoints):
 
     c = norminvcdf(p)
     arga = k / (1.0 - recovery)
-    a = 1.0 / beta * (c - sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
     return N(-a)
 
 ###############################################################################
@@ -111,7 +111,7 @@ def expMinLK(k, p, r, n, beta):
     c = norminvcdf(p)
     arga = k / (1.0 - r) / n
 
-    a = 1.0 / beta * (c - sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
     el1 = (1.0 - r) * M(c, -a, -beta) + k * N(a)
     return el1
 
@@ -138,11 +138,11 @@ def LHPDensity(k, p, r, beta):
 
     dk = 0.0000001
 
-    a = 1.0 / beta * (c - sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
     term1 = N(a)
 
     arga = (k + dk) / (1.0 - r)
-    a = 1.0 / beta * (c - sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
 
     term2 = N(a)
     rho = -(term2 - term1) / dk
@@ -169,13 +169,13 @@ def LHPAnalyticalDensityBaseCorr(k, p, r, beta, dbeta_dk):
 
     c = norminvcdf(p)
     arga = k / (1.0 - r)
-    root1minusBetaSqd = sqrt(1.0 - beta * beta)
+    root1minusBetaSqd = np.sqrt(1.0 - beta * beta)
     a = 1.0 / beta * (c - root1minusBetaSqd * norminvcdf(arga))
 
     da_dk = -c / beta / beta * dbeta_dk
     da_dk = da_dk + (1.0 / root1minusBetaSqd + root1minusBetaSqd /
                      beta / beta) * dbeta_dk * norminvcdf(arga)
-    da_dk = da_dk - sqrt(1.0 - beta * beta) / beta / \
+    da_dk = da_dk - np.sqrt(1.0 - beta * beta) / beta / \
         normpdf(norminvcdf(k / (1.0 - r))) / (1.0 - r)
 
     rho = -normpdf(a) * da_dk
@@ -201,8 +201,8 @@ def LHPAnalyticalDensity(k, p, r, beta):
 
     c = norminvcdf(p)
     arga = k / (1.0 - r)
-    a = 1.0 / beta * (c - sqrt(1.0 - beta * beta) * norminvcdf(arga))
-    da_dk = -sqrt(1.0 - beta * beta) / beta / \
+    a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    da_dk = -np.sqrt(1.0 - beta * beta) / beta / \
         normpdf(norminvcdf(k / (1.0 - r))) / (1.0 - r)
     rho = -normpdf(a) * da_dk
 
@@ -232,7 +232,7 @@ def ExpMinLK(k, p, r, n, beta):
     c = normpdf(p)
     arga = k / (1.0 - r) / n
 
-    a = (1.0 / beta) * (c - sqrt(1.0 - beta * beta) * normpdf(arga))
+    a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
     el = (1.0 - r) * M(c, -a, -beta) + k * N(a)
 
     return el
@@ -244,7 +244,7 @@ def ExpMinLK(k, p, r, n, beta):
 def probLGreaterThanK(K, P, R, beta):
     c = normpdf(P)
     arga = K / (1.0 - R)
-    a = (1.0 / beta) * (c - sqrt(1.0 - beta * beta) * normpdf(arga))
+    a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
     prob = 1.0 - N(a)
     return prob
 

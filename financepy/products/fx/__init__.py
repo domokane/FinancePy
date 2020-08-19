@@ -10,4 +10,3 @@ from .FinFXOption import *
 from .FinFXRainbowOption import *
 from .FinFXVanillaOption import *
 from .FinFXVarianceSwap import *
-from .FinFXVolatilitySmileDELETE import *

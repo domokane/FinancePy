@@ -9,6 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOption
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOptionTypes
+from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 import numpy as np
@@ -17,11 +18,11 @@ import time
 import sys
 sys.path.append("..//..")
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
 
-def test_FinRainbowOption():
+def test_FinEquityRainbowOption():
 
     #        import matplotlib.pyplot as plt
 
@@ -57,27 +58,28 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
             start = time.time()
             v = rainbowOption.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
+
             v_MC = rainbowOption.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
+
             end = time.time()
             duration = end - start
             testCases.print(numPaths, correlation, v, v_MC, duration)
@@ -111,6 +113,7 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
@@ -118,21 +121,19 @@ def test_FinRainbowOption():
 
             v = rainbowOption.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
 
             v_MC = rainbowOption.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -169,6 +170,7 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
@@ -176,21 +178,19 @@ def test_FinRainbowOption():
 
             v = rainbowOption.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
 
             v_MC = rainbowOption.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -226,26 +226,25 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
             start = time.time()
             v = rainbowOption.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
             v_MC = rainbowOption.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
             end = time.time()
             duration = end - start
@@ -283,6 +282,7 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
@@ -300,21 +300,19 @@ def test_FinRainbowOption():
 
             v = rainbowOption1.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
 
             v_MC = rainbowOption2.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -344,6 +342,7 @@ def test_FinRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(numAssets) * sqrt(correlation)
+        corrMatrix = betaVectorToCorrMatrix(betas)
 
         for numPaths in numPathsList:
 
@@ -361,21 +360,19 @@ def test_FinRainbowOption():
 
             v = rainbowOption1.value(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas)
+                corrMatrix)
 
             v_MC = rainbowOption2.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -428,17 +425,17 @@ def test_FinRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(numAssets) * sqrt(correlation)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
 
             v_MC = rainbowOption2.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -488,17 +485,17 @@ def test_FinRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(numAssets) * sqrt(correlation)
+            corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
 
             v_MC = rainbowOption2.valueMC(
                 valueDate,
-                expiryDate,
                 stockPrices,
                 discountCurve,
                 dividendYields,
                 volatilities,
-                betas,
+                corrMatrix,
                 numPaths)
 
             end = time.time()
@@ -507,10 +504,13 @@ def test_FinRainbowOption():
 
             rainbowOptionValuesMC.append(v_MC)
 
-#        plt.plot(corrList, rainbowOptionValuesMC, 'o-', label = "PUT Rainbow Option MC NTH = " + str(n))
+#    plt.plot(corrList, rainbowOptionValuesMC, 'o-', label = "PUT Rainbow Option MC NTH = " + str(n))
 #    plt.xlabel("Correlation")
 #    plt.legend(loc='best')
 
 
-test_FinRainbowOption()
+###############################################################################
+
+
+test_FinEquityRainbowOption()
 testCases.compareTestCases()

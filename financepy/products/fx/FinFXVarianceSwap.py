@@ -3,8 +3,8 @@
 ##############################################################################
 
 import numpy as np
-from math import log, exp, sqrt
 
+from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -98,7 +98,7 @@ class FinFXVarianceSwap(object):
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
         b = f * dvol / dK
-        var = (atmVol**2) * sqrt(1.0+3.0*tmat*(b**2))
+        var = (atmVol**2) * np.sqrt(1.0+3.0*tmat*(b**2))
         return var
 
 ###############################################################################
@@ -127,10 +127,10 @@ class FinFXVarianceSwap(object):
         tmat = (self._maturityDate - valuationDate)/gDaysInYear
 
         df = discountCurve.df(tmat)
-        r = - log(df)/tmat
+        r = - np.log(df)/tmat
 
         s0 = stockPrice
-        g = exp(r*tmat)
+        g = np.exp(r*tmat)
         fwd = stockPrice * g
 
         # This fixes the centre strike of the replication options
@@ -169,12 +169,12 @@ class FinFXVarianceSwap(object):
 
         self._callStrikes = callK
 
-        optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - log(sstar/s0))/tmat
+        optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - np.log(sstar/s0))/tmat
 
         self._callWts = np.zeros(numCallOptions)
         self._putWts = np.zeros(numPutOptions)
 
-        def f(x): return (2.0/tmat)*((x-sstar)/sstar-log(x/sstar))
+        def f(x): return (2.0/tmat)*((x-sstar)/sstar-np.log(x/sstar))
 
         sumWts = 0.0
         for n in range(0, self._numPutOptions):
@@ -232,7 +232,7 @@ class FinFXVarianceSwap(object):
 
         if useLogs is True:
             for i in range(1, numObservations):
-                x = log(closePrices[i]/closePrices[i-1])
+                x = np.log(closePrices[i]/closePrices[i-1])
                 cumX2 += x*x
         else:
             for i in range(1, numObservations):

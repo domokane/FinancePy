@@ -8,9 +8,8 @@ Created on Sun Feb 07 14:31:53 2016
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinInterpolate import interpolate, FinInterpMethods
+from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 import numpy as np
 import sys
@@ -37,7 +36,7 @@ def test_FinInterpolatedForwards():
     tDates = curveDate.addYears(tValues)
     tInterpDates = curveDate.addYears(tInterpValues)
 
-    for method in FinInterpMethods:
+    for method in FinInterpTypes:
 
         discountCurve = FinDiscountCurve(curveDate, tDates, dfValues, method)
         dfInterpValues = discountCurve.df(tInterpDates)
@@ -47,11 +46,14 @@ def test_FinInterpolatedForwards():
         if PLOT_GRAPHS:
             plt.figure(figsize=(8, 6))
             plt.plot(tValues, dfValues, 'o', color='g', label="DFS:")
-            plt.plot(tInterpValues, dfInterpValues, color='r', label="DF:" + str(method))
+            plt.plot(tInterpValues, dfInterpValues, color='r',
+                     label="DF:" + str(method))
             plt.legend()
             plt.figure(figsize=(8, 6))
-            plt.plot(tInterpValues, fwdInterpValues, color='r', label="FWD:" + str(method))
-            plt.plot(tInterpValues, zeroInterpValues, color='b', label="ZERO:" + str(method))
+            plt.plot(tInterpValues, fwdInterpValues, color='r',
+                     label="FWD:" + str(method))
+            plt.plot(tInterpValues, zeroInterpValues, color='b',
+                     label="ZERO:" + str(method))
             plt.plot(tValues, rValues, 'o', color='g',  label="ZERO RATES")
             plt.legend()
 

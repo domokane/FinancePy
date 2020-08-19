@@ -6,8 +6,7 @@
 # TODO: Term structure of volatility
 # TODO: Check that curve anchor date is valuation date ?
 
-import numpy as np
-from typing import Union, Optional
+from typing import Optional
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinCalendar import FinCalendar
@@ -58,7 +57,7 @@ class FinLiborCapFloor():
 
     def __init__(self,
                  startDate: FinDate,
-                 maturityDateOrTenor: Union[FinDate, str],
+                 maturityDateOrTenor: (FinDate, str),
                  optionType: FinLiborCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
@@ -284,7 +283,7 @@ class FinLiborCapFloor():
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face = 1.0
             dfTimes = liborCurve._times
-            dfValues = liborCurve._discountFactors
+            dfValues = liborCurve._dfValues
 
             v = model.optionOnZCB(texp, tmat, strikePrice, face,
                                   dfTimes, dfValues)
@@ -305,7 +304,7 @@ class FinLiborCapFloor():
 ###############################################################################
 
     def printLeg(self):
-        ''' Prints the cap floor amounts. '''
+        ''' Prints the cap floor payment amounts. '''
 
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)

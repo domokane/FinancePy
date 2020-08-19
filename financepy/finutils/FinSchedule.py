@@ -4,10 +4,12 @@
 
 
 from .FinError import FinError
+from .FinDate import FinDate
 from .FinCalendar import (FinCalendar, FinCalendarTypes)
 from .FinCalendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
 from .FinFrequency import (FinFrequency, FinFrequencyTypes)
 from .FinHelperFunctions import labelToString
+from .FinHelperFunctions import checkArgumentTypes
 
 ###############################################################################
 
@@ -16,33 +18,20 @@ class FinSchedule(object):
     ''' A Schedule is a vector of dates generated according to ISDA standard
     rules which starts on the next date after the start date and runs up to
     an end date. Dates are adjusted to a provided calendar. The zeroth
-    element is the PCD and the first element is the NCD '''
+    element is the previous coupon date (PCD) and the first element is the
+    Next Coupon Date (NCD). '''
 
     def __init__(self,
-                 startDate,
-                 endDate,
-                 frequencyType=FinFrequencyTypes.ANNUAL,
-                 calendarType=FinCalendarTypes.WEEKEND,
-                 busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType=FinDateGenRuleTypes.BACKWARD):
+                 startDate: FinDate,
+                 endDate: FinDate,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create FinSchedule object which calculates a sequence of dates in
         line with market convention for fixed income products. '''
 
-        if startDate > endDate:
-            raise FinError("Start Date after End Date")
-
-        if calendarType not in FinCalendarTypes:
-            raise FinError("Unknown Calendar type " + str(calendarType))
-
-        if busDayAdjustType not in FinBusDayAdjustTypes:
-            raise FinError(
-                "Unknown Business Day Adjust type " +
-                str(busDayAdjustType))
-
-        if dateGenRuleType not in FinDateGenRuleTypes:
-            raise FinError(
-                "Unknown Date Gen Rule type " +
-                str(dateGenRuleType))
+        checkArgumentTypes(self.__init__, locals())
 
         # validation complete
         self._startDate = startDate
@@ -58,7 +47,8 @@ class FinSchedule(object):
 ###############################################################################
 
     def flows(self):
-        ''' Returns a list of the schedule of dates. '''
+        ''' Returns a list of the schedule of FinDates. '''
+
         if self._adjustedDates is None:
             raise FinError("Dates have not been calculated.")
 

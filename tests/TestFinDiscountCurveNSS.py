@@ -7,7 +7,7 @@ Created on Fri Apr 08 09:26:27 2016
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-
+from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurveNSS import FinDiscountCurveNSS
 from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt
@@ -26,15 +26,17 @@ def test_FinNelsonSiegelSvenssonCurve():
     tau1 = 2.0
     tau2 = 0.5
     times = np.linspace(0.0, 10.0, 5)
+    startDate = FinDate(1, 1, 2020)
+    dates = startDate.addYears(times)
 
-    curve1 = FinDiscountCurveNSS(1., 0., 0., 0., tau1, tau2)
-    factor1loading = curve1.zero(times)
-    curve2 = FinDiscountCurveNSS(0., 1., 0., 0., tau1, tau2)
-    factor2loading = curve2.zero(times)
-    curve3 = FinDiscountCurveNSS(0., 0., 1., 0., tau1, tau2)
-    factor3loading = curve3.zero(times)
-    curve4 = FinDiscountCurveNSS(0., 0., 0., 1., tau1, tau2)
-    factor4loading = curve4.zero(times)
+    curve1 = FinDiscountCurveNSS(startDate, 1., 0., 0., 0., tau1, tau2)
+    factor1loading = curve1.zeroRate(dates)
+    curve2 = FinDiscountCurveNSS(startDate, 0., 1., 0., 0., tau1, tau2)
+    factor2loading = curve2.zeroRate(dates)
+    curve3 = FinDiscountCurveNSS(startDate, 0., 0., 1., 0., tau1, tau2)
+    factor3loading = curve3.zeroRate(dates)
+    curve4 = FinDiscountCurveNSS(startDate, 0., 0., 0., 1., tau1, tau2)
+    factor4loading = curve4.zeroRate(dates)
 
     testCases.header("FACTOR LOADING ON ZERO RATES")
     testCases.print(factor1loading)
@@ -61,45 +63,45 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve1 = FinDiscountCurveNSS(
+    curve1 = FinDiscountCurveNSS(startDate,
         beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates1 = curve1.zero(times)
+    zeroRates1 = curve1.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates1)
 
     beta1 = 0.04
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve2 = FinDiscountCurveNSS(
+    curve2 = FinDiscountCurveNSS(startDate,
         beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates2 = curve2.zero(times)
+    zeroRates2 = curve2.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates2)
 
     beta1 = 0.05
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve3 = FinDiscountCurveNSS(
+    curve3 = FinDiscountCurveNSS(startDate,
         beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates3 = curve3.zero(times)
+    zeroRates3 = curve3.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates3)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve4 = FinDiscountCurveNSS(
+    curve4 = FinDiscountCurveNSS(startDate,
         beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates4 = curve4.zero(times)
+    zeroRates4 = curve4.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates4)
 
     beta1 = 0.07
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve5 = FinDiscountCurveNSS(
+    curve5 = FinDiscountCurveNSS(startDate,
         beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates5 = curve5.zero(times)
+    zeroRates5 = curve5.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates5)
 
     if 1 == 0:

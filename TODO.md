@@ -35,10 +35,10 @@ Inflation - TIPS bonds with correct yield measures
 Inflation - Inflation Derivative - zeros and swaps using appropriate adjustments
 Inflation - Building an inflation curve
 
-Curves - Consider adding splines 
+Curves - Consider adding splines
 Models - BGM Calibration
 Models - Finite difference schemes ?
-Models - Sobol sequences implementation 
+Models - Sobol sequences implementation
 
 ## IN PROGRESS
 Equities - Variance swaps using given skew curve
@@ -59,7 +59,6 @@ Bonds - American Callable fixed coupon bonds using HW
 Bonds - American Callable floating coupon bonds using HW
 Bonds - American Callable/Puttable fixed coupon bonds using HW
 Bonds - American Callable/Puttable floating coupon bonds using HW
-Curves - B splines 
+Curves - B splines
 Models - Hull-White Trinomial Tree
 Libor - European Swaption pricing and risk
-

@@ -8,8 +8,6 @@ import numpy as np
 from numba import njit, float64, int64
 
 bump = 1e-4
-from ..finutils.FinHelperFunctions import labelToString
-
 
 ###############################################################################
 ###############################################################################
@@ -155,7 +153,7 @@ def crrTreeVal(stockPrice,
     return results
 
 ###############################################################################
-###############################################################################
+
 
 def crrTreeValAvg(stockPrice,
                   ccInterestRate,  # continuously compounded
@@ -165,30 +163,31 @@ def crrTreeValAvg(stockPrice,
                   timeToExpiry,
                   optionType,
                   strikePrice):
+    ''' Calculate the average values off the tree using an even and an odd
+    number of time steps. '''
 
-        value1 = crrTreeVal(stockPrice,
-                            ccInterestRate,
-                            ccDividendRate,
-                            volatility,
-                            numStepsPerYear,
-                            timeToExpiry,
-                            optionType,
-                            strikePrice,
-                            1)  # even
+    value1 = crrTreeVal(stockPrice,
+                        ccInterestRate,
+                        ccDividendRate,
+                        volatility,
+                        numStepsPerYear,
+                        timeToExpiry,
+                        optionType,
+                        strikePrice,
+                        1)  # even
 
-        value2 = crrTreeVal(stockPrice,
-                            ccInterestRate,
-                            ccDividendRate,
-                            volatility,
-                            numStepsPerYear,
-                            timeToExpiry,
-                            optionType,
-                            strikePrice,
-                            0)  # odd
+    value2 = crrTreeVal(stockPrice,
+                        ccInterestRate,
+                        ccDividendRate,
+                        volatility,
+                        numStepsPerYear,
+                        timeToExpiry,
+                        optionType,
+                        strikePrice,
+                        0)  # odd
 
-        v = (value1 + value2) / 2.0
-        res = {'value': v[0], 'delta': v[1], 'gamma': v[2], 'theta': v[3]}
-        return res
+    v = (value1 + value2) / 2.0
+    res = {'value': v[0], 'delta': v[1], 'gamma': v[2], 'theta': v[3]}
+    return res
 
-###############################################################################
 ###############################################################################

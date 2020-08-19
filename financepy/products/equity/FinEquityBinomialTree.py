@@ -36,7 +36,7 @@ class FinEquityTreeExerciseTypes(Enum):
 
 
 @jit
-def validatePayoff(payoffType, payoffParams):
+def _validatePayoff(payoffType, payoffParams):
 
     numParams = 0
 
@@ -70,7 +70,7 @@ def validatePayoff(payoffType, payoffParams):
 
 
 @njit(float64(float64, int64, float64[:]), fastmath=True, cache=True)
-def payoffValue(s, payoffType, payoffParams):
+def _payoffValue(s, payoffType, payoffParams):
 
     if payoffType == FinEquityTreePayoffTypes.FWD_CONTRACT.value:
         payoff = payoffParams[0] * s
@@ -93,19 +93,19 @@ def payoffValue(s, payoffType, payoffParams):
 
     return payoff
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
-def valueOnce(stockPrice,
-              r,
-              dividendYield,
-              volatility,
-              numSteps,
-              timeToExpiry,
-              payoffType,
-              exerciseType,
-              payoffParams):
+def _valueOnce(stockPrice,
+               r,
+               dividendYield,
+               volatility,
+               numSteps,
+               timeToExpiry,
+               payoffType,
+               exerciseType,
+               payoffParams):
 
     if numSteps < 3:
         numSteps = 3
@@ -151,7 +151,7 @@ def valueOnce(stockPrice,
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
         optionValues[index +
-                     iNode] = payoffValue(s, payoffTypeValue, payoffParams)
+                     iNode] = _payoffValue(s, payoffTypeValue, payoffParams)
 
     # begin backward steps from expiry
     for iTime in range(numSteps - 1, -1, -1):
@@ -173,7 +173,7 @@ def valueOnce(stockPrice,
                 optionValues[index + iNode] = holdValue
             elif exerciseType == FinEquityTreeExerciseTypes.AMERICAN:
                 s = stockValues[index + iNode]
-                exerciseValue = payoffValue(s, payoffTypeValue, payoffParams)
+                exerciseValue = _payoffValue(s, payoffTypeValue, payoffParams)
                 optionValues[index + iNode] = max(exerciseValue, holdValue)
 
     price = optionValues[0]
@@ -221,26 +221,26 @@ class FinEquityBinomialTree():
         timeToExpiry = (expiryDate - valueDate) / gDaysInYear
         r = discountCurve.zeroRate(expiryDate)
 
-        price1 = valueOnce(stockPrice,
-                           r,
-                           dividendYield,
-                           volatility,
-                           numSteps,
-                           timeToExpiry,
-                           payoffType,
-                           exerciseType,
-                           payoffParams)
+        price1 = _valueOnce(stockPrice,
+                            r,
+                            dividendYield,
+                            volatility,
+                            numSteps,
+                            timeToExpiry,
+                            payoffType,
+                            exerciseType,
+                            payoffParams)
 
         # Can I reuse the same tree ?
-        price2 = valueOnce(stockPrice,
-                           r,
-                           dividendYield,
-                           volatility,
-                           numSteps + 1,
-                           timeToExpiry,
-                           payoffType,
-                           exerciseType,
-                           payoffParams)
+        price2 = _valueOnce(stockPrice,
+                            r,
+                            dividendYield,
+                            volatility,
+                            numSteps + 1,
+                            timeToExpiry,
+                            payoffType,
+                            exerciseType,
+                            payoffParams)
 
         price = (price1 + price2) / 2.0
 

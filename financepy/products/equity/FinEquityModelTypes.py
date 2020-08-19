@@ -11,9 +11,9 @@ class FinEquityModel(object):
     ''' This is a parent class for equity models. '''
 
     def __init__(self):
-        self._parentType = None
-        self._volatility = 0.0
-        self._implementation = 0
+#        self._parentType = None
+#        self._volatility = 0.0
+#        self._implementation = 0
         pass
 
 ###############################################################################

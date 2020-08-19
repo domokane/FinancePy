@@ -10,10 +10,9 @@ from numba import njit, float64
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import uinterpolate, FinInterpMethods
+from ...market.curves.FinInterpolate import uinterpolate, FinInterpTypes
 from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
-from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 
 ###############################################################################
@@ -85,7 +84,7 @@ class FinCDSCurve():
                  liborCurve,
                  recoveryRate=0.40,
                  useCache=False,
-                 interpolationMethod=FinInterpMethods.FLAT_FORWARDS):
+                 interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
 
         self._curveDate = curveDate
         self._cdsContracts = cdsContracts
@@ -99,14 +98,14 @@ class FinCDSCurve():
 
         if cdsContracts is not None:
             if len(cdsContracts) > 0:
-                self.validate(cdsContracts)
-                self.buildCurve()
+                self._validate(cdsContracts)
+                self._buildCurve()
         else:
             pass  # In some cases we allow None to be passed
 
 ###############################################################################
 
-    def validate(self, cdsContracts):
+    def _validate(self, cdsContracts):
         ''' Ensure that contracts are in increasinbg maturity. '''
 
         if len(cdsContracts) == 0:
@@ -167,7 +166,7 @@ class FinCDSCurve():
 
 ###############################################################################
 
-    def buildCurve(self):
+    def _buildCurve(self):
         ''' Construct the CDS survival curve from a set of CDS contracts '''
 
         numTimes = len(self._cdsContracts)
