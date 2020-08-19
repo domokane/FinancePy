@@ -4,7 +4,7 @@ FinancePy is a python-based library that covers the following functionality:
 
 * Valuation and risk models for a wide range of equity, FX, interest rate and credit derivatives.
 
-Although it is written entirely in Python, it can achieve speeds comparable to C++ by using Numba. As a result the user has both the ability to examine the underlying code and the ability to perform pricing and risk at speeds which compare to a library written in C++. 
+Although it is written entirely in Python, it can achieve speeds comparable to C++ by using Numba. As a result the user has both the ability to examine the underlying code and the ability to perform pricing and risk at speeds which compare to a library written in C++.
 
 The target audience for this library includes:
 
@@ -39,11 +39,12 @@ Important Note:
 In all cases I will seek to be as helpful as possible, subject to constraints.
 
 ## The Library Design
+
 The underlying Python library is split into a number of major modules:
 
 * Finutils - These are utility functions used to assist you with modelling a security. These include dates (FinDate), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
 * Market - These are modules that capture the market information used to value a security. These include interest rate and credit curves, volatility surfaces and prices.
-* Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models. 
+* Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models.
 * Products - These are the actual securities and range from Government bonds to Bermudan swaptions.
 
 Any product valuation is the result of the following data design:
@@ -56,7 +57,7 @@ The interface to each product has a value() function that will take a model and 
 
 FinancePy can be installed using pip (see instructions below). A set of template Jupyter notebooks can be found under the github repository called FinancePy-Examples. The link is as follows:
 
-https://github.com/domokane/FinancePy-Examples
+<https://github.com/domokane/FinancePy-Examples>
 
 A pdf manual describing all of the functions can be found at the same repository.
 

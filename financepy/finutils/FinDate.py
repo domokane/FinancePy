@@ -424,16 +424,16 @@ class FinDate():
         newDate = FinDate(self._d, self._m, self._y)
 
         if periodType == DAYS:
-            for i in range(0, numPeriods):
+            for _ in range(0, numPeriods):
                 newDate = newDate.addDays(1)
         elif periodType == WEEKS:
-            for i in range(0, numPeriods):
+            for _ in range(0, numPeriods):
                 newDate = newDate.addDays(7)
         elif periodType == MONTHS:
-            for i in range(0, numPeriods):
+            for _ in range(0, numPeriods):
                 newDate = newDate.addMonths(1)
         elif periodType == YEARS:
-            for i in range(0, numPeriods):
+            for _ in range(0, numPeriods):
                 newDate = newDate.addMonths(12)
 
         return newDate

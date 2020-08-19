@@ -529,7 +529,7 @@ class FinBondConvertible(object):
     def accruedDays(self, 
                     settlementDate: FinDate):
         ''' Calculate number days from previous coupon date to settlement.'''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
