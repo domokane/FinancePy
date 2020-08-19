@@ -8,6 +8,7 @@ Created on Fri Apr 08 09:26:27 2016
 import datetime as dt
 
 import sys
+import os
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -30,7 +31,8 @@ def test_FinBondYieldCurve():
     ###########################################################################
 
     import pandas as pd
-    bondDataFrame = pd.read_csv('./data/giltBondPrices.txt', sep='\t')
+    path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
+    bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL

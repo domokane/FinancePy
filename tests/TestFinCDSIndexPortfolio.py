@@ -5,6 +5,8 @@ Created on Sun Jan 13 21:52:16 2019
 @author: Dominic O'Kane
 """
 
+import os
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
@@ -131,8 +133,10 @@ def test_CDSIndexPortfolio():
     maturity7Y = tradeDate.nextCDSDate(84)
     maturity10Y = tradeDate.nextCDSDate(120)
 
-    f = open('.//data//CDX_NA_IG_S7_SPREADS.csv', 'r')
+    path = os.path.join(os.path.dirname(__file__), './/data//CDX_NA_IG_S7_SPREADS.csv')
+    f = open(path, 'r')
     data = f.readlines()
+    f.close()
     issuerCurves = []
 
     for row in data[1:]:
