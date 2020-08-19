@@ -16,7 +16,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString, tableToString
-from ...market.curves.FinInterpolate import FinInterpTypes, uinterpolate
+from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
@@ -63,9 +63,9 @@ def _riskyPV01_NUMBA(teff,
 
     # The first coupon is a special case which needs to be handled carefully
     # taking into account what coupon has already accrued and what has not
-    qeff = uinterpolate(teff, npSurvTimes, npSurvValues, method)
-    q1 = uinterpolate(tncd, npSurvTimes, npSurvValues, method)
-    z1 = uinterpolate(tncd, npLiborTimes, npLiborValues, method)
+    qeff = _uinterpolate(teff, npSurvTimes, npSurvValues, method)
+    q1 = _uinterpolate(tncd, npSurvTimes, npSurvValues, method)
+    z1 = _uinterpolate(tncd, npLiborTimes, npLiborValues, method)
 
     # this is the part of the coupon accrued from previous coupon date to now
     # accrualFactorPCDToNow = dayCount.yearFrac(pcd,teff)
@@ -88,8 +88,8 @@ def _riskyPV01_NUMBA(teff,
 
         t2 = paymentTimes[it]
 
-        q2 = uinterpolate(t2, npSurvTimes, npSurvValues, method)
-        z2 = uinterpolate(t2, npLiborTimes, npLiborValues, method)
+        q2 = _uinterpolate(t2, npSurvTimes, npSurvValues, method)
+        z2 = _uinterpolate(t2, npLiborTimes, npLiborValues, method)
 
         accrualFactor = yearFracs[it]
 
@@ -143,8 +143,8 @@ def _protectionLegPV_NUMBA(teff,
     method = FinInterpTypes.FLAT_FORWARDS.value
     dt = (tmat - teff) / numStepsPerYear
     t = teff
-    z1 = uinterpolate(t, npLiborTimes, npLiborValues, method)
-    q1 = uinterpolate(t, npSurvTimes, npSurvValues, method)
+    z1 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+    q1 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
 
     protPV = 0.0
     small = 1e-8
@@ -154,8 +154,8 @@ def _protectionLegPV_NUMBA(teff,
         for i in range(0, numStepsPerYear):
 
             t = t + dt
-            z2 = uinterpolate(t, npLiborTimes, npLiborValues, method)
-            q2 = uinterpolate(t, npSurvTimes, npSurvValues, method)
+            z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+            q2 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
             # This needs to be updated to handle small h+r
             h12 = -log(q2 / q1) / dt
             r12 = -log(z2 / z1) / dt
@@ -171,8 +171,8 @@ def _protectionLegPV_NUMBA(teff,
         for i in range(0, numStepsPerYear):
 
             t += dt
-            z2 = uinterpolate(t, npLiborTimes, npLiborValues, method)
-            q2 = uinterpolate(t, npSurvTimes, npSurvValues, method)
+            z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+            q2 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
             dq = q1 - q2
             dprotPV = 0.5 * (z1 + z2) * dq
             protPV += dprotPV

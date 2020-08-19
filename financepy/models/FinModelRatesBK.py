@@ -176,8 +176,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice, face,
         tcpn = couponTimes[i]
         n = int(round(tcpn/_dt, 0))
         ttree = _treeTimes[n]
-        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
@@ -401,8 +401,8 @@ def americanBondOption_Tree_Fast(texp, tmat, strikePrice,  face,
         tcpn = couponTimes[i]
         n = int(round(tcpn/_dt, 0))
         ttree = _treeTimes[n]
-        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     # if DEBUG:
@@ -654,8 +654,8 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
         tcpn = couponTimes[i]
         n = int(round(tcpn/_dt, 0))
         ttree = _treeTimes[n]
-        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     #######################################################################
@@ -717,7 +717,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
         for i in range(0, maturityStep+1):
             flow = treeFlows[i]
             t = _treeTimes[i]
-            df = uinterpolate(t, _dfTimes, _dfValues, interp)
+            df = _uinterpolate(t, _dfTimes, _dfValues, interp)
             px += flow*df
         px += df
 
@@ -944,7 +944,7 @@ class FinModelRatesBK():
 
         for i in range(1, self._numTimeSteps+2):
             t = treeTimes[i]
-            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
+            dfTree[i] = _uinterpolate(t, dfTimes, dfValues, interp)
 
         self._dfTimes = dfTimes
         self._dfValues = dfValues

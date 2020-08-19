@@ -195,8 +195,8 @@ def americanBondOption_Tree_Fast(texp,
         if tcpn <= texp:
             n = int(tcpn/dt)
             ttree = _treeTimes[n]
-            df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-            df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+            df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+            df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
             treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
@@ -259,8 +259,8 @@ def americanBondOption_Tree_Fast(texp,
     putOptionValues = np.zeros(shape=(numTimeSteps, numNodes))
     bondValues = np.zeros(shape=(numTimeSteps, numNodes))
 
-    ptexp = uinterpolate(texp, _dfTimes, _dfValues, interp)
-    ptdelta = uinterpolate(texp+dt, _dfTimes, _dfValues, interp)
+    ptexp = _uinterpolate(texp, _dfTimes, _dfValues, interp)
+    ptdelta = _uinterpolate(texp+dt, _dfTimes, _dfValues, interp)
 
     flow = treeFlows[expiryStep]
 
@@ -283,7 +283,7 @@ def americanBondOption_Tree_Fast(texp,
         for i in range(0, numCoupons):
             tflow = couponTimes[i]
             if tflow > texp:
-                ptflow = uinterpolate(tflow, _dfTimes, _dfValues, interp)
+                ptflow = _uinterpolate(tflow, _dfTimes, _dfValues, interp)
                 zcb = P_Fast(texp, tflow, rt, dt, ptexp, ptdelta, ptflow,
                              _sigma, _a)
                 cpn = couponAmounts[i]
@@ -448,8 +448,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat, strikePrice, face,
         tcpn = couponTimes[i]
         n = int(round(tcpn/_dt, 0))
         ttree = _treeTimes[n]
-        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
@@ -669,8 +669,8 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
         tcpn = couponTimes[i]
         n = int(round(tcpn/dt, 0))
         ttree = _treeTimes[n]
-        df_flow = uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
@@ -732,7 +732,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponAmounts,
         for i in range(0, maturityStep+1):
             flow = treeFlows[i]
             t = _treeTimes[i]
-            df = uinterpolate(t, _dfTimes, _dfValues, interp)
+            df = _uinterpolate(t, _dfTimes, _dfValues, interp)
             px += flow*df
         px += df
 
@@ -828,8 +828,8 @@ def fwdFullBondPrice(rt, *args):
 
     dt = 0.001
     tdelta = texp + dt
-    ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
-    ptdelta = uinterpolate(tdelta, dfTimes, dfValues, interp)
+    ptexp = _uinterpolate(texp, dfTimes, dfValues, interp)
+    ptdelta = _uinterpolate(tdelta, dfTimes, dfValues, interp)
 
     numFlows = len(cpnTimes)
     pv = 0.0
@@ -839,7 +839,7 @@ def fwdFullBondPrice(rt, *args):
         cpn = cpnAmounts[i]
 
         if tcpn >= texp:  # CHECK IF IT SHOULD BE >=
-            ptcpn = uinterpolate(tcpn, dfTimes, dfValues, interp)
+            ptcpn = _uinterpolate(tcpn, dfTimes, dfValues, interp)
             zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
                          self._sigma, self._a)
             pv = pv + zcb * cpn
@@ -917,8 +917,8 @@ class FinModelRatesHW():
         if texp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
-        ptmat = uinterpolate(tmat, dfTimes, dfValues, interp)
+        ptexp = _uinterpolate(texp, dfTimes, dfValues, interp)
+        ptmat = _uinterpolate(tmat, dfTimes, dfValues, interp)
 
         sigma = self._sigma
         a = self._a
@@ -964,8 +964,8 @@ class FinModelRatesHW():
         dt = 0.0001
         numCoupons = len(cpnTimes)
 
-        ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
-        ptdelta = uinterpolate(texp+dt, dfTimes, dfValues, interp)
+        ptexp = _uinterpolate(texp, dfTimes, dfValues, interp)
+        ptdelta = _uinterpolate(texp+dt, dfTimes, dfValues, interp)
 
         callValue = 0.0
         putValue = 0.0
@@ -976,7 +976,7 @@ class FinModelRatesHW():
 
             if tcpn > texp:  # coupons on the expiry date are ignored
 
-                ptcpn = uinterpolate(tcpn, dfTimes, dfValues, interp)
+                ptcpn = _uinterpolate(tcpn, dfTimes, dfValues, interp)
 
                 strike = P_Fast(texp, tcpn, rstar, dt, ptexp, ptdelta,
                                 ptcpn, self._sigma, self._a)
@@ -1014,8 +1014,8 @@ class FinModelRatesHW():
         dt = self._dt
         tdelta = texp + dt
 
-        ptexp = uinterpolate(texp, self._dfTimes, self._dfValues, interp)
-        ptdelta = uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
+        ptexp = _uinterpolate(texp, self._dfTimes, self._dfValues, interp)
+        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
 
         numTimeSteps, numNodes = self._Q.shape
         expiryStep = int(texp/dt+0.50)
@@ -1035,7 +1035,7 @@ class FinModelRatesHW():
 
                 if tcpn >= texp:
 
-                    ptcpn = uinterpolate(tcpn, self._dfTimes, self._dfValues,
+                    ptcpn = _uinterpolate(tcpn, self._dfTimes, self._dfValues,
                                          interp)
 
                     zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
@@ -1077,9 +1077,9 @@ class FinModelRatesHW():
         dt = self._dt
         tdelta = texp + dt
 
-        ptexp = uinterpolate(texp, self._dfTimes, self._dfValues, interp)
-        ptdelta = uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
-        ptmat = uinterpolate(tmat, self._dfTimes, self._dfValues, interp)
+        ptexp = _uinterpolate(texp, self._dfTimes, self._dfValues, interp)
+        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
+        ptmat = _uinterpolate(tmat, self._dfTimes, self._dfValues, interp)
 
         numTimeSteps, numNodes = self._Q.shape
         expiryStep = int(texp/dt+0.50)
@@ -1244,7 +1244,7 @@ class FinModelRatesHW():
 
         for i in range(1, self._numTimeSteps+2):
             t = treeTimes[i]
-            dfTree[i] = uinterpolate(t, dfTimes, dfValues, interp)
+            dfTree[i] = _uinterpolate(t, dfTimes, dfValues, interp)
 
         self._dfTimes = dfTimes
         self._dfValues = dfValues

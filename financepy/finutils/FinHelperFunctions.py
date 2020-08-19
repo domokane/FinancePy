@@ -343,6 +343,8 @@ def checkArgumentTypes(func, values):
         value = values[valueName]
         usableType = toUsableType(annotationType)
         if(not isinstance(value, usableType)):
+
+            print("==>", value, type(value), usableType, isinstance(value, usableType))
             s = f"In {func.__module__}.{func.__name__}:\n"
             s += f"Mismatched Types: expected a "
             s += f"{valueName} of type '{usableType.__name__}', however"

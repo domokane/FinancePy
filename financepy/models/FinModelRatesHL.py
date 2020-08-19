@@ -7,7 +7,7 @@ from numba import njit
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N
-from ..market.curves.FinInterpolate import FinInterpTypes, uinterpolate
+from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 from ...finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpTypes.FLAT_FORWARDS.value
@@ -75,8 +75,8 @@ class FinModelRatesHL():
         if texp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        ptexp = uinterpolate(texp, dfTimes, dfValues, interp)
-        ptmat = uinterpolate(tmat, dfTimes, dfValues, interp)
+        ptexp = _uinterpolate(texp, dfTimes, dfValues, interp)
+        ptmat = _uinterpolate(tmat, dfTimes, dfValues, interp)
 
         sigma = self._sigma
 

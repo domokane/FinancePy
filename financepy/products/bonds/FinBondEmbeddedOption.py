@@ -161,7 +161,7 @@ class FinBondEmbeddedOption(object):
 
         face = self._bond._face
 
-        if type(model) is FinModelRatesHW:
+        if isinstance(model, FinModelRatesHW):
 
             ''' We need to build the tree out to the bond maturity date. To be
             more precise we only need to go out the the last option date but
@@ -183,7 +183,7 @@ class FinBondEmbeddedOption(object):
 
             return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
 
-        elif type(model) == FinModelRatesBK:
+        elif isinstance(model, FinModelRatesBK):
 
             ''' Because we not have a closed form bond price we need to build
             the tree out to the bond maturity which is after option expiry. '''

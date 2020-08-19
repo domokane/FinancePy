@@ -32,7 +32,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
     def __init__(self,
                  valuationDate: FinDate,
                  flatRate: float,
-                 frequencyType: FinFrequencyTypes=FinFrequencyTypes.CONTINUOUS,
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date and a rate and also a
@@ -40,7 +40,6 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         convention must be used to specify how time periods are to be measured.
         As the curve is flat, no interpolation scheme is required.
         '''
-
         checkArgumentTypes(self.__init__, locals())
 
         self._valuationDate = valuationDate

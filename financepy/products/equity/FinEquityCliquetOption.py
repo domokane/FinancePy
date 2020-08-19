@@ -139,9 +139,6 @@ class FinEquityCliquetOption(FinEquityOption):
         for i in range(0, numOptions):
             print(self._actualDates[i], self._dfs[i], self._v_options[i])
 
-#           print("%20s  %9.5f  %9.5f" %
-#                  self._expiryDates[i], self._dfs[i], self._v_options[i])
-
 ###############################################################################
 
     def __repr__(self):

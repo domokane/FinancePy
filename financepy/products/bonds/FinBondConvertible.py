@@ -23,12 +23,12 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolate import FinInterpTypes, uinterpolate
+from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 
 ###############################################################################
 
 
-@njit(fastmath=True, cache=True)
+# @njit(fastmath=True, cache=True)
 def _valueConvertible(tmat,
                       face,
                       couponTimes,
@@ -106,7 +106,7 @@ def _valueConvertible(tmat,
     treeTimes = np.linspace(0.0, tmat, numTimes)
     treeDfs = np.zeros(numTimes)
     for i in range(0, numTimes):
-        df = uinterpolate(treeTimes[i], dfTimes, dfValues, interp)
+        df = _uinterpolate(treeTimes[i], dfTimes, dfValues, interp)
         treeDfs[i] = df
 
     h = creditSpread/(1.0 - recRate)
@@ -119,9 +119,9 @@ def _valueConvertible(tmat,
         flowTime = couponTimes[i]
         n = int(round(flowTime/dt, 0))
         treeTime = treeTimes[n]
-        df_flow = uinterpolate(flowTime, dfTimes, dfValues, interp)
+        df_flow = _uinterpolate(flowTime, dfTimes, dfValues, interp)
         df_flow *= exp(-h*flowTime)
-        df_tree = uinterpolate(treeTime, dfTimes, dfValues, interp)
+        df_tree = _uinterpolate(treeTime, dfTimes, dfValues, interp)
         df_tree *= exp(-h*treeTime)
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 

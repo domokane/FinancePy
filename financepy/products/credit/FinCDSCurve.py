@@ -10,7 +10,7 @@ from numba import njit, float64
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import uinterpolate, FinInterpTypes
+from ...market.curves.FinInterpolate import _uinterpolate, FinInterpTypes
 from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
@@ -139,12 +139,16 @@ class FinCDSCurve():
             n = len(t)
             qs = np.zeros(n)
             for i in range(0, n):
-                qs[i] = uinterpolate(t[i], self._times, self._values,
-                                     self._interpolationMethod.value)
+                qs[i] = _uinterpolate(t[i],
+                                      self._times,
+                                      self._values,
+                                      self._interpolationMethod.value)
             return qs
         else:
-            q = uinterpolate(t, self._times, self._values,
-                             self._interpolationMethod.value)
+            q = _uinterpolate(t,
+                              self._times,
+                              self._values,
+                              self._interpolationMethod.value)
             return q
 
         return 999
