@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2019
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic O'Kane
-"""
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.bonds.FinBondFuture import FinBondFuture
@@ -20,7 +18,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinBondFuture():
 
-        # Example taken from Martellini and Priaulet page 360
+    # Example taken from Martellini and Priaulet page 360
     freq = FinFrequencyTypes.SEMI_ANNUAL
     basis = FinDayCountTypes.ACT_ACT_ICMA
 

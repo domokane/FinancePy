@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -21,6 +18,7 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinEquityRainbowOption():
 

@@ -14,13 +14,7 @@ from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
-
-from financepy.finutils.FinHelperFunctions import dump
-
-
-# from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
-
-from financepy.products.bonds import *
+from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
 
 import sys
 sys.path.append("..\\..")

@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Oct 18 17:54:03 2019
-
-@author: Dominic O'Kane
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
+
 
 def test_FinMeanVarPortfolio():
 
@@ -49,20 +48,19 @@ def test_FinMeanVarPortfolio():
     returns.head()
 
     # We need to make a list of the tickers that we want
-    assetList = ['AAPL','MSFT','IBM','GS','V','WMT','VZ','CSCO']
-    
-    numAssets = len(assetList)
-    
+    assetList = ['AAPL', 'MSFT', 'IBM', 'GS', 'V', 'WMT', 'VZ', 'CSCO']
+
     # Now we use this to select columns from the dataframe
     newReturns = returns[assetList]
     assetReturns = newReturns.mean()
     assetCovariance = newReturns.cov()
     assetCorrelations = newReturns.corr()
-    
     rfr = 0.015
 
     portfolio = FinMeanVarPortfolio(assetList)
     portfolio.setReturns(returns)
+
+###############################################################################
 
 
 #test_FinMeanVarPortfolio()

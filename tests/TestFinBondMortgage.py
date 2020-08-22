@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
-
-@author: Dominic
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 import sys
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.bonds.FinBondMortgage import FinBondMortgage, FinBondMortgageTypes
+from financepy.products.bonds.FinBondMortgage import FinBondMortgage
+from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
 
 sys.path.append("..//..")
 

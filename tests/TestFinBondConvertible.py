@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 # TODO
 import time
@@ -16,6 +18,7 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinBondConvertible():
 
@@ -123,6 +126,7 @@ def test_FinBondConvertible():
         testCases.print(period, numStepsPerYear, res)
 
 ###############################################################################
+
 
 test_FinBondConvertible()
 testCases.compareTestCases()

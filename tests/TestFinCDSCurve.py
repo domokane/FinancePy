@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 13 21:52:16 2019
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic O'Kane
-"""
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDS import FinCDS
@@ -16,9 +14,10 @@ from financepy.finutils.FinDate import FinDate
 import sys
 sys.path.append("..//..")
 
-import numpy as np
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
 
 
 def test_FinCDSCurve():
@@ -71,20 +70,20 @@ def test_FinCDSCurve():
         v = cds.value(curveDate, issuerCurve)
         testCases.print(i, v)
 
-    if 1==0:
+    if 1 == 0:
         x = [0.0, 1.2, 1.6, 1.7, 10.0]
         qs = issuerCurve.survProb(x)
         print("===>", qs)
-    
+
         x = [0.3, 1.2, 1.6, 1.7, 10.0]
         xx = np.array(x)
         qs = issuerCurve.survProb(xx)
         print("===>", qs)
-    
+
         x = [0.3, 1.2, 1.6, 1.7, 10.0]
         dfs = issuerCurve.df(x)
         print("===>", dfs)
-    
+
         x = [0.3, 1.2, 1.6, 1.7, 10.0]
         xx = np.array(x)
         dfs = issuerCurve.df(xx)

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 08 09:26:27 2016
-
-@author: Dominic O'Kane
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 import datetime as dt
 
@@ -18,6 +15,7 @@ from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondYieldCurve import FinBondYieldCurve
 from financepy.products.bonds.FinBondYieldCurveModel import *
+
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

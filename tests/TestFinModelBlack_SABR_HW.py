@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic
-"""
-import time
 import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -17,6 +14,7 @@ import matplotlib.pyplot as plt
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinSABR():
 
@@ -36,7 +34,6 @@ def test_FinSABR():
 
     f = 0.0350
     T = 1.0
-    K= 0.01
 
     vols1 = model1.blackVol(f, strikes, T)
     vols2 = model2.blackVol(f, strikes, T)
@@ -47,6 +44,7 @@ def test_FinSABR():
     plt.title("SABR")
 
 ###############################################################################
+
 
 def test_FinShiftedSABRSimple():
 
@@ -66,7 +64,6 @@ def test_FinShiftedSABRSimple():
 
     f = 0.0350
     T = 1.0
-    K= 0.01
 
     vols1 = model1.blackVol(f, strikes, T)
     vols2 = model2.blackVol(f, strikes, T)
@@ -77,6 +74,7 @@ def test_FinShiftedSABRSimple():
     plt.title("Shifted SIMPLE SABR")
 
 ###############################################################################
+
 
 def test_FinShiftedSABR():
 
@@ -100,6 +98,7 @@ def test_FinShiftedSABR():
     plt.title("SHIFTED SABR")
 
 ###############################################################################
+
 
 test_FinSABR()
 test_FinShiftedSABRSimple()

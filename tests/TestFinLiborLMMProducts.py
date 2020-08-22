@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
+
+import numpy as np
 
 from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
 from financepy.finutils.FinDate import FinDate
@@ -14,7 +18,6 @@ from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
 from financepy.products.libor.FinLiborLMMProducts import FinLiborLMMProducts
 
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
-import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -25,6 +28,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_Swaptions():
+    ''' In progress and so not used. '''
 
     startYear = 2020
     endYear = 2030
@@ -227,6 +231,7 @@ def test_CapsFloors():
 
 ###############################################################################
 
-# test_CapsFloors()
-# test_Swaptions()
+
+test_CapsFloors()
+#test_Swaptions()
 testCases.compareTestCases()

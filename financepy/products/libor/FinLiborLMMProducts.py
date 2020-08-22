@@ -112,7 +112,7 @@ class FinLiborLMMProducts():
         if numPaths < 2 or numPaths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discountCurve._curveDate != self._startDate:
+        if discountCurve._valuationDate != self._startDate:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         gammas = np.zeros(len(self._gridTimes))

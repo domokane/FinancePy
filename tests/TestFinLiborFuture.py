@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
-
-@author: Dominic
-"""
-
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 

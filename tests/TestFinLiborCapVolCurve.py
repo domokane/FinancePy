@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic
-"""
 import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -50,7 +48,7 @@ def test_FinCapVolCurve():
         capFloorVol = volCurve.capVol(dt)
         capFloorLetVol = volCurve.capletVol(dt)
         print("%s %7.3f %7.2f " % (dt, capFloorVol*100.0,
-                                          capFloorLetVol*100.0))
+                                   capFloorLetVol*100.0))
 
 ##########################################################################
 

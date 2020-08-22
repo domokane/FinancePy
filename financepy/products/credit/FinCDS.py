@@ -207,14 +207,17 @@ class FinCDS(object):
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
+            # To get the next CDS date we move on by the tenor and 
+            # then roll to next CDS date after that
             maturityDate = stepInDate.addTenor(maturityDateOrTenor)
+            maturityDate = maturityDate.nextCDSDate()
 
         if stepInDate > maturityDate:
             raise FinError("Step in date after maturity date")
 
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
-        self._coupon = runningCoupon
+        self._runningCoupon = runningCoupon
         self._notional = notional
         self._longProtection = longProtection
         self._dayCountType = dayCountType
@@ -318,7 +321,7 @@ class FinCDS(object):
             t0 = paymentDates[it - 1]
             t1 = paymentDates[it]
             accrualFactor = dayCount.yearFrac(t0, t1)
-            flow = accrualFactor * self._coupon * self._notional
+            flow = accrualFactor * self._runningCoupon * self._notional
 
             self._accrualFactors.append(accrualFactor)
             self._flows.append(flow)
@@ -356,9 +359,9 @@ class FinCDS(object):
             longProt = -1
 
         fullPV = fwdDf * longProt * \
-            (protPV - self._coupon * fullRPV01 * self._notional)
+            (protPV - self._runningCoupon * fullRPV01 * self._notional)
         cleanPV = fwdDf * longProt * \
-            (protPV - self._coupon * cleanRPV01 * self._notional)
+            (protPV - self._runningCoupon * cleanRPV01 * self._notional)
 
         return {'full_pv': fullPV, 'clean_pv': cleanPV}
 
@@ -385,7 +388,7 @@ class FinCDS(object):
 
         bump = 0.0001
         for cds in issuerCurve._cdsContracts:
-            cds._coupon += bump
+            cds._runningCoupon += bump
         issuerCurve._buildCurve()
 
         v1 = self.value(valuationDate,
@@ -397,7 +400,7 @@ class FinCDS(object):
 
         # NEED TO UNDO CHANGES TO CURVE OBJECT - NO NEED TO REBUILD !!!
         for cds in issuerCurve._cdsContracts:
-            cds._coupon -= bump
+            cds._runningCoupon -= bump
         issuerCurve._values = survProbs
 
         creditDV01 = (v1['full_pv'] - v0['full_pv'])
@@ -505,7 +508,8 @@ class FinCDS(object):
 
         fwdDf = 1.0
 
-        cleanPV = fwdDf * (protPV - self._coupon * cleanRPV01 * self._notional)
+        cleanPV = fwdDf * (protPV - self._runningCoupon * cleanRPV01
+                           * self._notional)
         cleanPrice = (self._notional - cleanPV) / self._notional * 100.0
         return cleanPrice
 
@@ -621,7 +625,7 @@ class FinCDS(object):
         paymentDates = self._adjustedDates
         pcd = paymentDates[0]
         accrualFactor = dayCount.yearFrac(pcd, self._stepInDate)
-        accruedInterest = accrualFactor * self._notional * self._coupon
+        accruedInterest = accrualFactor * self._notional * self._runningCoupon
 
         if self._longProtection:
             accruedInterest *= -1.0
@@ -711,7 +715,7 @@ class FinCDS(object):
                                    issuerCurve,
                                    pv01Method)['full_rpv01']
 
-        v = fullRPV01 * self._notional * self._coupon
+        v = fullRPV01 * self._notional * self._runningCoupon
         return v
 
 ##########################################################################
@@ -779,7 +783,7 @@ class FinCDS(object):
         protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
             / w * self._notional
         cleanPV = fwdDf * longProtection * \
-            (protPV - self._coupon * cleanRPV01 * self._notional)
+            (protPV - self._runningCoupon * cleanRPV01 * self._notional)
         fullPV = cleanPV + fwdDf * longProtection * accrued
 
         bumpSize = 0.0001
@@ -793,7 +797,7 @@ class FinCDS(object):
         protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat)) \
             / w * self._notional
         cleanPV_credit_bumped = fwdDf * longProtection * \
-            (protPV - self._coupon * cleanRPV01 * self._notional)
+            (protPV - self._runningCoupon * cleanRPV01 * self._notional)
         fullPV_credit_bumped = cleanPV_credit_bumped \
             + fwdDf * longProtection * accrued
         credit01 = fullPV_credit_bumped - fullPV
@@ -806,7 +810,7 @@ class FinCDS(object):
         protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
             / w * self._notional
         cleanPV_ir_bumped = fwdDf * longProtection * \
-            (protPV - self._coupon * cleanRPV01 * self._notional)
+            (protPV - self._runningCoupon * cleanRPV01 * self._notional)
         fullPV_ir_bumped = cleanPV_ir_bumped + fwdDf * longProtection * accrued
         ir01 = fullPV_ir_bumped - fullPV
 
@@ -837,13 +841,13 @@ class FinCDS(object):
         s = labelToString("STEPINDATE", self._stepInDate)
         s += labelToString("MATURITY", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("RUNNING COUPON", self._coupon * 10000, "bp\n")
+        s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")
         s += labelToString("DAYCOUNT", self._dayCountType)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType)
-        s += labelToString("ACCRUED DAYS:", self.accruedDays())
+        s += labelToString("ACCRUED DAYS", self.accruedDays())
 
         header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
         valueTable = [self._adjustedDates, self._accrualFactors, self._flows]

@@ -1,16 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 12 16:51:05 2016
-
-@author: Dominic O'Kane
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.products.fx.FinFXForward import FinFXForward
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.products.libor.FinLiborCurve import FinLiborCurve

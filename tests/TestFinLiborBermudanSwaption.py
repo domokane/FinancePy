@@ -1,20 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
-
-@author: Dominic
-"""
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
-
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborBermudanSwaption import FinLiborBermudanSwaption
@@ -33,8 +26,6 @@ def test_FinLiborBermudanSwaptionBKModel():
     ''' Replicate examples in paper by Leif Andersen which can be found at
     file:///C:/Users/Dominic/Downloads/SSRN-id155208.pdf '''
 
-    import time
-
     valuationDate = FinDate(1, 1, 2011)
     settlementDate = valuationDate
     exerciseDate = settlementDate.addYears(1)
@@ -47,8 +38,6 @@ def test_FinLiborBermudanSwaptionBKModel():
     liborCurve = FinDiscountCurveFlat(valuationDate,
                                       0.06,
                                       FinFrequencyTypes.SEMI_ANNUAL)
-
-    start = time.time()
 
     ###########################################################################
     # BLACK'S MODEL

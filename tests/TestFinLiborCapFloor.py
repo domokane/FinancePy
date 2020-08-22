@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug  5 16:23:12 2019
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic
-"""
+
 import time
 import numpy as np
 
@@ -14,6 +13,7 @@ from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
+
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -21,6 +21,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
+
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -35,7 +36,6 @@ from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 
 from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
-from financepy.finutils.FinError import FinError
 from financepy.finutils.FinSchedule import FinSchedule
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

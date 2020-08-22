@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
 import matplotlib.pyplot as plt
 import time
@@ -81,7 +83,8 @@ def test_FinBondEmbeddedOptionMATLAB():
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, numTimeSteps, v['bondwithoption'], v['bondpure'])
+        testCases.print(period, numTimeSteps, v['bondwithoption'],
+                        v['bondpure'])
         values.append(v['bondwithoption'])
 
     plt.figure()

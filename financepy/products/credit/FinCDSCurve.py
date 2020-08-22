@@ -106,7 +106,7 @@ class FinCDSCurve():
 ###############################################################################
 
     def _validate(self, cdsContracts):
-        ''' Ensure that contracts are in increasinbg maturity. '''
+        ''' Ensure that contracts are in increasing maturity. '''
 
         if len(cdsContracts) == 0:
             raise FinError("No CDS contracts have been supplied.")

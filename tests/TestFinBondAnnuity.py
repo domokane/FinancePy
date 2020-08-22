@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 30 10:52:29 2018
+###############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+###############################################################################
 
-@author: Dominic O'Kane
-"""
 # TODO Set up test cases correctly
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -17,7 +15,7 @@ from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
 # from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
-from financepy.products.bonds import *
+from financepy.products.bonds import FinBondAnnuity
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
