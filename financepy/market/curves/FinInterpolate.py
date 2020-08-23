@@ -21,8 +21,8 @@ class FinInterpTypes(Enum):
 ###############################################################################
 
 
-def interpolate(t: (float, np.ndarray),  # time
-                times: np.ndarray,  # Vector of times
+def interpolate(t: (float, np.ndarray),  # time or array of times
+                times: np.ndarray,  # Vector of times on grid
                 dfs: np.ndarray,  # Vector of discount factors
                 method: int):  # Interpolation method
     ''' Fast interpolation of discount factors at time x given discount factors
@@ -144,12 +144,12 @@ def _uinterpolate(t, times, dfs, method):
 
 ###############################################################################
 
-#@njit(float64[:](float64[:], float64[:], float64[:], int64),
-#      fastmath=True, cache=True, nogil=True)
+@njit(float64[:](float64[:], float64[:], float64[:], int64),
+      fastmath=True, cache=True, nogil=True)
 def _vinterpolate(xValues,
-                 xvector,
-                 dfs,
-                 method):
+                  xvector,
+                  dfs,
+                  method):
     ''' Return the interpolated values of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and

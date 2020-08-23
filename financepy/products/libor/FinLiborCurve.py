@@ -57,7 +57,6 @@ class FinLiborCurve(FinDiscountCurve):
 ###############################################################################
 
     def __init__(self,
-                 name: str,
                  valuationDate: FinDate,
                  liborDeposits: list,
                  liborFRAs: list,
@@ -70,7 +69,6 @@ class FinLiborCurve(FinDiscountCurve):
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._name = name
         self._times = []
         self._dfValues = []
         self._valuationDate = valuationDate

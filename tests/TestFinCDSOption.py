@@ -146,8 +146,7 @@ def buildFullIssuerCurve(tradeDate):
         dcType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborCurve(
-        "USD_LIBOR", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     cdsMarketContracts = []
 

@@ -65,7 +65,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    liborCurve = FinLiborCurve("USD_LIBOR", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -188,7 +188,7 @@ def test_FinLiborSwaptionQLExample():
     swap = FinLiborSwap(settlementDate, "30Y", 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve("USD_LIBOR", valuationDate, depos, [], swaps,
+    liborCurve = FinLiborCurve(valuationDate, depos, [], swaps,
                                FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")
@@ -282,8 +282,7 @@ def testFinLiborCashSettledSwaption():
     swap = FinLiborSwap(settlementDate, "30Y", 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve("USD_LIBOR", valuationDate, depos, [], swaps,
-                               FinInterpTypes.LINEAR_ZERO_RATES)
+    liborCurve = FinLiborCurve(valuationDate, depos, [], swaps, FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")
     swapMaturityDate = exerciseDate.addTenor("5Y")

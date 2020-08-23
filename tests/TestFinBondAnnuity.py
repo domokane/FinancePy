@@ -34,7 +34,7 @@ def test_FinBondAnnuity():
     swap5 = FinLiborSwap(settlementDate, "5Y", 0.0501, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3, swap4, swap5]
 
-    liborCurve = FinLiborCurve("USD_LIBOR", settlementDate, depos, [], swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, [], swaps)
 
     #   print("==============================================================")
     #   print("SEMI-ANNUAL FREQUENCY")

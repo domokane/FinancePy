@@ -266,7 +266,7 @@ def buildLiborCurve(valuationDate):
         dcType)
     swaps.append(swap19)
 
-    liborCurve = FinLiborCurve("USD", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 

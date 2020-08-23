@@ -43,7 +43,7 @@ def test_FinCDSCurve():
             fixedDCC)
         swaps.append(swap)
 
-    libor_curve = FinLiborCurve("USD_LIBOR", curveDate, depos, fras, swaps)
+    libor_curve = FinLiborCurve(curveDate, depos, fras, swaps)
 
     cdsContracts = []
 

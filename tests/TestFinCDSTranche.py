@@ -90,8 +90,7 @@ def buildLiborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinLiborCurve(
-        "USD_LIBOR", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -126,7 +125,7 @@ def loadHomogeneousCDSCurves(valuationDate,
                               recoveryRate)
 
     issuerCurves = []
-    for iCredit in range(0, numCredits):
+    for _ in range(0, numCredits):
         issuerCurves.append(issuerCurve)
 
     return issuerCurves

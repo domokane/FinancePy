@@ -151,7 +151,7 @@ def _protectionLegPV_NUMBA(teff,
 
     if useFlatHazardRateIntegral is True:
 
-        for i in range(0, numStepsPerYear):
+        for _ in range(0, numStepsPerYear):
 
             t = t + dt
             z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
@@ -168,7 +168,7 @@ def _protectionLegPV_NUMBA(teff,
 
     else:
 
-        for i in range(0, numStepsPerYear):
+        for _ in range(0, numStepsPerYear):
 
             t += dt
             z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)

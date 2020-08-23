@@ -40,7 +40,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     swap2 = FinLiborSwap(settlementDate, "2Y", 0.0400, fixedFreq, dcType)
     swap3 = FinLiborSwap(settlementDate, "3Y", 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discountCurve = FinLiborCurve("USD_LIBOR", settlementDate, [], [], swaps)
+    discountCurve = FinLiborCurve(settlementDate, [], [], swaps)
 
     ###########################################################################
 

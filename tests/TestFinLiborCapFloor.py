@@ -73,7 +73,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    liborCurve = FinLiborCurve("USD_LIBOR", settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 

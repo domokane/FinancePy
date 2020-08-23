@@ -28,7 +28,7 @@ def test_Imports():
         swap2 = FinLiborSwap(settlementDate, FinDate(1,1,2009), 0.05, fixedFreq, dcType)
         swap3 = FinLiborSwap(settlementDate, FinDate(1,1,2010), 0.05, fixedFreq, dcType)
         swaps = [swap1, swap2, swap3]
-        discountCurve = FinLiborCurve("USD_LIBOR", settlementDate, [], [], swaps)
+        discountCurve = FinLiborCurve(settlementDate, [], [], swaps)
 
         print(discountCurve)
 

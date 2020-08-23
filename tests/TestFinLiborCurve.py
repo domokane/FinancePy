@@ -69,8 +69,7 @@ def test_FinLiborDepositsOnly():
     fras = []
     swaps = []
 
-    liborCurve = FinLiborCurve("USD_LIBOR",
-                               settlementDate,
+    liborCurve = FinLiborCurve(settlementDate,
                                depos,
                                fras,
                                swaps)
@@ -120,8 +119,7 @@ def test_FinLiborFRAsOnly():
     depos = []
     swaps = []
 
-    liborCurve = FinLiborCurve("USD_LIBOR",
-                               settlementDate,
+    liborCurve = FinLiborCurve(settlementDate,
                                depos,
                                fras,
                                swaps)
@@ -273,8 +271,7 @@ def test_FinLiborDepositsFRAsSwaps():
                         fixedDCCType)
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve("USD_LIBOR",
-                               valuationDate,
+    liborCurve = FinLiborCurve(valuationDate,
                                depos,
                                fras,
                                swaps)
@@ -419,7 +416,7 @@ def test_FinLiborDepositsFuturesSwaps():
 
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve("USD_LIBOR", spotDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(spotDate, depos, fras, swaps)
 
     times = np.linspace(0.0, 2.0, 25)
     dates = spotDate.addYears(times)
