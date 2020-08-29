@@ -111,7 +111,7 @@ class FinBondAnnuity(object):
                                       self._frequencyType,
                                       calendarType,
                                       busDayRuleType,
-                                      dateGenRuleType).generate()
+                                      dateGenRuleType)._generate()
 
         self._pcd = self._flowDates[0]
         self._ncd = self._flowDates[1]
@@ -188,7 +188,7 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 

@@ -7,7 +7,7 @@ import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
@@ -16,7 +16,6 @@ from ...products.libor.FinLiborSwap import FinLiborSwap
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinHelperFunctions import timesFromDates
 from ...finutils.FinHelperFunctions import pv01Times
-from ...finutils.FinFrequency import dfToZero
 from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
@@ -59,6 +58,7 @@ class FinDiscountCurve():
         startIndex = 0
         if numPoints > 0:
             if dfDates[0] == valuationDate:
+                self._dfValues[0] = dfValues[0]
                 startIndex = 1
 
         for i in range(startIndex, numPoints):
@@ -79,16 +79,59 @@ class FinDiscountCurve():
 
 ###############################################################################
 
+    def _dfToZero(self,
+                  maturityDt: (FinDate, list),
+                  frequencyType: FinFrequencyTypes,
+                  dayCountType: FinDayCountTypes):
+        ''' Convert a discount factor to a zero rate with specific compounding
+        frequency which may be continuous, simple, or compounded at a specific
+        frequency which are all choices of FinFrequencyTypes. Returns a list of
+        discount factor. '''
+
+        f = FinFrequency(frequencyType)
+        dcCounter = FinDayCount(dayCountType)
+
+        if isinstance(maturityDt, FinDate):
+            dateList = [maturityDt]
+        else:
+            dateList = maturityDt
+
+        zeroRates = []
+        for dt in dateList:
+            df = self.df(dt)
+
+            t = dcCounter.yearFrac(self._valuationDate, dt)
+            t = max(t, gSmall)
+
+            if frequencyType == FinFrequencyTypes.CONTINUOUS:
+                r = -np.log(df)/t
+            elif frequencyType == FinFrequencyTypes.SIMPLE:
+                r = (1.0/df - 1.0)/t
+            else:
+                r = (np.power(df, -1.0/(t * f))-1.0) * f
+            zeroRates.append(r)
+
+        return zeroRates
+
+###############################################################################
+
     def zeroRate(self,
                  dt: (list, FinDate),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS):
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
         times so must use Numpy functions. Default frequency is a
         continuously compounded rate. '''
 
-        times = timesFromDates(dt, self._valuationDate)
-        zeroRates = self._zeroRate(times, frequencyType)
+        if isinstance(frequencyType, FinFrequencyTypes) is False:
+            raise FinError("Invalid Frequency type.")
+
+        if isinstance(dayCountType, FinDayCountTypes) is False:
+            raise FinError("Invalid Day Count type.")
+
+        # Calculate the zero rate taking into account frequency AND day count
+        zeroRates = self._dfToZero(dt, frequencyType, dayCountType)
 
         if isinstance(dt, FinDate):
             return zeroRates[0]
@@ -97,23 +140,26 @@ class FinDiscountCurve():
 
 ###############################################################################
 
-    def _zeroRate(self,
-                  times: (float, np.ndarray),
-                  frequencyType=FinFrequencyTypes):
-        ''' Calculate the zero rate to maturity date but with times as inputs.
-        This function is used internally and should be discouraged for external
-        use. The compounding frequency defaults to continuous. '''
+    # def _zeroRate(self,
+    #               times: (float, np.ndarray),
+    #               frequencyType=FinFrequencyTypes):
+    #     ''' Calculate the zero rate to maturity date but with times as inputs.
+    #     This function is used internally and should be discouraged for external
+    #     use. The compounding frequency defaults to continuous. '''
 
-        if isinstance(times, float):
-            times = np.array([times])
+    #     if isinstance(frequencyType, FinFrequencyTypes) is False:
+    #         raise FinError("Invalid Frequency type.")
 
-        if np.any(times < 0.0):
-            raise FinError("All times must be positive")
+    #     if isinstance(times, float):
+    #         times = np.array([times])
 
-        times = np.maximum(times, 1e-6)
-        dfs = self._df(times)
-        zeroRates = dfToZero(dfs, times, frequencyType)
-        return zeroRates
+    #     if np.any(times < 0.0):
+    #         raise FinError("All times must be positive")
+
+    #     times = np.maximum(times, 1e-6)
+    #     dfs = self._df(times)
+    #     zeroRates = dfToZero(dfs, times, frequencyType)
+    #     return zeroRates
 
 ###############################################################################
 
@@ -123,6 +169,9 @@ class FinDiscountCurve():
         ''' Calculate the par rate to maturity date. This is the rate paid by a
         bond that has a price of par today. For a par swap rate, use the swap
         rate function that takes in the swap details. '''
+
+        if isinstance(frequencyType, FinFrequencyTypes) is False:
+            raise FinError("Invalid Frequency type.")
 
         times = timesFromDates(dt, self._valuationDate)
         parRates = self._parRate(times, frequencyType)
@@ -140,6 +189,9 @@ class FinDiscountCurve():
         ''' Calculate the zero rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to continuous. '''
+
+        if isinstance(frequencyType, FinFrequencyTypes) is False:
+            raise FinError("Invalid Frequency type.")
 
         if frequencyType == FinFrequencyTypes.SIMPLE:
             raise FinError("Cannot calculate par rate with simple yield freq.")
@@ -180,6 +232,9 @@ class FinDiscountCurve():
         starts on the settlement date (which may be forward starting) with a
         specified frequency and day count convention. Have omitted calendar and
         other input choices for the moment so default values being used.'''
+
+        if isinstance(fixedFrequencyType, FinFrequencyTypes) is False:
+            raise FinError("Invalid Frequency type.")
 
         coupon = 1.0
         swap = FinLiborSwap(settlementDate,
@@ -340,7 +395,7 @@ class FinDiscountCurve():
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 

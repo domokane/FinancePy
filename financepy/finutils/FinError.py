@@ -46,7 +46,7 @@ class FinError(Exception):
         ''' Create FinError object by passing a message string. '''
         self._message = message
 
-    def print(self):
+    def _print(self):
         print("FinError:", self._message)
 
 ###############################################################################

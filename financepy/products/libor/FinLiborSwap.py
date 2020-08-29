@@ -18,9 +18,9 @@ class FinLiborSwap(object):
     ''' Class for managing an interest rate swap contract. '''
 
     def __init__(self,
-                 startDate: FinDate,  # This is typically T+2 on a new swap
-                 maturityDateOrTenor: (FinDate, str),
-                 fixedCoupon: float,
+                 startDate: FinDate,  # Date interest starts to accrue
+                 maturityDateOrTenor: (FinDate, str),  # Date of last coupon
+                 fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
                  notional: float = 100.0,
@@ -34,14 +34,24 @@ class FinLiborSwap(object):
         ''' Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
-        values that can be overwritten if needed. '''
+        values that can be overwritten if needed. The start date is contractual
+        and is the same as the settlement date for a new swap. It is the date
+        on which interest starts to accrue.'''
 
         checkArgumentTypes(self.__init__, locals())
 
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
+            # we do not holiday adjust this here. This will be done to the
+            # coupons inside the schedule generator. The reason not to adjust
+            # it is that if we did, all of the swaps would end up with non-
+            # overlapping coupon dates which is not what we want for boot-
+            # strapping and also is not how the market works !
             maturityDate = startDate.addTenor(maturityDateOrTenor)
+
+#            calendar = FinCalendar(calendarType)
+#            maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
 
         if startDate > maturityDate:
             raise FinError("Start date after maturity date")
@@ -71,7 +81,9 @@ class FinLiborSwap(object):
         self._generateFixedLegPaymentDates()
         self._generateFloatLegPaymentDates()
 
-        # Need to know latest payment date for bootstrap
+        self._adjustedMaturityDate = self._adjustedFixedDates[-1]
+
+        # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
         self._lastPaymentDate = self._maturityDate
         if self._adjustedFixedDates[-1] > self._lastPaymentDate:
             self._lastPaymentDate = self._adjustedFixedDates[-1]
@@ -92,6 +104,9 @@ class FinLiborSwap(object):
 
         self._firstFixingRate = None
         self._valuationDate = None
+        self._fixedStartIndex = None
+
+        self._calcFixedLegFlows()
 
 ##########################################################################
 
@@ -132,7 +147,7 @@ class FinLiborSwap(object):
             self._fixedFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
-            self._dateGenRuleType).generate()
+            self._dateGenRuleType)._generate()
 
 ##########################################################################
 
@@ -145,7 +160,7 @@ class FinLiborSwap(object):
             self._floatFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
-            self._dateGenRuleType).generate()
+            self._dateGenRuleType)._generate()
 
 ##########################################################################
 
@@ -223,12 +238,14 @@ class FinLiborSwap(object):
         self._fixedStartIndex = startIndex
 
         ''' Now PV fixed leg flows. '''
+        self._dfValuationDate = discountCurve.df(valuationDate)
+
         pv = 0.0
         prevDt = self._adjustedFixedDates[startIndex - 1]
 
         for nextDt in self._adjustedFixedDates[startIndex:]:
             alpha = basis.yearFrac(prevDt, nextDt)
-            df_discount = discountCurve.df(nextDt)
+            df_discount = discountCurve.df(nextDt) / self._dfValuationDate
             flow = self._fixedCoupon * alpha * self._notional
             flowPV = flow * df_discount
             pv += flowPV
@@ -245,10 +262,26 @@ class FinLiborSwap(object):
         self._fixedFlowPVs[-1] += flow * df_discount
         self._fixedFlows[-1] += flow
         self._fixedTotalPV[-1] = pv
-
-        z0 = discountCurve.df(valuationDate)
-        pv = pv / z0
         return pv
+
+##########################################################################
+
+    def _calcFixedLegFlows(self):
+
+        self._fixedYearFracs = []
+        self._fixedFlows = []
+
+        basis = FinDayCount(self._fixedDayCountType)
+
+        ''' Now PV fixed leg flows. '''
+        prevDt = self._adjustedFixedDates[0]
+
+        for nextDt in self._adjustedFixedDates[1:]:
+            alpha = basis.yearFrac(prevDt, nextDt)
+            flow = self._fixedCoupon * alpha * self._notional
+            prevDt = nextDt
+            self._fixedYearFracs.append(alpha)
+            self._fixedFlows.append(flow)
 
 ##########################################################################
 
@@ -291,17 +324,22 @@ class FinLiborSwap(object):
 ##########################################################################
 
     def floatLegValue(self,
-                      valuationDate,  # IS THIS THE SETTLEMENT DATE ????
+                      valuationDate,  # This should be the settlement date
                       discountCurve,
                       indexCurve,
                       firstFixingRate=None,
                       principal=0.0):
         ''' Value the floating leg with payments from an index curve and
-        discounting based on a supplied discount curve. '''
+        discounting based on a supplied discount curve. The valuation date can
+        be the today date. In this case the price of the floating leg will not
+        be par (assuming we added on a principal repayment). This is only the
+        case if we set the valuation date to be the swap's actual settlement
+        date. '''
 
         self._valuationDate = valuationDate
         self._floatYearFracs = []
         self._floatFlows = []
+        self._floatRates = []
         self._floatDfs = []
         self._floatFlowPVs = []
         self._floatTotalPV = []
@@ -322,25 +360,35 @@ class FinLiborSwap(object):
 
         self._floatStartIndex = startIndex
 
+        # Forward price to settlement date (if valuation is settlement date)
+        self._dfValuationDate = discountCurve.df(valuationDate)
+
         ''' The first floating payment is usually already fixed so is
         not implied by the index curve. '''
         prevDt = self._adjustedFloatDates[startIndex - 1]
         nextDt = self._adjustedFloatDates[startIndex]
         alpha = basis.yearFrac(prevDt, nextDt)
-        df1_index = 1.0  # Cannot be previous date as that has past
+        df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
         df2_index = indexCurve.df(nextDt)
+
+        floatRate = 0.0
 
         if self._firstFixingRate is None:
             libor = (df1_index / df2_index - 1.0) / alpha
             flow = libor * alpha * self._notional
+            floatRate = libor
         else:
             flow = self._firstFixingRate * alpha * self._notional
+            floatRate = self._firstFixingRate
 
-        df_discount = discountCurve.df(nextDt)
+        # All discounting is done forward to the valuation date
+        df_discount = discountCurve.df(nextDt) / self._dfValuationDate
+
         pv = flow * df_discount
 
         self._floatYearFracs.append(alpha)
         self._floatFlows.append(flow)
+        self._floatRates.append(floatRate)
         self._floatDfs.append(df_discount)
         self._floatFlowPVs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
@@ -352,14 +400,19 @@ class FinLiborSwap(object):
             alpha = basis.yearFrac(prevDt, nextDt)
             df2_index = indexCurve.df(nextDt)
             # The accrual factors cancel
+            floatRate = (df1_index / df2_index - 1.0) / alpha
             flow = (df1_index / df2_index - 1.0) * self._notional
-            df_discount = discountCurve.df(nextDt)
+
+            # All discounting is done forward to the valuation date
+            df_discount = discountCurve.df(nextDt) / self._dfValuationDate
+
             pv += flow * df_discount
             df1_index = df2_index
             prevDt = nextDt
 
             self._floatFlows.append(flow)
             self._floatYearFracs.append(alpha)
+            self._floatRates.append(floatRate)
             self._floatDfs.append(df_discount)
             self._floatFlowPVs.append(flow * df_discount)
             self._floatTotalPV.append(pv)
@@ -370,15 +423,14 @@ class FinLiborSwap(object):
         self._floatFlowPVs[-1] += flow * df_discount
         self._floatTotalPV[-1] = pv
 
-        z0 = discountCurve.df(valuationDate)
-        pv = pv / z0
-
         return pv
 
 ##########################################################################
 
-    def printFixedLeg(self):
-        ''' Prints the fixed leg amounts. '''
+    def printFixedLegPV(self):
+        ''' Prints the fixed leg dates, accrual factors, discount factors,
+        cash amounts, their present value and their cumulative PV using the
+        last valuation performed. '''
 
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)
@@ -395,7 +447,19 @@ class FinLiborSwap(object):
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
+        if self._fixedStartIndex is None:
+            raise FinError("Need to value swap before calling this function.")
+
         startIndex = self._fixedStartIndex
+
+        # By definition the discount factor is 1.0 on the valuation date
+        print("%15s %10s %12s %12.8f %12s %12s" %
+              (self._valuationDate,
+               "-",
+               "-",
+               1.0,
+               "-",
+               "-"))
 
         iFlow = 0
         for paymentDate in self._adjustedFixedDates[startIndex:]:
@@ -411,8 +475,42 @@ class FinLiborSwap(object):
 
 ##########################################################################
 
-    def printFloatLeg(self):
-        ''' Prints the floating leg amounts. '''
+    def printFixedLegFlows(self):
+        ''' Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. '''
+
+        print("START DATE:", self._startDate)
+        print("MATURITY DATE:", self._maturityDate)
+        print("COUPON (%):", self._fixedCoupon * 100)
+        print("FIXED LEG FREQUENCY:", str(self._fixedFrequencyType))
+        print("FIXED LEG DAY COUNT:", str(self._fixedDayCountType))
+
+        print(self._fixedFlows)
+
+        if len(self._fixedFlows) == 0:
+            print("Fixed Flows not calculated.")
+            return
+
+        header = "PAYMENT_DATE     YEAR_FRAC        FLOW"
+        print(header)
+
+        startIndex = 1
+
+        iFlow = 0
+        for paymentDate in self._adjustedFixedDates[startIndex:]:
+            print("%15s %12.8f %12.2f" %
+                  (paymentDate,
+                   self._fixedYearFracs[iFlow],
+                   self._fixedFlows[iFlow]))
+
+            iFlow += 1
+
+##########################################################################
+
+    def printFloatLegPV(self):
+        ''' Prints the floating leg dates, accrual factors, discount factors,
+        forward libor rates, implied cash amounts, their present value and
+        their cumulative PV using the last valuation performed. '''
 
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)
@@ -428,17 +526,29 @@ class FinLiborSwap(object):
         if self._firstFixingRate is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
-        header = "PAYMENT_DATE     YEAR_FRAC        FLOW         DF"
+        header = "PAYMENT_DATE     YEAR_FRAC    RATE(%)       FLOW         DF"
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
         startIndex = self._floatStartIndex
 
+        # By definition the discount factor is 1.0 on the valuation date
+
+        print("%15s %10s %10s %12s %12.8f %12s %12s" %
+              (self._valuationDate,
+               "-",
+               "-",
+               "-",
+               1.0,
+               "-",
+               "-"))
+
         iFlow = 0
         for paymentDate in self._adjustedFloatDates[startIndex:]:
-            print("%15s %10.7f %12.2f %12.8f %12.2f %12.2f" %
+            print("%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f" %
                   (paymentDate,
                    self._floatYearFracs[iFlow],
+                   self._floatRates[iFlow]*100.0,
                    self._floatFlows[iFlow],
                    self._floatDfs[iFlow],
                    self._floatFlowPVs[iFlow],
@@ -466,7 +576,7 @@ class FinLiborSwap(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
         print(self)

@@ -97,7 +97,7 @@ class FinOIS(object):
             self._fixedFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
-            self._dateGenRuleType).generate()
+            self._dateGenRuleType)._generate()
 
         self._adjustedFloatDates = FinSchedule(
             self._startDate,
@@ -105,7 +105,7 @@ class FinOIS(object):
             self._floatFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
-            self._dateGenRuleType).generate()
+            self._dateGenRuleType)._generate()
 
     ###########################################################################
 
@@ -290,7 +290,7 @@ class FinOIS(object):
 
     ###########################################################################
 
-    def print(self):
+    def _print(self):
         print(self)
 
 ###############################################################################

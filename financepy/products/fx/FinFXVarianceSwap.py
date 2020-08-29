@@ -245,7 +245,7 @@ class FinFXVarianceSwap(object):
 
 ###############################################################################
 
-    def print(self):
+    def printStrikes(self):
 
         if self._numPutOptions == 0 and self._numCallOptions == 0:
             return

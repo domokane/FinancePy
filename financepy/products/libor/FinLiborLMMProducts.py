@@ -73,7 +73,7 @@ class FinLiborLMMProducts():
                                       floatFrequencyType,
                                       calendarType,
                                       busDayAdjustType,
-                                      dateGenRuleType).generate()
+                                      dateGenRuleType)._generate()
 
         self._accrualFactors = []
         self._floatDayCountType = floatDayCountType
@@ -294,7 +294,7 @@ class FinLiborLMMProducts():
                                          floatFrequencyType,
                                          calendarType,
                                          busDayAdjustType,
-                                         dateGenRuleType).generate()
+                                         dateGenRuleType)._generate()
 
         for swaptionDt in swaptionFloatDates:
             foundDt = False
@@ -310,7 +310,7 @@ class FinLiborLMMProducts():
                                          fixedFrequencyType,
                                          calendarType,
                                          busDayAdjustType,
-                                         dateGenRuleType).generate()
+                                         dateGenRuleType)._generate()
 
         for swaptionDt in swaptionFixedDates:
             foundDt = False
@@ -365,7 +365,7 @@ class FinLiborLMMProducts():
                                     frequencyType,
                                     calendarType,
                                     busDayAdjustType,
-                                    dateGenRuleType).generate()
+                                    dateGenRuleType)._generate()
 
         for capFloorletDt in capFloorDates:
             foundDt = False
@@ -421,7 +421,7 @@ class FinLiborLMMProducts():
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Alternative print method. '''
 
         print(self)

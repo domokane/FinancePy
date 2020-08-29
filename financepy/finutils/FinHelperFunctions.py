@@ -8,7 +8,7 @@ from typing import Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
-from .FinDayCount import FinDayCountTypes
+from .FinDayCount import FinDayCountTypes, FinDayCount
 
 ###############################################################################
 
@@ -51,28 +51,33 @@ def pv01Times(t: float,
 
 def timesFromDates(dt: FinDate,
                    valuationDate: FinDate,
-                   dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                   dayCountType: FinDayCountTypes = None):
     ''' If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
     times from the valuation date. The output is always a numpy vector of times
     which has only one element if the input is only one date. '''
 
-#    dcCounter = FinDayCount(dayCountType)
+    if dayCountType is None:
+        dcCounter = None
+    else:
+        dcCounter = FinDayCount(dayCountType)
 
     if isinstance(dt, FinDate):
         numDates = 1
-        dateList = [dt]
         times = [None]
-#        times[0] = dcCounter.yearFrac(valuationDate, dt)
-        times[0] = (dt - valuationDate) / gDaysInYear
+        if dcCounter is None:
+            times[0] = (dt - valuationDate) / gDaysInYear
+        else:
+            times[0] = dcCounter.yearFrac(valuationDate, dt)
         return np.array(times)
     elif isinstance(dt, list) and isinstance(dt[0], FinDate):
         numDates = len(dt)
-        dateList = dt
         times = []
         for i in range(0, numDates):
-#            t = dcCounter.yearFrac(valuationDate, dateList[i])
-            t = (dateList[i]- valuationDate) / gDaysInYear
+            if dcCounter is None:
+                t = (dt[i] - valuationDate) / gDaysInYear
+            else:
+                t = dcCounter.yearFrac(valuationDate, dt)
             times.append(t)
         return np.array(times)
 

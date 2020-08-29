@@ -151,7 +151,7 @@ class FinBondMortgage(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 

@@ -405,7 +405,7 @@ class FinLiborSwaption():
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Alternative print method. '''
 
         print(self)

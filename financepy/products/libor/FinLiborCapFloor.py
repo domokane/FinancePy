@@ -114,7 +114,7 @@ class FinLiborCapFloor():
                                              self._frequencyType,
                                              self._calendarType,
                                              self._busDayAdjustType,
-                                             self._dateGenRuleType).generate()
+                                             self._dateGenRuleType)._generate()
 
 ##########################################################################
 
@@ -359,7 +359,7 @@ class FinLiborCapFloor():
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         print(self)
 
 ###############################################################################

@@ -74,7 +74,7 @@ class FinEquityCliquetOption(FinEquityOption):
                                         self._frequencyType,
                                         self._calendarType,
                                         self._busDayAdjustType,
-                                        self._dateGenRuleType).generate()
+                                        self._dateGenRuleType)._generate()
 
 ###############################################################################
 
@@ -154,7 +154,7 @@ class FinEquityCliquetOption(FinEquityOption):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 

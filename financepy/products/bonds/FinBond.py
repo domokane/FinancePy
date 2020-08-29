@@ -128,7 +128,7 @@ class FinBond(object):
                                       self._frequencyType,
                                       calendarType,
                                       busDayRuleType,
-                                      dateGenRuleType).generate()
+                                      dateGenRuleType)._generate()
 
         self._pcd = self._flowDates[0]
         self._ncd = self._flowDates[1]
@@ -565,7 +565,7 @@ class FinBond(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
         print(self)
