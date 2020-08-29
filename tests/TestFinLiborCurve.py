@@ -572,7 +572,7 @@ def test_derivativePricingExample():
     swap = FinLiborSwap(settlementDate, "30Y", swapRate, freqType, dayCountType)
     swaps.append(swap)
 
-    numRepeats = 1
+    numRepeats = 10
     start = time.time()
 
     for _ in range(0, numRepeats):
@@ -585,14 +585,18 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        liborCurve = FinLiborCurve(valuationDate, depos, fras, swaps,
+        liborCurve = FinLiborCurve(valuationDate,
+                                   depos,
+                                   fras,
+                                   swaps,
                                    FinInterpTypes.LINEAR_SWAP_RATES)
 
     end = time.time()
     elapsed2 = end - start
 
-    print("OLD SOLVER BOOTSTRAP", elapsed1/numRepeats)
-    print("NEW LINEAR SWAP BOOTSTRAP", elapsed2/numRepeats)
+    testCases.header("METHOD", "TIME")
+    testCases.print("NON-LINEAR SOLVER BOOTSTRAP", elapsed1/numRepeats)
+    testCases.print("LINEAR SWAP BOOTSTRAP", elapsed2/numRepeats)
 
 ###############################################################################
 
@@ -600,7 +604,6 @@ def test_derivativePricingExample():
 def test_bloombergPricingExample():
 
     ''' This is an example of a replication of a BBG example from
-
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
     '''
@@ -609,7 +612,6 @@ def test_bloombergPricingExample():
     # We do the O/N rate which settles on trade date
     spotDays = 0
     settlementDate = valuationDate.addWorkDays(spotDays)
-    print("Settlement Date:", settlementDate)
     depoDCCType = FinDayCountTypes.ACT_360
     depos = []
     depositRate = 0.0231381
@@ -665,26 +667,27 @@ def test_bloombergPricingExample():
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
 
-    print("VALUATION DATE PV")
-    print("VALUE:", swaps[0].value(valuationDate, liborCurve, liborCurve, None, principal))
-    print("FIXED:", swaps[0].fixedLegValue(valuationDate, liborCurve, principal))
-    print("FLOAT:", swaps[0].floatLegValue(valuationDate, liborCurve, liborCurve, None, principal))
+    testCases.header("VALUATION TO TODAY DATE"," PV")
+    testCases.print("VALUE:", swaps[0].value(valuationDate, liborCurve, liborCurve, None, principal))
+    testCases.print("FIXED:", swaps[0].fixedLegValue(valuationDate, liborCurve, principal))
+    testCases.print("FLOAT:", swaps[0].floatLegValue(valuationDate, liborCurve, liborCurve, None, principal))
 
-    print("SWAP SETTLEMENT DATE PV")
-    print("VALUE:", swaps[0].value(settlementDate, liborCurve, liborCurve, None, principal))
-    print("FIXED:", swaps[0].fixedLegValue(settlementDate, liborCurve, principal))
-    print("FLOAT:", swaps[0].floatLegValue(settlementDate, liborCurve, liborCurve, None, principal))
+    testCases.header("VALUATION TO SWAP SETTLEMENT DATE"," PV")
+    testCases.print("VALUE:", swaps[0].value(settlementDate, liborCurve, liborCurve, None, principal))
+    testCases.print("FIXED:", swaps[0].fixedLegValue(settlementDate, liborCurve, principal))
+    testCases.print("FLOAT:", swaps[0].floatLegValue(settlementDate, liborCurve, liborCurve, None, principal))
 
-    swaps[0].printFixedLegPV()
-    swaps[0].printFloatLegPV()
+    # swaps[0].printFixedLegPV()
+    # swaps[0].printFloatLegPV()
 
 ###############################################################################
 
+
 test_bloombergPricingExample()
-#test_derivativePricingExample()
-#test_FinLiborDepositsOnly()
-#test_FinLiborFRAsOnly()
-#test_FinLiborDepositsFRAsSwaps()
-#test_FinLiborDepositsFuturesSwaps()
+test_derivativePricingExample()
+test_FinLiborDepositsOnly()
+test_FinLiborFRAsOnly()
+test_FinLiborDepositsFRAsSwaps()
+test_FinLiborDepositsFuturesSwaps()
 
 testCases.compareTestCases()

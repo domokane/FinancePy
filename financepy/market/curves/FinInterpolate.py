@@ -50,6 +50,9 @@ def _uinterpolate(t, times, dfs, method):
     interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. '''
 
+    if method == FinInterpTypes.LINEAR_SWAP_RATES.value:
+        method = FinInterpTypes.FLAT_FORWARDS.value
+
     small = 1e-10
     numPoints = times.size
 

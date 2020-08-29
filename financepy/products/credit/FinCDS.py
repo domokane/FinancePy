@@ -6,6 +6,7 @@
 import numpy as np
 from numba import njit, float64, int64
 from math import exp, log
+from copy import deepcopy
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
@@ -23,12 +24,12 @@ from ...finutils.FinHelperFunctions import checkArgumentTypes
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
 
-##########################################################################
+###############################################################################
 
 
-#@njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
-#                 float64[:], float64[:], float64[:], int64),
-#      fastmath=True, cache=True)
+@njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
+                 float64[:], float64[:], float64[:], int64),
+      fastmath=True, cache=True)
 def _riskyPV01_NUMBA(teff,
                      accrualFactorPCDToNow,
                      paymentTimes,
@@ -87,7 +88,7 @@ def _riskyPV01_NUMBA(teff,
         # payment date
         fullRPV01 += q2 * z2 * accrualFactor
 
-        ####################################################################
+        #######################################################################
 
         if couponAccruedIndicator == 1:
 
@@ -106,7 +107,7 @@ def _riskyPV01_NUMBA(teff,
 
             fullRPV01 = fullRPV01 + dfullRPV01
 
-        ####################################################################
+        #######################################################################
 
         q1 = q2
 
@@ -114,10 +115,10 @@ def _riskyPV01_NUMBA(teff,
 
     return np.array([fullRPV01, cleanRPV01])
 
-##########################################################################
+###############################################################################
 
-#@njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
-#              float64, int64, int64), fastmath=True, cache=True)
+@njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
+              float64, int64, int64), fastmath=True, cache=True)
 def _protectionLegPV_NUMBA(teff,
                            tmat,
                            npLiborTimes,
@@ -173,6 +174,8 @@ def _protectionLegPV_NUMBA(teff,
     return protPV
 
 ###############################################################################
+###############################################################################
+###############################################################################
 
 
 class FinCDS(object):
@@ -197,8 +200,9 @@ class FinCDS(object):
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
-            # To get the next CDS date we move on by the tenor and 
-            # then roll to next CDS date after that
+            # To get the next CDS date we move on by the tenor and then roll to
+            # the next CDS date after that. We do not holiday adjust it. That
+            # is handled in the schedule generation.
             maturityDate = stepInDate.addTenor(maturityDateOrTenor)
             maturityDate = maturityDate.nextCDSDate()
 
@@ -219,7 +223,7 @@ class FinCDS(object):
         self._generateAdjustedCDSPaymentDates()
         self._calcFlows()
 
-##########################################################################
+###############################################################################
 
     def _generateAdjustedCDSPaymentDates(self):
         ''' Generate CDS payment dates which have been holiday adjusted.'''
@@ -292,7 +296,7 @@ class FinCDS(object):
             raise FinError("Unknown FinDateGenRuleType:" +
                            str(self._dateGenRuleType))
 
-##########################################################################
+###############################################################################
 
     def _calcFlows(self):
         ''' Calculate cash flow amounts on premium leg. '''
@@ -316,7 +320,7 @@ class FinCDS(object):
             self._accrualFactors.append(accrualFactor)
             self._flows.append(flow)
 
-##########################################################################
+###############################################################################
 
     def value(self,
               valuationDate,
@@ -353,11 +357,11 @@ class FinCDS(object):
         cleanPV = fwdDf * longProt * \
             (protPV - self._runningCoupon * cleanRPV01 * self._notional)
 
-        print("protLeg", protPV, "cleanRPV01", cleanRPV01, "value", cleanPV)
+#        print("protLeg", protPV, "cleanRPV01", cleanRPV01, "value", cleanPV)
 
         return {'full_pv': fullPV, 'clean_pv': cleanPV}
 
-##########################################################################
+###############################################################################
 
     def creditDV01(self,
                    valuationDate,
@@ -376,37 +380,34 @@ class FinCDS(object):
                         prot_method,
                         numStepsPerYear)
 
-        survProbs = issuerCurve._values
+        bump = 0.0001  # 1 basis point
 
-        bump = 0.0001
-        for cds in issuerCurve._cdsContracts:
+        # we create a deep copy to avoid state issues
+        bumpedIssuerCurve = deepcopy(issuerCurve)
+        for cds in bumpedIssuerCurve._cdsContracts:
             cds._runningCoupon += bump
-        issuerCurve._buildCurve()
+
+        bumpedIssuerCurve._buildCurve()
 
         v1 = self.value(valuationDate,
-                        issuerCurve,
+                        bumpedIssuerCurve,
                         contractRecovery,
                         pv01Method,
                         prot_method,
                         numStepsPerYear)
 
-        # NEED TO UNDO CHANGES TO CURVE OBJECT - NO NEED TO REBUILD !!!
-        for cds in issuerCurve._cdsContracts:
-            cds._runningCoupon -= bump
-        issuerCurve._values = survProbs
-
         creditDV01 = (v1['full_pv'] - v0['full_pv'])
         return creditDV01
 
-##########################################################################
+###############################################################################
 
     def interestDV01(self,
-                     valuationDate,
+                     valuationDate: FinDate,
                      issuerCurve,
                      contractRecovery=standardRecovery,
-                     pv01Method=0,
-                     prot_method=0,
-                     numStepsPerYear=25):
+                     pv01Method: int = 0,
+                     prot_method: int = 0,
+                     numStepsPerYear: int = 25):
         ''' Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve. '''
 
@@ -417,42 +418,33 @@ class FinCDS(object):
                         prot_method,
                         numStepsPerYear)
 
-        dfs = issuerCurve._liborCurve._values
-        survProbs = issuerCurve._values
+        # we create a deep copy to avoid state issues
+        newIssuerCurve = deepcopy(issuerCurve)
 
-        bump = 0.0001
-        for depo in issuerCurve._liborCurve._usedDeposits:
+        bump = 0.0001  # 1 basis point
+
+        for depo in newIssuerCurve._liborCurve._usedDeposits:
             depo._depositRate += bump
-        for fra in issuerCurve._liborCurve._usedFRAs:
+        for fra in newIssuerCurve._liborCurve._usedFRAs:
             fra._fraRate += bump
-        for swap in issuerCurve._liborCurve._usedSwaps:
+        for swap in newIssuerCurve._liborCurve._usedSwaps:
             swap._fixedCoupon += bump
-        issuerCurve._liborCurve._buildCurve()
-        issuerCurve.buildCurve()
+
+        newIssuerCurve._liborCurve._buildCurve()
+
+        newIssuerCurve._buildCurve()
 
         v1 = self.value(valuationDate,
-                        issuerCurve,
+                        newIssuerCurve,
                         contractRecovery,
                         pv01Method,
                         prot_method,
                         numStepsPerYear)
 
-        # Need do undo changes to Libor curve object in issuer curve
-        # Do not need to rebuild it - just restore initial dfs and surv probs.
-        for depo in issuerCurve._liborCurve._usedDeposits:
-            depo._depositRate -= bump
-        for fra in issuerCurve._liborCurve._usedFRAs:
-            fra._fraRate -= bump
-        for swap in issuerCurve._liborCurve._usedSwaps:
-            swap._fixedCoupon -= bump
-
-        issuerCurve._liborCurve._values = dfs
-        issuerCurve._values = survProbs
-
         interestDV01 = (v1['full_pv'] - v0['full_pv'])
         return interestDV01
 
-##########################################################################
+###############################################################################
 
     def cashSettlementAmount(self,
                              valuationDate,
@@ -477,7 +469,7 @@ class FinCDS(object):
         v = v / df
         return v
 
-##########################################################################
+###############################################################################
 
     def cleanPrice(self,
                    valuationDate,
@@ -505,7 +497,7 @@ class FinCDS(object):
         cleanPrice = (self._notional - cleanPV) / self._notional * 100.0
         return cleanPrice
 
-##########################################################################
+###############################################################################
 
     def riskyPV01_OLD(self,
                       valuationDate,
@@ -595,7 +587,7 @@ class FinCDS(object):
 
         return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
-##########################################################################
+###############################################################################
 
     def accruedDays(self):
         ''' Number of days between the previous coupon and the currrent step
@@ -607,7 +599,7 @@ class FinCDS(object):
         accruedDays = (self._stepInDate - pcd)
         return accruedDays
 
-##########################################################################
+###############################################################################
 
     def accruedInterest(self):
         ''' Calculate the amount of accrued interest that has accrued from the
@@ -624,7 +616,7 @@ class FinCDS(object):
 
         return accruedInterest
 
-##########################################################################
+###############################################################################
 
     def protectionLegPV(self,
                         valuationDate,
@@ -652,7 +644,7 @@ class FinCDS(object):
 
         return v * self._notional
 
-##########################################################################
+###############################################################################
 
     def riskyPV01(self,
                   valuationDate,
@@ -695,7 +687,7 @@ class FinCDS(object):
 #        print("NEW PV01",fullRPV01, cleanRPV01)
         return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
-##########################################################################
+###############################################################################
 
     def premiumLegPV(self,
                      valuationDate,
@@ -710,7 +702,7 @@ class FinCDS(object):
         v = fullRPV01 * self._notional * self._runningCoupon
         return v
 
-##########################################################################
+###############################################################################
 
     def parSpread(self,
                   valuationDate,
@@ -736,7 +728,7 @@ class FinCDS(object):
         spd = prot / cleanRPV01 / self._notional
         return spd
 
-##########################################################################
+###############################################################################
 
     def valueFastApprox(self,
                         valuationDate,
@@ -757,12 +749,14 @@ class FinCDS(object):
         h = flatCDSCurveSpread / (1.0 - curveRecovery)
         r = flatContinuousInterestRate
         fwdDf = 1.0
+        bumpSize = 0.0001
 
         if self._longProtection:
             longProtection = +1
         else:
             longProtection = -1
 
+        # The sign of he accrued has already been sign adjusted for direction
         accrued = self.accruedInterest()
 
         # This is the clean RPV01 as it treats the PV01 stream as though it
@@ -770,37 +764,40 @@ class FinCDS(object):
         # It therefore omits the part that has accrued
 
         w = r + h
-
-        cleanRPV01 = ((exp(-w * t_eff) - exp(-w * t_mat)) / w) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
-            / w * self._notional
+        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
+        cleanRPV01 = (z / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (z / w) * self._notional
         cleanPV = fwdDf * longProtection * \
             (protPV - self._runningCoupon * cleanRPV01 * self._notional)
-        fullPV = cleanPV + fwdDf * longProtection * accrued
+        fullPV = cleanPV + fwdDf * accrued
 
-        bumpSize = 0.0001
+        #######################################################################
+        # bump CDS spread and calculate
+        #######################################################################
 
         h = (flatCDSCurveSpread + bumpSize) / (1.0 - contractRecovery)
         r = flatContinuousInterestRate
-
         w = r + h
-
-        cleanRPV01 = ((exp(-w*t_eff) - exp(-w*t_mat)) / w) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat)) \
-            / w * self._notional
+        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
+        cleanRPV01 = (z / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (z / w) * self._notional
         cleanPV_credit_bumped = fwdDf * longProtection * \
             (protPV - self._runningCoupon * cleanRPV01 * self._notional)
         fullPV_credit_bumped = cleanPV_credit_bumped \
             + fwdDf * longProtection * accrued
         credit01 = fullPV_credit_bumped - fullPV
 
+        #######################################################################
+        # bump Rate and calculate
+        #######################################################################
+
         h = flatCDSCurveSpread / (1.0 - contractRecovery)
         r = flatContinuousInterestRate + bumpSize
 
         w = r + h
-        cleanRPV01 = ((exp(-w * t_eff) - exp(-w * t_mat)) / w) * 365.0 / 360.0
-        protPV = h * (1.0 - contractRecovery) * (exp(-w*t_eff)-exp(-w*t_mat))\
-            / w * self._notional
+        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
+        cleanRPV01 = (z / w) * 365.0 / 360.0
+        protPV = h * (1.0 - contractRecovery) * (z/w) * self._notional
         cleanPV_ir_bumped = fwdDf * longProtection * \
             (protPV - self._runningCoupon * cleanRPV01 * self._notional)
         fullPV_ir_bumped = cleanPV_ir_bumped + fwdDf * longProtection * accrued

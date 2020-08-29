@@ -26,9 +26,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildFullIssuerCurve(tradeDate):
+def buildFullIssuerCurve(valuationDate):
 
-    valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
     depos = []
     irBump = 0.0

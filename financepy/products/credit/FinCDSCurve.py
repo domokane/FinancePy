@@ -79,18 +79,18 @@ class FinCDSCurve():
     the interpolation of the survival probabilities is also required. '''
 
     def __init__(self,
-                 valuationDate,
-                 cdsContracts,
+                 valuationDate: FinDate,
+                 cdsContracts: list,
                  liborCurve,
-                 recoveryRate=0.40,
-                 useCache=False,
+                 recoveryRate: float = 0.40,
+                 useCache: bool = False,
                  interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Libor curve using the same recovery rate and the
         same interpolation method. '''
 
         if valuationDate != liborCurve._valuationDate:
-            raise FinError("Libor curve does not have same valuation date.")
+            raise FinError("Libor curve does not have same valuation date as Issuer curve.")
 
         self._valuationDate = valuationDate
         self._cdsContracts = cdsContracts
@@ -99,12 +99,8 @@ class FinCDSCurve():
         self._interpolationMethod = interpolationMethod
         self._builtOK = False
 
-        self._times = []
-        self._values = []
-
-        if cdsContracts is not None:
-            if len(cdsContracts) > 0:
-                self._validate(cdsContracts)
+        if self._cdsContracts is not None:
+            if len(self._cdsContracts) > 0:
                 self._buildCurve()
         else:
             pass  # In some cases we allow None to be passed
@@ -179,25 +175,19 @@ class FinCDSCurve():
     def _buildCurve(self):
         ''' Construct the CDS survival curve from a set of CDS contracts '''
 
+        self._validate(self._cdsContracts)
         numTimes = len(self._cdsContracts)
+
         # we size the vectors to include time zero
-
-        self._times = np.array([])
-        self._values = np.array([])
-
-        self._times = np.append(self._times, 0.0)
-        self._values = np.append(self._values, 1.0)
-
-        valuationDate = self._valuationDate
-
-        q_prev = 1.0
+        self._times = np.array([0.0])
+        self._values = np.array([1.0])
 
         for i in range(0, numTimes):
 
             maturityDate = self._cdsContracts[i]._maturityDate
 
-            argtuple = (self, valuationDate, self._cdsContracts[i])
-            tmat = (maturityDate - valuationDate) / gDaysInYear
+            argtuple = (self, self._valuationDate, self._cdsContracts[i])
+            tmat = (maturityDate - self._valuationDate) / gDaysInYear
             q = self._values[i]
 
             self._times = np.append(self._times, tmat)
@@ -205,14 +195,6 @@ class FinCDSCurve():
 
             optimize.newton(f, x0=q, fprime=None, args=argtuple,
                             tol=1e-7, maxiter=50, fprime2=None)
-
-#            print("FOUND:", self._times, self._values)
-#            self._cdsContracts[i].printFlows(self)
-
-#            if q > q_prev:
-#                raise FinError("Survival probabilities are not decreasing.")
-
-            q_prev = q
 
 ###############################################################################
 
