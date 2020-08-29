@@ -17,6 +17,7 @@ class FinInterpTypes(Enum):
     LINEAR_ZERO_RATES = 1
     FLAT_FORWARDS = 2
     LINEAR_FORWARDS = 3
+    LINEAR_SWAP_RATES = 4
 
 ###############################################################################
 
@@ -140,6 +141,8 @@ def _uinterpolate(t, times, dfs, method):
         return yvalue
 
     else:
+
+        raise FinError("Invalid interpolation scheme.")
         return 0.0
 
 ###############################################################################
