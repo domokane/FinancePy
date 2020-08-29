@@ -79,14 +79,20 @@ class FinCDSCurve():
     the interpolation of the survival probabilities is also required. '''
 
     def __init__(self,
-                 curveDate,
+                 valuationDate,
                  cdsContracts,
                  liborCurve,
                  recoveryRate=0.40,
                  useCache=False,
                  interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+        ''' Construct a credit curve from a sequence of maturity-ordered CDS
+        contracts and a Libor curve using the same recovery rate and the
+        same interpolation method. '''
 
-        self._curveDate = curveDate
+        if valuationDate != liborCurve._valuationDate:
+            raise FinError("Libor curve does not have same valuation date.")
+
+        self._valuationDate = valuationDate
         self._cdsContracts = cdsContracts
         self._recoveryRate = recoveryRate
         self._liborCurve = liborCurve
@@ -126,7 +132,7 @@ class FinCDSCurve():
         supports vectorisation. '''
 
         if isinstance(dt, FinDate):
-            t = (dt - self._curveDate) / gDaysInYear
+            t = (dt - self._valuationDate) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -144,14 +150,14 @@ class FinCDSCurve():
                                       self._values,
                                       self._interpolationMethod.value)
             return qs
-        else:
+        elif isinstance(t, float):
             q = _uinterpolate(t,
                               self._times,
                               self._values,
                               self._interpolationMethod.value)
             return q
-
-        return 999
+        else:
+            raise FinError("Unknown time type")
 
 ###############################################################################
 
@@ -160,7 +166,7 @@ class FinCDSCurve():
         function supports vectorisation. '''
 
         if isinstance(dt, FinDate):
-            t = (dt - self._curveDate) / gDaysInYear
+            t = (dt - self._valuationDate) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -182,7 +188,9 @@ class FinCDSCurve():
         self._times = np.append(self._times, 0.0)
         self._values = np.append(self._values, 1.0)
 
-        valuationDate = self._curveDate
+        valuationDate = self._valuationDate
+
+        q_prev = 1.0
 
         for i in range(0, numTimes):
 
@@ -198,7 +206,15 @@ class FinCDSCurve():
             optimize.newton(f, x0=q, fprime=None, args=argtuple,
                             tol=1e-7, maxiter=50, fprime2=None)
 
-##############################################################################
+#            print("FOUND:", self._times, self._values)
+#            self._cdsContracts[i].printFlows(self)
+
+#            if q > q_prev:
+#                raise FinError("Survival probabilities are not decreasing.")
+
+            q_prev = q
+
+###############################################################################
 
     def fwd(self, dt):
         ''' Calculate the instantaneous forward rate at the forward date dt
@@ -211,13 +227,13 @@ class FinCDSCurve():
         fwd = np.log(df1/df2)/dt
         return fwd
 
-##############################################################################
+###############################################################################
 
     def fwdRate(self, date1, date2, dayCountType):
         ''' Calculate the forward rate according between dates date1 and date2
         according to the specified day count convention. '''
 
-        if date1 < self._curveDate:
+        if date1 < self._valuationDate:
             raise FinError("Date1 before curve value date.")
 
         if date2 < date1:
@@ -264,7 +280,7 @@ class FinCDSCurve():
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 

@@ -26,19 +26,9 @@ standardRecovery = 0.40
 ##########################################################################
 
 
-@njit(
-    float64[:](
-        float64,
-        float64,
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        int64),
-    fastmath=True,
-    cache=True)
+#@njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
+#                 float64[:], float64[:], float64[:], int64),
+#      fastmath=True, cache=True)
 def _riskyPV01_NUMBA(teff,
                      accrualFactorPCDToNow,
                      paymentTimes,
@@ -126,8 +116,8 @@ def _riskyPV01_NUMBA(teff,
 
 ##########################################################################
 
-@njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
-              float64, int64, int64), fastmath=True, cache=True)
+#@njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
+#              float64, int64, int64), fastmath=True, cache=True)
 def _protectionLegPV_NUMBA(teff,
                            tmat,
                            npLiborTimes,
@@ -192,7 +182,7 @@ class FinCDS(object):
     def __init__(self,
                  stepInDate: FinDate,  # Date protection starts
                  maturityDateOrTenor: (FinDate, str),  # FinDate or tenor
-                 runningCoupon: float,  # Annualised coupon on premium leg
+                 runningCoupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
@@ -362,6 +352,8 @@ class FinCDS(object):
             (protPV - self._runningCoupon * fullRPV01 * self._notional)
         cleanPV = fwdDf * longProt * \
             (protPV - self._runningCoupon * cleanRPV01 * self._notional)
+
+        print("protLeg", protPV, "cleanRPV01", cleanRPV01, "value", cleanPV)
 
         return {'full_pv': fullPV, 'clean_pv': cleanPV}
 
@@ -838,7 +830,7 @@ class FinCDS(object):
     def __repr__(self):
         ''' print out details of the CDS contract and all of the calculated
         cashflows '''
-        s = labelToString("STEPINDATE", self._stepInDate)
+        s = labelToString("STEP-IN DATE", self._stepInDate)
         s += labelToString("MATURITY", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")
@@ -859,7 +851,7 @@ class FinCDS(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Simple print function for backward compatibility. '''
         print(self)
 
