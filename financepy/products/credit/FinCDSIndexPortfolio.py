@@ -322,7 +322,7 @@ class FinCDSIndexPortfolio():
 
                     for j in range(0, numCDSMaturityPoints):
 
-                        cdsSpread = cdsContracts[j]._coupon
+                        cdsSpread = cdsContracts[j]._runningCoupon
                         adjustedCDSSpreads[j] = cdsSpread * \
                             cdsSpreadMultipliers[j]
                         curveCDSContracts[j]._coupon = adjustedCDSSpreads[j]

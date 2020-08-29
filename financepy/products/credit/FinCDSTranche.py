@@ -23,7 +23,7 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...market.curves.FinInterpolate import interpolate, FinInterpTypes
+from ...market.curves.FinInterpolate import FinInterpTypes
 from ...finutils.FinError import FinError
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes

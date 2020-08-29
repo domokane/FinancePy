@@ -110,8 +110,13 @@ def test_FinDateAddMonths():
     testCases.header("Months", "Dates")
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
-    dates1 = startDate.addMonths(months)
-    print(dates1)
+
+    dates = startDate.addMonths(months)
+
+    testCases.header("DATES", "DATE")
+
+    for dt in dates:
+        testCases.print("DATE", dt)
 
 ###############################################################################
 
@@ -124,29 +129,34 @@ def test_FinDateAddYears():
 
     years = [1, 3, 5, 7, 10]
     dates1 = startDate.addYears(years)
-    print(startDate, dates1)
+    for dt in dates1:
+        testCases.print("DATES1", dt)
 
     years = np.array([1, 3, 5, 7, 10])
     dates2 = startDate.addYears(years)
-    print(startDate, dates2)
+    for dt in dates2:
+        testCases.print("DATES2", dt)
 
     years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
     dates3 = startDate.addYears(years)
-    print(startDate, dates3)
+
+    for dt in dates3:
+        testCases.print("DATES3", dt)
 
     dt = 1.0/365.0
     years = np.array([1.5+2.0*dt, 3.5-6*dt, 5.75+3*dt, 7.25+dt, 10.0+dt])
     dates4 = startDate.addYears(years)
 
-    print(startDate, dates4)
+    for dt in dates4:
+        testCases.print("DATES4", dt)
 
 ###############################################################################
 
 
-#test_FinDate()
-#test_FinDateTenors()
-#test_FinDateRange()
-#test_FinDateAddMonths()
+test_FinDate()
+test_FinDateTenors()
+test_FinDateRange()
+test_FinDateAddMonths()
 test_FinDateAddYears()
 
 testCases.compareTestCases()

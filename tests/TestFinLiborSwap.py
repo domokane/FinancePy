@@ -4,6 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
+import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
@@ -16,6 +17,8 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
+from financepy.market.curves.FinInterpolate import FinInterpTypes
 
 import sys
 sys.path.append("..//..")
@@ -342,6 +345,63 @@ def test_LiborSwap():
     testCases.print("BLOOMBERG VALUE", v_bbg)
     testCases.print("DIFFERENCE VALUE", v_bbg - v)
 
+###############################################################################
 
+
+def test_dp_example():
+
+    #  http://www.derivativepricing.com/blogpage.asp?id=8
+
+    startDate = FinDate(14, 11, 2011)
+    endDate = FinDate(14, 11, 2016)
+    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
+    swapCalendarType = FinCalendarTypes.TARGET
+    busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
+    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
+    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    payFixedFlag = True
+    fixedCoupon = 0.0124
+    notional = ONE_MILLION
+
+    swap = FinLiborSwap(startDate,
+                        endDate,
+                        fixedCoupon=fixedCoupon,
+                        fixedFreqType=fixedFreqType,
+                        fixedDayCountType=fixedDayCountType,
+                        floatFreqType=FinFrequencyTypes.SEMI_ANNUAL,
+                        floatDayCountType=FinDayCountTypes.ACT_360,
+                        notional=notional,
+                        payFixedFlag=payFixedFlag,
+                        calendarType=swapCalendarType,
+                        busDayAdjustType=busDayAdjustType,
+                        dateGenRuleType=dateGenRuleType)
+
+    swap.printFixedLegFlows()
+
+    dts = [FinDate(14, 11, 2011), FinDate(14, 5, 2012), FinDate(14, 11, 2012),
+           FinDate(14, 5, 2013), FinDate(14, 11, 2013), FinDate(14, 5, 2014),
+           FinDate(14, 11, 2014), FinDate(14, 5, 2015), FinDate(16, 11, 2015),
+           FinDate(16, 5, 2016), FinDate(14, 11, 2016)]
+
+    dfs = [0.9999843, 0.9966889, 0.9942107, 0.9911884, 0.9880738, 0.9836490,
+           0.9786276, 0.9710461, 0.9621778, 0.9514315, 0.9394919]
+
+    valuationDate = startDate
+
+    curve = FinDiscountCurve(valuationDate, dts, np.array(dfs),
+                             FinInterpTypes.FLAT_FORWARDS)
+
+    v = swap.value(valuationDate, curve, curve)
+
+    swap.printFixedLegPV()
+    swap.printFloatLegPV()
+
+    # This is essentially zero
+    print("Swap Value on a Notional of $1M:", v)
+
+###############################################################################
+
+
+test_dp_example()
 test_LiborSwap()
 testCases.compareTestCases()
