@@ -22,8 +22,8 @@ class FinSchedule(object):
     Next Coupon Date (NCD). '''
 
     def __init__(self,
-                 startDate: FinDate,
-                 endDate: FinDate,
+                 startDate: FinDate,   # Also known as the effective date
+                 endDate: FinDate,  # Also known as the maturity date
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -42,21 +42,21 @@ class FinSchedule(object):
         self._dateGenRuleType = dateGenRuleType
         self._adjustedDates = None
 
-        self.generate()
+        self._generate()
 
 ###############################################################################
 
-    def flows(self):
+    def scheduleDates(self):
         ''' Returns a list of the schedule of FinDates. '''
 
         if self._adjustedDates is None:
-            raise FinError("Dates have not been calculated.")
+            raise FinError("Schedule dates have not been generated.")
 
         return self._adjustedDates
 
 ###############################################################################
 
-    def generate(self):
+    def _generate(self):
         ''' Generate schedule of dates according to specified date generation
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. '''
@@ -117,7 +117,7 @@ class FinSchedule(object):
 
 ###############################################################################
 
-    def generate_alternative(self):
+    def _generate_alternative(self):
         ''' This adjusts each date BEFORE generating the next date.
         Generate schedule of dates according to specified date generation
         rules and also adjust these dates for holidays according to
@@ -203,7 +203,7 @@ class FinSchedule(object):
 
 ###############################################################################
 
-    def print(self):
+    def _print(self):
         ''' Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations. '''
         print(self)

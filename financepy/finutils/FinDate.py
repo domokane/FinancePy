@@ -6,6 +6,8 @@
 import datetime
 from .FinError import FinError
 from .FinMath import isLeapYear
+# from .FinCalendar import FinCalendar
+
 import numpy as np
 
 # from numba import njit, float64, int32
@@ -340,10 +342,14 @@ class FinDate():
         ''' For a specific month and year this returns the day number of the
             3rd Wednesday by scanning through dates in the third week. '''
 
-        d_start = 14
+        # Suppose 1st is Weds then 8th is Wed and 15th is 3rd Wed
+        # Suppose 1st is Thur then 7th is Wed and 14th is 2nd Wed so 21 is 3rd
+        # so earliest and latest dates are 15th and 21st
+
+        d_start = 15
         d_end = 21
 
-        for d in range(d_start, d_end):
+        for d in range(d_start, d_end+1):
             immDate = FinDate(d, m, y)
             if immDate._weekday == self.WED:
                 return d
@@ -394,7 +400,8 @@ class FinDate():
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
         independent. For example 10Y means 10 years while 120m also means 10
-        years. '''
+        years. The date is NOT weekend or holiday calendar adjusted. This must
+        be done AFTERWARDS. '''
 
         if isinstance(tenor, str) is False:
             raise FinError("Tenor must be a string e.g. '5Y'")
@@ -408,18 +415,26 @@ class FinDate():
         periodType = 0
         numPeriods = 0
 
-        if tenor[-1] == "D":
+        if tenor == "ON":   # overnight - should be used only if spot days = 0
             periodType = DAYS
+            numPeriods = 1
+        elif tenor == "TN":  # overnight - should be used when spot days > 0
+            periodType = DAYS
+            numPeriods = 1
+        elif tenor[-1] == "D":
+            periodType = DAYS
+            numPeriods = int(tenor[0:-1])
         elif tenor[-1] == "W":
             periodType = WEEKS
+            numPeriods = int(tenor[0:-1])
         elif tenor[-1] == "M":
             periodType = MONTHS
+            numPeriods = int(tenor[0:-1])
         elif tenor[-1] == "Y":
             periodType = YEARS
+            numPeriods = int(tenor[0:-1])
         else:
             raise FinError("Unknown tenor type in " + tenor)
-
-        numPeriods = int(tenor[0:-1])
 
         newDate = FinDate(self._d, self._m, self._y)
 
@@ -457,7 +472,7 @@ class FinDate():
 
     ###########################################################################
 
-    def print(self):
+    def _print(self):
         ''' prints formatted string of the date. '''
         print(self)
 

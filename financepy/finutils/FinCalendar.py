@@ -1,7 +1,11 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
+
+###############################################################################
+# TODO: Do some timings and tidy up logic in adjustment function
+###############################################################################
 
 from enum import Enum
 from .FinDate import FinDate
@@ -60,13 +64,15 @@ class FinDateGenRuleTypes(Enum):
     FORWARD = 1
     BACKWARD = 2
 
-##########################################################################
+###############################################################################
 
 
 class FinCalendar(object):
     ''' Class to manage designation of payment dates as holidays according to
     a regional or country-specific calendar convention specified by the user.
-    '''
+    It also supplies an adjustment method which takes in an adjustment
+    convention and then applies that to any date that falls on a holiday in the
+    specified calendar. '''
 
     def __init__(self,
                  calendarType: FinCalendarTypes):
@@ -87,8 +93,6 @@ class FinCalendar(object):
         ''' Adjust a payment date if it falls on a holiday according to the
         specified business day convention. '''
 
-        m = dt._m
-
         if type(busDayConventionType) != FinBusDayAdjustTypes:
             raise FinError("Invalid type passed. Need FinBusDayConventionType")
 
@@ -106,6 +110,10 @@ class FinCalendar(object):
 
         elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_FOLLOWING:
 
+            d_start = dt._d
+            m_start = dt._m
+            y_start = dt._y
+
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
                 dt = dt.addDays(1)
@@ -113,7 +121,8 @@ class FinCalendar(object):
             # if the business day is in a different month look back
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
-            if dt._m != m:
+            if dt._m != m_start:
+                dt = FinDate(d_start, m_start, y_start)
                 while self.isBusinessDay(dt) is False:
                     dt = dt.addDays(-1)
 
@@ -130,6 +139,10 @@ class FinCalendar(object):
 
         elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_PRECEDING:
 
+            d_start = dt._d
+            m_start = dt._m
+            y_start = dt._y
+
             # step backward until we find a business day
             while self.isBusinessDay(dt) is False:
                 dt = dt.addDays(-1)
@@ -137,7 +150,8 @@ class FinCalendar(object):
             # if the business day is in a different month look forward
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
-            if dt._m != m:
+            if dt._m != m_start:
+                dt = FinDate(d_start, m_start, y_start)
                 while self.isBusinessDay(dt) is False:
                     dt = dt.addDays(+1)
 

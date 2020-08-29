@@ -11,12 +11,12 @@ import numpy as np
 
 
 class FinFrequencyTypes(Enum):
-    CONTINUOUS = -1
-    SIMPLE = 0
-    ANNUAL = 1
-    SEMI_ANNUAL = 2
-    QUARTERLY = 3
-    MONTHLY = 4
+    CONTINUOUS = 1
+    SIMPLE = 2
+    ANNUAL = 3
+    SEMI_ANNUAL = 4
+    QUARTERLY = 5
+    MONTHLY = 6
 
 ###############################################################################
 
@@ -62,8 +62,12 @@ def zeroToDf(r: float,
         df = np.exp(-r*t)
     elif frequencyType == FinFrequencyTypes.SIMPLE:
         df = 1.0 / (1.0 + r * t)
-    else:
+    elif frequencyType == FinFrequencyTypes.ANNUAL or \
+        frequencyType == FinFrequencyTypes.SEMI_ANNUAL or \
+            frequencyType == FinFrequencyTypes.QUARTERLY:
         df = 1.0 / np.power(1.0 + r/f, f * t)
+    else:
+        raise FinError("Unknown Frequency type")
 
     return df
 
@@ -74,7 +78,8 @@ def dfToZero(df: float,
              t: float,
              frequencyType: FinFrequencyTypes):
     ''' Convert a discount factor to a zero rate with a specific compounding
-    frequency. '''
+    frequency which may be continuous, simple, or compounded at a specific
+    frequency which are all choices of FinFrequencyTypes. '''
 
     if isinstance(t, np.ndarray):
         t = np.maximum(t, 1e-6)
@@ -87,9 +92,14 @@ def dfToZero(df: float,
         r = -np.log(df)/t
     elif frequencyType == FinFrequencyTypes.SIMPLE:
         r = (1.0/df - 1.0)/t
+    elif frequencyType == FinFrequencyTypes.ANNUAL or \
+        frequencyType == FinFrequencyTypes.SEMI_ANNUAL or \
+            frequencyType == FinFrequencyTypes.QUARTERLY:
+        r = (np.power(df, -1.0/(t * f))-1.0) * f
     else:
-        r = (df**(-1.0/t)-1.0)*f
+        raise FinError("Unknown Frequency type")
 
+    print("dfToZero:", t, f, df, r)
     return r
 
 ###############################################################################
