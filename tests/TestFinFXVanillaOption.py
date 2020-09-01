@@ -192,7 +192,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinLiborDeposit(settlementDate, maturityDate, domDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinLiborCurve(forName, settlementDate,
+    domDiscountCurve = FinLiborCurve(settlementDate,
                                      depos, fras, swaps)
 
     depos = []
@@ -201,7 +201,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinLiborDeposit(settlementDate, maturityDate, forDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinLiborCurve(domName, settlementDate,
+    forDiscountCurve = FinLiborCurve(settlementDate,
                                      depos, fras, swaps)
 
     model = FinFXModelBlackScholes(volatility)

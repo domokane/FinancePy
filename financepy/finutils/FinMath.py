@@ -314,7 +314,7 @@ def normcdf_integrate(x: float):
     fx = exp(-x * x / 2.0)
     integral = fx / 2.0
 
-    for i in range(0, numSteps - 1):
+    for _ in range(0, numSteps - 1):
         x = x + dx
         fx = exp(-x * x / 2.0)
         integral += fx
@@ -445,7 +445,7 @@ def phi3(b1: float,
 
     v = 0.0
 
-    for i in range(1, numPoints + 1):
+    for _ in range(1, numPoints + 1):
         dp = N(x + dx) - N(x)
         h = (b2 - r12 * x) / r12p
         k = (b3 - r13 * x) / r13p

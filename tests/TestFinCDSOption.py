@@ -34,7 +34,7 @@ def buildFullIssuerCurve(valuationDate):
 
     m = 1.0  # 0.00000000000
 
-    spotDays = 2
+    spotDays = 0
     settlementDate = valuationDate.addDays(spotDays)
 
     maturityDate = settlementDate.addMonths(1)
@@ -59,6 +59,9 @@ def buildFullIssuerCurve(valuationDate):
     depos.append(depo5)
 
     fras = []
+
+    spotDays = 2
+    settlementDate = valuationDate.addDays(spotDays)
 
     swaps = []
     dcType = FinDayCountTypes.THIRTY_E_360_ISDA
@@ -145,7 +148,7 @@ def buildFullIssuerCurve(valuationDate):
         dcType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinLiborCurve(valuationDate, depos, fras, swaps)
 
     cdsMarketContracts = []
 
@@ -205,7 +208,7 @@ def test_fullPriceCDSwaption():
 
     # This reproduces example on page 38 of Open Gamma note on CDS Option
     tradeDate = FinDate(2014, 2, 5)
-    liborCurve, issuerCurve = buildFullIssuerCurve(tradeDate)
+    _, issuerCurve = buildFullIssuerCurve(tradeDate)
     stepInDate = tradeDate.addDays(1)
     valuationDate = stepInDate
     expiryDate = FinDate(2014, 3, 20)

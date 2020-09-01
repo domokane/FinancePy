@@ -23,8 +23,6 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 # TO DO
 ##########################################################################
 
-##########################################################################
-
 
 def buildLiborCurve(tradeDate):
 
@@ -245,7 +243,8 @@ def test_performCDSIndexHazardRateAdjustment():
     import time
     start = time.time()
 
-    adjustedIssuerCurves = FinCDSIndexPortfolio.hazardRateAdjustIntrinsic(
+    indexPortfolio = FinCDSIndexPortfolio()
+    adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
         valuationDate,
         issuerCurves,
         indexCoupons,
@@ -294,6 +293,8 @@ def test_performCDSIndexHazardRateAdjustment():
     testCases.print("ADJUSTED INTRINSIC SPD 5Y", intrinsicSpd5Y)
     testCases.print("ADJUSTED INTRINSIC SPD 7Y", intrinsicSpd7Y)
     testCases.print("ADJUSTED INTRINSIC SPD 10Y", intrinsicSpd10Y)
+
+###############################################################################
 
 
 test_performCDSIndexHazardRateAdjustment()

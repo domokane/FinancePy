@@ -82,8 +82,6 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
 
 def test_FinLiborCapFloor():
 
-    import time
-
     todayDate = FinDate(20, 6, 2019)
     valuationDate = todayDate
     startDate = todayDate.addWorkDays(2)
@@ -97,7 +95,6 @@ def test_FinLiborCapFloor():
     # COMPARISON OF MODELS
     ##########################################################################
 
-    start = time.time()
     strikes = np.linspace(0.02, 0.08, 10)
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
@@ -140,7 +137,7 @@ def test_FinLiborCapFloor():
 ###############################################################################
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
-          "SABR SHFTD", "HW", "BACH")
+                     "SABR SHFTD", "HW", "BACH")
 
     for k in strikes:
         capFloorType = FinLiborCapFloorTypes.CAP
@@ -197,7 +194,7 @@ def test_FinLiborCapFloorVolCurve():
 
     capVolDates = FinSchedule(valuationDate,
                               valuationDate.addTenor("10Y"),
-                              frequency).generate()
+                              frequency)._generate()
 
     flatRate = 0.04
     liborCurve = FinDiscountCurveFlat(valuationDate,
@@ -229,11 +226,12 @@ def test_FinLiborCapFloorVolCurve():
     model = FinModelBlack(vol)
     valueCap = capFloor.value(valuationDate, liborCurve, model)
     print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
-    print(capFloor.printLeg())
 
     # Value cap by breaking it down into caplets using caplet vols
     vCaplets = 0.0
     capletStartDate = capFloor._capFloorLetDates[1]
+    testCases.header("START", "END", "VOL", "VALUE")
+
     for capletEndDate in capFloor._capFloorLetDates[2:]:
         vol = volCurve.capletVol(capletEndDate)
         modelCaplet = FinModelBlack(vol)
@@ -244,17 +242,15 @@ def test_FinLiborCapFloorVolCurve():
                                                modelCaplet)
 
         vCaplets += vCaplet
-        print("START:",
-              capletStartDate,
-              "END:",
-              capletEndDate,
-              "VOL:",
-              vol*100.0,
-              "VALUE:",
-              vCaplet)
+        testCases.print("%12s" % capletStartDate,
+                        "%s" % capletEndDate,
+                        "%9.5f" % (vol*100.0),
+                        "%9.5f" % vCaplet)
 
         capletStartDate = capletEndDate
-    print("CAPLETS->CAP: ", vCaplets)
+
+    testCases.header("LABEL", "VALUE")
+    testCases.print("CAPLETS->CAP: ", vCaplets)
 
 ###############################################################################
 
@@ -294,12 +290,9 @@ def test_FinLiborCapletHull():
                                            liborCurve,
                                            model)
 
-    # Should equal 517.15 - use of dates makes it impossible to match Hull
-    # exactly
-
-    print(vCaplet)
-    if abs(vCaplet - 517.29) > 0.01:
-        print("Caplet price wrong")
+    # Cannot match Hull due to dates being adjusted
+    testCases.header("CORRECT PRICE", "MODEL PRICE")
+    testCases.print(517.29, vCaplet)
 
 ###############################################################################
 
@@ -360,7 +353,7 @@ def test_FinLiborCapFloorQLExample():
 
 
 test_FinLiborCapletHull()
-test_FinLiborCapFloorVolCurve()
-test_FinLiborCapFloor()
-test_FinLiborCapFloorQLExample()
-testCases.compareTestCases()
+#test_FinLiborCapFloorVolCurve()
+#test_FinLiborCapFloor()
+#test_FinLiborCapFloorQLExample()
+#testCases.compareTestCases()

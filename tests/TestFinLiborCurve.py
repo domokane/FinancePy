@@ -451,7 +451,7 @@ def test_FinLiborDepositsFuturesSwaps():
         swap.printFixedLeg(spotDate)
         swap.printFloatLeg(spotDate)
 
-        liborCurve.print()
+        print(liborCurve)
 
 ###############################################################################
 
@@ -576,7 +576,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        liborCurve = FinLiborCurve(valuationDate, depos, fras, swaps,
+        _ = FinLiborCurve(valuationDate, depos, fras, swaps,
                                    FinInterpTypes.FLAT_FORWARDS)
 
     end = time.time()
@@ -585,10 +585,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        liborCurve = FinLiborCurve(valuationDate,
-                                   depos,
-                                   fras,
-                                   swaps,
+        _ = FinLiborCurve(valuationDate, depos, fras, swaps,
                                    FinInterpTypes.LINEAR_SWAP_RATES)
 
     end = time.time()

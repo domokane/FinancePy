@@ -38,8 +38,9 @@ def test_FinBondOption():
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
     times = np.linspace(0, tmat, 20)
+    dates = settlementDate.addYears(times)
     dfs = np.exp(-0.05*times)
-    discountCurve = FinDiscountCurve(settlementDate, times, dfs)
+    discountCurve = FinDiscountCurve(settlementDate, dates, dfs)
 
     expiryDate = settlementDate.addTenor("18m")
     strikePrice = 105.0
@@ -183,13 +184,9 @@ def test_FinBondOptionAmericanConvergenceONE():
     strikePrice = 100.0
     face = 100.0
 
-    spotValue = bond.valueBondUsingDiscountCurve(settlementDate,
-                                                 discountCurve)
+    spotValue = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
 
-    texp = (expiryDate - settlementDate) / gDaysInYear
-    dfExpiry = discountCurve.df(texp)
-    tmat = (maturityDate - settlementDate) / gDaysInYear
-    dfMat = discountCurve.df(tmat)
+    dfExpiry = discountCurve.df(expiryDate)
 
     fwdValue = bond.valueBondUsingDiscountCurve(expiryDate, discountCurve)/dfExpiry
 
@@ -199,7 +196,7 @@ def test_FinBondOptionAmericanConvergenceONE():
     testCases.header("PERIOD", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
-    timeSteps = range(10, 100, 1)
+    timeSteps = range(30, 100, 1)
 
     for numTimeSteps in timeSteps:
 
@@ -258,7 +255,8 @@ def test_FinBondOptionAmericanConvergenceTWO():
     testCases.header("LABEL", "VALUE")
     testCases.print("BOND PRICE", spotValue)
 
-    testCases.header("PERIOD","N","EUR_CALL","AMER_CALL","EUR_PUT","AMER_PUT")
+    testCases.header("PERIOD", "N", "EUR_CALL", "AMER_CALL",
+                     "EUR_PUT", "AMER_PUT")
 
     sigma = 0.2
     a = 0.1
@@ -270,14 +268,18 @@ def test_FinBondOptionAmericanConvergenceTWO():
     vec_ep = []
     vec_ap = []
 
-    if 1==1:
+    if 1 == 1:
         K = 100.0
         bkModel = FinModelRatesBK(sigma, a, 100)
-        europeanCallBondOption = FinBondOption(bond, expiryDate, K, face, FinOptionTypes.EUROPEAN_CALL)
-        v_ec = europeanCallBondOption.value(settlementDate, discountCurve, bkModel)
-        print("OPTION", v_ec)
+        europeanCallBondOption = FinBondOption(bond, expiryDate, K, face,
+                                               FinOptionTypes.EUROPEAN_CALL)
 
-    numStepsVector = range(100, 100, 1) # should be 100-400
+        v_ec = europeanCallBondOption.value(settlementDate, discountCurve,
+                                            bkModel)
+        testCases.header("LABEL", "VALUE")
+        testCases.print("OPTION", v_ec)
+
+    numStepsVector = range(100, 100, 1)  # should be 100-400
 
     for numSteps in numStepsVector:
 
@@ -285,17 +287,25 @@ def test_FinBondOptionAmericanConvergenceTWO():
 
         start = time.time()
 
-        europeanCallBondOption = FinBondOption(bond, expiryDate, K, face, FinOptionTypes.EUROPEAN_CALL)
-        v_ec = europeanCallBondOption.value(settlementDate, discountCurve, bkModel)
+        europeanCallBondOption = FinBondOption(bond, expiryDate, K, face,
+                                               FinOptionTypes.EUROPEAN_CALL)
+        v_ec = europeanCallBondOption.value(settlementDate, discountCurve,
+                                            bkModel)
 
-        americanCallBondOption = FinBondOption(bond, expiryDate, K, face, FinOptionTypes.AMERICAN_CALL)
-        v_ac = americanCallBondOption.value(settlementDate, discountCurve, bkModel)
+        americanCallBondOption = FinBondOption(bond, expiryDate, K, face,
+                                               FinOptionTypes.AMERICAN_CALL)
+        v_ac = americanCallBondOption.value(settlementDate, discountCurve,
+                                            bkModel)
 
-        europeanPutBondOption = FinBondOption(bond, expiryDate, K, face, FinOptionTypes.EUROPEAN_PUT)
-        v_ep = europeanPutBondOption.value(settlementDate, discountCurve, bkModel)
+        europeanPutBondOption = FinBondOption(bond, expiryDate, K, face,
+                                              FinOptionTypes.EUROPEAN_PUT)
+        v_ep = europeanPutBondOption.value(settlementDate, discountCurve,
+                                           bkModel)
 
-        americanPutBondOption = FinBondOption(bond, expiryDate, K, face, FinOptionTypes.AMERICAN_PUT)
-        v_ap = americanPutBondOption.value(settlementDate, discountCurve, bkModel)
+        americanPutBondOption = FinBondOption(bond, expiryDate, K, face,
+                                              FinOptionTypes.AMERICAN_PUT)
+        v_ap = americanPutBondOption.value(settlementDate, discountCurve,
+                                           bkModel)
 
         end = time.time()
         period = end - start
@@ -323,13 +333,10 @@ def test_FinBondOptionAmericanConvergenceTWO():
     plt.plot(numStepsVector, vec_ap, label="American Put")
     plt.legend()
 
-
-
 ###############################################################################
 
 
-#test_FinBondOption()
-#test_FinBondOptionAmericanConvergenceONE()
+test_FinBondOption()
+# test_FinBondOptionAmericanConvergenceONE()
 test_FinBondOptionAmericanConvergenceTWO()
 testCases.compareTestCases()
-

@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import sys
 import numpy as np
 from numba import njit
 from typing import Union
@@ -9,6 +10,15 @@ from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
 from .FinError import FinError
 from .FinDayCount import FinDayCountTypes, FinDayCount
+
+###############################################################################
+
+
+def _funcName():
+    ''' Extract calling function name - using a protected method is not that
+    advisable but calling inspect.stack is so slow it must be avoided. '''
+    ff = sys._getframe().f_back.f_code.co_name
+    return ff
 
 ###############################################################################
 
@@ -57,6 +67,9 @@ def timesFromDates(dt: FinDate,
     times from the valuation date. The output is always a numpy vector of times
     which has only one element if the input is only one date. '''
 
+    if isinstance(valuationDate, FinDate) is False:
+        raise FinError("Valuation date is not a FinDate")
+
     if dayCountType is None:
         dcCounter = None
     else:
@@ -68,8 +81,10 @@ def timesFromDates(dt: FinDate,
         if dcCounter is None:
             times[0] = (dt - valuationDate) / gDaysInYear
         else:
-            times[0] = dcCounter.yearFrac(valuationDate, dt)
-        return np.array(times)
+            times[0] = dcCounter.yearFrac(valuationDate, dt)[0]
+
+        return times[0]
+
     elif isinstance(dt, list) and isinstance(dt[0], FinDate):
         numDates = len(dt)
         times = []
@@ -77,8 +92,9 @@ def timesFromDates(dt: FinDate,
             if dcCounter is None:
                 t = (dt[i] - valuationDate) / gDaysInYear
             else:
-                t = dcCounter.yearFrac(valuationDate, dt)
+                t = dcCounter.yearFrac(valuationDate, dt[i])[0]
             times.append(t)
+
         return np.array(times)
 
     elif isinstance(dt, np.ndarray):

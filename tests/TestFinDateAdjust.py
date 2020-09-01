@@ -30,7 +30,7 @@ def test_FinDateAdjust():
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
-    print("NO ADJUSTMENTS")
+    testCases.header("NO ADJUSTMENTS", "DATE")
     schedule = FinSchedule(startDate,
                            endDate,
                            frequencyType,
@@ -39,10 +39,10 @@ def test_FinDateAdjust():
                            dateGenRuleType)
 
     for dt in schedule._adjustedDates:
-        print(dt)
+        testCases.print("Date:", dt)
 
-    print("")
-    print("NO WEEKENDS AND FOLLOWING")
+    testCases.banner("")
+    testCases.header("NO WEEKENDS AND FOLLOWING", "DATE")
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
@@ -56,10 +56,10 @@ def test_FinDateAdjust():
                            dateGenRuleType)
 
     for dt in schedule._adjustedDates:
-        print(dt)
+        testCases.print("Date:", dt)
 
-    print("")
-    print("NO WEEKENDS AND MODIFIED FOLLOWING")
+    testCases.banner("")
+    testCases.header("NO WEEKENDS AND MODIFIED FOLLOWING", "DATE")
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
@@ -73,10 +73,11 @@ def test_FinDateAdjust():
                            dateGenRuleType)
 
     for dt in schedule._adjustedDates:
-        print(dt)
+        testCases.print("Date:", dt)
 
-    print("")
-    print("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING")
+    testCases.banner("")
+    testCases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
+                     "DATE")
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.US
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
@@ -93,7 +94,8 @@ def test_FinDateAdjust():
                            dateGenRuleType)
 
     for dt in schedule._adjustedDates:
-        print(dt)
+        testCases.print("Date:", dt)
+
 ###############################################################################
 
 

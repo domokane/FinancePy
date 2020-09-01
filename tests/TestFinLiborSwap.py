@@ -336,8 +336,6 @@ def test_LiborSwap():
     settlementDate = valuationDate.addDays(2)
     liborCurve = buildLiborCurve(valuationDate)
     v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
-#    swap.printFixedLeg(valuationDate)
-#    swap.printFloatLeg(valuationDate)
 
     v_bbg = 388147.0
     testCases.header("LABEL", "VALUE")

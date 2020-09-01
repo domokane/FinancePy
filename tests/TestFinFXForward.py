@@ -52,7 +52,7 @@ def test_FinFXForward():
     depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinLiborCurve(forName, settlementDate, depos, fras, swaps)
+    forDiscountCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -61,7 +61,7 @@ def test_FinFXForward():
     depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinLiborCurve(domName, settlementDate, depos, fras, swaps)
+    domDiscountCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     notional = 100.0
     notionalCurrency = forName

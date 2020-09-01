@@ -14,7 +14,6 @@ from financepy.finutils.FinOptionTypes import FinOptionTypes
 import sys
 sys.path.append("..//..")
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -47,13 +46,10 @@ def test_FinEquityCliquetOptionHaug():
                             dividendYield,
                             model)
 
-    cliquetOption.printFlows()
-    print("FINANCEPY", v)
+    testCases.print("FINANCEPY", v)
 
 ###############################################################################
 
 
 test_FinEquityCliquetOptionHaug()
-# test_FinEquityChooserOptionMatlab()
-# test_FinEquityChooserOptionDerivicom()
 testCases.compareTestCases()

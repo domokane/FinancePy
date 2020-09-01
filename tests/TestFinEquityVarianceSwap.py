@@ -62,12 +62,8 @@ def test_FinEquityVarianceSwap():
 
     testCases.print("REPLICATION VARIANCE:", k1)
 
-    # volSwap.print()
-
     k2 = volSwap.fairStrikeApprox(valuationDate, stockPrice, strikes, vols)
     testCases.print("DERMAN SKEW APPROX for K:", k2)
-
-    volSwap.printWeights()
 
 ##########################################################################
 

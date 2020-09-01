@@ -43,12 +43,13 @@ def test_FinCapVolCurve():
                                    capVolatilities,
                                    dayCountType)
 
-    print("  k  TEXP  CAPVOL  CAPLETVOL")
+    testCases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in capVolDates:
         capFloorVol = volCurve.capVol(dt)
         capFloorLetVol = volCurve.capletVol(dt)
-        print("%s %7.3f %7.2f " % (dt, capFloorVol*100.0,
-                                   capFloorLetVol*100.0))
+        testCases.print("%s" % dt,
+                        "%7.3f" % (capFloorVol*100.0),
+                        "%7.2f" % (capFloorLetVol*100.0))
 
 ##########################################################################
 

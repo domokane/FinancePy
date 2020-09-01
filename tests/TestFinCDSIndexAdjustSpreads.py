@@ -26,9 +26,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(tradeDate):
+def buildLiborCurve(valuationDate):
 
-    valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
 
     depos = []
@@ -91,9 +90,8 @@ def buildLiborCurve(tradeDate):
 ##########################################################################
 
 
-def buildIssuerCurve(tradeDate, liborCurve):
+def buildIssuerCurve(valuationDate, liborCurve):
 
-    valuationDate = tradeDate.addDays(1)
     cdsMarketContracts = []
 
     cdsCoupon = 0.0048375
@@ -115,9 +113,9 @@ def buildIssuerCurve(tradeDate, liborCurve):
 
 def test_CDSIndexAdjustSpreads():
 
-    tradeDate = FinDate(2007, 8, 1)
+    tradeDate = FinDate(1, 8, 2007)
     stepInDate = tradeDate.addDays(1)
-    valuationDate = stepInDate
+    valuationDate = tradeDate
 
     liborCurve = buildLiborCurve(tradeDate)
 
@@ -240,7 +238,8 @@ def test_CDSIndexAdjustSpreads():
     import time
     start = time.time()
 
-    adjustedIssuerCurves = FinCDSIndexPortfolio.spreadAdjustIntrinsic(
+    indexPortfolio = FinCDSIndexPortfolio()
+    adjustedIssuerCurves = indexPortfolio.spreadAdjustIntrinsic(
         valuationDate,
         issuerCurves,
         indexCoupons,
@@ -281,6 +280,8 @@ def test_CDSIndexAdjustSpreads():
     testCases.print("ADJUSTED INTRINSIC SPD 5Y:", intrinsicSpd5Y)
     testCases.print("ADJUSTED INTRINSIC SPD 7Y", intrinsicSpd7Y)
     testCases.print("ADJUSTED INTRINSIC SPD 10Y", intrinsicSpd10Y)
+
+###############################################################################
 
 
 test_CDSIndexAdjustSpreads()

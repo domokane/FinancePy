@@ -53,13 +53,16 @@ def test_FinDiscountCurves():
     finDiscountCurveFlat = FinDiscountCurveFlat(valuationDate, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = FinDiscountCurveNS(valuationDate, 0.0305, -0.01, 0.08, 10.0)
+    finDiscountCurveNS = FinDiscountCurveNS(valuationDate, 0.0305, -0.01,
+                                            0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = FinDiscountCurveNSS(valuationDate, 0.035, -0.02, 0.09, 0.1, 1.0, 2.0)
+    finDiscountCurveNSS = FinDiscountCurveNSS(valuationDate, 0.035, -0.02,
+                                              0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = FinDiscountCurvePoly(valuationDate, [0.05, 0.002, -0.00005])
+    finDiscountCurvePoly = FinDiscountCurvePoly(valuationDate, [0.05, 0.002,
+                                                                -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
     finDiscountCurvePWF = FinDiscountCurvePWF(valuationDate, dates, rates)
@@ -77,88 +80,67 @@ def test_FinDiscountCurves():
 
     fwdDate1 = valuationDate.addYears(1)
     fwdDate2 = fwdDate1.addTenor("3M")
- 
-    # Do single calls (no vectorisations)
 
-    print("")
-    print("                     CURVE           1YR        2YR        3YR        4YR        5YR")
+    # Do single calls (no vectorisations)
+    testCases.header("CURVE", "DATE", "RATE")
 
     for name, curve in zip(curveNames, curvesList):
-        print(" %30s"% name, end="")
         for date in dates:
             zeroRate = curve.zeroRate(date)
-            print(" %10.5f"% (zeroRate), end="")
-        print("")
+            testCases.print("%25s" % name, "%15s" % date,
+                            "%8.5f" % (zeroRate*100.0))
 
-    print("")
-    print("                     CURVE           ZERO      CCFWD      MMFWD       PAR         DF")
+    testCases.banner("")
+    testCases.header("CURVE", "ZERO", "CCFWD", "MMFWD", "PAR", "DF")
 
     for name, curve in zip(curveNames, curvesList):
 
         zeroRate = curve.zeroRate(fwdDate1)
-        print(" %30s" % name, end = "")
-
-        print(" %10.5f"% (zeroRate), end="")
-
         fwd = curve.fwd(fwdDate1)
-        print(" %10.5f"% (fwd), end = "")
-
         fwdRate = curve.fwdRate(fwdDate1, fwdDate2)
-        print(" %10.5f"% (fwdRate), end = "")
-
         parRate = curve.parRate(fwdDate1)
-        print(" %10.5f"% (parRate), end = "")
-
         df = curve.df(fwdDate1)
-        print(" %10.5f"% (df))
 
-    for curve in curvesList:
-        print(curve)
+        testCases.print("%30s" % name,
+                        " %10.5f" % (zeroRate),
+                        " %10.5f" % (fwd),
+                        " %10.5f" % (fwdRate),
+                        " %10.5f" % (parRate),
+                        " %10.5f" % (df))
 
     years = np.linspace(0, 10, 121)
     years2 = years + 3
     fwdDates = valuationDate.addYears(years)
     fwdDates2 = valuationDate.addYears(years2)
 
-    plt.figure()
-    for name, curve in zip(curveNames, curvesList):
-        zeroRates = curve.zeroRate(fwdDates)
-        plt.plot(years, zeroRates, label=name)
-    plt.legend()
-    plt.title("Zero Rates")
+    if 1 == 0:
+        plt.figure()
+        for name, curve in zip(curveNames, curvesList):
+            zeroRates = curve.zeroRate(fwdDates)
+            plt.plot(years, zeroRates, label=name)
+        plt.legend()
+        plt.title("Zero Rates")
 
-    plt.figure()
-    for name, curve in zip(curveNames, curvesList):
-        fwdRates = curve.fwd(fwdDates)
-        plt.plot(years, fwdRates, label=name)
-    plt.legend()
-    plt.title("CC Fwd Rates")
+        plt.figure()
+        for name, curve in zip(curveNames, curvesList):
+            fwdRates = curve.fwd(fwdDates)
+            plt.plot(years, fwdRates, label=name)
+        plt.legend()
+        plt.title("CC Fwd Rates")
 
-    plt.figure()
-    for name, curve in zip(curveNames, curvesList):
-        fwdRates = curve.fwdRate(fwdDates, fwdDates2)
-        plt.plot(years, fwdRates, label=name)
-    plt.legend()
-    plt.title("CC Fwd Rates")
+        plt.figure()
+        for name, curve in zip(curveNames, curvesList):
+            fwdRates = curve.fwdRate(fwdDates, fwdDates2)
+            plt.plot(years, fwdRates, label=name)
+        plt.legend()
+        plt.title("CC Fwd Rates")
 
-    plt.figure()
-    for name, curve in zip(curveNames, curvesList):
-        dfs = curve.df(fwdDates)
-        plt.plot(years, dfs, label=name)
-    plt.legend()
-    plt.title("Discount Factors")
-
-
-
-
-
-
-
-
-
-
-
-
+        plt.figure()
+        for name, curve in zip(curveNames, curvesList):
+            dfs = curve.df(fwdDates)
+            plt.plot(years, dfs, label=name)
+        plt.legend()
+        plt.title("Discount Factors")
 
 ###############################################################################
 

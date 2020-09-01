@@ -3,6 +3,7 @@
 ###############################################################################
 
 import numpy as np
+import time
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -153,10 +154,31 @@ def test_FinDateAddYears():
 ###############################################################################
 
 
+def test_FinDateSpeed():
+
+    numSteps = 1000
+    start = time.time()
+    dateList = []
+    for i in range(0, numSteps):
+        startDate = FinDate(1, 1, 2010)
+        dateList.append(startDate)
+    end = time.time()
+    elapsed = end - start
+
+    testCases.header("LABEL", "VALUE")
+    testCases.print("TIMING(s):", elapsed)
+
+    mem = sys.getsizeof(dateList)
+    testCases.print("Mem:", mem)
+
+###############################################################################
+
+
 test_FinDate()
 test_FinDateTenors()
 test_FinDateRange()
 test_FinDateAddMonths()
 test_FinDateAddYears()
+test_FinDateSpeed()
 
 testCases.compareTestCases()

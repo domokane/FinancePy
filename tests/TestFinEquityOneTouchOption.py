@@ -36,12 +36,13 @@ def test_FinEquityOneTouchOption():
     stockPrice = 105.0
     paymentSize = 15.0
 
-    print("")
-    print("CASH ONLY")
+    testCases.header("================================= CASH ONLY")
 
     downTypes = [FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_HIT,
                  FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_EXPIRY,
                  FinTouchOptionPayoffTypes.DOWN_AND_OUT_CASH_OR_NOTHING]
+
+    testCases.header("TYPE", "VALUE", "VALUE_MC")
 
     for downType in downTypes:
 
@@ -64,7 +65,9 @@ def test_FinEquityOneTouchOption():
                               numStepsPerYear,
                               numPaths)
 
-        print("%60s %9.5f %9.5f" % (downType, v, v_mc))
+        testCases.print("%60s " % downType,
+                        "%9.5f" % v,
+                        "%9.5f" % v_mc)
 
     stockPrice = 95.0
     paymentSize = 15.0
@@ -72,6 +75,8 @@ def test_FinEquityOneTouchOption():
     upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT,
                FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_EXPIRY,
                FinTouchOptionPayoffTypes.UP_AND_OUT_CASH_OR_NOTHING]
+
+    testCases.header("TYPE", "VALUE", "VALUE_MC")
 
     for upType in upTypes:
 
@@ -94,19 +99,21 @@ def test_FinEquityOneTouchOption():
                               numStepsPerYear,
                               numPaths)
 
-        print("%60s %9.5f %9.5f" % (upType, v, v_mc))
+        testCases.print("%60s " % upType,
+                        "%9.5f" % v,
+                        "%9.5f" % v_mc)
 
     ###########################################################################
 
     stockPrice = 105.0
 
-    print("")
-    print("ASSET ONLY")
+    testCases.banner("================= ASSET ONLY")
 
     downTypes = [FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_HIT,
                  FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_EXPIRY,
                  FinTouchOptionPayoffTypes.DOWN_AND_OUT_ASSET_OR_NOTHING]
 
+    testCases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
 
         option = FinEquityOneTouchOption(expiryDate,
@@ -127,7 +134,9 @@ def test_FinEquityOneTouchOption():
                               numStepsPerYear,
                               numPaths)
 
-        print("%60s %9.5f %9.5f" % (downType, v, v_mc))
+        testCases.print("%60s " % downType,
+                        "%9.5f" % v,
+                        "%9.5f" % v_mc)
 
     stockPrice = 95.0
 
@@ -155,7 +164,9 @@ def test_FinEquityOneTouchOption():
                               numStepsPerYear,
                               numPaths)
 
-        print("%60s %9.5f %9.5f" % (upType, v, v_mc))
+        testCases.print("%60s " % upType,
+                        "%9.5f" % v,
+                        "%9.5f" % v_mc)
 
 ###############################################################################
 

@@ -89,7 +89,7 @@ def test_CDSCurveRepricing():
     valuationDate = FinDate(2018, 6, 20)
     recoveryRate = 0.40
 
-    cdsContracts, issuerCurve = test_CurveBuild()
+    cdsContracts, issuerCurve = test_IssuerCurveBuild()
     testCases.header("CDS_MATURITY_DATE", "PAR_SPREAD")
     for cds in cdsContracts:
         spd = cds.parSpread(valuationDate, issuerCurve, recoveryRate)
@@ -100,30 +100,24 @@ def test_CDSCurveRepricing():
 
 def test_CDSCurveBuildTiming():
 
-    numCurves = 10
+    numCurves = 1000
 
     start = time.time()
-    for i in range(0, numCurves):
-        test_CurveBuild()
+    for _ in range(0, numCurves):
+        test_IssuerCurveBuild()
 
     end = time.time()
 
-    testCases.header("Label", "TIME")
+    testCases.header("LABEL", "TIME")
     duration = (end - start) / numCurves
     testCases.print(str(numCurves) + " Libor curves", duration)
-
-    start = time.time()
-    for i in range(0, numCurves):
-        buildFullIssuerCurve1(0, 0)
-    end = time.time()
-
-    duration = (end - start) / numCurves
-    testCases.print(str(numCurves) + " Libor + CDS curves:", duration)
 
 ##########################################################################
 
 
-def test_CurveBuild():
+def test_IssuerCurveBuild():
+    ''' Test issuer curve build with simple libor curve to isolate cds
+    curve building time cost. '''
 
     valuationDate = FinDate(2018, 6, 20)
 
@@ -353,9 +347,6 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     maturityDate = valuationDate.nextCDSDate(180)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
     cdsMarketContracts.append(cds)
-
-#    for cds in cdsMarketContracts:
-#        print("CDS Maturity Date",cds._maturityDate)
 
     recoveryRate = 0.40
 
@@ -661,7 +652,7 @@ def test_fullPriceCDSModelCheck():
 
 def test_fullPriceCDSConvergence():
 
-    liborCurve, issuerCurve = buildFullIssuerCurve1(0.0, 0.0)
+    _, issuerCurve = buildFullIssuerCurve1(0.0, 0.0)
 
     # This is the 10 year contract at an off market coupon
     maturityDate = FinDate(2029, 6, 20)
@@ -718,12 +709,13 @@ def test_CDSDateGeneration():
 ##########################################################################
 
 
-test_fullPriceCDSModelCheck()
 
+test_CDSCurveBuildTiming()
+#test_fullPriceCDSModelCheck()
 #test_CDSDateGeneration()
 #test_fullPriceCDS1()
 #test_fullPriceCDSConvergence()
-#test_CDSCurveBuildTiming()
 #test_CDSCurveRepricing()
 #test_CDSFastApproximation()
+
 #testCases.compareTestCases()

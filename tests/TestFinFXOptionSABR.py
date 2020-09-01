@@ -51,9 +51,9 @@ def test_FinFXOptionSABR():
     # keeps the value unchanged
     notional = 1000000.0
 
-    testCases.header("SPOT FX RATE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
-
     spotFXRates = np.arange(50, 200, 10)/100.0
+
+    testCases.header("OPTION", "FX_RATE", "VALUE_BS", "VOL_IN", "DIFF")
 
     for spotFXRate in spotFXRates:
 
@@ -84,10 +84,14 @@ def test_FinFXOptionSABR():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("CALL %9.6f %9.6f %9.7f %10.8f" % (spotFXRate,
-                                                 valueEuropean,
-                                                 valueAmerican,
-                                                 diff))
+
+        testCases.print("CALL:",
+                        "%9.6f" % spotFXRate,
+                        "%9.7f" % valueEuropean,
+                        "%9.7f" % valueAmerican,
+                        "%9.7f" % diff)
+
+    testCases.header("OPTION", "FX_RATE", "VALUE_BS", "VOL_IN", "DIFF")
 
     for spotFXRate in spotFXRates:
 
@@ -118,10 +122,11 @@ def test_FinFXOptionSABR():
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        print("PUT  %9.6f %9.6f %9.7f %10.8f" % (spotFXRate,
-                                                 valueEuropean,
-                                                 valueAmerican,
-                                                 diff))
+        testCases.print("PUT:",
+                        "%9.6f" % spotFXRate,
+                        "%9.7f" % valueEuropean,
+                        "%9.7f" % valueAmerican,
+                        "%9.7f" % diff)
 
 ###############################################################################
 
