@@ -2,15 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
 import datetime
 from .FinError import FinError
-from .FinMath import isLeapYear
-# from .FinCalendar import FinCalendar
-
+from numba import njit, boolean, int64
 import numpy as np
-
-# from numba import njit, float64, int32
 
 ENFORCE_DAY_FIRST = True
 
@@ -55,6 +50,93 @@ longMonthNames = [
 monthDaysNotLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
+###############################################################################
+
+
+@njit(boolean(int64), fastmath=True, cache=True)
+def isLeapYear(y: int):
+    ''' Test whether year y is a leap year - if so return True, else False '''
+    leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
+    return leapYear
+
+###############################################################################
+# CREATE DATE COUNTER
+###############################################################################
+
+
+gDateCounterList = None
+gStartYear = 1900
+gEndYear = 2100
+
+
+def calculateList():
+    ''' Calculate list of dates so that we can do quick lookup to get the
+    number of dates since 1 Jan 1900 (inclusive) BUT TAKING INTO ACCOUNT THE
+    FACT THAT EXCEL MISTAKENLY CALLS 1900 A LEAP YEAR. For us, agreement with
+    Excel is more important than this leap year error and in any case, we will
+    not usually be calculating day differences with start dates before 28 Feb
+    1900. Note that Excel inherited this "BUG" from LOTUS 1-2-3. '''
+
+    dayCounter = 0
+    maxDays = 0
+    global gDateCounterList
+    global gStartYear
+    global gEndYear
+
+    print("Calculating list between", gStartYear, "and", gEndYear)
+
+    gDateCounterList = []
+
+    idx = -1  # the first element will be idx=0
+
+    for yy in range(1900, gEndYear+1):
+
+        # DO NOT CHANGE THIS FOR AGREEMENT WITH EXCEL WHICH ASSUMES THAT 1900
+        # WAS A LEAP YEAR AND THAT 29 FEB 1900 ACTUALLY HAPPENED. A LOTUS BUG.
+        if yy == 1900:
+            leapYear = True
+        else:
+            leapYear = isLeapYear(yy)
+
+        for mm in range(1, 13):
+
+            if leapYear is True:
+                maxDays = monthDaysLeapYear[mm-1]
+            else:
+                maxDays = monthDaysNotLeapYear[mm-1]
+
+            for _ in range(1, maxDays+1):
+                idx += 1
+                dayCounter += 1
+                if yy >= gStartYear:
+                    gDateCounterList.append(dayCounter)
+
+            for _ in range(maxDays, 31):
+                idx += 1
+                if yy >= gStartYear:
+                    gDateCounterList.append(-999)
+
+
+@njit(fastmath=True, cache=True)
+def dateIndex(d, m, y):
+    idx = (y-gStartYear) * 12 * 31 + (m-1) * 31 + (d-1)
+    return idx
+
+
+@njit(fastmath=True, cache=True)
+def dateFromIndex(idx):
+    ''' Reverse mapping from index to date. Take care with numba as it can do
+    weird rounding on the integer. Seems OK now. '''
+    y = int(gStartYear + idx/12/31)
+    m = 1 + int((idx - (y-gStartYear) * 12 * 31) / 31)
+    d = 1 + idx - (y-gStartYear) * 12 * 31 - (m-1) * 31
+    return (d, m, y)
+
+
+@njit(fastmath=True, cache=True)
+def weekDay(dayCount):
+    weekday = (dayCount+5) % 7
+    return weekday
 
 ###############################################################################
 
@@ -81,14 +163,34 @@ class FinDate():
         must be in the order of day (of month), month number and then the year.
         The year must be a 4-digit number greater than or equal to 1900. '''
 
-        if d >= 1900 and d < 2100 and y > 0 and y <= 31:
+        global gStartYear
+        global gEndYear
+
+        # If the date has been entered as y, m, d we flip it to d, m, y
+        if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
             tmp = y
             y = d
             d = tmp
 
-        if y < 1900 or y > 2100:
+        if gDateCounterList is None:
+            calculateList()
+
+        if y < 1900:
+            raise FinError("Year cannot be before 1900")
+
+        # Resize date list dynamically if required
+        if y < gStartYear:
+            gStartYear = y
+            calculateList()
+
+        if y > gEndYear:
+            gEndYear = y
+            calculateList()
+
+        if y < gStartYear or y > gEndYear:
             raise FinError(
-                "Date: year " + str(y) + " should be 1900 to 2100.")
+                "Date: year " + str(y) + " should be " + str(gStartYear) +
+                " to " + str(gEndYear))
 
         if d < 1:
             raise FinError("Date: Leap year. Day not valid.")
@@ -97,9 +199,11 @@ class FinDate():
 
         if leapYear:
             if d > monthDaysLeapYear[m - 1]:
+                print(d, m, y)
                 raise FinError("Date: Leap year. Day not valid.")
         else:
             if d > monthDaysNotLeapYear[m - 1]:
+                print(d, m, y)
                 raise FinError("Date: Not Leap year. Day not valid.")
 
         self._y = y
@@ -116,10 +220,11 @@ class FinDate():
         ''' Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. '''
 
-        dt = datetime.date(self._y, self._m, self._d)
-        delta = dt - datetime.date(1900, 1, 1)
-        self._excelDate = delta.days
-        self._weekday = dt.weekday()
+        idx = dateIndex(self._d, self._m, self._y)
+        daysSinceFirstJan1900 = gDateCounterList[idx]
+        wd = weekDay(daysSinceFirstJan1900)
+        self._excelDate = daysSinceFirstJan1900
+        self._weekday = wd
 
     ###########################################################################
 
@@ -164,24 +269,69 @@ class FinDate():
     ###########################################################################
 
     def addDays(self,
-                numDays: int):
-        ''' Returns a new date that is numDays after the FinDate. '''
+                numDays: int = 1):
+        ''' Returns a new date that is numDays after the FinDate. I also make
+        it possible to go backwards a number of days. '''
 
-        dt = datetime.date(self._y, self._m, self._d)
-        dt = dt + datetime.timedelta(days=numDays)
-        d = dt.day
-        m = dt.month
-        y = dt.year
+        idx = dateIndex(self._d, self._m, self._y)
+
+        step = +1
+        if numDays < 0:
+            step = -1
+
+        while numDays != 0:
+            idx += step
+            if gDateCounterList[idx] > 0:
+                numDays -= step
+
+        (d, m, y) = dateFromIndex(idx)
         newDt = FinDate(d, m, y)
         return newDt
 
     ###########################################################################
 
+    # def addDays2(self,
+    #             numDays: int):
+    #     ''' Returns a new date that is numDays after the FinDate. '''
+
+    #     dt = datetime.date(self._y, self._m, self._d)
+    #     dt = dt + datetime.timedelta(days=numDays)
+    #     d = dt.day
+    #     m = dt.month
+    #     y = dt.year
+    #     newDt = FinDate(d, m, y)
+    #     return newDt
+
+    ###########################################################################
+
+    # def addWorkDays2(self,
+    #                  numDays: int):
+    #     ''' Returns a new date that is numDays working days after FinDate. Note
+    #     that only weekends are taken into account. Other Holidays are not. '''
+
+    #     if isinstance(numDays, int) is False:
+    #         raise FinError("Num days must be an integer")
+
+    #     if numDays < 0:
+    #         raise FinError("Num days must be positive.")
+
+    #     nextWorkingDt = FinDate(self._d, self._m, self._y)
+
+    #     while numDays > 0:
+    #         nextWorkingDt = nextWorkingDt.addDays(1)
+    #         if nextWorkingDt.isWeekend() is False:
+    #             numDays = numDays - 1
+
+    #     return nextWorkingDt
+
+    ###########################################################################
+
     def addWorkDays(self,
                     numDays: int):
-        ''' Returns a new date that is numDays working days after FinDate. '''
+        ''' Returns a new date that is numDays working days after FinDate. Note
+        that only weekends are taken into account. Other Holidays are not. '''
 
-        if type(numDays) is not int:
+        if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
         if numDays < 0:
@@ -208,13 +358,14 @@ class FinDate():
     ###########################################################################
 
     def addMonths(self,
-                  mm: int):
+                  mm: (list, int)):
         ''' Returns a new date that is mm months after the FinDate. If mm is an
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates.'''
 
         numMonths = 1
         scalarFlag = False
+
         if isinstance(mm, int) or isinstance(mm, float):
             mmVector = [mm]
             scalarFlag = True
@@ -235,9 +386,9 @@ class FinDate():
 
             mmi = int(mmi)
 
+            d = self._d
             m = self._m + mmi
             y = self._y
-            d = self._d
 
             while m > 12:
                 m = m - 12
@@ -246,6 +397,15 @@ class FinDate():
             while m < 1:
                 m = m + 12
                 y -= 1
+
+            leapYear = isLeapYear(y)
+
+            if leapYear:
+                if d > monthDaysLeapYear[m - 1]:
+                    d = monthDaysLeapYear[m-1]
+            else:
+                if d > monthDaysNotLeapYear[m - 1]:
+                    d = monthDaysNotLeapYear[m-1]
 
             newDt = FinDate(d, m, y)
             dateList.append(newDt)

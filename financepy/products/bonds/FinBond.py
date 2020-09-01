@@ -40,7 +40,7 @@ from scipy import optimize
 from enum import Enum
 
 
-class FinYieldConventions(Enum):
+class FinYTMCalcType(Enum):
     UK_DMO = 1,
     US_STREET = 2,
     US_TREASURY = 3
@@ -54,7 +54,7 @@ def _f(y, *args):
     settlementDate = args[1]
     price = args[2]
     convention = args[3]
-    px = bond.fullPriceFromYield(settlementDate, y, convention)
+    px = bond.fullPriceFromYTM(settlementDate, y, convention)
     objFn = px - price
     return objFn
 
@@ -77,16 +77,18 @@ def _g(oas, *args):
 class FinBond(object):
     ''' Class for fixed coupon bonds and performing related analytics. These
     are bullet bonds which means they have regular coupon payments of a known
-    size that are paid on known dates plus a payment of par at maturity.'''
+    size that are paid on known dates plus a payment of par at maturity. '''
 
     def __init__(self,
                  maturityDate: FinDate,
-                 coupon: float,
+                 coupon: float,  # Annualised bond coupon
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
-                 face: float = 100.0):
+                 faceAmount: float = 100.0):
         ''' Create FinBond object by providing Maturity Date, Frequency,
-        coupon and the accrual convention type. '''
+        coupon and the accrual convention type. No issue date is required as
+        we assume that the bond starts accruing before any settlement date and
+        so that the first coupon is a full coupon. This may change. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -95,14 +97,15 @@ class FinBond(object):
         self._frequencyType = frequencyType
         self._accrualType = accrualType
         self._frequency = FinFrequency(frequencyType)
-        self._face = face  # This is the position size
+        self._faceAmount = faceAmount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted
 
         ''' I do not determine cashflow dates as I do not want to require
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. '''
 
-        self._flowDates: List[FinDate] = []
+        self._flowDates = []
+
         self._settlementDate = FinDate(1, 1, 1900)
         self._accruedInterest = None
         self._accruedDays = 0.0
@@ -113,7 +116,6 @@ class FinBond(object):
     def _calculateFlowDates(self,
                             settlementDate: FinDate):
         ''' Determine the bond cashflow payment dates. '''
-
         # No need to generate flows if settlement date has not changed
         if settlementDate == self._settlementDate:
             return
@@ -136,29 +138,30 @@ class FinBond(object):
 
 ###############################################################################
 
-    def fullPriceFromYield(self,
-                           settlementDate: FinDate,
-                           y: float,
-                           convention: FinYieldConventions=FinYieldConventions.UK_DMO):
+    def fullPriceFromYTM(self,
+                         settlementDate: FinDate,
+                         ytm: float,
+                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         ''' Calculate the full price of bond from its yield to maturity. This
-        function is vectorised with respect to the yield input. '''
+        function is vectorised with respect to the yield input. It implements
+        a number of standard conventions for calculating the YTM. '''
 
-        if convention not in FinYieldConventions:
+        if convention not in FinYTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
-        y = np.array(y)  # VECTORIZED
-        y = y + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
+        ytm = np.array(ytm)  # VECTORIZED
+        ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
 
         self._calculateFlowDates(settlementDate)
-        f = self._frequencyType.value
+        f = FinFrequency(self._frequencyType)
         c = self._coupon
-        v = 1.0 / (1.0 + y/f)
+        v = 1.0 / (1.0 + ytm/f)
 
         # n is the number of flows after the next coupon - we remove 2 because
         # the first element is the previous coupon date and then the ncd
         n = len(self._flowDates) - 2
 
-        if convention == FinYieldConventions.UK_DMO:
+        if convention == FinYTMCalcType.UK_DMO:
             if n == 0:
                 fp = (v**(self._alpha))*(1.0+c/f)
             else:
@@ -167,7 +170,7 @@ class FinBond(object):
                 term3 = c*v*v*(1.0-v**(n-1))/f/(1.0-v)
                 term4 = v**n
                 fp = (v**(self._alpha))*(term1 + term2 + term3 + term4)
-        elif convention == FinYieldConventions.US_TREASURY:
+        elif convention == FinYTMCalcType.US_TREASURY:
             if n == 0:
                 fp = (v**(self._alpha))*(1.0+c/f)
             else:
@@ -175,12 +178,12 @@ class FinBond(object):
                 term2 = c*v/f
                 term3 = c*v*v*(1.0-v**(n-1))/f/(1.0-v)
                 term4 = v**n
-                vw = 1.0 / (1.0 + self._alpha * y/f)
+                vw = 1.0 / (1.0 + self._alpha * ytm/f)
                 fp = (vw)*(term1 + term2 + term3 + term4)
-        elif convention == FinYieldConventions.US_STREET:
-            vw = 1.0 / (1.0 + self._alpha * y/f)
+        elif convention == FinYTMCalcType.US_STREET:
+            vw = 1.0 / (1.0 + self._alpha * ytm/f)
             if n == 0:
-                vw = 1.0 / (1.0 + self._alpha * y/f)
+                vw = 1.0 / (1.0 + self._alpha * ytm/f)
                 fp = vw*(1.0+c/f)
             else:
                 term1 = c/f
@@ -198,15 +201,15 @@ class FinBond(object):
     def principal(self,
                   settlementDate: FinDate,
                   y: float,
-                  convention: FinYieldConventions):
+                  convention: FinYTMCalcType):
         ''' Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Libor rates. '''
 
-        fullPrice = self.fullPriceFromYield(settlementDate,
-                                            y, convention)
+        fullPrice = self.fullPriceFromYTM(settlementDate, y, convention)
 
-        principal = fullPrice * self._face / self._par - self._accruedInterest
+        principal = fullPrice * self._faceAmount / self._par
+        principal = principal - self._accruedInterest
         return principal
 
 ###############################################################################
@@ -214,13 +217,14 @@ class FinBond(object):
     def dollarDuration(self,
                        settlementDate: FinDate,
                        ytm: float,
-                       convention:FinYieldConventions=FinYieldConventions.UK_DMO):
-        ''' Calculate the risk or dP/dy of the bond by bumping. '''
+                       convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+        ''' Calculate the risk or dP/dy of the bond by bumping. This is also
+        known as the DV01 in Bloomberg. '''
 
         self._calculateFlowDates(settlementDate)
         dy = 0.0001
-        p0 = self.fullPriceFromYield(settlementDate, ytm - dy, convention)
-        p2 = self.fullPriceFromYield(settlementDate, ytm + dy, convention)
+        p0 = self.fullPriceFromYTM(settlementDate, ytm - dy, convention)
+        p2 = self.fullPriceFromYTM(settlementDate, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0
         return durn
 
@@ -229,12 +233,12 @@ class FinBond(object):
     def macauleyDuration(self,
                          settlementDate: FinDate,
                          ytm: float,
-                         convention: FinYieldConventions=FinYieldConventions.UK_DMO):
+                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         ''' Calculate the Macauley duration of the bond on a settlement date
         given its yield to maturity. '''
 
         dd = self.dollarDuration(settlementDate, ytm, convention)
-        fp = self.fullPriceFromYield(settlementDate, ytm, convention)
+        fp = self.fullPriceFromYTM(settlementDate, ytm, convention)
         md = dd * (1.0 + ytm / self._frequency) / fp
         return md
 
@@ -243,43 +247,44 @@ class FinBond(object):
     def modifiedDuration(self,
                          settlementDate: FinDate,
                          ytm: float,
-                         convention:FinYieldConventions=FinYieldConventions.UK_DMO):
+                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         ''' Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. '''
 
         dd = self.dollarDuration(settlementDate, ytm, convention)
-        fp = self.fullPriceFromYield(settlementDate, ytm, convention)
+        fp = self.fullPriceFromYTM(settlementDate, ytm, convention)
         md = dd / fp
         return md
 
 ###############################################################################
 
-    def convexityFromYield(self,
-                           settlementDate: FinDate,
-                           ytm: float,
-                           convention: FinYieldConventions=FinYieldConventions.UK_DMO):
+    def convexityFromYTM(self,
+                         settlementDate: FinDate,
+                         ytm: float,
+                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         ''' Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
         self._calculateFlowDates(settlementDate)
         dy = 0.0001
-        p0 = self.fullPriceFromYield(settlementDate, ytm - dy, convention)
-        p1 = self.fullPriceFromYield(settlementDate, ytm, convention)
-        p2 = self.fullPriceFromYield(settlementDate, ytm + dy, convention)
+        p0 = self.fullPriceFromYTM(settlementDate, ytm - dy, convention)
+        p1 = self.fullPriceFromYTM(settlementDate, ytm, convention)
+        p2 = self.fullPriceFromYTM(settlementDate, ytm + dy, convention)
         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
         return conv
 
 ###############################################################################
 
-    def cleanPriceFromYield(self,
-                            settlementDate: FinDate,
-                            ytm: float,
-                            convention: FinYieldConventions=FinYieldConventions.UK_DMO):
+    def cleanPriceFromYTM(self,
+                          settlementDate: FinDate,
+                          ytm: float,
+                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         ''' Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
-        fullPrice = self.fullPriceFromYield(settlementDate, ytm, convention)
-        cleanPrice = fullPrice - self._accruedInterest * self._par / self._face
+        fullPrice = self.fullPriceFromYTM(settlementDate, ytm, convention)
+        accruedAmount = self._accruedInterest * self._par / self._faceAmount
+        cleanPrice = fullPrice - accruedAmount
         return cleanPrice
 
 ###############################################################################
@@ -294,7 +299,7 @@ class FinBond(object):
         fullPrice = self.valueBondUsingDiscountCurve(settlementDate,
                                                      discountCurve)
 
-        accrued = self._accruedInterest * self._par / self._face
+        accrued = self._accruedInterest * self._par / self._faceAmount
         cleanPrice = fullPrice - accrued
         return cleanPrice
 
@@ -346,7 +351,7 @@ class FinBond(object):
     def yieldToMaturity(self,
                         settlementDate: FinDate,
                         cleanPrice: float,
-                        convention:FinYieldConventions=FinYieldConventions.US_TREASURY):
+                        convention: FinYTMCalcType = FinYTMCalcType.US_TREASURY):
         ''' Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. '''
 
@@ -359,7 +364,9 @@ class FinBond(object):
                            + str(type(cleanPrice)))
 
         self._calculateFlowDates(settlementDate)
-        fullPrices = (cleanPrices + self._accruedInterest*self._par/self._face)
+
+        accruedAmount = self._accruedInterest * self._par / self._faceAmount
+        fullPrices = (cleanPrices + accruedAmount)
         ytms = []
 
         for fullPrice in fullPrices:
@@ -386,10 +393,12 @@ class FinBond(object):
     def calcAccruedInterest(self,
                             settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
-        previous coupon date and the settlement date. '''
+        previous coupon date and the settlement date. Note that for some day
+        count schemes (such as 30E/360) this is not actually the number of days
+        between the previous coupon payment date and settlement date. '''
 
         if settlementDate != self._settlementDate:
-            self.calculateFlowDates(settlementDate)
+            self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -397,17 +406,21 @@ class FinBond(object):
         dc = FinDayCount(self._accrualType)
 
         if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
-            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)
-            alpha = 1.0 - accFactor
-            accFactor = accFactor/self._frequency
+            (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                                settlementDate,
+                                                self._ncd)
+            self._alpha = 1.0 - accFactor
+            accFactor = accFactor / self._frequency
         else:
-            accFactor = dc.yearFrac(self._pcd, settlementDate)
-            alpha = 1.0 - accFactor
+            (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                                settlementDate)
 
-        self._accruedInterest = accFactor * self._face * self._coupon
-        self._alpha = alpha
-        self._accruedDays = settlementDate - self._pcd
+            # need to adjust as accFactor is fraction over whole year, not
+            # just the first coupon period which could be 3M or 6M long
+            self._alpha = 1.0 - accFactor * self._frequency
 
+        self._accruedInterest = accFactor * self._faceAmount * self._coupon
+        self._accruedDays = num
         return self._accruedInterest
 
 ###############################################################################
@@ -429,7 +442,8 @@ class FinBond(object):
         cleanPrice = np.array(cleanPrice)
         self._calculateFlowDates(settlementDate)
 
-        bondPrice = (cleanPrice + self._accruedInterest*self._par / self._face)
+        accruedAmount = self._accruedInterest * self._par / self._faceAmount
+        bondPrice = cleanPrice + accruedAmount
         # Calculate the price of the bond discounted on the Libor curve
         pvLibor = 0.0
         prevDate = self._pcd
@@ -455,7 +469,7 @@ class FinBond(object):
         pv01 = 0.0
         for dt in schedule._adjustedDates[1:]:
             df = discountCurve.df(dt)
-            yearFrac = dayCount.yearFrac(prevDate, dt)
+            yearFrac = dayCount.yearFrac(prevDate, dt)[0]
             pv01 = pv01 + yearFrac * df
             prevDate = dt
 
@@ -507,7 +521,10 @@ class FinBond(object):
                            + str(type(cleanPrice)))
 
         self._calculateFlowDates(settlementDate)
-        fullPrices = (cleanPrices + self._accruedInterest*self._par/self._face)
+
+        accruedAmount = self._accruedInterest * self._par / self._faceAmount
+        fullPrices = cleanPrices + accruedAmount
+
         oass = []
 
         for fullPrice in fullPrices:
@@ -535,13 +552,16 @@ class FinBond(object):
                    settlementDate: FinDate):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
+
         self._calculateFlowDates(settlementDate)
 
-        for dt in self._flowDates[1:-1]:
-            flow = self._face * self._coupon/self._frequency
-            print(dt, ",", flow)
+        flow = self._faceAmount * self._coupon / self._frequency
 
-        print(self._flowDates[-1], ",", self._face + flow)
+        for dt in self._flowDates[1:-1]:
+            print("%12s" % dt, " %12.2f " % flow)
+
+        redemptionAmount = self._faceAmount + flow
+        print("%12s" % self._flowDates[-1], " %12.2f " % redemptionAmount)
 
 ###############################################################################
 
@@ -551,6 +571,7 @@ class FinBond(object):
                                recoveryRate: float):
         ''' Calculate discounted present value of flows assuming default model.
         This has not been completed. '''
+
         pass
 
 ###############################################################################
@@ -560,7 +581,7 @@ class FinBond(object):
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE", self._face, "")
+        s += labelToString("FACE AMOUNT", self._faceAmount, "")
         return s
 
 ###############################################################################

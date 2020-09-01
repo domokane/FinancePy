@@ -3,7 +3,7 @@
 ##############################################################################
 
 from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-from .FinMath import isLeapYear
+from .FinDate import isLeapYear
 from .FinError import FinError
 from enum import Enum
 
@@ -61,11 +61,15 @@ class FinDayCount(object):
         y1 = dt1._y
         y2 = dt2._y
 
+        num = 0
+        den = 0
+
         if self._type == FinDayCountTypes.THIRTY_360:
 
-            dayDiff = 360.0 * (y2 - y1) + 30.0 * (m2 - m1) + (d2 - d1)
-            accFactor = dayDiff / 360.0
-            return accFactor
+            num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_360_BOND:
 
@@ -74,17 +78,19 @@ class FinDayCount(object):
             if d1 == 31 or d1 == 30:
                 d2 = min(d2, 30)
 
-            dayDiff = 360.0 * (y2 - y1) + 30.0 * (m2 - m1) + (d2 - d1)
-            accFactor = dayDiff / 360.0
-            return accFactor
+            num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_360:
 
             d1 = min(d1, 30)
             d2 = min(d2, 30)
-            dayDiff = 360.0 * (y2 - y1) + 30.0 * (m2 - m1) + (d2 - d1)
-            accFactor = dayDiff / 360.0
-            return accFactor
+            num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_360_ISDA:
 
@@ -106,9 +112,10 @@ class FinDayCount(object):
 
             # Need to exclude termination date - to check this
 
-            dayDiff = 360.0 * (y2 - y1) + 30.0 * (m2 - m1) + (d2 - d1)
-            accFactor = dayDiff / 360.0
-            return accFactor
+            num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_360_PLUS_ISDA:
 
@@ -119,33 +126,39 @@ class FinDayCount(object):
                 d2 = 1
                 m2 = m2 + 1
 
-            dayDiff = 360.0 * (y2 - y1) + 30.0 * (m2 - m1) + (d2 - d1)
-            accFactor = dayDiff / 360.0
-            return accFactor
+            num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_ACT_ISDA:
 
             if isLeapYear(y1):
-                denom1 = 366.0
+                denom1 = 366
             else:
-                denom1 = 365.0
+                denom1 = 365
 
             if isLeapYear(y2):
-                denom2 = 366.0
+                denom2 = 366
             else:
-                denom2 = 365.0
+                denom2 = 365
 
             if y1 == y2:
+                num = dt2 - dt1
+                den = denom1
                 accFactor = (dt2 - dt1) / denom1
-                return accFactor
+                return (accFactor, num, den)
             else:
                 daysYear1 = datediff(dt1, FinDate(1, 1, y1+1))
                 daysYear2 = datediff(FinDate(1, 1, y2), dt2)
                 accFactor1 = daysYear1 / denom1
                 accFactor2 = daysYear2 / denom2
                 yearDiff = y2 - y1 - 1.0
+                # I do realise that num/den does not equal accFactor - just need to pass some info back
+                num = daysYear1 + daysYear2
+                den = denom1 + denom2
                 accFactor = accFactor1 + accFactor2 + yearDiff
-                return accFactor
+                return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
 
@@ -155,59 +168,69 @@ class FinDayCount(object):
             num = dt2 - dt1
             den = dt3 - dt1
             accFactor = num/den
-            return accFactor
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_360:
 
-            accFactor = (dt2 - dt1) / 360.0
-            return accFactor
+            num = dt2 - dt1
+            den = 360
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365_FIXED:
 
-            accFactor = (dt2 - dt1) / 365.0
-            return accFactor
+            num = dt2 - dt1
+            den = 365
+            accFactor = num / den
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365_LEAP:
 
             # The ISDA calculator sheet appears to split this across the
             # non-leap and the leap year which I do not see in any conventions.
 
-            denom = 365.0
+            denom = 365
 
             if isLeapYear(y1) and dt1 <= FinDate(28, 2, y1) \
                     and dt2 > FinDate(28, 2, y1):
-                denom = 366.0
+                denom = 366
 
             if isLeapYear(y2) and dt1 <= FinDate(28, 2, y2) \
                     and dt2 > FinDate(28, 2, y2):
-                denom = 366.0
+                denom = 366
 
             # handle case in which period straddles year end
-            accFactor = (dt2 - dt1) / denom
-            return accFactor
+            num = dt2 - dt1
+            accFactor = num / denom
+            return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365_ISDA:
 
             if isLeapYear(y1):
-                denom1 = 366.0
+                denom1 = 366
             else:
-                denom1 = 365.0
+                denom1 = 365
 
             if isLeapYear(y2):
-                denom2 = 366.0
+                denom2 = 366
             else:
-                denom2 = 365.0
+                denom2 = 365
 
             if y1 == y2:
-                accFactor = (dt2 - dt1) / denom1
-                return accFactor
+                num = dt2 - dt1
+                den = denom1
+                accFactor = num / denom1
+                return (accFactor, num, den)
             else:
                 daysYear1 = FinDate(1, 1, y1 + 1) - dt1
                 daysYear2 = dt2 - FinDate(1, 1, y1 + 1)
+
+                # I realise that num/den is not equal to accFactor. Just want to pass back some info.
+                num = daysYear1 + daysYear2
+                den = denom1 + denom2
                 accFactor = daysYear1 / denom1
                 accFactor += daysYear2 / denom2
-                return accFactor
-
+                return (accFactor, num, den)
         else:
             raise FinError(str(self._type) +
                            " is not one of FinDayCountTypes")

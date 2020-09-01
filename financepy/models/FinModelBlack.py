@@ -55,20 +55,14 @@ class FinModelBlack():
         sqrtT = np.sqrt(t)
         vol = self._volatility
 
-        if abs(t) < 1e-10:
-            t = 1e-10
-            sqrtT = np.sqrt(t)
+        t = np.maximum(t, 1e-10)
+        vol = np.maximum(vol, 1e-10)
+        k = np.maximum(k, 1e-10)
 
-        if abs(vol) < 1e-10:
-            vol = 1e-10
-
-        if abs(k) < 1e-10:
-            k = 1e-10
+        sqrtT = np.sqrt(t)
 
         d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrtT)
         d2 = d1 - vol*sqrtT
-
-        print(f, k, d1, d2)
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
             v = df * (f * N(d1) - k * N(d2))

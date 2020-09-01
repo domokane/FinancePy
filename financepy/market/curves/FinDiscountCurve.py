@@ -80,10 +80,12 @@ class FinDiscountCurve():
 ###############################################################################
 
     def _dfToZero(self,
-                  maturityDt: (FinDate, list),
+                  dfs: (float, np.ndarray),
+                  maturityDts: (FinDate, list),
                   frequencyType: FinFrequencyTypes,
                   dayCountType: FinDayCountTypes):
-        ''' Convert a discount factor to a zero rate with specific compounding
+        ''' Given a dates this first generates the discount factors. It then
+        converts the discount factors to a zero rate with a chosen compounding
         frequency which may be continuous, simple, or compounded at a specific
         frequency which are all choices of FinFrequencyTypes. Returns a list of
         discount factor. '''
@@ -91,14 +93,26 @@ class FinDiscountCurve():
         f = FinFrequency(frequencyType)
         dcCounter = FinDayCount(dayCountType)
 
-        if isinstance(maturityDt, FinDate):
-            dateList = [maturityDt]
+        if isinstance(maturityDts, FinDate):
+            dateList = [maturityDts]
         else:
-            dateList = maturityDt
+            dateList = maturityDts
 
+        if isinstance(dfs, float):
+            dfList = [dfs]
+        else:
+            dfList = dfs
+
+        if len(dateList) != len(dfList):
+            raise FinError("Date list and df list do not have same length")
+
+        numDates = len(dateList)
         zeroRates = []
-        for dt in dateList:
-            df = self.df(dt)
+
+        for i in range(0, numDates):
+
+            df = dfList[i]
+            dt = dateList[i]
 
             t = dcCounter.yearFrac(self._valuationDate, dt)
             t = max(t, gSmall)
@@ -111,17 +125,20 @@ class FinDiscountCurve():
                 r = (np.power(df, -1.0/(t * f))-1.0) * f
             zeroRates.append(r)
 
-        return zeroRates
+        if isinstance(maturityDts, FinDate):
+            return zeroRates[0]
+        else:
+            return np.array(zeroRates)
 
 ###############################################################################
 
     def zeroRate(self,
-                 dt: (list, FinDate),
+                 dts: (list, FinDate),
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
-        times so must use Numpy functions. Default frequency is a
+        dates so must use Numpy functions. Default frequency is a
         continuously compounded rate. '''
 
         if isinstance(frequencyType, FinFrequencyTypes) is False:
@@ -130,36 +147,9 @@ class FinDiscountCurve():
         if isinstance(dayCountType, FinDayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
-        # Calculate the zero rate taking into account frequency AND day count
-        zeroRates = self._dfToZero(dt, frequencyType, dayCountType)
-
-        if isinstance(dt, FinDate):
-            return zeroRates[0]
-        else:
-            return np.array(zeroRates)
-
-###############################################################################
-
-    # def _zeroRate(self,
-    #               times: (float, np.ndarray),
-    #               frequencyType=FinFrequencyTypes):
-    #     ''' Calculate the zero rate to maturity date but with times as inputs.
-    #     This function is used internally and should be discouraged for external
-    #     use. The compounding frequency defaults to continuous. '''
-
-    #     if isinstance(frequencyType, FinFrequencyTypes) is False:
-    #         raise FinError("Invalid Frequency type.")
-
-    #     if isinstance(times, float):
-    #         times = np.array([times])
-
-    #     if np.any(times < 0.0):
-    #         raise FinError("All times must be positive")
-
-    #     times = np.maximum(times, 1e-6)
-    #     dfs = self._df(times)
-    #     zeroRates = dfToZero(dfs, times, frequencyType)
-    #     return zeroRates
+        dfs = self.df(dts)
+        zeroRates = self._dfToZero(dfs, dts, frequencyType, dayCountType)
+        return zeroRates
 
 ###############################################################################
 
@@ -256,8 +246,8 @@ class FinDiscountCurve():
         times = timesFromDates(dt, self._valuationDate)
         dfs = self._df(times)
 
-        if isinstance(dt, FinDate):
-            return dfs[0]
+        if isinstance(dfs, float):
+            return dfs
         else:
             return np.array(dfs)
 
@@ -327,7 +317,7 @@ class FinDiscountCurve():
         curve. This is used for interest rate risk. '''
 
         times = self._times.copy()
-        values = self._discountFactors.copy()
+        values = self._dfValues.copy()
 
         n = len(self._times)
         for i in range(0, n):

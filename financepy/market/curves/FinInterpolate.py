@@ -144,9 +144,7 @@ def _uinterpolate(t, times, dfs, method):
         return yvalue
 
     else:
-
         raise FinError("Invalid interpolation scheme.")
-        return 0.0
 
 ###############################################################################
 

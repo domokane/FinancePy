@@ -14,7 +14,7 @@ from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
-from financepy.products.bonds.FinBond import FinBond, FinYieldConventions
+from financepy.products.bonds.FinBond import FinBond, FinYTMCalcType
 
 import sys
 sys.path.append("..\\..")
@@ -188,18 +188,13 @@ def buildLiborCurve(valueDate):
 
 def test_FinBond():
 
-#    FinBond(FinDate(1,1,2000),0.08,1, FinDayCountTypes.ACT_360)
-#    FinBond(FinDate(1,1,2000),8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
-#    FinBond(1.3,8,FinFrequencyTypes.ANNUAL, FinDayCountTypes.ACT_360)
-#    FinBond(FinDate(1,1,2000),0.08,FinFrequencyTypes.ANNUAL, 1)
-
     import pandas as pd
     path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    settlement = FinDate(19, 9, 2012)
+    settlementDate = FinDate(19, 9, 2012)
     face = ONE_MILLION
 
     for accrualType in FinDayCountTypes:
@@ -207,7 +202,7 @@ def test_FinBond():
         testCases.header("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS",
                          "ACCRUED", "YTM")
 
-        for index, bond in bondDataFrame.iterrows():
+        for _, bond in bondDataFrame.iterrows():
 
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
@@ -216,7 +211,7 @@ def test_FinBond():
             cleanPrice = bond['mid']
             bond = FinBond(maturityDt, coupon, frequencyType, accrualType, 100)
 
-            ytm = bond.yieldToMaturity(settlement, cleanPrice)
+            ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
             accd = bond._accruedInterest
             accd_days = bond._accruedDays
 
@@ -236,9 +231,9 @@ def test_FinBond():
     bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
 
     testCases.header("FIELD", "VALUE")
-    fullPrice = bond.fullPriceFromYield(settlementDate, y)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, y)
     testCases.print("Full Price = ", fullPrice)
-    cleanPrice = bond.cleanPriceFromYield(settlementDate, y)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, y)
     testCases.print("Clean Price = ", cleanPrice)
     accd = bond._accruedInterest
     testCases.print("Accrued = ", accd)
@@ -246,10 +241,10 @@ def test_FinBond():
     testCases.print("Yield to Maturity = ", ytm)
 
     bump = 1e-4
-    priceBumpedUp = bond.fullPriceFromYield(settlementDate, y + bump)
+    priceBumpedUp = bond.fullPriceFromYTM(settlementDate, y + bump)
     testCases.print("Price Bumped Up:", priceBumpedUp)
 
-    priceBumpedDn = bond.fullPriceFromYield(settlementDate, y - bump)
+    priceBumpedDn = bond.fullPriceFromYTM(settlementDate, y - bump)
     testCases.print("Price Bumped Dn:", priceBumpedDn)
 
     durationByBump = -(priceBumpedUp - fullPrice) / bump
@@ -265,7 +260,7 @@ def test_FinBond():
     macauleyDuration = bond.macauleyDuration(settlementDate, y)
     testCases.print("Macauley Duration = ", macauleyDuration)
 
-    conv = bond.convexityFromYield(settlementDate, y)
+    conv = bond.convexityFromYTM(settlementDate, y)
     testCases.print("Convexity = ", conv)
 
     # ASSET SWAP SPREAD
@@ -278,7 +273,7 @@ def test_FinBond():
 
     testCases.header("FIELD", "VALUE")
 
-    cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
     asw = bond.assetSwapSpread(settlementDate, cleanPrice, flatCurve)
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
@@ -327,27 +322,27 @@ def test_FinBond():
                    face)
 
     testCases.header("FIELD", "VALUE")
-    cleanPrice = 99.780842
+    cleanPrice = 99.7808417
 
     yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield = ", yld)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.UK_DMO)
+                               FinYTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.US_STREET)
+                               FinYTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.US_TREASURY)
+                               FinYTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    fullPrice = bond.fullPriceFromYield(settlementDate, ytm)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, ytm)
     testCases.print("Full Price = ", fullPrice)
 
-    cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
     testCases.print("Clean Price = ", cleanPrice)
 
     accd = bond._accruedInterest
@@ -365,7 +360,7 @@ def test_FinBond():
     macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
     testCases.print("Macauley Duration = ", macauleyDuration)
 
-    conv = bond.convexityFromYield(settlementDate, ytm)
+    conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)
 
 ##########################################################################
@@ -377,7 +372,7 @@ def test_FinBond():
     maturityDate = FinDate(13, 5, 2022)
     coupon = 0.027
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    accrualType = FinDayCountTypes.THIRTY_E_360_ISDA
     face = 100.0
 
     bond = FinBond(maturityDate, coupon, freqType, accrualType, face)
@@ -389,24 +384,23 @@ def test_FinBond():
     testCases.print("Current Yield = ", yld)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.UK_DMO)
+                               FinYTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.US_STREET)
+                               FinYTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
-                               FinYieldConventions.US_TREASURY)
+                               FinYTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    fullPrice = bond.fullPriceFromYield(settlementDate, ytm)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, ytm)
     testCases.print("Full Price = ", fullPrice)
 
-    cleanPrice = bond.cleanPriceFromYield(settlementDate, ytm)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
     testCases.print("Clean Price = ", cleanPrice)
 
-    # I GET 69 DAYS BUT BBG GETS 68 - CANNOT EXPLAIN!!
     accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
@@ -422,7 +416,7 @@ def test_FinBond():
     macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
     testCases.print("Macauley Duration = ", macauleyDuration)
 
-    conv = bond.convexityFromYield(settlementDate, ytm)
+    conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)
 
 ##########################################################################

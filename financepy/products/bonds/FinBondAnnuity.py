@@ -123,7 +123,7 @@ class FinBondAnnuity(object):
         prevDt = self._pcd
 
         for nextDt in self._flowDates[1:]:
-            alpha = basis.yearFrac(prevDt, nextDt)
+            alpha = basis.yearFrac(prevDt, nextDt)[0]
             flow = self._coupon * alpha * self._face
             self._flowAmounts.append(flow)
             prevDt = nextDt
@@ -144,11 +144,11 @@ class FinBondAnnuity(object):
         dc = FinDayCount(self._dayCountConventionType)
 
         if self._dayCountConventionType == FinDayCountTypes.ACT_ACT_ICMA:
-            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)
+            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)[0]
             alpha = 1.0 - accFactor
             accFactor = accFactor/self._frequency
         else:
-            accFactor = dc.yearFrac(self._pcd, settlementDate)
+            accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
             alpha = 1.0 - accFactor
 
         self._accruedInterest = accFactor * self._face * self._coupon
