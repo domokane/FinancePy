@@ -84,7 +84,7 @@ class FinLiborLMMProducts():
         self._gridTimes = [0.0]
 
         for nextDt in self._gridDates[1:]:
-            tau = basis.yearFrac(prevDt, nextDt)
+            tau = basis.yearFrac(prevDt, nextDt)[0]
             t = (nextDt - self._gridDates[0]) / gDaysInYear
             self._accrualFactors.append(tau)
             self._gridTimes.append(t)
@@ -251,13 +251,13 @@ class FinLiborLMMProducts():
             dt = self._gridDates[ix]
             zetas[ix] = volCurve.capletVol(dt)
 
+        # This function does not use Sobol - TODO
         self._fwds = LMMSimulateFwdsNF(self._numForwards,
                                        numPaths,
                                        self._forwardCurve,
                                        zetas,
                                        correlationMatrix,
                                        self._accrualFactors,
-                                       useSobol,
                                        seed)
 
 ###############################################################################
@@ -399,24 +399,9 @@ class FinLiborLMMProducts():
 ###############################################################################
 
     def __repr__(self):
-        ''' Function to allow us to print the swaption details. '''
+        ''' Function to allow us to print the LMM Products details. '''
 
-        s = labelToString("SETTLEMENT DATE", self._settlementDate)
-        s += labelToString("EXERCISE DATE", self._exerciseDate)
-        s += labelToString("SWAPTION TYPE", str(self._swaptionType))
-        s += labelToString("MATURITY DATE", self._maturityDate)
-        s += labelToString("SWAP NOTIONAL", self._notional)
-        s += labelToString("FIXED COUPON", self._fixedCoupon * 100)
-        s += labelToString("FIXED FREQUENCY", str(self._fixedFrequencyType))
-        s += labelToString("FIXED DAY COUNT", str(self._fixedDayCountType))
-        s += labelToString("FLOAT FREQUENCY", str(self._floatFrequencyType))
-        s += labelToString("FLOAT DAY COUNT", str(self._floatDayCountType))
-
-        if self._pv01 is not None:
-            s += labelToString("PV01", self._pv01)
-            s += labelToString("FWD SWAP RATE", self._fwdSwapRate*100)
-            s += labelToString("FWD DF TO EXPIRY", self._forwardDf, "")
-
+        s = "Function not written"
         return s
 
 ###############################################################################

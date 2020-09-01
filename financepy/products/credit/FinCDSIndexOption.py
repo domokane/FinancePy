@@ -308,7 +308,7 @@ class FinCDSIndexOption(object):
         dayCount = FinDayCount(self._dayCountType)
         pcd = flowDates[0]  # PCD
         eff = self._expiryDate
-        accrualFactorPCDToExpiry = dayCount.yearFrac(pcd, eff)
+        accrualFactorPCDToExpiry = dayCount.yearFrac(pcd, eff)[0]
 
         s0 = exp(-0.5 * sigma * sigma * texp)
 

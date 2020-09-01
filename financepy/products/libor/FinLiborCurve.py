@@ -11,7 +11,7 @@ from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...market.curves.FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 
 swaptol = 1e-8
 
@@ -82,7 +82,8 @@ class FinLiborCurve(FinDiscountCurve):
                  liborDeposits: list,
                  liborFRAs: list,
                  liborSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES):
+                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
+                 checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of a FinLibor curve given a valuation date and
         a set of libor deposits, libor FRAs and liborSwaps. Some of these may
         be left None and the algorithm will just use what is provided. An
@@ -90,14 +91,15 @@ class FinLiborCurve(FinDiscountCurve):
         linear interpolation for swap rates on coupon dates and to then assume
         flat forwards between these coupon dates.
 
-        The curve will assign a discount factor of 1.0 to the valuation date. 
+        The curve will assign a discount factor of 1.0 to the valuation date.
         '''
 
-        checkArgumentTypes(self.__init__, locals())
+        checkArgumentTypes(getattr(self, _funcName(), None), locals())
 
         self._valuationDate = valuationDate
         self._validateInputs(liborDeposits, liborFRAs, liborSwaps)
         self._interpType = interpType
+        self._checkRefit = checkRefit
         self._buildCurve()
 
 ###############################################################################
@@ -292,7 +294,8 @@ class FinLiborCurve(FinDiscountCurve):
                                     tol=swaptol, maxiter=50, fprime2=None,
                                     full_output=False)
 
-        self._checkRefits(1e-10, 1e-10, 1e-5)
+        if self._checkRefit is True:
+            self._checkRefits(1e-10, swaptol, 1e-5)
 
 ###############################################################################
 
@@ -341,7 +344,8 @@ class FinLiborCurve(FinDiscountCurve):
                                         maxiter=50, fprime2=None)
 
         if len(self._usedSwaps) == 0:
-            self._checkRefits(1e-10, 1e-10, 1e-10)
+            if self._checkRefit is True:
+                self._checkRefits(1e-10, swaptol, 1e-5)
             return
 
 #        print("CURVE SO FAR")
@@ -442,7 +446,8 @@ class FinLiborCurve(FinDiscountCurve):
 #        print(self._times)
 #        print(self._dfValues)
 
-        self._checkRefits(1e-10, 1e-10, 1e-1)
+        if self._checkRefit is True:
+            self._checkRefits(1e-10, swaptol, 1e-5)
 
 ###############################################################################
 

@@ -80,7 +80,7 @@ class FinLiborDeposit(object):
         this is a forward discount factor that starts on settlement date.'''
 
         dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         discountFactor = 1.0 / (1.0 + accFactor * self._depositRate)
         return discountFactor
 
@@ -97,7 +97,7 @@ class FinLiborDeposit(object):
             raise FinError("Start date after maturity date")
 
         dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         df_settle = liborCurve.df(self._startDate)
         df_maturity = liborCurve.df(self._maturityDate)
 
@@ -115,7 +115,7 @@ class FinLiborDeposit(object):
         ''' Print the date and size of the future repayment. '''
 
         dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         flow = (1.0 + accFactor * self._depositRate) * self._notional
         print(self._maturityDate, flow)
 

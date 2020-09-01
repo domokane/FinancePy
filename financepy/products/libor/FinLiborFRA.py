@@ -81,7 +81,7 @@ class FinLiborFRA(object):
         Libor and for doing discounting on the expected forward payment. '''
 
         dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         df1 = liborCurve.df(self._startDate)
         df2 = liborCurve.df(self._maturityDate)
         liborFwd = (df1 / df2 - 1.0) / accFactor
@@ -103,7 +103,7 @@ class FinLiborFRA(object):
 
         dc = FinDayCount(self._dayCountType)
         df1 = liborCurve.df(self._startDate)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         df2 = df1 / (1.0 + accFactor * self._fraRate)
         return df2
 
@@ -114,7 +114,7 @@ class FinLiborFRA(object):
 
         flow_settle = self._notional
         dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)
+        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         flow_maturity = (1.0 + accFactor * self._fraRate) * self._notional
 
         if self._payFixedRate is True:

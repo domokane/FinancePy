@@ -117,7 +117,7 @@ class FinOIS(object):
         self._fixedFlows = []
         prevDt = valueDate
         for dt in self._adjustedFixedDates:
-            flow = dayCounter.yearFrac(prevDt, dt) * self._fixedRate
+            flow = dayCounter.yearFrac(prevDt, dt)[0] * self._fixedRate
             self._fixedFlows.append(flow)
             prevDt = dt
 
@@ -137,7 +137,7 @@ class FinOIS(object):
         prevDt = valueDate
 
         for dt in self._adjustedFloatDates[1:]:
-            alpha = dayCounter.yearFrac(prevDt, dt)
+            alpha = dayCounter.yearFrac(prevDt, dt)[0]
             df2 = indexCurve.df(dt)
             flow = (df1 / df2 - 1.0) / alpha
             self._floatFlows.append(flow)
@@ -157,10 +157,10 @@ class FinOIS(object):
         dayCounter = FinDayCount(self._dayCountType)
 
         for dt, fixing in zip(oisDates[1:], oisFixings[1:]):
-            alpha = dayCounter.yearFrac(prevDt, dt)
+            alpha = dayCounter.yearFrac(prevDt, dt)[0]
             cmpd *= (1.0 + fixing * alpha)
 
-        alpha = dayCounter.yearFrac(oisDates[0], oisDates[-1])
+        alpha = dayCounter.yearFrac(oisDates[0], oisDates[-1])[0]
         rate = (cmpd - 1.0) / alpha
         return rate
 
@@ -224,7 +224,7 @@ class FinOIS(object):
 
         for dt2, flow in zip(self._adjustedFloatDates, self._floatFlows):
             df = discountCurve.df(dt2)
-            alpha = basis.yearFrac(dt1, dt2)
+            alpha = basis.yearFrac(dt1, dt2)[0]
             pv += df * flow * alpha
             dt1 = dt2
 

@@ -56,8 +56,8 @@ class FinBondFuture(object):
                           bond._accrualType,
                           face)
 
-        p = newBond.cleanPriceFromYield(self._firstDeliveryDate,
-                                        self._coupon)
+        p = newBond.cleanPriceFromYTM(self._firstDeliveryDate,
+                                      self._coupon)
 
         # Convention is to round the conversion factor to 4dp
         p = round(p, 4)

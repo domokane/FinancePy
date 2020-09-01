@@ -97,7 +97,7 @@ class FinCDSBasket(object):
             t = (adjustedDates[iTime] - valuationDate) / gDaysInYear
             dt0 = adjustedDates[iTime - 1]
             dt1 = adjustedDates[iTime]
-            accrualFactor = dayCount.yearFrac(dt0, dt1)
+            accrualFactor = dayCount.yearFrac(dt0, dt1)[0]
             averageAccrualFactor += accrualFactor
             rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
                 accrualFactor * liborCurve._df(t)

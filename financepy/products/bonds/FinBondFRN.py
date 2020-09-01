@@ -440,7 +440,7 @@ class FinBondFRN(object):
 
         dc = FinDayCount(self._accrualType)
 
-        accFactor = dc.yearFrac(self._pcd, settlementDate)
+        accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
         nextCoupon = resetLibor + self._quotedMargin
         self._accruedInterest = accFactor * self._face * nextCoupon
         self._accruedDays = settlementDate - self._pcd

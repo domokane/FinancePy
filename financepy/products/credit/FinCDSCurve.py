@@ -14,6 +14,8 @@ from ...market.curves.FinInterpolate import _uinterpolate, FinInterpTypes
 from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
+
 
 ###############################################################################
 
@@ -89,6 +91,8 @@ class FinCDSCurve():
         contracts and a Libor curve using the same recovery rate and the
         same interpolation method. '''
 
+        checkArgumentTypes(getattr(self, _funcName(), None), locals())
+
         if valuationDate != liborCurve._valuationDate:
             raise FinError("Libor curve does not have same valuation date as Issuer curve.")
 
@@ -99,11 +103,15 @@ class FinCDSCurve():
         self._interpolationMethod = interpolationMethod
         self._builtOK = False
 
-        if self._cdsContracts is not None:
-            if len(self._cdsContracts) > 0:
-                self._buildCurve()
+        self._times = []
+        self._values = []
+
+        if len(self._cdsContracts) > 0:
+            self._buildCurve()
         else:
             pass  # In some cases we allow None to be passed
+
+        return
 
 ###############################################################################
 
@@ -222,7 +230,7 @@ class FinCDSCurve():
             raise FinError("Date2 must not be before Date1")
 
         dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1, date2)
+        yearFrac = dayCount.yearFrac(date1, date2)[0]
         df1 = self.df(date1)
         df2 = self.df(date2)
         fwd = (df1 / df2 - 1.0) / yearFrac
@@ -254,6 +262,7 @@ class FinCDSCurve():
 
     def __repr__(self):
         ''' Print out the details of the survival probability curve. '''
+
         header = "TIME,SURVIVAL_PROBABILITY"
         valueTable = [self._times, self._values]
         precision = "10.7f"

@@ -151,7 +151,7 @@ class FinBondZeroCurve(FinDiscountCurve):
             raise FinError("Date2 must not be before Date1")
 
         dayCount = FinDayCount(dayCountType)
-        yearFrac = dayCount.yearFrac(date1, date2)
+        yearFrac = dayCount.yearFrac(date1, date2)[0]
         df1 = self.df(date1)
         df2 = self.df(date2)
         fwd = (df1 / df2 - 1.0) / yearFrac

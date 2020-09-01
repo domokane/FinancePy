@@ -551,11 +551,11 @@ class FinBondConvertible(object):
         dc = FinDayCount(self._accrualType)
 
         if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
-            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)
+            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)[0]
             alpha = 1.0 - accFactor
             accFactor = accFactor/self._frequency
         else:
-            accFactor = dc.yearFrac(self._pcd, settlementDate)
+            accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
             alpha = 1.0 - accFactor
 
         self._accrued = accFactor * self._face * self._coupon

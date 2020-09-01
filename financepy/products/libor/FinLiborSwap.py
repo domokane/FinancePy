@@ -244,7 +244,7 @@ class FinLiborSwap(object):
         prevDt = self._adjustedFixedDates[startIndex - 1]
 
         for nextDt in self._adjustedFixedDates[startIndex:]:
-            alpha = basis.yearFrac(prevDt, nextDt)
+            alpha = basis.yearFrac(prevDt, nextDt)[0]
             df_discount = discountCurve.df(nextDt) / self._dfValuationDate
             flow = self._fixedCoupon * alpha * self._notional
             flowPV = flow * df_discount
@@ -277,7 +277,7 @@ class FinLiborSwap(object):
         prevDt = self._adjustedFixedDates[0]
 
         for nextDt in self._adjustedFixedDates[1:]:
-            alpha = basis.yearFrac(prevDt, nextDt)
+            alpha = basis.yearFrac(prevDt, nextDt)[0]
             flow = self._fixedCoupon * alpha * self._notional
             prevDt = nextDt
             self._fixedYearFracs.append(alpha)
@@ -367,7 +367,7 @@ class FinLiborSwap(object):
         not implied by the index curve. '''
         prevDt = self._adjustedFloatDates[startIndex - 1]
         nextDt = self._adjustedFloatDates[startIndex]
-        alpha = basis.yearFrac(prevDt, nextDt)
+        alpha = basis.yearFrac(prevDt, nextDt)[0]
         df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
         df2_index = indexCurve.df(nextDt)
 
@@ -397,7 +397,7 @@ class FinLiborSwap(object):
         df1_index = indexCurve.df(prevDt)
 
         for nextDt in self._adjustedFloatDates[startIndex + 1:]:
-            alpha = basis.yearFrac(prevDt, nextDt)
+            alpha = basis.yearFrac(prevDt, nextDt)[0]
             df2_index = indexCurve.df(nextDt)
             # The accrual factors cancel
             floatRate = (df1_index / df2_index - 1.0) / alpha

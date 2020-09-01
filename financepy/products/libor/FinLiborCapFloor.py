@@ -155,7 +155,7 @@ class FinLiborCapFloor():
         else:
             fwdRate = self._lastFixing
 
-        alpha = self._dayCounter.yearFrac(startDate, endDate)
+        alpha = self._dayCounter.yearFrac(startDate, endDate)[0]
         df = liborCurve.df(endDate)
 
         if self._optionType == FinLiborCapFloorTypes.CAP:
@@ -177,7 +177,7 @@ class FinLiborCapFloor():
 
             startDate = self._capFloorLetDates[i - 1]
             endDate = self._capFloorLetDates[i]
-            alpha = self._dayCounter.yearFrac(startDate, endDate)
+            alpha = self._dayCounter.yearFrac(startDate, endDate)[0]
 
             df = liborCurve.df(endDate)
             fwdRate = liborCurve.fwdRate(startDate, endDate,
@@ -219,7 +219,7 @@ class FinLiborCapFloor():
 
         texp = (capletStartDate - self._startDate) / gDaysInYear
 
-        alpha = self._dayCounter.yearFrac(capletStartDate, capletEndDate)
+        alpha = self._dayCounter.yearFrac(capletStartDate, capletEndDate)[0]
 
         f = liborCurve.fwdRate(capletStartDate, capletEndDate,
                                self._dayCountType)
@@ -278,7 +278,8 @@ class FinLiborCapFloor():
         elif isinstance(model, FinModelRatesHW):
 
             tmat = (capletEndDate - valuationDate) / gDaysInYear
-            alpha = self._dayCounter.yearFrac(capletStartDate, capletEndDate)
+            alpha = self._dayCounter.yearFrac(capletStartDate,
+                                              capletEndDate)[0]
             strikePrice = 1.0/(1.0 + alpha * self._strikeRate)
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face = 1.0

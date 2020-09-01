@@ -159,7 +159,7 @@ class FinBondEmbeddedOption(object):
         dfTimes = discountCurve._times
         dfValues = discountCurve._dfValues
 
-        face = self._bond._face
+        face = self._bond._faceAmount
 
         if isinstance(model, FinModelRatesHW):
 
