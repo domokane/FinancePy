@@ -15,6 +15,9 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
 ###############################################################################
+# TODO: Move index spread details into class and then pass in issuer curves
+#       to the function when doing the adjustment
+###############################################################################
 
 
 class FinCDSIndexPortfolio():
@@ -184,9 +187,7 @@ class FinCDSIndexPortfolio():
         numCredits = len(issuerCurves)
 
         if numCredits < 1:
-            raise FinError(
-                "Number of credits in index must be > 1 and not ",
-                str(numCredits))
+            raise FinError("Number of credits in index must be > 1 and not" + str(numCredits))
 
         cdsContract = FinCDS(stepInDate,
                              maturityDate,
@@ -214,9 +215,7 @@ class FinCDSIndexPortfolio():
         numCredits = len(issuerCurves)
 
         if numCredits < 1:
-            raise FinError(
-                "Number of credits in index must be > 1 and not ",
-                str(numCredits))
+            raise FinError("Number of credits in index must be > 1 and not " + str(numCredits))
 
         cdsContract = FinCDS(stepInDate,
                              maturityDate,
@@ -233,7 +232,8 @@ class FinCDSIndexPortfolio():
 
 ###############################################################################
 
-    def spreadAdjustIntrinsic(valuationDate,
+    def spreadAdjustIntrinsic(self,
+                              valuationDate,
                               issuerCurves,
                               indexCoupons,
                               indexUpfronts,
@@ -248,9 +248,7 @@ class FinCDSIndexPortfolio():
         numCredits = len(issuerCurves)
 
         if numCredits < 1:
-            raise FinError(
-                "Number of credits in index must be > 1 and not ",
-                str(numCredits))
+            raise FinError("Number of credits in index must be > 1 and not " + str(numCredits))
 
         liborCurve = issuerCurves[0]._liborCurve
         numIndexMaturityPoints = len(indexCoupons)
@@ -325,7 +323,7 @@ class FinCDSIndexPortfolio():
                         cdsSpread = cdsContracts[j]._runningCoupon
                         adjustedCDSSpreads[j] = cdsSpread * \
                             cdsSpreadMultipliers[j]
-                        curveCDSContracts[j]._coupon = adjustedCDSSpreads[j]
+                        curveCDSContracts[j]._runningCoupon = adjustedCDSSpreads[j]
 
                     adjustedIssuerCurve = FinCDSCurve(valuationDate,
                                                       curveCDSContracts,
@@ -336,7 +334,7 @@ class FinCDSIndexPortfolio():
                                                                  adjustedIssuerCurve,
                                                                  indexRecoveryRate)
 
-                    cleanRPV01 = cdsIndex.riskyPV01(valuationDate, 
+                    cleanRPV01 = cdsIndex.riskyPV01(valuationDate,
                                                     adjustedIssuerCurve)['clean_rpv01']
 
                     sumRPV01 += cleanRPV01
@@ -365,7 +363,7 @@ class FinCDSIndexPortfolio():
 
             for j in range(0, numCDSMaturityPoints):
 
-                unadjustedSpread = issuerCurves[iCredit]._cdsContracts[j]._coupon
+                unadjustedSpread = issuerCurves[iCredit]._cdsContracts[j]._runningCoupon
 
                 adjustedSpread = unadjustedSpread * cdsSpreadMultipliers[j]
 
@@ -387,7 +385,8 @@ class FinCDSIndexPortfolio():
 
 ###############################################################################
 
-    def hazardRateAdjustIntrinsic(valuationDate,
+    def hazardRateAdjustIntrinsic(self,
+                                  valuationDate,
                                   issuerCurves,
                                   indexCoupons,
                                   indexUpfronts,
@@ -412,7 +411,7 @@ class FinCDSIndexPortfolio():
         for issuerCurve in issuerCurves:
 
             adjustedIssuerCurve = FinCDSCurve(valuationDate,
-                                              None,
+                                              [],
                                               liborCurve)
 
             adjustedIssuerCurve._times = issuerCurve._times.copy()

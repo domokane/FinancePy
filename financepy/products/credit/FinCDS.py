@@ -25,6 +25,11 @@ useFlatHazardRateIntegral = True
 standardRecovery = 0.40
 
 ###############################################################################
+# TODO: Perform protection leg pv analytically using fact that hazard rate and
+#       interest rates are flat between their combined node points. Right now I
+#       do not find the protection leg PV calculations to be a bottleneck,
+#       especially given the speedup benefits of using NUMBA.
+###############################################################################
 
 
 @njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
@@ -314,7 +319,7 @@ class FinCDS(object):
         for it in range(1, numFlows):
             t0 = paymentDates[it - 1]
             t1 = paymentDates[it]
-            accrualFactor = dayCount.yearFrac(t0, t1)
+            accrualFactor = dayCount.yearFrac(t0, t1)[0]
             flow = accrualFactor * self._runningCoupon * self._notional
 
             self._accrualFactors.append(accrualFactor)
@@ -526,10 +531,10 @@ class FinCDS(object):
 
         # this is the part of the coupon accrued from the previous coupon date
         # to now
-        accrualFactorPCDToNow = dayCount.yearFrac(pcd, teff)
+        accrualFactorPCDToNow = dayCount.yearFrac(pcd, teff)[0]
 
         # full first coupon is paid at the end of the current period if the
-        yearFrac = dayCount.yearFrac(pcd, ncd)
+        yearFrac = dayCount.yearFrac(pcd, ncd)[0]
 
         # reference credit survives to the premium payment date
         fullRPV01 = q1 * z1 * yearFrac
@@ -552,7 +557,7 @@ class FinCDS(object):
             q2 = issuerCurve.survivalProbability(t2)
             z2 = issuerCurve.df(t2)
 
-            accrualFactor = dayCount.yearFrac(t1, t2)
+            accrualFactor = dayCount.yearFrac(t1, t2)[0]
 
             # full coupon is paid at the end of the current period if survives
             # to payment date
@@ -608,7 +613,7 @@ class FinCDS(object):
         dayCount = FinDayCount(self._dayCountType)
         paymentDates = self._adjustedDates
         pcd = paymentDates[0]
-        accrualFactor = dayCount.yearFrac(pcd, self._stepInDate)
+        accrualFactor = dayCount.yearFrac(pcd, self._stepInDate)[0]
         accruedInterest = accrualFactor * self._notional * self._runningCoupon
 
         if self._longProtection:
@@ -666,7 +671,7 @@ class FinCDS(object):
         eff = self._stepInDate
         dayCount = FinDayCount(self._dayCountType)
 
-        accrualFactorPCDToNow = dayCount.yearFrac(pcd, eff)
+        accrualFactorPCDToNow = dayCount.yearFrac(pcd, eff)[0]
 
         yearFracs = self._accrualFactors
         teff = (eff - valuationDate) / gDaysInYear

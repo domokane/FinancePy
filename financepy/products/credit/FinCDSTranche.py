@@ -51,7 +51,7 @@ class FinCDSTranche(object):
                  k1: float,
                  k2: float,
                  notional: float = ONE_MILLION,
-                 coupon: float = 0.0,
+                 runningCoupon: float = 0.0,
                  longProtection: bool = True,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
@@ -70,7 +70,7 @@ class FinCDSTranche(object):
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
         self._notional = notional
-        self._coupon = coupon
+        self._runningCoupon = runningCoupon
         self._longProtection = longProtection
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
@@ -82,7 +82,7 @@ class FinCDSTranche(object):
 
         self._cdsContract = FinCDS(self._stepInDate,
                                    self._maturityDate,
-                                   self._coupon,
+                                   self._runningCoupon,
                                    notional,
                                    self._longProtection,
                                    self._frequencyType,
@@ -97,7 +97,7 @@ class FinCDSTranche(object):
                 valuationDate,
                 issuerCurves,
                 upfront,
-                coupon,
+                runningCoupon,
                 corr1,
                 corr2,
                 numPoints=50,
@@ -225,14 +225,14 @@ class FinCDSTranche(object):
             valuationDate, trancheCurve, curveRecovery)
         riskyPV01 = self._cdsContract.riskyPV01(valuationDate, trancheCurve)['clean_rpv01']
 
-        mtm = self._notional * (protLegPV - upfront - riskyPV01 * coupon)
+        mtm = self._notional * (protLegPV - upfront - riskyPV01 * runningCoupon)
 
         if not self._longProtection:
             mtm *= -1.0
 
         trancheOutput = np.zeros(4)
         trancheOutput[0] = mtm
-        trancheOutput[1] = riskyPV01 * self._notional * coupon
+        trancheOutput[1] = riskyPV01 * self._notional * runningCoupon
         trancheOutput[2] = protLegPV * self._notional
         trancheOutput[3] = protLegPV / riskyPV01
 
