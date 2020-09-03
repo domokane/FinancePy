@@ -7,9 +7,13 @@ from financepy.market.curves.FinInterpolate import interpolate, FinInterpTypes
 import numpy as np
 import math
 import sys
+import matplotlib.pyplot as plt
+
 sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+PLOT_GRAPHS = False
 
 ###############################################################################
 
@@ -45,12 +49,12 @@ def test_FinInterpolate():
 
         end = time.time()
 
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=(12, 10))
-        plt.plot(xValues, yValues, color='r', marker='o')
-        plt.plot(xInterpolateValues, yInterpValues, color='b',
-                 label=str(method))
-        plt.legend()
+        if PLOT_GRAPHS:
+            plt.figure(figsize=(12, 10))
+            plt.plot(xValues, yValues, color='r', marker='o')
+            plt.plot(xInterpolateValues, yInterpValues, color='b',
+                     label=str(method))
+            plt.legend()
 
     xp = np.array([0.2, 0.4, 0.45, 0.6, 0.82, 0.93, 0.99])
     yp = np.array([0.4, 0.9, 0.32, 0.2, 0.22, 0.10, 0.28])

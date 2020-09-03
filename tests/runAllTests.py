@@ -15,9 +15,9 @@ numModules = len(modules)
 
 ''' This is the index of the file - change this to start later in the list '''
 n = 0
+m = -1
 
-
-for moduleFileName in modules[n:]:
+for moduleFileName in modules[n:m]:
 
     n = n + 1
     moduleTextName = basename(moduleFileName[:-3])

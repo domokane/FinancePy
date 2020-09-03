@@ -24,7 +24,7 @@ with open('financepy//__init__.template', 'r') as file:
 filedata = filedata.replace('__version__', "'" + str(__version__) + "'")
 
 now = datetime.now()
-dt_string = now.strftime("%d %b %y at %H:%M")
+dt_string = now.strftime("%d %b %Y at %H:%M")
 
 # Replace the target string
 filedata = filedata.replace('__dateandtime__', dt_string)

@@ -128,8 +128,8 @@ class FinBondFuture(object):
 ###############################################################################
 
     def __repr__(self):
-
-        s = labelToString("TICKER NAME", self._tickerName)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("TICKER NAME", self._tickerName)
         s += labelToString("FIRST DELIVERY DATE", self._firstDeliveryDate)
         s += labelToString("LAST DELIVERY DATE", self._lastDeliveryDate)
         s += labelToString("CONTRACT SIZE", self._contractSize)

@@ -25,6 +25,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+PLOT_GRAPHS = False
+
 ###############################################################################
 # TODO: Add other discount curves
 ###############################################################################
@@ -78,42 +80,69 @@ def test_FinDiscountCurves():
     for curve in curvesList:
         curveNames.append(type(curve).__name__)
 
-    fwdDate1 = valuationDate.addYears(1)
-    fwdDate2 = fwdDate1.addTenor("3M")
+    testCases.banner("SINGLE CALLS NO VECTORS")
+    testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "PAR", "SWAP")
 
-    # Do single calls (no vectorisations)
-    testCases.header("CURVE", "DATE", "RATE")
+    years = np.linspace(1, 10, 10)
+    fwdMaturityDates = valuationDate.addYears(years)
+    fwdMaturityDates2 = valuationDate.addYears(years+1.0)
 
-    for name, curve in zip(curveNames, curvesList):
-        for date in dates:
-            zeroRate = curve.zeroRate(date)
-            testCases.print("%25s" % name, "%15s" % date,
-                            "%8.5f" % (zeroRate*100.0))
-
-    testCases.banner("")
-    testCases.header("CURVE", "ZERO", "CCFWD", "MMFWD", "PAR", "DF")
+    testCases.banner("######################################################")
+    testCases.banner("SINGLE CALLS")
+    testCases.banner("######################################################")
 
     for name, curve in zip(curveNames, curvesList):
 
-        zeroRate = curve.zeroRate(fwdDate1)
-        fwd = curve.fwd(fwdDate1)
-        fwdRate = curve.fwdRate(fwdDate1, fwdDate2)
-        parRate = curve.parRate(fwdDate1)
-        df = curve.df(fwdDate1)
+        for (fwdMaturityDate, fwdMaturityDate2) in zip(fwdMaturityDates,
+                                                       fwdMaturityDates2):
 
-        testCases.print("%30s" % name,
-                        " %10.5f" % (zeroRate),
-                        " %10.5f" % (fwd),
-                        " %10.5f" % (fwdRate),
-                        " %10.5f" % (parRate),
-                        " %10.5f" % (df))
+            zeroRate = curve.zeroRate(fwdMaturityDate)
+            fwd = curve.fwd(fwdMaturityDate)
+            fwdRate = curve.fwdRate(fwdMaturityDate, fwdMaturityDate2)
+            parRate = curve.parRate(fwdMaturityDate)
+            swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
+            df = curve.df(fwdMaturityDate)
 
-    years = np.linspace(0, 10, 121)
-    years2 = years + 3
-    fwdDates = valuationDate.addYears(years)
-    fwdDates2 = valuationDate.addYears(years2)
+            testCases.print("%-20s" % name,
+                            "%-12s" % fwdMaturityDate,
+                            "%7.6f" % (zeroRate),
+                            "%8.7f" % (df),
+                            "%7.6f" % (fwd),
+                            "%7.6f" % (fwdRate),
+                            "%7.6f" % (parRate),
+                            "%7.6f" % (swapRate))
 
-    if 1 == 0:
+    # Examine vectorisation
+    testCases.banner("######################################################")
+    testCases.banner("VECTORISATIONS")
+    testCases.banner("######################################################")
+
+    for name, curve in zip(curveNames, curvesList):
+
+        zeroRate = curve.zeroRate(fwdMaturityDates)
+        fwd = curve.fwd(fwdMaturityDates)
+        fwdRate = curve.fwdRate(fwdMaturityDates, fwdMaturityDates2)
+        parRate = curve.parRate(fwdMaturityDates)
+        swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
+        df = curve.df(fwdMaturityDates)
+
+        for i in range(0, len(fwdMaturityDates)):
+            testCases.print("%-20s" % name,
+                            "%-12s" % fwdMaturityDate,
+                            "%7.6f" % (zeroRate[i]),
+                            "%8.7f" % (df[i]),
+                            "%7.6f" % (fwd[i]),
+                            "%7.6f" % (fwdRate[i]),
+                            "%7.6f" % (parRate[i]),
+                            "%7.6f" % (swapRate[i]))
+
+    if PLOT_GRAPHS:
+
+        years = np.linspace(0, 10, 121)
+        years2 = years + 1.0
+        fwdDates = valuationDate.addYears(years)
+        fwdDates2 = valuationDate.addYears(years2)
+
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
             zeroRates = curve.zeroRate(fwdDates)

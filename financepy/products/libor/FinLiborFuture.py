@@ -134,7 +134,8 @@ class FinLiborFuture(object):
     def __repr__(self):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
-        s = labelToString("LAST TRADING DATE", self._lastTradingDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("LAST TRADING DATE", self._lastTradingDate)
         s += labelToString("DELIVERY DATE", self._deliveryDate)
         s += labelToString("END INTEREST PERIOD", self._endOfInterestPeriod)
         s += labelToString("ACCRUAL TYPE", self._accrualType)

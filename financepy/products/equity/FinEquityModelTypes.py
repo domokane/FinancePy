@@ -11,9 +11,6 @@ class FinEquityModel(object):
     ''' This is a parent class for equity models. '''
 
     def __init__(self):
-#        self._parentType = None
-#        self._volatility = 0.0
-#        self._implementation = 0
         pass
 
 ###############################################################################
@@ -26,6 +23,13 @@ class FinEquityModelBlackScholes(FinEquityModel):
         self._numStepsPerYear = numStepsPerYear
         self._useTree = useTree
 
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("VOLATILITY", self._volatility)
+        s += labelToString("NUM STEPS PER YEAR", self._numStepsPerYear)
+        s += labelToString("USE TREE", self._useTree)
+        return s
+
 ###############################################################################
 
 
@@ -35,5 +39,12 @@ class FinEquityModelHeston(FinEquityModel):
         self._volatility = volatility
         self._meanReversion = meanReversion
         self._implementation = 0
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("VOLATILITY", self._volatility)
+        s += labelToString("MEAN REVERSION", self._meanReversion)
+        s += labelToString("IMPLEMENTATION", self._implementation)
+        return s
 
 ###############################################################################

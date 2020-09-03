@@ -223,7 +223,8 @@ class FinEquityChooserOption(FinEquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("CHOOSER DATE", self._chooseDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("CHOOSER DATE", self._chooseDate)
         s += labelToString("CALL EXPIRY DATE", self._callExpiryDate)
         s += labelToString("CALL STRIKE PRICE", self._callStrike)
         s += labelToString("PUT EXPIRY DATE", self._putExpiryDate)

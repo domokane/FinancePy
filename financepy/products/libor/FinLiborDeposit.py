@@ -59,9 +59,11 @@ class FinLiborDeposit(object):
             maturityDate = maturityDateOrTenor
         else:
             maturityDate = startDate.addTenor(maturityDateOrTenor)
-            calendar = FinCalendar(self._calendarType)
-            maturityDate = calendar.adjust(maturityDate,
-                                           self._busDayAdjustType)
+
+        calendar = FinCalendar(self._calendarType)
+
+        maturityDate = calendar.adjust(maturityDate,
+                                       self._busDayAdjustType)
 
         if startDate > maturityDate:
             raise FinError("Start date cannot be after maturity date")
@@ -123,7 +125,8 @@ class FinLiborDeposit(object):
 
     def __repr__(self):
         ''' Print the contractual details of the Libor deposit. '''
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("DEPOSIT RATE", self._depositRate)

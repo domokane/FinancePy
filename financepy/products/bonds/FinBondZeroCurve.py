@@ -17,6 +17,7 @@ from ...market.curves.FinInterpolate import FinInterpTypes, interpolate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -144,7 +145,7 @@ class FinBondZeroCurve(FinDiscountCurve):
         ''' Calculate the forward rate according to the specified
         day count convention. '''
 
-        if date1 < self._curveDate:
+        if date1 < self._valuationDate:
             raise FinError("Date1 before curve value date.")
 
         if date2 < date1:
@@ -181,7 +182,9 @@ class FinBondZeroCurve(FinDiscountCurve):
 ###############################################################################
 
     def __repr__(self):
+        # TODO
         header = "TIMES,DISCOUNT FACTORS"
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         valueTable = [self._times, self._values]
         precision = "10.7f"
 

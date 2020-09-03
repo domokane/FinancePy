@@ -6,13 +6,14 @@ import numpy as np
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
-from ...finutils.FinFrequency import FinFrequencyTypes
+from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinMath import testMonotonicity
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinFrequency import zeroToDf
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinDayCount import FinDayCountTypes
+from ...finutils.FinHelperFunctions import timesFromDates
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 
@@ -26,7 +27,8 @@ class FinDiscountCurvePWF(FinDiscountCurve):
                  valuationDate: FinDate,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes=FinFrequencyTypes.CONTINUOUS):
+                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat. '''
 
@@ -40,51 +42,24 @@ class FinDiscountCurvePWF(FinDiscountCurve):
         if len(zeroDates) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._times = []
-        for dt in zeroDates:
-            t = (dt - self._valuationDate) / gDaysInYear
-            self._times.append(t)
-
-#        if self._times[0] > 0.0:
-#            self._times.insert(0, 0.0)
-#            r0 = zeroRates[0]
-#            zeroRates = zeroRates.tolist()
-#            zeroRates.insert(0, r0)
-
-        self._times = np.array(self._times)
-        self._zeroRates = np.array(zeroRates)
         self._zeroDates = zeroDates
+        self._zeroRates = np.array(zeroRates)
+        self._frequencyType = frequencyType
+        self._dayCountType = dayCountType
+
+        dcTimes = timesFromDates(zeroDates,
+                                 self._valuationDate,
+                                 self._dayCountType)
+
+        self._times = np.array(dcTimes)
 
         if testMonotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-        self._frequencyType = frequencyType
-
-###############################################################################
-
-    # def zeroRate(self,
-    #              dt: (list, FinDate),
-    #              frequencyType=FinFrequencyTypes.CONTINUOUS):
-    #     ''' Calculate the zero rate to maturity date. The compounding frequency
-    #     of the rate defaults to continuous which is useful for supplying a rate
-    #     to theoretical models such as Black-Scholes that require a continuously
-    #     compounded zero rate as input. '''
-
-    #     times = timesFromDates(dt, self._valuationDate)
-    #     zeroRates = self._zeroRate(times, frequencyType)
-
-    #     if isinstance(dt, FinDate):
-    #         print(dt)
-    #         print(zeroRates)
-    #         return zeroRates[0]
-    #     else:
-    #         return np.array(zeroRates)
-
 ###############################################################################
 
     def _zeroRate(self,
-                  times: (float, np.ndarray, list),
-                  frequencyType=FinFrequencyTypes.CONTINUOUS):
+                  times: (float, np.ndarray, list)):
         ''' The piecewise flat zero rate is selected and returned. '''
 
         if isinstance(times, float):
@@ -93,7 +68,7 @@ class FinDiscountCurvePWF(FinDiscountCurve):
         if np.any(times < 0.0):
             raise FinError("All times must be positive")
 
-        times = np.maximum(times, 1e-6)
+        times = np.maximum(times, gSmall)
 
         zeroRates = []
 
@@ -121,22 +96,6 @@ class FinDiscountCurvePWF(FinDiscountCurve):
 
 ###############################################################################
 
-    # def fwd(self,
-    #         dt: FinDate):
-    #     ''' Returns the continuously compounded forward rate at time t. As the
-    #     curve is piecewise flat in zero rate space, its shape in forward rates
-    #     requires a numerical calculation of the fwd rate. '''
-
-    #     times = timesFromDates(dt, self._valuationDate)
-    #     fwds = self._fwd(times)
-
-    #     if isinstance(dt, FinDate):
-    #         return fwds
-    #     else:
-    #         return np.array(fwds)
-
-###############################################################################
-
     def _fwd(self,
              times: (np.ndarray, list)):
         ''' Calculate the continuously compounded forward rate at the forward
@@ -160,28 +119,27 @@ class FinDiscountCurvePWF(FinDiscountCurve):
 
 ###############################################################################
 
-    # def df(self,
-    #        dt):
-    #     ''' Function to calculate a discount factor from a date or a
-    #     vector of dates. '''
+    def df(self,
+           dates: (FinDate, list)):
+        ''' Return discount factors given a single or vector of dates. The
+        discount factor depends on the rate and this in turn depends on its
+        compounding frequency and it defaults to continuous compounding. It
+        also depends on the day count convention. This was set in the
+        construction of the curve to be ACT_ACT_ISDA. '''
 
-    #     times = timesFromDates(dt, self._valuationDate)
-    #     dfs = self._df(times)
+        # Get day count times to use with curve day count convention
+        dcTimes = timesFromDates(dates,
+                                 self._valuationDate,
+                                 self._dayCountType)
 
-    #     if isinstance(dt, FinDate):
-    #         return dfs[0]
-    #     else:
-    #         return np.array(dfs)
+        zeroRates = self._zeroRate(dcTimes)
 
-###############################################################################
+        df = self._zeroToDf(self._valuationDate,
+                            zeroRates,
+                            dcTimes,
+                            self._frequencyType,
+                            self._dayCountType)
 
-    def _df(self,
-            t: (float, np.ndarray)):
-        ''' Given a time or vector of times this returns the corresponding
-        vector of discount factors. '''
-
-        r = self._zeroRate(t)
-        df = zeroToDf(r, t, self._frequencyType)
         return df
 
 ###############################################################################

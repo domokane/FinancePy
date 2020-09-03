@@ -26,7 +26,7 @@ verbose = False
 # TESTING
 
 
-#globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
+globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
 globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 #globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
@@ -175,7 +175,7 @@ class FinTestCases():
         elif len(self._headerFields) != len(args):
             n1 = len(self._headerFields)
             n2 = len(args)
-            raise FinError("ERROR: # headers must equal # arguments", n1, n2)
+            raise FinError("ERROR: # headers " + str(n1) + "must equal # arguments" + str(n2))
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename

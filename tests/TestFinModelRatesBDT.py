@@ -10,7 +10,8 @@ from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.products.bonds.FinBond import FinBond
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaption, FinLiborSwaptionTypes
+from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
+from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -21,9 +22,10 @@ from financepy.finutils.FinHelperFunctions import printTree
 from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
 import matplotlib.pyplot as plt
-import time
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+PLOT_GRAPHS = False
 
 ###############################################################################
 
@@ -59,7 +61,8 @@ def testBlackModelCheck():
 
     model = FinModelBlack(0.20)
     v = swaption.value(valuationDate, liborCurve, model)
-    print("BLACK'S MODEL PRICE:", v*100)
+    testCases.header("LABEL", "VALUE")
+    testCases.print("BLACK'S MODEL PRICE:", v*100)
 
 ###############################################################################
 
@@ -73,8 +76,11 @@ def test_BDTExampleOne():
     zeroDates = valuationDate.addYears(years)
     zeroRates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
 
-    print(zeroDates)
-    print(zeroRates)
+    testCases.header("DATES")
+    testCases.print(zeroDates)
+
+    testCases.header("RATES")
+    testCases.print(zeroRates)
 
     curve = FinDiscountCurveZeros(valuationDate,
                                   zeroDates,
@@ -83,13 +89,12 @@ def test_BDTExampleOne():
 
     yieldVol = 0.16
 
-    print("STARTING")
     numTimeSteps = 5
     tmat = years[-1]
     dfs = curve.df(zeroDates)
 
-    print("DFS")
-    print(dfs)
+    testCases.print("DFS")
+    testCases.print(dfs)
 
     years = np.array(years)
     dfs = np.array(dfs)
@@ -133,12 +138,14 @@ def test_BDTExampleTwo():
     times = np.linspace(0, tmat, 11)
     dates = settlementDate.addYears(times)
     dfs = np.exp(-0.05*times)
-    print("TIMES:", times)
+
+    testCases.header("LABEL", "VALUES")
+    testCases.print("TIMES:", times)
 
     curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
-    print("Fixed Income Price:", price)
+    testCases.print("Fixed Income Price:", price)
 
     sigma = 0.20
 
@@ -146,6 +153,7 @@ def test_BDTExampleTwo():
     numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exerciseType = FinOptionExerciseTypes.AMERICAN
 
+    testCases.header("Values")
     treeVector = []
     for numTimeSteps in numStepsList:
         model = FinModelRatesBDT(sigma, numTimeSteps)
@@ -153,10 +161,11 @@ def test_BDTExampleTwo():
         v = model.bondOption(texp, strikePrice,
                              face, couponTimes, couponFlows, exerciseType)
 
-        print(v)
+        testCases.print(v)
         treeVector.append(v['call'])
 
-    plt.plot(numStepsList, treeVector)
+    if PLOT_GRAPHS:
+        plt.plot(numStepsList, treeVector)
 
     # The value in Hill converges to 0.699 with 100 time steps while I get 0.70
 
@@ -191,7 +200,8 @@ def test_BDTExampleThree():
     # Andersen paper
     numTimeSteps = 200
 
-    print("NumSteps, Texp, Tmat, V_Fixed, V_pay, V_rec")
+    testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", 
+                     "V_Fixed", "V_pay", "V_rec")
 
     for exerciseType in [FinOptionExerciseTypes.EUROPEAN,
                          FinOptionExerciseTypes.BERMUDAN]:
@@ -242,9 +252,14 @@ def test_BDTExampleThree():
                                            couponFlows,
                                            exerciseType)
 
-                print("%s %9.5f %5d %9.5f %9.5f %9.2f %9.1f %9.1f"% \
-                      (exerciseType, sigma, numTimeSteps, expiryYears,
-                       maturityYears, price, v['pay']*100.0, v['rec']*100.0))
+                testCases.print("%s" % exerciseType,
+                                "%9.5f" % sigma,
+                                "%9.5f" % numTimeSteps,
+                                "%9.5f" % expiryYears,
+                                "%9.5f" % maturityYears,
+                                "%9.5f" % price,
+                                "%9.2f" % (v['pay']*100.0),
+                                "%9.2f" % (v['rec']*100.0))
 
 ###############################################################################
 

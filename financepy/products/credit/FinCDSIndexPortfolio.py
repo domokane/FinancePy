@@ -13,6 +13,7 @@ from ...finutils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # TODO: Move index spread details into class and then pass in issuer curves
@@ -449,11 +450,11 @@ class FinCDSIndexPortfolio():
 
                     # the CDS spreads we extract here should be the index
                     # maturity dates
-                    cdsIndex = FinCDS(
-                        valuationDate, indexMaturityDate, 0.0, 1.0)
+                    cdsIndex = FinCDS(valuationDate, indexMaturityDate, 0, 1.0)
 
-                    indexProtPV = cdsIndex.protectionLegPV(
-                        valuationDate, adjustedIssuerCurves[iCredit], indexRecoveryRate)
+                    indexProtPV = cdsIndex.protectionLegPV(valuationDate,
+                                                           adjustedIssuerCurves[iCredit],
+                                                           indexRecoveryRate)
 
                     rpv01Ret = cdsIndex.riskyPV01(
                         valuationDate, adjustedIssuerCurves[iCredit])
@@ -474,5 +475,23 @@ class FinCDSIndexPortfolio():
                 alpha *= ratio
 
         return adjustedIssuerCurves
+
+###############################################################################
+
+    def __repr__(self):
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("DAYCOUNT", self._dayCountType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

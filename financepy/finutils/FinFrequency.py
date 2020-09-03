@@ -6,7 +6,7 @@ from enum import Enum
 from ..finutils.FinError import FinError
 from ..finutils.FinDate import FinDate
 from ..finutils.FinDayCount import FinDayCountTypes
-from ..finutils.FinHelperFunctions import timesFromDates
+from ..finutils.FinGlobalVariables import gSmall
 
 import numpy as np
 
@@ -49,37 +49,7 @@ def FinFrequency(frequencyType):
 ###############################################################################
 
 
-def zeroToDf(valuationDate: FinDate,
-             rates: (float, np.ndarray),
-             dts: (list, FinDate),
-             frequencyType: FinFrequencyTypes,
-             dayCountType: FinDayCountTypes):
-    ''' Convert a zero with a specified compounding frequency and day count
-    convention to a discount factor for a single maturity date or a list of
-    dates. The day count is used to calculate the elapsed year fraction. '''
 
-    t = timesFromDates(dts, valuationDate, dayCountType)
-
-    if isinstance(t, np.ndarray):
-        t = np.maximum(t, 1e-6)
-    else:
-        t = max(t, 1e-6)
-
-    f = FinFrequency(frequencyType)
-
-    if frequencyType == FinFrequencyTypes.CONTINUOUS:
-        df = np.exp(-rates*t)
-    elif frequencyType == FinFrequencyTypes.SIMPLE:
-        df = 1.0 / (1.0 + rates * t)
-    elif frequencyType == FinFrequencyTypes.ANNUAL or \
-        frequencyType == FinFrequencyTypes.SEMI_ANNUAL or \
-            frequencyType == FinFrequencyTypes.QUARTERLY or \
-            frequencyType == FinFrequencyTypes.MONTHLY:
-        df = 1.0 / np.power(1.0 + rates/f, f * t)
-    else:
-        raise FinError("Unknown Frequency type")
-
-    return df
 
 ###############################################################################
 

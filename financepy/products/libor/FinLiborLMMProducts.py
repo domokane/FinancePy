@@ -90,12 +90,12 @@ class FinLiborLMMProducts():
             self._gridTimes.append(t)
             prevDt = nextDt
 
-        print(self._gridTimes)
+#        print(self._gridTimes)
         self._accrualFactors = np.array(self._accrualFactors)
         self._numForwards = len(self._accrualFactors)
         self._fwds = None
 
-        print("Num FORWARDS", self._numForwards)
+#        print("Num FORWARDS", self._numForwards)
 
 ###############################################################################
 
@@ -347,7 +347,7 @@ class FinLiborLMMProducts():
 
 ###############################################################################
 
-    def valueCapFloor(self, 
+    def valueCapFloor(self,
                       settlementDate: FinDate,
                       maturityDate: FinDate,
                       capFloorType: FinLiborCapFloorTypes,

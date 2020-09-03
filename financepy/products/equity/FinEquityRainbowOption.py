@@ -288,7 +288,9 @@ class FinEquityRainbowOption(FinEquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("EXPIRY DATE", self._expiryDate)
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
         s += labelToString("PAYOFF TYPE", self._payoffType)
         s += labelToString("PAYOFF PARAMS", self._payoffParams)
         s += labelToString("NUM ASSETS TYPE", self._numAssets, "")

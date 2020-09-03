@@ -591,7 +591,12 @@ class FinDate():
         ''' returns a formatted string of the date '''
         dateStr = ""
         dateStr += shortDayNames[self._weekday]
-        dateStr += " " + str(self._d) + " "
+
+        if self._d < 10:
+            dateStr += " 0" + str(self._d) + " "
+        else:
+            dateStr += " " + str(self._d) + " "
+
         dateStr += shortMonthNames[self._m - 1]
         dateStr += " " + str(self._y)
         return dateStr

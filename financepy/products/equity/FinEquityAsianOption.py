@@ -759,7 +759,8 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("START AVERAGING DATE", self._startAveragingDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START AVERAGING DATE", self._startAveragingDate)
         s += labelToString("EXPIRY DATE", self._expiryDate)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)

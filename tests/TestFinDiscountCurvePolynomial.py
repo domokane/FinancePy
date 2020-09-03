@@ -16,7 +16,7 @@ sys.path.append("..//..")
 # Use Frequency object
 ##########################################################################
 
-showPlots = True
+PLOT_GRAPHS = False
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -31,7 +31,7 @@ def test_FinDiscountCurvePolynomial():
     zeros = curve1.zeroRate(dates)
     fwds = curve1.fwd(dates)
 
-    if showPlots:
+    if PLOT_GRAPHS:
         import matplotlib.pyplot as plt
         plt.figure(figsize=(6, 4))
         plt.plot(times, zeros, label="Zeros")

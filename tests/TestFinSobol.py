@@ -36,17 +36,18 @@ def test_FinSobol():
     numRepeats = 100
     numDimensions = 10
 
+    testCases.header("TIME", "VALUE")
     start = time.time()
     for _ in range(numRepeats):
         getUniformSobol(1000, numDimensions)
     end = time.time()
-    print("Average time taken", (end - start) / numRepeats)
+    testCases.print("Average time taken", (end - start) / numRepeats)
 
     start = time.time()
     for _ in range(numRepeats):
         getGaussianSobol(1000, numDimensions)
     end = time.time()
-    print("Average time taken", (end - start) / numRepeats)
+    testCases.print("Average time taken", (end - start) / numRepeats)
 
 
 ###############################################################################

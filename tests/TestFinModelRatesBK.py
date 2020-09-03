@@ -84,15 +84,17 @@ def test_BKExampleTwo():
     curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
-    print("Fixed Income Price:", price)
+    testCases.header("LABEL", "VALUE")
+    testCases.print("Fixed Income Price:", price)
 
     sigma = 0.20
     a = 0.05
 
     # Test convergence
-    numStepsList = [100]  # 101,200,300,400,500,600,700,800,900,1000]
+    numStepsList = [100,200,300,400,500,600,700,800,900,1000]
     exerciseType = FinOptionExerciseTypes.AMERICAN
 
+    testCases.header("TIMESTEPS", "VALUE", "TIME")
     treeVector = []
     for numTimeSteps in numStepsList:
         start = time.time()
@@ -103,7 +105,7 @@ def test_BKExampleTwo():
         end = time.time()
         period = end-start
         treeVector.append(v)
-        print(numTimeSteps, v, period)
+        testCases.print(numTimeSteps, v, period)
 
 #    plt.plot(numStepsList, treeVector)
 

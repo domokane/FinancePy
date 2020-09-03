@@ -12,7 +12,6 @@ from numba import jit, njit, float64, int64
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import heaviside
-
 from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################

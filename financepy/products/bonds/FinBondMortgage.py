@@ -140,7 +140,8 @@ class FinBondMortgage(object):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._endDate)
         s += labelToString("MORTGAGE TYPE", self._mortgageType)
         s += labelToString("FREQUENCY", self._frequencyType)

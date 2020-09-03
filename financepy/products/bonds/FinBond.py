@@ -570,7 +570,8 @@ class FinBond(object):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("MATURITY DATE", self._maturityDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)

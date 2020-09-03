@@ -156,7 +156,7 @@ def test_FinDateAddYears():
 
 def test_FinDateSpeed():
 
-    numSteps = 1000
+    numSteps = 100
     start = time.time()
     dateList = []
     for _ in range(0, numSteps):

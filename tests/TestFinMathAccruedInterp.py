@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+pltGraph = False
 
 ##########################################################################
 
@@ -30,14 +31,16 @@ def test_FinMathAccdInterpolator():
     couponFlows = np.array(couponFlows)
 
     values = []
-    
+
     for t in treeTimes:
         v = accruedInterpolator(t, couponTimes, couponFlows)
         values.append(v)
 
-    print(values)
+    testCases.header("VALUE")
+    testCases.print(values)
 
-    plt.plot(treeTimes, values)
+    if pltGraph:
+        plt.plot(treeTimes, values)
 
 ##########################################################################
 

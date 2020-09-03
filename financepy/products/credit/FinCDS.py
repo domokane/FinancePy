@@ -832,7 +832,8 @@ class FinCDS(object):
     def __repr__(self):
         ''' print out details of the CDS contract and all of the calculated
         cashflows '''
-        s = labelToString("STEP-IN DATE", self._stepInDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("STEP-IN DATE", self._stepInDate)
         s += labelToString("MATURITY", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")

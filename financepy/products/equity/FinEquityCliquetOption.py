@@ -142,7 +142,8 @@ class FinEquityCliquetOption(FinEquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("FINAL EXPIRY DATE", self._finalExpiryDate)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("FREQUENCY TYPE", self._frequencyType)

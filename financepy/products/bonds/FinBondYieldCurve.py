@@ -168,7 +168,8 @@ class FinBondYieldCurve():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("BOND", self._bonds)
         s += labelToString("YIELDS", self._ylds)
         s += labelToString("CURVE FIT", self._curveFit)

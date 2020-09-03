@@ -19,6 +19,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 sys.path.append("..//..")
 sys.path.append("..")
 
+plotGraphs = False
+
 ###############################################################################
 
 
@@ -60,7 +62,8 @@ def test_FinBondZeroCurve():
         zeroRate = bondCurve.zeroRate(maturityDt)
         testCases.print(maturityDt, zeroRate)
 
-    bondCurve.plot("BOND CURVE")
+    if plotGraphs:
+        bondCurve.plot("BOND CURVE")
 
 ###############################################################################
 

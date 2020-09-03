@@ -16,6 +16,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+PLOT_GRAPHS = False
+
 ###############################################################################
 
 
@@ -65,7 +67,9 @@ def test_FinFXMktVolSurface():
                                    deltaMethod)
 
         fxMarket.checkCalibration()
-        fxMarket.plotVolCurves()
+
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
     ###########################################################################
 
@@ -113,7 +117,8 @@ def test_FinFXMktVolSurface():
                                    deltaMethod)
 
 #        fxMarket.checkCalibration()
-        fxMarket.plotVolCurves()
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
 #    print("==================================================================")
 
@@ -161,9 +166,9 @@ def test_FinFXMktVolSurface():
                                    deltaMethod)
 
         fxMarket.checkCalibration()
-        fxMarket.plotVolCurves()
 
-#        print("==============================================================")
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
     ###########################################################################
 
@@ -209,7 +214,9 @@ def test_FinFXMktVolSurface():
                                    deltaMethod)
 
         fxMarket.checkCalibration()
-        fxMarket.plotVolCurves()
+
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
     #    testCases.header("value", "delta")
     #    testCases.print(value, delta)

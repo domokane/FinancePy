@@ -14,7 +14,6 @@ from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import timesFromDates
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinFrequency import zeroToDf
 
 
 ###############################################################################
@@ -69,7 +68,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         self._interpType = interpType
 
         self._times = timesFromDates(zeroDates, valuationDate, dayCountType)
-        self._zeroRates = zeroRates
+        self._zeroRates = np.array(zeroRates)
         self._zeroDates = zeroDates
 
         if testMonotonicity(self._times) is False:
@@ -82,18 +81,18 @@ class FinDiscountCurveZeros(FinDiscountCurve):
     def _buildCurvePoints(self):
         ''' Hidden function to extract discount factors from zero rates. '''
 
-        dfValues = []
+        # Get day count times to use with curve day count convention
+        dcTimes = timesFromDates(self._zeroDates,
+                                 self._valuationDate,
+                                 self._dayCountType)
 
-        # We just calculate the discount factors using times as provided
-        numTimes = len(self._times)
+        dfs = self._zeroToDf(self._valuationDate,
+                             self._zeroRates,
+                             dcTimes,
+                             self._frequencyType,
+                             self._dayCountType)
 
-        for i in range(0, numTimes):
-            t = self._times[i]
-            r = self._zeroRates[i]
-            df = zeroToDf(r, t, self._frequencyType)
-            dfValues.append(df)
-
-        self._dfValues = np.array(dfValues)
+        self._dfValues = np.array(dfs)
 
 ###############################################################################
 

@@ -425,7 +425,8 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("EXPIRY DATE 1", self._expiryDate1)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE 1", self._expiryDate1)
         s += labelToString("STRIKE PRICE 1", self._strikePrice1)
         s += labelToString("OPTION TYPE 1", self._optionType1)
         s += labelToString("EXPIRY DATE 2", self._expiryDate2)

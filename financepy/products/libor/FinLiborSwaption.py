@@ -385,7 +385,8 @@ class FinLiborSwaption():
     def __repr__(self):
         ''' Function to allow us to print the swaption details. '''
 
-        s = labelToString("SETTLEMENT DATE", self._settlementDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
         s += labelToString("SWAPTION TYPE", str(self._swaptionType))
         s += labelToString("MATURITY DATE", self._maturityDate)

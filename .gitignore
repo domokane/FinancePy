@@ -29,3 +29,4 @@ financepy-0.*
 
 # MYPY
 .mypy_cache
+financepy/__init__.py

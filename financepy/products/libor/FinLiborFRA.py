@@ -127,7 +127,8 @@ class FinLiborFRA(object):
     ##########################################################################
 
     def __repr__(self):
-        s = labelToString("START ACCD DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START ACCD DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("FRA RATE", self._fraRate)
         s += labelToString("NOTIONAL", self._notional)

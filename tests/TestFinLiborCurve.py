@@ -26,6 +26,10 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+PLOT_GRAPHS = False
+
+###############################################################################
+
 
 def test_FinLiborDepositsOnly():
 
@@ -408,7 +412,7 @@ def test_FinLiborDepositsFuturesSwaps():
     zeroRates = liborCurve.zeroRate(dates)
     fwdRates = liborCurve.fwd(dates)
 
-    if 1 == 0:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(8, 6))
         plt.plot(times, zeroRates*100, label="zero rates")
         plt.plot(times, fwdRates*100, label="fwd rates")
@@ -418,7 +422,7 @@ def test_FinLiborDepositsFuturesSwaps():
 
         print("==============================================================")
         for fra in fras:
-            fra.print()
+            print(fra)
         print("==============================================================")
 
         endDate = spotDate
@@ -448,10 +452,10 @@ def test_FinLiborDepositsFuturesSwaps():
             df = liborCurve.df(endDate)
             print(endDate, df)
 
-        swap.printFixedLeg(spotDate)
-        swap.printFloatLeg(spotDate)
+        swap.printFixedLegPV(spotDate)
+        swap.printFloatLegPV(spotDate)
 
-        print(liborCurve)
+#        print(liborCurve)
 
 ###############################################################################
 

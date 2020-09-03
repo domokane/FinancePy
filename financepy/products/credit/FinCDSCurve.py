@@ -15,6 +15,7 @@ from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
+from ...finutils.FinHelperFunctions import labelToString
 
 
 ###############################################################################
@@ -262,7 +263,7 @@ class FinCDSCurve():
 
     def __repr__(self):
         ''' Print out the details of the survival probability curve. '''
-
+        s = labelToString("OBJECT TYPE", type(self).__name__)    
         header = "TIME,SURVIVAL_PROBABILITY"
         valueTable = [self._times, self._values]
         precision = "10.7f"

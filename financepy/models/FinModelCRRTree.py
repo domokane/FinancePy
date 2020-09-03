@@ -12,19 +12,8 @@ bump = 1e-4
 ###############################################################################
 ###############################################################################
 
-@njit(
-    float64[:](
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        float64,
-        int64,
-        float64,
-        int64),
-    fastmath=True,
-    cache=True)
+@njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
+                 float64, int64), fastmath=True, cache=True)
 def crrTreeVal(stockPrice,
                ccInterestRate,  # continuously compounded
                ccDividendRate,  # continuously compounded

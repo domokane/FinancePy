@@ -15,6 +15,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+PLOT_GRAPHS = False
+
 ##########################################################################
 
 
@@ -101,7 +103,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     zeroRates5 = curve5.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, beta4, zeroRates5)
 
-    if 1 == 0:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zeroRates1, 100), label='beta1=3%')
         plt.plot(times, scale(zeroRates2, 100), label='beta1=4%')

@@ -221,6 +221,8 @@ class FinLiborCurve(FinDiscountCurve):
 
         if numDepos > 0 and numFRAs > 0:
             if firstFRAMaturityDate <= lastDepositMaturityDate:
+                print("FRA Maturity Date:", firstFRAMaturityDate)
+                print("Last Deposit Date:", lastDepositMaturityDate)
                 raise FinError("First FRA must end after last Deposit")
 
         if numFRAs > 0 and numSwaps > 0:
@@ -482,7 +484,8 @@ class FinLiborCurve(FinDiscountCurve):
     def __repr__(self):
         ''' Print out the details of the Libor curve. '''
 
-        s = labelToString("VALUATION DATE", self._valuationDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("VALUATION DATE", self._valuationDate)
 
         for depo in self._usedDeposits:
             s += labelToString("DEPOSIT", "")

@@ -38,7 +38,7 @@ def buildLiborCurve(valuationDate):
     fras = []
     swaps = []
 
-    maturityDate = settlementDate.addMonths(6)
+    maturityDate = settlementDate.addMonths(1)
     depo1 = FinLiborDeposit(settlementDate, maturityDate, -0.00251, dcType)
     depos.append(depo1)
 
@@ -332,7 +332,7 @@ def test_LiborSwap():
     same curve being used for discounting and working out the implied
     future Libor rates. '''
 
-    valuationDate = FinDate(2018, 11, 30)
+    valuationDate = FinDate(30, 11, 2018)
     settlementDate = valuationDate.addDays(2)
     liborCurve = buildLiborCurve(valuationDate)
     v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
@@ -374,7 +374,7 @@ def test_dp_example():
                         busDayAdjustType=busDayAdjustType,
                         dateGenRuleType=dateGenRuleType)
 
-    swap.printFixedLegFlows()
+#    swap.printFixedLegFlows()
 
     dts = [FinDate(14, 11, 2011), FinDate(14, 5, 2012), FinDate(14, 11, 2012),
            FinDate(14, 5, 2013), FinDate(14, 11, 2013), FinDate(14, 5, 2014),
@@ -391,11 +391,12 @@ def test_dp_example():
 
     v = swap.value(valuationDate, curve, curve)
 
-    swap.printFixedLegPV()
-    swap.printFloatLegPV()
+#    swap.printFixedLegPV()
+#    swap.printFloatLegPV()
 
     # This is essentially zero
-    print("Swap Value on a Notional of $1M:", v)
+    testCases.header("LABEL", "VALUE")
+    testCases.print("Swap Value on a Notional of $1M:", v)
 
 ###############################################################################
 

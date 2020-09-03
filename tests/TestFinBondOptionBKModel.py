@@ -23,6 +23,8 @@ import matplotlib.pyplot as plt
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+plotGraphs = False
+
 ###############################################################################
 
 
@@ -317,21 +319,23 @@ def test_FinBondOptionAmericanConvergenceTWO():
         vec_ep.append(v_ep)
         vec_ap.append(v_ap)
 
-    plt.figure()
-    plt.plot(numStepsVector, vec_ec, label="European Call")
-    plt.legend()
+    if plotGraphs:
 
-    plt.figure()
-    plt.plot(numStepsVector, vec_ac, label="American Call")
-    plt.legend()
+        plt.figure()
+        plt.plot(numStepsVector, vec_ec, label="European Call")
+        plt.legend()
 
-    plt.figure()
-    plt.plot(numStepsVector, vec_ep, label="European Put")
-    plt.legend()
+        plt.figure()
+        plt.plot(numStepsVector, vec_ac, label="American Call")
+        plt.legend()
 
-    plt.figure()
-    plt.plot(numStepsVector, vec_ap, label="American Put")
-    plt.legend()
+        plt.figure()
+        plt.plot(numStepsVector, vec_ep, label="European Put")
+        plt.legend()
+
+        plt.figure()
+        plt.plot(numStepsVector, vec_ap, label="American Put")
+        plt.legend()
 
 ###############################################################################
 

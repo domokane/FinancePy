@@ -54,7 +54,8 @@ def test_FinEquityChooserOptionHaug():
                                  model, 20000)
 
     v_haug = 6.0508
-    print("FINANCEPY", v, "HAUG", v_haug, "MC", v_mc)
+    testCases.header("", "", "", "", "", "")
+    testCases.print("FINANCEPY", v, "HAUG", v_haug, "MC", v_mc)
 
 ##########################################################################
 
@@ -95,7 +96,8 @@ def test_FinEquityChooserOptionMatlab():
                                  model, 20000)
 
     v_matlab = 8.9308
-    print("FINANCEPY", v, "MATLAB", v_matlab, "MC", v_mc)
+    testCases.header("", "", "", "", "", "")
+    testCases.print("FINANCEPY", v, "MATLAB", v_matlab, "MC", v_mc)
 
 ##########################################################################
 
@@ -136,7 +138,8 @@ def test_FinEquityChooserOptionDerivicom():
                                  model, 20000)
 
     v_derivicom = 1.0989
-    print("FINANCEPY", v, "DERIVICOM", v_derivicom, "MC", v_mc)
+    testCases.header("", "", "", "", "", "")
+    testCases.print("FINANCEPY", v, "DERIVICOM", v_derivicom, "MC", v_mc)
 
 ##########################################################################
 

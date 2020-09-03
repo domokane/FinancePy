@@ -4,6 +4,7 @@
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
+from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
@@ -204,6 +205,10 @@ class FinLiborSwap(object):
             df0 = discountCurve.df(valuationDate)
 
         dfT = discountCurve.df(self._maturityDate)
+
+        if abs(pv01) < gSmall:
+            raise FinError("PV01 is zero. Cannot compute coupon.")
+
         cpn = (df0 - dfT) / pv01
         return cpn
 
@@ -219,7 +224,7 @@ class FinLiborSwap(object):
         self._fixedFlowPVs = []
         self._fixedTotalPV = []
 
-        basis = FinDayCount(self._fixedDayCountType)
+        dayCounter = FinDayCount(self._fixedDayCountType)
 
         ''' The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. '''
@@ -239,9 +244,12 @@ class FinLiborSwap(object):
 
         pv = 0.0
         prevDt = self._adjustedFixedDates[startIndex - 1]
+        df_discount = 1.0
+        if len(self._adjustedFixedDates) == 1:
+            return 0.0
 
         for nextDt in self._adjustedFixedDates[startIndex:]:
-            alpha = basis.yearFrac(prevDt, nextDt)[0]
+            alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
             df_discount = discountCurve.df(nextDt) / self._dfValuationDate
             flow = self._fixedCoupon * alpha * self._notional
             flowPV = flow * df_discount
@@ -268,13 +276,13 @@ class FinLiborSwap(object):
         self._fixedYearFracs = []
         self._fixedFlows = []
 
-        basis = FinDayCount(self._fixedDayCountType)
+        dayCounter = FinDayCount(self._fixedDayCountType)
 
         ''' Now PV fixed leg flows. '''
         prevDt = self._adjustedFixedDates[0]
 
         for nextDt in self._adjustedFixedDates[1:]:
-            alpha = basis.yearFrac(prevDt, nextDt)[0]
+            alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
             flow = self._fixedCoupon * alpha * self._notional
             prevDt = nextDt
             self._fixedYearFracs.append(alpha)
@@ -554,7 +562,8 @@ class FinLiborSwap(object):
 ##########################################################################
 
     def __repr__(self):
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("TERMINATION DATE", self._terminationDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)

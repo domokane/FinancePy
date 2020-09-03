@@ -21,6 +21,8 @@ from financepy.models.FinModelRatesBK import FinModelRatesBK
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+plotGraphs = False
+
 ###############################################################################
 
 
@@ -83,11 +85,14 @@ def test_FinBondEmbeddedOptionMATLAB():
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, numTimeSteps, v['bondwithoption'], v['bondpure'])
+        testCases.print(period, numTimeSteps, v['bondwithoption'],
+                        v['bondpure'])
+
         values.append(v['bondwithoption'])
 
-    plt.figure()
-    plt.plot(timeSteps, values)
+    if plotGraphs:
+        plt.figure()
+        plt.plot(timeSteps, values)
 
 ###############################################################################
 
@@ -157,9 +162,10 @@ def test_FinBondEmbeddedOptionQUANTLIB():
         testCases.print(period, numTimeSteps, v['bondwithoption'], v['bondpure'])
         values.append(v['bondwithoption'])
 
-    plt.figure()
-    plt.title("Puttable Bond Price Convergence")
-    plt.plot(timeSteps, values)
+    if plotGraphs:
+        plt.figure()
+        plt.title("Puttable Bond Price Convergence")
+        plt.plot(timeSteps, values)
 
 ###############################################################################
 

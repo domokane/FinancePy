@@ -10,8 +10,9 @@ from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
 import matplotlib.pyplot as plt
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+PLOT_GRAPHS = False
 
 ###############################################################################
 
@@ -38,10 +39,11 @@ def test_FinSABR():
     vols1 = model1.blackVol(f, strikes, T)
     vols2 = model2.blackVol(f, strikes, T)
 
-    plt.figure()
-    plt.plot(strikes, vols1)
-    plt.plot(strikes, vols2)
-    plt.title("SABR")
+    if PLOT_GRAPHS:
+        plt.figure()
+        plt.plot(strikes, vols1)
+        plt.plot(strikes, vols2)
+        plt.title("SABR")
 
 ###############################################################################
 
@@ -68,10 +70,11 @@ def test_FinShiftedSABRSimple():
     vols1 = model1.blackVol(f, strikes, T)
     vols2 = model2.blackVol(f, strikes, T)
 
-    plt.figure()
-    plt.plot(strikes, vols1)
-    plt.plot(strikes, vols2)
-    plt.title("Shifted SIMPLE SABR")
+    if PLOT_GRAPHS:
+        plt.figure()
+        plt.plot(strikes, vols1)
+        plt.plot(strikes, vols2)
+        plt.title("Shifted SIMPLE SABR")
 
 ###############################################################################
 
@@ -93,9 +96,10 @@ def test_FinShiftedSABR():
 
     vols = model.blackVol(f, strikes, T)
 
-    plt.figure()
-    plt.plot(strikes, vols)
-    plt.title("SHIFTED SABR")
+    if PLOT_GRAPHS:
+        plt.figure()
+        plt.plot(strikes, vols)
+        plt.title("SHIFTED SABR")
 
 ###############################################################################
 

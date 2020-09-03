@@ -260,7 +260,8 @@ class FinBondOption():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
         s += labelToString("STRIKE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("FACE", self._face, "")

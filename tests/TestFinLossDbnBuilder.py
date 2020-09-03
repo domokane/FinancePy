@@ -12,8 +12,9 @@ import time
 import sys
 sys.path.append("..//..")
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+plotGraphs = False
 
 ##########################################################################
 
@@ -82,7 +83,7 @@ def test_FinLossDbnBuilder():
 
         #######################################################################
 
-        if 1 == 0:
+        if plotGraphs:
             plt.figure()
             plt.plot(x, dbn1, label='GCD FULL')
             plt.plot(x, dbn2, label='ADJ BIN')

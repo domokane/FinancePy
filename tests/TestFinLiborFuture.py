@@ -16,12 +16,14 @@ def test_FinLiborFuture():
 
     todayDate = FinDate(5, 5, 2020)
 
+    testCases.header("VALUES")
+
     for i in range(1, 12):
         fut = FinLiborFuture(todayDate, i, "3M")
-        print(fut)
+        testCases.print(fut)
 
         fra = fut.toFRA(0.020, 0.0)
-        print(fra)
+        testCases.print(fra)
 
 ###############################################################################
 

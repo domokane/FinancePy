@@ -130,10 +130,11 @@ def test_Swaptions():
         model = FinModelBlack(swaptionVol)
         blackSwaptionPrice = swaption.value(valuationDate, liborCurve, model)
 
-        print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
-              % (strike, texp, fwdRateVol, swapVolSim1F, swapVolSimNF, swaptionVol, swaptionPrice1F, swaptionPriceNF, blackSwaptionPrice))
-
-#        print(swaption)
+        testCases.print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
+                        " SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
+              % (strike, texp, fwdRateVol, swapVolSim1F, swapVolSimNF,
+                 swaptionVol, swaptionPrice1F, swaptionPriceNF,
+                 blackSwaptionPrice))
 
 ###############################################################################
 
@@ -211,6 +212,8 @@ def test_CapsFloors():
     # Simulate paths of future Libor rates
     numFactors = 1
 
+    testCases.header("NUMPATHS", "VLMM", "VBLK", "ERROR")
+
     for numPaths in [10000, 20000, 50000, 100000, 200000, 400000, 1000000]:
 
         if numFactors == 1:
@@ -227,7 +230,7 @@ def test_CapsFloors():
                                           FinDayCountTypes.ACT_360)
 
         err = v_lmm - v_BLK
-        print(numPaths, v_lmm, v_BLK, err)
+        testCases.print(numPaths, v_lmm, v_BLK, err)
 
 ###############################################################################
 

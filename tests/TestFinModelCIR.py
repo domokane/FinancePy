@@ -4,7 +4,8 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.models.FinModelRatesCIR import zeroPrice_MC, zeroPrice, FinCIRNumericalScheme
+from financepy.models.FinModelRatesCIR import zeroPrice_MC, zeroPrice
+from financepy.models.FinModelRatesCIR import FinCIRNumericalScheme
 import numpy as np
 import time
 import sys
@@ -12,6 +13,8 @@ sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
 
 
 def test_FinModelRatesCIR():
@@ -93,6 +96,8 @@ def test_FinModelRatesCIR():
         end = time.time()
         elapsed = end - start
         testCases.print(t, elapsed, p, p_MC1, p_MC2, p_MC3, p_MC4, p_MC5)
+
+###############################################################################
 
 
 test_FinModelRatesCIR()

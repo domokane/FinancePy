@@ -262,11 +262,10 @@ def test_HullBookExamples():
     for i in range(0, numFwds):
         fwd0[i] = r
 
-    if verbose == 1:
-        print("FWD CURVE:", fwd0)
-
     numPaths = 500000
     spread = 0.0025  # basis points
+
+    testCases.header("VALUES")
 
     ###########################################################################
     # HULL TABLE 32.1
@@ -294,9 +293,9 @@ def test_HullBookExamples():
     hullRatchetCaplets1F = np.array(hullRatchetCaplets1F)
 
     if verbose:
-        print("Ratchet ONE FACTOR IMPLEMENTATION")
-        print(vRatchetCaplets)
-        print(hullRatchetCaplets1F)
+        testCases.banner("Ratchet ONE FACTOR IMPLEMENTATION")
+        testCases.print(vRatchetCaplets)
+        testCases.print(hullRatchetCaplets1F)
 
     checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
@@ -307,9 +306,9 @@ def test_HullBookExamples():
                            0.498, 0.502, 0.501, 0.497, 0.488]
 
     if verbose:
-        print("STICKY CAPLETS ONE FACTOR IMPLEMENTATION", numFactors)
-        print(vStickyCaplets)
-        print(hullStickyCaplets1F)
+        testCases.banner("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
+        testCases.print(vStickyCaplets)
+        testCases.print(hullStickyCaplets1F)
 
     checkVectorDifferences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
@@ -329,9 +328,9 @@ def test_HullBookExamples():
                             0.1890, 0.172, 0.167, 0.160, 0.153]
 
     if verbose:
-        print("RATCHET - NUM FACTORS:", numFactors)
-        print(vRatchetCaplets)
-        print(hullRatchetCaplets1F)
+        testCases.banner("RATCHET - NUM FACTORS 1F")
+        testCases.print(vRatchetCaplets)
+        testCases.print(hullRatchetCaplets1F)
 
     checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
@@ -344,9 +343,9 @@ def test_HullBookExamples():
     checkVectorDifferences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
     if verbose:
-        print("STICKY RATCHET - NUM FACTORS:", numFactors)
-        print(vStickyCaplets)
-        print(hullStickyCaplets1F)
+        testCases.banner("STICKY RATCHET - NUM FACTORS 1")
+        testCases.print(vStickyCaplets)
+        testCases.print(hullStickyCaplets1F)
 
     numFactors = 2
     lambdas2FList = [[0.00, 0.1410, 0.1952, 0.1678, 0.1711, 0.1525,
@@ -365,9 +364,9 @@ def test_HullBookExamples():
                             0.189, 0.180, 0.174, 0.168, 0.162]
 
     if verbose:
-        print("RATCHET - NUM FACTORS:", numFactors)
-        print(vRatchetCaplets)
-        print(hullRatchetCaplets2F)
+        testCases.banner("RATCHET - NUM FACTORS:2")
+        testCases.print(vRatchetCaplets)
+        testCases.print(hullRatchetCaplets2F)
 
     checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
 
@@ -378,9 +377,9 @@ def test_HullBookExamples():
                            0.512, 0.520, 0.523, 0.523, 0.519]
 
     if verbose:
-        print("STICKY RATCHET - NUM FACTORS:", numFactors)
-        print(vStickyCaplets)
-        print(hullStickyCaplets2F)
+        testCases.banner("STICKY RATCHET - NUM FACTORS:2")
+        testCases.print(vStickyCaplets)
+        testCases.print(hullStickyCaplets2F)
 
     checkVectorDifferences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
 
@@ -404,9 +403,9 @@ def test_HullBookExamples():
                                              fwd0, fwds3F, taus) * 100.0
 
     if verbose:
-        print("RATCHET - NUM FACTORS:", numFactors)
-        print(vRatchetCaplets)
-        print(hullRatchetCaplets3F)
+        testCases.banner("RATCHET - NUM FACTORS:3")
+        testCases.print(vRatchetCaplets)
+        testCases.print(hullRatchetCaplets3F)
 
     checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
 
@@ -417,9 +416,9 @@ def test_HullBookExamples():
                            0.524, 0.533, 0.537, 0.537, 0.534]
 
     if verbose:
-        print("STICKY RATCHET - NUM FACTORS:", numFactors)
-        print(vStickyCaplets)
-        print(hullStickyCaplets3F)
+        testCases.banner("STICKY RATCHET - NUM FACTORS:3")
+        testCases.print(vStickyCaplets)
+        testCases.print(hullStickyCaplets3F)
 
     checkVectorDifferences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
 

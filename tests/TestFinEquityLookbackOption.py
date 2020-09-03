@@ -528,9 +528,10 @@ def test_example():
 
     volatilities = [0.30]
 
+    testCases.header("VALUE")
     for vol in volatilities:
         v = lookbackCall.value(valueDate, stockPrice, discountCurve, dividendYield, vol, stockMinMax)
-        print(v, end=" ")
+        testCases.print(v)
 
 ###############################################################################
 

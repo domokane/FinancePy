@@ -277,7 +277,8 @@ class FinOIS(object):
 
     def __repr__(self):
         ''' Print the dates and cash flows on the OIS. '''
-        s = labelToString("StartDate:", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("StartDate:", self._startDate)
         s += labelToString("MaturityDate:", self._maturityDate)
         s += labelToString("OISFixedRate:", self._fixedRate)
         s += labelToString("PayFixedLeg:", self._payFixedLeg)

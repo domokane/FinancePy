@@ -13,6 +13,8 @@ sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+PLOT_GRAPHS = False
+
 ###############################################################################
 
 
@@ -29,7 +31,7 @@ def test_FinVolatilityCurve():
     interpStrikes = np.linspace(50, 150, 100)
     interpVols = volCurve.volatility(interpStrikes)
 
-    if 1 == 0:
+    if PLOT_GRAPHS:
         import matplotlib.pyplot as plt
         plt.plot(strikes, vols, 'o', interpStrikes, interpVols)
         plt.show()

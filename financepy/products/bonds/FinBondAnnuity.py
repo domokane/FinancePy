@@ -175,7 +175,8 @@ class FinBondAnnuity(object):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
 
-        s = labelToString("MATURITY DATE", self._maturityDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUS_DAY_RULE", self._busDayAdjustType)

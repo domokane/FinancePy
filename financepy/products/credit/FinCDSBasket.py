@@ -28,6 +28,7 @@ from ...market.curves.FinInterpolate import interpolate, FinInterpTypes
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString, tableToString
 
 ###############################################################################
 
@@ -308,5 +309,30 @@ class FinCDSBasket(object):
         basketOutput[3] = protLegPV / riskyPV01
 
         return basketOutput
+
+###############################################################################
+
+    def __repr__(self):
+        ''' print out details of the CDS contract and all of the calculated
+        cashflows '''
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("STEP-IN DATE", self._stepInDate)
+        s += labelToString("MATURITY", self._maturityDate)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")
+        s += labelToString("DAYCOUNT", self._dayCountType)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("ACCRUED DAYS", self.accruedDays())
+
+        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
+        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+        precision = "12.6f"
+
+        s += tableToString(header, valueTable, precision)
+
+        return s
 
 ###############################################################################

@@ -43,6 +43,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     # BLACK'S MODEL
     ###########################################################################
 
+    testCases.header("LABEL", "VALUE")
+
     model = FinModelBlack(0.25)
 
     swaptionType = FinLiborSwaptionTypes.PAYER
@@ -55,7 +57,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                            swapFixedDayCountType)
 
     value = europeanSwaptionPay.value(settlementDate, liborCurve, model)
-    print("EUROPEAN BLACK PAY VALUE:", value)
+    testCases.print("EUROPEAN BLACK PAY VALUE:", value)
 
     swaptionType = FinLiborSwaptionTypes.RECEIVER
     europeanSwaptionRec = FinLiborSwaption(settlementDate,
@@ -67,7 +69,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                            swapFixedDayCountType)
 
     value = europeanSwaptionRec.value(settlementDate, liborCurve, model)
-    print("EUROPEAN BLACK REC VALUE:", value)
+    testCases.print("EUROPEAN BLACK REC VALUE:", value)
 
     ###########################################################################
     # BK MODEL
@@ -80,10 +82,10 @@ def test_FinLiborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, numTimeSteps)
 
     value = europeanSwaptionPay.value(valuationDate, liborCurve, model)
-    print("EUROPEAN BK PAY VALUE:", value)
+    testCases.print("EUROPEAN BK PAY VALUE:", value)
 
     value = europeanSwaptionRec.value(valuationDate, liborCurve, model)
-    print("EUROPEAN BK REC VALUE:", value)
+    testCases.print("EUROPEAN BK REC VALUE:", value)
 
     ###########################################################################
     # BDT MODEL
@@ -95,10 +97,10 @@ def test_FinLiborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, numTimeSteps)
 
     value = europeanSwaptionPay.value(valuationDate, liborCurve, model)
-    print("EUROPEAN BK PAY VALUE:", value)
+    testCases.print("EUROPEAN BK PAY VALUE:", value)
 
     value = europeanSwaptionRec.value(valuationDate, liborCurve, model)
-    print("EUROPEAN BK REC VALUE:", value)
+    testCases.print("EUROPEAN BK REC VALUE:", value)
 
     ###########################################################################
 
@@ -136,9 +138,9 @@ def test_FinLiborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, numTimeSteps)
 
     value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
-    print("Bermudan BK PAY Value:", value)
+    testCases.print("Bermudan BK PAY Value:", value)
     value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
-    print("Bermudan BK REC Value:", value)
+    testCases.print("Bermudan BK REC Value:", value)
 
     ###########################################################################
     # BDT MODEL
@@ -150,9 +152,9 @@ def test_FinLiborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, numTimeSteps)
 
     value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
-    print("Bermudan BDT PAY Value:", value)
+    testCases.print("Bermudan BDT PAY Value:", value)
     value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
-    print("Bermudan BDT REC Value:", value)
+    testCases.print("Bermudan BDT REC Value:", value)
 
     ###########################################################################
     # USING HW MODEL
@@ -164,9 +166,9 @@ def test_FinLiborBermudanSwaptionBKModel():
     model = FinModelRatesHW(sigma, a, numTimeSteps)
 
     value = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
-    print("Bermudan HW PAY Value:", value)
+    testCases.print("Bermudan HW PAY Value:", value)
     value = bermudanSwaptionRec.value(valuationDate, liborCurve, model)
-    print("Bermudan HW REC Value:", value)
+    testCases.print("Bermudan HW REC Value:", value)
 
 ##########################################################################
 

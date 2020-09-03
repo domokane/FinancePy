@@ -17,6 +17,7 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...products.credit.FinCDS import FinCDS
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
+from ...finutils.FinHelperFunctions import labelToString
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -333,5 +334,29 @@ class FinCDSIndexOption(object):
         intH *= INVROOT2PI * dz
         intMaxH *= INVROOT2PI * dz * dfToExpiry
         return intH, intMaxH
+
+###############################################################################
+
+    def __repr__(self):
+        ''' print out details of the CDS contract and all of the calculated
+        cashflows '''
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("INDEX COUPON", self._indexCoupon*10000, "bp\n")
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("LONG PROTECTION", self._longProtection)
+        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("DAYCOUNT", self._dayCountType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
+        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################
