@@ -34,7 +34,7 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     ###########################################################################
 
-    dcType = FinDayCountTypes.THIRTY_360
+    dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
     swap1 = FinLiborSwap(settlementDate, "1Y", 0.0350, fixedFreq, dcType)
     swap2 = FinLiborSwap(settlementDate, "2Y", 0.0400, fixedFreq, dcType)

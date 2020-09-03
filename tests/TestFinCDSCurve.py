@@ -30,7 +30,7 @@ def test_FinCDSCurve():
     depos = []
     fras = []
 
-    fixedDCC = FinDayCountTypes.ACT_365_ISDA
+    fixedDCC = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
     fixedCoupon = 0.05
 

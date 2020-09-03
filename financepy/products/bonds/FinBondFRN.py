@@ -16,7 +16,9 @@ from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-# TODO: Need to complete and verify the risk sensitity calculations.
+###############################################################################
+# TODO: Need to complete and verify the risk sensitivity calculations.
+###############################################################################
 
 ###############################################################################
 
@@ -52,7 +54,7 @@ class FinBondFRN(object):
                  quotedMargin: float,
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
-                 face: float = 100.0):
+                 faceAmount: float = 100.0):
         ''' Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
         the position and par is the notional on which price is quoted. '''
@@ -65,7 +67,7 @@ class FinBondFRN(object):
         self._accrualType = accrualType
         self._flowDates = []
         self._frequency = FinFrequency(frequencyType)
-        self._face = face   # This is the position size
+        self._faceAmount = faceAmount   # This is the position size
         self._par = 100.0   # This is how price is quoted
 
         ''' I do not determine cashflow dates as I do not want to require
@@ -129,7 +131,7 @@ class FinBondFRN(object):
         df = pow(1.0 + (currentLibor + dm)/f, -alpha)
         pv = (nextCoupon/f) * df
 
-        for n in range(2, numFlows):
+        for _ in range(2, numFlows):
             df /= (1.0 + y/f)
             pv = pv + (c/f) * df
 
@@ -157,7 +159,7 @@ class FinBondFRN(object):
                                                      dm)
 
         accrued = self._accruedInterest
-        principal = fullPrice * self._face / self._par - accrued
+        principal = fullPrice * self._faceAmount / self._par - accrued
         return principal
 
 ###############################################################################
@@ -369,8 +371,8 @@ class FinBondFRN(object):
                                                      futureLibor,
                                                      dm)
 
-        accrued = self.accruedInterest(settlementDate, resetLibor)
-        accrued = accrued * self._par / self._face
+        accrued = self._accruedInterest(settlementDate, resetLibor)
+        accrued = accrued * self._par / self._faceAmount
 
         cleanPrice = fullPrice - accrued
         return cleanPrice
@@ -383,7 +385,7 @@ class FinBondFRN(object):
                                    discountCurve: FinDiscountCurve):
         ''' Calculate the bond price using some discount curve to present-value
         the bond's cashflows. THIS IS NOT COMPLETE. '''
-        self.calculateFlowDates(settlementDate)
+        self._calculateFlowDates(settlementDate)
 
         pv = 0.0
 
@@ -393,7 +395,7 @@ class FinBondFRN(object):
             pv = pv + flow * df
 
         pv = pv + df
-        return pv * self._face
+        return pv * self._faceAmount
 
 ###############################################################################
 
@@ -409,7 +411,7 @@ class FinBondFRN(object):
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         # Needs to be adjusted to par notional
-        accrued = self._accruedInterest * self._par / self._face
+        accrued = self._accruedInterest * self._par / self._faceAmount
 
         fullPrice = cleanPrice + accrued
 
@@ -440,10 +442,25 @@ class FinBondFRN(object):
 
         dc = FinDayCount(self._accrualType)
 
-        accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
+        if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
+
+            (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                              settlementDate,
+                                              self._ncd)
+
+            self._alpha = 1.0 - accFactor * self._frequency
+
+        else:
+
+            (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                              settlementDate)
+
+            self._alpha = 1.0 - accFactor * self._frequency
+
         nextCoupon = resetLibor + self._quotedMargin
-        self._accruedInterest = accFactor * self._face * nextCoupon
-        self._accruedDays = settlementDate - self._pcd
+ 
+        self._accruedInterest = accFactor * self._faceAmount * nextCoupon
+        self._accruedDays = num
         return self._accruedInterest
 
 ###############################################################################
@@ -464,11 +481,10 @@ class FinBondFRN(object):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
         s = labelToString("MATURITY DATE", self._maturityDate)
-        s += labelToString("COUPON", self._coupon)
+        s += labelToString("QUOTED MARGIN", self._quotedMargin)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE", self._face)
-
+        s += labelToString("FACE AMOUNT", self._faceAmount)
         return s
 
 ###############################################################################

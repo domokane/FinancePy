@@ -1,3 +1,4 @@
+from datetime import datetime
 from version import __version__
 import setuptools
 
@@ -21,6 +22,12 @@ with open('financepy//__init__.template', 'r') as file:
 
 # Replace the target string
 filedata = filedata.replace('__version__', "'" + str(__version__) + "'")
+
+now = datetime.now()
+dt_string = now.strftime("%d %b %y at %H:%M")
+
+# Replace the target string
+filedata = filedata.replace('__dateandtime__', dt_string)
 
 # Write the file out again
 with open('./financepy//__init__.py', 'w') as file:

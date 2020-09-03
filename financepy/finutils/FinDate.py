@@ -83,7 +83,7 @@ def calculateList():
     global gStartYear
     global gEndYear
 
-    print("Calculating list between", gStartYear, "and", gEndYear)
+#    print("Calculating list between", gStartYear, "and", gEndYear)
 
     gDateCounterList = []
 
@@ -290,42 +290,6 @@ class FinDate():
 
     ###########################################################################
 
-    # def addDays2(self,
-    #             numDays: int):
-    #     ''' Returns a new date that is numDays after the FinDate. '''
-
-    #     dt = datetime.date(self._y, self._m, self._d)
-    #     dt = dt + datetime.timedelta(days=numDays)
-    #     d = dt.day
-    #     m = dt.month
-    #     y = dt.year
-    #     newDt = FinDate(d, m, y)
-    #     return newDt
-
-    ###########################################################################
-
-    # def addWorkDays2(self,
-    #                  numDays: int):
-    #     ''' Returns a new date that is numDays working days after FinDate. Note
-    #     that only weekends are taken into account. Other Holidays are not. '''
-
-    #     if isinstance(numDays, int) is False:
-    #         raise FinError("Num days must be an integer")
-
-    #     if numDays < 0:
-    #         raise FinError("Num days must be positive.")
-
-    #     nextWorkingDt = FinDate(self._d, self._m, self._y)
-
-    #     while numDays > 0:
-    #         nextWorkingDt = nextWorkingDt.addDays(1)
-    #         if nextWorkingDt.isWeekend() is False:
-    #             numDays = numDays - 1
-
-    #     return nextWorkingDt
-
-    ###########################################################################
-
     def addWorkDays(self,
                     numDays: int):
         ''' Returns a new date that is numDays working days after FinDate. Note
@@ -521,7 +485,9 @@ class FinDate():
 
     def nextIMMDate(self):
         ''' This function returns the next IMM date after the current date
-            This is a 3rd Wednesday of Jun, March, Sep or December '''
+            This is a 3rd Wednesday of Jun, March, Sep or December. For an 
+            IMM contract the IMM date is the First Delivery Date of the
+            futures contract. '''
 
         y = self._y
         m = self._m
@@ -676,7 +642,6 @@ def fromDatetime(dt: FinDate):
     ''' Construct a FinDate from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. '''
 
-#    finDate = FinDate(dt.year, dt.month, dt.day)
     finDate = FinDate(dt.day, dt.month, dt.year)
     return finDate
 

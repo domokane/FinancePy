@@ -159,7 +159,7 @@ def test_FinDateSpeed():
     numSteps = 1000
     start = time.time()
     dateList = []
-    for i in range(0, numSteps):
+    for _ in range(0, numSteps):
         startDate = FinDate(1, 1, 2010)
         dateList.append(startDate)
     end = time.time()

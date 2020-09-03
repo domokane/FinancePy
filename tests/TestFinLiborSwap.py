@@ -40,7 +40,7 @@ def buildLiborCurve(valuationDate):
 
     maturityDate = settlementDate.addMonths(6)
     depo1 = FinLiborDeposit(settlementDate, maturityDate, -0.00251, dcType)
- #   depos.append(depo1)
+    depos.append(depo1)
 
     # Series of 1M futures
     startDate = settlementDate.nextIMMDate()
@@ -104,7 +104,7 @@ def buildLiborCurve(valuationDate):
     fras.append(fra)
 
     fixedFreq = FinFrequencyTypes.ANNUAL
-    dcType = FinDayCountTypes.THIRTY_360
+    dcType = FinDayCountTypes.THIRTY_E_360
 
     maturityDate = settlementDate.addMonths(24)
     swap1 = FinLiborSwap(settlementDate, maturityDate, -
@@ -300,7 +300,7 @@ def test_LiborSwap():
 
     fixedCoupon = 0.015
     fixedFreqType = FinFrequencyTypes.ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_360
+    fixedDayCountType = FinDayCountTypes.THIRTY_E_360
 
     floatSpread = 0.0
     floatFreqType = FinFrequencyTypes.SEMI_ANNUAL

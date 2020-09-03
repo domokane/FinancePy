@@ -196,7 +196,7 @@ def test_FinLiborDepositsFRAsSwaps():
     fras.append(fra)
 
     swaps = []
-    fixedDCCType = FinDayCountTypes.ACT_365_ISDA
+    fixedDCCType = FinDayCountTypes.ACT_365F
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
 
     swapRate = 0.05
@@ -382,7 +382,7 @@ def test_FinLiborDepositsFuturesSwaps():
     startDate = spotDate.addWorkDays(spotDays)
 
     swaps = []
-    fixedDCCType = FinDayCountTypes.THIRTY_360
+    fixedDCCType = FinDayCountTypes.THIRTY_E_360
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     floatFreqType = FinFrequencyTypes.QUARTERLY
     notional = 1000000
@@ -633,7 +633,7 @@ def test_bloombergPricingExample():
     fras[4] = futs[4].toFRA(97.1450, -0.00411)
     fras[5] = futs[5].toFRA(97.0750, -0.00589)
 
-    accrual = FinDayCountTypes.THIRTY_360
+    accrual = FinDayCountTypes.THIRTY_E_360
     freq = FinFrequencyTypes.SEMI_ANNUAL
 
     spotDays = 2

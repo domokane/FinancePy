@@ -269,10 +269,12 @@ class FinBondConvertible(object):
                  putDates: List[FinDate],  # list of put dates
                  putPrices: List[float],  # list of put prices
                  accrualType: FinDayCountTypes,  # day count type for accrued
-                 face: float = 100.0  # face amount
-                 ):
-        ''' Create FinBond object by providing Maturity Date, Frequency,
-        coupon and the accrual convention type. '''
+                 faceAmount: float = 100.0):  # face amount
+        ''' Create FinBondConvertible object by providing the bond Maturity
+        date, coupon, frequency type, accrual convention type and then all of
+        the details regarding the conversion option including the list of the
+        call and put dates and the corresponding list of call and put prices. 
+        '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -311,14 +313,18 @@ class FinBondConvertible(object):
             raise FinError("Conversion ratio is negative.")
 
         self._conversionRatio = conversionRatio
+        self._faceAmount = faceAmount
 
-        self._face = face
         self._settlementDate = FinDate(1, 1, 1900)
         ''' I do not determine cashflow dates as I do not want to require
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. '''
 
-##########################################################################
+        self._accruedInterest = None
+        self._accruedDays = 0.0
+        self._alpha = 0.0
+       
+###############################################################################
 
     def _calculateFlowDates(self,
                             settlementDate: FinDate):
@@ -342,9 +348,9 @@ class FinBondConvertible(object):
 
         self._pcd = self._flowDates[0]
         self._ncd = self._flowDates[1]
-        self._accruedInterest(settlementDate)
+        self.calcAccruedInterest(settlementDate)
 
-##########################################################################
+###############################################################################
 
     def value(self,
               settlementDate: FinDate,
@@ -470,7 +476,7 @@ class FinBondConvertible(object):
             raise FinError("Coupon times not monotonic")
 
         v1 = _valueConvertible(tmat,
-                               self._face,
+                               self._faceAmount,
                                couponTimes,
                                couponFlows,
                                callTimes,
@@ -492,7 +498,7 @@ class FinBondConvertible(object):
                                numStepsPerYear)
 
         v2 = _valueConvertible(tmat,
-                               self._face,
+                               self._faceAmount,
                                couponTimes,
                                couponFlows,
                                callTimes,
@@ -524,7 +530,7 @@ class FinBondConvertible(object):
 
         return results
 
-##########################################################################
+###############################################################################
 
     def accruedDays(self, 
                     settlementDate: FinDate):
@@ -536,40 +542,40 @@ class FinBondConvertible(object):
 
         return settlementDate - self._pcd
 
-##########################################################################
+###############################################################################
 
-    def _accruedInterest(self,
-                         settlementDate: FinDate):
+    def calcAccruedInterest(self,
+                            settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
-        self._calculateFlowDates(settlementDate)
+        if settlementDate != self._settlementDate:
+            self._calculateFlowDates(settlementDate)
 
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         dc = FinDayCount(self._accrualType)
 
-        if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
-            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)[0]
-            alpha = 1.0 - accFactor
-            accFactor = accFactor/self._frequency
-        else:
-            accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
-            alpha = 1.0 - accFactor
+        (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                          settlementDate,
+                                          self._ncd, 
+                                          self._frequency)
 
-        self._accrued = accFactor * self._face * self._coupon
-        self._alpha = alpha
-        self._accruedDays = settlementDate - self._pcd
+        self._alpha = 1.0 - accFactor * self._frequency
 
-##########################################################################
+        self._accrued = accFactor * self._faceAmount * self._coupon
+        self._accruedDays = num
+        return self._accruedInterest
+
+###############################################################################
 
     def currentYield(self,
                      cleanPrice: float):
         ''' Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)'''
 
-        y = self._coupon * self._face / cleanPrice
+        y = self._coupon * self._faceAmount / cleanPrice
         return y
 
 ###############################################################################
@@ -581,7 +587,7 @@ class FinBondConvertible(object):
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE AMOUNT", self._face)
+        s += labelToString("FACE AMOUNT", self._faceAmount)
         s += labelToString("CONVERSION RATIO", self._conversionRatio)
         s += labelToString("START CONVERT DATE", self._startConvertDate)
         s += labelToString("CALL", "DATES")

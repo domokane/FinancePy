@@ -49,7 +49,7 @@ class FinLiborLMMProducts():
                  settlementDate: FinDate,
                  maturityDate: FinDate,
                  floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
@@ -272,7 +272,7 @@ class FinLiborLMMProducts():
                       fixedDayCountType: FinDayCountTypes,
                       notional: float = ONE_MILLION,
                       floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                      floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                      floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                       calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                       busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                       dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
@@ -339,7 +339,7 @@ class FinLiborLMMProducts():
         if b == 0:
             raise FinError("Swaption swap maturity date is today.")
 
-        numPaths = 1000
+#        numPaths = 1000
 #        v = LMMSwaptionPricer(fixedCoupon, a, b, numPaths,
 #                              fwd0, fwds, taus, isPayer)
         v = 0.0

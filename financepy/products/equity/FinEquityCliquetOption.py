@@ -43,7 +43,7 @@ class FinEquityCliquetOption(FinEquityOption):
                  finalExpiryDate: FinDate,
                  optionType: FinOptionTypes,
                  frequencyType: FinFrequencyTypes,
-                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):

@@ -1,10 +1,10 @@
 cr = "\n"
 
 s = "###################################################################" + cr
-s += "#   WELCOME TO FINANCEPY BETA VERSION " + str(__version__) + " UNDER DEVELOPMENT     #" + cr
-s += "# FinancePy it is distributed FREE & WITHOUT ANY WARRANTY AND     #" + cr
-s += "# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For more   #" + cr
-s += "# details see the repo at https://github.com/domokane/FinancePy   #" + cr
+s += "# FINANCEPY BETA Version " + str(__version__) + " - This build on __dateandtime__ #" + cr
+s += "#   This library is distributed FREE & WITHOUT ANY WARRANTY and   #" + cr
+s += "#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       #" + cr
+s += "# For details see Github at https://github.com/domokane/FinancePy #" + cr
 s += "###################################################################"
 s += cr
 

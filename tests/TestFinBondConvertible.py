@@ -28,7 +28,7 @@ def test_FinBondConvertible():
     conversionRatio = 38.4615  # adjust for face
     coupon = 0.0575
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualBasis = FinDayCountTypes.ACT_365_FIXED
+    accrualBasis = FinDayCountTypes.ACT_365F
     face = 1000.0
 
     callPrice = 1100

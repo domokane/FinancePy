@@ -51,7 +51,7 @@ class FinLiborSwaption():
                  fixedDayCountType: FinDayCountTypes,
                  notional: float = ONE_MILLION,
                  floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):

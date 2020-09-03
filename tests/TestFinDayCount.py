@@ -24,15 +24,15 @@ def test_FinDayCount():
         numDays = 20
         dayCount = FinDayCount(dayCountMethod)
 
-        for i in range(0, numDays):
+        for _ in range(0, numDays):
             nextDate = nextDate.addDays(7)
-            alpha = dayCount.yearFrac(startDate, nextDate, nextDate)
+            dcf = dayCount.yearFrac(startDate, nextDate, nextDate, 1)
 
             testCases.print(
                 str(dayCountMethod),
                 str(startDate),
                 str(nextDate),
-                alpha)
+                dcf[0])
 
 
 test_FinDayCount()

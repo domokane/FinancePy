@@ -33,7 +33,7 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     swapFixedCoupon = 0.060
     swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.ACT_365_ISDA
+    swapFixedDayCountType = FinDayCountTypes.ACT_365F
 
     liborCurve = FinDiscountCurveFlat(valuationDate,
                                       0.06,

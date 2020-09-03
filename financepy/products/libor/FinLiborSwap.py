@@ -7,7 +7,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
+from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
@@ -19,14 +19,14 @@ class FinLiborSwap(object):
 
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
-                 maturityDateOrTenor: (FinDate, str),  # Date of last coupon
+                 terminationDateOrTenor: (FinDate, str),  # Date contract ends
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
                  notional: float = 100.0,
                  floatSpread: float = 0.0,
                  floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_360,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  payFixedFlag: bool = True,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -36,28 +36,25 @@ class FinLiborSwap(object):
         count convention and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
-        on which interest starts to accrue.'''
+        on which interest starts to accrue. The end of the contract is the
+        termination date. This is not adjusted for business days. The adjusted
+        termination date is called the maturity date. This is calculated. '''
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(maturityDateOrTenor) == FinDate:
-            maturityDate = maturityDateOrTenor
+        if type(terminationDateOrTenor) == FinDate:
+            self._terminationDate = terminationDateOrTenor
         else:
-            # we do not holiday adjust this here. This will be done to the
-            # coupons inside the schedule generator. The reason not to adjust
-            # it is that if we did, all of the swaps would end up with non-
-            # overlapping coupon dates which is not what we want for boot-
-            # strapping and also is not how the market works !
-            maturityDate = startDate.addTenor(maturityDateOrTenor)
+            self._terminationDate = startDate.addTenor(terminationDateOrTenor)
 
-#            calendar = FinCalendar(calendarType)
-#            maturityDate = calendar.adjust(maturityDate, busDayAdjustType)
+        calendar = FinCalendar(calendarType)
+        self._maturityDate = calendar.adjust(self._terminationDate,
+                                             busDayAdjustType)
 
-        if startDate > maturityDate:
+        if startDate > self._maturityDate:
             raise FinError("Start date after maturity date")
 
         self._startDate = startDate
-        self._maturityDate = maturityDate
         self._notional = notional
 
         self._fixedCoupon = fixedCoupon
@@ -143,7 +140,7 @@ class FinLiborSwap(object):
         the start date of the swap which may precede the valuation date'''
         self._adjustedFixedDates = FinSchedule(
             self._startDate,
-            self._maturityDate,
+            self._terminationDate,
             self._fixedFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
@@ -156,7 +153,7 @@ class FinLiborSwap(object):
         the start date of the swap which may precede the valuation date'''
         self._adjustedFloatDates = FinSchedule(
             self._startDate,
-            self._maturityDate,
+            self._terminationDate,
             self._floatFrequencyType,
             self._calendarType,
             self._busDayAdjustType,
@@ -485,8 +482,6 @@ class FinLiborSwap(object):
         print("FIXED LEG FREQUENCY:", str(self._fixedFrequencyType))
         print("FIXED LEG DAY COUNT:", str(self._fixedDayCountType))
 
-        print(self._fixedFlows)
-
         if len(self._fixedFlows) == 0:
             print("Fixed Flows not calculated.")
             return
@@ -560,6 +555,7 @@ class FinLiborSwap(object):
 
     def __repr__(self):
         s = labelToString("START DATE", self._startDate)
+        s += labelToString("TERMINATION DATE", self._terminationDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("PAY FIXED FLAG", self._payFixedFlag)

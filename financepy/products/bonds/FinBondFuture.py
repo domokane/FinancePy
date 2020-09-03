@@ -27,7 +27,7 @@ class FinBondFuture(object):
         checkArgumentTypes(self.__init__, locals())
 
         self._tickerName = tickerName
-        self._firstDeliveryDate = firstDeliveryDate
+        self._firstDeliveryDate = firstDeliveryDate  # This is the IMM date
         self._lastDeliveryDate = lastDeliveryDate
         self._contractSize = contractSize
         self._coupon = coupon

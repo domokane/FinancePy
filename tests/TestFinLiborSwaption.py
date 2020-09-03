@@ -53,7 +53,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     fras = []
 
     swaps = []
-    fixedBasis = FinDayCountTypes.ACT_365_ISDA
+    fixedBasis = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
 
     swapRate = 0.05
@@ -85,7 +85,7 @@ def testFinLiborSwaptionModels():
     swapMaturityDate = FinDate(2017, 1, 1)
 
     swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.ACT_365_ISDA
+    swapFixedDayCountType = FinDayCountTypes.ACT_365F
 
     strikes = np.linspace(0.02, 0.08, 10)
 
@@ -162,7 +162,7 @@ def test_FinLiborSwaptionQLExample():
     # No convexity correction provided so I omit interest rate futures
 
     swaps = []
-    accType = FinDayCountTypes.ACT_365_ISDA
+    accType = FinDayCountTypes.ACT_365F
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
 
     swap = FinLiborSwap(settlementDate, "3Y", 0.00790, fixedFreqType, accType)
@@ -262,7 +262,7 @@ def testFinLiborCashSettledSwaption():
     settlementDate = FinDate(2, 1, 2020)
 
     swaps = []
-    accType = FinDayCountTypes.ACT_365_ISDA
+    accType = FinDayCountTypes.ACT_365F
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
 
     swap = FinLiborSwap(settlementDate, "3Y", 0.00790, fixedFreqType, accType)

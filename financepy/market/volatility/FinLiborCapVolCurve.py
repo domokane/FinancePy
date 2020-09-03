@@ -56,6 +56,7 @@ class FinLiborCapVolCurve():
             raise FinError("Curve date cap floor volatility must equal zero")
 
         self._capSigmas = np.array(capSigmas)
+        self._capletGammas = []
 
         # Basic validation of dates
         prevDt = self._curveDate
@@ -187,7 +188,7 @@ class FinLiborCapVolCurve():
         for i in range(0, numTimes):
             t = self._times[i]
             tau = self._taus[i]
-            volCap = self._capVols[i]
+            volCap = self._capSigmas[i]
             fwdLiborVol = self._capletVols[i]
             s += labelToString("%7.4f  %6.4f  %9.4f  %9.4f"
                                % (t, tau, volCap*100.0, fwdLiborVol*100.0))

@@ -61,7 +61,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     fras = []
 
     swaps = []
-    fixedBasis = FinDayCountTypes.ACT_365_ISDA
+    fixedBasis = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
 
     swapRate = 0.05
@@ -179,7 +179,7 @@ def test_FinLiborCapFloorVolCurve():
     todayDate = FinDate(20, 6, 2019)
     valuationDate = todayDate
     maturityDate = valuationDate.addTenor("3Y")
-    dayCountType = FinDayCountTypes.THIRTY_360
+    dayCountType = FinDayCountTypes.THIRTY_E_360
     frequency = FinFrequencyTypes.ANNUAL
 
     k = 0.04
@@ -264,7 +264,7 @@ def test_FinLiborCapletHull():
     liborCurve = FinDiscountCurveFlat(valuationDate,
                                       0.070,
                                       FinFrequencyTypes.QUARTERLY,
-                                      FinDayCountTypes.THIRTY_360)
+                                      FinDayCountTypes.THIRTY_E_360)
 
     k = 0.08
     capFloorType = FinLiborCapFloorTypes.CAP
@@ -274,7 +274,7 @@ def test_FinLiborCapletHull():
                                 k,
                                 None,
                                 FinFrequencyTypes.QUARTERLY,
-                                FinDayCountTypes.THIRTY_360)
+                                FinDayCountTypes.THIRTY_E_360)
 
     # Value cap using a single flat cap volatility
     model = FinModelBlack(0.20)

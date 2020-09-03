@@ -233,7 +233,7 @@ class FinCDSIndexOption(object):
             rtb = x2
             dx = x1 - x2
 
-        for j in range(0, jmax):
+        for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
             fmid = self._calcObjFunc(xmid, valuationDate, sigma, indexCoupon,
@@ -312,7 +312,7 @@ class FinCDSIndexOption(object):
 
         s0 = exp(-0.5 * sigma * sigma * texp)
 
-        for iStep in range(0, numZSteps):
+        for _ in range(0, numZSteps):
             s = x * s0 * exp(sigma * sqrt(texp) * z)
             pdf = exp(-(z**2) / 2.0)
             z = z + dz

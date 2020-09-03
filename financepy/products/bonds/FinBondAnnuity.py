@@ -115,7 +115,7 @@ class FinBondAnnuity(object):
 
         self._pcd = self._flowDates[0]
         self._ncd = self._flowDates[1]
-        self._calcAccruedInterest(settlementDate)
+        self.calcAccruedInterest(settlementDate)
 
         self._flowAmounts = [0.0]
         basis = FinDayCount(self._dayCountConventionType)
@@ -130,8 +130,8 @@ class FinBondAnnuity(object):
 
 ###############################################################################
 
-    def _calcAccruedInterest(self,
-                             settlementDate: FinDate):
+    def calcAccruedInterest(self,
+                            settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
@@ -143,18 +143,15 @@ class FinBondAnnuity(object):
 
         dc = FinDayCount(self._dayCountConventionType)
 
-        if self._dayCountConventionType == FinDayCountTypes.ACT_ACT_ICMA:
-            accFactor = dc.yearFrac(self._pcd, settlementDate, self._ncd)[0]
-            alpha = 1.0 - accFactor
-            accFactor = accFactor/self._frequency
-        else:
-            accFactor = dc.yearFrac(self._pcd, settlementDate)[0]
-            alpha = 1.0 - accFactor
+        (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                          settlementDate,
+                                          self._ncd, 
+                                          self._frequency)
+
+        self._alpha = 1.0 - accFactor * self._frequency
 
         self._accruedInterest = accFactor * self._face * self._coupon
-        self._alpha = alpha
-        self._accruedDays = settlementDate - self._pcd
-
+        self._accruedDays = num
         return self._accruedInterest
 
 ###############################################################################
@@ -181,8 +178,8 @@ class FinBondAnnuity(object):
         s = labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("CALENDAR", self._calendarType)
-        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
-        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("BUS_DAY_RULE", self._busDayAdjustType)
+        s += labelToString("DATE_GEN_RULE", self._dateGenRuleType)
 
         return s
 

@@ -71,7 +71,7 @@ def buildLiborCurve(valueDate):
     depos.append(depo5)
 
     fras = []
-    fixedDCCType = FinDayCountTypes.ACT_365_ISDA
+    fixedDCCType = FinDayCountTypes.ACT_365F
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
 
     swaps = []
@@ -195,7 +195,7 @@ def test_FinBondFRN():
     maturityDate = FinDate(10, 11, 2021)
     quotedMargin = 0.0025
     freqType = FinFrequencyTypes.QUARTERLY
-    accrualType = FinDayCountTypes.THIRTY_360
+    accrualType = FinDayCountTypes.THIRTY_E_360
     face = 1000000
 
     bond = FinBondFRN(maturityDate,
@@ -303,7 +303,7 @@ def test_FinBondFRN():
     maturityDate = FinDate(3, 2, 2021)
     quotedMargin = 0.0020
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.THIRTY_360
+    accrualType = FinDayCountTypes.THIRTY_E_360
     face = 1000000.0
 
     bond = FinBondFRN(maturityDate,

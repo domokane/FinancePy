@@ -44,7 +44,7 @@ class FinLiborBermudanSwaption(object):
                  fixedDayCountType: FinDayCountTypes,
                  notional=ONE_MILLION,
                  floatFrequencyType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_360,
+                 floatDayCountType=FinDayCountTypes.THIRTY_E_360,
                  calendarType=FinCalendarTypes.WEEKEND,
                  busDayAdjustType=FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType=FinDateGenRuleTypes.BACKWARD):

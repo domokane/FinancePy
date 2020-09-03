@@ -111,7 +111,7 @@ class FinBond(object):
         self._accruedDays = 0.0
         self._alpha = 0.0
 
-##########################################################################
+###############################################################################
 
     def _calculateFlowDates(self,
                             settlementDate: FinDate):
@@ -405,19 +405,12 @@ class FinBond(object):
 
         dc = FinDayCount(self._accrualType)
 
-        if self._accrualType == FinDayCountTypes.ACT_ACT_ICMA:
-            (accFactor, num, _) = dc.yearFrac(self._pcd,
-                                                settlementDate,
-                                                self._ncd)
-            self._alpha = 1.0 - accFactor
-            accFactor = accFactor / self._frequency
-        else:
-            (accFactor, num, _) = dc.yearFrac(self._pcd,
-                                                settlementDate)
+        (accFactor, num, _) = dc.yearFrac(self._pcd,
+                                          settlementDate,
+                                          self._ncd, 
+                                          self._frequency)
 
-            # need to adjust as accFactor is fraction over whole year, not
-            # just the first coupon period which could be 3M or 6M long
-            self._alpha = 1.0 - accFactor * self._frequency
+        self._alpha = 1.0 - accFactor * self._frequency
 
         self._accruedInterest = accFactor * self._faceAmount * self._coupon
         self._accruedDays = num
