@@ -418,16 +418,21 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
     Hull does in his equation 32.14.
 
     The Number of Forwards is the number of points on the initial curve to the
-    trade maturity date. For example a cap that matures in 10 years with
-    quarterly caplets has 40 forwards. '''
+    trade maturity date.
+
+    But be careful: a cap that matures in 10 years with quarterly caplets has
+    40 forwards BUT the last forward to reset occurs at 9.75 years. You should
+    not simulate beyond this time. If you give the model 10 years as in the
+    Hull examples, you need to simulate 41 (or in this case 11) forwards as the
+    final cap or ratchet has its reset in 10 years. '''
 
     if len(gammas) != numForwards:
         raise FinError("Gamma vector does not have right number of forwards")
 
-    if len(fwd0) != numForwards - 1:
+    if len(fwd0) != numForwards:
         raise FinError("The length of fwd0 is not equal to numForwards")
 
-    if len(taus) != numForwards - 1:
+    if len(taus) != numForwards:
         raise FinError("The length of Taus is not equal to numForwards")
 
     np.random.seed(seed)
@@ -436,12 +441,6 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
     halfNumPaths = int(numPaths/2)
     fwd = np.empty((numPaths, numForwards, numForwards))
     fwdB = np.zeros(numForwards)
-
-    # Set up initial term structure
-    # df0 = np.zeros(numForwards)
-    # df0[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    # for ix in range(1, numForwards):
-    #     df0[ix] = df0[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     numTimes = numForwards
 
@@ -529,12 +528,6 @@ def LMMSimulateFwdsMF(numForwards, numFactors, numPaths, numeraireIndex, fwd0,
     halfNumPaths = int(numPaths/2)
     fwd = np.empty((numPaths, numForwards, numForwards))
     fwdB = np.zeros(numForwards)
-    discFwd = np.zeros(numForwards)
-
-    # Set up initial term structure
-    discFwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, numForwards):
-        discFwd[ix] = discFwd[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     numTimes = numForwards
 
@@ -637,12 +630,6 @@ def LMMCapFlrPricer(numForwards, numPaths, K, fwd0, fwds, taus, isCap):
     capFlrLets = np.zeros(numForwards-1)
     capFlrLetValues = np.zeros(numForwards-1)
     numeraire = np.zeros(numForwards)
-
-    # Set up initial term structure of discount factors - the first discount
-    # factor is the price of $1 paid at the end of the first caplet
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, numForwards):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for iPath in range(0, numPaths):
 
