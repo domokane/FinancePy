@@ -49,7 +49,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
 ###############################################################################
 
 
-def getVolCurve(numFwds, dt, flatVol=None):
+""" def getVolCurve(numFwds, dt, flatVol=None):
 
     valuationDate = FinDate(1, 1, 2020)
 
@@ -59,7 +59,7 @@ def getVolCurve(numFwds, dt, flatVol=None):
     capletDt = valuationDate
 
     capVolDates.append(valuationDate)
-    for i in range(0, numPeriods):
+    for _ in range(0, numPeriods):
         capletDt = capletDt.addTenor(capletVolTenor)
         capVolDates.append(capletDt)
 
@@ -85,7 +85,7 @@ def getVolCurve(numFwds, dt, flatVol=None):
         zetas[ix] = volCurve.capFloorletVol(t)
 
     print(zetas)
-    return zetas
+    return zetas """
 
 ###############################################################################
 
@@ -426,7 +426,7 @@ def test_HullBookExamples():
 ###############################################################################
 
 
-def test_Swap():
+""" def test_Swap():
 
     numFwds = 40
     numPaths = 10000
@@ -441,7 +441,6 @@ def test_Swap():
     zetas = getVolCurve(numFwds, dt, fwdRateVol)
     correl = getCorrelationMatrix(numFwds, 100.0)
 
-    K = r
     fwds = LMMSimulateFwdsNF(numFwds, numPaths, fwd0, zetas, correl, taus, seed)
 
     start = time.time()
@@ -451,7 +450,7 @@ def test_Swap():
     end = time.time()
     print("PRICER Period:", end - start)
 
-    print(swap)
+    print(swap) """
 
 ###############################################################################
 
