@@ -424,18 +424,24 @@ def LMMSimulateFwds1F(numForwards, numPaths, numeraireIndex, fwd0, gammas,
     if len(gammas) != numForwards:
         raise FinError("Gamma vector does not have right number of forwards")
 
+    if len(fwd0) != numForwards - 1:
+        raise FinError("The length of fwd0 is not equal to numForwards")
+
+    if len(taus) != numForwards - 1:
+        raise FinError("The length of Taus is not equal to numForwards")
+
     np.random.seed(seed)
     # Even number of paths for antithetics
     numPaths = 2 * int(numPaths/2)
     halfNumPaths = int(numPaths/2)
     fwd = np.empty((numPaths, numForwards, numForwards))
     fwdB = np.zeros(numForwards)
-    discFwd = np.zeros(numForwards)
 
     # Set up initial term structure
-    discFwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, numForwards):
-        discFwd[ix] = discFwd[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+    # df0 = np.zeros(numForwards)
+    # df0[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    # for ix in range(1, numForwards):
+    #     df0[ix] = df0[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     numTimes = numForwards
 

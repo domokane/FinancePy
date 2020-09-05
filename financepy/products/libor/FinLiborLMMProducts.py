@@ -115,26 +115,29 @@ class FinLiborLMMProducts():
         if discountCurve._valuationDate != self._startDate:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
-        gammas = np.zeros(len(self._gridTimes))
-        for ix in range(1, len(self._gridTimes)):
-            dt = self._gridDates[ix]
-            gammas[ix] = volCurve.capletVol(dt)
-
         self._numPaths = numPaths
         self._numeraireIndex = numeraireIndex
         self._useSobol = useSobol
 
-        self._numForwards = len(self._gridDates)
-        forwardCurve = []
+        numGridPoints = len(self._gridDates)
 
-        for i in range(1, self._numForwards):
+        self._numForwards = numGridPoints
+        self._forwardCurve = []
+
+        for i in range(1, numGridPoints):
             startDate = self._gridDates[i-1]
             endDate = self._gridDates[i]
-            fwdRate = discountCurve.fwdRate(startDate, endDate,
+            fwdRate = discountCurve.fwdRate(startDate,
+                                            endDate,
                                             self._floatDayCountType)
-            forwardCurve.append(fwdRate)
+            self._forwardCurve.append(fwdRate)
 
-        self._forwardCurve = np.array(forwardCurve)
+        self._forwardCurve = np.array(self._forwardCurve)
+
+        gammas = np.zeros(numGridPoints)
+        for ix in range(1, numGridPoints):
+            dt = self._gridDates[ix]
+            gammas[ix] = volCurve.capletVol(dt)
 
         self._fwds = LMMSimulateFwds1F(self._numForwards,
                                        numPaths,
@@ -193,6 +196,8 @@ class FinLiborLMMProducts():
                                             self._floatDayCountType)
             self._forwardCurve.append(fwdRate)
 
+        self._forwardCurve = np.array(self._forwardCurve)
+
         self._fwds = LMMSimulateFwdsMF(self._numForwards,
                                        numFactors,
                                        numPaths,
@@ -236,18 +241,23 @@ class FinLiborLMMProducts():
         self._numeraireIndex = numeraireIndex
         self._useSobol = useSobol
 
-        self._numForwards = len(self._gridDates) - 1
+        numGridPoints = len(self._gridTimes)
+
+        self._numForwards = numGridPoints - 1
         self._forwardCurve = []
 
-        for i in range(1, self._numForwards):
+        for i in range(1, numGridPoints):
             startDate = self._gridDates[i-1]
             endDate = self._gridDates[i]
-            fwdRate = discountCurve.forwardRate(startDate, endDate,
+            fwdRate = discountCurve.forwardRate(startDate,
+                                                endDate,
                                                 self._floatDayCountType)
             self._forwardCurve.append(fwdRate)
 
-        zetas = np.zeros(len(self._gridTimes))
-        for ix in range(1, len(self._gridTimes)):
+        self._forwardCurve = np.array(self._forwardCurve)
+
+        zetas = np.zeros(numGridPoints)
+        for ix in range(1, numGridPoints):
             dt = self._gridDates[ix]
             zetas[ix] = volCurve.capletVol(dt)
 
@@ -376,7 +386,7 @@ class FinLiborLMMProducts():
             if foundDt is False:
                 raise FinError("CapFloor date not on grid.")
 
-        numPeriods = len(capFloorDates)
+        numFowards = len(capFloorDates)
         numPaths = self._numPaths
         K = capFloorRate
         isCap = 0
@@ -387,7 +397,7 @@ class FinLiborLMMProducts():
         fwds = self._fwds
         taus = self._accrualFactors
 
-        v = LMMCapFlrPricer(numPeriods, numPaths, K, fwd0, fwds, taus, isCap)
+        v = LMMCapFlrPricer(numFowards, numPaths, K, fwd0, fwds, taus, isCap)
 
         # Sum the cap/floorlets to get cap/floor value
         v_capFloor = 0.0
