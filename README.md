@@ -49,7 +49,7 @@ The underlying Python library is split into a number of major modules:
 
 Any product valuation is the result of the following data design:
 
-**VALUATION = PRODUCT + MODEL + MARKET**
+**VALUATION** = **PRODUCT** + **MODEL** + **MARKET**
 
 The interface to each product has a value() function that will take a model and market to produce a price.
 
