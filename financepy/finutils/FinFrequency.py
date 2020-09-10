@@ -5,7 +5,6 @@
 from enum import Enum
 from ..finutils.FinError import FinError
 from ..finutils.FinDate import FinDate
-from ..finutils.FinDayCount import FinDayCountTypes
 from ..finutils.FinGlobalVariables import gSmall
 
 import numpy as np
@@ -45,41 +44,5 @@ def FinFrequency(frequencyType):
     else:
         print("Frequency type", frequencyType)
         raise FinError("Unknown frequency type")
-
-###############################################################################
-
-
-
-
-###############################################################################
-
-
-# def dfToZero(df: float,
-#              t: float,
-#              frequencyType: FinFrequencyTypes):
-#     ''' Convert a discount factor to a zero rate with a specific compounding
-#     frequency which may be continuous, simple, or compounded at a specific
-#     frequency which are all choices of FinFrequencyTypes. '''
-
-#     if isinstance(t, np.ndarray):
-#         t = np.maximum(t, 1e-6)
-#     else:
-#         t = max(t, 1e-6)
-
-#     f = FinFrequency(frequencyType)
-
-#     if frequencyType == FinFrequencyTypes.CONTINUOUS:
-#         r = -np.log(df)/t
-#     elif frequencyType == FinFrequencyTypes.SIMPLE:
-#         r = (1.0/df - 1.0)/t
-#     elif frequencyType == FinFrequencyTypes.ANNUAL or \
-#         frequencyType == FinFrequencyTypes.SEMI_ANNUAL or \
-#             frequencyType == FinFrequencyTypes.QUARTERLY:
-#         r = (np.power(df, -1.0/(t * f))-1.0) * f
-#     else:
-#         raise FinError("Unknown Frequency type")
-
-#     print("dfToZero:", t, f, df, r)
-#     return r
 
 ###############################################################################

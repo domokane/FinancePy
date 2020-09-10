@@ -220,11 +220,11 @@ def test_FinBondFRN():
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
-                                                 dm)
+    fullPrice = bond.fullPriceFromDM(settlementDate,
+                                     resetLibor,
+                                     currentLibor,
+                                     futureLibors,
+                                     dm)
 
     testCases.print("Full Price = ", fullPrice)
 
@@ -269,11 +269,11 @@ def test_FinBondFRN():
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
-    convexity = bond.convexityFromDiscountMargin(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
-                                                 dm)
+    convexity = bond.convexityFromDM(settlementDate,
+                                     resetLibor,
+                                     currentLibor,
+                                     futureLibors,
+                                     dm)
 
     testCases.print("Convexity = ", convexity)
 
@@ -303,7 +303,7 @@ def test_FinBondFRN():
     maturityDate = FinDate(3, 2, 2021)
     quotedMargin = 0.0020
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.THIRTY_E_360
+    accrualType = FinDayCountTypes.THIRTY_E_360_ISDA
     face = 1000000.0
 
     bond = FinBondFRN(maturityDate,
@@ -326,11 +326,11 @@ def test_FinBondFRN():
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    fullPrice = bond.fullPriceFromDiscountMargin(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
-                                                 dm)
+    fullPrice = bond.fullPriceFromDM(settlementDate,
+                                     resetLibor,
+                                     currentLibor,
+                                     futureLibors,
+                                     dm)
 
     testCases.print("Full Price = ", fullPrice)
 
@@ -375,11 +375,11 @@ def test_FinBondFRN():
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
-    convexity = bond.convexityFromDiscountMargin(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
-                                                 dm)
+    convexity = bond.convexityFromDM(settlementDate,
+                                     resetLibor,
+                                     currentLibor,
+                                     futureLibors,
+                                     dm)
 
     testCases.print("Convexity = ", convexity)
 

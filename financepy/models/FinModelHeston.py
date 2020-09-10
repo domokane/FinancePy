@@ -40,20 +40,8 @@ class FinHestonNumericalScheme(Enum):
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
                     float64, float64, float64, float64, int64, int64, int64),
                     fastmath=True)
-def getPaths(
-        s0,
-        r,
-        q,
-        v0,
-        kappa,
-        theta,
-        sigma,
-        rho,
-        t,
-        dt,
-        numPaths,
-        seed,
-        scheme):
+def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
+             seed, scheme):
 
     np.random.seed(seed)
     numSteps = int(t / dt)
@@ -303,9 +291,9 @@ class FinModelHeston():
         F = S0 * exp((r - q) * tau)
         K = option._strikePrice
         X = log(F / K)
-        I = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
-        v = S0 * exp(-q * tau) - K * exp(-r * tau) * I
-        return(v)
+        integral = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
+        v = S0 * exp(-q * tau) - K * exp(-r * tau) * integral
+        return (v)
 
 ##########################################################################
 # Taken from Nick Weber's VBA Finance book
@@ -352,10 +340,10 @@ class FinModelHeston():
             exp(-r * tau) * K * F(-1.0, kappa)
         return(v)
 
-##########################################################################
+###############################################################################
 # Gatheral book page 19 with definition of x given on page 16 and noting
 # that the value C is a forward value and so needs to be discounted
-##########################################################################
+###############################################################################
 
     def value_Gatheral(self,
                        valueDate,
@@ -402,4 +390,4 @@ class FinModelHeston():
         v = S0 * exp(-q * tau) * F(1) - K * exp(-r * tau) * F(0)
         return(v)
 
-##########################################################################
+###############################################################################

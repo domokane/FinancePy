@@ -1,4 +1,4 @@
-This is a collection of modules used across a wide range of FinancePy functions. Examples include date generation, special mathematical functions and useful helper functions for performing some repeated action.
+# This is a collection of modules used across a wide range of FinancePy functions. Examples include date generation, special mathematical functions and useful helper functions for performing some repeated action
 
 * FinDate is a class for handling dates in a financial setting. Special functions are included for computing IMM dates and CDS dates and moving dates forward by tenors.
 * FinCalendar is a class for determining which dates are not business dates in a specific region or country.
@@ -13,3 +13,23 @@ This is a collection of modules used across a wide range of FinancePy functions.
 * FinSchedule generates a sequence of cashflow payment dates in accordance with financial market standards
 * FinStatistics calculates a number of statistical variables such as mean, standard deviation and variance
 * FinTestCases is the code that underlies the test case framework used across FinancePy
+
+## FinDayCount
+
+The year fraction function can take up to 3 dates, D1, D2 and D3 and a frequency in specific cases. The current day count methods are listed below.
+
+* THIRTY_360_BOND - 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA 2000)
+* THIRTY_E_360 - ISDA 2006 4.16(g) 30/360 ISMA, ICMA
+* THIRTY_E_360_ISDA - ISDA 2006 4.16(h)
+* THIRTY_E_PLUS_360 - A month has 30 days. It rolls D2 to next month if D2 = 31
+* ACT_ACT_ISDA - Splits accrued period into leap and non-leap year portions.
+* ACT_ACT_ICMA - Used for US Treasury notes and bonds. Takes 3 dates and a frequency.
+* ACT_365_F - Denominator is always Fixed at 365, even in a leap year
+* ACT_360 - Day difference divided by 360 - always
+* ACT_365L - the 29 Feb is counted if it is in the date range
+
+Some references:
+
+* <https://www.eclipsesoftware.biz/DayCountConventions.html>
+* <https://en.wikipedia.org/wiki/Day_count_convention>
+* <http://data.cbonds.info/files/cbondscalc/Calculator.pdf>

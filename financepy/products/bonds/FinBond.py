@@ -27,7 +27,6 @@ from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from typing import List
 from scipy import optimize
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
@@ -289,15 +288,15 @@ class FinBond(object):
 
 ###############################################################################
 
-    def cleanValueFromDiscountCurve(self,
+    def cleanPriceFromDiscountCurve(self,
                                     settlementDate: FinDate,
                                     discountCurve: FinDiscountCurve):
         ''' Calculate the clean bond value using some discount curve to
         present-value the bond's cashflows back to the curve anchor date and
         not to the settlement date. '''
 
-        fullPrice = self.valueBondUsingDiscountCurve(settlementDate,
-                                                     discountCurve)
+        fullPrice = self.fullPriceFromDiscountCurve(settlementDate,
+                                                    discountCurve)
 
         accrued = self._accruedInterest * self._par / self._faceAmount
         cleanPrice = fullPrice - accrued
@@ -305,10 +304,9 @@ class FinBond(object):
 
 ##############################################################################
 
-    def valueBondUsingDiscountCurve(self,
-                                    settlementDate: FinDate,
-                                    discountCurve: FinDiscountCurve,
-                                    verbose=False):
+    def fullPriceFromDiscountCurve(self,
+                                   settlementDate: FinDate,
+                                   discountCurve: FinDiscountCurve):
         ''' Calculate the bond *value* using some discount curve to PV the
         bond's cashflows to the curve anchor date. The anchor of the discount
         curve should be on the valuation date and so be 0-3 days before the
@@ -327,14 +325,7 @@ class FinBond(object):
             flow = self._coupon / self._frequency
             pv = pv + flow * df
 
-            if verbose is True:
-                print(dt, flow, df, pv)
-
         pv = pv + df
-
-        if verbose is True:
-            print(dt, 1.0, df, pv)
-
         return pv * self._par
 
 ###############################################################################
@@ -558,14 +549,16 @@ class FinBond(object):
 
 ###############################################################################
 
-    def priceFromSurvivalCurve(self,
-                               discountCurve: FinDiscountCurve,
-                               survivalCurve: FinDiscountCurve,
-                               recoveryRate: float):
+    def cleanPriceFromSurvivalCurve(self,
+                                    discountCurve: FinDiscountCurve,
+                                    survivalCurve: FinDiscountCurve,
+                                    recoveryRate: float):
         ''' Calculate discounted present value of flows assuming default model.
+        The survival curve treats 
         This has not been completed. '''
 
-        pass
+        print("This function has not been implemented yet")
+        return
 
 ###############################################################################
 

@@ -16,10 +16,6 @@ from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.bonds.FinBond import FinBond, FinYTMCalcType
 
-import sys
-sys.path.append("..\\..")
-sys.path.append("..")
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

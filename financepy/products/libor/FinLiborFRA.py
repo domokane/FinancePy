@@ -87,6 +87,7 @@ class FinLiborFRA(object):
         liborFwd = (df1 / df2 - 1.0) / accFactor
         v = accFactor * (liborFwd - self._fraRate) * df2
 
+#        print(df1, df2, accFactor, liborFwd, v)
         # Forward value the FRA to the value date
         df_to_valueDate = liborCurve.df(valuationDate)
         v = v * self._notional / df_to_valueDate

@@ -1,12 +1,15 @@
-### TO DO 
+# TO DO
+
+This list is not maintained.
 
 ## NOT STARTED
+
 Notebooks- Add Disclaimer
 
 All products - Add notional to class
 
 Equities - Add term structure of interest rates to all models so that full discount curve is respected.
-Equities - Discrete dividends 
+Equities - Discrete dividends
 Equities - Log contracts using given skew curve
 Equities - Breedon-Litzenburger implied distribution of terminal stock price
 Equities - Fitting the skew parametrically
@@ -41,10 +44,12 @@ Models - Finite difference schemes ?
 Models - Sobol sequences implementation
 
 ## IN PROGRESS
+
 Equities - Variance swaps using given skew curve
 Equities - Convertible bond model with credit and equity dependence and discrete dividends
 
 ## DONE
+
 FX - Fitting the skew parametrically
 Equities - Vanillas
 FX - Vanilla FX options

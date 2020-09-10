@@ -70,7 +70,7 @@ def test_FinDiscountCurve():
         curve = FinDiscountCurve(start, dates, dfs, interp)
         fwdRates = curve.fwd(plotDates)
         zeroRates = curve.zeroRate(plotDates, FinFrequencyTypes.ANNUAL)
-        parRates = curve.parRate(plotDates, FinFrequencyTypes.ANNUAL)
+        parRates = curve.swapRate(start, plotDates, FinFrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))

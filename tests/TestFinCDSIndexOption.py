@@ -176,7 +176,7 @@ def test_fullPriceCDSIndexOption():
     expiryDate = FinDate(2008, 2, 1)
     maturityDate = FinDate(2011, 12, 20)
     notional = 10000.0
-    tolerance = 1e-3
+    tolerance = 1e-6
 
     testCases.header(
         "TIME",
@@ -199,13 +199,15 @@ def test_fullPriceCDSIndexOption():
             cds = FinCDS(valuationDate, dt, index / 10000.0)
             cdsContracts.append(cds)
 
-        indexCurve = FinCDSCurve(valuationDate, cdsContracts, liborCurve, indexRecovery)
+        indexCurve = FinCDSCurve(valuationDate, cdsContracts,
+                                 liborCurve, indexRecovery)
 
-        if 1 == 0:
+        if 1 == 1:
 
             indexSpreads = [index / 10000.0] * 4
 
-            adjustedIssuerCurves = FinCDSIndexPortfolio.hazardRateAdjustIntrinsic(
+            indexPortfolio = FinCDSIndexPortfolio()
+            adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
                 valuationDate,
                 issuerCurves,
                 indexSpreads,

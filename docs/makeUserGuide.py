@@ -506,7 +506,7 @@ def parseFunction(lines, startLine, endLine, className=""):
 
     functionLine = lines[startLine]
     leftCol = functionLine.find("def ")
-    indent = leftCol
+    indent = leftCol + 4
 
     # Do not include a commented out function
     hashCol = functionLine.find("#")
@@ -557,9 +557,11 @@ def parseFunction(lines, startLine, endLine, className=""):
             functionSignature = functionSignature.replace("__init__",
                                                           className)
 
+            functionSignature = functionSignature.replace("def ", "")
+
             missingSpaces = len(className) - len("__init__")
             if (missingSpaces >= 0):
-                functionSignature = functionSignature.replace("\n ","\n " + " " * (missingSpaces))
+                functionSignature = functionSignature.replace("\n ", "\n " + " " * (missingSpaces))
             else:
                 functionSignature = functionSignature.replace("\n" + " " * (-missingSpaces), "\n")
 

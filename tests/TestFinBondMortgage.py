@@ -2,15 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import sys
-
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBondMortgage import FinBondMortgage
 from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
-
-sys.path.append("..//..")
+from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -35,7 +35,7 @@ class FinFXBarrierOption(FinFXOption):
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # 1 unit of foreign in domestic
                  currencyPair: str,    # FORDOM
                  optionType: FinFXBarrierTypes,
                  barrierLevel: float,

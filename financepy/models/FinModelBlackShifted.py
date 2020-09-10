@@ -41,7 +41,8 @@ class FinModelBlackShifted():
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
         ''' Price a derivative using Black's model which values in the forward
-        measure following a change of measure. '''
+        measure following a change of measure. The sign of the shift is the
+        same as Matlab. '''
 
         s = self._shift
         f = forwardRate
@@ -50,21 +51,21 @@ class FinModelBlackShifted():
         sqrtT = np.sqrt(t)
         vol = self._volatility
 
-        d1 = np.log((f-s)/(k-s)) + vol * vol * t / 2
+        d1 = np.log((f+s)/(k+s)) + vol * vol * t / 2
         d1 = d1 / (vol * sqrtT)
         d2 = d1 - vol * sqrtT
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
-            return df * ((f-s) * norm.cdf(d1) - (k-s) * N(d2))
+            return df * ((f+s) * norm.cdf(d1) - (k+s) * N(d2))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
-            return df * ((k-s) * norm.cdf(-d2) - (f-s) * N(-d1))
+            return df * ((k+s) * norm.cdf(-d2) - (f+s) * N(-d1))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")
 
 ###############################################################################
 
     def __repr__(self):
-        s = "FINMODELBLACKSHIFTED"
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VOLATILITY", self._volatility)
         s += labelToString("SHIFT", self._shift)
         s += labelToString("IMPLEMENTATION", self._implementation)

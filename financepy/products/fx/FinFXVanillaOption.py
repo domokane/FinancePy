@@ -140,7 +140,7 @@ class FinFXVanillaOption():
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: float,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                 strikeFXRate: float,  # 1 unit of foreign in domestic
                  currencyPair: str,  # FORDOM
                  optionType: FinOptionTypes,
                  notional: float,
@@ -200,7 +200,7 @@ class FinFXVanillaOption():
 
     def value(self,
               valueDate,
-              spotFXRate,  # ONE UNIT OF FOREIGN IN DOMESTIC CCY
+              spotFXRate,  # 1 unit of foreign in domestic
               domDiscountCurve,
               forDiscountCurve,
               model):

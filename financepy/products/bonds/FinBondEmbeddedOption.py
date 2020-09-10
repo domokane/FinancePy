@@ -18,6 +18,9 @@ from enum import Enum
 import numpy as np
 from typing import List
 
+
+###############################################################################
+# TODO: Make it possible to specify start and end of American Callable/Puttable
 ###############################################################################
 
 
@@ -52,7 +55,7 @@ class FinBondEmbeddedOption(object):
                  callPrices: List[float],
                  putDates: List[FinDate],
                  putPrices: List[float],
-                 face: float = 100.0):
+                 faceAmount: float = 100.0):
         ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. '''
 
@@ -67,7 +70,7 @@ class FinBondEmbeddedOption(object):
                              coupon,
                              frequencyType,
                              accrualType,
-                             face)
+                             faceAmount)
 
         # Validate call and put schedules
         for dt in callDates:
@@ -112,7 +115,7 @@ class FinBondEmbeddedOption(object):
         self._callPrices = callPrices
         self._putDates = putDates
         self._putPrices = putPrices
-        self._face = face
+        self._faceAmount = faceAmount
 
 ###############################################################################
 
@@ -159,7 +162,7 @@ class FinBondEmbeddedOption(object):
         dfTimes = discountCurve._times
         dfValues = discountCurve._dfValues
 
-        face = self._bond._faceAmount
+        faceAmount = self._bond._faceAmount
 
         if isinstance(model, FinModelRatesHW):
 
@@ -170,12 +173,14 @@ class FinBondEmbeddedOption(object):
             model.buildTree(tmat, dfTimes, dfValues)
             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
-                                                 putTimes, putPrices, face)
+                                                 putTimes, putPrices,
+                                                 faceAmount)
             model._numTimeSteps += 1
             model.buildTree(tmat, dfTimes, dfValues)
             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
-                                                 putTimes, putPrices, face)
+                                                 putTimes, putPrices,
+                                                 faceAmount)
             model._numTimeSteps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
@@ -192,13 +197,13 @@ class FinBondEmbeddedOption(object):
             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 face)
+                                                 faceAmount)
             model._numTimeSteps += 1
             model.buildTree(tmat, dfTimes, dfValues)
             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 face)
+                                                 faceAmount)
             model._numTimeSteps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
@@ -216,17 +221,15 @@ class FinBondEmbeddedOption(object):
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE AMOUNT", self._face)
-        s += labelToString("CONVERSION RATIO", self._conversionRatio)
-        s += labelToString("START CONVERT DATE", self._startConvertDate)
+        s += labelToString("FACE AMOUNT", self._faceAmount)
 
+        s += labelToString("NUM CALL DATES", len(self._callDates))
         for i in range(0, len(self._callDates)):
-            s += labelToString("CALL DATE AND PRICE", self._callDates[i],
-                               self._callPrices[i])
+            s += "%12s %12.6f\n" % (self._callDates[i], self._callPrices[i])
 
+        s += labelToString("NUM PUT DATES", len(self._putDates))
         for i in range(0, len(self._putDates)):
-            s += labelToString("PUT DATE AND PRICE", self._putDates[i],
-                               self._putPrices[i])
+            s += "%12s %12.6f\n" % (self._putDates[i], self._putPrices[i])
 
         return s
 

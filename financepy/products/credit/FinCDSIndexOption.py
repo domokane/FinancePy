@@ -66,7 +66,7 @@ class FinCDSIndexOption(object):
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
         self._frequencyType = frequencyType
-        self._businessDateAdjustType = busDayAdjustType
+        self._busDayAdjustType = busDayAdjustType
 
         self._cdsContract = FinCDS(self._expiryDate,
                                    self._maturityDate,
@@ -76,7 +76,7 @@ class FinCDSIndexOption(object):
                                    self._frequencyType,
                                    self._dayCountType,
                                    self._calendarType,
-                                   self._businessDateAdjustType,
+                                   self._busDayAdjustType,
                                    self._dateGenRuleType)
 
 ###############################################################################

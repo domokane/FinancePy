@@ -239,8 +239,8 @@ class FinLiborBermudanSwaption(object):
 ###############################################################################
 
     def __repr__(self):
-
-        s = labelToString("EXERCISE DATE", self._exerciseDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXERCISE DATE", self._exerciseDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("SWAPTION TYPE", self._swaptionType)
         s += labelToString("EXERCISE TYPE", self._exerciseType)

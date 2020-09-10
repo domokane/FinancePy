@@ -126,14 +126,14 @@ class FinDiscountCurvePWL(FinDiscountCurve):
 
 ###############################################################################
 
-    def _df(self,
-            t: (float, np.ndarray)):
-        ''' Returns the discount factor at time t taking into account the
-        piecewise flat zero rate curve and the compunding frequency. '''
-        print("JKJKSJJ")
-        r = self._zeroRate(t, self._frequencyType)
-        df = zeroToDf(r, t, self._frequencyType)
-        return df
+    # def _df(self,
+    #         t: (float, np.ndarray)):
+    #     ''' Returns the discount factor at time t taking into account the
+    #     piecewise flat zero rate curve and the compunding frequency. '''
+
+    #     r = self._zeroRate(t, self._frequencyType)
+    #     df = zeroToDf(r, t, self._frequencyType)
+    #     return df
 
 ###############################################################################
 

@@ -9,11 +9,11 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinMath import testMonotonicity
-from .FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import timesFromDates
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import checkArgumentTypes
+from .FinInterpolate import FinInterpTypes
 
 
 ###############################################################################
@@ -44,7 +44,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         corresponding date. We must specify the compounding frequency of the
         zero rates and also a day count convention for calculating times which
         we must do to calculate discount factors. Finally we specify the
-        interpolation scheme. '''
+        interpolation scheme for off-grid dates.'''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -67,61 +67,56 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         self._dayCountType = dayCountType
         self._interpType = interpType
 
-        self._times = timesFromDates(zeroDates, valuationDate, dayCountType)
         self._zeroRates = np.array(zeroRates)
         self._zeroDates = zeroDates
+
+        self._times = timesFromDates(zeroDates, valuationDate, dayCountType)
 
         if testMonotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        self._buildCurvePoints()
-
-###############################################################################
-
-    def _buildCurvePoints(self):
-        ''' Hidden function to extract discount factors from zero rates. '''
-
-        # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(self._zeroDates,
-                                 self._valuationDate,
-                                 self._dayCountType)
-
         dfs = self._zeroToDf(self._valuationDate,
                              self._zeroRates,
-                             dcTimes,
+                             self._times,
                              self._frequencyType,
                              self._dayCountType)
 
         self._dfValues = np.array(dfs)
 
-###############################################################################
+# ###############################################################################
 
-    def bump(self, bumpSize):
-        ''' Calculate the continuous forward rate at the forward date. '''
+#     def bump(self, bumpSize):
+#         ''' Calculate the continuous forward rate at the forward date. '''
 
-        times = self._times.copy()
-        discountFactors = self._discountFactors.copy()
+#         times = self._times.copy()
+#         discountFactors = self._discountFactors.copy()
 
-        n = len(self._times)
-        for i in range(0, n):
-            t = times[i]
-            discountFactors[i] = discountFactors[i] * np.exp(-bumpSize*t)
+#         n = len(self._times)
+#         for i in range(0, n):
+#             t = times[i]
+#             discountFactors[i] = discountFactors[i] * np.exp(-bumpSize*t)
 
-        discCurve = FinDiscountCurve(self._valuationDate, times,
-                                     discountFactors,
-                                     self._interpType)
+#         discCurve = FinDiscountCurve(self._valuationDate, times,
+#                                      discountFactors,
+#                                      self._interpType)
 
-        return discCurve
+#         return discCurve
 
 ###############################################################################
 
     def __repr__(self):
-        s = type(self).__name__ + "\n"
-        numPoints = len(self._times)
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("VALUATION DATE", self._valuationDate)
+        s += labelToString("FREQUENCY TYPE", (self._frequencyType))
+        s += labelToString("DAY COUNT TYPE", (self._dayCountType))
+        s += labelToString("INTERP TYPE", (self._interpType))
+
         s += labelToString("DATES", "ZERO RATES")
+        numPoints = len(self._times)
         for i in range(0, numPoints):
-            s += labelToString(self._zeroDates[i], self._zeroRates[i])
-        s += labelToString("FREQUENCY", (self._frequencyType))
+            s += labelToString("%12s" % self._zeroDates[i],
+                               "%10.7f" % self._zeroRates[i])
 
         return s
 

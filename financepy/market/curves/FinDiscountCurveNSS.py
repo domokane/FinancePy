@@ -98,6 +98,11 @@ class FinDiscountCurveNSS(FinDiscountCurve):
                                    frequencyType,
                                    dayCountType)
 
+        if isinstance(dates, FinDate):
+            return zeroRates[0]
+        else:
+            return np.array(zeroRates)
+
         return zeroRates
 
 ###############################################################################
@@ -143,7 +148,10 @@ class FinDiscountCurveNSS(FinDiscountCurve):
                             self._frequencyType,
                             self._dayCountType)
 
-        return df
+        if isinstance(dates, FinDate):
+            return df[0]
+        else:
+            return df
 
 ###############################################################################
 

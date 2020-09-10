@@ -12,10 +12,10 @@ from ..products.credit.FinCDSCurve import uniformToDefaultTime
 ##########################################################################
 
 
-def defaultTimesGC(issuerCurves,
-                   correlationMatrix,
-                   numTrials,
-                   seed):
+def _defaultTimesGC(issuerCurves,
+                    correlationMatrix,
+                    numTrials,
+                    seed):
     ''' Generate a matrix of default times by credit and trial using a
     Gaussian copula model using a full rank correlation matrix. '''
 

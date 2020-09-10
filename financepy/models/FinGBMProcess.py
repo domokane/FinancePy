@@ -81,14 +81,14 @@ def getPathsAssets(numAssets,
 
 
 @njit(cache=True, fastmath=True)
-def getAssets(numAssets,
-              numPaths,
-              t,
-              mus,
-              stockPrices,
-              volatilities,
-              corrMatrix,
-              seed):
+def _getAssets(numAssets,
+               numPaths,
+               t,
+               mus,
+               stockPrices,
+               volatilities,
+               corrMatrix,
+               seed):
 
     np.random.seed(seed)
     vsqrtdts = volatilities * np.sqrt(t)
@@ -112,18 +112,21 @@ def getAssets(numAssets,
 
 class FinGBMProcess():
 
-    def getPaths(
-            self,
-            numPaths: int,
-            numTimeSteps: int,
-            t: float,
-            mu: float,
-            stockPrice: float,
-            volatility: float,
-            seed: int):
+    def getPaths(self,
+                 numPaths: int,
+                 numTimeSteps: int,
+                 t: float,
+                 mu: float,
+                 stockPrice: float,
+                 volatility: float,
+                 seed: int):
+        ''' Get a matrix of simulated GBM asset values by path and time step.
+        Inputs are the number of paths and time steps, the time horizon and
+        the initial asset value, volatility and random number seed. '''
 
         paths = getPaths(numPaths, numTimeSteps,
                          t, mu, stockPrice, volatility, seed)
+
         return paths
 
 ###############################################################################
@@ -138,11 +141,14 @@ class FinGBMProcess():
                        volatilities,
                        betas,
                        seed):
+        ''' Get a matrix of simulated GBM asset values by asset, path and time
+        step. Inputs are the number of assets, paths and time steps, the time-
+        horizon and the initial asset values, volatilities and betas. '''
 
         if numTimeSteps == 2:
-            paths = getAssets(numAssets, numPaths,
-                              t, mus, stockPrices,
-                              volatilities, betas, seed)
+            paths = _getAssets(numAssets, numPaths,
+                               t, mus, stockPrices,
+                               volatilities, betas, seed)
         else:
             paths = getPathsAssets(numAssets, numPaths, numTimeSteps,
                                    t, mus, stockPrices,

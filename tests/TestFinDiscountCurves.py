@@ -81,7 +81,7 @@ def test_FinDiscountCurves():
         curveNames.append(type(curve).__name__)
 
     testCases.banner("SINGLE CALLS NO VECTORS")
-    testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "PAR", "SWAP")
+    testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
 
     years = np.linspace(1, 10, 10)
     fwdMaturityDates = valuationDate.addYears(years)
@@ -95,11 +95,10 @@ def test_FinDiscountCurves():
 
         for (fwdMaturityDate, fwdMaturityDate2) in zip(fwdMaturityDates,
                                                        fwdMaturityDates2):
-
+            tenor = "3M"
             zeroRate = curve.zeroRate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
-            fwdRate = curve.fwdRate(fwdMaturityDate, fwdMaturityDate2)
-            parRate = curve.parRate(fwdMaturityDate)
+            fwdRate = curve.fwdRate(fwdMaturityDate, tenor)
             swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
@@ -109,7 +108,6 @@ def test_FinDiscountCurves():
                             "%8.7f" % (df),
                             "%7.6f" % (fwd),
                             "%7.6f" % (fwdRate),
-                            "%7.6f" % (parRate),
                             "%7.6f" % (swapRate))
 
     # Examine vectorisation
@@ -119,10 +117,10 @@ def test_FinDiscountCurves():
 
     for name, curve in zip(curveNames, curvesList):
 
+        tenor = "3M"
         zeroRate = curve.zeroRate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
-        fwdRate = curve.fwdRate(fwdMaturityDates, fwdMaturityDates2)
-        parRate = curve.parRate(fwdMaturityDates)
+        fwdRate = curve.fwdRate(fwdMaturityDates, tenor)
         swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
@@ -133,7 +131,6 @@ def test_FinDiscountCurves():
                             "%8.7f" % (df[i]),
                             "%7.6f" % (fwd[i]),
                             "%7.6f" % (fwdRate[i]),
-                            "%7.6f" % (parRate[i]),
                             "%7.6f" % (swapRate[i]))
 
     if PLOT_GRAPHS:

@@ -175,7 +175,9 @@ class FinTestCases():
         elif len(self._headerFields) != len(args):
             n1 = len(self._headerFields)
             n2 = len(args)
-            raise FinError("ERROR: # headers " + str(n1) + "must equal # arguments" + str(n2))
+            raise FinError("ERROR: Number of data columns is " + str(n1)
+                           + " but must equal " + str(n2)
+                           + " to align with headers.")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename

@@ -32,8 +32,7 @@ class FinModelBachelier():
               timeToExpiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Price a derivative using Bachelier's model which values in the
-        forward measure following a change of measure. '''
+        ''' Price a call or put option using Bachelier's model. '''
 
         f = forwardRate
         t = timeToExpiry
@@ -54,7 +53,7 @@ class FinModelBachelier():
 ###############################################################################
 
     def __repr__(self):
-        s = "FINMODELBACHELIER"
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VOLATILITY", self._volatility)
         return s
 

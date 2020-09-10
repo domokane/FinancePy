@@ -189,7 +189,7 @@ class FinLiborSwap(object):
 
 ##########################################################################
 
-    def parCoupon(self, valuationDate, discountCurve):
+    def swapRate(self, valuationDate, discountCurve):
         ''' Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -207,7 +207,7 @@ class FinLiborSwap(object):
         dfT = discountCurve.df(self._maturityDate)
 
         if abs(pv01) < gSmall:
-            raise FinError("PV01 is zero. Cannot compute coupon.")
+            raise FinError("PV01 is zero. Cannot compute swap rate.")
 
         cpn = (df0 - dfT) / pv01
         return cpn
@@ -320,7 +320,7 @@ class FinLiborSwap(object):
         df = 1.0
         alpha = 1.0 / m
 
-        for nextDt in self._adjustedFixedDates[startIndex:]:
+        for _ in self._adjustedFixedDates[startIndex:]:
             df = df / (1.0 + alpha * flatSwapRate)
             flatPV01 += df * alpha
 
@@ -379,9 +379,9 @@ class FinLiborSwap(object):
         floatRate = 0.0
 
         if self._firstFixingRate is None:
-            libor = (df1_index / df2_index - 1.0) / alpha
-            flow = libor * alpha * self._notional
-            floatRate = libor
+            fwdRate = (df1_index / df2_index - 1.0) / alpha
+            flow = (fwdRate + self._floatSpread) * alpha * self._notional
+            floatRate = fwdRate
         else:
             flow = self._firstFixingRate * alpha * self._notional
             floatRate = self._firstFixingRate
@@ -405,8 +405,8 @@ class FinLiborSwap(object):
             alpha = basis.yearFrac(prevDt, nextDt)[0]
             df2_index = indexCurve.df(nextDt)
             # The accrual factors cancel
-            floatRate = (df1_index / df2_index - 1.0) / alpha
-            flow = (df1_index / df2_index - 1.0) * self._notional
+            fwdRate = (df1_index / df2_index - 1.0) / alpha
+            flow = (fwdRate + self._floatSpread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
             df_discount = discountCurve.df(nextDt) / self._dfValuationDate
@@ -417,7 +417,7 @@ class FinLiborSwap(object):
 
             self._floatFlows.append(flow)
             self._floatYearFracs.append(alpha)
-            self._floatRates.append(floatRate)
+            self._floatRates.append(fwdRate)
             self._floatDfs.append(df_discount)
             self._floatFlowPVs.append(flow * df_discount)
             self._floatTotalPV.append(pv)

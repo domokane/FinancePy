@@ -11,30 +11,18 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
-# from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
-from financepy.products.bonds import FinBondAnnuity
+
+from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+###############################################################################
 
 
 def test_FinBondAnnuity():
 
     settlementDate = FinDate(20, 6, 2018)
-
-    depos = []
-    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
-    swap1 = FinLiborSwap(settlementDate, "1Y", 0.0502, fixedFreq, dcType)
-    swap2 = FinLiborSwap(settlementDate, "2Y", 0.0502, fixedFreq, dcType)
-    swap3 = FinLiborSwap(settlementDate, "3Y", 0.0501, fixedFreq, dcType)
-    swap4 = FinLiborSwap(settlementDate, "4Y", 0.0502, fixedFreq, dcType)
-    swap5 = FinLiborSwap(settlementDate, "5Y", 0.0501, fixedFreq, dcType)
-    swaps = [swap1, swap2, swap3, swap4, swap5]
-
-    liborCurve = FinLiborCurve(settlementDate, depos, [], swaps)
 
     #   print("==============================================================")
     #   print("SEMI-ANNUAL FREQUENCY")

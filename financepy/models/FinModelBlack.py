@@ -76,7 +76,7 @@ class FinModelBlack():
 ###############################################################################
 
     def __repr__(self):
-        s = "FINMODELBLACK"
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VOLATILITY", self._volatility)
         s += labelToString("IMPLEMENTATION", self._implementation)
         s += labelToString("NUMSTEPS", self._numSteps)

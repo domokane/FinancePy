@@ -30,7 +30,6 @@ class FinBondMortgage(object):
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.
     '''
-###############################################################################
 
     def __init__(self,
                  startDate: FinDate,

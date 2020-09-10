@@ -64,7 +64,7 @@ class FinFXForward():
 
     def value(self,
               valueDate,
-              spotFXRate,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
+              spotFXRate,  # 1 unit of foreign in domestic
               domDiscountCurve,
               forDiscountCurve):
         ''' Calculate the value of an FX forward contract where the current
@@ -121,7 +121,7 @@ class FinFXForward():
 
     def forward(self,
                 valueDate,
-                spotFXRate,  # PRICE OF ONE UNIT OF FOREIGN IN DOMESTIC CCY
+                spotFXRate,  # 1 unit of foreign in domestic
                 domDiscountCurve,
                 forDiscountCurve):
         ''' Calculate the FX Forward rate that makes the value of the FX

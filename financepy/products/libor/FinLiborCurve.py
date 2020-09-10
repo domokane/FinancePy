@@ -5,13 +5,13 @@
 import numpy as np
 from scipy import optimize
 
-from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolate import FinInterpTypes
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
+from ...finutils.FinGlobalVariables import gDaysInYear
+from ...market.curves.FinInterpolate import FinInterpTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 swaptol = 1e-8
 
@@ -233,6 +233,7 @@ class FinLiborCurve(FinDiscountCurve):
         self._usedDeposits = liborDeposits
         self._usedFRAs = liborFRAs
         self._usedSwaps = liborSwaps
+        self._dayCountType = None
 
 ###############################################################################
 
@@ -505,7 +506,8 @@ class FinLiborCurve(FinDiscountCurve):
 
         s += labelToString("GRID TIMES", "GRID DFS")
         for i in range(0, numPoints):
-            s += labelToString(self._times[i], self._dfValues[i])
+            s += labelToString("% 10.6f" % self._times[i],
+                               "%12.10f" % self._dfValues[i])
 
         return s
 

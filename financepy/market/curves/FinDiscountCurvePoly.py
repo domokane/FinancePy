@@ -98,14 +98,16 @@ class FinDiscountCurvePoly(FinDiscountCurve):
 ###############################################################################
 
     def df(self,
-           dts: (list, FinDate)):
+           dates: (list, FinDate)):
         ''' Calculate the fwd rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to that specified in the
         constructor of the curve object. '''
 
         # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dts, self._valuationDate, self._dayCountType)
+        dcTimes = timesFromDates(dates,
+                                 self._valuationDate,
+                                 self._dayCountType)
 
         # We now get the discount factors using these times
         zeroRates = self._zeroRate(dcTimes)

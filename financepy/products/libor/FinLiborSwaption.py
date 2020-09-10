@@ -2,9 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+
+##############################################################################
+# TODO: Allow an index curve to be passed in that is not same as discount curve
 # TODO: Extend to allow term structure of volatility
 # TODO: Extend to allow two fixed legs in underlying swap
 # TODO: Cash settled swaptions
+##############################################################################
 
 import numpy as np
 
@@ -118,8 +122,14 @@ class FinLiborSwaption():
                             self._dateGenRuleType)
 
         k = self._fixedCoupon
+
+        # The pv01 is the value of the swap cashflows as of the curve date
         pv01 = swap.pv01(valuationDate, discountCurve)
-        s = swap.parCoupon(valuationDate, discountCurve)
+
+        # We need to calculate the forward swap rate on the swaption exercise
+        # date that makes the forward swap worth par including principal
+        s = swap.swapRate(valuationDate, discountCurve)
+
         texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
@@ -196,7 +206,7 @@ class FinLiborSwaption():
                 swaptionPrice = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
-                               str(self._optionType))
+                               str(self._swaptionType))
 
             # Cancel the multiplication at the end below
             swaptionPrice /= pv01
@@ -288,10 +298,11 @@ class FinLiborSwaption():
         self._forwardDf = discountCurve.df(self._exerciseDate)
         self._underlyingSwap = swap
 
-        # The exchange of cash occurs on the settlement date
-        dfSettle = discountCurve.df(self._settlementDate)
-        swaptionPrice = swaptionPrice * pv01 * self._notional / dfSettle
-
+        # The exchange of cash occurs on the settlement date. However the
+        # actual value is that on the specified valuation date which could
+        # be the swaption settlement date.
+        dfSettlement = discountCurve.df(self._settlementDate)
+        swaptionPrice = swaptionPrice * pv01 * self._notional / dfSettlement
         return swaptionPrice
 
 ###############################################################################
@@ -356,10 +367,11 @@ class FinLiborSwaption():
         # The annuity needs to be discounted to today using the correct df
         self._pv01 = pv01 * self._forwardDf
 
-        # The exchange of cash occurs on the settlement date
-        dfSettle = discountCurve.df(self._settlementDate)
-        swaptionPrice = swaptionPrice * self._pv01 * self._notional / dfSettle
-
+        # The exchange of cash occurs on the settlement date but we need to 
+        # value the swaption on the provided valuation date - which could be
+        # the settlement date or may be a different date.
+        dfValuation = discountCurve.df(valuationDate)
+        swaptionPrice = swaptionPrice * self._pv01 * self._notional / dfValuation
         return swaptionPrice
 
 ###############################################################################
@@ -369,7 +381,7 @@ class FinLiborSwaption():
         if self._underlyingSwap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 
-        self._underlyingSwap.printFixedLeg()
+        self._underlyingSwap.printFixedLegPV()
 
 ###############################################################################
 
@@ -378,7 +390,7 @@ class FinLiborSwaption():
         if self._underlyingSwap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 
-        self._underlyingSwap.printFloatLeg()
+        self._underlyingSwap.printFloatLegPV()
 
 ###############################################################################
 
