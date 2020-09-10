@@ -57,7 +57,7 @@ class FinEquityBarrierOption(FinEquityOption):
         self._numObservationsPerYear = int(numObservationsPerYear)
 
         if optionType not in FinEquityBarrierTypes:
-            raise FinError("Option Type ", optionType, " unknown.")
+            raise FinError("Option Type " + str(optionType) + " unknown.")
 
         self._optionType = optionType
         self._notional = notional

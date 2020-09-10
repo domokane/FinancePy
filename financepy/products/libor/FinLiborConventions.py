@@ -23,13 +23,14 @@ class FinLiborConventions():
                  indexName: str = "LIBOR"):
 
         if currencyName == "USD" and indexName == "LIBOR":
-            spotLag = 2
-            dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
-            calendarType=FinCalendarTypes.TARGET
+            self._spotLag = 2
+            self._dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
+            self._calendarType=FinCalendarTypes.TARGET
         elif currencyName == "EUR"and indexName == "EURIBOR":
-            spotLag = 2
-            dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
-            calendarType=FinCalendarTypes.TARGET
-        endif
+            self._spotLag = 2
+            self._dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
+            self._calendarType=FinCalendarTypes.TARGET
+        else:
+            pass
 
 ###############################################################################

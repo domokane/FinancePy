@@ -272,7 +272,7 @@ class FinEquityVarianceSwap(object):
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("STRIKE VARIANCE", self._strikeVariance)
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("PAY STRIKE FLAG", self._payStrike, "")
+        s += labelToString("PAY STRIKE FLAG", self._payStrikeFlag, "")
         return s
 
 ###############################################################################

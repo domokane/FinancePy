@@ -43,7 +43,7 @@ class FinCDSBasket(object):
                  stepInDate: FinDate,
                  maturityDate: FinDate,
                  notional: float = ONE_MILLION,
-                 coupon: float = 0.0,
+                 runningCoupon: float = 0.0,
                  longProtection: bool = True,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
@@ -56,7 +56,7 @@ class FinCDSBasket(object):
         self._stepInDate = stepInDate
         self._maturityDate = maturityDate
         self._notional = notional
-        self._coupon = coupon / 10000.0
+        self._runningCoupon = runningCoupon / 10000.0
         self._longProtection = longProtection
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
@@ -66,7 +66,7 @@ class FinCDSBasket(object):
 
         self._cdsContract = FinCDS(self._stepInDate,
                                    self._maturityDate,
-                                   self._coupon,
+                                   self._runningCoupon,
                                    1.0,
                                    self._longProtection,
                                    self._frequencyType,
@@ -183,7 +183,7 @@ class FinCDSBasket(object):
                                           liborCurve)
 
         spd = protPV / rpv01
-        value = self._notional * (protPV - self._coupon * rpv01)
+        value = self._notional * (protPV - self._runningCoupon * rpv01)
 
         if not self._longProtection:
             value = value * -1.0
@@ -223,7 +223,7 @@ class FinCDSBasket(object):
                                           liborCurve)
 
         spd = protPV / rpv01
-        value = self._notional * (protPV - self._coupon * rpv01)
+        value = self._notional * (protPV - self._runningCoupon * rpv01)
 
         if not self._longProtection:
             value = value * -1.0
@@ -299,14 +299,14 @@ class FinCDSBasket(object):
         riskyPV01 = self._cdsContract.riskyPV01(valuationDate, basketCurve)['clean_rpv01']
 
         # Long protection
-        mtm = self._notional * (protLegPV - riskyPV01 * self._coupon)
+        mtm = self._notional * (protLegPV - riskyPV01 * self._runningCoupon)
 
         if not self._longProtection:
             mtm *= -1.0
 
         basketOutput = np.zeros(4)
         basketOutput[0] = mtm
-        basketOutput[1] = riskyPV01 * self._notional * self._coupon
+        basketOutput[1] = riskyPV01 * self._notional * self._runningCoupon
         basketOutput[2] = protLegPV * self._notional
         basketOutput[3] = protLegPV / riskyPV01
 
@@ -327,13 +327,11 @@ class FinCDSBasket(object):
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType)
-        s += labelToString("ACCRUED DAYS", self.accruedDays())
 
-        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
-        precision = "12.6f"
-
-        s += tableToString(header, valueTable, precision)
+#        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
+#        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+#        precision = "12.6f"
+#        s += tableToString(header, valueTable, precision)
 
         return s
 

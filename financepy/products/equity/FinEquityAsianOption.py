@@ -101,7 +101,7 @@ def _valueMC_NUMBA(t0,
 
     payoff_a = 0.0
 
-    for p in range(0, numPaths):
+    for _ in range(0, numPaths):
 
         # evolve stock price to start of averaging period
         g = np.random.standard_normal(1)
@@ -203,7 +203,7 @@ def _valueMC_fast_NUMBA(t0: float,
     s_1_arithmetic = np.zeros(numPaths)
     s_2_arithmetic = np.zeros(numPaths)
 
-    for obs in range(0, n):
+    for _ in range(0, n):
 
         g = np.random.normal(0.0, 1.0, size=(numPaths))
 
@@ -277,7 +277,7 @@ def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
     ln_s_1_geometric = np.zeros(numPaths)
     ln_s_2_geometric = np.zeros(numPaths)
 
-    for obs in range(0, n):
+    for _ in range(0, n):
 
         g = np.random.normal(0.0, 1.0, size=(numPaths))
         for ip in range(0, numPaths):

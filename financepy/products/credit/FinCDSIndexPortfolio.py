@@ -40,7 +40,7 @@ class FinCDSIndexPortfolio():
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
         self._frequencyType = frequencyType
-        self._businessDateAdjustType = busDayAdjustType
+        self._busDayAdjustType = busDayAdjustType
 
 ###############################################################################
 

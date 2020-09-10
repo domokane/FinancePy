@@ -154,7 +154,9 @@ class FinOIS(object):
 
         prevDt = oisDates[0]
         cmpd = 1.0
-        dayCounter = FinDayCount(self._dayCountType)
+
+        # Check this - fixed or floating ?
+        dayCounter = FinDayCount(self._fixedDayCountType)
 
         for dt, fixing in zip(oisDates[1:], oisFixings[1:]):
             alpha = dayCounter.yearFrac(prevDt, dt)[0]
@@ -234,9 +236,9 @@ class FinOIS(object):
     ###########################################################################
 
     def df(self,
-           oisRate,
-           startDate,
-           endDate):
+           oisRate: float,
+           startDate: FinDate,
+           endDate: FinDate):
         ''' Calculate the OIS rate implied discount factor. '''
 
         df = 1.0

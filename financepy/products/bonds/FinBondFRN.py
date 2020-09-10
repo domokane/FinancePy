@@ -121,8 +121,8 @@ class FinBondFRN(object):
 
         dayCounter = FinDayCount(self._accrualType)
 
-        (accFactor, dc, _) = dayCounter.yearFrac(settlementDate, self._ncd)
-        (accFactor, dbc, _) = dayCounter.yearFrac(self._pcd, self._ncd)
+        (_, dc, _) = dayCounter.yearFrac(settlementDate, self._ncd)
+        (_, dbc, _) = dayCounter.yearFrac(self._pcd, self._ncd)
 
         alpha = float(dc) / float(dbc)
         f = self._frequency
@@ -401,26 +401,26 @@ class FinBondFRN(object):
 
 ###############################################################################
 
-    def fullPriceFromDiscountCurve(self,
-                                   settlementDate: FinDate,
-                                   indexCurve: FinDiscountCurve,
-                                   discountCurve: FinDiscountCurve):
-        ''' Calculate the bond price using some discount curve to present-value
-        the bond's cashflows. THIS IS NOT COMPLETE. '''
+    # def fullPriceFromDiscountCurve(self,
+    #                                settlementDate: FinDate,
+    #                                indexCurve: FinDiscountCurve,
+    #                                discountCurve: FinDiscountCurve):
+    #     ''' Calculate the bond price using some discount curve to present-value
+    #     the bond's cashflows. THIS IS NOT COMPLETE. '''
 
-        print("WARNING: DO NOT USE THIS FUNCTION")
+    #     print("WARNING: DO NOT USE THIS FUNCTION")
 
-        self._calculateFlowDates(settlementDate)
+    #     self._calculateFlowDates(settlementDate)
 
-        pv = 0.0
+    #     pv = 0.0
 
-        for dt in self._flowDates:
-            df = discountCurve.df(dt)
-            flow = self._coupon / self._frequency
-            pv = pv + flow * df
+    #     for dt in self._flowDates:
+    #         df = discountCurve.df(dt)
+    #         flow = self._coupon / self._frequency
+    #         pv = pv + flow * df
 
-        pv = pv + df
-        return pv * self._faceAmount
+    #     pv = pv + df
+    #     return pv * self._faceAmount
 
 ###############################################################################
 

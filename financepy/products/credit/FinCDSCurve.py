@@ -267,8 +267,8 @@ class FinCDSCurve():
         header = "TIME,SURVIVAL_PROBABILITY"
         valueTable = [self._times, self._values]
         precision = "10.7f"
-
-        return tableToString(header, valueTable, precision)
+        s += tableToString(header, valueTable, precision)
+        return s
 
 ###############################################################################
 

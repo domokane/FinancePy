@@ -28,6 +28,18 @@ class FinEquityOption(object):
 
 ###############################################################################
 
+    def value(self,
+              valueDate: FinDate,
+              stockPrice: float,
+              discountCurve: FinDiscountCurve,
+              dividendYield: float,
+              model):
+
+        print("You should not be here!")
+        return 0.0
+
+###############################################################################
+
     def delta(self,
               valueDate: FinDate,
               stockPrice: float,
