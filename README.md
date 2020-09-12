@@ -36,7 +36,23 @@ Important Note:
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
-In all cases I will seek to be as helpful as possible, subject to constraints.
+## Quick Start
+
+FinancePy can be installed from pip using the command:
+
+`pip install financepy`
+
+To upgrade an existing installation type:
+
+`pip install --upgrade financepy`
+
+You can then access a set of Jupyter Notebooks on at Github
+
+https://github.com/domokane/FinancePy-Examples
+
+Download a zipped version by clicking on the green button and selecting Download ZIP. 
+
+A pdf manual describing all of the functions can be found at the same repository.
 
 ## The Library Design
 
@@ -53,31 +69,10 @@ Any product valuation is the result of the following data design:
 
 The interface to each product has a value() function that will take a model and market to produce a price.
 
-## How to Use the Library
-
-FinancePy can be installed using pip (see instructions below). A set of template Jupyter notebooks can be found under the github repository called FinancePy-Examples. The link is as follows:
-
-<https://github.com/domokane/FinancePy-Examples>
-
-A pdf manual describing all of the functions can be found at the same repository.
-
-## Issues
-
-The current version of the code is a beta. If you have any questions or issues then please send them to me or post them as an issue on the github page.
-
 ## Author
 
 Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and 10 years of academic experience.
 
-## Installation
-
-FinancePy can be installed from pip using the command:
-
-`pip install financepy`
-
-To upgrade an existing installation type:
-
-`pip install --upgrade financepy`
 
 ## Dependencies
 
