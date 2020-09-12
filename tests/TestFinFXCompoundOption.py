@@ -54,11 +54,11 @@ def test_FinEquityCompoundOption():
 
     cmpdOption = FinEquityCompoundOption(
         expiryDate1,
-        expiryDate2,
-        k1,
-        k2,
         optionType1,
-        optionType2)
+        k1,
+        expiryDate2,
+        optionType2,
+        k2)
     stockPrice = 85.0
 
     testCases.header(
@@ -117,7 +117,7 @@ def test_FinEquityCompoundOption():
                 FinOptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = FinEquityCompoundOption(
-                expiryDate1, expiryDate2, k1, k2, optionType1, optionType2)
+                expiryDate1, optionType1, k1, expiryDate2, optionType2, k2)
             stockPrices = range(70, 100)
 
             for stockPrice in stockPrices:

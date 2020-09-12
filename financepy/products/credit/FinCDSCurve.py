@@ -21,44 +21,6 @@ from ...finutils.FinHelperFunctions import labelToString
 ###############################################################################
 
 
-@njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-def uniformToDefaultTime(u, t, v):
-    ''' Fast mapping of a uniform random variable to a default time given a
-    survival probability curve. '''
-
-    if u == 0.0:
-        return 99999.0
-
-    if u == 1.0:
-        return 0.0
-
-    numPoints = len(v)
-    index = 0
-
-    for i in range(1, numPoints):
-        if u <= v[i - 1] and u > v[i]:
-            index = i
-            break
-
-    if index == numPoints + 1:
-        t1 = t[numPoints - 1]
-        q1 = v[numPoints - 1]
-        t2 = t[numPoints]
-        q2 = v[numPoints]
-        lam = log(q1 / q2) / (t2 - t1)
-        tau = t2 - log(u / q2) / lam
-    else:
-        t1 = t[index - 1]
-        q1 = v[index - 1]
-        t2 = t[index]
-        q2 = v[index]
-        tau = (t1 * log(q2 / u) + t2 * log(u / q1)) / log(q2 / q1)
-
-    return tau
-
-###############################################################################
-
-
 def f(q, *args):
     ''' Function that returns zero when the survival probability that gives a
     zero value of the CDS has been determined. '''

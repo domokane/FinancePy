@@ -22,10 +22,10 @@ from ..finutils.FinError import FinError
 # dS = rS dt + sqrt(V) * S * (rhohat dz1 + rho dz2)
 # dV = kappa(theta-V) dt + sigma sqrt(V) dz2
 # where rhohat = sqrt(1-rho*rho)
-##########################################################################
+###############################################################################
 # TODO - DECIDE WHETHER TO OO MODEL
 # TODO - NEEDS CHECKING FOR MC CONVERGENCE
-##########################################################################
+###############################################################################
 
 from enum import Enum
 
@@ -35,11 +35,12 @@ class FinHestonNumericalScheme(Enum):
     EULERLOG = 2
     QUADEXP = 3
 
-##########################################################################
+###############################################################################
+
 
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
                     float64, float64, float64, float64, int64, int64, int64),
-                    fastmath=True)
+      fastmath=True)
 def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
              seed, scheme):
 
@@ -143,7 +144,7 @@ def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
 
     return sPaths
 
-##########################################################################
+###############################################################################
 
 
 class FinModelHeston():
@@ -161,7 +162,7 @@ class FinModelHeston():
         self._sigma = sigma
         self._rho = rho
 
-##########################################################################
+###############################################################################
 
     def value_MC(self,
                  valueDate,
@@ -205,7 +206,7 @@ class FinModelHeston():
         v = payoff * exp(-interestRate * tau)
         return v
 
-##########################################################################
+###############################################################################
 
     def value_Lewis(self,
                     valueDate,
@@ -253,7 +254,7 @@ class FinModelHeston():
 #        v2 = S0 * exp(-q*tau) - K * exp(-r*tau) * I1
         return(v1)
 
-##########################################################################
+###############################################################################
 
     def value_Lewis_Rouah(self,
                           valueDate,
@@ -283,7 +284,7 @@ class FinModelHeston():
             q = V * tau / 2.0
             Q = np.exp(-e * q)
             H = np.exp((2.0 * kappa * theta / V) * (q * g - np.log((1.0 -
-                                                                    h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
+                  h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
             return integrand.real
 
@@ -295,9 +296,9 @@ class FinModelHeston():
         v = S0 * exp(-q * tau) - K * exp(-r * tau) * integral
         return (v)
 
-##########################################################################
+###############################################################################
 # Taken from Nick Weber's VBA Finance book
-##########################################################################
+###############################################################################
 
     def value_Weber(self,
                     valueDate,
@@ -367,7 +368,7 @@ class FinModelHeston():
         F = S0 * exp((r - q) * tau)
         x0 = log(F / K)
 
-        def F(j):
+        def FF(j):
             def integrand(u):
                 V = sigma * sigma
                 A = -u * u / 2.0 - 1j * u / 2.0 + 1j * j * u
@@ -387,7 +388,7 @@ class FinModelHeston():
             area = 0.50 + 1.0 / pi * integrate.quad(integrand, 0.0, np.inf)[0]
             return area
 
-        v = S0 * exp(-q * tau) * F(1) - K * exp(-r * tau) * F(0)
+        v = S0 * exp(-q * tau) * FF(1) - K * exp(-r * tau) * FF(0)
         return(v)
 
 ###############################################################################

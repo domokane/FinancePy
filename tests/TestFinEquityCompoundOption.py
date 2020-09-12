@@ -10,10 +10,6 @@ from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackSch
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 
-import sys
-sys.path.append("..//..")
-
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -51,13 +47,12 @@ def test_FinEquityCompoundOption():
                     4000,
                     5000]
 
-    cmpdOption = FinEquityCompoundOption(
-        expiryDate1,
-        expiryDate2,
-        k1,
-        k2,
-        optionType1,
-        optionType2)
+    cmpdOption = FinEquityCompoundOption(expiryDate1,
+                                         optionType1,
+                                         k1,
+                                         expiryDate2,
+                                         optionType2,
+                                         k2)
     stockPrice = 85.0
 
     testCases.header(
@@ -116,7 +111,8 @@ def test_FinEquityCompoundOption():
                 FinOptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = FinEquityCompoundOption(
-                expiryDate1, expiryDate2, k1, k2, optionType1, optionType2)
+                expiryDate1, optionType1, k1,
+                expiryDate2, optionType2, k2)
             stockPrices = range(70, 100)
 
             for stockPrice in stockPrices:
@@ -166,6 +162,7 @@ def test_FinEquityCompoundOption():
                     theta)
 
 ##########################################################################
+
 
 test_FinEquityCompoundOption()
 testCases.compareTestCases()

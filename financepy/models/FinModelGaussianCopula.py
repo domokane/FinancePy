@@ -7,15 +7,17 @@
 import numpy as np
 
 from ..finutils.FinMath import N
-from ..products.credit.FinCDSCurve import uniformToDefaultTime
+from ..finutils.FinHelperFunctions import uniformToDefaultTime
 
-##########################################################################
+###############################################################################
+# TODO:
+###############################################################################
 
 
-def _defaultTimesGC(issuerCurves,
-                    correlationMatrix,
-                    numTrials,
-                    seed):
+def defaultTimesGC(issuerCurves,
+                   correlationMatrix,
+                   numTrials,
+                   seed):
     ''' Generate a matrix of default times by credit and trial using a
     Gaussian copula model using a full rank correlation matrix. '''
 

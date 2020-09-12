@@ -2,20 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import sqrt
+import numpy as np
 
-from ...finutils.FinMath import NormSInv, N, M, phi3
-from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString
+from ..finutils.FinMath import N, M, phi3
+from ..finutils.FinMath import norminvcdf as NormSInv
+from ..finutils.FinError import FinError
 
-##########################################################################
+###############################################################################
 
 
 class LHPlusModel():
     ''' Large Homogenous Portfolio model with extra asset. Used for
     approximating full Gaussian copula. '''
-    def __init__(self, P, R, H, beta, P0, R0, H0, beta0):
 
+    def __init__(self, P, R, H, beta, P0, R0, H0, beta0):
         self._P = P
         self._R = R
         self._H = H
@@ -25,7 +25,7 @@ class LHPlusModel():
         self._H0 = H0
         self._beta0 = beta0
 
-##########################################################################
+###############################################################################
 
     def probLossGreaterThanK(self, K):
         ''' Returns P(L>K) where L is the portfolio loss given by model. '''
@@ -44,7 +44,8 @@ class LHPlusModel():
         else:
             inva = NormSInv(arga)
 
-        a = (1.0 / self._beta) * (c - sqrt(1.0 - self._beta * self._beta) * inva)
+        RtOneMinusBeta2 = np.sqrt(1.0 - self._beta * self._beta)
+        a = (1.0 / self._beta) * (c - RtOneMinusBeta2 * inva)
         argb = (K - (1.0 - self._R0) * self._H0) / (1.0 - self._R) / self._H
         invb = 0.0
 
@@ -56,13 +57,13 @@ class LHPlusModel():
             invb = NormSInv(argb)
 
         b = (1.0 / self._beta) * \
-            ((c - sqrt(1.0 - self._beta * self._beta) * invb))
+            ((c - RtOneMinusBeta2 * invb))
 
         probLgtK = N(a) + M(c0, b, self._beta0) - M(c0, a, self._beta0)
 
         return probLgtK
 
-##########################################################################
+###############################################################################
 
     def expMinLKIntegral(self, K, dK):
 
@@ -87,7 +88,7 @@ class LHPlusModel():
 
         return expMinLK
 
-##########################################################################
+###############################################################################
 
     def expMinLK(self, K):
 
@@ -105,8 +106,10 @@ class LHPlusModel():
         inva = NormSInv(arga)
         invb = NormSInv(argb)
 
-        a = 1.0 / self._beta * (c - sqrt(1.0 - self._beta * self._beta) * inva)
-        b = 1.0 / self._beta * (c - sqrt(1.0 - self._beta * self._beta) * invb)
+        RtOneMinusBeta2 = np.sqrt(1.0 - self._beta * self._beta)
+
+        a = 1.0 / self._beta * (c - RtOneMinusBeta2 * inva)
+        b = 1.0 / self._beta * (c - RtOneMinusBeta2 * invb)
 
         r12 = self._beta
         r13 = self._beta0
@@ -116,14 +119,14 @@ class LHPlusModel():
         el2 = self._P0 * self._H0 * (1.0 - self._R0)
         el3 = -K * (M(c0, a, self._beta0) - N(a))
         el4 = - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
-        term1 = M(c, a, self._beta) + phi3(b, c, c0, r12,
-                                           r13, r23) - phi3(a, c, c0, r12, r13, r23)
+        term1 = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
+            - phi3(a, c, c0, r12, r13, r23)
         el5 = - (1.0 - self._R) * self._H * term1
 
         elk1k2 = el1 + el2 + el3 + el4 + el5
         return elk1k2
 
-##########################################################################
+###############################################################################
 
     def expMinLK2(self, K):
 
@@ -142,8 +145,10 @@ class LHPlusModel():
         inva = NormSInv(arga)
         invb = NormSInv(argb)
 
-        a = (1.0 / self._beta) * (c - sqrt(1.0 - self._beta * self._beta) * inva)
-        b = (1.0 / self._beta) * (c - sqrt(1.0 - self._beta * self._beta) * invb)
+        RtOneMinusBeta2 = np.sqrt(1.0 - self._beta * self._beta)
+
+        a = (1.0 / self._beta) * (c - RtOneMinusBeta2 * inva)
+        b = (1.0 / self._beta) * (c - RtOneMinusBeta2 * invb)
 
         r12 = self._beta
         r13 = self._beta0
@@ -154,12 +159,13 @@ class LHPlusModel():
         el1 = el1 - K * (M(c0, a, self._beta0) - N(a))
         el1 = el1 - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
 
-        term = M(c, a, self._beta) + phi3(b, c, c0, r12,
-                                          r13, r23) - phi3(a, c, c0, r12, r13, r23)
+        term = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
+            - phi3(a, c, c0, r12, r13, r23)
+
         el1 = el1 - (1.0 - self._R) * self._H * term
         return el1
 
-##########################################################################
+###############################################################################
 
     def trancheSurvivalProbability(self, k1, k2):
 
@@ -172,4 +178,4 @@ class LHPlusModel():
         q = 1.0 - (elK2 - elK1) / (k2 - k1)
         return q
 
-##########################################################################
+###############################################################################

@@ -13,12 +13,13 @@ import numpy as np
 
 
 class FinFrequencyTypes(Enum):
-    CONTINUOUS = 1
-    SIMPLE = 2
-    ANNUAL = 3
-    SEMI_ANNUAL = 4
-    QUARTERLY = 5
-    MONTHLY = 6
+    SIMPLE = 0
+    ANNUAL = 1
+    SEMI_ANNUAL = 2
+    TRI_ANNUAL = 3
+    QUARTERLY = 4
+    MONTHLY = 12
+    CONTINUOUS = 99
 
 ###############################################################################
 
@@ -35,6 +36,8 @@ def FinFrequency(frequencyType):
             return 1
         elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
             return 2
+        elif frequencyType == FinFrequencyTypes.TRI_ANNUAL:
+            return 3
         elif frequencyType == FinFrequencyTypes.QUARTERLY:
             return 4
         elif frequencyType == FinFrequencyTypes.MONTHLY:

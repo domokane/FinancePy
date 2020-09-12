@@ -17,10 +17,10 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
 from ...products.credit.FinCDS import FinCDS
 
 from ...models.FinModelGaussianCopula1F import homogeneousBasketLossDbn
-from ...models.FinModelGaussianCopula import _defaultTimesGC
+from ...models.FinModelGaussianCopula import defaultTimesGC
 from ...models.FinModelStudentTCopula import FinModelStudentTCopula
 
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
+from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
@@ -171,10 +171,10 @@ class FinCDSBasket(object):
         if nToDefault > numCredits or nToDefault < 1:
             raise FinError("nToDefault must be 1 to numCredits")
 
-        defaultTimes = _defaultTimesGC(issuerCurves,
-                                       correlationMatrix,
-                                       numTrials,
-                                       seed)
+        defaultTimes = defaultTimesGC(issuerCurves,
+                                      correlationMatrix,
+                                      numTrials,
+                                      seed)
 
         rpv01, protPV = self.valueLegs_MC(valuationDate,
                                           nToDefault,

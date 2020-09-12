@@ -4,7 +4,7 @@
 
 import sys
 import numpy as np
-from numba import njit
+from numba import njit, float64
 from typing import Union
 from .FinDate import FinDate
 from .FinGlobalVariables import gDaysInYear
@@ -356,6 +356,44 @@ def toUsableType(t):
 ###############################################################################
 
 
+@njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
+def uniformToDefaultTime(u, t, v):
+    ''' Fast mapping of a uniform random variable to a default time given a
+    survival probability curve. '''
+
+    if u == 0.0:
+        return 99999.0
+
+    if u == 1.0:
+        return 0.0
+
+    numPoints = len(v)
+    index = 0
+
+    for i in range(1, numPoints):
+        if u <= v[i - 1] and u > v[i]:
+            index = i
+            break
+
+    if index == numPoints + 1:
+        t1 = t[numPoints - 1]
+        q1 = v[numPoints - 1]
+        t2 = t[numPoints]
+        q2 = v[numPoints]
+        lam = np.log(q1 / q2) / (t2 - t1)
+        tau = t2 - np.log(u / q2) / lam
+    else:
+        t1 = t[index - 1]
+        q1 = v[index - 1]
+        t2 = t[index]
+        q2 = v[index]
+        tau = (t1 * np.log(q2 / u) + t2 * np.log(u / q1)) / np.log(q2 / q1)
+
+    return tau
+
+###############################################################################
+
+
 def checkArgumentTypes(func, values):
     ''' Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
@@ -365,7 +403,8 @@ def checkArgumentTypes(func, values):
         usableType = toUsableType(annotationType)
         if(not isinstance(value, usableType)):
 
-            print("==>", value, type(value), usableType, isinstance(value, usableType))
+            print("==>", value, type(value), usableType,
+                  isinstance(value, usableType))
             s = f"In {func.__module__}.{func.__name__}:\n"
             s += f"Mismatched Types: expected a "
             s += f"{valueName} of type '{usableType.__name__}', however"

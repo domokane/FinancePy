@@ -4,8 +4,8 @@
 
 import numpy as np
 
+from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinGlobalVariables import gDaysInYear
 
 ##########################################################################

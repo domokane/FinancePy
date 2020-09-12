@@ -5,7 +5,6 @@
 
 import numpy as np
 from scipy import optimize
-from numba import njit
 
 from ...finutils.FinMath import M
 from ...finutils.FinGlobalVariables import gDaysInYear

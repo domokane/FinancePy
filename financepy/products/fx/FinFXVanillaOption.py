@@ -121,7 +121,7 @@ def solveForStrike(valueDate,
                 forDiscountCurve, delta, deltaType, volatility)
 
     sigma = optimize.newton(g, x0=spotFXRate, args=argtuple,
-                            tol=1e-5, maxiter=50, fprime2=None)
+                            tol=1e-5, maxiter=100, fprime2=None)
     return sigma
 
 ###############################################################################
@@ -236,7 +236,7 @@ class FinFXVanillaOption():
         F0T = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes or \
-            type(model) == FinFXModelSABR:
+           type(model) == FinFXModelSABR:
 
             if type(model) == FinFXModelBlackScholes:
                 volatility = model._volatility
@@ -268,11 +268,11 @@ class FinFXVanillaOption():
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
                 numStepsPerYear = 100
                 vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
+                          texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
             elif self._optionType == FinOptionTypes.AMERICAN_PUT:
                 numStepsPerYear = 100
                 vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
-                        texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
+                           texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
             else:
                 raise FinError("Unknown option type")
 
@@ -413,10 +413,13 @@ class FinFXVanillaOption():
             else:
                 raise FinError("Unknown option type")
 
-            pips_spot_delta = w*np.exp(-rf*tdel)*N(w*d1)
-            pips_fwd_delta = w*N(w*d1)
-            pct_spot_delta_prem_adj = w*np.exp(-rd*tdel)*N(w*d2)*K/S0
-            pct_fwd_delta_prem_adj = w*K*N(w*d2)/F
+            n1 = N(w*d1)
+            n2 = N(w*d2)
+
+            pips_spot_delta = w*np.exp(-rf*tdel)*n1
+            pips_fwd_delta = w*n1
+            pct_spot_delta_prem_adj = w*np.exp(-rd*tdel)*n2*K/S0
+            pct_fwd_delta_prem_adj = w*K*n2/F
 
         return {"pips_spot_delta": pips_spot_delta,
                 "pips_fwd_delta": pips_fwd_delta,

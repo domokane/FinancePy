@@ -3,7 +3,6 @@
 ##############################################################################
 
 import numpy as np
-from scipy.stats import norm
 from scipy.optimize import fmin_powell
 from scipy.optimize import newton
 import matplotlib.pyplot as plt
@@ -17,10 +16,12 @@ from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-N = norm.cdf
+# N = norm.cdf
+from ...finutils.FinMath import normcdf_fast as N
 
-from ...finutils.FinHelperFunctions import labelToString
-
+###############################################################################
+# TODO: Speed up search for strike by providing derivative function to go with
+#       delta fit.
 ###############################################################################
 
 
@@ -332,9 +333,11 @@ class FinFXVolSurface():
 
             # Determine parameters of vol surface using Powell minimisation
             args = (self, call, put)
-            xopt = fmin_powell(obj, c0, args, disp=False)
+            tol = 1e-8
+            xopt = fmin_powell(obj, c0, args, disp=False, ftol=tol)
             v = obj(xopt, *args)
-            if abs(v) > 1e-20:
+
+            if abs(v) > tol:
                 raise FinError("Failed to fit volatility smile curve.")
 
             # Calculate the 25 Delta call and put strikes from new vol surface
@@ -347,8 +350,6 @@ class FinFXVolSurface():
 
             self._parameters[i, :] = np.array(xopt)
 
-            ###################################################################
-
 ###############################################################################
 
     def solveForSmileStrike(self,
@@ -357,7 +358,7 @@ class FinFXVolSurface():
                             tenorIndex):
         ''' Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
-        strike '''
+        strike. '''
 
         argtuple = (self, vanillaOption, deltaTarget, tenorIndex)
 
@@ -519,27 +520,3 @@ class FinFXVolSurface():
         plt.legend(loc='upper right')
 
 ###############################################################################
-
-# def calculatePDF(self):
-#     ''' calculate the probability density function of the underlying
-#     using the volatility smile or skew curve following the approach set
-#     out in Breedon and Litzenberger. '''
-
-#     strikes = []
-#     volatilities = []
-#     numStrikes = len(strikes)
-#     numVols = len(volatilities)
-
-#     if numStrikes != numVols:
-#         raise FinError("Strike and volatility vectors not same length.")
-
-#     for i in range(1, numStrikes):
-#         if strikes[i] <= strikes[i - 1]:
-#             raise FinError("Grid Strikes are not in increasing order")
-
-#     self._curveDate = curveDate
-#     self._strikes = np.array(strikes)
-#     self._volatilities = np.array(volatilities)
-
-#     self._z = np.polyfit(self._strikes, self._volatilities, polynomial)
-#     self._f = np.poly1d(self._z)

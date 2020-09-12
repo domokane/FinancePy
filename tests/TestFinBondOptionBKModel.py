@@ -56,7 +56,7 @@ def test_FinBondOption():
 
     testCases.header("LABEL", "VALUE")
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    price = bond.fullPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.print("Fixed Income Price:", price)
 
     numTimeSteps = 100
@@ -87,7 +87,7 @@ def test_FinBondOption():
 
     optionType = FinOptionTypes.AMERICAN_CALL
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    price = bond.fullPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.header("LABEL", "VALUE")
     testCases.print("Fixed Income Price:", price)
 
@@ -117,7 +117,7 @@ def test_FinBondOption():
 
     optionType = FinOptionTypes.EUROPEAN_PUT
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    price = bond.fullPriceFromDiscountCurve(settlementDate, discountCurve)
 
     for strikePrice in strikes:
 
@@ -143,7 +143,7 @@ def test_FinBondOption():
 
     optionType = FinOptionTypes.AMERICAN_PUT
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    price = bond.fullPriceFromDiscountCurve(settlementDate, discountCurve)
 
     for strikePrice in strikes:
 
@@ -253,7 +253,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
     expiryDate = settlementDate.addTenor("18m")
     face = 100.0
 
-    spotValue = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    spotValue = bond.fullPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.header("LABEL", "VALUE")
     testCases.print("BOND PRICE", spotValue)
 

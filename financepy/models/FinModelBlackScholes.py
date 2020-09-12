@@ -7,6 +7,7 @@
 import numpy as np
 
 from scipy.stats import norm
+from ..finutils.FinGlobalVariables import gSmall
 N = norm.cdf
 
 ###############################################################################
@@ -15,12 +16,12 @@ N = norm.cdf
 
 
 def bsValue(s, t, k, r, q, v, phi):
-    ''' Price a derivative using Black-Scholes model where
-    phi is 1 for a call, -1 for a put.'''
+    ''' Price a derivative using Black-Scholes model where phi is 1 for a call,
+    and -1 for a put.'''
 
-    k = max(k, 1e-6)
-    t = max(t, 1e-6)
-    v = max(v, 1e-6)
+    k = max(k, gSmall)
+    t = max(t, gSmall)
+    v = max(v, gSmall)
 
     sqrtT = np.sqrt(t)
     ss = s * np.exp(-q*t)

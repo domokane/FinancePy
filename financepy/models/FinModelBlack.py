@@ -7,6 +7,7 @@
 import numpy as np
 
 from ..finutils.FinMath import N
+from ..finutils.FinGlobalVariables import gSmall
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinOptionTypes import FinOptionTypes
 from ..finutils.FinError import FinError
@@ -55,9 +56,9 @@ class FinModelBlack():
         sqrtT = np.sqrt(t)
         vol = self._volatility
 
-        t = np.maximum(t, 1e-10)
-        vol = np.maximum(vol, 1e-10)
-        k = np.maximum(k, 1e-10)
+        t = np.maximum(t, gSmall)
+        vol = np.maximum(vol, gSmall)
+        k = np.maximum(k, gSmall)
 
         sqrtT = np.sqrt(t)
 

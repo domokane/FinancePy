@@ -3,6 +3,8 @@ from .FinEquityAmericanOption import *
 from .FinEquityBarrierOption import *
 from .FinEquityBasketOption import *
 from .FinEquityBinomialTree import *
+from .FinEquityChooserOption import *
+from .FinEquityCliquetOption import *
 from .FinEquityCompoundOption import *
 from .FinEquityDigitalOption import *
 from .FinEquityFixedLookbackOption import *

@@ -607,7 +607,16 @@ def phi2(h1, hk, r):
 
     return bv
 
-##########################################################################
+###############################################################################
+
+
+@njit(float64[:, :](float64[:, :]), cache=True, fastmath=True)
+def cholesky(rho):
+    ''' Numba-compliant wrapper around Numpy cholesky function. '''
+    chol = np.linalg.cholesky(rho)
+    return chol
+
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
