@@ -14,6 +14,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
+from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -150,9 +151,12 @@ def test_HullWhiteBondOption():
         model.buildTree(texp, times, dfs)
 
         americanExercise = False
+
+        exerciseType = FinOptionExerciseTypes.EUROPEAN
+
         v1 = model.americanBondOption_Tree(texp, strikePrice, face,
                                            couponTimes, couponFlows,
-                                           americanExercise)
+                                           exerciseType)
 
         v2 = model.europeanBondOption_Tree(texp, strikePrice, face,
                                            couponTimes, couponFlows)
@@ -240,7 +244,7 @@ def test_HullWhiteCallableBond():
 
     ###########################################################################
 
-    v1 = bond.valueBondUsingDiscountCurve(settlementDate, curve)
+    v1 = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
 
     sigma = 0.02  # basis point volatility
     a = 0.1

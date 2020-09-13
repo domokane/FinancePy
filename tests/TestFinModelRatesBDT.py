@@ -144,7 +144,7 @@ def test_BDTExampleTwo():
 
     curve = FinDiscountCurve(settlementDate, dates, dfs)
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
+    price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
     testCases.print("Fixed Income Price:", price)
 
     sigma = 0.20
@@ -239,7 +239,7 @@ def test_BDTExampleThree():
                 couponTimes = np.array(couponTimes)
                 couponFlows = np.array(couponFlows)
 
-                price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
+                price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
 
                 model = FinModelRatesBDT(sigma, numTimeSteps)
                 model.buildTree(tmat, times, dfs)
@@ -262,8 +262,9 @@ def test_BDTExampleThree():
                                 "%9.2f" % (v['rec']*100.0))
 
 ###############################################################################
-
 # This has broken and needs to be repaired!!!!
+
+
 test_BDTExampleOne()
 test_BDTExampleTwo()
 test_BDTExampleThree()

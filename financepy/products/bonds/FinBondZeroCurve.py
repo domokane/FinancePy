@@ -187,8 +187,8 @@ class FinBondZeroCurve(FinDiscountCurve):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         valueTable = [self._times, self._values]
         precision = "10.7f"
-
-        return tableToString(header, valueTable, precision)
+        s += tableToString(header, valueTable, precision)
+        return s
 
 ###############################################################################
 

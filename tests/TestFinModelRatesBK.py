@@ -83,7 +83,7 @@ def test_BKExampleTwo():
     dfs = np.exp(-0.05*times)
     curve = FinDiscountCurve(settlementDate, dates, dfs)
 
-    price = bond.valueBondUsingDiscountCurve(settlementDate, curve)
+    price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
     testCases.header("LABEL", "VALUE")
     testCases.print("Fixed Income Price:", price)
 

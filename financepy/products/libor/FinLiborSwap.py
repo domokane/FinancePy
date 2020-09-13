@@ -11,6 +11,7 @@ from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinMath import ONE_MILLION
 
 ##########################################################################
 
@@ -24,7 +25,7 @@ class FinLiborSwap(object):
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
-                 notional: float = 100.0,
+                 notional: float = ONE_MILLION,
                  floatSpread: float = 0.0,
                  floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,

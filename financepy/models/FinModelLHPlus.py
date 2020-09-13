@@ -75,7 +75,7 @@ class LHPlusModel():
         expMinLK = 0.0
         checkSum = 0.0
 
-        for i in range(0, numSteps):
+        for _ in range(0, numSteps):
             k0 += dK
             cdf1 = self.probLossGreaterThanK(k0)
             pdf = cdf0 - cdf1

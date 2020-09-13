@@ -41,9 +41,9 @@ def getPaths(numPaths,
 ###############################################################################
 
 
-#@njit(float64[:, :, :](int64, int64, int64, float64, float64[:], float64[:],
-#                       float64[:], float64[:, :], int64), cache=True, fastmath=True)
-@njit
+@njit(float64[:, :, :](int64, int64, int64, float64, float64[:], float64[:],
+                       float64[:], float64[:, :], int64),
+      cache=True, fastmath=True)
 def getPathsAssets(numAssets,
                    numPaths,
                    numTimeSteps,
@@ -66,7 +66,15 @@ def getPathsAssets(numAssets,
 
     g = np.random.standard_normal((numPaths, numTimeSteps + 1, numAssets))
     c = cholesky(corrMatrix)
-    gCorr = np.dot(g, c.transpose())
+    gCorr = np.empty((numPaths, numTimeSteps + 1, numAssets))
+
+    # Calculate the dot product
+    for ip in range(0, numPaths):
+        for it in range(0, numTimeSteps+1):
+            for ia in range(0, numAssets):
+                gCorr[ip][it][ia] = 0.0
+                for ib in range(0, numAssets):
+                    gCorr[ip][it][ia] += g[ip][it][ib] * c[ia][ib]
 
     for ip in range(0, numPaths):
         for ia in range(0, numAssets):
@@ -80,18 +88,17 @@ def getPathsAssets(numAssets,
                 w = np.exp(z * vsqrtdts[ia])
                 v = m[ia]
                 Sall[ip, it, ia] = Sall[ip, it - 1, ia] * v*w
-                Sall[ip + numPaths, it, ia] = Sall[ip +
-                                                   numPaths, it - 1, ia] * v/w
+                Sall[ip + numPaths, it, ia] = Sall[ip + numPaths,
+                                                   it - 1, ia] * v/w
 
     return Sall
 
 ###############################################################################
 
 
-#@njit(float64[:, :](int64, int64, float64, float64[:], float64[:],
-#                    float64[:], float64[:, :], int64),
-#      cache=True, fastmath=True)
-@njit(cache=True, fastmath=True)
+@njit(float64[:, :](int64, int64, float64, float64[:], float64[:],
+                    float64[:], float64[:, :], int64),
+      cache=True, fastmath=True)
 def getAssets(numAssets,
               numPaths,
               t,
@@ -110,7 +117,14 @@ def getAssets(numAssets,
     Sall = np.empty((2 * numPaths, numAssets))
     g = np.random.standard_normal((numPaths, numAssets))
     c = cholesky(corrMatrix)
-    gCorr = np.dot(g, c.transpose())
+    gCorr = np.empty((numPaths, numAssets))
+
+    # Calculate the dot product
+    for ip in range(0, numPaths):
+        for ia in range(0, numAssets):
+            gCorr[ip][ia] = 0.0
+            for ib in range(0, numAssets):
+                gCorr[ip][ia] += g[ip][ib] * c[ia][ib]
 
     for ip in range(0, numPaths):
         for ia in range(0, numAssets):

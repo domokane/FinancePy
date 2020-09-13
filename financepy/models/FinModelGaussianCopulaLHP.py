@@ -10,7 +10,6 @@ import numpy as np
 from ..finutils.FinMath import N
 from ..finutils.FinMath import normpdf, norminvcdf, M
 from ..finutils.FinError import FinError
-from ..finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -52,7 +51,7 @@ def trSurvProbLHP(k1,
     value = 1.0 - (elk2 - elk1) / (k2 - k1)
     return value
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)

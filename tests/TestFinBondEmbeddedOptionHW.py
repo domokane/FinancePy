@@ -64,7 +64,7 @@ def test_FinBondEmbeddedOptionMATLAB():
         putDate = putDate.addMonths(1)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    v = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.print("Bond Pure Price:", v)
 
     sigma = 0.01  # basis point volatility
@@ -146,7 +146,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
                                          putDates, putPrices)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.valueBondUsingDiscountCurve(settlementDate, discountCurve)
+    v = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("PERIOD", "NumTimeSteps", "BondWithOption", "BondPure")

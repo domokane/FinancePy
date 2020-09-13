@@ -14,6 +14,8 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinMath import corrMatrixGenerator
 from financepy.finutils.FinDate import FinDate
+from financepy.models.FinGBMProcess import getPathsAssets
+
 import time
 import numpy as np
 from os.path import dirname, join
@@ -355,8 +357,29 @@ def test_FinCDSBasket():
                 period = (end - start)
                 testCases.print(period, numTrials, rho, ntd, v[2] * 10000)
 
-##########################################################################
+###############################################################################
 
 
+def testFinGBMProcess():
+
+    numAssets = 3
+    numPaths = 5
+    numTimeSteps = 1
+    t = 1.0
+    mus = 0.03 * np.ones(numAssets)
+    stockPrices = 100.0 * np.ones(numAssets)
+    volatilities = 0.2 * np.ones(numAssets)
+    rho = 0.8
+    corrMatrix = corrMatrixGenerator(rho, numAssets)
+    seed = 1912
+
+    x = getPathsAssets(numAssets, numPaths, numTimeSteps, t,
+                       mus, stockPrices, volatilities,
+                       corrMatrix, seed)
+
+###############################################################################
+
+
+testFinGBMProcess()
 test_FinCDSBasket()
 testCases.compareTestCases()

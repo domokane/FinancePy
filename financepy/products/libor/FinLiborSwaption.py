@@ -238,6 +238,11 @@ class FinLiborSwaption():
 
             tmat = (self._maturityDate - valuationDate) / gDaysInYear
 
+            # Sometimes the coupon is adjusted although the maturity is not
+            # So we set the maturity time to be the adjusted final coupon tine
+            if self._maturityDate != swap._adjustedFixedDates[-1]:
+                tmat = cpnTimes[-1]
+
             model.buildTree(tmat, dfTimes, dfValues)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat, 1.0, 1.0,

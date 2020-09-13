@@ -12,16 +12,15 @@ from ..finutils.FinError import FinError
 from .FinModelLossDbnBuilder import indepLossDbnRecursionGCD
 from .FinModelLossDbnBuilder import indepLossDbnHeterogeneousAdjBinomial
 from .FinModelLossDbnBuilder import portfolioGCD
-from ..finutils.FinHelperFunctions import labelToString
 
-##########################################################################
+###############################################################################
 
 minZ = -6.0
 
-##########################################################################
+###############################################################################
 # This implements the one-factor latent variable formulation of the Gaussian
 # Copula model as well as some approximations
-##########################################################################
+###############################################################################
 
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
@@ -57,7 +56,7 @@ def lossDbnRecursionGCD(numCredits,
     for iCredit in range(0, int(numCredits)):
         thresholds[iCredit] = norminvcdf(defaultProbs[iCredit])
 
-    for iStep in range(0, numIntegrationSteps):
+    for _ in range(0, numIntegrationSteps):
         for iCredit in range(0, numCredits):
             beta = betaVector[iCredit]
             denom = np.sqrt(1.0 - beta * beta)
@@ -80,7 +79,7 @@ def lossDbnRecursionGCD(numCredits,
 
     return uncondLossDbn
 
-##########################################################################
+###############################################################################
 
 @njit(float64[:](float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
@@ -127,19 +126,11 @@ def homogeneousBasketLossDbn(survivalProbabilities,
 
     return lossDbn
 
-##########################################################################
+###############################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        int64,
-        float64[:],
-        float64[:],
-        float64[:],
-        int64),
-    fastmath=True)
+@njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
+              int64), fastmath=True)
 def trSurvProbRecursion(k1,
                         k2,
                         numCredits,
@@ -207,10 +198,10 @@ def trSurvProbRecursion(k1,
     q = 1.0 - trancheEL / (k2 - k1)
     return q
 
-##########################################################################
+###############################################################################
 
-@njit(float64(float64, float64, float64, float64),
-      fastmath=True, cache=True)
+
+@njit(float64(float64, float64, float64, float64), fastmath=True, cache=True)
 def gaussApproxTrancheLoss(k1, k2, mu, sigma):
 
     if abs(sigma) < 1e-6:
@@ -230,20 +221,11 @@ def gaussApproxTrancheLoss(k1, k2, mu, sigma):
 
     return gaussApproxTrancheLoss
 
-##########################################################################
+###############################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        int64,
-        float64[:],
-        float64[:],
-        float64[:],
-        int64),
-    fastmath=True,
-    cache=True)
+@njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
+              int64), fastmath=True, cache=True)
 def trSurvProbGaussian(k1,
                        k2,
                        numCredits,
@@ -278,7 +260,7 @@ def trSurvProbGaussian(k1,
         losses[iCredit] = (1.0 - recoveryRates[iCredit]) / numCredits
 
     v = 0.0
-    for iStep in range(0, numIntegrationSteps):
+    for _ in range(0, numIntegrationSteps):
 
         mu = 0.0
         var = 0.0
@@ -303,7 +285,7 @@ def trSurvProbGaussian(k1,
     q = 1.0 - v / (k2 - k1)
     return q
 
-##########################################################################
+###############################################################################
 
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
@@ -351,20 +333,11 @@ def lossDbnHeterogeneousAdjBinomial(numCredits,
 
     return uncondLossDbn
 
-##########################################################################
+###############################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        int64,
-        float64[:],
-        float64[:],
-        float64[:],
-        int64),
-    fastmath=True,
-    cache=True)
+@njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
+              int64), fastmath=True, cache=True)
 def trSurvProbAdjBinomial(k1,
                           k2,
                           numCredits,
@@ -414,4 +387,4 @@ def trSurvProbAdjBinomial(k1,
     q = 1.0 - trancheEL / (k2 - k1)
     return q
 
-##########################################################################
+###############################################################################
