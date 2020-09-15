@@ -24,7 +24,7 @@ class FinOptionTypes(Enum):
 ###############################################################################
 
 
-class FinLiborSwaptionTypes(Enum):
+class FinLiborSwapTypes(Enum):
     PAYER = 1
     RECEIVER = 2
 

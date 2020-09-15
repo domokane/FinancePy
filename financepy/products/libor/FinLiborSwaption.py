@@ -35,7 +35,7 @@ from ...models.FinModelRatesBK import FinModelRatesBK
 from ...models.FinModelRatesBDT import FinModelRatesBDT
 
 from ...finutils.FinOptionTypes import FinOptionTypes, FinOptionExerciseTypes
-from ...finutils.FinOptionTypes import FinLiborSwaptionTypes
+from ...finutils.FinOptionTypes import FinLiborSwapTypes
 
 ###############################################################################
 
@@ -48,8 +48,8 @@ class FinLiborSwaption():
     def __init__(self,
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
-                 maturityDate: FinDate,
-                 swaptionType: FinLiborSwaptionTypes,
+                 swapMaturityDate: FinDate,
+                 swapType: FinLiborSwapTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -70,13 +70,13 @@ class FinLiborSwaption():
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
 
-        if exerciseDate > maturityDate:
+        if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
-        self._maturityDate = maturityDate
-        self._swaptionType = swaptionType
+        self._swapMaturityDate = swapMaturityDate
+        self._swapType = swapType
 
         self._fixedCoupon = fixedCoupon
         self._fixedFrequencyType = fixedFrequencyType
@@ -102,13 +102,14 @@ class FinLiborSwaption():
               model):
         ''' Valuation of a Libor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
-        FinModelBlackShifted, '''
+        FinModelBlackShifted, FinModelSABR, FinModelHW, FinModelBK and 
+        FinModelBDT. The last two involved a tree-based valuation. '''
 
         floatSpread = 0.0
-        payFixedFlag = True
 
         swap = FinLiborSwap(self._exerciseDate,
-                            self._maturityDate,
+                            self._swapMaturityDate,
+                            self._swapType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -116,7 +117,6 @@ class FinLiborSwaption():
                             floatSpread,
                             self._floatFrequencyType,
                             self._floatDayCountType,
-                            payFixedFlag,
                             self._calendarType,
                             self._busDayAdjustType,
                             self._dateGenRuleType)
@@ -131,78 +131,91 @@ class FinLiborSwaption():
         s = swap.swapRate(valuationDate, discountCurve)
 
         texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
+        tmat = (self._swapMaturityDate - self._settlementDate) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
 
+        #######################################################################
+        # For the tree models we need to generate a vector of the coupons
+        #######################################################################
+
+        cpnTimes = [texp]
+        cpnFlows = [0.0]
+
+        # The first flow is always the previous coupon date
+        numFlows = len(swap._adjustedFixedDates)
+
+        for iFlow in range(1, numFlows):
+            flowDate = swap._adjustedFixedDates[iFlow]
+            cpnTime = (flowDate - valuationDate) / gDaysInYear
+            cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+            cpnTimes.append(cpnTime)
+            cpnFlows.append(cpnFlow)
+
+        cpnTimes = np.array(cpnTimes)
+        cpnFlows = np.array(cpnFlows)
+
+        dfTimes = discountCurve._times
+        dfValues = discountCurve._dfValues
+
+        if np.any(cpnTimes < 0.0):
+            raise FinError("No coupon times can be before the value date.")
+
+        strikePrice = 1.0
+        face = 1.0
+
+        #######################################################################
+
         if isinstance(model, FinModelBlack):
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelRatesHW):
 
-            cpnTimes = [texp]
-            cpnFlows = [0.0]
-
-            # The first flow is always the previous coupon date
-            numFlows = len(swap._adjustedFixedDates)
-
-            for iFlow in range(1, numFlows):
-                flowDate = swap._adjustedFixedDates[iFlow]
-                cpnTime = (flowDate - valuationDate) / gDaysInYear
-                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
-                cpnTimes.append(cpnTime)
-                cpnFlows.append(cpnFlow)
-
-            cpnTimes = np.array(cpnTimes)
-            cpnFlows = np.array(cpnFlows)
-
-            dfTimes = discountCurve._times
-            dfValues = discountCurve._dfValues
-
-            if np.any(cpnTimes < 0.0):
-                raise FinError("No coupon times can be before the value date.")
-
-            swaptionPx = model.europeanBondOption_Jamshidian(texp, 1.0,
-                                                             1.0, cpnTimes,
+            swaptionPx = model.europeanBondOption_Jamshidian(texp,
+                                                             strikePrice,
+                                                             face, 
+                                                             cpnTimes,
                                                              cpnFlows,
-                                                             dfTimes, dfValues)
+                                                             dfTimes,
+                                                             dfValues)
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['put']
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
@@ -213,85 +226,36 @@ class FinLiborSwaption():
 
         elif isinstance(model, FinModelRatesBK):
 
-            print("** USE WITH CAUTION AS TREE MAY NEED TWEAKS FOR ACCRUED **")
-            cpnTimes = [texp]
-            cpnFlows = [0.0]
-
-            # The first flow is always the previous coupon date
-            numFlows = len(swap._adjustedFixedDates)
-
-            for iFlow in range(1, numFlows):
-                flowDate = swap._adjustedFixedDates[iFlow]
-                cpnTime = (flowDate - valuationDate) / gDaysInYear
-                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
-                cpnTimes.append(cpnTime)
-                cpnFlows.append(cpnFlow)
-
-            cpnTimes = np.array(cpnTimes)
-            cpnFlows = np.array(cpnFlows)
-
-            dfTimes = discountCurve._times
-            dfValues = discountCurve._dfValues
-
-            if np.any(cpnTimes < 0.0):
-                raise FinError("No coupon times can be before the value date.")
-
-            tmat = (self._maturityDate - valuationDate) / gDaysInYear
-
-            # Sometimes the coupon is adjusted although the maturity is not
-            # So we set the maturity time to be the adjusted final coupon tine
-            if self._maturityDate != swap._adjustedFixedDates[-1]:
-                tmat = cpnTimes[-1]
-
             model.buildTree(tmat, dfTimes, dfValues)
             swaptionPx = model.bermudanSwaption(texp,
-                                                tmat, 1.0, 1.0,
+                                                tmat,
+                                                strikePrice,
+                                                face,
                                                 cpnTimes,
                                                 cpnFlows,
                                                 FinOptionExerciseTypes.EUROPEAN)
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
 
         elif isinstance(model, FinModelRatesBDT):
 
-            print("** USE WITH CAUTION AS TREE MAY NEED TWEAKS FOR ACCRUED **")
-            cpnTimes = [texp]
-            cpnFlows = [0.0]
-
-            # The first flow is always the previous coupon date
-            numFlows = len(swap._adjustedFixedDates)
-
-            for iFlow in range(1, numFlows):
-                flowDate = swap._adjustedFixedDates[iFlow]
-                cpnTime = (flowDate - valuationDate) / gDaysInYear
-                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
-                cpnTimes.append(cpnTime)
-                cpnFlows.append(cpnFlow)
-
-            cpnTimes = np.array(cpnTimes)
-            cpnFlows = np.array(cpnFlows)
-
-            dfTimes = discountCurve._times
-            dfValues = discountCurve._dfValues
-
-            if np.any(cpnTimes < 0.0):
-                raise FinError("No coupon times can be before the value date.")
-
-            tmat = (self._maturityDate - valuationDate) / gDaysInYear
-
             model.buildTree(tmat, dfTimes, dfValues)
-            swaptionPx = model.bermudanSwaption(texp, tmat, 1.0, 1.0,
-                                                cpnTimes, cpnFlows,
+            swaptionPx = model.bermudanSwaption(texp,
+                                                tmat,
+                                                strikePrice,
+                                                face,
+                                                cpnTimes,
+                                                cpnFlows,
                                                 FinOptionExerciseTypes.EUROPEAN)
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
@@ -324,10 +288,10 @@ class FinLiborSwaption():
         Black volatility for the standard arbitrage-free valuation. '''
 
         floatSpread = 0.0
-        payFixedFlag = True
 
         swap = FinLiborSwap(self._exerciseDate,
-                            self._maturityDate,
+                            self._swapMaturityDate,
+                            self._swapType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -335,7 +299,6 @@ class FinLiborSwaption():
                             floatSpread,
                             self._floatFrequencyType,
                             self._floatDayCountType,
-                            payFixedFlag,
                             self._calendarType,
                             self._busDayAdjustType,
                             self._dateGenRuleType)
@@ -354,10 +317,10 @@ class FinLiborSwaption():
 
         if isinstance(model, FinModelBlack):
 
-            if self._swaptionType == FinLiborSwaptionTypes.PAYER:
+            if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
+            elif self._swapType == FinLiborSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
@@ -405,8 +368,8 @@ class FinLiborSwaption():
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
-        s += labelToString("SWAPTION TYPE", str(self._swaptionType))
-        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("SWAP TYPE", str(self._swapType))
+        s += labelToString("SWAP MATURITY DATE", self._swapMaturityDate)
         s += labelToString("SWAP NOTIONAL", self._notional)
         s += labelToString("FIXED COUPON", self._fixedCoupon * 100)
         s += labelToString("FIXED FREQUENCY", str(self._fixedFrequencyType))

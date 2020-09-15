@@ -40,7 +40,7 @@ class FinHestonNumericalScheme(Enum):
 
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
                     float64, float64, float64, float64, int64, int64, int64),
-      fastmath=True)
+      cache=True, fastmath=True)
 def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
              seed, scheme):
 

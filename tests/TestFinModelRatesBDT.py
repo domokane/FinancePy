@@ -110,6 +110,8 @@ def test_BDTExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
+    testCases.banner("===================== FIG 28.11 HULL BOOK =============")
+
     settlementDate = FinDate(1, 12, 2019)
     expiryDate = settlementDate.addTenor("18m")
     maturityDate = settlementDate.addTenor("10Y")
@@ -150,7 +152,7 @@ def test_BDTExampleTwo():
     sigma = 0.20
 
     # Test convergence
-    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    numStepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exerciseType = FinOptionExerciseTypes.AMERICAN
 
     testCases.header("Values")
@@ -167,9 +169,9 @@ def test_BDTExampleTwo():
     if PLOT_GRAPHS:
         plt.plot(numStepsList, treeVector)
 
-    # The value in Hill converges to 0.699 with 100 time steps while I get 0.70
+    # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
 
-    if 1 == 0:
+    if 1 == 1:
         print("RT")
         printTree(model._rt, 5)
         print("Q")
@@ -181,6 +183,8 @@ def test_BDTExampleTwo():
 def test_BDTExampleThree():
     # Valuation of a swaption as in Leif Andersen's paper - see Table 1 on
     # SSRN-id155208.pdf
+
+    testCases.banner("===================== ANDERSEN PAPER ==============")
 
     # This is a sanity check
     testBlackModelCheck()

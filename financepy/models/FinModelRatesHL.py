@@ -8,7 +8,7 @@ from numba import njit
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N
 from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
-from ...finutils.FinHelperFunctions import labelToString
+from ..finutils.FinHelperFunctions import labelToString
 
 interp = FinInterpTypes.FLAT_FORWARDS.value
 

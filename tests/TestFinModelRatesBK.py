@@ -15,16 +15,15 @@ from financepy.finutils.FinHelperFunctions import printTree
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
-import matplotlib.pyplot as plt
 import time
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-
 ###############################################################################
 
 def test_BKExampleOne():
-    # HULL BOOK INITIAL EXAMPLE SECTION 28.7 HW EDITION 6
+
+    testCases.banner("=== HULL INITIAL EXAMPLE SECTION 28.7 ED 6 PG 668 ====")
 
     times = [0.0, 0.5000, 1.00000, 1.50000, 2.00000, 2.500000, 3.00000]
     zeros = [0.03, 0.0343, 0.03824, 0.04183, 0.04512, 0.048512, 0.05086]
@@ -33,17 +32,23 @@ def test_BKExampleOne():
     dfs = np.exp(-zeros*times)
 
     startDate = FinDate(1, 12, 2019)
-    endDate = FinDate(1, 12, 2022)
+    endDate = FinDate(1, 6, 2021)
     sigma = 0.25
     a = 0.22
-    numTimeSteps = 40
+    numTimeSteps = 3
     tmat = (endDate - startDate)/gDaysInYear
     model = FinModelRatesBK(sigma, a, numTimeSteps)
     model.buildTree(tmat, times, dfs)
-#    printTree(model._Q)
-#    print("")
-#    printTree(model._rt)
-#    print("")
+
+    # Agrees with Figure 28.10 - Not exact as we have dt not exactly 0.50
+    if numTimeSteps < 5:
+        testCases.header("LABEL", "VALUE")
+        testCases.print("QTREE", model._Q)
+        testCases.print("RTREE", model._rt)
+        printTree(model._rt)
+        testCases.print("PU AT LAST TIME", model._pu)
+        testCases.print("PDM AT LAST TIME", model._pm)
+        testCases.print("PD AT LAST TIME", model._pd)
 
 ###############################################################################
 
@@ -89,9 +94,16 @@ def test_BKExampleTwo():
 
     sigma = 0.20
     a = 0.05
+    numTimeSteps = 26
+
+    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model.buildTree(tmat, times, dfs)
+    exerciseType = FinOptionExerciseTypes.AMERICAN
+    v = model.bondOption(texp, strikePrice, face, couponTimes,
+                         couponFlows, exerciseType)
 
     # Test convergence
-    numStepsList = [100,200,300,400,500,600,700,800,900,1000]
+    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exerciseType = FinOptionExerciseTypes.AMERICAN
 
     testCases.header("TIMESTEPS", "VALUE", "TIME")
@@ -119,7 +131,6 @@ def test_BKExampleTwo():
 
 ###############################################################################
 
-# This has broken and needs to be repaired!!!!
 
 test_BKExampleOne()
 test_BKExampleTwo()

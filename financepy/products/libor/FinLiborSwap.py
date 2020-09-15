@@ -12,6 +12,7 @@ from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinMath import ONE_MILLION
+from ...finutils.FinOptionTypes import FinLiborSwapTypes
 
 ##########################################################################
 
@@ -22,6 +23,7 @@ class FinLiborSwap(object):
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends
+                 swapType: FinLiborSwapTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -29,7 +31,6 @@ class FinLiborSwap(object):
                  floatSpread: float = 0.0,
                  floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 payFixedFlag: bool = True,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
@@ -68,7 +69,7 @@ class FinLiborSwap(object):
         self._fixedDayCountType = fixedDayCountType
         self._floatDayCountType = floatDayCountType
 
-        self._payFixedFlag = payFixedFlag
+        self._swapType = swapType
 
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
@@ -130,7 +131,7 @@ class FinLiborSwap(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._payFixedFlag is True:
+        if self._swapType == FinLiborSwapTypes.PAYER:
             value = value * (-1.0)
 
         return value

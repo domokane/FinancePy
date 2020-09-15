@@ -13,7 +13,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinOptionTypes import FinOptionExerciseTypes
-from ...finutils.FinOptionTypes import FinLiborSwaptionTypes
+from ...finutils.FinOptionTypes import FinLiborSwapTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
@@ -36,8 +36,8 @@ class FinLiborBermudanSwaption(object):
     def __init__(self,
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
-                 maturityDate: FinDate,
-                 swaptionType: FinLiborSwaptionTypes,
+                 swapMaturityDate: FinDate,
+                 swapType: FinLiborSwapTypes,
                  exerciseType: FinOptionExerciseTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
@@ -57,13 +57,13 @@ class FinLiborBermudanSwaption(object):
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
 
-        if exerciseDate > maturityDate:
+        if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
-        self._maturityDate = maturityDate
-        self._swaptionType = swaptionType
+        self._swapMaturityDate = swapMaturityDate
+        self._swapType = swapType
         self._exerciseType = exerciseType
 
         self._fixedCoupon = fixedCoupon
@@ -89,14 +89,15 @@ class FinLiborBermudanSwaption(object):
               discountCurve,
               model):
         ''' Value the Bermudan swaption using the specified model and a
-        discount curve. '''
+        discount curve. The choices of model are the Hull-White model, the 
+        Black-Karasinski model and the Black-Derman-Toy model. '''
 
         floatSpread = 0.0
-        payFixedFlag = True
 
         # The underlying is a swap in which we pay the fixed amount
         swap = FinLiborSwap(self._exerciseDate,
-                            self._maturityDate,
+                            self._swapMaturityDate,
+                            self._swapType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -104,40 +105,36 @@ class FinLiborBermudanSwaption(object):
                             floatSpread,
                             self._floatFrequencyType,
                             self._floatDayCountType,
-                            payFixedFlag,
                             self._calendarType,
                             self._busDayAdjustType,
                             self._dateGenRuleType)
 
-        #  I need to do this to generate the fixed leg flows - design issue
+        #  I need to do this to generate the fixed leg flows
         swap.pv01(valuationDate, discountCurve)
 
-        # Set up for Tree
-        numFlows = len(swap._adjustedFixedDates)
-        cpnTimes = []
-        cpnAmounts = []
-
         texp = (self._exerciseDate - valuationDate) / gDaysInYear
-        tmat = (self._maturityDate - valuationDate) / gDaysInYear
+        tmat = (self._swapMaturityDate - valuationDate) / gDaysInYear
+
+        cpnTimes = [texp]
+        cpnFlows = [0.0]
+
+        # The first flow is always the PCD
+        numFlows = len(swap._adjustedFixedDates)
 
         for iFlow in range(1, numFlows):
             flowDate = swap._adjustedFixedDates[iFlow]
             cpnTime = (flowDate - valuationDate) / gDaysInYear
             cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
             cpnTimes.append(cpnTime)
-            cpnAmounts.append(cpnFlow)
+            cpnFlows.append(cpnFlow)
 
         cpnTimes = np.array(cpnTimes)
-        cpnAmounts = np.array(cpnAmounts)
+        cpnFlows = np.array(cpnFlows)
 
         callTimes = []
         for cpnTime in cpnTimes:
             if cpnTime >= texp:
                 callTimes.append(cpnTime)
-
-#        numCalls = len(callTimes)
-#        callTimes = np.array(callTimes)
-#        callPrices = np.ones(numCalls)
 
         dfTimes = discountCurve._times
         dfValues = discountCurve._dfValues
@@ -145,104 +142,34 @@ class FinLiborBermudanSwaption(object):
         face = 1.0
         strikePrice = 1.0
 
+        #######################################################################
         # For both models, the tree needs to extend out to maturity because of
         # the multi-callable nature of the Bermudan Swaption
-        if isinstance(model, FinModelRatesHW):
+        #######################################################################
 
-            model.buildTree(tmat, dfTimes, dfValues)
-            v1 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
+        model.buildTree(tmat, dfTimes, dfValues)
+        v = model.bermudanSwaption(texp,
+                                   tmat,
+                                   strikePrice,
+                                   face,
+                                   cpnTimes,
+                                   cpnFlows,
+                                   self._exerciseType)
 
-            model._numTimeSteps += 1
-            model.buildTree(tmat, dfTimes, dfValues)
-            v2 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
-            model._numTimeSteps -= 1
-
-            if self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                v = self._notional * (v1['rec'] + v2['rec'])/2.0
-                return v
-            elif self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                v = self._notional * (v1['pay'] + v2['pay'])/2.0
-                return v
-
-        elif type(model) == FinModelRatesBK:
-
-            model.buildTree(tmat, dfTimes, dfValues)
-            v1 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
-
-            model._numTimeSteps += 1
-            model.buildTree(tmat, dfTimes, dfValues)
-            v2 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
-            model._numTimeSteps -= 1
-
-            if self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                v = self._notional * (v1['rec'] + v2['rec'])/2.0
-                return v
-            elif self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                v = self._notional * (v1['pay'] + v2['pay'])/2.0
-                return v
-
-        elif type(model) == FinModelRatesBDT:
-
-            model.buildTree(tmat, dfTimes, dfValues)
-            v1 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
-
-            model._numTimeSteps += 1
-            model.buildTree(tmat, dfTimes, dfValues)
-            v2 = model.bermudanSwaption(texp,
-                                        tmat,
-                                        strikePrice,
-                                        face,
-                                        cpnTimes,
-                                        cpnAmounts,
-                                        self._exerciseType)
-            model._numTimeSteps -= 1
-
-            if self._swaptionType == FinLiborSwaptionTypes.RECEIVER:
-                v = self._notional * (v1['rec'] + v2['rec'])/2.0
-                return v
-            elif self._swaptionType == FinLiborSwaptionTypes.PAYER:
-                v = self._notional * (v1['pay'] + v2['pay'])/2.0
-                return v
-        else:
-            raise FinError("Unknown model and option combination")
+        if self._swapType == FinLiborSwapTypes.RECEIVER:
+            v = self._notional * v['rec']
+            return v
+        elif self._swapType == FinLiborSwapTypes.PAYER:
+            v = self._notional * v['pay']
+            return v
 
 ###############################################################################
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
-        s += labelToString("MATURITY DATE", self._maturityDate)
-        s += labelToString("SWAPTION TYPE", self._swaptionType)
+        s += labelToString("MATURITY DATE", self._swapMaturityDate)
+        s += labelToString("SWAP TYPE", self._swapType)
         s += labelToString("EXERCISE TYPE", self._exerciseType)
         s += labelToString("FIXED COUPON", self._fixedCoupon)
         s += labelToString("FIXED FREQUENCY", self._fixedFrequencyType)

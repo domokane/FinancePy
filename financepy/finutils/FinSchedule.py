@@ -61,12 +61,12 @@ class FinSchedule(object):
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. '''
 
-        self._adjustedDates = []
         calendar = FinCalendar(self._calendarType)
         frequency = FinFrequency(self._frequencyType)
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []
+        self._adjustedDates = []
 
         if self._dateGenRuleType == FinDateGenRuleTypes.BACKWARD:
 
@@ -83,7 +83,11 @@ class FinSchedule(object):
             flowNum += 1
 
             # reverse order and holiday adjust dates
-            for i in range(0, flowNum):
+            # the first date is not adjusted as this was provided
+            dt = unadjustedScheduleDates[flowNum - 1]
+            self._adjustedDates.append(dt)
+
+            for i in range(1, flowNum):
 
                 dt = calendar.adjust(unadjustedScheduleDates[flowNum - i - 1],
                                      self._busDayAdjustType)
@@ -104,6 +108,7 @@ class FinSchedule(object):
                 nextDate = nextDate.addMonths(numMonths)
                 flowNum = flowNum + 1
 
+            # The first date is not adjusted as it is given
             for i in range(1, flowNum):
 
                 dt = calendar.adjust(unadjustedScheduleDates[i],
