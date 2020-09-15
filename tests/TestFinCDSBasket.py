@@ -47,6 +47,7 @@ def buildLiborCurve(tradeDate):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -56,6 +57,7 @@ def buildLiborCurve(tradeDate):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -65,6 +67,7 @@ def buildLiborCurve(tradeDate):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         0.0501,
         fixedFreq,
         dcType)
@@ -74,6 +77,7 @@ def buildLiborCurve(tradeDate):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -83,6 +87,7 @@ def buildLiborCurve(tradeDate):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         0.0501,
         fixedFreq,
         dcType)

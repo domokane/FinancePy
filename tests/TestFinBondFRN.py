@@ -11,6 +11,8 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+
 import sys
 sys.path.append("..//..")
 
@@ -24,6 +26,8 @@ def buildLiborCurve(valueDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
+
+    payFixed = FinLiborSwapTypes.PAYER
 
     spotDays = 2
     settlementDate = valueDate.addWorkDays(spotDays)
@@ -82,6 +86,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap1)
@@ -91,6 +96,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap2)
@@ -100,6 +106,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap3)
@@ -109,6 +116,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap4)
@@ -118,6 +126,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap5)
@@ -127,6 +136,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap6)
@@ -136,6 +146,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap7)
@@ -145,6 +156,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap8)
@@ -154,6 +166,7 @@ def buildLiborCurve(valueDate):
         settlementDate,
         maturityDate,
         swapRate,
+        payFixed,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap9)

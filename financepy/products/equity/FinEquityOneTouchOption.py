@@ -43,7 +43,7 @@ class FinTouchOptionPayoffTypes(Enum):
 ###############################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def _barrierPayOneAtHitPVDown(s, H, r, dt):
     ''' Pay $1 if the stock crosses the barrier H from above. PV payment. '''
     numPaths, numTimeSteps = s.shape
@@ -67,7 +67,7 @@ def _barrierPayOneAtHitPVDown(s, H, r, dt):
 ###############################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def _barrierPayOneAtHitPVUp(s, H, r, dt):
     ''' Pay $1 if the stock crosses the barrier H from below. PV payment. '''
 
@@ -92,7 +92,7 @@ def _barrierPayOneAtHitPVUp(s, H, r, dt):
 ###############################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def _barrierPayAssetAtExpiryDownOut(s, H):
     ''' Pay $1 if the stock crosses the barrier H from above. PV payment. '''
     numPaths, numTimeSteps = s.shape
@@ -114,7 +114,7 @@ def _barrierPayAssetAtExpiryDownOut(s, H):
 ###############################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def _barrierPayAssetAtExpiryUpOut(s, H):
     ''' Pay $1 if the stock crosses the barrier H from below. PV payment. '''
 

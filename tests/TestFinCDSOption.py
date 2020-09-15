@@ -71,6 +71,7 @@ def buildFullIssuerCurve(valuationDate):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0044 + irBump,
         fixedFreq,
         dcType)
@@ -80,6 +81,7 @@ def buildFullIssuerCurve(valuationDate):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0078 + irBump,
         fixedFreq,
         dcType)
@@ -89,6 +91,7 @@ def buildFullIssuerCurve(valuationDate):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0119 + irBump,
         fixedFreq,
         dcType)
@@ -98,6 +101,7 @@ def buildFullIssuerCurve(valuationDate):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0158 + irBump,
         fixedFreq,
         dcType)
@@ -107,6 +111,7 @@ def buildFullIssuerCurve(valuationDate):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0192 + irBump,
         fixedFreq,
         dcType)
@@ -116,6 +121,7 @@ def buildFullIssuerCurve(valuationDate):
     swap6 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0219 + irBump,
         fixedFreq,
         dcType)
@@ -125,6 +131,7 @@ def buildFullIssuerCurve(valuationDate):
     swap7 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0242 + irBump,
         fixedFreq,
         dcType)
@@ -134,6 +141,7 @@ def buildFullIssuerCurve(valuationDate):
     swap8 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0261 + irBump,
         fixedFreq,
         dcType)
@@ -143,6 +151,7 @@ def buildFullIssuerCurve(valuationDate):
     swap9 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.0276 + irBump,
         fixedFreq,
         dcType)

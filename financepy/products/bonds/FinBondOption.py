@@ -14,7 +14,9 @@ from ...finutils.FinOptionTypes import FinOptionTypes, FinOptionExerciseTypes
 from enum import Enum
 import numpy as np
 
-
+###############################################################################
+# TODO: Add BDT model to valuation
+# TODO: Reorganise code - too much duplication
 ###############################################################################
 
 
@@ -106,8 +108,8 @@ class FinBondOption():
             elif self._optionType == FinOptionTypes.EUROPEAN_CALL  \
                     and model._useJamshidian is False:
 
+                exerciseType = FinOptionExerciseTypes.EUROPEAN
                 model.buildTree(texp, dfTimes, dfValues)
-                exerciseType = FinOptionTypes.EUROPEAN_CALL
                 v1 = model.americanBondOption_Tree(texp,
                                                    self._strikePrice,
                                                    self._face,
@@ -130,7 +132,7 @@ class FinBondOption():
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT  \
                     and model._useJamshidian is False:
 
-                exerciseType = FinOptionExerciseTypes.AMERICAN
+                exerciseType = FinOptionExerciseTypes.EUROPEAN
                 model.buildTree(texp, dfTimes, dfValues)
                 v1 = model.americanBondOption_Tree(texp, self._strikePrice,
                                                    self._face,
@@ -151,7 +153,6 @@ class FinBondOption():
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
 
                 exerciseType = FinOptionExerciseTypes.AMERICAN
-
                 model.buildTree(texp, dfTimes, dfValues)
                 v1 = model.americanBondOption_Tree(texp, self._strikePrice,
                                                    self._face,
@@ -200,7 +201,9 @@ class FinBondOption():
                 model.buildTree(tmat, dfTimes, dfValues)
                 v1 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)
+
                 model._numTimeSteps += 1
+
                 model.buildTree(tmat, dfTimes, dfValues)
                 v2 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)
@@ -216,6 +219,7 @@ class FinBondOption():
                                       cpnTimes, cpnAmounts, exerciseType)
 
                 model._numTimeSteps += 1
+
                 model.buildTree(tmat, dfTimes, dfValues)
                 v2 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)
@@ -232,6 +236,7 @@ class FinBondOption():
                                       cpnTimes, cpnAmounts, exerciseType)
 
                 model._numTimeSteps += 1
+
                 model.buildTree(tmat, dfTimes, dfValues)
                 v2 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)
@@ -246,7 +251,9 @@ class FinBondOption():
                 model.buildTree(tmat, dfTimes, dfValues)
                 v1 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)
+
                 model._numTimeSteps += 1
+
                 model.buildTree(tmat, dfTimes, dfValues)
                 v2 = model.bondOption(texp, self._strikePrice, self._face,
                                       cpnTimes, cpnAmounts, exerciseType)

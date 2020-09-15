@@ -63,11 +63,12 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     swaps = []
     fixedBasis = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    swapType = FinLiborSwapTypes.PAYER
 
     swapRate = 0.05
-    swap1 = FinLiborSwap(settlementDate, "1Y", swapRate, fixedFreq, fixedBasis)
-    swap2 = FinLiborSwap(settlementDate, "3Y", swapRate, fixedFreq, fixedBasis)
-    swap3 = FinLiborSwap(settlementDate, "5Y", swapRate, fixedFreq, fixedBasis)
+    swap1 = FinLiborSwap(settlementDate, "1Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap2 = FinLiborSwap(settlementDate, "3Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap3 = FinLiborSwap(settlementDate, "5Y", swapType, swapRate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)

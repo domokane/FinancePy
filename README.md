@@ -1,6 +1,6 @@
 # FinancePy
 
-FinancePy is a python-based library that covers the following functionality:
+FinancePy is a python-based library that is currently in beta version. It covers the following functionality:
 
 * Valuation and risk models for a wide range of equity, FX, interest rate and credit derivatives.
 
@@ -36,7 +36,7 @@ Important Note:
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
-## Quick Start
+## Quick Start Guide
 
 FinancePy can be installed from pip using the command:
 
@@ -48,9 +48,11 @@ To upgrade an existing installation type:
 
 You can then access a set of Jupyter Notebooks on at Github
 
-https://github.com/domokane/FinancePy-Examples
+<https://github.com/domokane/FinancePy-Examples>
 
-Download a zipped version by clicking on the green button and selecting Download ZIP. 
+Note that the first import of the library may take over 10 seconds as Numba compiles all of the imported module functions with a Numba decorator - this makes certain python functions run at speeds comparable with the C programming language. These compiled functions are then cached locally. Thereafter FinancePy should load almost instantly.
+
+Download a zipped version by clicking on the green button and selecting Download ZIP.
 
 A pdf manual describing all of the functions can be found at the same repository.
 
@@ -72,7 +74,6 @@ The interface to each product has a value() function that will take a model and 
 ## Author
 
 Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and 10 years of academic experience.
-
 
 ## Dependencies
 

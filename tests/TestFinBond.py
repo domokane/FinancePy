@@ -15,6 +15,7 @@ from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.products.bonds.FinBond import FinBond, FinYTMCalcType
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -82,6 +83,7 @@ def buildLiborCurve(valueDate):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -91,6 +93,7 @@ def buildLiborCurve(valueDate):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -100,6 +103,7 @@ def buildLiborCurve(valueDate):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -109,6 +113,7 @@ def buildLiborCurve(valueDate):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -118,6 +123,7 @@ def buildLiborCurve(valueDate):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -127,6 +133,7 @@ def buildLiborCurve(valueDate):
     swap6 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -136,6 +143,7 @@ def buildLiborCurve(valueDate):
     swap7 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -145,6 +153,7 @@ def buildLiborCurve(valueDate):
     swap8 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -154,6 +163,7 @@ def buildLiborCurve(valueDate):
     swap9 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         swapRate,
         fixedFreqType,
         fixedDCCType)

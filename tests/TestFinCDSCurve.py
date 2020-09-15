@@ -40,6 +40,7 @@ def test_FinCDSCurve():
         swap = FinLiborSwap(
             curveDate,
             maturityDate,
+            FinLiborSwapTypes.PAYER,
             fixedCoupon,
             fixedFreq,
             fixedDCC)

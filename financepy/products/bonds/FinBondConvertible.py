@@ -28,7 +28,7 @@ from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 ###############################################################################
 
 
-# @njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def _valueConvertible(tmat,
                       face,
                       couponTimes,

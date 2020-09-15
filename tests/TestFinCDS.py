@@ -20,6 +20,8 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+
 import numpy as np
 import sys
 sys.path.append("..//..")
@@ -220,6 +222,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.015910 + irBump,
         fixedFreq,
         dcType)
@@ -229,6 +232,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.014990 + irBump,
         fixedFreq,
         dcType)
@@ -238,6 +242,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.014725 + irBump,
         fixedFreq,
         dcType)
@@ -247,6 +252,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.014640 + irBump,
         fixedFreq,
         dcType)
@@ -256,6 +262,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.014800 + irBump,
         fixedFreq,
         dcType)
@@ -265,6 +272,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap6 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.014995 + irBump,
         fixedFreq,
         dcType)
@@ -274,6 +282,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap7 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.015180 + irBump,
         fixedFreq,
         dcType)
@@ -283,6 +292,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap8 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.015610 + irBump,
         fixedFreq,
         dcType)
@@ -292,6 +302,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap9 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.015880 + irBump,
         fixedFreq,
         dcType)
@@ -301,6 +312,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap10 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        FinLiborSwapTypes.PAYER,
         m * 0.016430 + irBump,
         fixedFreq,
         dcType)
@@ -489,6 +501,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settlementDate,
         maturityDate,
         m * 0.002155 + irBump,
+        FinLiborSwapTypes.PAYER,
         fixedFreq,
         dcType)
     swaps.append(swap1)
@@ -498,6 +511,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settlementDate,
         maturityDate,
         m * 0.002305 + irBump,
+        FinLiborSwapTypes.PAYER,
         fixedFreq,
         dcType)
     swaps.append(swap2)
@@ -507,6 +521,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settlementDate,
         maturityDate,
         m * 0.002665 + irBump,
+        FinLiborSwapTypes.PAYER,
         fixedFreq,
         dcType)
     swaps.append(swap3)
@@ -516,6 +531,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settlementDate,
         maturityDate,
         m * 0.003290 + irBump,
+        FinLiborSwapTypes.PAYER,
         fixedFreq,
         dcType)
     swaps.append(swap4)

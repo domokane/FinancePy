@@ -16,6 +16,7 @@ from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
 
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 
@@ -36,11 +37,12 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     ###########################################################################
 
+    swapType = FinLiborSwapTypes.PAYER
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swap1 = FinLiborSwap(settlementDate, "1Y", 0.0350, fixedFreq, dcType)
-    swap2 = FinLiborSwap(settlementDate, "2Y", 0.0400, fixedFreq, dcType)
-    swap3 = FinLiborSwap(settlementDate, "3Y", 0.0450, fixedFreq, dcType)
+    swap1 = FinLiborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
+    swap2 = FinLiborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
+    swap3 = FinLiborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
     discountCurve = FinLiborCurve(settlementDate, [], [], swaps)
 
@@ -129,7 +131,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     callDates = [nextCallDate]
     callPrices = [100.0]
 
-    for i in range(1, 24):
+    for _ in range(1, 24):
         nextCallDate = nextCallDate.addMonths(3)
         callDates.append(nextCallDate)
         callPrices.append(100.0)
@@ -151,7 +153,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("PERIOD", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 200, 10) #1000, 10)
+    timeSteps = range(100, 200, 10)  # 1000, 10)
     values = []
     for numTimeSteps in timeSteps:
         model = FinModelRatesBK(sigma, a, numTimeSteps)
@@ -159,7 +161,8 @@ def test_FinBondEmbeddedOptionQUANTLIB():
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, numTimeSteps, v['bondwithoption'], v['bondpure'])
+        testCases.print(period, numTimeSteps, v['bondwithoption'],
+                        v['bondpure'])
         values.append(v['bondwithoption'])
 
     if plotGraphs:

@@ -21,6 +21,8 @@ from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+
 
 sys.path.append("..//..")
 
@@ -209,73 +211,88 @@ def test_FinLiborDepositsFRAsSwaps():
 #                        fixedDCCType)
 #    swaps.append(swap)
 
+    swapType = FinLiborSwapTypes.PAYER
     maturityDate = settlementDate.addMonths(36)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(48)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(60)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(72)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(84)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(96)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(108)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(120)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(132)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(144)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(180)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapType,
+                        swapRate, fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(240)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(300)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(360)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
@@ -386,6 +403,7 @@ def test_FinLiborDepositsFuturesSwaps():
     startDate = spotDate.addWorkDays(spotDays)
 
     swaps = []
+    swapType = FinLiborSwapTypes.PAYER
     fixedDCCType = FinDayCountTypes.THIRTY_E_360
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     floatFreqType = FinFrequencyTypes.QUARTERLY
@@ -398,7 +416,7 @@ def test_FinLiborDepositsFuturesSwaps():
 
     swapRate = 0.02776305
 
-    swap = FinLiborSwap(startDate, "2Y", swapRate,
+    swap = FinLiborSwap(startDate, "2Y", swapType, swapRate,
                         fixedFreqType, fixedDCCType, notional,
                         floatSpread, floatFreqType, floatDCCType,
                         payFixed, calendarType, busDayAdjustRule)
