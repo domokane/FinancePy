@@ -16,6 +16,8 @@ TEN_MILLION = 10000000
 ONE_BILLION = 1000000000
 
 ###############################################################################
+# TODO: Move this somewhere else.
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -29,7 +31,7 @@ def accruedInterpolator(tset: float,  # Settlement time in years
     foundIndex = -1
 
     for i in range(1, numCoupons):
-        if tset >= couponTimes[i-1] and tset < couponTimes[i]:
+        if tset > couponTimes[i-1] and tset <= couponTimes[i]:
             foundIndex = i
             break
 
@@ -45,7 +47,7 @@ def accruedInterpolator(tset: float,  # Settlement time in years
 
     accdFrac = (tset-t0)/denom
     accdCpn = accdFrac * couponAmounts[i]
-#    print(tset, t0, t1, denom, accdCpn)
+#    print("ACCD INTERPOLATOR", tset, t0, t1, denom, accdCpn)
     return accdCpn
 
 ###############################################################################

@@ -22,6 +22,10 @@ from ...products.libor.FinLiborSwap import FinLiborSwap
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...models.FinModelRatesBDT import FinModelRatesBDT
+from ...models.FinModelBlack import FinModelBlack
+from ...models.FinModelBlackShifted import FinModelBlackShifted
+from ...models.FinModelSABR import FinModelSABR
+from ...models.FinModelSABRShifted import FinModelSABRShifted
 
 ###############################################################################
 
@@ -59,6 +63,9 @@ class FinLiborBermudanSwaption(object):
 
         if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
+
+        if exerciseType == FinOptionExerciseTypes.AMERICAN:
+            raise FinError("American optionality not supported.")
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
@@ -146,6 +153,12 @@ class FinLiborBermudanSwaption(object):
         # For both models, the tree needs to extend out to maturity because of
         # the multi-callable nature of the Bermudan Swaption
         #######################################################################
+
+        if isinstance(model, FinModelBlack) or \
+           isinstance(model, FinModelBlackShifted) or \
+             isinstance(model, FinModelSABR) or \
+               isinstance(model, FinModelSABRShifted):
+                  raise FinError("Model is not valid for Bermudan Swaptions")
 
         model.buildTree(tmat, dfTimes, dfValues)
         v = model.bermudanSwaption(texp,

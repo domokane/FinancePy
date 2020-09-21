@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit, float64
 from typing import Union
 from .FinDate import FinDate
-from .FinGlobalVariables import gDaysInYear
+from .FinGlobalVariables import gDaysInYear, gSmall
 from .FinError import FinError
 from .FinDayCount import FinDayCountTypes, FinDayCount
 
@@ -390,6 +390,51 @@ def uniformToDefaultTime(u, t, v):
         tau = (t1 * np.log(q2 / u) + t2 * np.log(u / q1)) / np.log(q2 / q1)
 
     return tau
+
+###############################################################################
+# THIS IS NOT USED
+
+@njit(fastmath=True, cache=True)
+def accruedTree(gridTimes: np.ndarray,
+                gridFlows: np.ndarray,
+                face: float):
+    ''' Fast calulation of accrued interest using an Actual/Actual type of
+    convention. This does not calculate according to other conventions. '''
+
+    numGridTimes = len(gridTimes)
+
+    if len(gridFlows) != numGridTimes:
+        raise FinError("Grid flows not same size as grid times.")
+
+    accrued = np.zeros(numGridTimes)
+
+    # When the grid time is before the first coupon we have to extrapolate back
+
+    couponTimes = np.zeros(0)
+    couponFlows = np.zeros(0)
+
+    for iGrid in range(1, numGridTimes):
+
+        cpnTime = gridTimes[iGrid]
+        cpnFlow = gridFlows[iGrid]
+
+        if gridFlows[iGrid] > gSmall:
+            couponTimes = np.append(couponTimes, cpnTime)
+            couponFlows = np.append(couponFlows, cpnFlow)
+
+    numCoupons = len(couponTimes)
+
+    # interpolate between coupons
+    for iGrid in range(0, numGridTimes):
+        t = gridTimes[iGrid]            
+        for i in range(0, numCoupons):
+            if t > couponTimes[i-1] and t <= couponTimes[i]:
+                den = couponTimes[i] - couponTimes[i-1]
+                num = (t - couponTimes[i-1])
+                accrued[iGrid] = face * num * couponFlows[i] / den
+                break
+     
+    return accrued
 
 ###############################################################################
 

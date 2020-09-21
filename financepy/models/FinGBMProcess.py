@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64, int64
+from numba import jit, njit, float64, int64
 from ..finutils.FinMath import cholesky
 
 ###############################################################################
@@ -96,9 +96,10 @@ def getPathsAssets(numAssets,
 ###############################################################################
 
 
-@njit(float64[:, :](int64, int64, float64, float64[:], float64[:],
-                    float64[:], float64[:, :], int64),
-      cache=True, fastmath=True)
+#@njit(float64[:, :](int64, int64, float64, float64[:], float64[:], float64[:],
+#                   float64[:, :], int64),
+#                   cache=True, fastmath=True)
+@njit
 def getAssets(numAssets,
               numPaths,
               t,
@@ -107,6 +108,7 @@ def getAssets(numAssets,
               volatilities,
               corrMatrix,
               seed):
+    
     ''' Get the simulated GBM process for a number of assets and paths for one
     time step. Inputs include the number of assets, paths, the vector of mus,
     stock prices, volatilities, a correlation matrix and a seed. '''
@@ -167,7 +169,7 @@ class FinGBMProcess():
                        mus,
                        stockPrices,
                        volatilities,
-                       betas,
+                       corrMatrix,
                        seed):
         ''' Get a matrix of simulated GBM asset values by asset, path and time
         step. Inputs are the number of assets, paths and time steps, the time-
@@ -176,11 +178,11 @@ class FinGBMProcess():
         if numTimeSteps == 2:
             paths = getAssets(numAssets, numPaths,
                               t, mus, stockPrices,
-                              volatilities, betas, seed)
+                              volatilities, corrMatrix, seed)
         else:
             paths = getPathsAssets(numAssets, numPaths, numTimeSteps,
                                    t, mus, stockPrices,
-                                   volatilities, betas, seed)
+                                   volatilities, corrMatrix, seed)
         return paths
 
 ###############################################################################

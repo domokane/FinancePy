@@ -12,7 +12,7 @@ This module describes a curve that is fitted to bond yields calculated from bond
 
 * Polynomial 
 * Nelson-Siegel
-* Nelson-Siegal-Svensson
+* Nelson-Siegel-Svensson
 * Cubic B-Splines
 
 This fitted curve cannot be used for pricing as yields assume a flat term structure. It can be used for fitting and interpolating yields off a nicely constructed yield curve interpolation curve.

@@ -274,10 +274,12 @@ class FinDiscountCurve():
             t: (float, np.ndarray)):
         ''' Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. '''
+
         df = interpolate(t,
                          self._times,
                          self._dfValues,
                          self._interpType.value)
+        
         return df
 
 ###############################################################################
@@ -299,7 +301,8 @@ class FinDiscountCurve():
         ''' Calculate the continuously compounded forward rate at the forward
         FinDate provided. This is done by perturbing the time by one day only
         and measuring the change in the log of the discount factor divided by
-        the time increment dt. Of course I am assuming 1 day is continuous. '''
+        the time increment dt. I am assuming continuous compounding over the
+        one date. '''
 
         if isinstance(dts, FinDate):
             dtsPlusOneDays = [dts.addDays(1)]
@@ -369,7 +372,8 @@ class FinDiscountCurve():
                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculate the forward rate between two forward dates according to
         the specified day count convention. This defaults to Actual 360. The
-        first date is specified and the second is given as the tenor. '''
+        first date is specified and the second is given as a date or as a tenor
+        which is added to the first date. '''
 
         if isinstance(startDate, FinDate):
             startDates = []

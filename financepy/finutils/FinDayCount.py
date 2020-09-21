@@ -31,17 +31,28 @@ def isLastDayOfFeb(dt: FinDate):
 
 ###############################################################################
 
-
+###############################################################################
+#    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA 2000)
+#    THIRTY_E_360 = 2  # ISDA 2006 4.16(g) 30/360 ISMA, ICMA
+#    THIRTY_E_360_ISDA = 3  # ISDA 2006 4.16(h)
+#    THIRTY_E_PLUS_360 = 4  # ROLLS D2 TO NEXT MONTH IF D2 = 31
+#    ACT_ACT_ISDA = 5  # SPLITS ACCRUAL PERIOD INTO LEAP YEAR AND NON LEAP YEAR
+#    ACT_ACT_ICMA = 6  # METHOD FOR ALL US TREASURY NOTES AND BONDS
+#    ACT_365F = 7  # Denominator is always Fixed at 365, even in a leap year
+#    ACT_360 = 8
+#    ACT_365L = 9  # the 29 Feb is counted if it is in the date range
+###############################################################################
+        
 class FinDayCountTypes(Enum):
-    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA 2000)
-    THIRTY_E_360 = 2  # ISDA 2006 4.16(g) 30/360 ISMA, ICMA
-    THIRTY_E_360_ISDA = 3  # ISDA 2006 4.16(h)
-    THIRTY_E_PLUS_360 = 4  # ROLLS D2 TO NEXT MONTH IF D2 = 31
-    ACT_ACT_ISDA = 5  # SPLITS ACCRUAL PERIOD INTO LEAP YEAR AND NON LEAP YEAR
-    ACT_ACT_ICMA = 6  # METHOD FOR ALL US TREASURY NOTES AND BONDS
-    ACT_365F = 7  # Denominator is always Fixed at 365, even in a leap year
+    THIRTY_360_BOND = 1  
+    THIRTY_E_360 = 2  
+    THIRTY_E_360_ISDA = 3  
+    THIRTY_E_PLUS_360 = 4  
+    ACT_ACT_ISDA = 5  
+    ACT_ACT_ICMA = 6  
+    ACT_365F = 7  
     ACT_360 = 8
-    ACT_365L = 9  # the 29 Feb is counted if it is in the date range
+    ACT_365L = 9 
 
 ###############################################################################
 
