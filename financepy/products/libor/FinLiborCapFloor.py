@@ -282,11 +282,11 @@ class FinLiborCapFloor():
                                               capletEndDate)[0]
             strikePrice = 1.0/(1.0 + alpha * self._strikeRate)
             notionalAdj = (1.0 + self._strikeRate * alpha)
-            face = 1.0
+            faceAmount = 1.0
             dfTimes = liborCurve._times
             dfValues = liborCurve._dfValues
 
-            v = model.optionOnZCB(texp, tmat, strikePrice, face,
+            v = model.optionOnZCB(texp, tmat, strikePrice, faceAmount,
                                   dfTimes, dfValues)
 
             # we divide by alpha to offset the multiplication above

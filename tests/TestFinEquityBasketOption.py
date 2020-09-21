@@ -94,21 +94,24 @@ def test_FinEquityBasketOption():
             corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
+
             v = callOption.value(
-                valueDate,
-                stockPrices,
-                discountCurve,
-                dividendYields,
-                volatilities,
-                corrMatrix)
+                    valueDate,
+                    stockPrices,
+                    discountCurve,
+                    dividendYields,
+                    volatilities,
+                    corrMatrix)
+
             vMC = callOption.valueMC(
-                valueDate,
-                stockPrices,
-                discountCurve,
-                dividendYields,
-                volatilities,
-                corrMatrix,
-                numPaths)
+                    valueDate,
+                    stockPrices,
+                    discountCurve,
+                    dividendYields,
+                    volatilities,
+                    corrMatrix,
+                    numPaths)
+
             end = time.time()
             duration = end - start
             testCases.print(numPaths, beta, v, vMC, duration)

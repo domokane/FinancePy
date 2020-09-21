@@ -273,8 +273,8 @@ def test_FinLiborDepositsFRAsSwaps():
     swaps.append(swap)
 
     maturityDate = settlementDate.addMonths(180)
-    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapType,
-                        swapRate, fixedFreqType,
+    swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate,
+                        fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
@@ -410,7 +410,6 @@ def test_FinLiborDepositsFuturesSwaps():
     notional = 1000000
     floatSpread = 0.0
     floatDCCType = FinDayCountTypes.ACT_360
-    payFixed = True
     calendarType = FinCalendarTypes.US
     busDayAdjustRule = FinBusDayAdjustTypes.PRECEDING
 
@@ -419,7 +418,7 @@ def test_FinLiborDepositsFuturesSwaps():
     swap = FinLiborSwap(startDate, "2Y", swapType, swapRate,
                         fixedFreqType, fixedDCCType, notional,
                         floatSpread, floatFreqType, floatDCCType,
-                        payFixed, calendarType, busDayAdjustRule)
+                        calendarType, busDayAdjustRule)
 
     swaps.append(swap)
 
@@ -561,37 +560,38 @@ def test_derivativePricingExample():
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
 #    dayCountType = FinDayCountTypes.ACT_360
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-
+    swapType = FinLiborSwapTypes.PAYER
+    
     swapRate = 0.0058
-    swap = FinLiborSwap(settlementDate, "1Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "1Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0060
-    swap = FinLiborSwap(settlementDate, "2Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "2Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0072
-    swap = FinLiborSwap(settlementDate, "3Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "3Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0096
-    swap = FinLiborSwap(settlementDate, "4Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "4Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0124
-    swap = FinLiborSwap(settlementDate, "5Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "5Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0173
-    swap = FinLiborSwap(settlementDate, "7Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "7Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0219
-    swap = FinLiborSwap(settlementDate, "10Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "10Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0283
-    swap = FinLiborSwap(settlementDate, "30Y", swapRate, freqType, dayCountType)
+    swap = FinLiborSwap(settlementDate, "30Y", swapType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     numRepeats = 10
@@ -661,25 +661,26 @@ def test_bloombergPricingExample():
     spotDays = 2
     settlementDate = valuationDate.addWorkDays(spotDays)
     notional = ONE_MILLION
+    swapType = FinLiborSwapTypes.PAYER
 
     swaps = []
-    swap = FinLiborSwap(settlementDate, "2Y", (2.77417+2.77844)/200, freq, accrual, notional); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "3Y", (2.86098+2.86582)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "4Y", (2.90240+2.90620)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "5Y", (2.92944+2.92906)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "6Y", (2.94001+2.94499)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "7Y", (2.95352+2.95998)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "8Y", (2.96830+2.97400)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "9Y", (2.98403+2.98817)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "10Y", (2.99716+3.00394)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "11Y", (3.01344+3.01596)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "12Y", (3.02276+3.02684)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "15Y", (3.04092+3.04508)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "20Y", (3.04417+3.05183)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "25Y", (3.03219+3.03621)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "30Y", (3.01030+3.01370)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "40Y", (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
-    swap = FinLiborSwap(settlementDate, "50Y", (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "2Y", swapType, (2.77417+2.77844)/200, freq, accrual, notional); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "3Y", swapType, (2.86098+2.86582)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "4Y", swapType, (2.90240+2.90620)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "5Y", swapType,  (2.92944+2.92906)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "6Y", swapType, (2.94001+2.94499)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "7Y", swapType,  (2.95352+2.95998)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "8Y", swapType, (2.96830+2.97400)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "9Y", swapType, (2.98403+2.98817)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "10Y", swapType, (2.99716+3.00394)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "11Y", swapType, (3.01344+3.01596)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "12Y", swapType,  (3.02276+3.02684)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "15Y", swapType, (3.04092+3.04508)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "20Y", swapType, (3.04417+3.05183)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "25Y", swapType, (3.03219+3.03621)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "30Y", swapType, (3.01030+3.01370)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "40Y", swapType, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
+    swap = FinLiborSwap(settlementDate, "50Y", swapType,  (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
     liborCurve = FinLiborCurve(valuationDate, depos, fras, swaps)
 

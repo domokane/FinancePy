@@ -34,7 +34,7 @@ from ...models.FinModelRatesLMM import LMMCapFlrPricer
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
+from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
 
 from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
@@ -276,7 +276,7 @@ class FinLiborLMMProducts():
                       settlementDate: FinDate,
                       exerciseDate: FinDate,
                       maturityDate: FinDate,
-                      swaptionType: FinLiborSwaptionTypes,
+                      swaptionType: FinLiborSwapTypes,
                       fixedCoupon: float,
                       fixedFrequencyType: FinFrequencyTypes,
                       fixedDayCountType: FinDayCountTypes,

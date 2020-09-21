@@ -15,6 +15,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 from ...finutils.FinError import FinError
 from ...finutils.FinOptionTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import _funcName
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
@@ -182,13 +183,15 @@ class FinEquityBasketOption():
                 dividendYields: np.ndarray,
                 volatilities: np.ndarray,
                 corrMatrix: np.ndarray,
-                numPaths=10000,
-                seed=4242):
+                numPaths:int = 10000,
+                seed:int = 4242):
         ''' Valuation of the EquityBasketOption using a Monte-Carlo simulation
         of stock prices assuming a GBM distribution. Cholesky decomposition is
         used to handle a full rank correlation structure between the individual
         assets. The numPaths and seed are pre-set to default values but can be
         overwritten. '''
+
+        checkArgumentTypes(getattr(self, _funcName(), None), locals())
 
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
