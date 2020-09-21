@@ -102,8 +102,9 @@ class FinLiborSwaption():
               model):
         ''' Valuation of a Libor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
-        FinModelBlackShifted, FinModelSABR, FinModelHW, FinModelBK and 
-        FinModelBDT. The last two involved a tree-based valuation. '''
+        FinModelBlackShifted, FinModelSABR, FinModelSABRShifted, FinModelHW,
+        FinModelBK and FinModelBDT. The last two involved a tree-based
+        valuation. '''
 
         floatSpread = 0.0
 
@@ -163,7 +164,7 @@ class FinLiborSwaption():
             raise FinError("No coupon times can be before the value date.")
 
         strikePrice = 1.0
-        face = 1.0
+        faceAmount = 1.0
 
         #######################################################################
 
@@ -205,13 +206,13 @@ class FinLiborSwaption():
 
         elif isinstance(model, FinModelRatesHW):
 
-            swaptionPx = model.europeanBondOption_Jamshidian(texp,
-                                                             strikePrice,
-                                                             face, 
-                                                             cpnTimes,
-                                                             cpnFlows,
-                                                             dfTimes,
-                                                             dfValues)
+            swaptionPx = model.europeanBondOption(texp,
+                                                  strikePrice,
+                                                  faceAmount, 
+                                                  cpnTimes,
+                                                  cpnFlows,
+                                                  dfTimes,
+                                                  dfValues)
 
             if self._swapType == FinLiborSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['put']
@@ -230,7 +231,7 @@ class FinLiborSwaption():
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
                                                 strikePrice,
-                                                face,
+                                                faceAmount,
                                                 cpnTimes,
                                                 cpnFlows,
                                                 FinOptionExerciseTypes.EUROPEAN)
@@ -248,7 +249,7 @@ class FinLiborSwaption():
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
                                                 strikePrice,
-                                                face,
+                                                faceAmount,
                                                 cpnTimes,
                                                 cpnFlows,
                                                 FinOptionExerciseTypes.EUROPEAN)

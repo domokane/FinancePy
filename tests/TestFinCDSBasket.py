@@ -15,6 +15,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinMath import corrMatrixGenerator
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinGBMProcess import getPathsAssets
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
 
 import time
 import numpy as np

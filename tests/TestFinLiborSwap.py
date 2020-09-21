@@ -19,6 +19,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
 
 import sys
 sys.path.append("..//..")
@@ -106,13 +107,15 @@ def buildLiborCurve(valuationDate):
     fixedFreq = FinFrequencyTypes.ANNUAL
     dcType = FinDayCountTypes.THIRTY_E_360
 
+    swapType = FinLiborSwapTypes.PAYER
+    
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(settlementDate, maturityDate, -
+    swap1 = FinLiborSwap(settlementDate, maturityDate, swapType, -
                          0.001506, fixedFreq, dcType)
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(settlementDate, maturityDate, -
+    swap2 = FinLiborSwap(settlementDate,maturityDate,  swapType, -
                          0.000185, fixedFreq, dcType)
     swaps.append(swap2)
 
@@ -120,6 +123,7 @@ def buildLiborCurve(valuationDate):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.001358,
         fixedFreq,
         dcType)
@@ -129,6 +133,7 @@ def buildLiborCurve(valuationDate):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0027652,
         fixedFreq,
         dcType)
@@ -138,6 +143,7 @@ def buildLiborCurve(valuationDate):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0041539,
         fixedFreq,
         dcType)
@@ -147,6 +153,7 @@ def buildLiborCurve(valuationDate):
     swap6 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0054604,
         fixedFreq,
         dcType)
@@ -156,6 +163,7 @@ def buildLiborCurve(valuationDate):
     swap7 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.006674,
         fixedFreq,
         dcType)
@@ -165,6 +173,7 @@ def buildLiborCurve(valuationDate):
     swap8 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.007826,
         fixedFreq,
         dcType)
@@ -174,6 +183,7 @@ def buildLiborCurve(valuationDate):
     swap9 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.008821,
         fixedFreq,
         dcType)
@@ -183,6 +193,7 @@ def buildLiborCurve(valuationDate):
     swap10 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0097379,
         fixedFreq,
         dcType)
@@ -192,6 +203,7 @@ def buildLiborCurve(valuationDate):
     swap11 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0105406,
         fixedFreq,
         dcType)
@@ -201,6 +213,7 @@ def buildLiborCurve(valuationDate):
     swap12 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0123927,
         fixedFreq,
         dcType)
@@ -210,6 +223,7 @@ def buildLiborCurve(valuationDate):
     swap13 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0139882,
         fixedFreq,
         dcType)
@@ -219,6 +233,7 @@ def buildLiborCurve(valuationDate):
     swap14 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0144972,
         fixedFreq,
         dcType)
@@ -228,6 +243,7 @@ def buildLiborCurve(valuationDate):
     swap15 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0146081,
         fixedFreq,
         dcType)
@@ -237,6 +253,7 @@ def buildLiborCurve(valuationDate):
     swap16 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.01461897,
         fixedFreq,
         dcType)
@@ -246,6 +263,7 @@ def buildLiborCurve(valuationDate):
     swap17 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.014567455,
         fixedFreq,
         dcType)
@@ -255,6 +273,7 @@ def buildLiborCurve(valuationDate):
     swap18 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.0140826,
         fixedFreq,
         dcType)
@@ -264,6 +283,7 @@ def buildLiborCurve(valuationDate):
     swap19 = FinLiborSwap(
         settlementDate,
         maturityDate,
+        swapType,
         0.01436822,
         fixedFreq,
         dcType)
@@ -310,12 +330,13 @@ def test_LiborSwap():
     swapCalendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-
-    payFixedFlag = False
+    swapType = FinLiborSwapTypes.RECEIVER
+    
     notional = 10.0 * ONE_MILLION
 
     swap = FinLiborSwap(startDate,
                         endDate,
+                        swapType,
                         fixedCoupon,
                         fixedFreqType,
                         fixedDayCountType,
@@ -323,7 +344,6 @@ def test_LiborSwap():
                         floatSpread,
                         floatFreqType,
                         floatDayCountType,
-                        payFixedFlag,
                         swapCalendarType,
                         busDayAdjustType,
                         dateGenRuleType)
@@ -357,19 +377,19 @@ def test_dp_example():
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
-    payFixedFlag = True
+    swapType = FinLiborSwapTypes.PAYER
     fixedCoupon = 0.0124
     notional = ONE_MILLION
 
     swap = FinLiborSwap(startDate,
                         endDate,
+                        swapType,
                         fixedCoupon=fixedCoupon,
                         fixedFreqType=fixedFreqType,
                         fixedDayCountType=fixedDayCountType,
                         floatFreqType=FinFrequencyTypes.SEMI_ANNUAL,
                         floatDayCountType=FinDayCountTypes.ACT_360,
                         notional=notional,
-                        payFixedFlag=payFixedFlag,
                         calendarType=swapCalendarType,
                         busDayAdjustType=busDayAdjustType,
                         dateGenRuleType=dateGenRuleType)

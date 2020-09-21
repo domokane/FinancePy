@@ -12,6 +12,8 @@ from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+
 import sys
 sys.path.append("..//..")
 
