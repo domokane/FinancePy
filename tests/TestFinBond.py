@@ -14,7 +14,8 @@ from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
-from financepy.products.bonds.FinBond import FinBond, FinYTMCalcType
+from financepy.products.bonds.FinBond import FinBond
+from financepy.products.bonds.FinBond import FinYTMCalcType
 from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -213,9 +214,12 @@ def test_FinBond():
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
             maturityDt = fromDatetime(matDatetime)
+            issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
+
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
-            bond = FinBond(maturityDt, coupon, frequencyType, accrualType, 100)
+            bond = FinBond(issueDt, maturityDt, 
+                           coupon, frequencyType, accrualType, 100)
 
             ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
             accd = bond._accruedInterest
@@ -230,11 +234,13 @@ def test_FinBond():
     accrualConvention = FinDayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settlementDate = FinDate(19, 4, 1994)
+    issueDate = FinDate(15, 7, 1990)
     maturityDate = FinDate(15, 7, 1997)
     coupon = 0.085
     face = ONE_MILLION
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    bond = FinBond(maturityDate, coupon, freqType, accrualConvention, face)
+    bond = FinBond(issueDate, maturityDate, 
+                   coupon, freqType, accrualConvention, face)
 
     testCases.header("FIELD", "VALUE")
     fullPrice = bond.fullPriceFromYTM(settlementDate, y)
@@ -315,13 +321,15 @@ def test_FinBond():
 
     testCases.banner("BLOOMBERG US TREASURY EXAMPLE")
     settlementDate = FinDate(21, 7, 2017)
+    issueDate = FinDate(15, 5, 2010)
     maturityDate = FinDate(15, 5, 2027)
     coupon = 0.02375
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
 
-    bond = FinBond(maturityDate,
+    bond = FinBond(issueDate,
+                   maturityDate,
                    coupon,
                    freqType,
                    accrualType,
@@ -375,13 +383,15 @@ def test_FinBond():
 
     testCases.banner("BLOOMBERG APPLE CORP BOND EXAMPLE")
     settlementDate = FinDate(21, 7, 2017)
+    issueDate = FinDate(13, 5, 2012)
     maturityDate = FinDate(13, 5, 2022)
     coupon = 0.027
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.THIRTY_E_360_ISDA
     face = 100.0
 
-    bond = FinBond(maturityDate, coupon, freqType, accrualType, face)
+    bond = FinBond(issueDate, maturityDate,
+                   coupon, freqType, accrualType, face)
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 101.581564

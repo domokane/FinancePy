@@ -2,15 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-#  - ROUNDING CONVENTIONS FOR ACCRUED
-#  - CHECK OAS CALCULATION
-#  - Check how first coupon on floating leg is sized on asset swaps. '''
+###############################################################################
+# TODO: - ROUNDING CONVENTIONS FOR ACCRUED
+# TODO: - CHECK OAS CALCULATION
+# TODO:  - Check how first coupon on floating leg is sized on asset swaps. '''
+###############################################################################
 
 # https://www.dmo.gov.uk/media/15004/convention_changes.pdf
+
 ###############################################################################
-# Conventions
+# Conventions:
 #  GILTS - SEMI ANNUAL ACT/ACT
 #  US TREASURIES
+###############################################################################
+
+###############################################################################
+# NOTE THAT I ASSUME THAT IF YOU SETTLE A SWAP ON A COUPON PAYMENT DATE YOU
+# GET THE COUPON AND THE ACCRUED INTEREST EQUALS THE COUPON.
 ###############################################################################
 
 import numpy as np
@@ -79,6 +87,7 @@ class FinBond(object):
     size that are paid on known dates plus a payment of par at maturity. '''
 
     def __init__(self,
+                 issueDate: FinDate,
                  maturityDate: FinDate,
                  coupon: float,  # Annualised bond coupon
                  frequencyType: FinFrequencyTypes,
@@ -91,6 +100,10 @@ class FinBond(object):
 
         checkArgumentTypes(self.__init__, locals())
 
+        if issueDate >= maturityDate:
+            raise FinError("Issue Date must preceded maturity date.")
+
+        self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._frequencyType = frequencyType
@@ -99,10 +112,6 @@ class FinBond(object):
         self._faceAmount = faceAmount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted
 
-        ''' I do not determine cashflow dates as I do not want to require
-        users to supply the issue date and without that I do not know how
-        far to go back in the cashflow date schedule. '''
-
         self._flowDates = []
 
         self._settlementDate = FinDate(1, 1, 1900)
@@ -110,30 +119,30 @@ class FinBond(object):
         self._accruedDays = 0.0
         self._alpha = 0.0
 
+        self._calculateFlowDates()
+
 ###############################################################################
 
-    def _calculateFlowDates(self,
-                            settlementDate: FinDate):
+    def _calculateFlowDates(self):
         ''' Determine the bond cashflow payment dates. '''
         # No need to generate flows if settlement date has not changed
-        if settlementDate == self._settlementDate:
-            return
 
-        self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
         busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
-        self._flowDates = FinSchedule(settlementDate,
+        self._flowDates = FinSchedule(self._issueDate,
                                       self._maturityDate,
                                       self._frequencyType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
 
-        self._pcd = self._flowDates[0]
-        self._ncd = self._flowDates[1]
-        self.calcAccruedInterest(settlementDate)
+#        print(self._flowDates)
+
+#        self._pcd = self._flowDates[0]
+#        self._ncd = self._flowDates[1]
+#        self.calcAccruedInterest(settlementDate)
 
 ###############################################################################
 
@@ -148,18 +157,26 @@ class FinBond(object):
         if convention not in FinYTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
+        self.calcAccruedInterest(settlementDate)
+
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
 
-        self._calculateFlowDates(settlementDate)
         f = FinFrequency(self._frequencyType)
         c = self._coupon
         v = 1.0 / (1.0 + ytm/f)
 
-        # n is the number of flows after the next coupon - we remove 2 because
-        # the first element is the previous coupon date and then the ncd
-        n = len(self._flowDates) - 2
+        # n is the number of flows after the next coupon 
+        
+        n = 0
+        for dt in self._flowDates:
+            if dt > settlementDate:
+                n += 1
+        n = n - 1
 
+        if n < 0:
+            raise FinError("No coupons left")
+ 
         if convention == FinYTMCalcType.UK_DMO:
             if n == 0:
                 fp = (v**(self._alpha))*(1.0+c/f)
@@ -220,7 +237,6 @@ class FinBond(object):
         ''' Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. '''
 
-        self._calculateFlowDates(settlementDate)
         dy = 0.0001
         p0 = self.fullPriceFromYTM(settlementDate, ytm - dy, convention)
         p2 = self.fullPriceFromYTM(settlementDate, ytm + dy, convention)
@@ -264,7 +280,6 @@ class FinBond(object):
         ''' Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. '''
 
-        self._calculateFlowDates(settlementDate)
         dy = 0.0001
         p0 = self.fullPriceFromYTM(settlementDate, ytm - dy, convention)
         p1 = self.fullPriceFromYTM(settlementDate, ytm, convention)
@@ -295,6 +310,7 @@ class FinBond(object):
         present-value the bond's cashflows back to the curve anchor date and
         not to the settlement date. '''
 
+        self.calcAccruedInterest(settlementDate)
         fullPrice = self.fullPriceFromDiscountCurve(settlementDate,
                                                     discountCurve)
 
@@ -307,26 +323,35 @@ class FinBond(object):
     def fullPriceFromDiscountCurve(self,
                                    settlementDate: FinDate,
                                    discountCurve: FinDiscountCurve):
-        ''' Calculate the bond *value* using some discount curve to PV the
-        bond's cashflows to the curve anchor date. The anchor of the discount
-        curve should be on the valuation date and so be 0-3 days before the
-        settlement of the bond. This is not the same as the full price which
-        is only the correct price on the settlement date of the bond which may
-        be in the future.'''
+        ''' Calculate the bond price using a provided discount curve to PV the
+        bond's cashflows to the settlement date. As such it is effectively a
+        forward bond price if the settlement date is after the valuation date.
+        '''
 
-        if discountCurve._valuationDate > settlementDate:
-            raise FinError("Discount curve date is after bond settlement date")
+        if settlementDate < discountCurve._valuationDate:
+            raise FinError("Bond settles before Discount curve date")
 
-        self._calculateFlowDates(settlementDate)
-        pv = 0.0
+        if settlementDate > self._maturityDate:
+            raise FinError("Bond settles after it matures.")
+
+        px = 0.0
+        df = 1.0
+        dfSettle = discountCurve.df(settlementDate)
 
         for dt in self._flowDates[1:]:
-            df = discountCurve.df(dt)
-            flow = self._coupon / self._frequency
-            pv = pv + flow * df
 
-        pv = pv + df
-        return pv * self._par
+            # coupons paid on the settlement date are included            
+            if dt >= settlementDate:
+                df = discountCurve.df(dt)
+                t = (dt - settlementDate) / gDaysInYear
+                flow = self._coupon / self._frequency
+                pv = flow * df
+                px += pv
+
+        px += df
+        px = px / dfSettle
+
+        return px * self._par
 
 ###############################################################################
 
@@ -354,8 +379,7 @@ class FinBond(object):
             raise FinError("Unknown type for cleanPrice "
                            + str(type(cleanPrice)))
 
-        self._calculateFlowDates(settlementDate)
-
+        self.calcAccruedInterest(settlementDate)
         accruedAmount = self._accruedInterest * self._par / self._faceAmount
         fullPrices = (cleanPrices + accruedAmount)
         ytms = []
@@ -365,7 +389,7 @@ class FinBond(object):
             argtuple = (self, settlementDate, fullPrice, convention)
 
             ytm = optimize.newton(_f,
-                                  x0=0.10,  # guess initial value of 10%
+                                  x0=0.05,  # guess initial value of 10%
                                   fprime=None,
                                   args=argtuple,
                                   tol=1e-8,
@@ -381,16 +405,22 @@ class FinBond(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self,
-                            settlementDate: FinDate):
+    def calcAccruedInterest(self, settlementDate: FinDate):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
         between the previous coupon payment date and settlement date. '''
 
-        if settlementDate != self._settlementDate:
-            self._calculateFlowDates(settlementDate)
+        numFlows = len(self._flowDates)
+        
+        for iFlow in range(1, numFlows):
 
+            # coupons paid on a settlement date are paid 
+            if self._flowDates[iFlow] >= settlementDate:
+                self._pcd = self._flowDates[iFlow-1]
+                self._ncd = self._flowDates[iFlow]
+                break
+        
         if len(self._flowDates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
@@ -401,10 +431,14 @@ class FinBond(object):
                                           self._ncd, 
                                           self._frequency)
 
-        self._alpha = 1.0 - accFactor * self._frequency
+        if num < 0:
+            print(self._flowDates)
+            print(settlementDate, "PCD:", self._pcd, "NCD", self._ncd)
 
+        self._alpha = 1.0 - accFactor * self._frequency
         self._accruedInterest = accFactor * self._faceAmount * self._coupon
         self._accruedDays = num
+        
         return self._accruedInterest
 
 ###############################################################################
@@ -424,7 +458,6 @@ class FinBond(object):
         respect to the clean price. '''
 
         cleanPrice = np.array(cleanPrice)
-        self._calculateFlowDates(settlementDate)
 
         accruedAmount = self._accruedInterest * self._par / self._faceAmount
         bondPrice = cleanPrice + accruedAmount
@@ -433,8 +466,12 @@ class FinBond(object):
         prevDate = self._pcd
 
         for dt in self._flowDates[1:]:
-            df = discountCurve.df(dt)
-            pvLibor += df * self._coupon / self._frequency
+            
+            # coupons paid on a settlement date are included
+            if dt >= settlementDate:
+                df = discountCurve.df(dt)
+                pvLibor += df * self._coupon / self._frequency
+
         pvLibor += df
 
         # Calculate the PV01 of the floating leg of the asset swap
@@ -469,19 +506,22 @@ class FinBond(object):
         ''' Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. '''
 
-        self._calculateFlowDates(settlementDate)
+        self.calcAccruedInterest(settlementDate)
         f = self._frequency
         c = self._coupon
 
         pv = 0.0
         for dt in self._flowDates[1:]:
-            t = (dt - settlementDate) / gDaysInYear
-            df = discountCurve.df(dt)
-            # determine the Libor implied zero rate
-            r = f * (np.power(df, -1.0 / t / f) - 1.0)
-            # determine the OAS adjusted zero rate
-            df_adjusted = np.power(1.0 + (r + oas)/f, -t * f)
-            pv = pv + (c / f) * df_adjusted
+            
+            # coupons paid on a settlement date are included
+            if dt >= settlementDate:
+                t = (dt - settlementDate) / gDaysInYear
+                df = discountCurve.df(dt)
+                # determine the Libor implied zero rate
+                r = f * (np.power(df, -1.0 / t / f) - 1.0)
+                # determine the OAS adjusted zero rate
+                df_adjusted = np.power(1.0 + (r + oas)/f, -t * f)
+                pv = pv + (c / f) * df_adjusted
 
         pv = pv + df_adjusted
         pv *= self._par
@@ -504,7 +544,7 @@ class FinBond(object):
             raise FinError("Unknown type for cleanPrice "
                            + str(type(cleanPrice)))
 
-        self._calculateFlowDates(settlementDate)
+        self.calcAccruedInterest(settlementDate)
 
         accruedAmount = self._accruedInterest * self._par / self._faceAmount
         fullPrices = cleanPrices + accruedAmount
@@ -537,12 +577,12 @@ class FinBond(object):
         ''' Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. '''
 
-        self._calculateFlowDates(settlementDate)
-
         flow = self._faceAmount * self._coupon / self._frequency
 
         for dt in self._flowDates[1:-1]:
-            print("%12s" % dt, " %12.2f " % flow)
+            # coupons paid on a settlement date are included
+            if dt >= settlementDate:
+                print("%12s" % dt, " %12.2f " % flow)
 
         redemptionAmount = self._faceAmount + flow
         print("%12s" % self._flowDates[-1], " %12.2f " % redemptionAmount)
@@ -564,6 +604,7 @@ class FinBond(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)

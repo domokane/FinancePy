@@ -48,11 +48,12 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     ###########################################################################
 
+    issueDate = FinDate(1, 1, 2005)
     maturityDate = FinDate(1, 1, 2010)
     coupon = 0.0525
     frequencyType = FinFrequencyTypes.ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
 
     callDates = []
     callPrices = []
@@ -72,7 +73,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     sigma = 0.01  # This volatility is very small for a BK process
     a = 0.1
 
-    puttableBond = FinBondEmbeddedOption(maturityDate, coupon,
+    puttableBond = FinBondEmbeddedOption(issueDate, maturityDate, coupon,
                                          frequencyType, accrualType,
                                          callDates, callPrices,
                                          putDates, putPrices)
@@ -117,11 +118,12 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
+    issueDate = FinDate(15, 9, 2010)
     maturityDate = FinDate(15, 9, 2022)
     coupon = 0.025
     frequencyType = FinFrequencyTypes.QUARTERLY
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
 
     ###########################################################################
     # Set up the call and put times and prices
@@ -143,7 +145,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     sigma = 0.12/0.035  # basis point volatility
     a = 0.03
 
-    puttableBond = FinBondEmbeddedOption(maturityDate, coupon,
+    puttableBond = FinBondEmbeddedOption(issueDate, maturityDate, coupon,
                                          frequencyType, accrualType,
                                          callDates, callPrices,
                                          putDates, putPrices)

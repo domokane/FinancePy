@@ -42,9 +42,10 @@ def test_FinBondZeroCurve():
         dateString = bondRow['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = fromDatetime(matDatetime)
+        issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
         coupon = bondRow['coupon']/100.0
         cleanPrice = bondRow['mid']
-        bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
+        bond = FinBond(issueDt, maturityDt, coupon, frequencyType, accrualType)
         bonds.append(bond)
         cleanPrices.append(cleanPrice)
 

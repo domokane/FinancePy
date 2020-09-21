@@ -47,6 +47,7 @@ class FinBondEmbeddedOption(object):
     ''' Class for fixed coupon bonds with embedded call or put optionality. '''
 
     def __init__(self,
+                 issueDate: FinDate,
                  maturityDate: FinDate,  # FinDate
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
                  frequencyType: FinFrequencyTypes,
@@ -61,12 +62,14 @@ class FinBondEmbeddedOption(object):
 
         checkArgumentTypes(self.__init__, locals())
 
+        self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._frequencyType = frequencyType
         self._accrualType = accrualType
 
-        self._bond = FinBond(maturityDate,
+        self._bond = FinBond(issueDate,
+                             maturityDate,
                              coupon,
                              frequencyType,
                              accrualType,
@@ -116,6 +119,7 @@ class FinBondEmbeddedOption(object):
         self._putDates = putDates
         self._putPrices = putPrices
         self._faceAmount = faceAmount
+        self._bond._calculateFlowDates()
 
 ###############################################################################
 
@@ -128,15 +132,15 @@ class FinBondEmbeddedOption(object):
         model and a discount curve. '''
 
         # Generate bond coupon flow schedule
-        self._bond._calculateFlowDates(settlementDate)
         cpn = self._bond._coupon/self._bond._frequency
         cpnTimes = []
         cpnAmounts = []
 
         for flowDate in self._bond._flowDates[1:]:
-            cpnTime = (flowDate - settlementDate) / gDaysInYear
-            cpnTimes.append(cpnTime)
-            cpnAmounts.append(cpn)
+            if flowDate > settlementDate:
+                cpnTime = (flowDate - settlementDate) / gDaysInYear
+                cpnTimes.append(cpnTime)
+                cpnAmounts.append(cpn)
 
         cpnTimes = np.array(cpnTimes)
         cpnAmounts = np.array(cpnAmounts)
@@ -144,16 +148,18 @@ class FinBondEmbeddedOption(object):
         # Generate bond call times and prices
         callTimes = []
         for dt in self._callDates:
-            callTime = (dt - settlementDate) / gDaysInYear
-            callTimes.append(callTime)
+            if dt > settlementDate:
+                callTime = (dt - settlementDate) / gDaysInYear
+                callTimes.append(callTime)
         callTimes = np.array(callTimes)
         callPrices = np.array(self._callPrices)
 
         # Generate bond put times and prices
         putTimes = []
         for dt in self._putDates:
-            putTime = (dt - settlementDate) / gDaysInYear
-            putTimes.append(putTime)
+            if dt > settlementDate:
+                putTime = (dt - settlementDate) / gDaysInYear
+                putTimes.append(putTime)
         putTimes = np.array(putTimes)
         putPrices = np.array(self._putPrices)
 
@@ -217,6 +223,7 @@ class FinBondEmbeddedOption(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)

@@ -42,9 +42,11 @@ def test_FinBondPortfolio():
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
             maturityDt = fromDatetime(matDatetime)
+            issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
-            bond = FinBond(maturityDt, coupon, frequencyType, accrualType)
+            bond = FinBond(issueDt, maturityDt, 
+                           coupon, frequencyType, accrualType)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
             accd = bond._accruedInterest

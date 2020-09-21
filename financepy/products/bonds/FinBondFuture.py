@@ -50,7 +50,11 @@ class FinBondFuture(object):
         roundedTmatInMonths = int(tmat * 4.0) * 3
         newMat = self._firstDeliveryDate.addMonths(roundedTmatInMonths)
         face = 1.0
-        newBond = FinBond(newMat,
+
+        issueDate = FinDate(newMat._d, newMat._m, 2000)
+
+        newBond = FinBond(issueDate,
+                          newMat,
                           bond._coupon,
                           bond._frequencyType,
                           bond._accrualType,
