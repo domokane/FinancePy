@@ -10,7 +10,8 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes, FinLiborSwapTypes
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 
@@ -20,7 +21,6 @@ from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -162,7 +162,7 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     payRec = valuePay - valueRec
     testCases.print("PAYER MINUS RECEIVER :", payRec)
-
+    
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
@@ -179,6 +179,8 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinLiborSwapTypes.RECEIVER
+    exerciseType = FinOptionExerciseTypes.EUROPEAN
+
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
@@ -239,6 +241,8 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinLiborSwapTypes.RECEIVER
+    exerciseType = FinOptionExerciseTypes.BERMUDAN
+
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,

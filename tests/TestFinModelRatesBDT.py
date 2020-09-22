@@ -11,7 +11,7 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaptionTypes
+from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -49,7 +49,7 @@ def testBlackModelCheck():
     notional = 100.0
 
     # Pricing a PAYER
-    swaptionType = FinLiborSwaptionTypes.PAYER
+    swaptionType = FinLiborSwapTypes.PAYER
     swaption = FinLiborSwaption(settlementDate,
                                 exerciseDate,
                                 maturityDate,
@@ -113,21 +113,32 @@ def test_BDTExampleTwo():
     testCases.banner("===================== FIG 28.11 HULL BOOK =============")
 
     settlementDate = FinDate(1, 12, 2019)
+    issueDate = FinDate(1, 12, 2015)
     expiryDate = settlementDate.addTenor("18m")
     maturityDate = settlementDate.addTenor("10Y")
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
 
-    bond._calculateFlowDates(settlementDate)
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
+    numFlows = len(bond._flowDates)
+
+    for i in range(1, numFlows):
+        pcd = bond._flowDates[i-1]
+        ncd = bond._flowDates[i]
+        if pcd < settlementDate and ncd > settlementDate:
+            flowTime = (pcd - settlementDate) / gDaysInYear
+            couponTimes.append(flowTime)
+            couponFlows.append(cpn)
+
     for flowDate in bond._flowDates:
-        flowTime = (flowDate - settlementDate) / gDaysInYear
-        couponTimes.append(flowTime)
-        couponFlows.append(cpn)
+        if flowDate > settlementDate:
+            flowTime = (flowDate - settlementDate) / gDaysInYear
+            couponTimes.append(flowTime)
+            couponFlows.append(cpn)
 
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
@@ -213,6 +224,7 @@ def test_BDTExampleThree():
         for maturityYears in [4.0, 5.0, 10.0, 20.0]:
 
             maturityDate = settlementDate.addYears(maturityYears)
+            issueDate = FinDate(maturityDate._d, maturityDate._m, 2000)
 
             if maturityYears == 4.0 or maturityYears == 5.0:
                 sigma = 0.2012
@@ -228,8 +240,7 @@ def test_BDTExampleThree():
                 tmat = (maturityDate - settlementDate) / gDaysInYear
                 texp = (expiryDate - settlementDate) / gDaysInYear
 
-                bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
-                bond._calculateFlowDates(settlementDate)
+                bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
 
                 couponTimes = []
                 couponFlows = []

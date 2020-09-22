@@ -59,21 +59,32 @@ def test_BKExampleTwo():
     # have the exact same dt so there are some differences
 
     settlementDate = FinDate(1, 12, 2019)
+    issueDate = FinDate(1, 12, 2018)
     expiryDate = settlementDate.addTenor("18m")
     maturityDate = settlementDate.addTenor("10Y")
     coupon = 0.05
     frequencyType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
 
-    bond._calculateFlowDates(settlementDate)
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
+    numFlows = len(bond._flowDates)
+
+    for i in range(1, numFlows):
+        pcd = bond._flowDates[i-1]
+        ncd = bond._flowDates[i]
+        if pcd < settlementDate and ncd > settlementDate:
+            flowTime = (pcd - settlementDate) / gDaysInYear
+            couponTimes.append(flowTime)
+            couponFlows.append(cpn)
+
     for flowDate in bond._flowDates:
-        flowTime = (flowDate - settlementDate) / gDaysInYear
-        couponTimes.append(flowTime)
-        couponFlows.append(cpn)
+        if flowDate > settlementDate:
+            flowTime = (flowDate - settlementDate) / gDaysInYear
+            couponTimes.append(flowTime)
+            couponFlows.append(cpn)
 
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)

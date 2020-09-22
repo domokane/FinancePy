@@ -38,7 +38,7 @@ def test_FinBondZeroCurve():
     bonds = []
     cleanPrices = []
 
-    for index, bondRow in bondDataFrame.iterrows():
+    for _, bondRow in bondDataFrame.iterrows():
         dateString = bondRow['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = fromDatetime(matDatetime)
@@ -55,7 +55,7 @@ def test_FinBondZeroCurve():
 
     testCases.header("DATE", "ZERO RATE")
 
-    for index, bond in bondDataFrame.iterrows():
+    for _, bond in bondDataFrame.iterrows():
 
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')

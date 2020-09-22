@@ -113,6 +113,7 @@ class FinBond(object):
         self._par = 100.0  # This is how price is quoted
 
         self._flowDates = []
+        self._flowAmounts = []
 
         self._settlementDate = FinDate(1, 1, 1900)
         self._accruedInterest = None
@@ -120,6 +121,7 @@ class FinBond(object):
         self._alpha = 0.0
 
         self._calculateFlowDates()
+        self._calculateFlowAmounts()
 
 ###############################################################################
 
@@ -138,11 +140,18 @@ class FinBond(object):
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
 
-#        print(self._flowDates)
+###############################################################################
 
-#        self._pcd = self._flowDates[0]
-#        self._ncd = self._flowDates[1]
-#        self.calcAccruedInterest(settlementDate)
+    def _calculateFlowAmounts(self):
+        ''' Determine the bond cashflow payment amounts without principal '''
+
+        self._flowAmounts = [0.0]
+
+        for dt in self._flowDates[1:]:
+           cpn = self._coupon / self._frequency
+           self._flowAmounts.append(cpn)
+    
+#        self._flowAmounts[-1] += 1.0
 
 ###############################################################################
 
@@ -343,7 +352,6 @@ class FinBond(object):
             # coupons paid on the settlement date are included            
             if dt >= settlementDate:
                 df = discountCurve.df(dt)
-                t = (dt - settlementDate) / gDaysInYear
                 flow = self._coupon / self._frequency
                 pv = flow * df
                 px += pv
@@ -458,7 +466,7 @@ class FinBond(object):
         respect to the clean price. '''
 
         cleanPrice = np.array(cleanPrice)
-
+        self.calcAccruedInterest(settlementDate)
         accruedAmount = self._accruedInterest * self._par / self._faceAmount
         bondPrice = cleanPrice + accruedAmount
         # Calculate the price of the bond discounted on the Libor curve

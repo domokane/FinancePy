@@ -30,7 +30,7 @@ from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 
 @njit(fastmath=True, cache=True)
 def _valueConvertible(tmat,
-                      face,
+                      faceAmount,
                       couponTimes,
                       couponFlows,
                       callTimes,
@@ -126,7 +126,7 @@ def _valueConvertible(tmat,
         treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
-    treeCallValue = np.ones(numTimes) * face * 1000.0
+    treeCallValue = np.ones(numTimes) * faceAmount * 1000.0
     numCalls = len(callTimes)
     for i in range(0, numCalls):
         callTime = callTimes[i]
@@ -206,7 +206,7 @@ def _valueConvertible(tmat,
     ###########################################################################
 
     flow = treeFlows[numTimes-1]
-    bulletPV = (1.0 + flow) * face
+    bulletPV = (1.0 + flow) * faceAmount
     for iNode in range(0, numLevels):
         convValue = treeConvertValue[numTimes-1, iNode]
         treeConvBondValue[numTimes-1, iNode] = max(bulletPV, convValue)
@@ -226,14 +226,14 @@ def _valueConvertible(tmat,
             futValueUp = treeConvBondValue[iTime+1, iNode+1]
             futValueDn = treeConvBondValue[iTime+1, iNode]
             hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
-            holdPV = df * hold + pDef * df * recRate * face + flow * face
+            holdPV = df * hold + pDef * df * recRate * faceAmount + flow * faceAmount
             conv = treeConvertValue[iTime, iNode]
             value = min(max(holdPV, conv, put), call)
             treeConvBondValue[iTime, iNode] = value
 
         bulletPV = df * bulletPV * survProb
-        bulletPV += pDef * df * recRate * face
-        bulletPV += flow * face
+        bulletPV += pDef * df * recRate * faceAmount
+        bulletPV += flow * faceAmount
 
     price = treeConvBondValue[0, 0]
     delta = (treeConvBondValue[1, 1] - treeConvBondValue[1, 0]) / \

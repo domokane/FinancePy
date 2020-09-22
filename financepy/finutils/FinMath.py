@@ -28,27 +28,25 @@ def accruedInterpolator(tset: float,  # Settlement time in years
     convention. This does not calculate according to other conventions. '''
 
     numCoupons = len(couponTimes)
-    foundIndex = -1
 
     for i in range(1, numCoupons):
-        if tset > couponTimes[i-1] and tset <= couponTimes[i]:
-            foundIndex = i
-            break
 
-    if foundIndex == -1:
-        return 0.0
+        pct = couponTimes[i - 1]
+        nct = couponTimes[i]
+        denom = (nct-pct)
+       
+        if tset >= pct and tset < nct:
+            accdFrac = (tset-pct) / denom
+            accdCpn = accdFrac * couponAmounts[i]
+            return accdCpn
 
-    t0 = couponTimes[foundIndex - 1]
-    t1 = couponTimes[foundIndex]
-    denom = t1 - t0
-
-    if abs(denom) < 1e-6:
-        raise FinError("Coupon times are the same")
-
-    accdFrac = (tset-t0)/denom
-    accdCpn = accdFrac * couponAmounts[i]
-#    print("ACCD INTERPOLATOR", tset, t0, t1, denom, accdCpn)
-    return accdCpn
+    # TODO: NEED TO REVISIT THIS TODO
+    return 0.0
+    print("t", tset)
+    print("CPN TIMES", couponTimes)
+    print("CPN AMNTS", couponAmounts)
+ 
+    raise FinError("Failed to calculate accrued")
 
 ###############################################################################
 

@@ -206,7 +206,7 @@ class FinLiborSwaption():
 
         elif isinstance(model, FinModelRatesHW):
 
-            swaptionPx = model.europeanBondOption(texp,
+            swaptionPx = model.europeanBondOptionJamshidian(texp,
                                                   strikePrice,
                                                   faceAmount, 
                                                   cpnTimes,
@@ -220,7 +220,7 @@ class FinLiborSwaption():
                 swaptionPrice = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
-                               str(self._swaptionType))
+                               str(self._swapType))
 
             # Cancel the multiplication at the end below
             swaptionPrice /= pv01

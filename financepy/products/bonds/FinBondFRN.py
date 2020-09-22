@@ -57,6 +57,8 @@ class FinBondFRN(object):
         quoted margin, coupon frequency, accrual type. Face is the size of
         the position and par is the notional on which price is quoted. '''
 
+        print("Warning: An issue date argument will be added to this soon.")
+
         checkArgumentTypes(self.__init__, locals())
 
         self._maturityDate = maturityDate

@@ -64,7 +64,9 @@ class FinModelRatesHL():
 
 ###############################################################################
 
-    def optionOnZCB(self, texp, tmat, strikePrice, face, dfTimes, dfValues):
+    def optionOnZCB(self, texp, tmat,
+                    strikePrice, faceAmount,
+                    dfTimes, dfValues):
         ''' Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. '''
@@ -82,10 +84,10 @@ class FinModelRatesHL():
 
         sigmap = sigma * (tmat-texp) * np.sqrt(texp)
 
-        h = np.log((face*ptmat)/(strikePrice*ptexp)) / sigmap + sigmap/2.0
+        h = np.log((faceAmount*ptmat)/(strikePrice*ptexp))/sigmap+sigmap/2.0
 
-        callValue = face * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
-        putValue = strikePrice * ptexp * N(-h+sigmap) - face * ptmat * N(-h)
+        callValue = faceAmount * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
+        putValue = strikePrice * ptexp * N(-h+sigmap) - faceAmount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 

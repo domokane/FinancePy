@@ -125,15 +125,27 @@ class FinLiborBermudanSwaption(object):
         cpnTimes = [texp]
         cpnFlows = [0.0]
 
-        # The first flow is always the PCD
         numFlows = len(swap._adjustedFixedDates)
 
+        # The first flow is always the PCD
+
         for iFlow in range(1, numFlows):
-            flowDate = swap._adjustedFixedDates[iFlow]
-            cpnTime = (flowDate - valuationDate) / gDaysInYear
-            cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
-            cpnTimes.append(cpnTime)
-            cpnFlows.append(cpnFlow)
+
+            pcd = swap._adjustedFixedDates[iFlow-1]
+            ncd = swap._adjustedFixedDates[iFlow]
+
+            if ncd > valuationDate:
+
+                if len(cpnTimes) == 0:
+                    cpnTime = (pcd - valuationDate) / gDaysInYear
+                    cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+                    cpnTimes.append(cpnTime)
+                    cpnFlows.append(cpnFlow)
+                    
+                cpnTime = (ncd - valuationDate) / gDaysInYear
+                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+                cpnTimes.append(cpnTime)
+                cpnFlows.append(cpnFlow)
 
         cpnTimes = np.array(cpnTimes)
         cpnFlows = np.array(cpnFlows)
@@ -146,7 +158,7 @@ class FinLiborBermudanSwaption(object):
         dfTimes = discountCurve._times
         dfValues = discountCurve._dfValues
 
-        face = 1.0
+        faceAmount = 1.0
         strikePrice = 1.0
 
         #######################################################################
@@ -164,7 +176,7 @@ class FinLiborBermudanSwaption(object):
         v = model.bermudanSwaption(texp,
                                    tmat,
                                    strikePrice,
-                                   face,
+                                   faceAmount,
                                    cpnTimes,
                                    cpnFlows,
                                    self._exerciseType)
