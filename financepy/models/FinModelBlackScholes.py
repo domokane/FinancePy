@@ -19,9 +19,9 @@ def bsValue(s, t, k, r, q, v, phi):
     ''' Price a derivative using Black-Scholes model where phi is 1 for a call,
     and -1 for a put.'''
 
-    k = max(k, gSmall)
-    t = max(t, gSmall)
-    v = max(v, gSmall)
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
 
     sqrtT = np.sqrt(t)
     ss = s * np.exp(-q*t)
