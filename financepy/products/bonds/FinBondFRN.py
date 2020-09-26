@@ -14,7 +14,6 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 # TODO: Need to complete and verify the risk sensitivity calculations.
@@ -48,6 +47,7 @@ class FinBondFRN(object):
     quoted margin.'''
 
     def __init__(self,
+                 issueDate: FinDate,
                  maturityDate: FinDate,
                  quotedMargin: float,    # Fixed spread paid on top of index
                  frequencyType: FinFrequencyTypes,
@@ -61,6 +61,7 @@ class FinBondFRN(object):
 
         checkArgumentTypes(self.__init__, locals())
 
+        self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._quotedMargin = quotedMargin
         self._frequencyType = frequencyType
@@ -78,30 +79,23 @@ class FinBondFRN(object):
         self._accruedInterest = 0.0
         self._accruedDays = 0.0
 
+        self._calculateFlowDates()
+
 ###############################################################################
 
-    def _calculateFlowDates(self,
-                            settlementDate: FinDate):
+    def _calculateFlowDates(self):
         ''' Determine the bond cashflow payment dates. '''
 
-        # No need to generate flows if settlement date has not changed
-        if settlementDate == self._settlementDate:
-            return
-
-        self._settlementDate = settlementDate
         calendarType = FinCalendarTypes.NONE
         busDayRuleType = FinBusDayAdjustTypes.NONE
         dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 
-        self._flowDates = FinSchedule(settlementDate,
+        self._flowDates = FinSchedule(self._issueDate,
                                       self._maturityDate,
                                       self._frequencyType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
-
-        self._pcd = self._flowDates[0]
-        self._ncd = self._flowDates[1]
 
 ###############################################################################
 
@@ -118,7 +112,6 @@ class FinBondFRN(object):
         is the level of subsequent future Libor payments and the discount
         margin. '''
 
-        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dayCounter = FinDayCount(self._accrualType)
@@ -133,18 +126,20 @@ class FinBondFRN(object):
         c = futureLibor + q
         numFlows = len(self._flowDates)
         dfPeriod = 1.0/(1.0 + y/f)
-
+        
+        # Handle the next coupon date (ncd)
         nextCoupon = resetLibor + self._quotedMargin
         df = pow(1.0 + (currentLibor + dm)/f, -alpha)
         pv = (nextCoupon/f) * df
-
-        for _ in range(2, numFlows):
-            df *= dfPeriod
-            pv = pv + (c/f) * df
+        
+        # Now do all subsequent coupons that fall after the ncd
+        for iFlow in range(1, numFlows):            
+            if self._flowDates[iFlow] > self._ncd:
+                df *= dfPeriod
+                pv = pv + (c/f) * df
 
         pv += df
         pv = pv * self._par
-
         return pv
 
 ###############################################################################
@@ -182,7 +177,6 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -214,7 +208,6 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
         dy = 0.0001
 
@@ -344,7 +337,6 @@ class FinBondFRN(object):
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self._calculateFlowDates(settlementDate)
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         dy = 0.0001
@@ -434,8 +426,7 @@ class FinBondFRN(object):
                        cleanPrice: float):
         ''' Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. '''
-
-        self._calculateFlowDates(settlementDate)
+        
         self.calcAccruedInterest(settlementDate, resetLibor)
 
         # Needs to be adjusted to par notional
@@ -453,6 +444,7 @@ class FinBondFRN(object):
                              tol=1e-8,
                              maxiter=50,
                              fprime2=None)
+
         return dm
 
 ###############################################################################
@@ -463,12 +455,18 @@ class FinBondFRN(object):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. '''
 
-        self._calculateFlowDates(settlementDate)
+        numFlows = len(self._flowDates)
 
-        if len(self._flowDates) == 0:
+        if numFlows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         dc = FinDayCount(self._accrualType)
+
+        for i in range(1, numFlows):
+            if self._flowDates[i] > settlementDate:
+                self._pcd = self._flowDates[i-1]
+                self._ncd = self._flowDates[i]
+                break
 
         (accFactor, num, _) = dc.yearFrac(self._pcd,
                                           settlementDate,

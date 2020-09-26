@@ -175,8 +175,7 @@ class FinBond(object):
         c = self._coupon
         v = 1.0 / (1.0 + ytm/f)
 
-        # n is the number of flows after the next coupon 
-        
+        # n is the number of flows after the next coupon         
         n = 0
         for dt in self._flowDates:
             if dt > settlementDate:
@@ -420,28 +419,23 @@ class FinBond(object):
         between the previous coupon payment date and settlement date. '''
 
         numFlows = len(self._flowDates)
-        
-        for iFlow in range(1, numFlows):
 
+        if numFlows == 0:
+            raise FinError("Accrued interest - not enough flow dates.")
+
+        for iFlow in range(1, numFlows):
             # coupons paid on a settlement date are paid 
             if self._flowDates[iFlow] >= settlementDate:
                 self._pcd = self._flowDates[iFlow-1]
                 self._ncd = self._flowDates[iFlow]
                 break
         
-        if len(self._flowDates) == 0:
-            raise FinError("Accrued interest - not enough flow dates.")
-
         dc = FinDayCount(self._accrualType)
 
         (accFactor, num, _) = dc.yearFrac(self._pcd,
                                           settlementDate,
                                           self._ncd, 
                                           self._frequency)
-
-        if num < 0:
-            print(self._flowDates)
-            print(settlementDate, "PCD:", self._pcd, "NCD", self._ncd)
 
         self._alpha = 1.0 - accFactor * self._frequency
         self._accruedInterest = accFactor * self._faceAmount * self._coupon

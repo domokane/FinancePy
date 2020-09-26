@@ -205,13 +205,15 @@ def test_FinBondFRN():
     ##########################################################################
 
     testCases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE")
+    issueDate = FinDate(10, 11, 2010)
     maturityDate = FinDate(10, 11, 2021)
     quotedMargin = 0.0025
     freqType = FinFrequencyTypes.QUARTERLY
     accrualType = FinDayCountTypes.THIRTY_E_360
     face = 1000000
 
-    bond = FinBondFRN(maturityDate,
+    bond = FinBondFRN(issueDate,
+                      maturityDate,
                       quotedMargin,
                       freqType,
                       accrualType,
@@ -312,6 +314,7 @@ def test_FinBondFRN():
 ##########################################################################
 
     testCases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE II")
+    issueDate = FinDate(28, 3, 2000)
     settlementDate = FinDate(28, 3, 2014)
     maturityDate = FinDate(3, 2, 2021)
     quotedMargin = 0.0020
@@ -319,7 +322,8 @@ def test_FinBondFRN():
     accrualType = FinDayCountTypes.THIRTY_E_360_ISDA
     face = 1000000.0
 
-    bond = FinBondFRN(maturityDate,
+    bond = FinBondFRN(issueDate,
+                      maturityDate,
                       quotedMargin,
                       freqType,
                       accrualType,
@@ -338,7 +342,7 @@ def test_FinBondFRN():
                              cleanPrice)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
-
+    
     fullPrice = bond.fullPriceFromDM(settlementDate,
                                      resetLibor,
                                      currentLibor,
