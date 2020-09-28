@@ -36,7 +36,7 @@ Important Note:
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
-Contact me at allmypythonprojects@gmail.com.
+Contact me at quant@financepy.com.
 
 ## Quick Start Guide
 

@@ -14,7 +14,6 @@ Equities - Log contracts using given skew curve
 Equities - Breedon-Litzenburger implied distribution of terminal stock price
 Equities - Fitting the skew parametrically
 Equities - Add interest rate risk to the Convertible bond model.
-Equities - Cliquets
 Equities - Range Notes
 Equities - CPPI
 Equities - Bull Notes
@@ -31,7 +30,6 @@ Libor - Extend swaption pricing to the two curve approach
 Libor - BGM with swaption and cap/floor calibration
 Libor - Bermudan Swaption pricing and risk using Andersen approach
 Libor - Bermudan Swaption pricing and risk using LS approach
-Libor - Cap and floor pricing and risk
 Libor - Range Accruals using BGM
 
 Inflation - TIPS bonds with correct yield measures
@@ -41,7 +39,6 @@ Inflation - Building an inflation curve
 Curves - Consider adding splines
 Models - BGM Calibration
 Models - Finite difference schemes ?
-Models - Sobol sequences implementation
 
 ## IN PROGRESS
 
@@ -50,6 +47,9 @@ Equities - Convertible bond model with credit and equity dependence and discrete
 
 ## DONE
 
+Libor - Cap and floor pricing and risk
+Models - Sobol sequences implementation
+Equities - Cliquets
 FX - Fitting the skew parametrically
 Equities - Vanillas
 FX - Vanilla FX options

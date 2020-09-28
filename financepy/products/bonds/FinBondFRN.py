@@ -496,6 +496,7 @@ class FinBondFRN(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("QUOTED MARGIN (bp)", self._quotedMargin * 10000.0)
         s += labelToString("FREQUENCY", self._frequencyType)
