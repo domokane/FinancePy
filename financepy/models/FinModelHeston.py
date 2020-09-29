@@ -10,7 +10,6 @@ import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY
 from ..finutils.FinGlobalVariables import gDaysInYear
 from ..finutils.FinOptionTypes import FinOptionTypes
 from ..finutils.FinMath import norminvcdf
-from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinError import FinError
 
 ##########################################################################

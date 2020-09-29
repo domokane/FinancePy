@@ -1,14 +1,19 @@
 # TO DO
 
-This list is not maintained.
+## HIGH PRIORITY
+Inflation - TIPS bonds with correct yield measures
+Perpetual - Perpetual bonds with correct yield measures
+Equities - Convertible bond model  - check accrued interest on tree
+Credit - Finish testing FinCDSTranche and add repr method
+Equities - Convertible bond model  - check credit modelling - testing
 
-## NOT STARTED
+## MEDIUM PRIORITY
+Calibration framework for Libor and Equity derivatives
 
-Notebooks- Add Disclaimer
-
-All products - Add notional to class
-
-Equities - Add term structure of interest rates to all models so that full discount curve is respected.
+Equities - American Vanilla option approximations
+Equities - SABR model
+Equities - Implement Sobol across products
+Equities - Vol surface calibration
 Equities - Discrete dividends
 Equities - Log contracts using given skew curve
 Equities - Breedon-Litzenburger implied distribution of terminal stock price
@@ -19,34 +24,45 @@ Equities - CPPI
 Equities - Bull Notes
 Equities - Payoff language
 Equities - Power options
+Equities - Variance swaps using given skew curve
 
 FX - Barrier bending
 FX - Breedon-Litzenburger implied distribution of terminal stock price
+FX - Heston model
 
+Libor - Implement G2++ rate model
+Libor - Implement CIR model
+Libor - Shifted Vasicek Tree
+Libor - Shifted BDT tree
+Libor - Shifted BK Tree
+Libor - Shifted CIR Tree
 Libor - Add OIS product to the library
 Libor - Add OIS to the Libor curve construction
-Libor - Extend swap pricing to two curve approach
-Libor - Extend swaption pricing to the two curve approach
+Libor - Swaption surface object
+Libor - Cap floor curve object
 Libor - BGM with swaption and cap/floor calibration
 Libor - Bermudan Swaption pricing and risk using Andersen approach
 Libor - Bermudan Swaption pricing and risk using LS approach
 Libor - Range Accruals using BGM
+Libor - Extend swaption pricing to the two curve approach
 
-Inflation - TIPS bonds with correct yield measures
 Inflation - Inflation Derivative - zeros and swaps using appropriate adjustments
 Inflation - Building an inflation curve
 
+Commodities - New asset class
+
+# LOW PRIORITY
 Curves - Consider adding splines
 Models - BGM Calibration
 Models - Finite difference schemes ?
+Models - Jump diffusion
+Models - Test Heston Model
 
-## IN PROGRESS
-
-Equities - Variance swaps using given skew curve
-Equities - Convertible bond model with credit and equity dependence and discrete dividends
 
 ## DONE
-
+Libor - Extend swap pricing to two curve approach
+Equities - Add term structure of interest rates to all models so that full discount curve is respected.
+Notebooks- Add Disclaimer
 Libor - Cap and floor pricing and risk
 Models - Sobol sequences implementation
 Equities - Cliquets
