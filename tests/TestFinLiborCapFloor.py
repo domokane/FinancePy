@@ -11,6 +11,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
+from financepy.products.libor.FinLiborSwap import FinLiborSwapTypes
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
