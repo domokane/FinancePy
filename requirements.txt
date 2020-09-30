@@ -1,0 +1,10 @@
+##### Imports used in Test files but not required by financepy
+os
+pandas
+matplotlib
+
+##### Imports required by core library
+numba
+numpy
+scipy
+
