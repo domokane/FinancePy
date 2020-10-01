@@ -23,6 +23,8 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 
+from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
