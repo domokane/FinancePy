@@ -10,13 +10,11 @@ To upgrade an existing installation type:
 
 # Using FinancePy in a Jupyter Notebook
 
-**Once financepy has been installed, it is easy to get started. Just download the set of Jupyter Notebooks on Github at the following link**
+Once financepy has been installed, it is easy to get started.
 
-<https://github.com/domokane/FinancePy-Examples>
+Just download the project and examine the set of Jupyter Notebooks in the notebooks folder.
 
-**Do this by clicking on the green button and selecting Download ZIP. Unzip this download to a local folder, start your Jupyter Notebook and then open any one of these notebooks. It should all work automatically.**
-
-**A pdf manual describing all of the functions can be found in the project directory:**
+A pdf manual describing all of the functions can be found in the project directory.
 
 # Overview
 
