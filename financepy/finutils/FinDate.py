@@ -652,6 +652,18 @@ def fromDatetime(dt: FinDate):
 
 ###############################################################################
 
+def daysInMonth(m, y):
+    ''' Get the number of days in the month (1-12) of a given year y. '''
+
+    if m < 1 or m > 12:
+        raise FinError("Month must be 1-12")
+    
+    if isLeapYear(y) is False:
+        return monthDaysNotLeapYear[m-1]
+    else:
+        return monthDaysLeapYear[m-1]
+
+###############################################################################
 
 def dateRange(startDate: FinDate,
               endDate: FinDate,
