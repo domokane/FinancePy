@@ -13,8 +13,8 @@ The target audience for this library includes:
 * Traders wishing to price or risk-manage a derivative.
 * Quantitative analysts seeking to price or reverse engineer a price.
 * Risk managers wishing to replicate and understand a price.
-* Portfolio managers wishing to check prices or calculate risk measures
-* Fund managers wanting to value a portfolio or examine a trading strategy
+* Portfolio managers wishing to check prices or calculate risk measures.
+* Fund managers wanting to value a portfolio or examine a trading strategy.
 * Structurers or financial engineers seeking to examine the pricing of a derivative structure.
 
 Users should have a good, but not advanced, understanding of Python. In terms of Python, the style of the library has been determined subject to the following criteria:
@@ -83,15 +83,15 @@ FinancePy depends on Numpy, Numba, Scipy and basic python libraries such as os, 
 
 ## Changelog
 
-See the changelog for a detailed history of changes
+See the changelog for a detailed history of changes.
 
 ## Contributions
 
 Contributions are very welcome. There are a number of requirements:
 
-* You should use CamelCase i.e. variables of the form optionPrice
-* Comments are required for every class and function and they should be clear
-* At least one test case must be provided for every function
+* You should use CamelCase i.e. variables of the form optionPrice.
+* Comments are required for every class and function and they should be clear.
+* At least one test case must be provided for every function.
 * Follow the style of the code as currently written. This may change over time but please use the current style as your guide.
 
 ## Disclaimer
