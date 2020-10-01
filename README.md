@@ -1,4 +1,26 @@
-# FinancePy
+# Quick Start Guide
+
+FinancePy can be installed from pip using the command:
+
+`pip install financepy`
+
+To upgrade an existing installation type:
+
+`pip install --upgrade financepy`
+
+# Using FinancePy in a Jupyter Notebook
+
+**Once financepy has been installed, it is easy to get started. Just download the set of Jupyter Notebooks on Github at the following link**
+
+<https://github.com/domokane/FinancePy-Examples>
+
+**Do this by clicking on the green button and selecting Download ZIP. Unzip this download to a local folder, start your Jupyter Notebook and then open any one of these notebooks. It should all work automatically.**
+
+**A pdf manual describing all of the functions can be found here:**
+
+<https://github.com/domokane/FinancePy-Examples/blob/master/FinancePyManualV_0.180.pdf>
+
+# Overview
 
 FinancePy is a python-based library that is currently in beta version. It covers the following functionality:
 
@@ -37,26 +59,6 @@ Important Note:
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
 Contact me at quant@financepy.com.
-
-## Quick Start Guide
-
-FinancePy can be installed from pip using the command:
-
-`pip install financepy`
-
-To upgrade an existing installation type:
-
-`pip install --upgrade financepy`
-
-You can then access a set of Jupyter Notebooks on at Github
-
-<https://github.com/domokane/FinancePy-Examples>
-
-Note that the first import of the library may take over 10 seconds as Numba compiles all of the imported module functions with a Numba decorator - this makes certain python functions run at speeds comparable with the C programming language. These compiled functions are then cached locally. Thereafter FinancePy should load almost instantly.
-
-Download a zipped version by clicking on the green button and selecting Download ZIP.
-
-A pdf manual describing all of the functions can be found at the same repository.
 
 ## The Library Design
 
