@@ -16,9 +16,7 @@ To upgrade an existing installation type:
 
 **Do this by clicking on the green button and selecting Download ZIP. Unzip this download to a local folder, start your Jupyter Notebook and then open any one of these notebooks. It should all work automatically.**
 
-**A pdf manual describing all of the functions can be found here:**
-
-<https://github.com/domokane/FinancePy-Examples/blob/master/FinancePyManualV_0.180.pdf>
+**A pdf manual describing all of the functions can be found in the project directory:**
 
 # Overview
 
