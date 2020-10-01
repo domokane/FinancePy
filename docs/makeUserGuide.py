@@ -840,14 +840,13 @@ buildTail()
 
 print("Latex filename:", userGuideFileName)
 
-
 if 1 == 1:
     # Do it twice for the TOC
     print("pdflatex " + userGuideFileName)
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
-    pdfFileName2 = '../../financepy-examples-git/' + pdfFileName1
-    # TODO: Only works if you have fincancepy-examples-git
+    pdfFileName2 = '../' + pdfFileName1
+    # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
     print("Copying ", pdfFileName1, " to ", pdfFileName2)
     shutil.copyfile(pdfFileName1, pdfFileName2)
