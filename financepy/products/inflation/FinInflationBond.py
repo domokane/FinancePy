@@ -82,11 +82,11 @@ class FinInflationBond(FinBond):
 
 ###############################################################################
 
-    def flatFromYieldToMaturity(self,
-                                settlementDate: FinDate,
-                                ytm: float,
-                                lastCpnCPI: float,
-                                convention: FinYTMCalcType):
+    def flatPriceFromYieldToMaturity(self,
+                                     settlementDate: FinDate,
+                                     ytm: float,
+                                     lastCpnCPI: float,
+                                     convention: FinYTMCalcType):
         ''' Calculate the flat clean price value of the bond based on the clean
         price amount and the CPI growth to the last coupon date. '''
 
@@ -119,7 +119,8 @@ class FinInflationBond(FinBond):
         s += labelToString("COUPON", self._coupon)
         s += labelToString("FREQUENCY", self._frequencyType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE AMOUNT", self._faceAmount, "")
+        s += labelToString("FACE AMOUNT", self._faceAmount)
+        s += labelToString("BASE CPI VALUE", self._baseCPIValue, "")
         return s
 
 ###############################################################################

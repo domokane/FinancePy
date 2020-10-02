@@ -1,4 +1,4 @@
-# Quick Start Guide
+## Quick Start Guide
 
 FinancePy can be installed from pip using the command:
 
@@ -8,7 +8,7 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-# Using FinancePy in a Jupyter Notebook
+## Using FinancePy in a Jupyter Notebook
 
 Once financepy has been installed, it is easy to get started.
 
@@ -16,7 +16,7 @@ Just download the project and examine the set of Jupyter Notebooks in the notebo
 
 A pdf manual describing all of the functions can be found in the project directory.
 
-# Overview
+## Overview
 
 FinancePy is a python-based library that is currently in beta version. It covers the following functionality:
 
@@ -104,7 +104,3 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-## License
-
-MIT
