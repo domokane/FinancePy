@@ -1,6 +1,6 @@
 ## Quick Start Guide
 
-FinancePy can be installed from pip using the command:
+FinancePy can be installed from pip using the following command:
 
 `pip install financepy`
 
