@@ -156,7 +156,7 @@ class FinFXVanillaOption():
 
         checkArgumentTypes(self.__init__, locals())
 
-        deliveryDate = expiryDate.addWorkDays(spotDays)
+        deliveryDate = expiryDate.addWeekDays(spotDays)
 
         ''' The FX rate the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
@@ -210,7 +210,7 @@ class FinFXVanillaOption():
         price in domestic of one unit of foreign currency. '''
 
         if type(valueDate) == FinDate:
-            spotDate = valueDate.addWorkDays(self._spotDays)
+            spotDate = valueDate.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
             texp = (self._expiryDate - valueDate) / gDaysInYear
         else:
@@ -360,7 +360,7 @@ class FinFXVanillaOption():
         by Iain Clark, published by Wiley Finance. '''
 
         if type(valueDate) == FinDate:
-            spotDate = valueDate.addWorkDays(self._spotDays)
+            spotDate = valueDate.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
             texp = (self._expiryDate - valueDate) / gDaysInYear
         else:

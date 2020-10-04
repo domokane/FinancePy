@@ -30,7 +30,7 @@ def buildLiborCurve(valueDate):
     payFixed = FinLiborSwapTypes.PAYER
 
     spotDays = 2
-    settlementDate = valueDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWeekDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)

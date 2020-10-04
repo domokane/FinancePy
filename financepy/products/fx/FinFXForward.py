@@ -33,7 +33,7 @@ class FinFXForward():
 
         checkArgumentTypes(self.__init__, locals())
 
-        deliveryDate = expiryDate.addWorkDays(spotDays)
+        deliveryDate = expiryDate.addWeekDays(spotDays)
 
         ''' The FX rate is the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the

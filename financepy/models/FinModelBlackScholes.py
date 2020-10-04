@@ -5,6 +5,7 @@
 # TODO Fix this
 
 import numpy as np
+from numba import njit
 
 from scipy.stats import norm
 from ..finutils.FinGlobalVariables import gSmall
@@ -13,11 +14,18 @@ N = norm.cdf
 ###############################################################################
 # This is intended to be a fast calculator and validation is left to calling
 # functions.
+###############################################################################
 
 
 def bsValue(s, t, k, r, q, v, phi):
-    ''' Price a derivative using Black-Scholes model where phi is 1 for a call,
-    and -1 for a put.'''
+    ''' Price a derivative using Black-Scholes model where 
+    phi is +1 for a call, and
+    phi is -1 for a put.'''
+
+    # if phi == 1:
+    #     print("Call", s, t, k, r, q, v, phi)
+    # else:
+    #     print("Put", s, t, k, r, q, v, phi)
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)

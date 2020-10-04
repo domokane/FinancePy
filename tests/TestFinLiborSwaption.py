@@ -39,7 +39,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     depos = []
 
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     depositRate = 0.05
 
     depo1 = FinLiborDeposit(settlementDate, "1M", depositRate, depoBasis)
@@ -100,7 +100,7 @@ def testFinLiborSwaptionModels():
     model5 = FinModelRatesHW(0.00001, 0.00001)
     model6 = FinModelRatesBK(0.01, 0.01)
 
-    settlementDate = valuationDate.addWorkDays(2)
+    settlementDate = valuationDate.addWeekDays(2)
 
     for k in strikes:
         swaptionType = FinLiborSwapTypes.PAYER

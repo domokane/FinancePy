@@ -40,7 +40,7 @@ def test_FinFXForward():
     ###########################################################################
 
     spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWeekDays(spotDays)
     maturityDate = settlementDate.addMonths(12)
     notional = 100.0
     calendarType = FinCalendarTypes.TARGET

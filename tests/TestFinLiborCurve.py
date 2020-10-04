@@ -41,7 +41,7 @@ def test_FinLiborDepositsOnly():
     valuationDate = FinDate(2018, 2, 23)
 
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depoDCCType = FinDayCountTypes.ACT_360
     notional = 100.0
@@ -100,7 +100,7 @@ def test_FinLiborFRAsOnly():
     valuationDate = FinDate(2018, 2, 23)
 
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depoDCCType = FinDayCountTypes.ACT_360
     notional = 100.0
@@ -152,7 +152,7 @@ def test_FinLiborDepositsFRAsSwaps():
     depos = []
 
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
@@ -340,7 +340,7 @@ def test_FinLiborDepositsFuturesSwaps():
 
     spotDate = FinDate(6, 6, 2018)
     spotDays = 0
-    settlementDate = spotDate.addWorkDays(spotDays)
+    settlementDate = spotDate.addWeekDays(spotDays)
     depoDCCType = FinDayCountTypes.ACT_360
     depos = []
     depositRate = 0.0231381
@@ -400,7 +400,7 @@ def test_FinLiborDepositsFuturesSwaps():
     ###########################################################################
 
     spotDays = 2
-    startDate = spotDate.addWorkDays(spotDays)
+    startDate = spotDate.addWeekDays(spotDays)
 
     swaps = []
     swapType = FinLiborSwapTypes.PAYER
@@ -486,21 +486,21 @@ def test_derivativePricingExample():
 
     # We do the O/N rate which settles on trade date
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001410
     depo = FinLiborDeposit(settlementDate, "ON", depositRate, dccType)
     depos.append(depo)
 
     spotDays = 1
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001410
     depo = FinLiborDeposit(settlementDate, "TN", depositRate, dccType)
     depos.append(depo)
 
     spotDays = 2
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001910
     depo = FinLiborDeposit(settlementDate, "1W", depositRate, dccType)
@@ -630,7 +630,7 @@ def test_bloombergPricingExample():
 
     # We do the O/N rate which settles on trade date
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     depoDCCType = FinDayCountTypes.ACT_360
     depos = []
     depositRate = 0.0231381
@@ -659,7 +659,7 @@ def test_bloombergPricingExample():
     freq = FinFrequencyTypes.SEMI_ANNUAL
 
     spotDays = 2
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     notional = ONE_MILLION
     swapType = FinLiborSwapTypes.PAYER
 

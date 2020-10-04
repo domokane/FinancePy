@@ -29,6 +29,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinSchedule import FinSchedule
+from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
@@ -93,10 +94,9 @@ class FinBond(object):
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  faceAmount: float = 100.0):
-        ''' Create FinBond object by providing Maturity Date, Frequency,
-        coupon and the accrual convention type. No issue date is required as
-        we assume that the bond starts accruing before any settlement date and
-        so that the first coupon is a full coupon. This may change. '''
+        ''' Create FinBond object by providing the issue date, maturity Date,
+        coupon frequency, annualised coupon, the accrual convention type, face
+        amount and the number of ex-dividend days. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -116,7 +116,9 @@ class FinBond(object):
         self._flowDates = []
         self._flowAmounts = []
 
-        self._settlementDate = FinDate(1, 1, 1900)
+#        self._settlementDate = FinDate(1, 1, 1900)
+#        self._exDividendDate = None
+
         self._accruedInterest = None
         self._accruedDays = 0.0
         self._alpha = 0.0
@@ -413,11 +415,18 @@ class FinBond(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self, settlementDate: FinDate):
+    def calcAccruedInterest(self, 
+                            settlementDate: FinDate,
+                            numExDividendDays: int = 0, 
+                            calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
-        between the previous coupon payment date and settlement date. '''
+        between the previous coupon payment date and settlement date. If the
+        bond trades with ex-coupon dates then you need to supply the number of
+        days before the coupon date the ex-coupon date is. You can specify the
+        calendar to be used - NONE means only calendar days, WEEKEND is only 
+        weekends or you can specify a country calendar for business days.'''
 
         numFlows = len(self._flowDates)
 
@@ -430,17 +439,30 @@ class FinBond(object):
                 self._pcd = self._flowDates[iFlow-1]
                 self._ncd = self._flowDates[iFlow]
                 break
-        
-        dc = FinDayCount(self._accrualType)
 
-        (accFactor, num, _) = dc.yearFrac(self._pcd,
-                                          settlementDate,
-                                          self._ncd, 
-                                          self._frequency)
+        dc = FinDayCount(self._accrualType)
+        cal = FinCalendar(calendarType)
+        exDividendDate = cal.addBusinessDays(self._ncd, -numExDividendDays)
+
+        (accFactor, num, den) = dc.yearFrac(self._pcd,
+                                            settlementDate,
+                                            self._ncd, 
+                                            self._frequency)
+        
+        if settlementDate >= exDividendDate:
+            accFactor = accFactor - 1.0 / self._frequency
 
         self._alpha = 1.0 - accFactor * self._frequency
         self._accruedInterest = accFactor * self._faceAmount * self._coupon
         self._accruedDays = num
+
+        print(self._pcd,
+              settlementDate,
+              self._ncd,
+              exDividendDate,
+              accFactor, 
+              num, den,
+              self._accruedInterest)
         
         return self._accruedInterest
 

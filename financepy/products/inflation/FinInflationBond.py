@@ -30,7 +30,8 @@ class FinInflationBond(FinBond):
                  frequencyType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  faceAmount: float,
-                 baseCPIValue: float): # Value of CPI index at bond issue date
+                 baseCPIValue: float, 
+                 numExDividendDays: int = 0): # Value of CPI index at bond issue date
         ''' Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
@@ -51,6 +52,7 @@ class FinInflationBond(FinBond):
         self._baseCPIValue = baseCPIValue # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted
         self._redemption = 1.0 # Amount paid at maturity
+        self._numExDividendDays = numExDividendDays
 
         self._flowDates = []
         self._flowAmounts = []

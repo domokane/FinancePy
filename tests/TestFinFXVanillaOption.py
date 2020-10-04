@@ -180,7 +180,7 @@ def test_FinFXVanillaOptionBloombergExample():
     volatility = 0.20
 
     spotDays = 0
-    settlementDate = valueDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWeekDays(spotDays)
     maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
     notionalCurrency = "EUR"

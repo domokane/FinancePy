@@ -7,6 +7,8 @@ import datetime as dt
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinCalendar import FinCalendar
+from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate, fromDatetime
@@ -29,7 +31,7 @@ def buildLiborCurve(valueDate):
     depos = []
 
     spotDays = 2
-    settlementDate = valueDate.addWorkDays(spotDays)
+    settlementDate = valueDate.addWeekDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
@@ -435,8 +437,35 @@ def test_FinBond():
     conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)
 
-##########################################################################
+###############################################################################
 
+def test_FinBondExDividend():
+    
+    issueDate = FinDate(7, 9, 2000)
+    maturityDate = FinDate(7, 9, 2020)
+    coupon = 0.05
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    face = 100.0
+    exDivDays = 7
 
-test_FinBond()
+    calendarType = FinCalendarTypes.UK
+        
+    bond = FinBond(issueDate, maturityDate, coupon, freqType,
+                   accrualType, face)
+    
+    settlementDate = FinDate(7, 9, 2003)
+    accruedAmounts = []
+
+    for i in range(0, 365):
+        
+        accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+        settlementDate = settlementDate.addDays(1)
+
+        accruedAmounts.append(accrued) 
+           
+###############################################################################
+
+# test_FinBond()
+test_FinBondExDividend()
 testCases.compareTestCases()

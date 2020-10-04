@@ -7,6 +7,7 @@
 # TODO: Do some timings and tidy up logic in adjustment function
 ###############################################################################
 
+import datetime
 from enum import Enum
 from .FinDate import FinDate
 from .FinError import FinError
@@ -161,6 +162,43 @@ class FinCalendar(object):
                            str(busDayConventionType))
 
         return dt
+
+###############################################################################
+
+    def addBusinessDays(self,
+                        startDate: FinDate,
+                        numDays: int):
+        ''' Returns a new date that is numDays business days after FinDate. 
+        All holidays in the chosen calendar are assumed not business days. '''
+
+        # TODO: REMOVE DATETIME DEPENDENCE HERE
+
+        if isinstance(numDays, int) is False:
+            raise FinError("Num days must be an integer")
+
+        dt = datetime.date(startDate._y, startDate._m, startDate._d)
+        d = dt.day
+        m = dt.month
+        y = dt.year
+        newDt = FinDate(d, m, y)
+
+        s = +1
+        if numDays < 0:
+            numDays = -1 * numDays
+            s = -1
+
+        while numDays > 0:
+            dt = dt + s * datetime.timedelta(days=1)
+            d = dt.day
+            m = dt.month
+            y = dt.year
+            newDt = FinDate(d, m, y)
+
+            if self.isBusinessDay(newDt) is True:
+#                print("BUS DAY: ", newDt, numDays)
+                numDays -= 1
+
+        return newDt
 
 ###############################################################################
 

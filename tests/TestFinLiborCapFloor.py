@@ -50,7 +50,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     depos = []
 
     spotDays = 0
-    settlementDate = valuationDate.addWorkDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     depositRate = 0.05
 
     depo1 = FinLiborDeposit(settlementDate, "1M", depositRate, depoBasis)
@@ -88,7 +88,7 @@ def test_FinLiborCapFloor():
 
     todayDate = FinDate(20, 6, 2019)
     valuationDate = todayDate
-    startDate = todayDate.addWorkDays(2)
+    startDate = todayDate.addWeekDays(2)
     maturityDate = startDate.addTenor("1Y")
     liborCurve = test_FinLiborDepositsAndSwaps(todayDate)
 

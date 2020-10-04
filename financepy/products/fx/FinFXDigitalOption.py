@@ -65,7 +65,7 @@ class FinFXDigitalOption():
         domestic or foreign currency. '''
 
         if type(valueDate) == FinDate:
-            spotDate = valueDate.addWorkDays(self._spotDays)
+            spotDate = valueDate.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
             texp = (self._expiryDate - valueDate) / gDaysInYear
         else:

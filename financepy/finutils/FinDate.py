@@ -290,16 +290,17 @@ class FinDate():
 
     ###########################################################################
 
-    def addWorkDays(self,
+    def addWeekDays(self,
                     numDays: int):
         ''' Returns a new date that is numDays working days after FinDate. Note
-        that only weekends are taken into account. Other Holidays are not. '''
+        that only weekends are taken into account. Other Holidays are not. If
+        you want to include regional holidays then use addBusinessDays from
+        the FinCalendar class. '''
+
+        # TODO: REMOVE DATETIME DEPENDENCE HERE
 
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
-
-        if numDays < 0:
-            raise FinError("Num days must be positive.")
 
         dt = datetime.date(self._y, self._m, self._d)
         d = dt.day
@@ -307,8 +308,13 @@ class FinDate():
         y = dt.year
         newDt = FinDate(d, m, y)
 
+        s = +1
+        if numDays < 0:
+            numDays = -1 * numDays
+            s = -1
+
         while numDays > 0:
-            dt = dt + datetime.timedelta(days=1)
+            dt = dt + s * datetime.timedelta(days=1)
             d = dt.day
             m = dt.month
             y = dt.year
@@ -626,7 +632,7 @@ def dailyWorkingDaySchedule(self,
     dt = startDate
     dateList.append(dt)
     while dt < endDate:
-        dt = dt.addWorkDays(1)
+        dt = dt.addWeekDays(1)
         dateList.append(dt)
 
     return dateList

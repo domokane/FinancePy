@@ -110,7 +110,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
     valuationDate = FinDate(16, 8, 2016)
-    settlementDate = valuationDate.addWorkDays(3)
+    settlementDate = valuationDate.addWeekDays(3)
 
     ###########################################################################
 
