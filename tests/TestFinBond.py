@@ -461,7 +461,6 @@ def test_FinBondExDividend():
         
         accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
         settlementDate = settlementDate.addDays(1)
-
         accruedAmounts.append(accrued) 
            
 ###############################################################################

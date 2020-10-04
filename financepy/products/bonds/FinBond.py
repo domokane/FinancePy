@@ -456,13 +456,13 @@ class FinBond(object):
         self._accruedInterest = accFactor * self._faceAmount * self._coupon
         self._accruedDays = num
 
-        print(self._pcd,
-              settlementDate,
-              self._ncd,
-              exDividendDate,
-              accFactor, 
-              num, den,
-              self._accruedInterest)
+        # print(self._pcd,
+        #       settlementDate,
+        #       self._ncd,
+        #       exDividendDate,
+        #       accFactor, 
+        #       num, den,
+        #       self._accruedInterest)
         
         return self._accruedInterest
 
