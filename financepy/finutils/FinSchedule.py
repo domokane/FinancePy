@@ -23,11 +23,12 @@ class FinSchedule(object):
 
     def __init__(self,
                  startDate: FinDate,   # Also known as the effective date
-                 endDate: FinDate,  # Also known as the maturity date
+                 endDate: FinDate,  # Also known as the termination date
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
+                 adjustTerminationDate:bool = False):
         ''' Create FinSchedule object which calculates a sequence of dates in
         line with market convention for fixed income products. '''
 
@@ -40,8 +41,12 @@ class FinSchedule(object):
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
+        
+        # TODO USE THIS TO ADJUST OR NOT
+        self._adjustTerminationDate = adjustTerminationDate
+        
         self._adjustedDates = None
-
+        
         self._generate()
 
 ###############################################################################
@@ -60,6 +65,8 @@ class FinSchedule(object):
         ''' Generate schedule of dates according to specified date generation
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. '''
+
+        # NEED TO INCORPORATE ADJUST TERMINATION DATE FLAG
 
         calendar = FinCalendar(self._calendarType)
         frequency = FinFrequency(self._frequencyType)

@@ -448,21 +448,37 @@ def test_FinBondExDividend():
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
     exDivDays = 7
+    testCases.header("LABEL", "VALUE")
 
-    calendarType = FinCalendarTypes.UK
-        
-    bond = FinBond(issueDate, maturityDate, coupon, freqType,
-                   accrualType, face)
-    
+    calendarType = FinCalendarTypes.UK        
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType, face)    
     settlementDate = FinDate(7, 9, 2003)
-    accruedAmounts = []
+    accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+    testCases.print("SettlementDate:", settlementDate)
+    testCases.print("Accrued:", accrued)
 
-    for i in range(0, 365):
-        
-        accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+    ###########################################################################
+    testCases.banner("=======================================================")
+    testCases.header("SETTLEMENT", "ACCRUED")
+
+    issueDate = FinDate(7, 9, 2000)
+    maturityDate = FinDate(7, 9, 2020)
+    coupon = 0.05
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    face = 100.0
+    exDivDays = 7
+
+    calendarType = FinCalendarTypes.UK        
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType, face)    
+
+    settlementDate = FinDate(25, 8, 2010)
+
+    for i in range(0, 13):
         settlementDate = settlementDate.addDays(1)
-        accruedAmounts.append(accrued) 
-           
+        accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+        testCases.print(settlementDate, accrued)
+        
 ###############################################################################
 
 # test_FinBond()

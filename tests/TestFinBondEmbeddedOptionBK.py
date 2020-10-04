@@ -61,7 +61,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     putPrices = []
 
     putDate = FinDate(1, 1, 2008)
-    for i in range(0, 24):
+    for _ in range(0, 24):
         putDates.append(putDate)
         putPrices.append(100)
         putDate = putDate.addMonths(1)
@@ -109,7 +109,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
     valueDate = FinDate(16, 8, 2016)
-    settlementDate = valueDate.addWeekDays(3)
+    settlementDate = valueDate.addWorkDays(3)
 
     ###########################################################################
 
