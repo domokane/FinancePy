@@ -123,9 +123,9 @@ def calculateList():
 
 ##############################################################################
 # The index in these functions is not the excel date index used as the 
-# internal representation of the date but the inded of that date in the
+# internal representation of the date but the index of that date in the
 # padded date object used to store the dates in a way that allows for a
-# quick lookup.
+# quick lookup. Do not confuse them as you will find they are out by months
 ##############################################################################
 
 @njit(fastmath=True, cache=True)
@@ -183,7 +183,7 @@ class FinDate():
         if isinstance(args[0], str):
            d, m, y = parse_date(args[0], args[1])
         else:
-            d, m, y = args[0], args[1], args[2]
+           d, m, y = args[0], args[1], args[2]
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
