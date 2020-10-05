@@ -627,7 +627,8 @@ class FinDate():
         return dateStr
 
     ###########################################################################
-
+    # REMOVE THIS
+    
     def _print(self):
         ''' prints formatted string of the date. '''
         print(self)
