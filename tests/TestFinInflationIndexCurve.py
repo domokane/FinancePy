@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 
 import sys
 sys.path.append("..//..")

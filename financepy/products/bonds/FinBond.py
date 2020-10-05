@@ -449,7 +449,7 @@ class FinBond(object):
                                             self._ncd, 
                                             self._frequency)
         
-        if settlementDate >= exDividendDate:
+        if settlementDate > exDividendDate:
             accFactor = accFactor - 1.0 / self._frequency
 
         self._alpha = 1.0 - accFactor * self._frequency
