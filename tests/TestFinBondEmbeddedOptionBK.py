@@ -5,6 +5,9 @@
 import matplotlib.pyplot as plt
 import time
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
@@ -109,7 +112,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
     valueDate = FinDate(16, 8, 2016)
-    settlementDate = valueDate.addWorkDays(3)
+    settlementDate = valueDate.addWeekDays(3)
 
     ###########################################################################
 

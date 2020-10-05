@@ -6,7 +6,7 @@ import glob
 from os.path import dirname, basename, join
 
 import sys
-sys.path.append("..//financepy")
+sys.path.append("..")
 
 print("Looking in folder:", dirname(__file__))
 modules = glob.glob(join(dirname(__file__), "TestFin*.py"))

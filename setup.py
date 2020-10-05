@@ -39,7 +39,7 @@ setuptools.setup(
     name="financepy",
     version=version_number_str,
     author="Dominic O'Kane",
-    author_email="okane.dominic@gmail.com",
+    author_email="quant@financepy.com",
     description="A Finance Library",
     long_description=long_description,
     long_description_content_type="text/markdown",

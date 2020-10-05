@@ -150,7 +150,7 @@ class FinBond(object):
 
         self._flowAmounts = [0.0]
 
-        for dt in self._flowDates[1:]:
+        for _ in self._flowDates[1:]:
            cpn = self._coupon / self._frequency
            self._flowAmounts.append(cpn)
     
@@ -444,7 +444,7 @@ class FinBond(object):
         cal = FinCalendar(calendarType)
         exDividendDate = cal.addBusinessDays(self._ncd, -numExDividendDays)
 
-        (accFactor, num, den) = dc.yearFrac(self._pcd,
+        (accFactor, num, _) = dc.yearFrac(self._pcd,
                                             settlementDate,
                                             self._ncd, 
                                             self._frequency)
@@ -455,14 +455,6 @@ class FinBond(object):
         self._alpha = 1.0 - accFactor * self._frequency
         self._accruedInterest = accFactor * self._faceAmount * self._coupon
         self._accruedDays = num
-
-        # print(self._pcd,
-        #       settlementDate,
-        #       self._ncd,
-        #       exDividendDate,
-        #       accFactor, 
-        #       num, den,
-        #       self._accruedInterest)
         
         return self._accruedInterest
 

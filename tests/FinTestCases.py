@@ -9,7 +9,6 @@ import time
 from enum import Enum
 from financepy.finutils.FinError import FinError
 
-
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
     ANALYSE_TEST_CASES = 2
