@@ -59,6 +59,10 @@ def isLeapYear(y: int):
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
     return leapYear
 
+
+def parse_date(dateStr, dateFormat):
+    dt_obj = datetime.datetime.strptime(dateStr, dateFormat)
+    return dt_obj.day, dt_obj.month, dt_obj.year
 ###############################################################################
 # CREATE DATE COUNTER
 ###############################################################################
@@ -163,16 +167,23 @@ class FinDate():
 
     ###########################################################################
 
-    def __init__(self,
-                 d: int,  # Day number in month with values from 1 to 31
-                 m: int,  # Month number where January = 1, ..., December = 12
-                 y: int):  # Year number which must be between 1900 and 2100
+    def __init__(self, *args):  # Year number which must be between 1900 and 2100
         ''' Create a date given a day of month, month and year. The arguments
         must be in the order of day (of month), month number and then the year.
-        The year must be a 4-digit number greater than or equal to 1900. '''
+        The year must be a 4-digit number greater than or equal to 1900.
+
+        Example Input:
+        start_date = FinDate('1-1-2018', '%d-%m-%Y')
+        start_date = FinDate(1, 1, 2018)
+        '''
 
         global gStartYear
         global gEndYear
+
+        if isinstance(args[0], str):
+           d, m, y = parse_date(args[0], args[1])
+        else:
+            d, m, y = args[0], args[1], args[2]
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:

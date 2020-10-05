@@ -21,6 +21,8 @@ def test_FinDate():
 
     startDate = FinDate(1, 1, 2018)
 
+    assert FinDate(1, 1, 2018) == FinDate('1-1-2018', '%d-%m-%Y')
+
     testCases.header("DATE", "MONTHS", "CDS DATE")
 
     for numMonths in range(0, 120):
