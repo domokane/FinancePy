@@ -117,6 +117,13 @@ def calculateList():
                     gDateCounterList.append(-999)
 
 
+##############################################################################
+# The index in these functions is not the excel date index used as the 
+# internal representation of the date but the inded of that date in the
+# padded date object used to store the dates in a way that allows for a
+# quick lookup.
+##############################################################################
+
 @njit(fastmath=True, cache=True)
 def dateIndex(d, m, y):
     idx = (y-gStartYear) * 12 * 31 + (m-1) * 31 + (d-1)
@@ -132,6 +139,7 @@ def dateFromIndex(idx):
     d = 1 + idx - (y-gStartYear) * 12 * 31 - (m-1) * 31
     return (d, m, y)
 
+###############################################################################
 
 @njit(fastmath=True, cache=True)
 def weekDay(dayCount):
