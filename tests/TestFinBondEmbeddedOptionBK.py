@@ -81,7 +81,7 @@ def test_FinBondEmbeddedOptionMATLAB():
                                          callDates, callPrices,
                                          putDates, putPrices)
 
-    testCases.header("PERIOD", "NumTimeSteps", "BondWithOption", "BondPure")
+    testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
 
     timeSteps = range(100, 200, 10)  # 1000, 10)
     values = []
@@ -157,7 +157,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     v = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
     testCases.print("Bond Pure Price:", v)
 
-    testCases.header("PERIOD", "NumTimeSteps", "BondWithOption", "BondPure")
+    testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
     timeSteps = range(100, 200, 10)  # 1000, 10)
     values = []
     for numTimeSteps in timeSteps:

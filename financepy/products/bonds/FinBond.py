@@ -116,9 +116,6 @@ class FinBond(object):
         self._flowDates = []
         self._flowAmounts = []
 
-#        self._settlementDate = FinDate(1, 1, 1900)
-#        self._exDividendDate = None
-
         self._accruedInterest = None
         self._accruedDays = 0.0
         self._alpha = 0.0
@@ -129,8 +126,9 @@ class FinBond(object):
 ###############################################################################
 
     def _calculateFlowDates(self):
-        ''' Determine the bond cashflow payment dates. '''
-        # No need to generate flows if settlement date has not changed
+        ''' Determine the bond cashflow payment dates.'''
+
+        # This should only be called once from init 
 
         calendarType = FinCalendarTypes.NONE
         busDayRuleType = FinBusDayAdjustTypes.NONE
@@ -154,8 +152,6 @@ class FinBond(object):
            cpn = self._coupon / self._frequency
            self._flowAmounts.append(cpn)
     
-#        self._flowAmounts[-1] += 1.0
-
 ###############################################################################
 
     def fullPriceFromYTM(self,
@@ -248,7 +244,7 @@ class FinBond(object):
         ''' Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. '''
 
-        dy = 0.0001
+        dy = 0.0001 # 1 basis point
         p0 = self.fullPriceFromYTM(settlementDate, ytm - dy, convention)
         p2 = self.fullPriceFromYTM(settlementDate, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0

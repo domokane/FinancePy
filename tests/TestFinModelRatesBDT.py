@@ -182,7 +182,7 @@ def test_BDTExampleTwo():
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
 
-    if 1 == 1:
+    if 1 == 0:
         print("RT")
         printTree(model._rt, 5)
         print("Q")

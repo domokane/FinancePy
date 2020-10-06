@@ -45,7 +45,7 @@ def test_BKExampleOne():
         testCases.header("LABEL", "VALUE")
         testCases.print("QTREE", model._Q)
         testCases.print("RTREE", model._rt)
-        printTree(model._rt)
+#        printTree(model._rt)
         testCases.print("PU AT LAST TIME", model._pu)
         testCases.print("PDM AT LAST TIME", model._pm)
         testCases.print("PD AT LAST TIME", model._pd)

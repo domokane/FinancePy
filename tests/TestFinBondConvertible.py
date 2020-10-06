@@ -87,7 +87,7 @@ def test_FinBondConvertible():
     testCases.header("LABEL")
     testCases.print("NO CALLS OR PUTS")
 
-    testCases.header("PERIOD", "NUMSTEPS", "PRICE")
+    testCases.header("TIME", "NUMSTEPS", "PRICE")
 
     for numStepsPerYear in [5, 10, 20, 40, 80]:
         start = time.time()
@@ -109,7 +109,7 @@ def test_FinBondConvertible():
     testCases.header("LABEL")
     testCases.print("DIVIDENDS")
 
-    testCases.header("PERIOD", "NUMSTEPS", "PRICE")
+    testCases.header("TIME", "NUMSTEPS", "PRICE")
     for numStepsPerYear in [5, 10, 20, 40, 80]:
         start = time.time()
         res = bond.value(settlementDate,

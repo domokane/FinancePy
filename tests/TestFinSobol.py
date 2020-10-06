@@ -36,7 +36,7 @@ def test_FinSobol():
     numRepeats = 100
     numDimensions = 10
 
-    testCases.header("TIME", "VALUE")
+    testCases.header("LABEL", "TIME")
     start = time.time()
     for _ in range(numRepeats):
         getUniformSobol(1000, numDimensions)

@@ -441,7 +441,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     a = 0.01
     model = FinModelRatesBDT(sigma, numTimeSteps)
 
-    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
+#    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 

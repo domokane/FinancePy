@@ -85,7 +85,7 @@ def test_HullWhiteExampleTwo():
     testCases.banner("Comparing option on zero coupon bond analytical vs Tree")
 
     testCases.header("NUMTIMESTEP", "VTREE_CALL", "VTREE_PUT", 
-                     "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF", "PERIOD")
+                     "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF", "TIME")
 
     for numTimeSteps in numStepsList:
 

@@ -168,7 +168,7 @@ def test_FinBondOptionEuropeanConvergence():
     timeSteps = range(10, 400, 10)
     strikePrice = 100.0
 
-    testCases.header("PERIOD","N","PUT_JAM","PUT_TREE","CALL_JAM","CALL_TREE")
+    testCases.header("TIME","N","PUT_JAM","PUT_TREE","CALL_JAM","CALL_TREE")
 
     for numTimeSteps in timeSteps:
 
@@ -229,7 +229,7 @@ def test_FinBondOptionAmericanConvergenceONE():
     strikePrice = 100.0
     face = 100.0
 
-    testCases.header("PERIOD", "N", "PUT_AMER", "PUT_EUR",
+    testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
     timeSteps = range(100, 500, 10)
@@ -298,7 +298,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
     testCases.header("LABEL", "VALUE")
     testCases.print("BOND PRICE", spotValue)
 
-    testCases.header("PERIOD", "N", "EUR_CALL", "AMER_CALL",
+    testCases.header("TIME", "N", "EUR_CALL", "AMER_CALL",
                      "EUR_PUT", "AMER_PUT")
 
     sigma = 0.01
@@ -386,9 +386,9 @@ def test_FinBondOptionZEROVOLConvergence():
     dfExpiry = discountCurve.df(expiryDate)
     fwdCleanValue = bond.cleanPriceFromDiscountCurve(expiryDate, discountCurve)
     fwdFullValue = bond.fullPriceFromDiscountCurve(expiryDate, discountCurve)
-    print("BOND FwdCleanBondPx", fwdCleanValue)
-    print("BOND FwdFullBondPx", fwdFullValue)
-    print("BOND Accrued:", bond._accruedInterest)
+#    print("BOND FwdCleanBondPx", fwdCleanValue)
+#    print("BOND FwdFullBondPx", fwdFullValue)
+#    print("BOND Accrued:", bond._accruedInterest)
 
     spotCleanValue = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
 

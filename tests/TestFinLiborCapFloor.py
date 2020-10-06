@@ -222,14 +222,14 @@ def test_FinLiborCapFloorVolCurve():
                                    capVolatilities,
                                    dayCountType)
 
-    print(volCurve._capletGammas)
+#    print(volCurve._capletGammas)
 
     # Value cap using a single flat cap volatility
     tcap = (maturityDate - valuationDate) / gDaysInYear
     vol = volCurve.capVol(maturityDate)
     model = FinModelBlack(vol)
     valueCap = capFloor.value(valuationDate, liborCurve, model)
-    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
+#    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
 
     # Value cap by breaking it down into caplets using caplet vols
     vCaplets = 0.0
@@ -351,13 +351,13 @@ def test_FinLiborCapFloorQLExample():
 
     end = time.time()
     period = end - start
-    print(v, period/numRepeats)
+#    print(v, period/numRepeats)
 
 ###############################################################################
 
 
 test_FinLiborCapletHull()
-#test_FinLiborCapFloorVolCurve()
-#test_FinLiborCapFloor()
-#test_FinLiborCapFloorQLExample()
-#testCases.compareTestCases()
+test_FinLiborCapFloorVolCurve()
+test_FinLiborCapFloor()
+test_FinLiborCapFloorQLExample()
+testCases.compareTestCases()

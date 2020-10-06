@@ -105,6 +105,7 @@ class FinInflationBond(FinBond):
         ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
         index ratio in line with the CPI growth since the bond base CPI date.
+        We assume no ex-dividend period.
         '''
 
         self.calcAccruedInterest(settlementDate)        

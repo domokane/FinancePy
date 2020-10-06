@@ -500,8 +500,8 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        m * 0.002155 + irBump,
         FinLiborSwapTypes.PAYER,
+        m * 0.002155 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap1)
@@ -510,8 +510,8 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        m * 0.002305 + irBump,
         FinLiborSwapTypes.PAYER,
+        m * 0.002305 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap2)
@@ -520,8 +520,8 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        m * 0.002665 + irBump,
         FinLiborSwapTypes.PAYER,
+        m * 0.002665 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap3)
@@ -530,8 +530,8 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        m * 0.003290 + irBump,
         FinLiborSwapTypes.PAYER,
+        m * 0.003290 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap4)
@@ -727,11 +727,11 @@ def test_CDSDateGeneration():
 
 
 test_CDSCurveBuildTiming()
-#test_fullPriceCDSModelCheck()
-#test_CDSDateGeneration()
-#test_fullPriceCDS1()
-#test_fullPriceCDSConvergence()
-#test_CDSCurveRepricing()
-#test_CDSFastApproximation()
+test_fullPriceCDSModelCheck()
+test_CDSDateGeneration()
+test_fullPriceCDS1()
+test_fullPriceCDSConvergence()
+test_CDSCurveRepricing()
+test_CDSFastApproximation()
 
-#testCases.compareTestCases()
+testCases.compareTestCases()

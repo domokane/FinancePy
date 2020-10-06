@@ -172,7 +172,7 @@ def test_FinInflationBondStack():
     fixingRates = [284.2, 284.1, 284.5, 284.6, 285.6, 283.0, 285.0,
                    285.1, 288.2, 289.2, 289.6, 289.5]    
     inflationIndex = FinInflationIndexCurve(fixingDates, fixingRates, lag)
-    print(inflationIndex)
+#    print(inflationIndex)
     ###########################################################################
         
     zciisData = [(FinDate(31,7,2020), 3.1500000000137085),
@@ -243,7 +243,7 @@ def test_FinInflationBondStack():
                                                FinFrequencyTypes.ANNUAL,
                                                FinDayCountTypes.ACT_ACT_ISDA)
 
-    print(inflationZeroCurve)
+#    print(inflationZeroCurve)
 
     ###########################################################################    
 
@@ -260,6 +260,8 @@ def test_FinInflationBondStack():
 
     yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield = ", yld)
+
+    return
 
     ###########################################################################
     # Inherited functions that just calculate real yield without CPI adjustments

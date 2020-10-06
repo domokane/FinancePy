@@ -462,8 +462,8 @@ def fwdfwdCorrelation(fwds):
     start = time.time()
     fwdCorr = LMMFwdFwdCorrelation(numFwds, numPaths, 1, fwds)
     end = time.time()
-    print("CORR Period:", end - start)
-    print(fwdCorr)
+#    print("CORR Period:", end - start)
+#    print(fwdCorr)
 
 ###############################################################################
 

@@ -25,7 +25,7 @@ verbose = False
 # TESTING
 
 
-globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
+#globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
 globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 #globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
@@ -135,10 +135,8 @@ class FinTestCases():
 
         else:
 
-            print(
-                "GENERATING NEW OUTPUT FOR MODULE",
-                moduleFilename,
-                "FOR COMPARISON.")
+#            print("GENERATING NEW OUTPUT FOR MODULE", moduleFilename,
+#                "FOR COMPARISON.")
 
             if exists(self._compareFilename) and self._carefulMode:
                 overwrite = input("File " + self._compareFilename +
@@ -421,12 +419,22 @@ class FinTestCases():
 #                numWarnings, numErrors = compareContents[rowNum]
 #                print(rowNum,"GOLDEN: ==>",goldenRow)
 
-        print("Analysis of ", self._moduleName, "completed with",
-              totalNumErrors, "errors and", totalNumWarnings, "warnings.")
+#        print("Analysis of", self._moduleName, "completed with",
+#              totalNumErrors, "errors and", totalNumWarnings, "warnings.")
+
+        print("NUM LINES:", numCompareLines, 
+              "====>",
+              "ERRORS:", totalNumErrors, 
+              "WARNINGS:", totalNumWarnings)
 
         self.printLog("Analysis of ", self._moduleName, " completed with ",
                       totalNumErrors, " errors and ", totalNumWarnings,
                       " warnings.")
+
+        self.printLog("NUM LINES:", numCompareLines,
+                      "====>",
+                      "ERRORS:", totalNumErrors, 
+                      " WARNINGS:", totalNumWarnings)
 
         return
 
@@ -441,7 +449,7 @@ class FinTestCases():
     def printLog(self, *args):
         f = open(self._differencesFilename, 'a')
         for arg in args:
-            f.write(str(arg))
+            f.write(str(arg) + " ")
 
         f.write("\n")
         f.close()

@@ -260,11 +260,11 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Principal = ", principal)
 
-    duration = bond.dollarRateDuration(settlementDate,
-                                       resetLibor,
-                                       currentLibor,
-                                       futureLibors,
-                                       dm)
+    duration = bond.dollarDuration(settlementDate,
+                                   resetLibor,
+                                   currentLibor,
+                                   futureLibors,
+                                   dm)
 
     testCases.print("Dollar Rate Duration = ", duration)
 
@@ -368,7 +368,7 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Principal = ", principal)
 
-    duration = bond.dollarRateDuration(settlementDate,
+    duration = bond.dollarDuration(settlementDate,
                                        resetLibor,
                                        currentLibor,
                                        futureLibors,
