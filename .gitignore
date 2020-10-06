@@ -37,6 +37,9 @@ financepy-0.*
 *.toc
 *.bak
 
+TestFin*_DIFFS.testLog
+TestFin*_COMPARE.testLog
+
 # MYPY
 .mypy_cache
 financepy/__init__.py

@@ -106,13 +106,13 @@ class FinTestCases():
             return None
 
         self._goldenFilename = join(self._goldenFolder,
-                                    self._moduleName + "_GOLDEN.log")
+                                    self._moduleName + "_GOLDEN.testLog")
 
         self._compareFilename = join(self._compareFolder,
-                                     self._moduleName + "_COMPARE.log")
+                                     self._moduleName + "_COMPARE.testLog")
 
         self._differencesFilename = join(self._differencesFolder,
-                                         self._moduleName + "_DIFFS.log")
+                                         self._moduleName + "_DIFFS.testLog")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
 
