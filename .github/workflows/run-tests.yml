@@ -3,10 +3,9 @@ name: test_action
 on: [push, pull_request]
 
 jobs:
-build:
-runs-on: ubuntu-latest
-
- steps:
+ build:
+  runs-on: ubuntu-latest
+  steps: 
    - name: checkout repo content
      uses: actions/checkout@v2
    - name: setup python
