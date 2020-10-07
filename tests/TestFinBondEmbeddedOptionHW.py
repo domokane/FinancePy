@@ -7,7 +7,7 @@ import time
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -39,7 +39,7 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     swap1 = FinLiborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
     swap2 = FinLiborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
     swap3 = FinLiborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)

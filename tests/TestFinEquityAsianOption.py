@@ -6,7 +6,7 @@ import time
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAsianOption import FinEquityAsianOption
 from financepy.products.equity.FinEquityAsianOption import FinAsianOptionValuationMethods
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes

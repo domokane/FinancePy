@@ -12,7 +12,7 @@ from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinOptionTypes import FinLiborSwapTypes
+from ...finutils.FinGlobalTypes import FinSwapTypes
 
 ##########################################################################
 
@@ -23,7 +23,7 @@ class FinLiborSwap(object):
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends
-                 swapType: FinLiborSwapTypes,
+                 swapType: FinSwapTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -131,7 +131,7 @@ class FinLiborSwap(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._swapType == FinLiborSwapTypes.PAYER:
+        if self._swapType == FinSwapTypes.PAYER:
             value = value * (-1.0)
 
         return value

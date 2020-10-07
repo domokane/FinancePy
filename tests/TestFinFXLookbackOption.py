@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXFloatLookbackOption import FinFXFloatLookbackOption
 from financepy.products.fx.FinFXFixedLookbackOption import FinFXFixedLookbackOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat

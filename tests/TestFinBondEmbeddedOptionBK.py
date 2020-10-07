@@ -19,7 +19,7 @@ from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 
@@ -40,7 +40,7 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     ###########################################################################
 
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
     swap1 = FinLiborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)

@@ -19,7 +19,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolate import FinInterpTypes
-from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
+from financepy.products.libor.FinLiborSwaption import FinSwapTypes
 
 import sys
 sys.path.append("..//..")
@@ -107,7 +107,7 @@ def buildLiborCurve(valuationDate):
     fixedFreq = FinFrequencyTypes.ANNUAL
     dcType = FinDayCountTypes.THIRTY_E_360
 
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     
     maturityDate = settlementDate.addMonths(24)
     swap1 = FinLiborSwap(settlementDate, maturityDate, swapType, -
@@ -330,7 +330,7 @@ def test_LiborSwap():
     swapCalendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     
     notional = 10.0 * ONE_MILLION
 
@@ -377,7 +377,7 @@ def test_dp_example():
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     fixedCoupon = 0.0124
     notional = ONE_MILLION
 

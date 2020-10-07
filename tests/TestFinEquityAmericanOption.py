@@ -8,7 +8,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
 from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDate import FinDate

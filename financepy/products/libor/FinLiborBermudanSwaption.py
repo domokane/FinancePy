@@ -12,8 +12,8 @@ from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinOptionTypes import FinOptionExerciseTypes
-from ...finutils.FinOptionTypes import FinLiborSwapTypes
+from ...finutils.FinGlobalTypes import FinExerciseTypes
+from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
@@ -41,8 +41,8 @@ class FinLiborBermudanSwaption(object):
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
                  swapMaturityDate: FinDate,
-                 swapType: FinLiborSwapTypes,
-                 exerciseType: FinOptionExerciseTypes,
+                 swapType: FinSwapTypes,
+                 exerciseType: FinExerciseTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -64,7 +64,7 @@ class FinLiborBermudanSwaption(object):
         if exerciseDate > swapMaturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
-        if exerciseType == FinOptionExerciseTypes.AMERICAN:
+        if exerciseType == FinExerciseTypes.AMERICAN:
             raise FinError("American optionality not supported.")
 
         self._settlementDate = settlementDate
@@ -181,10 +181,10 @@ class FinLiborBermudanSwaption(object):
                                    cpnFlows,
                                    self._exerciseType)
 
-        if self._swapType == FinLiborSwapTypes.RECEIVER:
+        if self._swapType == FinSwapTypes.RECEIVER:
             v = self._notional * v['rec']
             return v
-        elif self._swapType == FinLiborSwapTypes.PAYER:
+        elif self._swapType == FinSwapTypes.PAYER:
             v = self._notional * v['pay']
             return v
 

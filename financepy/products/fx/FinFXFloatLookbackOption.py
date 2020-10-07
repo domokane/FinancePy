@@ -12,7 +12,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 from ...products.fx.FinFXOption import FinFXOption
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ##########################################################################

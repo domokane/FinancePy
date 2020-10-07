@@ -8,7 +8,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOption
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption
 # from financepy.products.equity.FinEquityOption import *
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate

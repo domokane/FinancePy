@@ -26,18 +26,11 @@ from ...models.FinModelBachelier import FinModelBachelier
 from ...models.FinModelSABR import FinModelSABR
 from ...models.FinModelSABRShifted import FinModelSABRShifted
 from ...models.FinModelRatesHW import FinModelRatesHW
-
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinCapFloorTypes, FinOptionTypes
 
 ##########################################################################
 
 from enum import Enum
-
-
-class FinLiborCapFloorTypes(Enum):
-    CAP = 1
-    FLOOR = 2
-
 
 class FinLiborCapFloorModelTypes(Enum):
     BLACK = 1
@@ -58,7 +51,7 @@ class FinLiborCapFloor():
     def __init__(self,
                  startDate: FinDate,
                  maturityDateOrTenor: (FinDate, str),
-                 optionType: FinLiborCapFloorTypes,
+                 optionType: FinCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
@@ -158,9 +151,9 @@ class FinLiborCapFloor():
         alpha = self._dayCounter.yearFrac(startDate, endDate)[0]
         df = liborCurve.df(endDate)
 
-        if self._optionType == FinLiborCapFloorTypes.CAP:
+        if self._optionType == FinCapFloorTypes.CAP:
             capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
-        elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+        elif self._optionType == FinCapFloorTypes.FLOOR:
             capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
 
         capFloorLetValue *= self._notional
@@ -183,9 +176,9 @@ class FinLiborCapFloor():
             fwdRate = liborCurve.fwdRate(startDate, endDate,
                                          self._dayCountType)
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0)
 
             intrinsicValue *= self._notional
@@ -232,46 +225,46 @@ class FinLiborCapFloor():
 
         if isinstance(model, FinModelBlack):
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBachelier):
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
@@ -290,9 +283,9 @@ class FinLiborCapFloor():
                                   dfTimes, dfValues)
 
             # we divide by alpha to offset the multiplication above
-            if self._optionType == FinLiborCapFloorTypes.CAP:
+            if self._optionType == FinCapFloorTypes.CAP:
                 capFloorLetValue = v['put'] * notionalAdj / alpha
-            elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+            elif self._optionType == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = v['call'] * notionalAdj / alpha
 
         else:
@@ -319,10 +312,10 @@ class FinLiborCapFloor():
             print("Caplets not calculated.")
             return
 
-        if self._optionType == FinLiborCapFloorTypes.CAP:
+        if self._optionType == FinCapFloorTypes.CAP:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    CAPLET_PV       CUM_PV"
-        elif self._optionType == FinLiborCapFloorTypes.FLOOR:
+        elif self._optionType == FinCapFloorTypes.FLOOR:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    FLRLET_PV       CUM_PV"
 

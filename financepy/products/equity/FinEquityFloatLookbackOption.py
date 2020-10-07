@@ -14,7 +14,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

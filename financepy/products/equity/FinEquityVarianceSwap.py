@@ -11,7 +11,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
 from .FinEquityOption import FinEquityModelBlackScholes
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 

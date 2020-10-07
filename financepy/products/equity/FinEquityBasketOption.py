@@ -13,7 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...models.FinGBMProcess import FinGBMProcess
 
 from ...finutils.FinError import FinError
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinHelperFunctions import _funcName
 from ...finutils.FinDate import FinDate

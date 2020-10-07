@@ -13,7 +13,7 @@ from ...finutils.FinMath import N, covar
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve

@@ -9,7 +9,7 @@ from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
 from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinOptionTypes import FinOptionExerciseTypes
+from ..finutils.FinGlobalTypes import FinExerciseTypes
 from ..finutils.FinGlobalVariables import gSmall
 
 interp = FinInterpTypes.FLAT_FORWARDS.value
@@ -22,11 +22,11 @@ interp = FinInterpTypes.FLAT_FORWARDS.value
 
 def optionExerciseTypesToInt(optionExerciseType):
 
-    if optionExerciseType == FinOptionExerciseTypes.EUROPEAN:
+    if optionExerciseType == FinExerciseTypes.EUROPEAN:
         return 1
-    if optionExerciseType == FinOptionExerciseTypes.BERMUDAN:
+    if optionExerciseType == FinExerciseTypes.BERMUDAN:
         return 2
-    if optionExerciseType == FinOptionExerciseTypes.AMERICAN:
+    if optionExerciseType == FinExerciseTypes.AMERICAN:
         return 3
     else:
         raise FinError("Unknown option exercise type.")

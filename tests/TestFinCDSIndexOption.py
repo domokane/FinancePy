@@ -15,7 +15,7 @@ from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 import numpy as np
 import sys
@@ -50,7 +50,7 @@ def buildLiborCurve(tradeDate):
     swap1 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        FinLiborSwapTypes.PAYER,
+        FinSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -60,7 +60,7 @@ def buildLiborCurve(tradeDate):
     swap2 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        FinLiborSwapTypes.PAYER,
+        FinSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -70,7 +70,7 @@ def buildLiborCurve(tradeDate):
     swap3 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        FinLiborSwapTypes.PAYER,
+        FinSwapTypes.PAYER,
         0.0501,
         fixedFreq,
         dcType)
@@ -80,7 +80,7 @@ def buildLiborCurve(tradeDate):
     swap4 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        FinLiborSwapTypes.PAYER,
+        FinSwapTypes.PAYER,
         0.0502,
         fixedFreq,
         dcType)
@@ -90,7 +90,7 @@ def buildLiborCurve(tradeDate):
     swap5 = FinLiborSwap(
         settlementDate,
         maturityDate,
-        FinLiborSwapTypes.PAYER,
+        FinSwapTypes.PAYER,
         0.0501,
         fixedFreq,
         dcType)

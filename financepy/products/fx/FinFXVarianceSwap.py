@@ -8,7 +8,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from .FinFXModelTypes import FinFXModelBlackScholes
 from .FinFXVanillaOption import FinFXVanillaOption
 

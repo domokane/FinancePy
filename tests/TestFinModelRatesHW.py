@@ -14,7 +14,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
+from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -181,7 +181,7 @@ def test_HullWhiteBondOption():
         model = FinModelRatesHW(sigma, a, numTimeSteps, FinHWEuropeanCalcType.EXPIRY_ONLY)
         model.buildTree(texp, times, dfs)
 
-        exerciseType = FinOptionExerciseTypes.EUROPEAN
+        exerciseType = FinExerciseTypes.EUROPEAN
 
         v1 = model.bondOption(texp, strikePrice, face,
                               couponTimes, couponFlows, exerciseType)
@@ -301,7 +301,7 @@ def test_HullWhiteCallableBond():
     numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     tmat = (maturityDate - settlementDate)/gDaysInYear
 
-    testCases.header("NUMSTEPS", "BOND_ONLY", "CALLABLE_BOND", "TIME")
+    testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 
     for numTimeSteps in numStepsList:
 
@@ -315,7 +315,7 @@ def test_HullWhiteCallableBond():
 
         end = time.time()
         period = end-start
-        testCases.print(numTimeSteps, v1, v2, period)
+        testCases.print(numTimeSteps, period, v1, v2)
 
 ###############################################################################
 

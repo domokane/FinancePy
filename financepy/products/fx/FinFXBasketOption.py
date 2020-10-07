@@ -15,7 +15,7 @@ from ...models.FinGBMProcess import FinGBMProcess
 ###############################################################################
 
 from ...products.fx.FinFXOption import FinFXOption
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError

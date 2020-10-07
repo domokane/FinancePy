@@ -34,8 +34,9 @@ from ...models.FinModelRatesLMM import LMMCapFlrPricer
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 
-from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
+from ...finutils.FinGlobalTypes import FinExerciseTypes
+from ...finutils.FinGlobalTypes import FinSwapTypes
+from ...finutils.FinGlobalTypes import FinCapFloorTypes
 
 from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
 
@@ -276,7 +277,7 @@ class FinLiborLMMProducts():
                       settlementDate: FinDate,
                       exerciseDate: FinDate,
                       maturityDate: FinDate,
-                      swaptionType: FinLiborSwapTypes,
+                      swaptionType: FinSwapTypes,
                       fixedCoupon: float,
                       fixedFrequencyType: FinFrequencyTypes,
                       fixedDayCountType: FinDayCountTypes,
@@ -360,7 +361,7 @@ class FinLiborLMMProducts():
     def valueCapFloor(self,
                       settlementDate: FinDate,
                       maturityDate: FinDate,
-                      capFloorType: FinLiborCapFloorTypes,
+                      capFloorType: FinCapFloorTypes,
                       capFloorRate: float,
                       frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                       dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
@@ -390,7 +391,7 @@ class FinLiborLMMProducts():
         numPaths = self._numPaths
         K = capFloorRate
         isCap = 0
-        if capFloorType == FinLiborCapFloorTypes.CAP:
+        if capFloorType == FinCapFloorTypes.CAP:
             isCap = 1
 
         fwd0 = self._forwardCurve

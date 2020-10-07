@@ -9,7 +9,7 @@ from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackSch
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 
 import sys
 sys.path.append("..//..")

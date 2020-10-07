@@ -10,8 +10,8 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 
@@ -47,7 +47,7 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     fwdPayerSwap = FinLiborSwap(exerciseDate,
                                 swapMaturityDate,
-                                FinLiborSwapTypes.PAYER,
+                                FinSwapTypes.PAYER,
                                 swapFixedCoupon,
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType)
@@ -60,7 +60,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     # fwdPayerSwap.printFixedLegPV()
 
     # Now we create the European swaptions
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     europeanSwaptionPay = FinLiborSwaption(settlementDate,
                                            exerciseDate,
                                            swapMaturityDate,
@@ -69,7 +69,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                            swapFixedFrequencyType,
                                            swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     europeanSwaptionRec = FinLiborSwaption(settlementDate,
                                            exerciseDate,
                                            swapMaturityDate,
@@ -166,8 +166,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.EUROPEAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -178,8 +178,8 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
-    exerciseType = FinOptionExerciseTypes.EUROPEAN
+    swapType = FinSwapTypes.RECEIVER
+    exerciseType = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -228,8 +228,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.BERMUDAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -240,8 +240,8 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
-    exerciseType = FinOptionExerciseTypes.BERMUDAN
+    swapType = FinSwapTypes.RECEIVER
+    exerciseType = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -337,8 +337,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.EUROPEAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -349,7 +349,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
@@ -395,8 +395,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.BERMUDAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -407,7 +407,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
@@ -502,8 +502,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.EUROPEAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -514,7 +514,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
@@ -559,8 +559,8 @@ def test_FinLiborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    swapType = FinLiborSwapTypes.PAYER
-    exerciseType = FinOptionExerciseTypes.BERMUDAN
+    swapType = FinSwapTypes.PAYER
+    exerciseType = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
@@ -571,7 +571,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    swapType = FinLiborSwapTypes.RECEIVER
+    swapType = FinSwapTypes.RECEIVER
     bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,

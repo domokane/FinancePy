@@ -16,7 +16,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.products.bonds.FinBondOption import FinBondOption
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.models.FinModelRatesHW import FinModelRatesHW, FinHWEuropeanCalcType
 
 import matplotlib.pyplot as plt

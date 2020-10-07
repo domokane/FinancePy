@@ -8,10 +8,10 @@ import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloorTypes
+from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborSwap import FinLiborSwapTypes
+from financepy.products.libor.FinLiborSwap import FinSwapTypes
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
 from financepy.products.libor.FinLiborCurve import FinLiborCurve
 
@@ -23,7 +23,7 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpTypes
@@ -66,7 +66,7 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     swaps = []
     fixedBasis = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
 
     swapRate = 0.05
     swap1 = FinLiborSwap(settlementDate, "1Y", swapType, swapRate, fixedFreq, fixedBasis)
@@ -112,7 +112,7 @@ def test_FinLiborCapFloor():
     model6 = FinModelBachelier(0.01)
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorTypes.CAP
+        capFloorType = FinCapFloorTypes.CAP
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
@@ -126,7 +126,7 @@ def test_FinLiborCapFloor():
                      "SABR_SHFTD", "HW", "BACH")
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorTypes.FLOOR
+        capFloorType = FinCapFloorTypes.FLOOR
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
@@ -144,7 +144,7 @@ def test_FinLiborCapFloor():
                      "SABR SHFTD", "HW", "BACH")
 
     for k in strikes:
-        capFloorType = FinLiborCapFloorTypes.CAP
+        capFloorType = FinCapFloorTypes.CAP
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
@@ -153,7 +153,7 @@ def test_FinLiborCapFloor():
         cvalue5 = capfloor.value(valuationDate, liborCurve, model5)
         cvalue6 = capfloor.value(valuationDate, liborCurve, model6)
 
-        capFloorType = FinLiborCapFloorTypes.FLOOR
+        capFloorType = FinCapFloorTypes.FLOOR
         capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
@@ -187,7 +187,7 @@ def test_FinLiborCapFloorVolCurve():
     frequency = FinFrequencyTypes.ANNUAL
 
     k = 0.04
-    capFloorType = FinLiborCapFloorTypes.CAP
+    capFloorType = FinCapFloorTypes.CAP
     capFloor = FinLiborCapFloor(valuationDate,
                                 maturityDate,
                                 capFloorType,
@@ -271,7 +271,7 @@ def test_FinLiborCapletHull():
                                       FinDayCountTypes.THIRTY_E_360)
 
     k = 0.08
-    capFloorType = FinLiborCapFloorTypes.CAP
+    capFloorType = FinCapFloorTypes.CAP
     capFloor = FinLiborCapFloor(valuationDate,
                                 maturityDate,
                                 capFloorType,
@@ -334,7 +334,7 @@ def test_FinLiborCapFloorQLExample():
     lastFixing = 0.0065560
     notional = 1000000
     dayCountType = FinDayCountTypes.ACT_360
-    optionType = FinLiborCapFloorTypes.CAP
+    optionType = FinCapFloorTypes.CAP
     strikeRate = 0.02
 
     cap = FinLiborCapFloor(startDate, endDate, optionType, strikeRate,

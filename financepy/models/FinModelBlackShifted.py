@@ -9,7 +9,7 @@ from scipy.stats import norm
 
 from ..finutils.FinMath import N
 from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinOptionTypes import FinOptionTypes
+from ..finutils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
 # NOTE: Keeping this separate from SABR for the moment.

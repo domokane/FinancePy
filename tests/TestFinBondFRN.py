@@ -11,7 +11,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 import sys
 sys.path.append("..//..")
@@ -27,7 +27,7 @@ def buildLiborCurve(valueDate):
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    payFixed = FinLiborSwapTypes.PAYER
+    payFixed = FinSwapTypes.PAYER
 
     spotDays = 2
     settlementDate = valueDate.addWeekDays(spotDays)

@@ -12,7 +12,8 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from .FinBond import FinBond
 from ...finutils.FinGlobalVariables import gSmall
-from ...finutils.FinOptionTypes import FinOptionTypes, FinOptionExerciseTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes, FinExerciseTypes
+
 from enum import Enum
 import numpy as np
 
@@ -108,11 +109,11 @@ class FinBondOption():
         couponTimes = np.array(couponTimes)
         couponFlows = np.array(couponFlows)
 
-        exerciseType = FinOptionExerciseTypes.AMERICAN
+        exerciseType = FinExerciseTypes.AMERICAN
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL \
             or self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                exerciseType = FinOptionExerciseTypes.EUROPEAN                
+                exerciseType = FinExerciseTypes.EUROPEAN                
 
         # This is wasteful if the model is Jamshidian but how to do neat design ?
         model.buildTree(tmat, dfTimes, dfValues)

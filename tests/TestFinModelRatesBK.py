@@ -13,7 +13,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
 from financepy.models.FinModelRatesBK import FinModelRatesBK
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
+from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 
 import time
 
@@ -109,15 +109,15 @@ def test_BKExampleTwo():
 
     model = FinModelRatesBK(sigma, a, numTimeSteps)
     model.buildTree(tmat, times, dfs)
-    exerciseType = FinOptionExerciseTypes.AMERICAN
+    exerciseType = FinExerciseTypes.AMERICAN
     v = model.bondOption(texp, strikePrice, face, couponTimes,
                          couponFlows, exerciseType)
 
     # Test convergence
     numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    exerciseType = FinOptionExerciseTypes.AMERICAN
+    exerciseType = FinExerciseTypes.AMERICAN
 
-    testCases.header("TIMESTEPS", "VALUE", "TIME")
+    testCases.header("TIMESTEPS", "TIME", "VALUE")
     treeVector = []
     for numTimeSteps in numStepsList:
         start = time.time()
@@ -128,7 +128,7 @@ def test_BKExampleTwo():
         end = time.time()
         period = end-start
         treeVector.append(v)
-        testCases.print(numTimeSteps, v, period)
+        testCases.print(numTimeSteps, period, v)
 
 #    plt.plot(numStepsList, treeVector)
 

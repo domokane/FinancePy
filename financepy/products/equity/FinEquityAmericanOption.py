@@ -11,7 +11,7 @@ from ...finutils.FinError import FinError
 from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...models.FinModelCRRTree import crrTreeValAvg
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption

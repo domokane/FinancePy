@@ -15,7 +15,7 @@ def test_Imports():
 
     dcType = FinDayCountTypes.ACT_360
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     swap1 = FinLiborSwap(settlementDate, FinDate(1,1,2008), swapType, 0.05, fixedFreq, dcType)
     swap2 = FinLiborSwap(settlementDate, FinDate(1,1,2009), swapType, 0.05, fixedFreq, dcType)
     swap3 = FinLiborSwap(settlementDate, FinDate(1,1,2010), swapType, 0.05, fixedFreq, dcType)

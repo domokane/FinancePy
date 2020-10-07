@@ -19,7 +19,7 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 
 from scipy.stats import norm
 N = norm.cdf

@@ -21,7 +21,7 @@ from financepy.products.libor.FinLiborSwap import FinLiborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 
 sys.path.append("..//..")
@@ -211,7 +211,7 @@ def test_FinLiborDepositsFRAsSwaps():
 #                        fixedDCCType)
 #    swaps.append(swap)
 
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     maturityDate = settlementDate.addMonths(36)
     swap = FinLiborSwap(settlementDate, maturityDate, swapType, swapRate, 
                         fixedFreqType,
@@ -403,7 +403,7 @@ def test_FinLiborDepositsFuturesSwaps():
     startDate = spotDate.addWeekDays(spotDays)
 
     swaps = []
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     fixedDCCType = FinDayCountTypes.THIRTY_E_360
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     floatFreqType = FinFrequencyTypes.QUARTERLY
@@ -560,7 +560,7 @@ def test_derivativePricingExample():
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
 #    dayCountType = FinDayCountTypes.ACT_360
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
     
     swapRate = 0.0058
     swap = FinLiborSwap(settlementDate, "1Y", swapType, swapRate, freqType, dayCountType)
@@ -661,7 +661,7 @@ def test_bloombergPricingExample():
     spotDays = 2
     settlementDate = valuationDate.addWeekDays(spotDays)
     notional = ONE_MILLION
-    swapType = FinLiborSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
 
     swaps = []
     swap = FinLiborSwap(settlementDate, "2Y", swapType, (2.77417+2.77844)/200, freq, accrual, notional); swaps.append(swap)

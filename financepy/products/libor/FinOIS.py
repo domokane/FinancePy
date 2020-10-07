@@ -13,15 +13,16 @@ from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinDate import FinDate, dailyWorkingDaySchedule
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinHelperFunctions import labelToString
+from ...finutils.FinGlobalTypes import FinSwapTypes
 
 ###############################################################################
 ###############################################################################
 
 
 class FinOIS(object):
-    ''' Class for managing overnight index swaps. This is a swap contract in
+    ''' Class for managing overnight index swaps (OIS). This is a contract in
     which a fixed payment leg is exchanged for a floating coupon leg. There
-    is no exchange of par.
+    is no exchange of par. The contract is entered into at zero initial cost.
 
     The contract lasts from a start date to a specified maturity date.
     The fixed coupon is the OIS fixed rate which is set at contract initiation.
@@ -43,12 +44,12 @@ class FinOIS(object):
     def __init__(self,
                  startDate: FinDate,
                  maturityDate: FinDate,
+                 payRecFixed: FinSwapTypes,
                  fixedRate: float,
                  fixedFrequencyType: FinFrequencyTypes,
-                 fixedDayCountType: FinDayCountTypes,
+                 fixedDayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  floatDayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 payFixedLeg: bool = True,
                  notional: float = ONE_MILLION,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -62,7 +63,7 @@ class FinOIS(object):
 
         self._startDate = startDate
         self._maturityDate = maturityDate
-        self._payFixedLeg = payFixedLeg
+        self._payFixedLeg = payRecFixed
         self._notional = notional
 
         self._fixedRate = fixedRate
@@ -72,8 +73,6 @@ class FinOIS(object):
 
         self._fixedDayCountType = fixedDayCountType
         self._floatDayCountType = floatDayCountType
-
-        self._payFixedLeg = payFixedLeg
 
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
@@ -184,7 +183,7 @@ class FinOIS(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._payFixedLeg is True:
+        if self._payFixedLeg is FinSwapTypes.PAYER:
             value = value * (-1.0)
 
         return value * self._notional

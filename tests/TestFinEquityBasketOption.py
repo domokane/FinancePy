@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
-from financepy.finutils.FinOptionTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.finutils.FinDate import FinDate

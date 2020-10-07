@@ -12,7 +12,7 @@ from ...finutils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ##########################################################################

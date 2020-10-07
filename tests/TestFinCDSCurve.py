@@ -13,11 +13,7 @@ from financepy.products.libor.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinOptionTypes import FinLiborSwapTypes
-
-import sys
-sys.path.append("..//..")
-
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -42,7 +38,7 @@ def test_FinCDSCurve():
         swap = FinLiborSwap(
             curveDate,
             maturityDate,
-            FinLiborSwapTypes.PAYER,
+            FinSwapTypes.PAYER,
             fixedCoupon,
             fixedFreq,
             fixedDCC)

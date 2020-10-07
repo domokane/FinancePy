@@ -11,6 +11,8 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
+
 import sys
 sys.path.append("..//..")
 
@@ -25,7 +27,7 @@ def test_OIS():
 
     endDate = startDate.addMonths(60)
     oisRate = 0.04
-    isPayer = True
+    isPayer = FinSwapTypes.PAYER
     fixedFreq = FinFrequencyTypes.ANNUAL
     fixedDayCount = FinDayCountTypes.ACT_ACT_ISDA
     floatFreq = FinFrequencyTypes.ANNUAL
@@ -34,12 +36,12 @@ def test_OIS():
 
     ois = FinOIS(startDate,
                  endDate,
+                 isPayer,
                  oisRate,
                  fixedFreq,
                  fixedDayCount,
                  floatFreq,
                  floatDayCount,
-                 isPayer,
                  notional)
 
     valueDate = FinDate(2018, 11, 30)

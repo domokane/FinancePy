@@ -11,7 +11,7 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
-from financepy.products.libor.FinLiborSwaption import FinLiborSwapTypes
+from financepy.products.libor.FinLiborSwaption import FinSwapTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -19,7 +19,7 @@ from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 from financepy.finutils.FinHelperFunctions import printTree
-from financepy.finutils.FinOptionTypes import FinOptionExerciseTypes
+from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 
 import matplotlib.pyplot as plt
 
@@ -49,7 +49,7 @@ def testBlackModelCheck():
     notional = 100.0
 
     # Pricing a PAYER
-    swaptionType = FinLiborSwapTypes.PAYER
+    swaptionType = FinSwapTypes.PAYER
     swaption = FinLiborSwaption(settlementDate,
                                 exerciseDate,
                                 maturityDate,
@@ -164,7 +164,7 @@ def test_BDTExampleTwo():
 
     # Test convergence
     numStepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    exerciseType = FinOptionExerciseTypes.AMERICAN
+    exerciseType = FinExerciseTypes.AMERICAN
 
     testCases.header("Values")
     treeVector = []
@@ -218,8 +218,8 @@ def test_BDTExampleThree():
     testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", 
                      "V_Fixed", "V_pay", "V_rec")
 
-    for exerciseType in [FinOptionExerciseTypes.EUROPEAN,
-                         FinOptionExerciseTypes.BERMUDAN]:
+    for exerciseType in [FinExerciseTypes.EUROPEAN,
+                         FinExerciseTypes.BERMUDAN]:
 
         for maturityYears in [4.0, 5.0, 10.0, 20.0]:
 

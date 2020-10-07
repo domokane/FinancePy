@@ -8,7 +8,6 @@ from enum import Enum
 
 ###############################################################################
 
-
 class FinOptionTypes(Enum):
     EUROPEAN_CALL = 1
     EUROPEAN_PUT = 2
@@ -23,15 +22,19 @@ class FinOptionTypes(Enum):
 
 ###############################################################################
 
+class FinCapFloorTypes(Enum):
+    CAP = 1
+    FLOOR = 2
 
-class FinLiborSwapTypes(Enum):
+###############################################################################
+
+class FinSwapTypes(Enum):
     PAYER = 1
     RECEIVER = 2
 
 ###############################################################################
 
-
-class FinOptionExerciseTypes(Enum):
+class FinExerciseTypes(Enum):
     EUROPEAN = 1
     BERMUDAN = 2
     AMERICAN = 3

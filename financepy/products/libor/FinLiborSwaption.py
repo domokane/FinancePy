@@ -34,8 +34,9 @@ from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
 from ...models.FinModelRatesBDT import FinModelRatesBDT
 
-from ...finutils.FinOptionTypes import FinOptionTypes, FinOptionExerciseTypes
-from ...finutils.FinOptionTypes import FinLiborSwapTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinSwapTypes
+from ...finutils.FinGlobalTypes import FinExerciseTypes
 
 ###############################################################################
 
@@ -49,7 +50,7 @@ class FinLiborSwaption():
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
                  swapMaturityDate: FinDate,
-                 swapType: FinLiborSwapTypes,
+                 swapType: FinSwapTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -170,37 +171,37 @@ class FinLiborSwaption():
 
         if isinstance(model, FinModelBlack):
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
@@ -214,9 +215,9 @@ class FinLiborSwaption():
                                                   dfTimes,
                                                   dfValues)
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['put']
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
@@ -234,11 +235,11 @@ class FinLiborSwaption():
                                                 faceAmount,
                                                 cpnTimes,
                                                 cpnFlows,
-                                                FinOptionExerciseTypes.EUROPEAN)
+                                                FinExerciseTypes.EUROPEAN)
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
@@ -252,11 +253,11 @@ class FinLiborSwaption():
                                                 faceAmount,
                                                 cpnTimes,
                                                 cpnFlows,
-                                                FinOptionExerciseTypes.EUROPEAN)
+                                                FinExerciseTypes.EUROPEAN)
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
@@ -318,15 +319,13 @@ class FinLiborSwaption():
 
         if isinstance(model, FinModelBlack):
 
-            if self._swapType == FinLiborSwapTypes.PAYER:
+            if self._swapType == FinSwapTypes.PAYER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinLiborSwapTypes.RECEIVER:
+            elif self._swapType == FinSwapTypes.RECEIVER:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
-
         else:
-
             raise FinError("Cash settled swaptions must be priced using"
                            + " Black's model.")
 

@@ -8,7 +8,7 @@ import numpy as np
 from scipy.stats import norm
 
 from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinOptionTypes import FinOptionTypes
+from ..finutils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.

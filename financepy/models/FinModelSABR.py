@@ -3,7 +3,7 @@
 ###############################################################################
 
 from numba import njit, float64
-from ..finutils.FinOptionTypes import FinOptionTypes
+from ..finutils.FinGlobalTypes import FinOptionTypes
 import numpy as np
 from ..finutils.FinMath import N
 from ..finutils.FinError import FinError

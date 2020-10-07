@@ -14,7 +14,7 @@ from ...finutils.FinDate import FinDate
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinOptionTypes import FinOptionTypes
+from ...finutils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
 
