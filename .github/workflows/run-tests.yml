@@ -17,4 +17,5 @@ jobs:
        python setup.py install
        pip install ipython
        pip install numba==0.49
+       pip install matplotlib
        python tests/runAllTests.py
