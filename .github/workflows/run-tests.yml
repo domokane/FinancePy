@@ -16,4 +16,5 @@ jobs:
      run: |
        python setup.py install
        pip install ipython
+       pip install numba==0.49
        python tests/runAllTests.py
