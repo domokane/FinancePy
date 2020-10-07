@@ -15,4 +15,5 @@ jobs:
    - name: run test script
      run: |
        python setup.py install
+       pip install ipython
        python tests/runAllTests.py
