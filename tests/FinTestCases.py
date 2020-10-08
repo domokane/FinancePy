@@ -84,6 +84,8 @@ class FinTestCases():
         self._foldersExist = True
         self._rootFolder = rootFolder
         self._headerFields = None
+        self._globalNumWarnings = 0
+        self._globalNumErrors = 0
 
 #        print("Root folder:",self._rootFolder)
 #        print("Modulename:",self._moduleName)
@@ -422,10 +424,10 @@ class FinTestCases():
 #        print("Analysis of", self._moduleName, "completed with",
 #              totalNumErrors, "errors and", totalNumWarnings, "warnings.")
 
-        print("NUM LINES:", numCompareLines, 
-              "====>",
-              "ERRORS:", totalNumErrors, 
-              "WARNINGS:", totalNumWarnings)
+#        print("NUM LINES:", numCompareLines, 
+#              "====>",
+#              "ERRORS:", totalNumErrors, 
+#              "WARNINGS:", totalNumWarnings)
 
         self.printLog("Analysis of ", self._moduleName, " completed with ",
                       totalNumErrors, " errors and ", totalNumWarnings,
@@ -435,6 +437,9 @@ class FinTestCases():
                       "====>",
                       "ERRORS:", totalNumErrors, 
                       " WARNINGS:", totalNumWarnings)
+
+        self._globalNumErrors = totalNumErrors
+        self._globalNumWarnings = totalNumWarnings
 
         return
 
