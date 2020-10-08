@@ -146,7 +146,7 @@ def _valueOnce(stockPrice,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            exerciseValue = 0.0
+            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
                 exerciseValue = max(s - k2, 0)
@@ -188,6 +188,8 @@ def _valueOnce(stockPrice,
             futureExpectedValue = probs[iTime] * vUp
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+
+            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
                 exerciseValue = max(holdValue - k1, 0)
