@@ -80,13 +80,13 @@ def crrTreeVal(stockPrice,
         s = stockValues[index + iNode]
 
         if optionType == FinOptionTypes.EUROPEAN_CALL.value:
-            optionValues[index + iNode] = max(s - strikePrice, 0)
+            optionValues[index + iNode] = max(s - strikePrice, 0.0)
         elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
-            optionValues[index + iNode] = max(strikePrice - s, 0)
+            optionValues[index + iNode] = max(strikePrice - s, 0.0)
         elif optionType == FinOptionTypes.AMERICAN_CALL.value:
-            optionValues[index + iNode] = max(s - strikePrice, 0)
+            optionValues[index + iNode] = max(s - strikePrice, 0.0)
         elif optionType == FinOptionTypes.AMERICAN_PUT.value:
-            optionValues[index + iNode] = max(strikePrice - s, 0)
+            optionValues[index + iNode] = max(strikePrice - s, 0.0)
 
     # begin backward steps from expiry to value date
     for iTime in range(numSteps - 1, -1, -1):

@@ -222,12 +222,12 @@ class FinFXFixedLookbackOption():
         if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMax = np.max(Sall, axis=1)
             smaxs = np.ones(numPaths) * smax
-            payoff = np.maximum(SMax - k, 0)
+            payoff = np.maximum(SMax - k, 0.0)
             payoff = np.maximum(payoff, smaxs - k)
         elif optionType == FinOptionTypes.EUROPEAN_PUT:
             SMin = np.min(Sall, axis=1)
             smins = np.ones(numPaths) * smin
-            payoff = np.maximum(k - SMin, 0)
+            payoff = np.maximum(k - SMin, 0.0)
             payoff = np.maximum(payoff, k - smins)
         else:
             raise FinError("Unknown lookback option type:" + str(optionType))

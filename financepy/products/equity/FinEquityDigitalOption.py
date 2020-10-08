@@ -142,18 +142,18 @@ class FinEquityDigitalOption(FinEquityOption):
 
         if self._underlyingType == FinDigitalOptionTypes.CASH_OR_NOTHING:
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                payoff_a_1 = np.heaviside(s_1 - K, 0)
-                payoff_a_2 = np.heaviside(s_2 - K, 0)
+                payoff_a_1 = np.heaviside(s_1 - K, 0.0)
+                payoff_a_2 = np.heaviside(s_2 - K, 0.0)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                payoff_a_1 = np.heaviside(K - s_1, 0)
-                payoff_a_2 = np.heaviside(K - s_2, 0)
+                payoff_a_1 = np.heaviside(K - s_1, 0.0)
+                payoff_a_2 = np.heaviside(K - s_2, 0.0)
         elif self._underlyingType == FinDigitalOptionTypes.ASSET_OR_NOTHING:
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                payoff_a_1 = s_1 * np.heaviside(s_1 - K, 0)
-                payoff_a_2 = s_2 * np.heaviside(s_2 - K, 0)
+                payoff_a_1 = s_1 * np.heaviside(s_1 - K, 0.0)
+                payoff_a_2 = s_2 * np.heaviside(s_2 - K, 0.0)
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                payoff_a_1 = s_1 * np.heaviside(K - s_1, 0)
-                payoff_a_2 = s_2 * np.heaviside(K - s_2, 0)
+                payoff_a_1 = s_1 * np.heaviside(K - s_1, 0.0)
+                payoff_a_2 = s_2 * np.heaviside(K - s_2, 0.0)
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
         v = payoff * df / 2.0

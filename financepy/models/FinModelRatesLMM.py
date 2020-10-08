@@ -635,7 +635,7 @@ def LMMCapFlrPricer(numForwards, numPaths, K, fwd0, fwds, taus, isCap):
 
         periodRoll = 1.0
         libor = fwds[iPath, 0, 0]
-        capFlrLets[0] = max(K - libor, 0) * taus[0]
+        capFlrLets[0] = max(K - libor, 0.0) * taus[0]
 
         # Now loop over the caplets starting with one that fixes immediately
         # but which may have intrinsic value that cannot be ignored.
@@ -644,16 +644,16 @@ def LMMCapFlrPricer(numForwards, numPaths, K, fwd0, fwds, taus, isCap):
             libor = fwds[iPath, j, j]
             if j == 1:
                 if isCap == 0:
-                    capFlrLets[j] = max(K - libor, 0) * taus[j]
+                    capFlrLets[j] = max(K - libor, 0.0) * taus[j]
                 else:
-                    capFlrLets[j] = max(libor - K, 0) * taus[j]
+                    capFlrLets[j] = max(libor - K, 0.0) * taus[j]
 
                 numeraire[0] = 1.0 / discFactor[0]
             else:
                 if isCap == 1:
-                    capFlrLets[j] = max(libor - K, 0) * taus[j]
+                    capFlrLets[j] = max(libor - K, 0.0) * taus[j]
                 elif isCap == 0:
-                    capFlrLets[j] = max(K - libor, 0) * taus[j]
+                    capFlrLets[j] = max(K - libor, 0.0) * taus[j]
                 else:
                     raise FinError("isCap should be 0 or 1")
 

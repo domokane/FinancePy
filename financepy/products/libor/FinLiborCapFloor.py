@@ -152,9 +152,9 @@ class FinLiborCapFloor():
         df = liborCurve.df(endDate)
 
         if self._optionType == FinCapFloorTypes.CAP:
-            capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0)
+            capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0.0)
         elif self._optionType == FinCapFloorTypes.FLOOR:
-            capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0)
+            capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0.0)
 
         capFloorLetValue *= self._notional
         capFloorValue += capFloorLetValue
@@ -177,9 +177,9 @@ class FinLiborCapFloor():
                                          self._dayCountType)
 
             if self._optionType == FinCapFloorTypes.CAP:
-                intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0)
+                intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0.0)
             elif self._optionType == FinCapFloorTypes.FLOOR:
-                intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0)
+                intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0.0)
 
             intrinsicValue *= self._notional
 

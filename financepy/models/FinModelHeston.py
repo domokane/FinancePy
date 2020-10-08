@@ -195,9 +195,9 @@ class FinModelHeston():
                           schemeValue)
 
         if option._optionType == FinOptionTypes.EUROPEAN_CALL:
-            path_payoff = np.maximum(sPaths[:, -1] - K, 0)
+            path_payoff = np.maximum(sPaths[:, -1] - K, 0.0)
         elif option._optionType == FinOptionTypes.EUROPEAN_PUT:
-            path_payoff = np.maximum(K - sPaths[:, -1], 0)
+            path_payoff = np.maximum(K - sPaths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
 

@@ -128,10 +128,10 @@ def _valueOnce(stockPrice,
         s = stockValues[index + iNode]
         if optionType2 == FinOptionTypes.EUROPEAN_CALL\
            or optionType2 == FinOptionTypes.AMERICAN_CALL:
-            optionValues[index + iNode] = max(s - k2, 0)
+            optionValues[index + iNode] = max(s - k2, 0.0)
         elif optionType2 == FinOptionTypes.EUROPEAN_PUT\
            or optionType2 == FinOptionTypes.AMERICAN_PUT:
-            optionValues[index + iNode] = max(k2 - s, 0)
+            optionValues[index + iNode] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
     for iTime in range(numSteps - 1, numSteps1, -1):
@@ -149,9 +149,9 @@ def _valueOnce(stockPrice,
             exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
-                exerciseValue = max(s - k2, 0)
+                exerciseValue = max(s - k2, 0.0)
             elif optionType1 == FinOptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k2 - s, 0)
+                exerciseValue = max(k2 - s, 0.0)
 
             optionValues[index + iNode] = max(exerciseValue, holdValue)
 
@@ -170,10 +170,10 @@ def _valueOnce(stockPrice,
 
         if optionType1 == FinOptionTypes.EUROPEAN_CALL\
            or optionType1 == FinOptionTypes.AMERICAN_CALL:
-            optionValues[index + iNode] = max(holdValue - k1, 0)
+            optionValues[index + iNode] = max(holdValue - k1, 0.0)
         elif optionType1 == FinOptionTypes.EUROPEAN_PUT\
            or optionType1 == FinOptionTypes.AMERICAN_PUT:
-            optionValues[index + iNode] = max(k1 - holdValue, 0)
+            optionValues[index + iNode] = max(k1 - holdValue, 0.0)
 
     # begin backward steps from t1 expiry to value date
     for iTime in range(numSteps1 - 1, -1, -1):
@@ -192,9 +192,9 @@ def _valueOnce(stockPrice,
             exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
-                exerciseValue = max(holdValue - k1, 0)
+                exerciseValue = max(holdValue - k1, 0.0)
             elif optionType1 == FinOptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k1 - holdValue, 0)
+                exerciseValue = max(k1 - holdValue, 0.0)
 
             optionValues[index + iNode] = max(exerciseValue, holdValue)
 
