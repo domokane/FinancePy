@@ -7,5 +7,5 @@ from .FinLiborFuture import *
 from .FinLiborConventions import *
 from .FinLiborSwap import *
 from .FinLiborSwaption import *
-from .FinOIS import *
+from .FinOvernightIndexSwap import *
 from .FinLiborCurve import *
