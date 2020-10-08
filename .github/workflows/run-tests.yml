@@ -1,0 +1,21 @@
+name: test_action
+
+on: [push, pull_request]
+
+jobs:
+ build:
+  runs-on: ubuntu-latest
+  steps: 
+   - name: checkout repo content
+     uses: actions/checkout@v2
+   - name: setup python
+     uses: actions/setup-python@v2
+     with:
+       python-version: 3.8
+   - name: run test script
+     run: |
+       python setup.py install
+       pip install ipython
+       pip install numba==0.49
+       pip install matplotlib
+       python tests/runAllTests.py
