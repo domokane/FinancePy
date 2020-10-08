@@ -23,3 +23,10 @@ jobs:
        pip install ipython==7.16.1
        python setup.py install
        python tests/runAllTests.py
+   - name: Archive code coverage results
+     uses: actions/upload-artifact@v2
+     with:
+        name: result-differences-file-upload
+        path: tests/differences
+              !tests/differences/.gitkeep
+
