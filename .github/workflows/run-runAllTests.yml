@@ -15,7 +15,7 @@ jobs:
    - name: run test script
      run: |
        pip install numpy==1.18.5
-       pip install llvmlite==0.33.1
+       pip install llvmlite==0.33.0
        pip install scipy==1.5.0
        pip install numba==0.50.1
        pip install pandas==1.0.5
