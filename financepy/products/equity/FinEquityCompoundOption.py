@@ -56,16 +56,15 @@ def _valueOnce(stockPrice,
                riskFreeRate,
                dividendYield,
                volatility,
-               t1,
-               t2,
-               optionType1,
-               optionType2,
-               k1,
-               k2,
+               t1, t2,
+               optionType1, optionType2,
+               k1, k2,
                numSteps):
 
     if numSteps < 3:
         numSteps = 3
+
+    # TODO EUROPEAN call-put works but AMERICAN call-put needs to be tested
 
     # Need equally spaced time intervals for a recombining tree
     # Downside is that we may not measure periods exactly
@@ -137,6 +136,7 @@ def _valueOnce(stockPrice,
     for iTime in range(numSteps - 1, numSteps1, -1):
         index = int(0.5 * iTime * (iTime + 1))
         for iNode in range(0, iTime + 1):
+            s = stockValues[index + iNode]
             nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
             nextNodeDn = nextIndex + iNode
             nextNodeUp = nextIndex + iNode + 1
@@ -159,6 +159,7 @@ def _valueOnce(stockPrice,
     iTime = numSteps1
     index = int(0.5 * iTime * (iTime + 1))
     for iNode in range(0, iTime + 1):
+        s = stockValues[index + iNode]
         nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
         nextNodeDn = nextIndex + iNode
         nextNodeUp = nextIndex + iNode + 1
