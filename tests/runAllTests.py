@@ -9,7 +9,7 @@ import sys
 sys.path.append("..")
 
 print("Looking in folder:", dirname(__file__))
-modules = glob.glob(join(dirname(__file__), "Test*.py"))
+modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
 
 numModules = len(modules)
 
