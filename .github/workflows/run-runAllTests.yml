@@ -20,6 +20,6 @@ jobs:
        pip install numba==0.50.1
        pip install pandas==1.0.5
        pip install matplotlib==3.2.2       
-       pip install ipython==17.6.1
+       pip install ipython==17.16.1
        python setup.py install
        python tests/runAllTests.py
