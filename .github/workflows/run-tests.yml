@@ -16,8 +16,8 @@ jobs:
      run: |
        python setup.py install
        pip install ipython
-       pip install numba==0.51.2
        pip install numpy=1.19.1
        pip install scipy=1.5.2
+       pip install numba==0.51.2
        pip install matplotlib
        python tests/runAllTests.py
