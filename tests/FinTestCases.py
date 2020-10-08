@@ -332,7 +332,7 @@ class FinTestCases():
 
     def compareTestCases(self):
         ''' Compare output of COMPARE mode to GOLDEN output '''
-
+        
         self.startLog()
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:

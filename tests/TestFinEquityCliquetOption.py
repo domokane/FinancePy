@@ -46,6 +46,7 @@ def test_FinEquityCliquetOptionHaug():
                             dividendYield,
                             model)
 
+    testCases.header("LABEL", "VALUE")
     testCases.print("FINANCEPY", v)
 
 ###############################################################################
