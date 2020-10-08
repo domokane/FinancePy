@@ -59,7 +59,7 @@ def test_FinEquityVanillaOption():
 
 ###############################################################################
 
-    stockPrices = range(80, 120, 2)
+    stockPrices = range(80, 120, 10)
     numPaths = 100000
 
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
@@ -101,7 +101,7 @@ def test_FinEquityVanillaOption():
 
 ###############################################################################
 
-    stockPrices = range(80, 120, 2)
+    stockPrices = range(80, 120, 10)
     numPaths = 100000
 
     testCases.header("STOCK PRICE", "VALUE_BS", "VALUE_MC", "TIME")
@@ -130,7 +130,7 @@ def test_FinEquityVanillaOption():
 
 ###############################################################################
 
-    stockPrices = range(80, 120, 2)
+    stockPrices = range(80, 120, 10)
 
     testCases.header(
         "STOCK PRICE",
@@ -215,7 +215,7 @@ def test_FinEquityVanillaOption():
 
     testCases.header("STOCK PRICE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 
-    stockPrices = range(60, 150, 2)
+    stockPrices = range(60, 150, 10)
 
     for stockPrice in stockPrices:
         callOption = FinEquityVanillaOption(

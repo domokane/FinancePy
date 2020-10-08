@@ -23,7 +23,7 @@ def test_FinEquityLookBackOption():
     stockPrice = 100.0
     volatility = 0.3
     numPathsRange = [10000]
-    stockPriceRange = range(90, 110, 2)
+    stockPriceRange = range(90, 110, 5)
     numStepsPerYear = 252
 
     domesticRate = 0.05
@@ -217,7 +217,7 @@ def test_FinEquityLookBackOption():
 ###############################################################################
 ###############################################################################
 
-    stockPriceRange = range(90, 110, 2)
+    stockPriceRange = range(90, 110, 5)
     numStepsPerYear = 252
 
     testCases.header(

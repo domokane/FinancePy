@@ -78,7 +78,7 @@ def test_HullWhiteExampleTwo():
     vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
-    numStepsList = range(100, 500, 50)
+    numStepsList = range(100, 500, 100)
     analVector = []
     treeVector = []
 
@@ -164,7 +164,7 @@ def test_HullWhiteBondOption():
     model = FinModelRatesHW(sigma, a, None)
 
     #  Test convergence
-    numStepsList = range(20, 500, 10)
+    numStepsList = range(50, 500, 50)
     texp = (expiryDate - settlementDate)/gDaysInYear
 
     vJam = model.europeanBondOptionJamshidian(texp, strikePrice, face,
@@ -298,7 +298,7 @@ def test_HullWhiteCallableBond():
     a = 0.01
 
     # Test convergence
-    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    numStepsList = [100, 200, 500, 1000]
     tmat = (maturityDate - settlementDate)/gDaysInYear
 
     testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")

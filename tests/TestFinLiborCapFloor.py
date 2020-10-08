@@ -99,7 +99,7 @@ def test_FinLiborCapFloor():
     # COMPARISON OF MODELS
     ##########################################################################
 
-    strikes = np.linspace(0.02, 0.08, 10)
+    strikes = np.linspace(0.02, 0.08, 5)
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
                      "SABR_SHFTD", "HW", "BACH")

@@ -165,7 +165,7 @@ def test_FinBondOptionEuropeanConvergence():
     strikePrice = 100.0
     face = 100.0
 
-    timeSteps = range(10, 400, 10)
+    timeSteps = range(100, 400, 100)
     strikePrice = 100.0
 
     testCases.header("TIME","N","PUT_JAM","PUT_TREE","CALL_JAM","CALL_TREE")
@@ -232,7 +232,7 @@ def test_FinBondOptionAmericanConvergenceONE():
     testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
-    timeSteps = range(100, 500, 10)
+    timeSteps = range(100, 500, 100)
 
     for numTimeSteps in timeSteps:
 
@@ -311,7 +311,7 @@ def test_FinBondOptionAmericanConvergenceTWO():
     vec_ep = []
     vec_ap = []
 
-    numStepsVector = range(10, 500, 10)
+    numStepsVector = range(100, 500, 100)
 
     for numSteps in numStepsVector:
         hwModel = FinModelRatesHW(sigma, a, numSteps)
@@ -396,7 +396,7 @@ def test_FinBondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER") 
 
-    numTimeSteps = range(50, 1000, 50)
+    numTimeSteps = range(100, 1000, 100)
     strikePrices = [90, 100, 110, 120]
 
     for strikePrice in strikePrices:

@@ -687,7 +687,7 @@ def test_fullPriceCDSConvergence():
     cdsRecovery = 0.40
 
     testCases.header("NumSteps", "Value")
-    for n in [10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000]:
+    for n in [10, 50, 100, 500, 1000]:
         v_full = cdsContract.value(
             valuationDate, issuerCurve, cdsRecovery, 0, 1, n)['full_pv']
         testCases.print(n, v_full)

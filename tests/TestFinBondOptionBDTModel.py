@@ -50,7 +50,7 @@ def test_FinBondOption():
 
     ###########################################################################
 
-    strikes = [80, 85, 90, 95, 100, 105, 110, 115, 120]
+    strikes = [80, 90, 100, 110, 120]
 
     optionType = FinOptionTypes.EUROPEAN_CALL
 
@@ -356,7 +356,7 @@ def test_FinBondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER") 
 
-    numTimeSteps = range(50, 1000, 50)
+    numTimeSteps = range(100, 1000, 200)
     strikePrices = [90, 100, 110, 120]
 
     for strikePrice in strikePrices:

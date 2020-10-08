@@ -5,6 +5,8 @@
 import glob
 from os.path import dirname, basename, join
 
+from financepy.finutils.FinError import FinError
+
 import sys
 sys.path.append("..")
 
@@ -22,21 +24,39 @@ from FinTestCases import FinTestCases
 
 for moduleFileName in modules[n:m+1]:
 
-    moduleTextName = basename(moduleFileName[:-3])
+    try:
 
-    print("TEST: %3d out of %3d: MODULE: %-35s "% (n+1, numModules, moduleTextName), end="")
-    moduleName = __import__(moduleTextName)
-
-    numErrors = moduleName.testCases._globalNumErrors
-    numWarnings = moduleName.testCases._globalNumWarnings
-
-    print("WARNINGS: %3d   ERRORS: %3d " % (numWarnings, numErrors), end ="")
-
-    if numErrors > 0:
-        for i in range(0, numErrors):
-            print("*", end="")
+        moduleTextName = basename(moduleFileName[:-3])
     
-    print("")
+        print("TEST: %3d out of %3d: MODULE: %-35s "% (n+1, numModules,
+                                                       moduleTextName), end="")
+        moduleName = __import__(moduleTextName)
+    
+        numErrors = moduleName.testCases._globalNumErrors
+        numWarnings = moduleName.testCases._globalNumWarnings
+    
+        print("WARNINGS: %3d   ERRORS: %3d " % (numWarnings, numErrors), end ="")
+    
+        if numErrors > 0:
+            for i in range(0, numErrors):
+                print("*", end="")
+        
+        print("")
+    
+        n = n + 1
 
-    n = n + 1
+    except FinError as err:
+        print("Fin Error:", err._message, "************") 
+        pass
+    except ValueError as err:
+        print("Value Error", err.args[0], "************")
+        pass
+    except NameError as err:
+        print("Name Error", err.args[0], "************")
+        pass
+    except BaseException:
+        print("Unknown error occured.")
+        pass
+        
+    
 

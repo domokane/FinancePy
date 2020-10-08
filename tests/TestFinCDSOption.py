@@ -318,7 +318,7 @@ def test_fullPriceCDSwaption():
 
     testCases.header("STRIKE", "FULL VALUE", "IMPLIED VOL")
 
-    for strike in np.linspace(100, 300, 21):
+    for strike in np.linspace(100, 300, 41):
 
         cdsOption = FinCDSOption(expiryDate,
                                  maturityDate,

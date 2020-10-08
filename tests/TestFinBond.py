@@ -456,7 +456,7 @@ def test_FinBondExDividend():
     accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
     testCases.print("SettlementDate:", settlementDate)
     testCases.print("Accrued:", accrued)
-
+    
     ###########################################################################
     testCases.banner("=======================================================")
     testCases.header("SETTLEMENT", "ACCRUED")
@@ -481,6 +481,6 @@ def test_FinBondExDividend():
         
 ###############################################################################
 
-# test_FinBond()
+test_FinBond()
 test_FinBondExDividend()
 testCases.compareTestCases()

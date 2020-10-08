@@ -306,7 +306,7 @@ def test_FinCDSBasket():
         rho = beta ** 2
         corrMatrix = corrMatrixGenerator(rho, numCredits)
         for ntd in range(1, numCredits + 1):
-            for doF in [3, 10]:
+            for doF in [3, 6]:
                 start = time.time()
 
                 v = basket.valueStudentT_MC(valuationDate,

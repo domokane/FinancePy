@@ -197,7 +197,7 @@ def test_fullPriceCDSIndexOption():
         "ABPAY",
         "ABREC")
 
-    for index in np.linspace(20, 60, 5):
+    for index in np.linspace(20, 60, 10):
 
         #######################################################################
 
@@ -236,7 +236,7 @@ def test_fullPriceCDSIndexOption():
 
         #######################################################################
 
-        for strike in np.linspace(20, 60, 5):
+        for strike in np.linspace(20, 60, 20):
 
             start = time.time()
 

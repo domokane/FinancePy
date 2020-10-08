@@ -126,7 +126,7 @@ def test_FinEquityBarrierOption():
 
 ##########################################################################
 
-    stockPrices = range(50, 150, 10)
+    stockPrices = range(50, 150, 50)
     B = 105.0
 
     testCases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")

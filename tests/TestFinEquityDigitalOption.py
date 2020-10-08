@@ -80,7 +80,7 @@ def test_FinEquityDigitalOption():
 
 ##########################################################################
 
-    stockPrices = range(50, 150)
+    stockPrices = range(50, 150, 50)
     callOptionValues = []
     callOptionDeltas = []
     callOptionVegas = []

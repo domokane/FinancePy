@@ -190,7 +190,7 @@ def test_FinBondOptionAmericanConvergenceONE():
     testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
-    timeSteps = range(30, 100, 1)
+    timeSteps = range(30, 100, 10)
 
     for numTimeSteps in timeSteps:
 
@@ -364,7 +364,7 @@ def test_FinBondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER") 
 
-    numTimeSteps = range(50, 1000, 50)
+    numTimeSteps = range(100, 1000, 100)
     strikePrices = [90, 100, 110, 120]
 
     for strikePrice in strikePrices:

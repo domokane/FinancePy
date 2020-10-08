@@ -19,7 +19,7 @@ PLOT_GRAPHS = False
 
 def test_FinSABR():
 
-    strikes = np.linspace(0.01, 0.06, 100)
+    strikes = np.linspace(0.01, 0.06, 10)
 
     alpha = 0.060277
     beta = 0.5
@@ -50,7 +50,7 @@ def test_FinSABR():
 
 def test_FinShiftedSABRSimple():
 
-    strikes = np.linspace(0.01, 0.06, 100)
+    strikes = np.linspace(0.01, 0.06, 10)
 
     alpha = 0.060277
     beta = 0.5
@@ -81,7 +81,7 @@ def test_FinShiftedSABRSimple():
 
 def test_FinShiftedSABR():
 
-    strikes = np.linspace(-0.006, 0.016, 100)
+    strikes = np.linspace(-0.006, 0.016, 10)
 
     alpha = 0.013345
     beta = 0.5

@@ -30,7 +30,7 @@ def test_FinEquityCompoundOption():
     model = FinEquityModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
-    numStepsList = [100, 200, 300, 500, 1000, 2000, 5000]
+    numStepsList = [100, 200, 500, 1000, 2000, 5000]
 
     ###########################################################################
 
@@ -101,7 +101,7 @@ def test_FinEquityCompoundOption():
             cmpdOption = FinEquityCompoundOption(
                 expiryDate1, optionType1, k1,
                 expiryDate2, optionType2, k2)
-            stockPrices = range(70, 100)
+            stockPrices = range(70, 100, 10)
 
             for stockPrice in stockPrices:
                 value = cmpdOption.value(

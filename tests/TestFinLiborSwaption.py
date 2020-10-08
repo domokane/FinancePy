@@ -88,7 +88,7 @@ def testFinLiborSwaptionModels():
     swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = FinDayCountTypes.ACT_365F
 
-    strikes = np.linspace(0.02, 0.08, 10)
+    strikes = np.linspace(0.02, 0.08, 5)
 
     testCases.header("LAB", "STRIKE", "BLK", "BLK_SHFT", "SABR",
                      "SABR_SHFT", "HW", "BK")

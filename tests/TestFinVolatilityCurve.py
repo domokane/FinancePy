@@ -28,7 +28,7 @@ def test_FinVolatilityCurve():
     volCurve = FinEquityVolCurve(valueDate, expiryDate,
                                  strikes, vols, polynomial)
 
-    interpStrikes = np.linspace(50, 150, 100)
+    interpStrikes = np.linspace(50, 150, 10)
     interpVols = volCurve.volatility(interpStrikes)
 
     if PLOT_GRAPHS:

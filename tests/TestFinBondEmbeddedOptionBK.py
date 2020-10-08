@@ -158,7 +158,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 200, 10)  # 1000, 10)
+    timeSteps = range(100, 200, 20)  # 1000, 10)
     values = []
     for numTimeSteps in timeSteps:
         model = FinModelRatesBK(sigma, a, numTimeSteps)
