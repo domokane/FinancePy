@@ -7,6 +7,9 @@ from os.path import dirname, basename, join
 
 from financepy.finutils.FinError import FinError
 
+# I put this here to get the library loaded and header printed before loop
+from FinTestCases import FinTestCases
+
 import sys
 sys.path.append("..")
 
@@ -19,8 +22,8 @@ numModules = len(modules)
 n = 0
 m = numModules
 
-# I put this here to get the header print before the loop starts
-from FinTestCases import FinTestCases
+
+###############################################################################
 
 for moduleFileName in modules[n:m+1]:
 
@@ -45,8 +48,9 @@ for moduleFileName in modules[n:m+1]:
     
         n = n + 1
 
+    # Want testing to continue even if a module has an exception
     except FinError as err:
-        print("Fin Error:", err._message, "************") 
+        print("FinError:", err._message, "************") 
         pass
     except ValueError as err:
         print("Value Error", err.args[0], "************")
@@ -57,6 +61,9 @@ for moduleFileName in modules[n:m+1]:
     except BaseException:
         print("Unknown error occured.")
         pass
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        pass
         
-    
+###############################################################################    
 
