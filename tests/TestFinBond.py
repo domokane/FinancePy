@@ -399,43 +399,43 @@ def test_FinBond():
     cleanPrice = 101.581564
 
     yld = bond.currentYield(cleanPrice)
-    testCases.print("Current Yield = ", yld)
+    testCases.print("Current Yield", yld)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
                                FinYTMCalcType.UK_DMO)
-    testCases.print("UK DMO Yield To Maturity = ", ytm)
+    testCases.print("UK DMO Yield To Maturity", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
                                FinYTMCalcType.US_STREET)
-    testCases.print("US STREET Yield To Maturity = ", ytm)
+    testCases.print("US STREET Yield To Maturity", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
                                FinYTMCalcType.US_TREASURY)
-    testCases.print("US TREASURY Yield To Maturity = ", ytm)
+    testCases.print("US TREASURY Yield To Maturity", ytm)
 
     fullPrice = bond.fullPriceFromYTM(settlementDate, ytm)
-    testCases.print("Full Price = ", fullPrice)
+    testCases.print("Full Price", fullPrice)
 
     cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
-    testCases.print("Clean Price = ", cleanPrice)
+    testCases.print("Clean Price", cleanPrice)
 
     accddays = bond._accruedDays
-    testCases.print("Accrued Days = ", accddays)
+    testCases.print("Accrued Days", accddays)
 
     accd = bond._accruedInterest
-    testCases.print("Accrued = ", accd)
+    testCases.print("Accrued", accd)
 
     duration = bond.dollarDuration(settlementDate, ytm)
-    testCases.print("Dollar Duration = ", duration)
+    testCases.print("Dollar Duration", duration)
 
     modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
-    testCases.print("Modified Duration = ", modifiedDuration)
+    testCases.print("Modified Duration", modifiedDuration)
 
     macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
-    testCases.print("Macauley Duration = ", macauleyDuration)
+    testCases.print("Macauley Duration", macauleyDuration)
 
     conv = bond.convexityFromYTM(settlementDate, ytm)
-    testCases.print("Convexity = ", conv)
+    testCases.print("Convexity", conv)
 
 ###############################################################################
 

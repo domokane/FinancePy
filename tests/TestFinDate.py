@@ -167,8 +167,8 @@ def test_FinDateSpeed():
     end = time.time()
     elapsed = end - start
 
-    testCases.header("LABEL", "VALUE")
-    testCases.print("TIMING(s):", elapsed)
+    testCases.header("LABEL", "TIME")
+    testCases.print("TIMING", elapsed)
 
     mem = sys.getsizeof(dateList)
     testCases.print("Mem:", mem)
