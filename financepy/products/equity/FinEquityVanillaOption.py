@@ -19,7 +19,7 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from financepy.finutils.FinSobol import getGaussianSobol
+from financepy.models.FinSobol import getGaussianSobol
 
 from scipy.stats import norm
 N = norm.cdf
