@@ -51,18 +51,23 @@ for moduleFileName in modules[n:m+1]:
     # Want testing to continue even if a module has an exception
     except FinError as err:
         print("FinError:", err._message, "************") 
+        n = n + 1
         pass
     except ValueError as err:
         print("Value Error", err.args[0], "************")
+        n = n + 1
         pass
     except NameError as err:
         print("Name Error", err.args[0], "************")
+        n = n + 1
         pass
-    except BaseException:
-        print("Unknown error occured.")
+    except BaseException as e:
+        print("Unknown error occured.", e)
+        n = n + 1
         pass
     except:
         print("Unexpected error:", sys.exc_info()[0])
+        n = n + 1
         pass
         
 ###############################################################################    
