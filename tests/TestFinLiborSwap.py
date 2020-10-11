@@ -104,30 +104,31 @@ def buildLiborCurve(valuationDate):
     fra = FinIborFRA(startDate, endDate, -0.00126, dcType)
     fras.append(fra)
 
+    ###########################################################################
+    ###########################################################################
+    ###########################################################################
+    ###########################################################################
+    
     fixedFreq = FinFrequencyTypes.ANNUAL
     dcType = FinDayCountTypes.THIRTY_E_360
-
     swapType = FinSwapTypes.PAYER
     
+    #####################################################
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(settlementDate, maturityDate, swapType, -
-                         0.001506, fixedFreq, dcType)
+    swap1 = FinLiborSwap(settlementDate, maturityDate, swapType, -0.001506,
+                         fixedFreq, dcType)
     swaps.append(swap1)
-
+    #####################################################
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(settlementDate,maturityDate,  swapType, -
-                         0.000185, fixedFreq, dcType)
+    swap2 = FinLiborSwap(settlementDate,maturityDate,  swapType, -0.000185,
+                         fixedFreq, dcType)
     swaps.append(swap2)
-
+    #####################################################
     maturityDate = settlementDate.addMonths(48)
-    swap3 = FinLiborSwap(
-        settlementDate,
-        maturityDate,
-        swapType,
-        0.001358,
-        fixedFreq,
-        dcType)
+    swap3 = FinLiborSwap(settlementDate, maturityDate, swapType,0.001358,
+                         fixedFreq, dcType)
     swaps.append(swap3)
+    #####################################################
 
     maturityDate = settlementDate.addMonths(60)
     swap4 = FinLiborSwap(
@@ -288,7 +289,7 @@ def buildLiborCurve(valuationDate):
         fixedFreq,
         dcType)
     swaps.append(swap19)
-
+    
     liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
@@ -315,8 +316,8 @@ def test_LiborSwap():
 
     # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
-    startDate = FinDate(2017, 12, 27)
-    endDate = FinDate(2067, 12, 27)
+    startDate = FinDate(27, 12, 2017)
+    endDate = FinDate(27, 12, 2067)
 
     fixedCoupon = 0.015
     fixedFreqType = FinFrequencyTypes.ANNUAL

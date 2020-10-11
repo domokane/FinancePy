@@ -55,7 +55,7 @@ class FinSchedule(object):
         ''' Returns a list of the schedule of FinDates. '''
 
         if self._adjustedDates is None:
-            raise FinError("Schedule dates have not been generated.")
+            self._generate()
 
         return self._adjustedDates
 
