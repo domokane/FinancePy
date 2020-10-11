@@ -14,8 +14,8 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-class FinLiborDeposit(object):
-    ''' A Libor deposit is an agreement to borrow money interbank at the Libor
+class FinIborDeposit(object):
+    ''' An Ibor deposit is an agreement to borrow money interbank at the Libor
     fixing rate starting on the start date and repaid on the maturity date
     with the interest amount calculated according to a day count convention and
     dates calculated according to a calendar and business day adjustment rule.

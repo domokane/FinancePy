@@ -18,8 +18,19 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 
 
 class FinLiborSwap(object):
-    ''' Class for managing an interest rate swap contract. '''
+    ''' Class for managing a Fixed vs IBOR swap contract. This is a contract
+    in which a fixed payment leg is exchanged for a series of floating rates
+    payments linked to some IBOR index rate. There is no exchange of par.
+    The contract is entered into at zero initial cost. The contract lasts from
+    a start date to a specified maturity date.
 
+    The floating rate is not known fully until the end of the preceding payment
+    period. It is set in advance and paid in arrears. 
+    
+    The value of the contract is the NPV of the two coupon streams. Discounting
+    is done on a supplied discount curve which is separate from the curve from
+    which the implied index rates are extracted. '''
+    
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends

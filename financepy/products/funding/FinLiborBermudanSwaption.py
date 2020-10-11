@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
-from ...products.libor.FinLiborSwap import FinLiborSwap
+from ...products.funding.FinLiborSwap import FinLiborSwap
 
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK

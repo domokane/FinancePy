@@ -15,12 +15,12 @@ from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinDate import FinDate
 
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...products.libor.FinLiborFRA import FinLiborFRA
+from ...products.funding.FinIborFRA import FinIborFRA
 
 ###############################################################################
 
 
-class FinLiborFuture(object):
+class FinIborFuture(object):
     ''' Class for managing short term interest rate futures contracts. '''
 
     # Reference
@@ -59,13 +59,13 @@ class FinLiborFuture(object):
 ###############################################################################
 
     def toFRA(self, futuresPrice, convexity):
-        ''' Convert the futures contract to a FinLiborFRA object so it can be
+        ''' Convert the futures contract to a FinIborFRA object so it can be
         used to boostrap a Libor curve. For this we need to adjust the futures
         rate using the convexity correction. '''
 
         fraRate = self.FRARate(futuresPrice, convexity)
 
-        fra = FinLiborFRA(self._deliveryDate,
+        fra = FinIborFRA(self._deliveryDate,
                           self._endOfInterestPeriod,
                           fraRate,
                           self._accrualType,

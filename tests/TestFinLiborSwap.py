@@ -7,10 +7,10 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborFRA import FinLiborFRA
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborFRA import FinIborFRA
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
@@ -19,7 +19,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolate import FinInterpTypes
-from financepy.products.libor.FinLiborSwaption import FinSwapTypes
+from financepy.products.funding.FinLiborSwaption import FinSwapTypes
 
 import sys
 sys.path.append("..//..")
@@ -40,68 +40,68 @@ def buildLiborCurve(valuationDate):
     swaps = []
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, -0.00251, dcType)
+    depo1 = FinIborDeposit(settlementDate, maturityDate, -0.00251, dcType)
     depos.append(depo1)
 
     # Series of 1M futures
     startDate = settlementDate.nextIMMDate()
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.0023, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.0023, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00234, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00234, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00225, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00225, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00226, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00226, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00219, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00219, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00213, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00213, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00186, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00186, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00189, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00189, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00175, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00175, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00143, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00143, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00126, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00126, dcType)
     fras.append(fra)
 
     startDate = startDate.addMonths(1)
     endDate = startDate.addMonths(1)
-    fra = FinLiborFRA(startDate, endDate, -0.00126, dcType)
+    fra = FinIborFRA(startDate, endDate, -0.00126, dcType)
     fras.append(fra)
 
     fixedFreq = FinFrequencyTypes.ANNUAL

@@ -9,11 +9,11 @@ import numpy as np
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborSwap import FinSwapTypes
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborCapFloor import FinLiborCapFloor
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinLiborSwap import FinSwapTypes
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -44,7 +44,7 @@ from financepy.finutils.FinSchedule import FinSchedule
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
-def test_FinLiborDepositsAndSwaps(valuationDate):
+def test_FinIborDepositsAndSwaps(valuationDate):
 
     depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -53,9 +53,9 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     settlementDate = valuationDate.addWeekDays(spotDays)
     depositRate = 0.05
 
-    depo1 = FinLiborDeposit(settlementDate, "1M", depositRate, depoBasis)
-    depo2 = FinLiborDeposit(settlementDate, "3M", depositRate, depoBasis)
-    depo3 = FinLiborDeposit(settlementDate, "6M", depositRate, depoBasis)
+    depo1 = FinIborDeposit(settlementDate, "1M", depositRate, depoBasis)
+    depo2 = FinIborDeposit(settlementDate, "3M", depositRate, depoBasis)
+    depo3 = FinIborDeposit(settlementDate, "6M", depositRate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -90,7 +90,7 @@ def test_FinLiborCapFloor():
     valuationDate = todayDate
     startDate = todayDate.addWeekDays(2)
     maturityDate = startDate.addTenor("1Y")
-    liborCurve = test_FinLiborDepositsAndSwaps(todayDate)
+    liborCurve = test_FinIborDepositsAndSwaps(todayDate)
 
     # The capfloor has begun
     # lastFixing = 0.028

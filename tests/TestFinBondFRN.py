@@ -4,13 +4,13 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
 from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 import sys
@@ -34,35 +34,35 @@ def buildLiborCurve(valueDate):
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(
+    depo1 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(3)
-    depo2 = FinLiborDeposit(
+    depo2 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(6)
-    depo3 = FinLiborDeposit(
+    depo3 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(9)
-    depo4 = FinLiborDeposit(
+    depo4 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(12)
-    depo5 = FinLiborDeposit(
+    depo5 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,

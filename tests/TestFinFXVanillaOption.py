@@ -15,8 +15,8 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 
 from financepy.finutils.FinDate import FinDate
 import sys
@@ -189,7 +189,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = FinLiborDeposit(settlementDate, maturityDate, domDepoRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, domDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
     domDiscountCurve = FinLiborCurve(settlementDate,
@@ -198,7 +198,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = FinLiborDeposit(settlementDate, maturityDate, forDepoRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, forDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
     forDiscountCurve = FinLiborCurve(settlementDate,

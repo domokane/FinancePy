@@ -13,11 +13,11 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
-from financepy.products.libor.FinLiborFRA import FinLiborFRA
-from financepy.products.libor.FinLiborFuture import FinLiborFuture
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborFRA import FinIborFRA
+from financepy.products.funding.FinIborFuture import FinIborFuture
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
@@ -33,7 +33,7 @@ PLOT_GRAPHS = False
 ###############################################################################
 
 
-def test_FinLiborDepositsOnly():
+def test_FinIborDepositsOnly():
 
     # I have used the following useful blog post by Ioannis Rigopoulos for this
     # https://blog.deriscope.com/index.php/en/yield-curve-excel-quantlib-deposit
@@ -51,28 +51,28 @@ def test_FinLiborDepositsOnly():
     # 1 month
     depositRate = 0.04
     maturityDate = settlementDate.addMonths(1)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            depoDCCType, notional, calendarType)
     depos.append(depo)
 
     # 2 months
     depositRate = 0.04
     maturityDate = settlementDate.addMonths(2)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            depoDCCType, notional, calendarType)
     depos.append(depo)
 
     # 6 months
     depositRate = 0.04
     maturityDate = settlementDate.addMonths(6)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            depoDCCType, notional, calendarType)
     depos.append(depo)
 
     # 1 year
     depositRate = 0.04
     maturityDate = settlementDate.addMonths(12)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            depoDCCType, notional, calendarType)
     depos.append(depo)
 
@@ -94,7 +94,7 @@ def test_FinLiborDepositsOnly():
 ###############################################################################
 
 
-def test_FinLiborFRAsOnly():
+def test_FinIborFRAsOnly():
 
     # TO DO FIX THIS
     valuationDate = FinDate(2018, 2, 23)
@@ -114,7 +114,7 @@ def test_FinLiborFRAsOnly():
     fraRate = 0.04
     fraSettlementDate = settlementDate.addMonths(1)
     fraMaturityDate = settlementDate.addMonths(4)
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate,
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate,
                       depoDCCType, notional, payFixed, calendarType)
     fras.append(fra)
 
@@ -122,7 +122,7 @@ def test_FinLiborFRAsOnly():
     fraRate = 0.08
     fraSettlementDate = settlementDate.addMonths(4)
     fraMaturityDate = settlementDate.addMonths(7)
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate,
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate,
                       depoDCCType, notional, payFixed, calendarType)
     fras.append(fra)
 
@@ -144,7 +144,7 @@ def test_FinLiborFRAsOnly():
 ###############################################################################
 
 
-def test_FinLiborDepositsFRAsSwaps():
+def test_FinIborDepositsFRAsSwaps():
 
     valuationDate = FinDate(2019, 9, 18)
 
@@ -156,27 +156,27 @@ def test_FinLiborDepositsFRAsSwaps():
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     maturityDate = settlementDate.addMonths(2)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     maturityDate = settlementDate.addMonths(3)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     maturityDate = settlementDate.addMonths(6)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     maturityDate = settlementDate.addMonths(9)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     maturityDate = settlementDate.addMonths(12)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate, dccType)
     depos.append(depo)
 
     fras = []
@@ -184,21 +184,21 @@ def test_FinLiborDepositsFRAsSwaps():
     fraRate = 0.04
     fraSettlementDate = settlementDate.addMonths(9)
     fraMaturityDate = settlementDate.addMonths(13)
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
     fraRate = 0.03
     fraSettlementDate = settlementDate.addMonths(13)
     fraMaturityDate = settlementDate.addMonths(17)
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
     fraRate = 0.07
     fraSettlementDate = settlementDate.addMonths(17)
     fraMaturityDate = settlementDate.addMonths(21)
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     swaps = []
@@ -336,7 +336,7 @@ def futureToFRARate(price, convexity):
 ###############################################################################
 
 
-def test_FinLiborDepositsFuturesSwaps():
+def test_FinIborDepositsFuturesSwaps():
 
     spotDate = FinDate(6, 6, 2018)
     spotDays = 0
@@ -344,19 +344,19 @@ def test_FinLiborDepositsFuturesSwaps():
     depoDCCType = FinDayCountTypes.ACT_360
     depos = []
     depositRate = 0.0231381
-    depo = FinLiborDeposit(settlementDate, "3M", depositRate, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "3M", depositRate, depoDCCType)
     depos.append(depo)
 
     depositRate = 0.027
-    depo = FinLiborDeposit(settlementDate, "3M", depositRate, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "3M", depositRate, depoDCCType)
     depos.append(depo)
 
     depos = []
-    depo = FinLiborDeposit(settlementDate, "1M", 0.0230, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "1M", 0.0230, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "2M", 0.0235, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "2M", 0.0235, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "3M", 0.0240, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "3M", 0.0240, depoDCCType)
     depos.append(depo)
 
     fras = []
@@ -364,37 +364,37 @@ def test_FinLiborDepositsFuturesSwaps():
     fraRate = futureToFRARate(97.6675, -0.00005)
     fraSettlementDate = spotDate.nextIMMDate()
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     fraRate = futureToFRARate(97.5200, -0.00060)
     fraSettlementDate = fraMaturityDate
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     fraRate = futureToFRARate(97.3550, -0.00146)
     fraSettlementDate = fraMaturityDate
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     fraRate = futureToFRARate(97.2450, -0.00263)
     fraSettlementDate = fraMaturityDate
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     fraRate = futureToFRARate(97.1450, -0.00411)
     fraSettlementDate = fraMaturityDate
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     fraRate = futureToFRARate(97.0750, -0.00589)
     fraSettlementDate = fraSettlementDate.nextIMMDate()
     fraMaturityDate = fraSettlementDate.nextIMMDate()
-    fra = FinLiborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
+    fra = FinIborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
 
     ###########################################################################
@@ -489,69 +489,69 @@ def test_derivativePricingExample():
     settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001410
-    depo = FinLiborDeposit(settlementDate, "ON", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "ON", depositRate, dccType)
     depos.append(depo)
 
     spotDays = 1
     settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001410
-    depo = FinLiborDeposit(settlementDate, "TN", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "TN", depositRate, dccType)
     depos.append(depo)
 
     spotDays = 2
     settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.001910
-    depo = FinLiborDeposit(settlementDate, "1W", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "1W", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.002090
-    depo = FinLiborDeposit(settlementDate, "2W", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "2W", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.002490
-    depo = FinLiborDeposit(settlementDate, "1M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "1M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.003450
-    depo = FinLiborDeposit(settlementDate, "2M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "2M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.004570
-    depo = FinLiborDeposit(settlementDate, "3M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "3M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.005230
-    depo = FinLiborDeposit(settlementDate, "4M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "4M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.005860
-    depo = FinLiborDeposit(settlementDate, "5M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "5M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.006540
-    depo = FinLiborDeposit(settlementDate, "6M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "6M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.007080
-    depo = FinLiborDeposit(settlementDate, "7M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "7M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.007540
-    depo = FinLiborDeposit(settlementDate, "8M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "8M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.008080
-    depo = FinLiborDeposit(settlementDate, "9M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "9M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.008570
-    depo = FinLiborDeposit(settlementDate, "10M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "10M", depositRate, dccType)
     depos.append(depo)
 
     depositRate = 0.009130
-    depo = FinLiborDeposit(settlementDate, "11M", depositRate, dccType)
+    depo = FinIborDeposit(settlementDate, "11M", depositRate, dccType)
     depos.append(depo)
 
     fras = []
@@ -635,17 +635,17 @@ def test_bloombergPricingExample():
     depos = []
     depositRate = 0.0231381
     maturityDate = settlementDate.addMonths(3)
-    depo = FinLiborDeposit(settlementDate, maturityDate, depositRate,
+    depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            depoDCCType)
     depos.append(depo)
 
     futs = []
-    fut = FinLiborFuture(valuationDate, 1); futs.append(fut)
-    fut = FinLiborFuture(valuationDate, 2); futs.append(fut)
-    fut = FinLiborFuture(valuationDate, 3); futs.append(fut)
-    fut = FinLiborFuture(valuationDate, 4); futs.append(fut)
-    fut = FinLiborFuture(valuationDate, 5); futs.append(fut)
-    fut = FinLiborFuture(valuationDate, 6); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 1); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 2); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 3); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 4); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 5); futs.append(fut)
+    fut = FinIborFuture(valuationDate, 6); futs.append(fut)
 
     fras = [None]*6
     fras[0] = futs[0].toFRA(97.6675, -0.00005)
@@ -705,9 +705,9 @@ def test_bloombergPricingExample():
 
 test_bloombergPricingExample()
 test_derivativePricingExample()
-test_FinLiborDepositsOnly()
-test_FinLiborFRAsOnly()
-test_FinLiborDepositsFRAsSwaps()
-test_FinLiborDepositsFuturesSwaps()
+test_FinIborDepositsOnly()
+test_FinIborFRAsOnly()
+test_FinIborDepositsFRAsSwaps()
+test_FinIborDepositsFuturesSwaps()
 
 testCases.compareTestCases()

@@ -28,7 +28,7 @@ class FinCompoundingTypes(Enum):
 ###############################################################################
 
 
-class FinOvernightIndexSwap(object):
+class FinOISwap(object):
     ''' Class for managing overnight index swaps (OIS) and Fed Funds swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate. There is no exchange of par.
@@ -55,7 +55,7 @@ class FinOvernightIndexSwap(object):
     def __init__(self,
                  startDate: FinDate,
                  maturityDate: FinDate,
-                 payRecFixed: FinSwapTypes,
+                 swapType: FinSwapTypes,
                  fixedRate: float,
                  fixedFrequencyType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
@@ -75,7 +75,7 @@ class FinOvernightIndexSwap(object):
 
         self._startDate = startDate
         self._maturityDate = maturityDate
-        self._payFixedLeg = payRecFixed
+        self._swapType = swapType
         self._notional = notional
 
         self._fixedRate = fixedRate
@@ -237,10 +237,27 @@ class FinOvernightIndexSwap(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._payFixedLeg is FinSwapTypes.PAYER:
+        if self._swapType is FinSwapTypes.PAYER:
             value = value * (-1.0)
 
         return value * self._notional
+
+    ###########################################################################
+
+    def df(self, oisRate: float):
+        ''' Calculate the OIS rate implied discount factor. '''
+
+        df = 1.0
+        prevDt = self._startDate
+        dt = prevDt
+
+        while dt <= self._maturityDate:
+            dt = dt.addWeekDays(1)
+            dayCount = dt - prevDt
+            df = df / (1.0 + oisRate * dayCount / 360.0)
+            prevDt = dt            
+
+        return df
 
     ###########################################################################
 
@@ -266,23 +283,6 @@ class FinOvernightIndexSwap(object):
         print("Floating Leg Flows")
         for dt in self._adjustedFloatDates:
             print(dt)
-
-    ###########################################################################
-
-    def df(self, oisRate: float):
-        ''' Calculate the OIS rate implied discount factor. '''
-
-        df = 1.0
-        prevDt = self._startDate
-        dt = prevDt
-
-        while dt <= self._maturityDate:
-            dt = dt.addWeekDays(1)
-            dayCount = dt - prevDt
-            df = df / (1.0 + oisRate * dayCount / 360.0)
-            prevDt = dt            
-
-        return df
 
     ###########################################################################
 

@@ -7,9 +7,9 @@ import numpy as np
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDS import FinCDS
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate

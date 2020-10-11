@@ -14,7 +14,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-class FinLiborFRA(object):
+class FinInflationSwap(object):
     ''' Class for managing LIBOR forward rate agreements. A forward rate
     agreement is an agreement to exchange a fixed pre-agreed rate for a
     floating rate linked to LIBOR that is not known until some specified
@@ -50,6 +50,9 @@ class FinLiborFRA(object):
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
         ''' Create a Forward Rate Agreeement object. '''
 
+        print("DO NOT USE")
+        raise FinError("DO NOT USE")
+        
         checkArgumentTypes(self.__init__, locals())
 
         self._calendarType = calendarType

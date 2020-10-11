@@ -10,10 +10,10 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
-from financepy.products.libor.FinLiborSwaption import FinSwapTypes
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinLiborSwaption import FinLiborSwaption
+from financepy.products.funding.FinLiborSwaption import FinSwapTypes
 
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.models.FinModelBlackShifted import FinModelBlackShifted
@@ -23,7 +23,7 @@ from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpTypes
@@ -33,7 +33,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinLiborDepositsAndSwaps(valuationDate):
+def test_FinIborDepositsAndSwaps(valuationDate):
 
     depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -42,9 +42,9 @@ def test_FinLiborDepositsAndSwaps(valuationDate):
     settlementDate = valuationDate.addWeekDays(spotDays)
     depositRate = 0.05
 
-    depo1 = FinLiborDeposit(settlementDate, "1M", depositRate, depoBasis)
-    depo2 = FinLiborDeposit(settlementDate, "3M", depositRate, depoBasis)
-    depo3 = FinLiborDeposit(settlementDate, "6M", depositRate, depoBasis)
+    depo1 = FinIborDeposit(settlementDate, "1M", depositRate, depoBasis)
+    depo2 = FinIborDeposit(settlementDate, "3M", depositRate, depoBasis)
+    depo3 = FinIborDeposit(settlementDate, "6M", depositRate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -80,7 +80,7 @@ def testFinLiborSwaptionModels():
     ##########################################################################
 
     valuationDate = FinDate(2011, 1, 1)
-    liborCurve = test_FinLiborDepositsAndSwaps(valuationDate)
+    liborCurve = test_FinIborDepositsAndSwaps(valuationDate)
 
     exerciseDate = FinDate(2012, 1, 1)
     swapMaturityDate = FinDate(2017, 1, 1)
@@ -151,13 +151,13 @@ def test_FinLiborSwaptionQLExample():
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
-    depo = FinLiborDeposit(settlementDate, "1W", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "1W", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "1M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "1M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "3M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "3M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "6M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "6M", 0.0023, depoDCCType)
     depos.append(depo)
 
     # No convexity correction provided so I omit interest rate futures
@@ -250,13 +250,13 @@ def testFinLiborCashSettledSwaption():
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
-    depo = FinLiborDeposit(settlementDate, "1W", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "1W", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "1M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "1M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "3M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "3M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = FinLiborDeposit(settlementDate, "6M", 0.0023, depoDCCType)
+    depo = FinIborDeposit(settlementDate, "6M", 0.0023, depoDCCType)
     depos.append(depo)
 
     # No convexity correction provided so I omit interest rate futures

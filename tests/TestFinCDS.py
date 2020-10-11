@@ -8,10 +8,10 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.market.curves.FinInterpolate import FinInterpTypes
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinLiborCurve import FinLiborCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
@@ -192,19 +192,19 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     settlementDate = valuationDate.addDays(spotDays)
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, m * 0.022009, dcType)
+    depo1 = FinIborDeposit(settlementDate, maturityDate, m * 0.022009, dcType)
 
     maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(settlementDate, maturityDate, m * 0.022138, dcType)
+    depo2 = FinIborDeposit(settlementDate, maturityDate, m * 0.022138, dcType)
 
     maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(settlementDate, maturityDate, m * 0.021810, dcType)
+    depo3 = FinIborDeposit(settlementDate, maturityDate, m * 0.021810, dcType)
 
     maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(settlementDate, maturityDate, m * 0.020503, dcType)
+    depo4 = FinIborDeposit(settlementDate, maturityDate, m * 0.020503, dcType)
 
     maturityDate = settlementDate.addMonths(12)
-    depo5 = FinLiborDeposit(settlementDate, maturityDate, m * 0.019930, dcType)
+    depo5 = FinIborDeposit(settlementDate, maturityDate, m * 0.019930, dcType)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -472,19 +472,19 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     depos = []
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, m * 0.001709, dcType)
+    depo1 = FinIborDeposit(settlementDate, maturityDate, m * 0.001709, dcType)
 
     maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(settlementDate, maturityDate, m * 0.002123, dcType)
+    depo2 = FinIborDeposit(settlementDate, maturityDate, m * 0.002123, dcType)
 
     maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(settlementDate, maturityDate, m * 0.002469, dcType)
+    depo3 = FinIborDeposit(settlementDate, maturityDate, m * 0.002469, dcType)
 
     maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(settlementDate, maturityDate, m * 0.003045, dcType)
+    depo4 = FinIborDeposit(settlementDate, maturityDate, m * 0.003045, dcType)
 
     maturityDate = settlementDate.addMonths(12)
-    depo5 = FinLiborDeposit(settlementDate, maturityDate, m * 0.004449, dcType)
+    depo5 = FinIborDeposit(settlementDate, maturityDate, m * 0.004449, dcType)
 
     depos.append(depo1)
     depos.append(depo2)

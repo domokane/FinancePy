@@ -10,14 +10,14 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.products.libor.FinLiborSwaption import FinSwapTypes
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
+from financepy.products.funding.FinLiborSwaption import FinSwapTypes
+from financepy.products.funding.FinLiborSwaption import FinLiborSwaption
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 
-from financepy.products.libor.FinLiborLMMProducts import FinLiborLMMProducts
+from financepy.products.funding.FinLiborLMMProducts import FinLiborLMMProducts
 
-from financepy.products.libor.FinLiborCapFloor import FinLiborCapFloor
+from financepy.products.funding.FinLiborCapFloor import FinLiborCapFloor
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 

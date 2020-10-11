@@ -7,7 +7,7 @@ import numpy as np
 from financepy.finutils.FinError import FinError
 from financepy.finutils.FinMath import N
 from numba import jit, njit, float64, int64, prange
-from financepy.finutils.FinSobol import getUniformSobol
+from financepy.models.FinSobol import getUniformSobol
 from financepy.finutils.FinMath import norminvcdf
 
 # TO DO: SHITED LOGNORMAL

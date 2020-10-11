@@ -1,4 +1,4 @@
-from financepy.finutils.FinSobol import getUniformSobol, getGaussianSobol
+from financepy.models.FinSobol import getUniformSobol, getGaussianSobol
 
 import time
 from numba import jit

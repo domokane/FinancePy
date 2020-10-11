@@ -14,7 +14,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-class FinLiborFRA(object):
+class FinIborFRA(object):
     ''' Class for managing LIBOR forward rate agreements. A forward rate
     agreement is an agreement to exchange a fixed pre-agreed rate for a
     floating rate linked to LIBOR that is not known until some specified

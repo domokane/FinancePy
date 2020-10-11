@@ -48,7 +48,7 @@ def _g(df, *args):
 ###############################################################################
 
 
-class FinLiborCurve(FinDiscountCurve):
+class FinOISCurve(FinDiscountCurve):
     ''' Constructs a discount curve as implied by the prices of Libor
     deposits, FRAs and IRS. The curve date is the date on which we are
     performing the valuation based on the information available on the
