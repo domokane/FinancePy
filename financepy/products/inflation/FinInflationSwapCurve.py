@@ -49,7 +49,7 @@ def _g(df, *args):
 
 
 class FinInflationSwapCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Libor
+    ''' Constructs a discount curve as implied by the prices of Ibor
     deposits, FRAs and IRS. The curve date is the date on which we are
     performing the valuation based on the information available on the
     curve date. Typically it is the date on which an amount of 1 unit paid
@@ -79,13 +79,13 @@ class FinInflationSwapCurve(FinDiscountCurve):
 
     def __init__(self,
                  valuationDate: FinDate,
-                 liborDeposits: list,
-                 liborFRAs: list,
-                 liborSwaps: list,
+                 iborDeposits: list,
+                 iborFRAs: list,
+                 iborSwaps: list,
                  interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
                  checkRefit: bool = False):  # Set to True to test it works
-        ''' Create an instance of a FinLibor curve given a valuation date and
-        a set of libor deposits, libor FRAs and liborSwaps. Some of these may
+        ''' Create an instance of a FinIbor curve given a valuation date and
+        a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
         linear interpolation for swap rates on coupon dates and to then assume
@@ -98,7 +98,7 @@ class FinInflationSwapCurve(FinDiscountCurve):
         checkArgumentTypes(getattr(self, _funcName(), None), locals())
 
         self._valuationDate = valuationDate
-        self._validateInputs(liborDeposits, liborFRAs, liborSwaps)
+        self._validateInputs(iborDeposits, iborFRAs, iborSwaps)
         self._interpType = interpType
         self._checkRefit = checkRefit
         self._buildCurve()
@@ -115,26 +115,26 @@ class FinInflationSwapCurve(FinDiscountCurve):
 ###############################################################################
 
     def _validateInputs(self,
-                        liborDeposits,
-                        liborFRAs,
-                        liborSwaps):
-        ''' Validate the inputs for each of the Libor products. '''
+                        iborDeposits,
+                        iborFRAs,
+                        iborSwaps):
+        ''' Validate the inputs for each of the Ibor products. '''
 
-        numDepos = len(liborDeposits)
-        numFRAs = len(liborFRAs)
-        numSwaps = len(liborSwaps)
+        numDepos = len(iborDeposits)
+        numFRAs = len(iborFRAs)
+        numSwaps = len(iborSwaps)
 
         if numDepos + numFRAs + numSwaps == 0:
             raise FinError("No calibration instruments.")
 
         # Validation of the inputs.
         if numDepos > 0:
-            for depo in liborDeposits:
+            for depo in iborDeposits:
                 startDt = depo._startDate
                 if startDt < self._valuationDate:
                     raise FinError("First deposit starts before value date.")
 
-            for depo in liborDeposits:
+            for depo in iborDeposits:
                 startDt = depo._startDate
                 endDt = depo._maturityDate
                 if startDt >= endDt:
@@ -142,9 +142,9 @@ class FinInflationSwapCurve(FinDiscountCurve):
 
         # Ensure order of depos
         if numDepos > 1:
-            prevDt = liborDeposits[0]._maturityDate
+            prevDt = iborDeposits[0]._maturityDate
 
-            for depo in liborDeposits[1:]:
+            for depo in iborDeposits[1:]:
                 nextDt = depo._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Deposits must be in increasing maturity")
@@ -152,25 +152,25 @@ class FinInflationSwapCurve(FinDiscountCurve):
 
         # Ensure that valuation date is on or after first deposit start date
         if numDepos > 1:
-            if liborDeposits[0]._startDate > self._valuationDate:
+            if iborDeposits[0]._startDate > self._valuationDate:
                 raise FinError("Valuation date must not be before first deposit settles.")
 
         if numFRAs > 0:
-            for fra in liborFRAs:
+            for fra in iborFRAs:
                 startDt = fra._startDate
                 if startDt <= self._valuationDate:
                     raise FinError("FRAs starts before valuation date")
 
         if numFRAs > 1:
-            prevDt = liborFRAs[0]._maturityDate
-            for fra in liborFRAs[1:]:
+            prevDt = iborFRAs[0]._maturityDate
+            for fra in iborFRAs[1:]:
                 nextDt = fra._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("FRAs must be in increasing maturity")
                 prevDt = nextDt
 
         if numSwaps > 0:
-            for swap in liborSwaps:
+            for swap in iborSwaps:
                 startDt = swap._startDate
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
@@ -178,24 +178,24 @@ class FinInflationSwapCurve(FinDiscountCurve):
         if numSwaps > 1:
 
             # Swaps must all start on the same date for the bootstrap
-            startDt = liborSwaps[0]._startDate
-            for swap in liborSwaps[1:]:
+            startDt = iborSwaps[0]._startDate
+            for swap in iborSwaps[1:]:
                 nextStartDt = swap._startDate
                 if nextStartDt != startDt:
                     raise FinError("Swaps must all have same start date.")
 
             # Swaps must be increasing in tenor/maturity
-            prevDt = liborSwaps[0]._maturityDate
-            for swap in liborSwaps[1:]:
+            prevDt = iborSwaps[0]._maturityDate
+            for swap in iborSwaps[1:]:
                 nextDt = swap._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Swaps must be in increasing maturity")
                 prevDt = nextDt
 
             # Swaps must have same cashflows for bootstrap to work
-            longestSwap = liborSwaps[-1]
+            longestSwap = iborSwaps[-1]
             longestSwapCpnDates = longestSwap._adjustedFixedDates
-            for swap in liborSwaps[0:-1]:
+            for swap in iborSwaps[0:-1]:
                 swapCpnDates = swap._adjustedFixedDates
                 numFlows = len(swapCpnDates)
                 for iFlow in range(0, numFlows):
@@ -211,14 +211,14 @@ class FinInflationSwapCurve(FinDiscountCurve):
         lastFRAMaturityDate = FinDate(1, 1, 1900)
 
         if numDepos > 0:
-            lastDepositMaturityDate = liborDeposits[-1]._maturityDate
+            lastDepositMaturityDate = iborDeposits[-1]._maturityDate
 
         if numFRAs > 0:
-            firstFRAMaturityDate = liborFRAs[0]._maturityDate
-            lastFRAMaturityDate = liborFRAs[-1]._maturityDate
+            firstFRAMaturityDate = iborFRAs[0]._maturityDate
+            lastFRAMaturityDate = iborFRAs[-1]._maturityDate
 
         if numSwaps > 0:
-            firstSwapMaturityDate = liborSwaps[0]._maturityDate
+            firstSwapMaturityDate = iborSwaps[0]._maturityDate
 
         if numDepos > 0 and numFRAs > 0:
             if firstFRAMaturityDate <= lastDepositMaturityDate:
@@ -231,9 +231,9 @@ class FinInflationSwapCurve(FinDiscountCurve):
                 raise FinError("First Swap must mature after last FRA")
 
         # Now determine which instruments are used
-        self._usedDeposits = liborDeposits
-        self._usedFRAs = liborFRAs
-        self._usedSwaps = liborSwaps
+        self._usedDeposits = iborDeposits
+        self._usedFRAs = iborFRAs
+        self._usedSwaps = iborSwaps
         self._dayCountType = None
 
 ###############################################################################
@@ -456,7 +456,7 @@ class FinInflationSwapCurve(FinDiscountCurve):
 ###############################################################################
 
     def _checkRefits(self, depoTol, fraTol, swapTol):
-        ''' Ensure that the Libor curve refits the calibration instruments. '''
+        ''' Ensure that the Ibor curve refits the calibration instruments. '''
         for depo in self._usedDeposits:
             v = depo.value(self._valuationDate, self) / depo._notional
             if abs(v - 1.0) > depoTol:
@@ -484,7 +484,7 @@ class FinInflationSwapCurve(FinDiscountCurve):
 ###############################################################################
 
     def __repr__(self):
-        ''' Print out the details of the Libor curve. '''
+        ''' Print out the details of the Ibor curve. '''
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUATION DATE", self._valuationDate)

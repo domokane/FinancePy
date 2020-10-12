@@ -7,7 +7,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -27,7 +27,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(tradeDate):
+def buildIborCurve(tradeDate):
 
     valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
@@ -91,7 +91,7 @@ def buildLiborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -124,7 +124,7 @@ def test_valueCDSIndex():
 
     # We treat an index as a CDS contract with a flat CDS curve
     tradeDate = FinDate(2006, 2, 7)
-    liborCurve = buildLiborCurve(tradeDate)
+    liborCurve = buildIborCurve(tradeDate)
     issuerCurve = buildIssuerCurve(tradeDate, liborCurve)
     stepInDate = tradeDate.addDays(1)
     valuationDate = stepInDate

@@ -11,7 +11,7 @@ from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
@@ -318,7 +318,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap10)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
     cdsMarketContracts = []
 
@@ -536,7 +536,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap4)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, [], swaps)
+    liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps)
 
     cdsCoupon = 0.01 + mktSpreadBump
 

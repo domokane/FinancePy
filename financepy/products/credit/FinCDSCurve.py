@@ -40,7 +40,7 @@ def f(q, *args):
 
 class FinCDSCurve():
     ''' Generate a survival probability curve implied by the value of CDS
-    contracts given a Libor curve and an assumed recovery rate. A scheme for
+    contracts given a Ibor curve and an assumed recovery rate. A scheme for
     the interpolation of the survival probabilities is also required. '''
 
     def __init__(self,
@@ -51,13 +51,13 @@ class FinCDSCurve():
                  useCache: bool = False,
                  interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
         ''' Construct a credit curve from a sequence of maturity-ordered CDS
-        contracts and a Libor curve using the same recovery rate and the
+        contracts and a Ibor curve using the same recovery rate and the
         same interpolation method. '''
 
         checkArgumentTypes(getattr(self, _funcName(), None), locals())
 
         if valuationDate != liborCurve._valuationDate:
-            raise FinError("Libor curve does not have same valuation date as Issuer curve.")
+            raise FinError("Ibor curve does not have same valuation date as Issuer curve.")
 
         self._valuationDate = valuationDate
         self._cdsContracts = cdsContracts
@@ -129,7 +129,7 @@ class FinCDSCurve():
 ###############################################################################
 
     def df(self, dt):
-        ''' Extract the discount factor from the underlying Libor curve. This
+        ''' Extract the discount factor from the underlying Ibor curve. This
         function supports vectorisation. '''
 
         if isinstance(dt, FinDate):

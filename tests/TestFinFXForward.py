@@ -8,7 +8,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 
 from financepy.finutils.FinDate import FinDate
@@ -52,7 +52,7 @@ def test_FinFXForward():
     depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    forDiscountCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -61,7 +61,7 @@ def test_FinFXForward():
     depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    domDiscountCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
     notional = 100.0
     notionalCurrency = forName

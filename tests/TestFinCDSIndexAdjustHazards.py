@@ -7,7 +7,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -26,7 +26,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(tradeDate):
+def buildIborCurve(tradeDate):
 
     valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
@@ -89,7 +89,7 @@ def buildLiborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -125,7 +125,7 @@ def test_performCDSIndexHazardRateAdjustment():
     stepInDate = tradeDate.addDays(1)
     valuationDate = stepInDate
 
-    liborCurve = buildLiborCurve(tradeDate)
+    liborCurve = buildIborCurve(tradeDate)
 
     maturity3Y = tradeDate.nextCDSDate(36)
     maturity5Y = tradeDate.nextCDSDate(60)
