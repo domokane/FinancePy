@@ -199,7 +199,7 @@ class FinDiscountCurve():
         a swap that has a price of par today. This is the same as a Libor swap
         rate except that we do not do any business day adjustments. '''
 
-        # Note that this function does not call the FinLiborSwap class to
+        # Note that this function does not call the FinIborSwap class to
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 

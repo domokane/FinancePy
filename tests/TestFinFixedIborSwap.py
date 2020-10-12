@@ -8,7 +8,7 @@ import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinLiborCurve import FinLiborCurve
-from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
@@ -22,10 +22,6 @@ from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinSchedule import FinSchedule
-
-import sys
-sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
-from ...products.funding.FinLiborSwap import FinLiborSwap
+from ...products.funding.FinIborSwap import FinIborSwap
 
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
@@ -102,7 +102,7 @@ class FinLiborBermudanSwaption(object):
         floatSpread = 0.0
 
         # The underlying is a swap in which we pay the fixed amount
-        swap = FinLiborSwap(self._exerciseDate,
+        swap = FinIborSwap(self._exerciseDate,
                             self._swapMaturityDate,
                             self._swapType,
                             self._fixedCoupon,

@@ -10,8 +10,8 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 from financepy.products.funding.FinLiborCapFloor import FinLiborCapFloor
-from financepy.products.funding.FinLiborSwap import FinLiborSwap
-from financepy.products.funding.FinLiborSwap import FinSwapTypes
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborSwap import FinSwapTypes
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.products.funding.FinLiborCurve import FinLiborCurve
 
@@ -69,9 +69,9 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swapType = FinSwapTypes.PAYER
 
     swapRate = 0.05
-    swap1 = FinLiborSwap(settlementDate, "1Y", swapType, swapRate, fixedFreq, fixedBasis)
-    swap2 = FinLiborSwap(settlementDate, "3Y", swapType, swapRate, fixedFreq, fixedBasis)
-    swap3 = FinLiborSwap(settlementDate, "5Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap1 = FinIborSwap(settlementDate, "1Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap2 = FinIborSwap(settlementDate, "3Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap3 = FinIborSwap(settlementDate, "5Y", swapType, swapRate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)

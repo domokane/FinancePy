@@ -17,12 +17,12 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinCrossCurrencySwap(object):
+class FinFixedIborCcySwap(object):
     ''' Class for managing a cross currency swap contract. This is a contract
-    in which a fixed or floating payment leg in one currency is exchanged for a
-    series of fixed or floating rates in a second currency. There is an
-    exchange of par. The contract is entered into at zero initial cost and it
-    lasts from a start date to a specified maturity date.
+    in which a fixed payment leg in one currency is exchanged for floating
+    payments in a second currency. There is an exchange of par at maturity.
+    The contract is entered into at zero initial cost and it lasts from a start
+    date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curves (one for each leg) which is separate
@@ -306,7 +306,7 @@ class FinCrossCurrencySwap(object):
                         frequencyType):
         ''' Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinLiborSwaption
+        used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods.'''
 
         m = FinFrequency(frequencyType)

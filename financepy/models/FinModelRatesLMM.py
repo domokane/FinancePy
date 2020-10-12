@@ -6,7 +6,7 @@ import numpy as np
 
 from financepy.finutils.FinError import FinError
 from financepy.finutils.FinMath import N
-from numba import jit, njit, float64, int64, prange
+from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
 from financepy.models.FinSobol import getUniformSobol
 from financepy.finutils.FinMath import norminvcdf
 
@@ -352,7 +352,7 @@ def LMMSimulateFwdsNF(numForwards, numPaths, fwd0, zetas, correl, taus, seed):
     avgg = 0.0
     stdg = 0.0
 
-    for iPath in prange(0, numPaths):
+    for iPath in range(0, numPaths):
 
         # Initial value of forward curve at time 0
         for iFwd in range(0, numForwards):

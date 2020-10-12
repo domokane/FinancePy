@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinLiborSwap(object):
+class FinIborSwap(object):
     ''' Class for managing a Fixed vs IBOR swap contract. This is a contract
     in which a fixed payment leg is exchanged for a series of floating rates
     payments linked to some IBOR index rate. There is no exchange of par.
@@ -309,7 +309,7 @@ class FinLiborSwap(object):
                         frequencyType):
         ''' Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinLiborSwaption
+        used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods.'''
 
         m = FinFrequency(frequencyType)

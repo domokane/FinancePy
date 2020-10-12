@@ -7,8 +7,8 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.products.funding.FinLiborSwaption import FinSwapTypes
-from financepy.products.funding.FinLiborSwaption import FinLiborSwaption
+from financepy.products.funding.FinIborSwaption import FinSwapTypes
+from financepy.products.funding.FinIborSwaption import FinIborSwaption
 from financepy.finutils.FinHelperFunctions import checkVectorDifferences
 
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsNF
@@ -164,8 +164,8 @@ def getForwardCurve(numFwds, r):
 #         notional = 1.0
 
 #         # Pricing a PAYER
-#         swaptionType = FinLiborSwaptionTypes.PAYER
-#         swaption = FinLiborSwaption(settlementDate,
+#         swaptionType = FinIborSwaptionTypes.PAYER
+#         swaption = FinIborSwaption(settlementDate,
 #                                     exerciseDate,
 #                                     maturityDate,
 #                                     swaptionType,

@@ -10,8 +10,8 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.products.funding.FinLiborSwaption import FinSwapTypes
-from financepy.products.funding.FinLiborSwaption import FinLiborSwaption
+from financepy.products.funding.FinIborSwaption import FinSwapTypes
+from financepy.products.funding.FinIborSwaption import FinIborSwaption
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 
@@ -46,10 +46,10 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     swaptionVol = 15.54
 
-#     liborSwaption = FinLiborSwaption(settlementDate,
+#     liborSwaption = FinIborSwaption(settlementDate,
 #                                      exerciseDate,
 #                                      maturityDate,
-#                                      FinLiborSwaptionTypes.PAYER,
+#                                      FinIborSwaptionTypes.PAYER,
 #                                      fixedCoupon,
 #                                      FinFrequencyTypes.ANNUAL,
 #                                      FinDayCountTypes.ACT_360)
@@ -116,8 +116,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #         notional = 1.0
 
 #         # Pricing a PAYER
-#         swaptionType = FinLiborSwaptionTypes.PAYER
-#         swaption = FinLiborSwaption(settlementDate,
+#         swaptionType = FinIborSwaptionTypes.PAYER
+#         swaption = FinIborSwaption(settlementDate,
 #                                     exerciseDate,
 #                                     maturityDate,
 #                                     swaptionType,

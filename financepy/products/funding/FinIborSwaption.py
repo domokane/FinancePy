@@ -24,7 +24,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
-from ...products.funding.FinLiborSwap import FinLiborSwap
+from ...products.funding.FinIborSwap import FinIborSwap
 
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
@@ -41,7 +41,7 @@ from ...finutils.FinGlobalTypes import FinExerciseTypes
 ###############################################################################
 
 
-class FinLiborSwaption():
+class FinIborSwaption():
     ''' This is the class for the European-style swaption, an option to enter
     into a swap (payer or receiver of the fixed coupon), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. '''
@@ -109,7 +109,7 @@ class FinLiborSwaption():
 
         floatSpread = 0.0
 
-        swap = FinLiborSwap(self._exerciseDate,
+        swap = FinIborSwap(self._exerciseDate,
                             self._swapMaturityDate,
                             self._swapType,
                             self._fixedCoupon,
@@ -291,7 +291,7 @@ class FinLiborSwaption():
 
         floatSpread = 0.0
 
-        swap = FinLiborSwap(self._exerciseDate,
+        swap = FinIborSwap(self._exerciseDate,
                             self._swapMaturityDate,
                             self._swapType,
                             self._fixedCoupon,

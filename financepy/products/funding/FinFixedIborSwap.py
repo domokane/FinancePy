@@ -14,7 +14,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 
 ###############################################################################
 # THIS IS A FIXED VERSUS IBOR SWAP 
-# THIS IS DIFFERENT FROM FinLiborSwap as it passes in the schedules. 
+# THIS IS DIFFERENT FROM FinIborSwap as it passes in the schedules. 
 # THE AIM IS TO ALLOW MORE FLEXIBLE SCHEDULE DEFINITION
 # IT SHOULD HAVE THE SAME FUNCTIONALITY FOR THE SAME SCHEDULES
 ###############################################################################
@@ -360,7 +360,7 @@ class FinFixedIborSwap(object):
                         frequencyType: FinFrequencyTypes):
         ''' Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinLiborSwaption
+        used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods.'''
 
         m = FinFrequency(frequencyType)

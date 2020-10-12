@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSIndexOption import FinCDSIndexOption
 from financepy.products.credit.FinCDS import FinCDS
-from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinLiborCurve import FinLiborCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -47,7 +47,7 @@ def buildLiborCurve(tradeDate):
     settlementDate = valuationDate
 
     maturityDate = settlementDate.addMonths(12)
-    swap1 = FinLiborSwap(
+    swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -57,7 +57,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(24)
-    swap2 = FinLiborSwap(
+    swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -67,7 +67,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap2)
 
     maturityDate = settlementDate.addMonths(36)
-    swap3 = FinLiborSwap(
+    swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -77,7 +77,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap3)
 
     maturityDate = settlementDate.addMonths(48)
-    swap4 = FinLiborSwap(
+    swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -87,7 +87,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap4)
 
     maturityDate = settlementDate.addMonths(60)
-    swap5 = FinLiborSwap(
+    swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,

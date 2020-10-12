@@ -12,8 +12,8 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinGlobalTypes import FinExerciseTypes
-from financepy.products.funding.FinLiborSwaption import FinLiborSwaption
-from financepy.products.funding.FinLiborSwap import FinLiborSwap
+from financepy.products.funding.FinIborSwaption import FinIborSwaption
+from financepy.products.funding.FinIborSwap import FinIborSwap
 
 from financepy.products.funding.FinLiborBermudanSwaption import FinLiborBermudanSwaption
 from financepy.models.FinModelBlack import FinModelBlack
@@ -45,7 +45,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                       0.0625,
                                       FinFrequencyTypes.SEMI_ANNUAL)
 
-    fwdPayerSwap = FinLiborSwap(exerciseDate,
+    fwdPayerSwap = FinIborSwap(exerciseDate,
                                 swapMaturityDate,
                                 FinSwapTypes.PAYER,
                                 swapFixedCoupon,
@@ -61,7 +61,7 @@ def test_FinLiborBermudanSwaptionBKModel():
 
     # Now we create the European swaptions
     swapType = FinSwapTypes.PAYER
-    europeanSwaptionPay = FinLiborSwaption(settlementDate,
+    europeanSwaptionPay = FinIborSwaption(settlementDate,
                                            exerciseDate,
                                            swapMaturityDate,
                                            swapType,
@@ -70,7 +70,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                            swapFixedDayCountType)
 
     swapType = FinSwapTypes.RECEIVER
-    europeanSwaptionRec = FinLiborSwaption(settlementDate,
+    europeanSwaptionRec = FinIborSwaption(settlementDate,
                                            exerciseDate,
                                            swapMaturityDate,
                                            swapType,
