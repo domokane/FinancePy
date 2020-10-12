@@ -23,7 +23,7 @@ from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborCurve import FinIborCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinInterpolate import FinInterpTypes
@@ -66,7 +66,7 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -192,7 +192,7 @@ def test_FinIborSwaptionQLExample():
     swap = FinIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, [], swaps,
+    liborCurve = FinIborCurve(settlementDate, depos, [], swaps,
                                FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")
@@ -241,7 +241,7 @@ def test_FinIborSwaptionQLExample():
 ###############################################################################
 
 
-def testFinLiborCashSettledSwaption():
+def testFinIborCashSettledSwaption():
 
     testCases.header("LABEL", "VALUE")
 
@@ -293,7 +293,7 @@ def testFinLiborCashSettledSwaption():
     swap = FinIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    liborCurve = FinLiborCurve(valuationDate, depos, [], swaps,
+    liborCurve = FinIborCurve(valuationDate, depos, [], swaps,
                                FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")
@@ -670,7 +670,7 @@ def testFinIborSwaptionMatlabExamples():
 
 
 testFinIborSwaptionModels()
-testFinLiborCashSettledSwaption()
+testFinIborCashSettledSwaption()
 testFinIborSwaptionMatlabExamples()
 test_FinIborSwaptionQLExample()
 

@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
@@ -15,9 +15,9 @@ from financepy.products.funding.FinIborSwaption import FinIborSwaption
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 
-from financepy.products.funding.FinLiborLMMProducts import FinLiborLMMProducts
+from financepy.products.funding.FinIborLMMProducts import FinIborLMMProducts
 
-from financepy.products.funding.FinLiborCapFloor import FinLiborCapFloor
+from financepy.products.funding.FinIborCapFloor import FinIborCapFloor
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -161,9 +161,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     capVol = 15.54
 
-#     liborCap = FinLiborCapFloor(settlementDate,
+#     liborCap = FinIborCapFloor(settlementDate,
 #                                 capMaturityDate,
-#                                 FinLiborCapFloorTypes.CAP,
+#                                 FinIborCapFloorTypes.CAP,
 #                                 capFloorRate,
 #                                 None,
 #                                 FinFrequencyTypes.ANNUAL,
@@ -176,7 +176,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # LMM VALUATION
 #     ###########################################################################
 
-#     lmmProducts = FinLiborLMMProducts(settlementDate,
+#     lmmProducts = FinIborLMMProducts(settlementDate,
 #                                       capMaturityDate,
 #                                       frequencyType,
 #                                       dayCountType)
@@ -199,7 +199,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolatilities = np.array(capVolatilities)/100.0
 
 #     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
-#     volCurve = FinLiborCapVolCurve(valuationDate,
+#     volCurve = FinIborCapVolCurve(valuationDate,
 #                                    capVolDates,
 #                                    capVolatilities,
 #                                    dayCountType)
@@ -225,7 +225,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #         v_lmm = lmmProducts.valueCapFloor(settlementDate,
 #                                           capMaturityDate,
-#                                           FinLiborCapFloorTypes.CAP,
+#                                           FinIborCapFloorTypes.CAP,
 #                                           capFloorRate,
 #                                           FinFrequencyTypes.ANNUAL,
 #                                           FinDayCountTypes.ACT_360)

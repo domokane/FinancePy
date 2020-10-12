@@ -16,7 +16,7 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 ##########################################################################
 
 
-class FinLiborConventions():
+class FinIborConventions():
 
     def __init__(self,
                  currencyName: str,

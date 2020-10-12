@@ -8,7 +8,7 @@
 * Equities - Convertible bond model  - check credit modelling - testing
 
 ## MEDIUM PRIORITY
-Calibration framework for Libor and Equity derivatives
+Calibration framework for Ibor and Equity derivatives
 
 Equities - American Vanilla option approximations
 Equities - SABR model
@@ -30,21 +30,21 @@ FX - Barrier bending
 FX - Breedon-Litzenburger implied distribution of terminal stock price
 FX - Heston model
 
-Libor - Implement G2++ rate model
-Libor - Implement CIR model
-Libor - Shifted Vasicek Tree
-Libor - Shifted BDT tree
-Libor - Shifted BK Tree
-Libor - Shifted CIR Tree
-Libor - Add OIS product to the library
-Libor - Add OIS to the Libor curve construction
-Libor - Swaption surface object
-Libor - Cap floor curve object
-Libor - BGM with swaption and cap/floor calibration
-Libor - Bermudan Swaption pricing and risk using Andersen approach
-Libor - Bermudan Swaption pricing and risk using LS approach
-Libor - Range Accruals using BGM
-Libor - Extend swaption pricing to the two curve approach
+Ibor - Implement G2++ rate model
+Ibor - Implement CIR model
+Ibor - Shifted Vasicek Tree
+Ibor - Shifted BDT tree
+Ibor - Shifted BK Tree
+Ibor - Shifted CIR Tree
+Ibor - Add OIS product to the library
+Ibor - Add OIS to the Ibor curve construction
+Ibor - Swaption surface object
+Ibor - Cap floor curve object
+Ibor - BGM with swaption and cap/floor calibration
+Ibor - Bermudan Swaption pricing and risk using Andersen approach
+Ibor - Bermudan Swaption pricing and risk using LS approach
+Ibor - Range Accruals using BGM
+Ibor - Extend swaption pricing to the two curve approach
 
 Inflation - Inflation Derivative - zeros and swaps using appropriate adjustments
 Inflation - Building an inflation curve
@@ -60,10 +60,10 @@ Models - Test Heston Model
 
 
 ## DONE
-Libor - Extend swap pricing to two curve approach
+Ibor - Extend swap pricing to two curve approach
 Equities - Add term structure of interest rates to all models so that full discount curve is respected.
 Notebooks- Add Disclaimer
-Libor - Cap and floor pricing and risk
+Ibor - Cap and floor pricing and risk
 Models - Sobol sequences implementation
 Equities - Cliquets
 FX - Fitting the skew parametrically
@@ -73,7 +73,7 @@ FX - Digital FX options
 FX - FX One-touch
 FX - FX Barriers
 FX - Calibrating to volatility smile (RR and MS)
-Libor - Add IR futures to the Libor curve construction
+Ibor - Add IR futures to the Ibor curve construction
 Bonds - Options on Bonds using Jamshidian
 Bonds - Options on Bonds using Hull-White
 Bonds - American Callable fixed coupon bonds using HW
@@ -82,4 +82,4 @@ Bonds - American Callable/Puttable fixed coupon bonds using HW
 Bonds - American Callable/Puttable floating coupon bonds using HW
 Curves - B splines
 Models - Hull-White Trinomial Tree
-Libor - European Swaption pricing and risk
+Ibor - European Swaption pricing and risk

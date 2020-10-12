@@ -17,12 +17,12 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinFixedIborCcySwap(object):
+class FinIborIborXCcySwap(object):
     ''' Class for managing a cross currency swap contract. This is a contract
-    in which a fixed payment leg in one currency is exchanged for floating
-    payments in a second currency. There is an exchange of par at maturity.
-    The contract is entered into at zero initial cost and it lasts from a start
-    date to a specified maturity date.
+    in which a fixed or floating payment leg in one currency is exchanged for a
+    series of fixed or floating rates in a second currency. There is an
+    exchange of par. The contract is entered into at zero initial cost and it
+    lasts from a start date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curves (one for each leg) which is separate

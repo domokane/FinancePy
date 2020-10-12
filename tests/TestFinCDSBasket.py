@@ -8,7 +8,7 @@ from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSBasket import FinCDSBasket
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborCurve import FinIborCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -31,7 +31,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(tradeDate):
+def buildIborCurve(tradeDate):
 
     valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
@@ -94,7 +94,7 @@ def buildLiborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -185,7 +185,7 @@ def test_FinCDSBasket():
     stepInDate = tradeDate.addDays(1)
     valuationDate = tradeDate.addDays(1)
 
-    liborCurve = buildLiborCurve(tradeDate)
+    liborCurve = buildIborCurve(tradeDate)
 
     basketMaturity = FinDate(2011, 12, 20)
 

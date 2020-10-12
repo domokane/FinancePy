@@ -227,7 +227,7 @@ class FinBond(object):
                   convention: FinYTMCalcType):
         ''' Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
-        future Libor rates. '''
+        future Ibor rates. '''
 
         fullPrice = self.fullPriceFromYTM(settlementDate, y, convention)
 
@@ -467,15 +467,15 @@ class FinBond(object):
             swapFloatBusDayAdjustRuleType=FinBusDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=FinDateGenRuleTypes.BACKWARD):
         ''' Calculate the par asset swap spread of the bond. The discount curve
-        is a Libor curve that is passed in. This function is vectorised with
+        is a Ibor curve that is passed in. This function is vectorised with
         respect to the clean price. '''
 
         cleanPrice = np.array(cleanPrice)
         self.calcAccruedInterest(settlementDate)
         accruedAmount = self._accruedInterest * self._par / self._faceAmount
         bondPrice = cleanPrice + accruedAmount
-        # Calculate the price of the bond discounted on the Libor curve
-        pvLibor = 0.0
+        # Calculate the price of the bond discounted on the Ibor curve
+        pvIbor = 0.0
         prevDate = self._pcd
 
         for dt in self._flowDates[1:]:
@@ -483,9 +483,9 @@ class FinBond(object):
             # coupons paid on a settlement date are included
             if dt >= settlementDate:
                 df = discountCurve.df(dt)
-                pvLibor += df * self._coupon / self._frequency
+                pvIbor += df * self._coupon / self._frequency
 
-        pvLibor += df * self._redemption
+        pvIbor += df * self._redemption
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the coupon starts accruing on the settlement date
@@ -507,7 +507,7 @@ class FinBond(object):
             pv01 = pv01 + yearFrac * df
             prevDate = dt
 
-        asw = (pvLibor - bondPrice/self._par) / pv01
+        asw = (pvIbor - bondPrice/self._par) / pv01
         return asw
 
 ###############################################################################
@@ -530,7 +530,7 @@ class FinBond(object):
             if dt >= settlementDate:
                 t = (dt - settlementDate) / gDaysInYear
                 df = discountCurve.df(dt)
-                # determine the Libor implied zero rate
+                # determine the Ibor implied zero rate
                 r = f * (np.power(df, -1.0 / t / f) - 1.0)
                 # determine the OAS adjusted zero rate
                 df_adjusted = np.power(1.0 + (r + oas)/f, -t * f)

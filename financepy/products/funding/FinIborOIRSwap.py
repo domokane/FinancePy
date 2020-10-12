@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinLiborBasisSwap(object):
+class FinIborOIRSwap(object):
     ''' Class for managing an interest rate basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment in a different LIBOR tenor. There is no exchange of
@@ -40,7 +40,7 @@ class FinLiborBasisSwap(object):
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create a Libor basis swap contract giving the contract start
+        ''' Create a Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating 
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
@@ -119,7 +119,7 @@ class FinLiborBasisSwap(object):
               recFirstFixingRate=None,
               principal=0.0):
 
-        ''' Value the LIBOR basis swap on a value date given a single Libor
+        ''' Value the LIBOR basis swap on a value date given a single Ibor
         discount curve and each of the index curves for the two floating legs
         of the swap. '''
 

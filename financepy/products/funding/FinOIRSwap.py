@@ -28,7 +28,7 @@ class FinCompoundingTypes(Enum):
 ###############################################################################
 
 
-class FinOISwap(object):
+class FinOIRSwap(object):
     ''' Class for managing overnight index swaps (OIS) and Fed Funds swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate. There is no exchange of par.

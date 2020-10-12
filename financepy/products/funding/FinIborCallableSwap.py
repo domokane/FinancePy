@@ -51,7 +51,7 @@
 # ###############################################################################
 
 
-# class FinLiborBermudanSwaption(object):
+# class FinIborBermudanSwaption(object):
 #     ''' Class for fixed coupon bonds with embedded call or put optionality. '''
 
 #     def __init__(self,

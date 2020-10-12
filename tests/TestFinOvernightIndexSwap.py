@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinOISwap import FinOISwap
+from financepy.products.funding.FinOIRSwap import FinOIRSwap
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -38,7 +38,7 @@ def test_OIS():
     floatDayCount = FinDayCountTypes.ACT_360
     notional = ONE_MILLION
 
-    ois = FinOISwap(startDate,
+    ois = FinOIRSwap(startDate,
                                 endDate,
                                 swapType,
                                 oisRate,
