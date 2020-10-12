@@ -17,12 +17,12 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 ##########################################################################
 
 
-class FinLiborCapVolCurve():
+class FinIborCapVolCurve():
     ''' Class to manage a term structure of cap (flat) volatilities and to
     do the conversion to caplet (spot) volatilities. This does not manage a
     strike dependency, only a term structure. The cap and caplet volatilies
     are keyed off the cap and caplet maturity dates. However this volatility
-    only applies to the evolution of the Libor rate out to the caplet start
+    only applies to the evolution of the Ibor rate out to the caplet start
     dates. Note also that this class also handles floor vols.'''
 
     def __init__(self,
@@ -103,7 +103,7 @@ class FinLiborCapVolCurve():
         fwdRateVol = self._capSigmas[0]
         self._capletGammas = np.zeros(numCaps)
         self._capletGammas[0] = 0.0
-        cumLibor2Tau = (fwdRateVol**2) * self._taus[0]
+        cumIbor2Tau = (fwdRateVol**2) * self._taus[0]
 
         sumTau = 0.0
         for i in range(1, len(self._capMaturityDates)):
@@ -111,14 +111,14 @@ class FinLiborCapVolCurve():
             tau = self._taus[i]
             sumTau += tau
             volCap = self._capSigmas[i]
-            volLibor2 = ((volCap**2) * sumTau - cumLibor2Tau) / tau
+            volIbor2 = ((volCap**2) * sumTau - cumIbor2Tau) / tau
 
-            if volLibor2 < 0.0:
+            if volIbor2 < 0.0:
                 raise FinError("Error due to negative caplet variance.")
 
-            volLibor = np.sqrt(volLibor2)
-            self._capletGammas[i] = volLibor
-            cumLibor2Tau += volLibor2 * self._taus[i]
+            volIbor = np.sqrt(volIbor2)
+            self._capletGammas[i] = volIbor
+            cumIbor2Tau += volIbor2 * self._taus[i]
 
 ###############################################################################
 
@@ -189,9 +189,9 @@ class FinLiborCapVolCurve():
             t = self._times[i]
             tau = self._taus[i]
             volCap = self._capSigmas[i]
-            fwdLiborVol = self._capletVols[i]
+            fwdIborVol = self._capletVols[i]
             s += labelToString("%7.4f  %6.4f  %9.4f  %9.4f"
-                               % (t, tau, volCap*100.0, fwdLiborVol*100.0))
+                               % (t, tau, volCap*100.0, fwdIborVol*100.0))
 
         return s
 

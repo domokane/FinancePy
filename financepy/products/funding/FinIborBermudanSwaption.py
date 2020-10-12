@@ -30,7 +30,7 @@ from ...models.FinModelSABRShifted import FinModelSABRShifted
 ###############################################################################
 
 
-class FinLiborBermudanSwaption(object):
+class FinIborBermudanSwaption(object):
     ''' This is the class for the Bermudan-style swaption, an option to enter
     into a swap (payer or receiver of the fixed coupon), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. This swaption

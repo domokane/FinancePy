@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time as time
-from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
@@ -73,7 +73,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
-    volCurve = FinLiborCapVolCurve(valuationDate,
+    volCurve = FinIborCapVolCurve(valuationDate,
                                    capVolDates,
                                    capVolatilities,
                                    dayCountType)

@@ -32,7 +32,7 @@ from ...finutils.FinGlobalTypes import FinCapFloorTypes, FinOptionTypes
 
 from enum import Enum
 
-class FinLiborCapFloorModelTypes(Enum):
+class FinIborCapFloorModelTypes(Enum):
     BLACK = 1
     SHIFTED_BLACK = 2
     SABR = 3
@@ -40,11 +40,11 @@ class FinLiborCapFloorModelTypes(Enum):
 ##########################################################################
 
 
-class FinLiborCapFloor():
-    ''' Class for Caps and Floors. These are contracts which observe a Libor
+class FinIborCapFloor():
+    ''' Class for Caps and Floors. These are contracts which observe a Ibor
     reset L on a future start date and then make a payoff at the end of the
-    Libor period which is Max[L-K,0] for a cap and Max[K-L,0] for a floor.
-    This is then day count adjusted for the Libor period and then scaled by
+    Ibor period which is Max[L-K,0] for a cap and Max[K-L,0] for a floor.
+    This is then day count adjusted for the Ibor period and then scaled by
     the contract notional to produce a valuation. A number of models can be
     selected from.'''
 
@@ -60,7 +60,7 @@ class FinLiborCapFloor():
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Initialise FinLiborCapFloor object. '''
+        ''' Initialise FinIborCapFloor object. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -113,7 +113,7 @@ class FinLiborCapFloor():
 
     def value(self, valuationDate, liborCurve, model):
         ''' Value the cap or floor using the chosen model which specifies
-        the volatility of the Libor rate to the cap start date. '''
+        the volatility of the Ibor rate to the cap start date. '''
 
         self._valuationDate = valuationDate
         self._generateDates()

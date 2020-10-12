@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinCrossCurrencySwap(object):
+class FinFixedFixedXCcySwap(object):
     ''' Class for managing a cross currency swap contract. This is a contract
     in which a fixed or floating payment leg in one currency is exchanged for a
     series of fixed or floating rates in a second currency. There is an
@@ -124,7 +124,7 @@ class FinCrossCurrencySwap(object):
               indexCurve,
               firstFixingRate=None,
               principal=0.0):
-        ''' Value the interest rate swap on a value date given a single Libor
+        ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
 
         fixedLegValue = self.fixedLegValue(valuationDate,

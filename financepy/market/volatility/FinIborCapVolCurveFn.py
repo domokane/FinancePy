@@ -13,7 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 ##########################################################################
 
 
-class FinLiborCapVolCurveFn():
+class FinIborCapVolCurveFn():
     ''' Class to manage a term structure of caplet volatilities using the
     parametric form suggested by Rebonato (1999). '''
 

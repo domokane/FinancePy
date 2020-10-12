@@ -38,13 +38,13 @@ from ...finutils.FinGlobalTypes import FinExerciseTypes
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinGlobalTypes import FinCapFloorTypes
 
-from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 
 ###############################################################################
 
 
-class FinLiborLMMProducts():
-    ''' This is the class for pricing Libor products using the LMM. '''
+class FinIborLMMProducts():
+    ''' This is the class for pricing Ibor products using the LMM. '''
 
     def __init__(self,
                  settlementDate: FinDate,
@@ -64,7 +64,7 @@ class FinLiborLMMProducts():
         if settlementDate > maturityDate:
             raise FinError("Settlement date must be before maturity date")
 
-        ''' Set up the grid for the Libor rates that are to be simulated. These
+        ''' Set up the grid for the Ibor rates that are to be simulated. These
         must be consistent with the floating rate leg of the product that is to
         be priced. '''
 
@@ -102,13 +102,13 @@ class FinLiborLMMProducts():
 
     def simulate1F(self,
                    discountCurve,
-                   volCurve: FinLiborCapVolCurve,
+                   volCurve: FinIborCapVolCurve,
                    numPaths: int = 1000,
                    numeraireIndex: int = 0,
                    useSobol: bool = True,
                    seed: int = 42):
         ''' Run the one-factor simulation of the evolution of the forward
-        Libors to generate and store all of the Libor forward rate paths. '''
+        Ibors to generate and store all of the Ibor forward rate paths. '''
 
         if numPaths < 2 or numPaths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
@@ -159,7 +159,7 @@ class FinLiborLMMProducts():
                    numeraireIndex: int = 0,
                    useSobol: bool = True,
                    seed: int = 42):
-        ''' Run the simulation to generate and store all of the Libor forward
+        ''' Run the simulation to generate and store all of the Ibor forward
         rate paths. This is a multi-factorial version so the user must input
         a numpy array consisting of a column for each factor and the number of
         rows must equal the number of grid times on the underlying simulation
@@ -213,14 +213,14 @@ class FinLiborLMMProducts():
 
     def simulateNF(self,
                    discountCurve,
-                   volCurve: FinLiborCapVolCurve,
+                   volCurve: FinIborCapVolCurve,
                    correlationMatrix: np.ndarray,
                    modelType: FinRateModelLMMModelTypes,
                    numPaths: int = 1000,
                    numeraireIndex: int = 0,
                    useSobol: bool = True,
                    seed: int = 42):
-        ''' Run the simulation to generate and store all of the Libor forward
+        ''' Run the simulation to generate and store all of the Ibor forward
         rate paths using a full factor reduction of the fwd-fwd correlation
         matrix using Cholesky decomposition.'''
 
@@ -290,7 +290,7 @@ class FinLiborLMMProducts():
         ''' Value a swaption in the LMM model using simulated paths of the
         forward curve. This relies on pricing the fixed leg of the swap and
         assuming that the floating leg will be worth par. As a result we only
-        need simulate Libors with the frequency of the fixed leg. '''
+        need simulate Ibors with the frequency of the fixed leg. '''
 
         # Note that the simulation time steps run all the way out to the last
         # forward rate. However we only really need the forward rates at the

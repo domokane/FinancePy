@@ -28,8 +28,8 @@ class FinCompoundingTypes(Enum):
 ###############################################################################
 
 
-class FinOISwap(object):
-    ''' Class for managing overnight index swaps (OIS) and Fed Funds swaps. 
+class FinOIRSwap(object):
+    ''' Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate. There is no exchange of par.
     The contract is entered into at zero initial cost.
@@ -46,11 +46,12 @@ class FinOISwap(object):
 
     In its simplest form, there is just one fixed rate payment and one floating
     rate payment at contract maturity. However when the contract becomes longer
-    than one year the floating and fixed payments become periodic.
+    than one year the floating and fixed payments become periodic, usually with
+    annual exchanges of cash.
 
-    The value of the contract is the NPV of the two coupon streams.
-    Discounting is done on a supplied OIS curve which is itself implied by
-    the term structure of market OIS rates. '''
+    The value of the contract is the NPV of the two coupon streams. Discounting
+    is done on the OIS curve which is itself implied by the term structure of
+    market OIS rates. '''
 
     def __init__(self,
                  startDate: FinDate,

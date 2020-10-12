@@ -1,5 +1,5 @@
 from .FinEquityVolCurve import *
 from .FinFXVolSurface import *
-from .FinLiborCapVolCurve import *
+from .FinIborCapVolCurve import *
 
 

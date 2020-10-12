@@ -15,7 +15,7 @@ from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborCurve import FinIborCurve
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBond import FinYTMCalcType
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
@@ -25,7 +25,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(valueDate):
+def buildIborCurve(valueDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -172,7 +172,7 @@ def buildLiborCurve(valueDate):
         fixedDCCType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborCurve(settlementDate,
+    liborCurve = FinIborCurve(settlementDate,
                                depos,
                                fras,
                                swaps)
@@ -292,7 +292,7 @@ def test_FinBond():
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
     # When the libor curve is the Libor curve then the ASW is positive
-    liborCurve = buildLiborCurve(settlementDate)
+    liborCurve = buildIborCurve(settlementDate)
     asw = bond.assetSwapSpread(settlementDate, cleanPrice, liborCurve)
     oas = bond.optionAdjustedSpread(settlementDate, cleanPrice, liborCurve)
     testCases.print("Discounted on LIBOR Curve ASW:", asw * 10000)

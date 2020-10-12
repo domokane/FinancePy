@@ -7,7 +7,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborCurve import FinIborCurve
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 from financepy.products.funding.FinIborFRA import FinIborFRA
@@ -28,7 +28,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def buildLiborCurve(valuationDate):
+def buildIborCurve(valuationDate):
 
     settlementDate = valuationDate.addDays(2)
     dcType = FinDayCountTypes.ACT_360
@@ -346,7 +346,7 @@ def buildLiborCurve(valuationDate):
                               floatLegDates, dcType)
     swaps.append(swap19)
     
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 
@@ -413,7 +413,7 @@ def test_LiborSwap():
 
     valuationDate = FinDate(30, 11, 2018)
     settlementDate = valuationDate.addDays(2)
-    liborCurve = buildLiborCurve(valuationDate)
+    liborCurve = buildIborCurve(valuationDate)
     v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
 
     v_bbg = 388147.0

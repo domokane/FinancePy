@@ -21,18 +21,18 @@ class FinIborFRA(object):
     future fixing date. The FRA payment occurs on or soon after this date
     on the FRA settlement date. Typically the timing gap is two days.
 
-    A FRA is used to hedge a Libor quality loan or lend of some agreed
+    A FRA is used to hedge a Ibor quality loan or lend of some agreed
     notional amount. This period starts on the settlement date of the
     FRA and ends on the maturity date of the FRA. For example a 1x4 FRA
-    relates to a Libor starting in 1 month for a loan period ending in 4
-    months. Hence it links to 3-month Libor rate. The amount received by a 
+    relates to a Ibor starting in 1 month for a loan period ending in 4
+    months. Hence it links to 3-month Ibor rate. The amount received by a 
     payer of fixed rate at settlement is:
 
-        acc(1,2) * (Libor(1,2) - FRA RATE) / (1 + acc(0,1) x Libor(0,1))
+        acc(1,2) * (Ibor(1,2) - FRA RATE) / (1 + acc(0,1) x Ibor(0,1))
 
     So the value at time 0 is
 
-        acc(1,2) * (FWD Libor(1,2) - FRA RATE) x df(0,2)
+        acc(1,2) * (FWD Ibor(1,2) - FRA RATE) x df(0,2)
 
     If the base date of the curve is before the value date then we
     forward adjust this amount to that value date. For simplicity I have
@@ -41,7 +41,7 @@ class FinIborFRA(object):
 
     def __init__(self,
                  startDate: FinDate,  # The date the FRA starts to accrue
-                 maturityDateOrTenor: (FinDate, str),  # End of the Libor rate period
+                 maturityDateOrTenor: (FinDate, str),  # End of the Ibor rate period
                  fraRate: float,  # The fixed contractual FRA rate
                  dayCountType: FinDayCountTypes,  # For interest period
                  notional: float = 100.0,
@@ -78,7 +78,7 @@ class FinIborFRA(object):
     def value(self, valuationDate, liborCurve):
         ''' Determine mark to market value of a FRA contract based on the
         market FRA rate. The same curve is used for calculating the forward
-        Libor and for doing discounting on the expected forward payment. '''
+        Ibor and for doing discounting on the expected forward payment. '''
 
         dc = FinDayCount(self._dayCountType)
         accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
@@ -111,7 +111,7 @@ class FinIborFRA(object):
     ###########################################################################
 
     def printFlows(self, valuationDate):
-        ''' Determine the value of the Deposit given a Libor curve. '''
+        ''' Determine the value of the Deposit given a Ibor curve. '''
 
         flow_settle = self._notional
         dc = FinDayCount(self._dayCountType)

@@ -127,7 +127,7 @@ class FinIborSwap(object):
               indexCurve,
               firstFixingRate=None,
               principal=0.0):
-        ''' Value the interest rate swap on a value date given a single Libor
+        ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
 
         fixedLegValue = self.fixedLegValue(valuationDate,

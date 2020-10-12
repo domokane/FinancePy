@@ -9,11 +9,11 @@ import numpy as np
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
-from financepy.products.funding.FinLiborCapFloor import FinLiborCapFloor
+from financepy.products.funding.FinIborCapFloor import FinIborCapFloor
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinIborSwap import FinSwapTypes
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborCurve import FinIborCurve
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -38,7 +38,7 @@ from financepy.models.FinModelRatesHW import FinModelRatesHW
 
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 
-from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinSchedule import FinSchedule
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -77,14 +77,14 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
 
     return liborCurve
 
 ##########################################################################
 
 
-def test_FinLiborCapFloor():
+def test_FinIborCapFloor():
 
     todayDate = FinDate(20, 6, 2019)
     valuationDate = todayDate
@@ -113,7 +113,7 @@ def test_FinLiborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
-        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        capfloor = FinIborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
@@ -127,7 +127,7 @@ def test_FinLiborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        capfloor = FinIborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
@@ -145,7 +145,7 @@ def test_FinLiborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
-        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        capfloor = FinIborCapFloor(startDate, maturityDate, capFloorType, k)
         cvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         cvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         cvalue3 = capfloor.value(valuationDate, liborCurve, model3)
@@ -154,7 +154,7 @@ def test_FinLiborCapFloor():
         cvalue6 = capfloor.value(valuationDate, liborCurve, model6)
 
         capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = FinLiborCapFloor(startDate, maturityDate, capFloorType, k)
+        capfloor = FinIborCapFloor(startDate, maturityDate, capFloorType, k)
         fvalue1 = capfloor.value(valuationDate, liborCurve, model1)
         fvalue2 = capfloor.value(valuationDate, liborCurve, model2)
         fvalue3 = capfloor.value(valuationDate, liborCurve, model3)
@@ -175,7 +175,7 @@ def test_FinLiborCapFloor():
 ###############################################################################
 
 
-def test_FinLiborCapFloorVolCurve():
+def test_FinIborCapFloorVolCurve():
     ''' Aim here is to price cap and caplets using cap and caplet vols and to
     demonstrate they are the same - NOT SURE THAT HULLS BOOKS FORMULA WORKS FOR
     OPTIONS. '''
@@ -188,7 +188,7 @@ def test_FinLiborCapFloorVolCurve():
 
     k = 0.04
     capFloorType = FinCapFloorTypes.CAP
-    capFloor = FinLiborCapFloor(valuationDate,
+    capFloor = FinIborCapFloor(valuationDate,
                                 maturityDate,
                                 capFloorType,
                                 k,
@@ -217,7 +217,7 @@ def test_FinLiborCapFloorVolCurve():
     capVolatilities = np.array(capVolatilities)/100.0
     capVolatilities[0] = 0.0
 
-    volCurve = FinLiborCapVolCurve(valuationDate,
+    volCurve = FinIborCapVolCurve(valuationDate,
                                    capVolDates,
                                    capVolatilities,
                                    dayCountType)
@@ -259,7 +259,7 @@ def test_FinLiborCapFloorVolCurve():
 ###############################################################################
 
 
-def test_FinLiborCapletHull():
+def test_FinIborCapletHull():
 
     #  Hull Page 703, example 29.3
     todayDate = FinDate(20, 6, 2019)
@@ -272,7 +272,7 @@ def test_FinLiborCapletHull():
 
     k = 0.08
     capFloorType = FinCapFloorTypes.CAP
-    capFloor = FinLiborCapFloor(valuationDate,
+    capFloor = FinIborCapFloor(valuationDate,
                                 maturityDate,
                                 capFloorType,
                                 k,
@@ -301,7 +301,7 @@ def test_FinLiborCapletHull():
 ###############################################################################
 
 
-def test_FinLiborCapFloorQLExample():
+def test_FinIborCapFloorQLExample():
 
     valuationDate = FinDate(14, 6, 2016)
 
@@ -337,7 +337,7 @@ def test_FinLiborCapFloorQLExample():
     optionType = FinCapFloorTypes.CAP
     strikeRate = 0.02
 
-    cap = FinLiborCapFloor(startDate, endDate, optionType, strikeRate,
+    cap = FinIborCapFloor(startDate, endDate, optionType, strikeRate,
                            lastFixing, frequencyType,  dayCountType, notional,
                            calendarType, busDayAdjustType, dateGenRuleType)
 
@@ -356,8 +356,8 @@ def test_FinLiborCapFloorQLExample():
 ###############################################################################
 
 
-test_FinLiborCapletHull()
-test_FinLiborCapFloorVolCurve()
-test_FinLiborCapFloor()
-test_FinLiborCapFloorQLExample()
+test_FinIborCapletHull()
+test_FinIborCapFloorVolCurve()
+test_FinIborCapFloor()
+test_FinIborCapFloorQLExample()
 testCases.compareTestCases()

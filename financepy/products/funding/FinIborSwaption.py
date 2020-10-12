@@ -64,7 +64,7 @@ class FinIborSwaption():
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
         floating leg payment schedules. Bermudan style swaption should be
-        priced using the FinLiborBermudanSwaption class. '''
+        priced using the FinIborBermudanSwaption class. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -101,7 +101,7 @@ class FinIborSwaption():
               valuationDate,
               discountCurve,
               model):
-        ''' Valuation of a Libor European-style swaption using a choice of
+        ''' Valuation of a Ibor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
         FinModelBlackShifted, FinModelSABR, FinModelSABRShifted, FinModelHW,
         FinModelBK and FinModelBDT. The last two involved a tree-based
@@ -283,7 +283,7 @@ class FinIborSwaption():
                          discountCurve,
                          swapRate: float,
                          model):
-        ''' Valuation of a Libor European-style swaption using a cash settled
+        ''' Valuation of a Ibor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
         discounts all of the future payments at a flat swap rate. Note that the
         Black volatility for this valuation should in general not equal the

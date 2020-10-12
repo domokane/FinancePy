@@ -15,7 +15,7 @@ from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 from financepy.products.funding.FinIborSwaption import FinIborSwaption
 from financepy.products.funding.FinIborSwap import FinIborSwap
 
-from financepy.products.funding.FinLiborBermudanSwaption import FinLiborBermudanSwaption
+from financepy.products.funding.FinIborBermudanSwaption import FinIborBermudanSwaption
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesHW import FinModelRatesHW
@@ -28,7 +28,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def test_FinLiborBermudanSwaptionBKModel():
+def test_FinIborBermudanSwaptionBKModel():
     ''' Replicate examples in paper by Leif Andersen which can be found at
     file:///C:/Users/Dominic/Downloads/SSRN-id155208.pdf '''
 
@@ -169,7 +169,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -181,7 +181,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.RECEIVER
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -231,7 +231,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -243,7 +243,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.RECEIVER
     exerciseType = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -340,7 +340,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -350,7 +350,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinSwapTypes.RECEIVER
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -398,7 +398,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -408,7 +408,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinSwapTypes.RECEIVER
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -505,7 +505,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -515,7 +515,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinSwapTypes.RECEIVER
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -562,7 +562,7 @@ def test_FinLiborBermudanSwaptionBKModel():
     swapType = FinSwapTypes.PAYER
     exerciseType = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionPay = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -572,7 +572,7 @@ def test_FinLiborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     swapType = FinSwapTypes.RECEIVER
-    bermudanSwaptionRec = FinLiborBermudanSwaption(settlementDate,
+    bermudanSwaptionRec = FinIborBermudanSwaption(settlementDate,
                                                    exerciseDate,
                                                    swapMaturityDate,
                                                    swapType,
@@ -617,6 +617,6 @@ def test_FinLiborBermudanSwaptionBKModel():
 ##########################################################################
 
 
-test_FinLiborBermudanSwaptionBKModel()
+test_FinIborBermudanSwaptionBKModel()
 
 testCases.compareTestCases()
