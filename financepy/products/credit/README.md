@@ -7,4 +7,8 @@ This folder contains a set of credit-related assets ranging from CDS to CDS opti
 
 
 ### FinCDSCurve
+<<<<<<< HEAD
 This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinIborSingleCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
+=======
+This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinIborCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
+>>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710

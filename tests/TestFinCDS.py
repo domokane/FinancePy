@@ -318,7 +318,11 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap10)
 
+<<<<<<< HEAD
     liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+=======
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
+>>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710
 
     cdsMarketContracts = []
 
@@ -536,7 +540,11 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap4)
 
+<<<<<<< HEAD
     liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps)
+=======
+    liborCurve = FinIborCurve(settlementDate, depos, [], swaps)
+>>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710
 
     cdsCoupon = 0.01 + mktSpreadBump
 
