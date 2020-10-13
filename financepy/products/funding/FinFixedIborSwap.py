@@ -4,20 +4,18 @@
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
-from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
+from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
+from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
-from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 
-###############################################################################
-# THIS IS A FIXED VERSUS IBOR SWAP 
-# THIS IS DIFFERENT FROM FinIborSwap as it passes in the schedules. 
-# THE AIM IS TO ALLOW MORE FLEXIBLE SCHEDULE DEFINITION
-# IT SHOULD HAVE THE SAME FUNCTIONALITY FOR THE SAME SCHEDULES
-###############################################################################
+##########################################################################
+
 
 class FinFixedIborSwap(object):
     ''' Class for managing a Fixed vs IBOR swap contract. This is a contract
@@ -26,25 +24,27 @@ class FinFixedIborSwap(object):
     The contract is entered into at zero initial cost. The contract lasts from
     a start date to a specified maturity date.
 
-    
     The floating rate is not known fully until the end of the preceding payment
     period. It is set in advance and paid in arrears. 
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
     which the implied index rates are extracted. '''
-             
+    
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends
                  swapType: FinSwapTypes,
-                 fixedScheduleDates: list,
-                 fixedDayCountType: FinDayCountTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
-                 floatScheduleDates: list,
-                 floatDayCountType: FinDayCountTypes,
+                 fixedFreqType: FinFrequencyTypes,
+                 fixedDayCountType: FinDayCountTypes,
+                 notional: float = ONE_MILLION,
                  floatSpread: float = 0.0,
-                 notional: float = ONE_MILLION):
+                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
+                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -54,6 +54,8 @@ class FinFixedIborSwap(object):
         termination date. This is not adjusted for business days. The adjusted
         termination date is called the maturity date. This is calculated. '''
 
+#        print("This class will soon be deprecated in favour of FinFixedIborSwap")
+
         checkArgumentTypes(self.__init__, locals())
 
         if type(terminationDateOrTenor) == FinDate:
@@ -61,7 +63,9 @@ class FinFixedIborSwap(object):
         else:
             self._terminationDate = startDate.addTenor(terminationDateOrTenor)
 
-        self._maturityDate = self._terminationDate
+        calendar = FinCalendar(calendarType)
+        self._maturityDate = calendar.adjust(self._terminationDate,
+                                             busDayAdjustType)
 
         if startDate > self._maturityDate:
             raise FinError("Start date after maturity date")
@@ -72,16 +76,24 @@ class FinFixedIborSwap(object):
         self._fixedCoupon = fixedCoupon
         self._floatSpread = floatSpread
 
+        self._fixedFrequencyType = fixedFreqType
+        self._floatFrequencyType = floatFreqType
+
         self._fixedDayCountType = fixedDayCountType
         self._floatDayCountType = floatDayCountType
 
         self._swapType = swapType
 
-        # Should probably validate these dates for monotonicity and types
-        self._adjustedFixedDates = fixedScheduleDates
-        self._adjustedFloatDates = floatScheduleDates
+        self._calendarType = calendarType
+        self._busDayAdjustType = busDayAdjustType
+        self._dateGenRuleType = dateGenRuleType
 
-        # Check this is correct
+        # These are generated immediately as they are for the entire
+        # life of the swap. Given a valuation date we can determine
+        # which cash flows are in the future and value the swap
+        self._generateFixedLegPaymentDates()
+        self._generateFloatLegPaymentDates()
+
         self._adjustedMaturityDate = self._adjustedFixedDates[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
@@ -127,7 +139,7 @@ class FinFixedIborSwap(object):
             prevDt = nextDt
             self._fixedYearFracs.append(alpha)
             self._fixedFlows.append(flow)
-
+            
 ###############################################################################
 
     def value(self,
@@ -136,7 +148,7 @@ class FinFixedIborSwap(object):
               indexCurve,
               firstFixingRate=None,
               principal=0.0):
-        ''' Value the interest rate swap on a value date given a single Libor
+        ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
 
         fixedLegValue = self.fixedLegValue(valuationDate,
@@ -156,7 +168,51 @@ class FinFixedIborSwap(object):
 
         return value
 
-###############################################################################
+##########################################################################
+
+    def _generateFixedLegPaymentDates(self):
+        ''' Generate the fixed leg payment dates all the way back to
+        the start date of the swap which may precede the valuation date'''
+        self._adjustedFixedDates = FinSchedule(
+            self._startDate,
+            self._terminationDate,
+            self._fixedFrequencyType,
+            self._calendarType,
+            self._busDayAdjustType,
+            self._dateGenRuleType)._generate()
+
+##########################################################################
+
+    def _generateFloatLegPaymentDates(self):
+        ''' Generate the floating leg payment dates all the way back to
+        the start date of the swap which may precede the valuation date'''
+        self._adjustedFloatDates = FinSchedule(
+            self._startDate,
+            self._terminationDate,
+            self._floatFrequencyType,
+            self._calendarType,
+            self._busDayAdjustType,
+            self._dateGenRuleType)._generate()
+
+##########################################################################
+
+    def fixedDates(self):
+        ''' return a vector of the fixed leg payment dates '''
+        if self._adjustedFixedDates is None:
+            raise FinError("Fixed dates have not been generated")
+
+        return self._adjustedFixedDates[1:]
+
+##########################################################################
+
+    def floatDates(self):
+        ''' return a vector of the fixed leg payment dates '''
+        if self._adjustedFloatDates is None:
+            raise FinError("Float dates have not been generated")
+
+        return self._adjustedFloatDates[1:]
+
+##########################################################################
 
     def pv01(self, valuationDate, discountCurve):
         ''' Calculate the value of 1 basis point coupon on the fixed leg. '''
@@ -192,8 +248,7 @@ class FinFixedIborSwap(object):
 
 ##########################################################################
 
-    def fixedLegValue(self, valuationDate: FinDate, 
-                      discountCurve, principal=0.0):
+    def fixedLegValue(self, valuationDate, discountCurve, principal=0.0):
 
         self._valuationDate = valuationDate
 
@@ -247,6 +302,63 @@ class FinFixedIborSwap(object):
         self._fixedFlows[-1] += flow
         self._fixedTotalPV[-1] = pv
         return pv
+
+##########################################################################
+
+    def _calcFixedLegFlows(self):
+
+        self._fixedYearFracs = []
+        self._fixedFlows = []
+
+        dayCounter = FinDayCount(self._fixedDayCountType)
+
+        ''' Now PV fixed leg flows. '''
+        prevDt = self._adjustedFixedDates[0]
+
+        for nextDt in self._adjustedFixedDates[1:]:
+            alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
+            flow = self._fixedCoupon * alpha * self._notional
+            prevDt = nextDt
+            self._fixedYearFracs.append(alpha)
+            self._fixedFlows.append(flow)
+
+##########################################################################
+
+    def cashSettledPV01(self,
+                        valuationDate,
+                        flatSwapRate,
+                        frequencyType):
+        ''' Calculate the forward value of an annuity of a forward starting
+        swap using a single flat discount rate equal to the swap rate. This is
+        used in the pricing of a cash-settled swaption in the FinIborSwaption
+        class. This method does not affect the standard valuation methods.'''
+
+        m = FinFrequency(frequencyType)
+
+        if m == 0:
+            raise FinError("Frequency cannot be zero.")
+
+        ''' The swap may have started in the past but we can only value
+        payments that have occurred after the valuation date. '''
+        startIndex = 0
+        while self._adjustedFixedDates[startIndex] < valuationDate:
+            startIndex += 1
+
+        ''' If the swap has yet to settle then we do not include the
+        start date of the swap as a coupon payment date. '''
+        if valuationDate <= self._startDate:
+            startIndex = 1
+
+        ''' Now PV fixed leg flows. '''
+        flatPV01 = 0.0
+        df = 1.0
+        alpha = 1.0 / m
+
+        for _ in self._adjustedFixedDates[startIndex:]:
+            df = df / (1.0 + alpha * flatSwapRate)
+            flatPV01 += df * alpha
+
+        return flatPV01
 
 ##########################################################################
 
@@ -352,46 +464,8 @@ class FinFixedIborSwap(object):
 
         return pv
 
-###############################################################################
+##########################################################################
 
-    def cashSettledPV01(self,
-                        valuationDate: FinDate,
-                        flatSwapRate: float,
-                        frequencyType: FinFrequencyTypes):
-        ''' Calculate the forward value of an annuity of a forward starting
-        swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinIborSwaption
-        class. This method does not affect the standard valuation methods.'''
-
-        m = FinFrequency(frequencyType)
-
-        if m == 0:
-            raise FinError("Frequency cannot be zero.")
-
-        ''' The swap may have started in the past but we can only value
-        payments that have occurred after the valuation date. '''
-        startIndex = 0
-        while self._adjustedFixedDates[startIndex] < valuationDate:
-            startIndex += 1
-
-        ''' If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. '''
-        if valuationDate <= self._startDate:
-            startIndex = 1
-
-        ''' Now PV fixed leg flows. '''
-        flatPV01 = 0.0
-        df = 1.0
-        alpha = 1.0 / m
-
-        for _ in self._adjustedFixedDates[startIndex:]:
-            df = df / (1.0 + alpha * flatSwapRate)
-            flatPV01 += df * alpha
-
-        return flatPV01
-
-###############################################################################
-    
     def printFixedLegPV(self):
         ''' Prints the fixed leg dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
@@ -400,6 +474,7 @@ class FinFixedIborSwap(object):
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)
         print("COUPON (%):", self._fixedCoupon * 100)
+        print("FIXED LEG FREQUENCY:", str(self._fixedFrequencyType))
         print("FIXED LEG DAY COUNT:", str(self._fixedDayCountType))
         print("VALUATION DATE", self._valuationDate)
 
@@ -477,6 +552,7 @@ class FinFixedIborSwap(object):
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._maturityDate)
         print("SPREAD COUPON (%):", self._floatSpread * 100)
+        print("FLOAT LEG FREQUENCY:", str(self._floatFrequencyType))
         print("FLOAT LEG DAY COUNT:", str(self._floatDayCountType))
         print("VALUATION DATE", self._valuationDate)
 
@@ -528,8 +604,13 @@ class FinFixedIborSwap(object):
         s += labelToString("SWAP TYPE", self._swapType)
         s += labelToString("FIXED COUPON", self._fixedCoupon)
         s += labelToString("FLOAT SPREAD", self._floatSpread)
+        s += labelToString("FIXED FREQUENCY", self._fixedFrequencyType)
+        s += labelToString("FLOAT FREQUENCY", self._floatFrequencyType)
         s += labelToString("FIXED DAY COUNT", self._fixedDayCountType)
         s += labelToString("FLOAT DAY COUNT", self._floatDayCountType)
+        s += labelToString("CALENDAR", self._calendarType)
+        s += labelToString("BUS DAY ADJUST", self._busDayAdjustType)
+        s += labelToString("DATE GEN TYPE", self._dateGenRuleType)
         return s
 
 ###############################################################################

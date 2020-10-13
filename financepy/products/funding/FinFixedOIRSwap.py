@@ -14,23 +14,49 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 
-##########################################################################
+
+###############################################################################
+
+from enum import Enum
+
+class FinCompoundingTypes(Enum):
+     COMPOUNDED = 1
+     OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
+     AVERAGED = 3
+     AVERAGED_DAILY = 4
+
+###############################################################################
 
 
-class FinIborSwap(object):
-    ''' Class for managing a Fixed vs IBOR swap contract. This is a contract
-    in which a fixed payment leg is exchanged for a series of floating rates
-    payments linked to some IBOR index rate. There is no exchange of par.
-    The contract is entered into at zero initial cost. The contract lasts from
-    a start date to a specified maturity date.
+class FinFixedOIRSwap(object):
+    ''' Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
+    This is a contract in which a fixed payment leg is exchanged for a payment
+    which pays the rolled-up overnight index rate (OIR). There is no exchange
+    of par. The contract is entered into at zero initial cost.
 
-    The floating rate is not known fully until the end of the preceding payment
-    period. It is set in advance and paid in arrears. 
+    NOTE: This class is almost identical to FinFixedIborSwap but will possibly
+    deviate as distinctions between the two become clear to me. If not they 
+    will be converged (or inherited) to avoid duplication.
     
+    The contract lasts from a start date to a specified maturity date.
+    The fixed coupon is the OIS fixed rate for the corresponding tenor which is
+    set at contract initiation.
+
+    The floating rate is not known fully until the end of each payment period.
+    It's calculated at the contract maturity and is based on daily observations
+    of the overnight index rate which are compounded according to a specific
+    convention. Hence the OIS floating rate is determined by the history of the
+    OIS rates.
+
+    In its simplest form, there is just one fixed rate payment and one floating
+    rate payment at contract maturity. However when the contract becomes longer
+    than one year the floating and fixed payments become periodic, usually with
+    annual exchanges of cash.
+
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which is separate from the curve from
-    which the implied index rates are extracted. '''
-    
+    is done on the OIS curve which is itself implied by the term structure of
+    market OIS rates. '''
+
     def __init__(self,
                  startDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends
@@ -45,14 +71,7 @@ class FinIborSwap(object):
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create an interest rate swap contract giving the contract start
-        date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
-        count convention and notional. The floating leg parameters have default
-        values that can be overwritten if needed. The start date is contractual
-        and is the same as the settlement date for a new swap. It is the date
-        on which interest starts to accrue. The end of the contract is the
-        termination date. This is not adjusted for business days. The adjusted
-        termination date is called the maturity date. This is calculated. '''
+        ''' Create OIS object. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -119,24 +138,42 @@ class FinIborSwap(object):
 
         self._calcFixedLegFlows()
 
-##########################################################################
+###############################################################################
+
+    def _calcFixedLegFlows(self):
+
+        self._fixedYearFracs = []
+        self._fixedFlows = []
+
+        dayCounter = FinDayCount(self._fixedDayCountType)
+
+        ''' Now PV fixed leg flows. '''
+        prevDt = self._adjustedFixedDates[0]
+
+        for nextDt in self._adjustedFixedDates[1:]:
+            alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
+            flow = self._fixedCoupon * alpha * self._notional
+            prevDt = nextDt
+            self._fixedYearFracs.append(alpha)
+            self._fixedFlows.append(flow)
+            
+###############################################################################
 
     def value(self,
               valuationDate,
-              discountCurve,
-              indexCurve,
+              oisCurve,
               firstFixingRate=None,
               principal=0.0):
         ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
 
         fixedLegValue = self.fixedLegValue(valuationDate,
-                                           discountCurve,
+                                           oisCurve,
                                            principal)
 
         floatLegValue = self.floatLegValue(valuationDate,
-                                           discountCurve,
-                                           indexCurve,
+                                           oisCurve,
+                                           oisCurve,
                                            firstFixingRate,
                                            principal)
 

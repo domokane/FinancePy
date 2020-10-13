@@ -5,7 +5,7 @@ from .FinIborDeposit import *
 from .FinIborFRA import *
 from .FinIborFuture import *
 from .FinIborConventions import *
-from .FinIborSwap import *
-from .FinIborSwaption import *
-from .FinOIRSwap import *
+from .FinFixedIborSwap import *
+from .FinFixedIborSwap import *
+from .FinFixedOIRSwap import *
 from .FinIborSingleCurve import *

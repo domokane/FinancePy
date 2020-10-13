@@ -8,7 +8,6 @@ import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
@@ -18,10 +17,9 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolate import FinInterpTypes
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.finutils.FinSchedule import FinSchedule
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -108,243 +106,143 @@ def buildIborCurve(valuationDate):
     ###########################################################################
     
     fixedFreq = FinFrequencyTypes.ANNUAL
-    floatFreq = FinFrequencyTypes.QUARTERLY
-    calType = FinCalendarTypes.WEEKEND
-    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
-    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
     dcType = FinDayCountTypes.THIRTY_E_360
     swapType = FinSwapTypes.PAYER
 
     #######################################
     maturityDate = settlementDate.addMonths(24) 
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                               calType, busDayAdjustType, dateGenRuleType).scheduleDates()   
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = -0.001506    
     swap1 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap1)
 
     #######################################
     maturityDate = settlementDate.addMonths(36)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()   
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = -0.000185 
     swap2 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap2)
 
     #######################################
     maturityDate = settlementDate.addMonths(48)   
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                calType, busDayAdjustType, dateGenRuleType).scheduleDates()  
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.001358
     swap3 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap3)
 
     #######################################
     maturityDate = settlementDate.addMonths(60)   
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()   
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0027652
     swap4 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap4)
 
     #######################################
     maturityDate = settlementDate.addMonths(72)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0041539
     swap5 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap5)
 
     #######################################
     maturityDate = settlementDate.addMonths(84)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()    
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0054604
     swap6 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap6)
 
     #######################################
     maturityDate = settlementDate.addMonths(96)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()    
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.006674
     swap7 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap7)
 
     #######################################
     maturityDate = settlementDate.addMonths(108)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.007826
     swap8 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap8)
 
     #######################################
     maturityDate = settlementDate.addMonths(120)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()    
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.008821
     swap9 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap9)
 
     #######################################
     maturityDate = settlementDate.addMonths(132)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0097379
     swap10 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap10)
 
     #######################################
     maturityDate = settlementDate.addMonths(144)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0105406
     swap11 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap11)
 
     #######################################
     maturityDate = settlementDate.addMonths(180)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0123927
     swap12 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap12)
 
     #######################################
     maturityDate = settlementDate.addMonths(240)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0139882
     swap13 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                             fixedLegDates, dcType, swapRate,
-                             floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap13)
 
     #######################################
     maturityDate = settlementDate.addMonths(300)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0144972
     swap14 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap14)
 
     #######################################
     maturityDate = settlementDate.addMonths(360)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0146081
     swap15 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap15)
 
     #######################################
     maturityDate = settlementDate.addMonths(420)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.01461897
     swap16 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap16)
 
     #######################################
     maturityDate = settlementDate.addMonths(480)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.014567455
     swap17 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap17)
 
     #######################################
     maturityDate = settlementDate.addMonths(540)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.0140826
     swap18 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap18)
 
     #######################################
     maturityDate = settlementDate.addMonths(600)
-    floatLegDates = FinSchedule(settlementDate, maturityDate, floatFreq, 
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(settlementDate, maturityDate, fixedFreq,
-                                   calType, busDayAdjustType, dateGenRuleType).scheduleDates()
     swapRate = 0.01436822
     swap19 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
-                              fixedLegDates, dcType, swapRate,
-                              floatLegDates, dcType)
+                             swapRate, fixedFreq, dcType)
     swaps.append(swap19)
+    
+    ########################################
     
     liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
 
@@ -391,21 +289,19 @@ def test_LiborSwap():
     
     notional = 10.0 * ONE_MILLION
 
-    floatLegDates = FinSchedule(startDate, endDate, floatFreqType, swapCalendarType,
-                                busDayAdjustType, dateGenRuleType).scheduleDates()
-    fixedLegDates = FinSchedule(startDate, endDate, fixedFreqType, swapCalendarType,
-                                busDayAdjustType, dateGenRuleType).scheduleDates()
-    
     swap = FinFixedIborSwap(startDate,
                             endDate,
                             swapType,
-                            fixedLegDates,
-                            fixedDayCountType,
                             fixedCoupon,
-                            floatLegDates,
-                            floatDayCountType,
+                            fixedFreqType,
+                            fixedDayCountType,
+                            notional,
                             floatSpread,
-                            notional)
+                            floatFreqType,
+                            floatDayCountType,
+                            swapCalendarType,
+                            busDayAdjustType,
+                            dateGenRuleType)
 
     ''' Now perform a valuation after the swap has seasoned but with the
     same curve being used for discounting and working out the implied
@@ -424,5 +320,61 @@ def test_LiborSwap():
 
 ###############################################################################
 
+
+def test_dp_example():
+
+    #  http://www.derivativepricing.com/blogpage.asp?id=8
+
+    startDate = FinDate(14, 11, 2011)
+    endDate = FinDate(14, 11, 2016)
+    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
+    swapCalendarType = FinCalendarTypes.TARGET
+    busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
+    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
+    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    swapType = FinSwapTypes.PAYER
+    fixedCoupon = 0.0124
+    notional = ONE_MILLION
+
+    swap = FinFixedIborSwap(startDate,
+                        endDate,
+                        swapType,
+                        fixedCoupon=fixedCoupon,
+                        fixedFreqType=fixedFreqType,
+                        fixedDayCountType=fixedDayCountType,
+                        floatFreqType=FinFrequencyTypes.SEMI_ANNUAL,
+                        floatDayCountType=FinDayCountTypes.ACT_360,
+                        notional=notional,
+                        calendarType=swapCalendarType,
+                        busDayAdjustType=busDayAdjustType,
+                        dateGenRuleType=dateGenRuleType)
+
+#    swap.printFixedLegFlows()
+
+    dts = [FinDate(14, 11, 2011), FinDate(14, 5, 2012), FinDate(14, 11, 2012),
+           FinDate(14, 5, 2013), FinDate(14, 11, 2013), FinDate(14, 5, 2014),
+           FinDate(14, 11, 2014), FinDate(14, 5, 2015), FinDate(16, 11, 2015),
+           FinDate(16, 5, 2016), FinDate(14, 11, 2016)]
+
+    dfs = [0.9999843, 0.9966889, 0.9942107, 0.9911884, 0.9880738, 0.9836490,
+           0.9786276, 0.9710461, 0.9621778, 0.9514315, 0.9394919]
+
+    valuationDate = startDate
+
+    curve = FinDiscountCurve(valuationDate, dts, np.array(dfs),
+                             FinInterpTypes.FLAT_FORWARDS)
+
+    v = swap.value(valuationDate, curve, curve)
+
+#    swap.printFixedLegPV()
+#    swap.printFloatLegPV()
+
+    # This is essentially zero
+    testCases.header("LABEL", "VALUE")
+    testCases.print("Swap Value on a Notional of $1M:", v)
+
+###############################################################################
+
 test_LiborSwap()
+test_dp_example()
 testCases.compareTestCases()

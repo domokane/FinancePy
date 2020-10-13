@@ -17,7 +17,7 @@ This is a class to manage Forward Rate Agreements (FRAs) in which one party agre
 
 ## Swaps
 
-### FinIborSwap
+### FinFixedIborSwap
 
 This is a contract to exchange fixed rate coupons for floating Ibor rates. This class has functionality to value the swap contract and to calculate its risk.
 

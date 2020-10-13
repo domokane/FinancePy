@@ -11,7 +11,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 from financepy.products.funding.FinIborSwaption import FinIborSwaption
 from financepy.products.funding.FinIborSwaption import FinSwapTypes
 
@@ -58,9 +58,9 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swapType = FinSwapTypes.PAYER
     
     swapRate = 0.05
-    swap1 = FinIborSwap(settlementDate, "1Y",  swapType, swapRate, fixedFreq, fixedBasis)
-    swap2 = FinIborSwap(settlementDate, "3Y",  swapType, swapRate, fixedFreq, fixedBasis)
-    swap3 = FinIborSwap(settlementDate, "5Y",  swapType, swapRate, fixedFreq, fixedBasis)
+    swap1 = FinFixedIborSwap(settlementDate, "1Y",  swapType, swapRate, fixedFreq, fixedBasis)
+    swap2 = FinFixedIborSwap(settlementDate, "3Y",  swapType, swapRate, fixedFreq, fixedBasis)
+    swap3 = FinFixedIborSwap(settlementDate, "5Y",  swapType, swapRate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -105,12 +105,12 @@ def testFinIborSwaptionModels():
     for k in strikes:
         swaptionType = FinSwapTypes.PAYER
         swaption = FinIborSwaption(settlementDate,
-                                    exerciseDate,
-                                    swapMaturityDate,
-                                    swaptionType,
-                                    k,
-                                    swapFixedFrequencyType,
-                                    swapFixedDayCountType)
+                                   exerciseDate,
+                                   swapMaturityDate,
+                                   swaptionType,
+                                   k,
+                                   swapFixedFrequencyType,
+                                   swapFixedDayCountType)
 
         swap1 = swaption.value(valuationDate, liborCurve, model1)
         swap2 = swaption.value(valuationDate, liborCurve, model2)
@@ -167,29 +167,29 @@ def test_FinIborSwaptionQLExample():
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     swapType = FinSwapTypes.PAYER
     
-    swap = FinIborSwap(settlementDate, "3Y", swapType, 0.00790, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "3Y", swapType, 0.00790, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "4Y", swapType, 0.01200, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "4Y", swapType, 0.01200, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "5Y", swapType, 0.01570, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "5Y", swapType, 0.01570, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "6Y", swapType, 0.01865, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "6Y", swapType, 0.01865, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "7Y", swapType, 0.02160, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "7Y", swapType, 0.02160, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "8Y", swapType, 0.02350, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "8Y", swapType, 0.02350, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "9Y", swapType, 0.02540, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "9Y", swapType, 0.02540, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "10Y", swapType, 0.0273, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "10Y", swapType, 0.0273, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "15Y", swapType, 0.0297, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "15Y", swapType, 0.0297, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "20Y", swapType,  0.0316, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "20Y", swapType,  0.0316, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "25Y", swapType, 0.0335, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "25Y", swapType, 0.0335, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
     liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps,
@@ -268,29 +268,29 @@ def testFinIborCashSettledSwaption():
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     swapType = FinSwapTypes.PAYER
     
-    swap = FinIborSwap(settlementDate, "3Y", swapType, 0.00790, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "3Y", swapType, 0.00790, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "4Y", swapType, 0.01200, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "4Y", swapType, 0.01200, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "5Y", swapType, 0.01570, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "5Y", swapType, 0.01570, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "6Y", swapType, 0.01865, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "6Y", swapType, 0.01865, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "7Y", swapType, 0.02160, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "7Y", swapType, 0.02160, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "8Y", swapType, 0.02350, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "8Y", swapType, 0.02350, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "9Y", swapType, 0.02540, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "9Y", swapType, 0.02540, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "10Y", swapType, 0.0273, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "10Y", swapType, 0.0273, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "15Y", swapType, 0.0297, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "15Y", swapType, 0.0297, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "20Y", swapType, 0.0316, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "20Y", swapType, 0.0316, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "25Y", swapType, 0.0335, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "25Y", swapType, 0.0335, fixedFreqType, accType)
     swaps.append(swap)
-    swap = FinIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
+    swap = FinFixedIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
     liborCurve = FinIborSingleCurve(valuationDate, depos, [], swaps,

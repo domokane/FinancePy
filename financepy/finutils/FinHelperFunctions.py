@@ -22,6 +22,18 @@ def _funcName():
 
 ###############################################################################
 
+def gridIndex(t, gridTimes):
+    
+    n = len(gridTimes)    
+    for i in range(0, n):
+        gridTime = gridTimes[i]
+        if abs(gridTime - t) < gSmall:
+            return i
+
+    raise FinError("Grid index not found")
+
+###############################################################################
+
 
 def betaVectorToCorrMatrix(betas):
     ''' Convert a one-factor vector of factor weights to a square correlation

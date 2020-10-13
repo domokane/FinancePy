@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinOIRSwap import FinOIRSwap
+from financepy.products.funding.FinFixedOIRSwap import FinFixedOIRSwap
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -21,7 +21,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-def test_OIRSwap():
+def test_FinFixedOIRSwap():
 
     # Here I follow the example in
     # https://blog.deriscope.com/index.php/en/excel-quantlib-overnight-index-swap
@@ -32,32 +32,34 @@ def test_OIRSwap():
     endDate = startDate.addMonths(60)
     oisRate = 0.04
     swapType = FinSwapTypes.PAYER
-    fixedFreq = FinFrequencyTypes.ANNUAL
+    fixedFreqType = FinFrequencyTypes.ANNUAL
     fixedDayCount = FinDayCountTypes.ACT_360
-    floatFreq = FinFrequencyTypes.ANNUAL
+    floatFreqType = FinFrequencyTypes.ANNUAL
     floatDayCount = FinDayCountTypes.ACT_360
+    floatSpread = 0.0
     notional = ONE_MILLION
 
-    ois = FinOIRSwap(startDate,
-                                endDate,
-                                swapType,
-                                oisRate,
-                                fixedFreq,
-                                fixedDayCount,
-                                floatFreq,
-                                floatDayCount,
-                                notional)
+    ois = FinFixedOIRSwap(startDate,
+                          endDate,
+                          swapType,
+                          oisRate,
+                          fixedFreqType,
+                          fixedDayCount,
+                          notional,
+                          floatSpread,
+                          floatFreqType,
+                          floatDayCount)
 
     valueDate = FinDate(2018, 11, 30)
     marketRate = 0.05
-    indexCurve = FinDiscountCurveFlat(valueDate, marketRate,
-                                      FinFrequencyTypes.ANNUAL)
+    oisCurve = FinDiscountCurveFlat(valueDate, marketRate,
+                                    FinFrequencyTypes.ANNUAL)
 
-    v = ois.value(startDate, [], [], indexCurve, indexCurve)
+    v = ois.value(startDate, oisCurve)
     testCases.header("LABEL", "VALUE")
     testCases.print("SWAP_VALUE", v)
     
 ###############################################################################
 
-test_OIRSwap()
+test_FinFixedOIRSwap()
 testCases.compareTestCases()

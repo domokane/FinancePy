@@ -13,7 +13,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 from financepy.products.funding.FinIborSwaption import FinIborSwaption
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 
 from financepy.products.funding.FinIborBermudanSwaption import FinIborBermudanSwaption
 from financepy.models.FinModelBlack import FinModelBlack
@@ -45,7 +45,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                       0.0625,
                                       FinFrequencyTypes.SEMI_ANNUAL)
 
-    fwdPayerSwap = FinIborSwap(exerciseDate,
+    fwdPayerSwap = FinFixedIborSwap(exerciseDate,
                                 swapMaturityDate,
                                 FinSwapTypes.PAYER,
                                 swapFixedCoupon,

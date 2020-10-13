@@ -9,7 +9,7 @@ from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
@@ -82,7 +82,7 @@ def buildIborCurve(valueDate):
 
     swapRate = 0.05
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinIborSwap(
+    swap1 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -92,7 +92,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinIborSwap(
+    swap2 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -102,7 +102,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap2)
 
     maturityDate = settlementDate.addMonths(48)
-    swap3 = FinIborSwap(
+    swap3 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -112,7 +112,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap3)
 
     maturityDate = settlementDate.addMonths(60)
-    swap4 = FinIborSwap(
+    swap4 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -122,7 +122,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap4)
 
     maturityDate = settlementDate.addMonths(72)
-    swap5 = FinIborSwap(
+    swap5 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -132,7 +132,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap5)
 
     maturityDate = settlementDate.addMonths(84)
-    swap6 = FinIborSwap(
+    swap6 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -142,7 +142,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap6)
 
     maturityDate = settlementDate.addMonths(96)
-    swap7 = FinIborSwap(
+    swap7 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -152,7 +152,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap7)
 
     maturityDate = settlementDate.addMonths(108)
-    swap8 = FinIborSwap(
+    swap8 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -162,7 +162,7 @@ def buildIborCurve(valueDate):
     swaps.append(swap8)
 
     maturityDate = settlementDate.addMonths(120)
-    swap9 = FinIborSwap(
+    swap9 = FinFixedIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
