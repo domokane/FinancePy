@@ -54,15 +54,15 @@ for moduleFileName in modules[n:m+1]:
         n = n + 1
         pass
     except ValueError as err:
-        print("Value Error", err.args[0], "************")
+        print("Value Error:", err.args[0], "************")
         n = n + 1
         pass
     except NameError as err:
-        print("Name Error", err.args[0], "************")
+        print("Name Error:", err.args[0], "************")
         n = n + 1
         pass
     except BaseException as e:
-        print("Unknown error occured.", e)
+        print("Base error:", e)
         n = n + 1
         pass
     except:

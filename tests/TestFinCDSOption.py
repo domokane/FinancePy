@@ -159,14 +159,9 @@ def buildFullIssuerCurve(valuationDate):
         dcType)
     swaps.append(swap9)
 
-<<<<<<< HEAD
     liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
-=======
-    liborCurve = FinIborCurve(valuationDate, depos, fras, swaps)
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710
 
     cdsMarketContracts = []
-
     cdsCoupon = 0.005743
     maturityDate = valuationDate.nextCDSDate(6)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)

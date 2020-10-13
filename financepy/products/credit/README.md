@@ -5,10 +5,5 @@ This folder contains a set of credit-related assets ranging from CDS to CDS opti
 * FinCDSOption is an option on a single CDS. The strike is expressed in spread terms and the option is European style. It is different from an option on a CDS index option. A suitable pricing model is provided which adjusts for the risk that the reference credit defaults before the option expiry date.
 * FinCDSTranche is a synthetic CDO tranche. This is a financial derivative which takes a loss if the total loss on the portfolio exceeds a lower threshold K1 and which is wiped out if it exceeds a higher threshold K2. The value depends on the default correlation between the assets in the portfolio of credits. This also includes a valuation model based on the Gaussian copula model.
 
-
 ### FinCDSCurve
-<<<<<<< HEAD
 This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinIborSingleCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
-=======
-This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinIborCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710

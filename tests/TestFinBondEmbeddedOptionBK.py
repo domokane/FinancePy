@@ -47,11 +47,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
     swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-<<<<<<< HEAD
     discountCurve = FinIborSingleCurve(settlementDate, [], [], swaps)
-=======
-    discountCurve = FinIborCurve(settlementDate, [], [], swaps)
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710
 
     ###########################################################################
 

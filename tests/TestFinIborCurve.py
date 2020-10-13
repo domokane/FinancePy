@@ -13,11 +13,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-=======
-from financepy.products.funding.FinIborCurve import FinIborCurve
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
@@ -83,11 +79,7 @@ def test_FinIborDepositsOnly():
     fras = []
     swaps = []
 
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
     liborCurve = FinIborSingleCurve(settlementDate,
-=======
-    liborCurve = FinIborCurve(settlementDate,
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
                                depos,
                                fras,
                                swaps)
@@ -137,11 +129,7 @@ def test_FinIborFRAsOnly():
     depos = []
     swaps = []
 
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
     liborCurve = FinIborSingleCurve(settlementDate,
-=======
-    liborCurve = FinIborCurve(settlementDate,
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
                                depos,
                                fras,
                                swaps)
@@ -308,11 +296,7 @@ def test_FinIborDepositsFRAsSwaps():
                         fixedDCCType)
     swaps.append(swap)
 
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
     liborCurve = FinIborSingleCurve(valuationDate,
-=======
-    liborCurve = FinIborCurve(valuationDate,
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
                                depos,
                                fras,
                                swaps)
@@ -438,11 +422,7 @@ def test_FinIborDepositsFuturesSwaps():
 
     swaps.append(swap)
 
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
     liborCurve = FinIborSingleCurve(spotDate, depos, fras, swaps)
-=======
-    liborCurve = FinIborCurve(spotDate, depos, fras, swaps)
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
 
     times = np.linspace(0.0, 2.0, 25)
     dates = spotDate.addYears(times)
@@ -618,11 +598,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
         _ = FinIborSingleCurve(valuationDate, depos, fras, swaps,
-=======
-        _ = FinIborCurve(valuationDate, depos, fras, swaps,
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
                                    FinInterpTypes.FLAT_FORWARDS)
 
     end = time.time()
@@ -631,11 +607,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
         _ = FinIborSingleCurve(valuationDate, depos, fras, swaps,
-=======
-        _ = FinIborCurve(valuationDate, depos, fras, swaps,
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
                                    FinInterpTypes.LINEAR_SWAP_RATES)
 
     end = time.time()
@@ -710,11 +682,7 @@ def test_bloombergPricingExample():
     swap = FinIborSwap(settlementDate, "40Y", swapType, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = FinIborSwap(settlementDate, "50Y", swapType,  (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-<<<<<<< HEAD:tests/TestFinIborSingleCurve.py
     liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
-=======
-    liborCurve = FinIborCurve(valuationDate, depos, fras, swaps)
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:tests/TestFinIborCurve.py
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0

@@ -8,8 +8,8 @@ This is the basic Ibor instrument in which a party borrows an amount for a speci
 
 ### FinInterestRateFuture
 
-This is a class to handle interest rate futures contracts. This is an exchange-traded contract 
-to receive or pay Ibor on a specified future date. It can be used to build the Liboir term structure. 
+This is a class to handle interest rate futures contracts. This is an exchange-traded contract
+to receive or pay Ibor on a specified future date. It can be used to build the Liboir term structure.
 
 ### FinIborFRA
 
@@ -55,7 +55,7 @@ This is a contract to exchange the daily compounded Overnight index swap rate fo
 
 This is a discount curve that is extracted by bootstrapping a set of OIS rates. The internal representation of the curve are discount factors on each of the OIS dates. Between these dates, discount factors are interpolated according to a specified scheme.
 
-### FinIborCurve
+### FinIborSingleCurve
 
 This is a discount curve that is extracted by bootstrapping a set of Ibor deposits, Ibor FRAs and Ibor swap prices. The internal representation of the curve are discount factors on each of the deposit, FRA and swap maturity dates. Between these dates, discount factors are interpolated according to a specified scheme - see below.
 

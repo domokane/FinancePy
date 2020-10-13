@@ -48,7 +48,6 @@ def _g(df, *args):
 ###############################################################################
 
 
-<<<<<<< HEAD:financepy/products/funding/FinIborSingleCurve.py
 class FinIborSingleCurve(FinDiscountCurve):
     ''' Constructs a discount curve as implied by the prices of Ibor
     deposits, FRAs and IRS. Discounting is assumed to be at Libor and the value
@@ -62,15 +61,6 @@ class FinIborSingleCurve(FinDiscountCurve):
     which an amount of 1 unit paid has a present value of 1. This class
     inherits from FinDiscountCurve and so it has all of the methods that that
     class has.
-=======
-class FinIborCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Ibor
-    deposits, FRAs and IRS. The curve date is the date on which we are
-    performing the valuation based on the information available on the
-    curve date. Typically it is the date on which an amount of 1 unit paid
-    has a present value of 1. This class inherits from FinDiscountCurve
-    and so it has all of the methods that that class has.
->>>>>>> b3bd08bebbb48765d5862e8d5fdef81668a92710:financepy/products/funding/FinIborCurve.py
 
     There are two main curve-building approaches:
 
