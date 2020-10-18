@@ -142,7 +142,7 @@
 #         payFixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
-#         swap = FinFixedIborSwap(self._exerciseDate,
+#         swap = FinIborSwap(self._exerciseDate,
 #                             self._maturityDate,
 #                             self._fixedCoupon,
 #                             self._fixedFrequencyType,
@@ -179,7 +179,7 @@
 #         callPrices = np.array(self._callPrices)
 
 #         # Generate bond put times and prices
-#         if self._swaptionType == FinFixedIborSwaptionType.PAYER:
+#         if self._swaptionType == FinIborSwaptionType.PAYER:
 #             callPrice = 100.0
 #             putPrice = 1e10
 #         else:

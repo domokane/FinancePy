@@ -15,13 +15,11 @@ sys.path.append("..")
 
 print("Looking in folder:", dirname(__file__))
 modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
-
 numModules = len(modules)
 
 ''' This is the index of the file - change this to start later in the list '''
 n = 0
 m = numModules
-
 
 ###############################################################################
 
@@ -29,12 +27,10 @@ for moduleFileName in modules[n:m+1]:
 
     try:
 
-        moduleTextName = basename(moduleFileName[:-3])
-    
+        moduleTextName = basename(moduleFileName[:-3])    
         print("TEST: %3d out of %3d: MODULE: %-35s "% (n+1, numModules,
                                                        moduleTextName), end="")
-        moduleName = __import__(moduleTextName)
-    
+        moduleName = __import__(moduleTextName)    
         numErrors = moduleName.testCases._globalNumErrors
         numWarnings = moduleName.testCases._globalNumWarnings
     
@@ -44,8 +40,7 @@ for moduleFileName in modules[n:m+1]:
             for i in range(0, numErrors):
                 print("*", end="")
         
-        print("")
-    
+        print("")    
         n = n + 1
 
     # Want testing to continue even if a module has an exception

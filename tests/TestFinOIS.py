@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinFixedOIRSwap import FinFixedOIRSwap
+from financepy.products.funding.FinOIS import FinOIS
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -39,16 +39,16 @@ def test_FinFixedOIRSwap():
     floatSpread = 0.0
     notional = ONE_MILLION
 
-    ois = FinFixedOIRSwap(startDate,
-                          endDate,
-                          swapType,
-                          oisRate,
-                          fixedFreqType,
-                          fixedDayCount,
-                          notional,
-                          floatSpread,
-                          floatFreqType,
-                          floatDayCount)
+    ois = FinOIS(startDate,
+                                endDate,
+                                swapType,
+                                oisRate,
+                                fixedFreqType,
+                                fixedDayCount,
+                                notional,
+                                floatSpread,
+                                floatFreqType,
+                                floatDayCount)
 
     valueDate = FinDate(2018, 11, 30)
     marketRate = 0.05

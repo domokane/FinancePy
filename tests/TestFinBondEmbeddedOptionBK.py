@@ -14,7 +14,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 
-from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
+from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
@@ -43,9 +43,9 @@ def test_FinBondEmbeddedOptionMATLAB():
     swapType = FinSwapTypes.PAYER
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swap1 = FinFixedIborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
-    swap2 = FinFixedIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
-    swap3 = FinFixedIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
+    swap1 = FinIborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
+    swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
+    swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
     discountCurve = FinIborSingleCurve(settlementDate, [], [], swaps)
 

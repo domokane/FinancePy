@@ -8,7 +8,7 @@ import numpy as np
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.funding.FinFixedIborSwap import FinFixedIborSwap
+from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
@@ -26,7 +26,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def buildIborCurve(valuationDate):
+def buildIborSingleCurve(valuationDate):
 
     settlementDate = valuationDate.addDays(2)
     dcType = FinDayCountTypes.ACT_360
@@ -112,133 +112,133 @@ def buildIborCurve(valuationDate):
     #######################################
     maturityDate = settlementDate.addMonths(24) 
     swapRate = -0.001506    
-    swap1 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap1 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap1)
 
     #######################################
     maturityDate = settlementDate.addMonths(36)
     swapRate = -0.000185 
-    swap2 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap2 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap2)
 
     #######################################
     maturityDate = settlementDate.addMonths(48)   
     swapRate = 0.001358
-    swap3 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap3 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap3)
 
     #######################################
     maturityDate = settlementDate.addMonths(60)   
     swapRate = 0.0027652
-    swap4 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap4 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap4)
 
     #######################################
     maturityDate = settlementDate.addMonths(72)
     swapRate = 0.0041539
-    swap5 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap5 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap5)
 
     #######################################
     maturityDate = settlementDate.addMonths(84)
     swapRate = 0.0054604
-    swap6 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap6 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap6)
 
     #######################################
     maturityDate = settlementDate.addMonths(96)
     swapRate = 0.006674
-    swap7 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap7 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap7)
 
     #######################################
     maturityDate = settlementDate.addMonths(108)
     swapRate = 0.007826
-    swap8 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap8 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap8)
 
     #######################################
     maturityDate = settlementDate.addMonths(120)
     swapRate = 0.008821
-    swap9 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap9 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap9)
 
     #######################################
     maturityDate = settlementDate.addMonths(132)
     swapRate = 0.0097379
-    swap10 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap10 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap10)
 
     #######################################
     maturityDate = settlementDate.addMonths(144)
     swapRate = 0.0105406
-    swap11 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap11 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap11)
 
     #######################################
     maturityDate = settlementDate.addMonths(180)
     swapRate = 0.0123927
-    swap12 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap12 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap12)
 
     #######################################
     maturityDate = settlementDate.addMonths(240)
     swapRate = 0.0139882
-    swap13 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap13 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap13)
 
     #######################################
     maturityDate = settlementDate.addMonths(300)
     swapRate = 0.0144972
-    swap14 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap14 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap14)
 
     #######################################
     maturityDate = settlementDate.addMonths(360)
     swapRate = 0.0146081
-    swap15 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap15 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap15)
 
     #######################################
     maturityDate = settlementDate.addMonths(420)
     swapRate = 0.01461897
-    swap16 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap16 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap16)
 
     #######################################
     maturityDate = settlementDate.addMonths(480)
     swapRate = 0.014567455
-    swap17 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap17 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap17)
 
     #######################################
     maturityDate = settlementDate.addMonths(540)
     swapRate = 0.0140826
-    swap18 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap18 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap18)
 
     #######################################
     maturityDate = settlementDate.addMonths(600)
     swapRate = 0.01436822
-    swap19 = FinFixedIborSwap(settlementDate, maturityDate, swapType,
+    swap19 = FinIborSwap(settlementDate, maturityDate, swapType,
                              swapRate, fixedFreq, dcType)
     swaps.append(swap19)
     
@@ -254,7 +254,7 @@ def buildIborCurve(valuationDate):
         testCases.print("DEPO VALUE:", depo._maturityDate, v)
 
     for fra in fras:
-        v = fra.value(settlementDate, liborCurve)
+        v = fra.value(settlementDate, liborCurve, liborCurve)
         testCases.print("FRA VALUE:", fra._maturityDate, v)
     
     for swap in swaps:
@@ -289,7 +289,7 @@ def test_LiborSwap():
     
     notional = 10.0 * ONE_MILLION
 
-    swap = FinFixedIborSwap(startDate,
+    swap = FinIborSwap(startDate,
                             endDate,
                             swapType,
                             fixedCoupon,
@@ -309,7 +309,7 @@ def test_LiborSwap():
 
     valuationDate = FinDate(30, 11, 2018)
     settlementDate = valuationDate.addDays(2)
-    liborCurve = buildIborCurve(valuationDate)
+    liborCurve = buildIborSingleCurve(valuationDate)
     v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
 
     v_bbg = 388147.0
@@ -336,7 +336,7 @@ def test_dp_example():
     fixedCoupon = 0.0124
     notional = ONE_MILLION
 
-    swap = FinFixedIborSwap(startDate,
+    swap = FinIborSwap(startDate,
                         endDate,
                         swapType,
                         fixedCoupon=fixedCoupon,

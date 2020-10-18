@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinIborOIRSwap(object):
+class FinIborBasisSwap(object):
     ''' Class for managing an interest rate basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment in a different LIBOR tenor. There is no exchange of

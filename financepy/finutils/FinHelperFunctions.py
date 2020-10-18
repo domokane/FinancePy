@@ -28,6 +28,7 @@ def gridIndex(t, gridTimes):
     for i in range(0, n):
         gridTime = gridTimes[i]
         if abs(gridTime - t) < gSmall:
+            print(t, gridTimes, i) 
             return i
 
     raise FinError("Grid index not found")

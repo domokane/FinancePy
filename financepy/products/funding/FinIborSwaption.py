@@ -24,7 +24,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
-from ...products.funding.FinFixedIborSwap import FinFixedIborSwap
+from ...products.funding.FinIborSwap import FinIborSwap
 
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
@@ -109,7 +109,7 @@ class FinIborSwaption():
 
         floatSpread = 0.0
 
-        swap = FinFixedIborSwap(self._exerciseDate,
+        swap = FinIborSwap(self._exerciseDate,
                             self._swapMaturityDate,
                             self._swapType,
                             self._fixedCoupon,
@@ -291,7 +291,7 @@ class FinIborSwaption():
 
         floatSpread = 0.0
 
-        swap = FinFixedIborSwap(self._exerciseDate,
+        swap = FinIborSwap(self._exerciseDate,
                             self._swapMaturityDate,
                             self._swapType,
                             self._fixedCoupon,

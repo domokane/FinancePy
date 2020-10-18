@@ -28,13 +28,13 @@ class FinCompoundingTypes(Enum):
 ###############################################################################
 
 
-class FinFixedOIRSwap(object):
+class FinOIS(object):
     ''' Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate (OIR). There is no exchange
     of par. The contract is entered into at zero initial cost.
 
-    NOTE: This class is almost identical to FinFixedIborSwap but will possibly
+    NOTE: This class is almost identical to FinIborSwap but will possibly
     deviate as distinctions between the two become clear to me. If not they 
     will be converged (or inherited) to avoid duplication.
     
@@ -172,7 +172,6 @@ class FinFixedOIRSwap(object):
                                            principal)
 
         floatLegValue = self.floatLegValue(valuationDate,
-                                           oisCurve,
                                            oisCurve,
                                            firstFixingRate,
                                            principal)
@@ -321,25 +320,6 @@ class FinFixedOIRSwap(object):
 
 ##########################################################################
 
-    def _calcFixedLegFlows(self):
-
-        self._fixedYearFracs = []
-        self._fixedFlows = []
-
-        dayCounter = FinDayCount(self._fixedDayCountType)
-
-        ''' Now PV fixed leg flows. '''
-        prevDt = self._adjustedFixedDates[0]
-
-        for nextDt in self._adjustedFixedDates[1:]:
-            alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
-            flow = self._fixedCoupon * alpha * self._notional
-            prevDt = nextDt
-            self._fixedYearFracs.append(alpha)
-            self._fixedFlows.append(flow)
-
-##########################################################################
-
     def cashSettledPV01(self,
                         valuationDate,
                         flatSwapRate,
@@ -380,8 +360,7 @@ class FinFixedOIRSwap(object):
 
     def floatLegValue(self,
                       valuationDate,  # This should be the settlement date
-                      discountCurve,
-                      indexCurve,
+                      oisCurve,
                       firstFixingRate=None,
                       principal=0.0):
         ''' Value the floating leg with payments from an index curve and
@@ -416,15 +395,15 @@ class FinFixedOIRSwap(object):
         self._floatStartIndex = startIndex
 
         # Forward price to settlement date (if valuation is settlement date)
-        self._dfValuationDate = discountCurve.df(valuationDate)
+        self._dfValuationDate = oisCurve.df(valuationDate)
 
         ''' The first floating payment is usually already fixed so is
         not implied by the index curve. '''
         prevDt = self._adjustedFloatDates[startIndex - 1]
         nextDt = self._adjustedFloatDates[startIndex]
         alpha = basis.yearFrac(prevDt, nextDt)[0]
-        df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
-        df2_index = indexCurve.df(nextDt)
+        df1_index = oisCurve.df(self._startDate)  # Cannot be pcd as has past
+        df2_index = oisCurve.df(nextDt)
 
         floatRate = 0.0
 
@@ -437,7 +416,7 @@ class FinFixedOIRSwap(object):
             floatRate = self._firstFixingRate
 
         # All discounting is done forward to the valuation date
-        df_discount = discountCurve.df(nextDt) / self._dfValuationDate
+        df_discount = oisCurve.df(nextDt) / self._dfValuationDate
 
         pv = flow * df_discount
 
@@ -449,17 +428,17 @@ class FinFixedOIRSwap(object):
         self._floatTotalPV.append(pv)
 
         prevDt = nextDt
-        df1_index = indexCurve.df(prevDt)
+        df1_index = oisCurve.df(prevDt)
 
         for nextDt in self._adjustedFloatDates[startIndex + 1:]:
             alpha = basis.yearFrac(prevDt, nextDt)[0]
-            df2_index = indexCurve.df(nextDt)
+            df2_index = oisCurve.df(nextDt)
             # The accrual factors cancel
             fwdRate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwdRate + self._floatSpread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
-            df_discount = discountCurve.df(nextDt) / self._dfValuationDate
+            df_discount = oisCurve.df(nextDt) / self._dfValuationDate
 
             pv += flow * df_discount
             df1_index = df2_index

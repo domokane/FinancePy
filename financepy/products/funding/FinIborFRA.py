@@ -10,6 +10,7 @@ from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 ###############################################################################
 
@@ -37,7 +38,10 @@ class FinIborFRA(object):
     If the base date of the curve is before the value date then we
     forward adjust this amount to that value date. For simplicity I have
     assumed that the fixing date and the settlement date are the same date.
-    This should be amended later. '''
+    This should be amended later. 
+    
+    The valuation below incorporates a dual curve approach.
+    '''
 
     def __init__(self,
                  startDate: FinDate,  # The date the FRA starts to accrue
@@ -75,35 +79,43 @@ class FinIborFRA(object):
 
     ###########################################################################
 
-    def value(self, valuationDate, liborCurve):
+    def value(self, 
+              valuationDate: FinDate, 
+              discountCurve: FinDiscountCurve,
+              indexCurve: FinDiscountCurve):
         ''' Determine mark to market value of a FRA contract based on the
-        market FRA rate. The same curve is used for calculating the forward
-        Ibor and for doing discounting on the expected forward payment. '''
+        market FRA rate. We allow the pricing to have a different curve for
+        the Libor index and the discounting of promised cashflows. '''
 
+        # Get the Libor index from the index curve
         dc = FinDayCount(self._dayCountType)
         accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
-        df1 = liborCurve.df(self._startDate)
-        df2 = liborCurve.df(self._maturityDate)
-        liborFwd = (df1 / df2 - 1.0) / accFactor
-        v = accFactor * (liborFwd - self._fraRate) * df2
+        dfIndex1 = indexCurve.df(self._startDate)
+        dfIndex2 = indexCurve.df(self._maturityDate)
+        liborFwd = (dfIndex1 / dfIndex2 - 1.0) / accFactor
 
-#        print(df1, df2, accFactor, liborFwd, v)
+        # Get the discount factor from a discount curve
+        dfDiscount2 = discountCurve.df(self._maturityDate)
+
+        v = accFactor * (liborFwd - self._fraRate) * dfDiscount2
+
         # Forward value the FRA to the value date
-        df_to_valueDate = liborCurve.df(valuationDate)
+        df_to_valueDate = discountCurve.df(valuationDate)
         v = v * self._notional / df_to_valueDate
 
-        if self._payFixedRate:
+        if self._payFixedRate is True:
             v *= -1.0
         return v
 
     ##########################################################################
 
-    def maturityDf(self, liborCurve):
-        ''' Determine the maturity date discount factor needed to refit
-        the FRA given the libor curve anbd the contract FRA rate. '''
+    def maturityDf(self, indexCurve):
+        ''' Determine the maturity date index discount factor needed to refit
+        the market FRA rate. In a dual-curve world, this is not the discount
+        rate discount factor but the index curve discount factor. '''
 
         dc = FinDayCount(self._dayCountType)
-        df1 = liborCurve.df(self._startDate)
+        df1 = indexCurve.df(self._startDate)
         accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
         df2 = df1 / (1.0 + accFactor * self._fraRate)
         return df2
