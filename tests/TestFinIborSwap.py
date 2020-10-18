@@ -254,11 +254,11 @@ def buildIborSingleCurve(valuationDate):
         testCases.print("DEPO VALUE:", depo._maturityDate, v)
 
     for fra in fras:
-        v = fra.value(settlementDate, liborCurve, liborCurve)
+        v = fra.value(settlementDate, liborCurve)
         testCases.print("FRA VALUE:", fra._maturityDate, v)
     
     for swap in swaps:
-        v = swap.value(settlementDate, liborCurve, liborCurve, None)
+        v = swap.value(settlementDate, liborCurve)
         testCases.print("SWAP VALUE:", swap._maturityDate, v)
 
     return liborCurve

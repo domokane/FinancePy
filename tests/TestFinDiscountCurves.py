@@ -99,7 +99,8 @@ def test_FinDiscountCurves():
             zeroRate = curve.zeroRate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwdRate = curve.fwdRate(fwdMaturityDate, tenor)
-            swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
+            settlementDate = valuationDate
+            swapRate = curve.swapRate(valuationDate, settlementDate, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
             testCases.print("%-20s" % name,
@@ -121,7 +122,7 @@ def test_FinDiscountCurves():
         zeroRate = curve.zeroRate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwdRate = curve.fwdRate(fwdMaturityDates, tenor)
-        swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
+        swapRate = curve.swapRate(valuationDate, valuationDate, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):

@@ -17,6 +17,7 @@ from financepy.products.funding.FinOISCurve import FinOISCurve
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinOIS import FinOIS
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolate import FinInterpTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
@@ -26,11 +27,6 @@ sys.path.append("..//..")
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
-
-###############################################################################
-
-
-
 
 ###############################################################################
 
@@ -93,6 +89,18 @@ def test_FinOISDepositsFRAsSwaps():
     spotDays = 0
     settleDt = valuationDate.addWeekDays(spotDays)
 
+    depoDCCType = FinDayCountTypes.ACT_360
+    notional = 100.0
+    calendarType = FinCalendarTypes.TARGET
+    depos = []
+
+    # 1 month
+    depositRate = 0.04
+    maturityDate = settleDt.addMonths(1)
+    depo = FinIborDeposit(settleDt, maturityDate, depositRate,
+                          depoDCCType, notional, calendarType)
+    depos.append(depo)
+    
     fras = []
     # 1 x 4 FRA
     fraRate = 0.04
@@ -211,6 +219,7 @@ def test_FinOISDepositsFRAsSwaps():
     swaps.append(swap)
 
     liborCurve = FinOISCurve(valuationDate,
+                             depos,
                                    fras,
                                    swaps)
 
@@ -250,6 +259,8 @@ def futureToFRARate(price, convexity):
 
 
 def test_FinOISDepositsFuturesSwaps():
+
+    depos = []
 
     spotDate = FinDate(6, 6, 2018)
     spotDays = 0
@@ -318,7 +329,7 @@ def test_FinOISDepositsFuturesSwaps():
 
     swaps.append(swap)
 
-    liborCurve = FinOISCurve(spotDate, fras, swaps)
+    liborCurve = FinOISCurve(spotDate, depos, fras, swaps)
 
     times = np.linspace(0.0, 2.0, 25)
     dates = spotDate.addYears(times)
@@ -495,7 +506,7 @@ def test_bloombergPricingExample():
     swap = FinOIS(settleDt, "40Y", payRec, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = FinOIS(settleDt, "50Y", payRec, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    oisCurve = FinOISCurve(valuationDate, fras, swaps)
+    oisCurve = FinOISCurve(valuationDate, [], fras, swaps)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
@@ -520,6 +531,6 @@ test_bloombergPricingExample()
 #test_derivativePricingExample()
 #test_FinOISFRAsOnly()
 #test_FinOISDepositsFRAsSwaps()
-#test_FinOISDepositsFuturesSwaps()
+test_FinOISDepositsFuturesSwaps()
 
 testCases.compareTestCases()

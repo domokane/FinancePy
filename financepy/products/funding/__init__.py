@@ -9,3 +9,4 @@ from .FinIborSwap import *
 from .FinOISCurve import *
 from .FinOIS import *
 from .FinIborSingleCurve import *
+from .FinIborDualCurve import *

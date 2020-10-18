@@ -41,7 +41,7 @@ def _g(df, *args):
     fra = args[2]
     numPoints = len(liborCurve._times)
     liborCurve._dfValues[numPoints - 1] = df
-    v_fra = fra.value(valueDate, liborCurve, liborCurve)
+    v_fra = fra.value(valueDate, liborCurve)
     v_fra /= fra._notional
     return v_fra
 

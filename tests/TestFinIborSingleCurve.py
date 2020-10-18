@@ -138,7 +138,7 @@ def test_FinIborFRAsOnly():
 
     ''' Check calibration '''
     for fra in fras:
-        v = fra.value(settlementDate, liborCurve, liborCurve)
+        v = fra.value(settlementDate, liborCurve)
         testCases.print("FRA:", fra._maturityDate, v)
 
 ###############################################################################

@@ -16,7 +16,7 @@ from ...products.funding.FinIborDeposit import FinIborDeposit
 from ...products.funding.FinIborFRA import FinIborFRA
 from ...products.funding.FinIborSwap import FinIborSwap
 
-swaptol = 1e-8
+swaptol = 1e-10
 
 ##############################################################################
 # TODO: CHANGE times to dfTimes
@@ -68,7 +68,7 @@ class FinIborDualCurve(FinDiscountCurve):
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS,
                  checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may

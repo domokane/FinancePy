@@ -12,13 +12,38 @@ from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import FinInterpTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-
+from ...finutils.FinDayCount import FinDayCountTypes
 swaptol = 1e-8
 
 ##############################################################################
 # TODO: CHANGE times to dfTimes
 ##############################################################################
 
+
+def _fois(oir, *args):
+    ''' Extract the implied overnight index rate assuming it is flat over 
+    period in question. '''
+
+    targetOISRate = args[0]
+    dayCounter = args[1]
+    dateSchedule = args[2]
+
+    startDate = dateSchedule[0]
+    endDate = dateSchedule[-1]
+
+    df = 1.0
+    prevDt = dateSchedule[0]
+    for dt in dateSchedule[1:]:
+        yearFrac = dayCounter.yearFrac(prevDt, dt)
+        df = df * (1.0 + oir * yearFrac)
+
+    period = dayCounter.yearFrac(startDate, endDate)
+    
+    OISRate = (df - 1.0) / period
+    diff = OISRate - targetOISRate
+    return diff
+
+###############################################################################
 
 def _f(df, *args):
     ''' Root search objective function for swaps '''
@@ -27,7 +52,7 @@ def _f(df, *args):
     swap = args[2]
     numPoints = len(curve._times)
     curve._dfValues[numPoints - 1] = df
-    v_swap = swap.value(valueDate, curve, curve, None, 1.0)
+    v_swap = swap.value(valueDate, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
 
@@ -41,7 +66,7 @@ def _g(df, *args):
     fra = args[2]
     numPoints = len(curve._times)
     curve._dfValues[numPoints - 1] = df
-    v_fra = fra.value(valueDate, curve, curve)
+    v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
 
@@ -65,6 +90,7 @@ class FinOISCurve(FinDiscountCurve):
 
     def __init__(self,
                  valuationDate: FinDate,
+                 oisDeposits: list,
                  oisFRAs: list,
                  oisSwaps: list,
                  interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
@@ -82,7 +108,7 @@ class FinOISCurve(FinDiscountCurve):
         checkArgumentTypes(getattr(self, _funcName(), None), locals())
 
         self._valuationDate = valuationDate
-        self._validateInputs(oisFRAs, oisSwaps)
+        self._validateInputs(oisDeposits, oisFRAs, oisSwaps)
         self._interpType = interpType
         self._checkRefit = checkRefit
         self._buildCurve()
@@ -100,15 +126,46 @@ class FinOISCurve(FinDiscountCurve):
 ###############################################################################
 
     def _validateInputs(self,
+                        oisDeposits,
                         oisFRAs,
                         oisSwaps):
         ''' Validate the inputs for each of the Libor products. '''
 
+        numDepos = len(oisDeposits)
         numFRAs = len(oisFRAs)
         numSwaps = len(oisSwaps)
 
-        if numFRAs + numSwaps == 0:
+        if numDepos + numFRAs + numSwaps == 0:
             raise FinError("No calibration instruments.")
+
+        # Validation of the inputs.
+        if numDepos > 0:
+            for depo in oisDeposits:
+                startDt = depo._startDate
+                if startDt < self._valuationDate:
+                    raise FinError("First deposit starts before value date.")
+
+            for depo in oisDeposits:
+                startDt = depo._startDate
+                endDt = depo._maturityDate
+                if startDt >= endDt:
+                    raise FinError("First deposit ends on or before it begins")
+
+        # Ensure order of depos
+        if numDepos > 1:
+            prevDt = oisDeposits[0]._maturityDate
+
+            for depo in oisDeposits[1:]:
+                nextDt = depo._maturityDate
+                if nextDt <= prevDt:
+                    raise FinError("Deposits must be in increasing maturity")
+                prevDt = nextDt
+
+        # Ensure that valuation date is on or after first deposit start date
+        if numDepos > 1:
+            if oisDeposits[0]._startDate > self._valuationDate:
+                raise FinError("Valuation date must not be before first deposit settles.")
+
 
         # Validation of the inputs.
         if numFRAs > 0:
@@ -134,11 +191,11 @@ class FinOISCurve(FinDiscountCurve):
         if numSwaps > 1:
 
             # Swaps must all start on the same date for the bootstrap
-            startDt = oisSwaps[0]._startDate
-            for swap in oisSwaps[1:]:
-                nextStartDt = swap._startDate
-                if nextStartDt != startDt:
-                    raise FinError("Swaps must all have same start date.")
+#            startDt = oisSwaps[0]._startDate
+#            for swap in oisSwaps[1:]:
+#                nextStartDt = swap._startDate
+#                if nextStartDt != startDt:
+#                    raise FinError("Swaps must all have same start date.")
 
             # Swaps must be increasing in tenor/maturity
             prevDt = oisSwaps[0]._maturityDate
@@ -148,15 +205,15 @@ class FinOISCurve(FinDiscountCurve):
                     raise FinError("Swaps must be in increasing maturity")
                 prevDt = nextDt
 
-            # Swaps must have same cashflows for bootstrap to work
-            longestSwap = oisSwaps[-1]
-            longestSwapCpnDates = longestSwap._adjustedFixedDates
-            for swap in oisSwaps[0:-1]:
-                swapCpnDates = swap._adjustedFixedDates
-                numFlows = len(swapCpnDates)
-                for iFlow in range(0, numFlows):
-                    if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
-                        raise FinError("Swap coupons are not on the same date grid.")
+            # Swaps must have same cashflows for linear swap bootstrap to work
+#            longestSwap = oisSwaps[-1]
+#            longestSwapCpnDates = longestSwap._adjustedFixedDates
+#            for swap in oisSwaps[0:-1]:
+#                swapCpnDates = swap._adjustedFixedDates
+#                numFlows = len(swapCpnDates)
+#                for iFlow in range(0, numFlows):
+#                    if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
+#                        raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -470,6 +527,64 @@ class FinOISCurve(FinDiscountCurve):
                 swap.printFixedLegPV()
                 swap.printFloatLegPV()
                 raise FinError("Swap not repriced.")
+
+###############################################################################
+
+    # def overnightRate(self,
+    #                   settlementDate: FinDate,
+    #                   startDate: FinDate,
+    #                   maturityDate: (FinDate, list),
+    #                   dayCountType: FinDayCountTypes=FinDayCountTypes.THIRTY_E_360):
+    #     ''' get a vector of dates and values for the overnight rate implied by
+    #     the OIS rate term structure. '''
+
+    #     # Note that this function does not call the FinIborSwap class to
+    #     # calculate the swap rate since that will create a circular dependency.
+    #     # I therefore recreate the actual calculation of the swap rate here.
+
+    #     if isinstance(maturityDate, FinDate):
+    #         maturityDates = [maturityDate]
+    #     else:
+    #         maturityDates = maturityDate
+
+    #     overnightRates = []
+
+    #     dfValuationDate = self.df(settlementDate)
+
+    #     for maturityDt in maturityDates:
+
+    #         schedule = FinSchedule(startDate,
+    #                                maturityDt,
+    #                                frequencyType)
+
+    #         flowDates = schedule._generate()
+    #         flowDates[0] = startDate
+
+    #         dayCounter = FinDayCount(dayCountType)
+    #         prevDt = flowDates[0]
+    #         pv01 = 0.0
+    #         df = 1.0
+
+    #         for nextDt in flowDates[1:]:                
+    #             if nextDt > settlementDate:
+    #                 df = self.df(nextDt) / dfValuationDate
+    #                 alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
+    #                 pv01 += alpha * df
+
+    #             prevDt = nextDt
+
+    #         if abs(pv01) < gSmall:
+    #             parRate = None
+    #         else:
+    #             dfStart = self.df(startDate)
+    #             parRate = (dfStart - df) / pv01
+
+    #         parRates.append(parRate)
+
+    #     if isinstance(maturityDate, FinDate):
+    #         return parRates[0]
+    #     else:
+    #         return parRates
 
 ###############################################################################
 

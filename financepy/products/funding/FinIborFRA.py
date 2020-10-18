@@ -82,10 +82,13 @@ class FinIborFRA(object):
     def value(self, 
               valuationDate: FinDate, 
               discountCurve: FinDiscountCurve,
-              indexCurve: FinDiscountCurve):
+              indexCurve: FinDiscountCurve = None):
         ''' Determine mark to market value of a FRA contract based on the
         market FRA rate. We allow the pricing to have a different curve for
         the Libor index and the discounting of promised cashflows. '''
+
+        if indexCurve is None:
+            indexCurve = discountCurve
 
         # Get the Libor index from the index curve
         dc = FinDayCount(self._dayCountType)

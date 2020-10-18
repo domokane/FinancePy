@@ -192,7 +192,8 @@ class FinDiscountCurve():
 
     def swapRate(self,
                  settlementDate: FinDate,
-                 maturityDate: FinDate,
+                 startDate: FinDate,
+                 maturityDate: (list, FinDate),
                  frequencyType=FinFrequencyTypes.ANNUAL,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360):
         ''' Calculate the swap rate to maturity date. This is the rate paid by
@@ -221,29 +222,34 @@ class FinDiscountCurve():
 
         parRates = []
 
+        dfValuationDate = self.df(settlementDate)
+
         for maturityDt in maturityDates:
 
-            schedule = FinSchedule(settlementDate,
+            schedule = FinSchedule(startDate,
                                    maturityDt,
                                    frequencyType)
 
             flowDates = schedule._generate()
+            flowDates[0] = startDate
 
             dayCounter = FinDayCount(dayCountType)
             prevDt = flowDates[0]
             pv01 = 0.0
             df = 1.0
 
-            for nextDt in flowDates[1:]:
-                df = self.df(nextDt)
-                alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
-                pv01 += alpha * df
+            for nextDt in flowDates[1:]:                
+                if nextDt > settlementDate:
+                    df = self.df(nextDt) / dfValuationDate
+                    alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
+                    pv01 += alpha * df
+
                 prevDt = nextDt
 
             if abs(pv01) < gSmall:
                 parRate = None
             else:
-                dfStart = self.df(settlementDate)
+                dfStart = self.df(startDate)
                 parRate = (dfStart - df) / pv01
 
             parRates.append(parRate)

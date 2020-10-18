@@ -25,8 +25,9 @@ class FinCompoundingTypes(Enum):
      AVERAGED = 3
      AVERAGED_DAILY = 4
 
-###############################################################################
 
+
+###############################################################################
 
 class FinOIS(object):
     ''' Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
@@ -66,7 +67,7 @@ class FinOIS(object):
                  fixedDayCountType: FinDayCountTypes,
                  notional: float = ONE_MILLION,
                  floatSpread: float = 0.0,
-                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -111,6 +112,8 @@ class FinOIS(object):
         self._generateFixedLegPaymentDates()
         self._generateFloatLegPaymentDates()
 
+        print("XXX", self._adjustedFixedDates)
+        
         self._adjustedMaturityDate = self._adjustedFixedDates[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
@@ -195,6 +198,8 @@ class FinOIS(object):
             self._calendarType,
             self._busDayAdjustType,
             self._dateGenRuleType)._generate()
+        
+        self._adjustedFixedDates[0] = self._startDate
 
 ##########################################################################
 
@@ -208,6 +213,8 @@ class FinOIS(object):
             self._calendarType,
             self._busDayAdjustType,
             self._dateGenRuleType)._generate()
+
+        self._adjustedFloatDates[0] = self._startDate
 
 ##########################################################################
 

@@ -322,6 +322,7 @@ def testFinIborCashSettledSwaption():
     testCases.print("Swaption No-Arb Value:", v)
 
     fwdSwapRate = liborCurve.swapRate(valuationDate,
+                                      exerciseDate,
                                       swapMaturityDate,
                                       swapFixedFrequencyType,
                                       swapFixedDayCountType)

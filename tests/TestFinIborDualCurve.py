@@ -149,8 +149,9 @@ def buildOIS(valuationDate):
     # swaps.append(swap)
 
     oisCurve = FinOISCurve(valuationDate,
-                                    fras,
-                                    swaps)
+                           [],
+                           fras,
+                           swaps)
 
     return oisCurve
 

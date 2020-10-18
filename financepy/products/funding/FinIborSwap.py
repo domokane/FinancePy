@@ -144,11 +144,14 @@ class FinIborSwap(object):
     def value(self,
               valuationDate: FinDate,
               discountCurve: FinDiscountCurve,
-              indexCurve: FinDiscountCurve,
+              indexCurve: FinDiscountCurve=None,
               firstFixingRate=None,
               principal=0.0):
         ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
+
+        if indexCurve is None:
+            indexCurve = discountCurve
 
         fixedLegValue = self.fixedLegValue(valuationDate,
                                            discountCurve,
@@ -375,8 +378,6 @@ class FinIborSwap(object):
         df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
         df2_index = indexCurve.df(nextDt)
  
-        floatRate = 0.0
-
         if self._firstFixingRate is None:
             fwdIndexRate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwdIndexRate + self._floatSpread) * alpha * self._notional
