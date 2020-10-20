@@ -191,7 +191,6 @@ class FinDiscountCurve():
 ###############################################################################
 
     def swapRate(self,
-                 settlementDate: FinDate,
                  startDate: FinDate,
                  maturityDate: (list, FinDate),
                  frequencyType=FinFrequencyTypes.ANNUAL,
@@ -203,6 +202,9 @@ class FinDiscountCurve():
         # Note that this function does not call the FinIborSwap class to
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
+
+        if startDate < self._valuationDate:
+            raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(frequencyType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
@@ -222,8 +224,6 @@ class FinDiscountCurve():
 
         parRates = []
 
-        dfValuationDate = self.df(settlementDate)
-
         for maturityDt in maturityDates:
 
             schedule = FinSchedule(startDate,
@@ -232,18 +232,16 @@ class FinDiscountCurve():
 
             flowDates = schedule._generate()
             flowDates[0] = startDate
-
+            
             dayCounter = FinDayCount(dayCountType)
             prevDt = flowDates[0]
             pv01 = 0.0
             df = 1.0
 
             for nextDt in flowDates[1:]:                
-                if nextDt > settlementDate:
-                    df = self.df(nextDt) / dfValuationDate
-                    alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
-                    pv01 += alpha * df
-
+                df = self.df(nextDt)
+                alpha = dayCounter.yearFrac(prevDt, nextDt)[0]
+                pv01 += alpha * df
                 prevDt = nextDt
 
             if abs(pv01) < gSmall:
@@ -253,7 +251,7 @@ class FinDiscountCurve():
                 parRate = (dfStart - df) / pv01
 
             parRates.append(parRate)
-
+ 
         if isinstance(maturityDate, FinDate):
             return parRates[0]
         else:

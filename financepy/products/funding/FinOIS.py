@@ -111,8 +111,6 @@ class FinOIS(object):
         # which cash flows are in the future and value the swap
         self._generateFixedLegPaymentDates()
         self._generateFloatLegPaymentDates()
-
-        print("XXX", self._adjustedFixedDates)
         
         self._adjustedMaturityDate = self._adjustedFixedDates[-1]
 

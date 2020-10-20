@@ -193,7 +193,7 @@ def test_FinIborSwaptionQLExample():
     swaps.append(swap)
 
     liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps,
-                               FinInterpTypes.LINEAR_ZERO_RATES)
+                                    FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")
     swapMaturityDate = exerciseDate.addTenor("5Y")
@@ -206,15 +206,15 @@ def test_FinIborSwaptionQLExample():
     swaptionType = FinSwapTypes.PAYER
 
     swaption = FinIborSwaption(settlementDate,
-                                exerciseDate,
-                                swapMaturityDate,
-                                swaptionType,
-                                swapFixedCoupon,
-                                swapFixedFrequencyType,
-                                swapFixedDayCountType,
-                                swapNotional,
-                                swapFloatFrequencyType,
-                                swapFloatDayCountType)
+                               exerciseDate,
+                               swapMaturityDate,
+                               swaptionType,
+                               swapFixedCoupon,
+                               swapFixedFrequencyType,
+                               swapFixedDayCountType,
+                               swapNotional,
+                               swapFloatFrequencyType,
+                               swapFloatDayCountType)
 
     testCases.header("MODEL", "VALUE")
 
@@ -304,12 +304,12 @@ def testFinIborCashSettledSwaption():
     swapFloatFrequencyType = FinFrequencyTypes.QUARTERLY
     swapFloatDayCountType = FinDayCountTypes.ACT_360
     swapNotional = 1000000
-    swaptionType = FinSwapTypes.PAYER
+    swapType = FinSwapTypes.PAYER
 
     swaption = FinIborSwaption(settlementDate,
                                 exerciseDate,
                                 swapMaturityDate,
-                                swaptionType,
+                                swapType,
                                 swapFixedCoupon,
                                 swapFixedFrequencyType,
                                 swapFixedDayCountType,
@@ -321,19 +321,28 @@ def testFinIborCashSettledSwaption():
     v = swaption.value(settlementDate, liborCurve, model)
     testCases.print("Swaption No-Arb Value:", v)
 
-    fwdSwapRate = liborCurve.swapRate(valuationDate,
-                                      exerciseDate,
-                                      swapMaturityDate,
-                                      swapFixedFrequencyType,
-                                      swapFixedDayCountType)
+    fwdSwapRate1 = liborCurve.swapRate(exerciseDate,
+                                       swapMaturityDate,
+                                       swapFixedFrequencyType,
+                                       swapFixedDayCountType)
 
-    testCases.print("Fwd Swap Rate:", fwdSwapRate)
+    testCases.print("Curve Fwd Swap Rate:", fwdSwapRate1)
+
+    fwdSwap = FinIborSwap(exerciseDate, 
+                          swapMaturityDate, 
+                          swapType, 
+                          swapFixedCoupon, 
+                          swapFixedFrequencyType, 
+                          swapFixedDayCountType)
+
+    fwdSwapRate2 = fwdSwap.swapRate(settlementDate, liborCurve)
+    testCases.print("Fwd Swap Swap Rate:", fwdSwapRate2)
 
     model = FinModelBlack(0.1533)
 
     v = swaption.cashSettledValue(valuationDate,
                                   liborCurve,
-                                  fwdSwapRate,
+                                  fwdSwapRate2,
                                   model)
 
     testCases.print("Swaption Cash Settled Value:", v)

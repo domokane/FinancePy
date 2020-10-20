@@ -227,7 +227,7 @@ class FinIborSwap(object):
         if abs(pv01) < gSmall:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        cpn = (df0 - dfT) / pv01
+        cpn = (df0 - dfT) / pv01        
         return cpn
 
 ##########################################################################
@@ -276,7 +276,6 @@ class FinIborSwap(object):
             flowPV = flow * df_discount
             pv += flowPV
             prevDt = nextDt
-#            print("FixedIborSwapFixedLeg:", nextDt, flow, df_discount)
             self._fixedYearFracs.append(alpha)
             self._fixedFlows.append(flow)
             self._fixedDfs.append(df_discount)

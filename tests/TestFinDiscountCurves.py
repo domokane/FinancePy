@@ -85,22 +85,18 @@ def test_FinDiscountCurves():
 
     years = np.linspace(1, 10, 10)
     fwdMaturityDates = valuationDate.addYears(years)
-    fwdMaturityDates2 = valuationDate.addYears(years+1.0)
 
     testCases.banner("######################################################")
     testCases.banner("SINGLE CALLS")
     testCases.banner("######################################################")
 
     for name, curve in zip(curveNames, curvesList):
-
-        for (fwdMaturityDate, fwdMaturityDate2) in zip(fwdMaturityDates,
-                                                       fwdMaturityDates2):
+        for fwdMaturityDate in fwdMaturityDates:
             tenor = "3M"
             zeroRate = curve.zeroRate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwdRate = curve.fwdRate(fwdMaturityDate, tenor)
-            settlementDate = valuationDate
-            swapRate = curve.swapRate(valuationDate, settlementDate, fwdMaturityDate)
+            swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
             testCases.print("%-20s" % name,
@@ -117,12 +113,11 @@ def test_FinDiscountCurves():
     testCases.banner("######################################################")
 
     for name, curve in zip(curveNames, curvesList):
-
         tenor = "3M"
         zeroRate = curve.zeroRate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwdRate = curve.fwdRate(fwdMaturityDates, tenor)
-        swapRate = curve.swapRate(valuationDate, valuationDate, fwdMaturityDates)
+        swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
