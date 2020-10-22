@@ -374,10 +374,13 @@ class FinIborSwap(object):
         prevDt = self._adjustedFloatDates[startIndex - 1]
         nextDt = self._adjustedFloatDates[startIndex]
         alpha = basis.yearFrac(prevDt, nextDt)[0]
-        df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
-        df2_index = indexCurve.df(nextDt)
- 
+
+        if self._firstFixingRate is None and self._startDate < valuationDate:
+            raise FinError("First fixing rate has to be set.")
+
         if self._firstFixingRate is None:
+            df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
+            df2_index = indexCurve.df(nextDt)
             fwdIndexRate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwdIndexRate + self._floatSpread) * alpha * self._notional
         else:
@@ -479,7 +482,7 @@ class FinIborSwap(object):
 
             iFlow += 1
 
-##########################################################################
+###############################################################################
 
     def printFixedLegFlows(self):
         ''' Prints the fixed leg amounts without any valuation details. Shows
@@ -509,7 +512,31 @@ class FinIborSwap(object):
 
             iFlow += 1
 
-##########################################################################
+###############################################################################
+
+    def printFloatLegFlows(self):
+        ''' Prints the float leg amounts without any valuation details. Shows
+        the dates and sizes of the promised float leg flows. '''
+
+        print("START DATE:", self._startDate)
+        print("MATURITY DATE:", self._maturityDate)
+        print("FLOAT SPREAD (bps):", self._floatSpread * 10000)
+        print("FLOAT LEG FREQUENCY:", str(self._floatFrequencyType))
+        print("FLOAT LEG DAY COUNT:", str(self._floatDayCountType))
+
+        header = "PAYMENT_DATE     YEAR_FRAC"
+        print(header)
+
+        startIndex = 1
+
+        iFlow = 0
+        for paymentDate in self._adjustedFloatDates[startIndex:]:
+            print("%15s %12.8f TBD" %
+                  (paymentDate, self._floatYearFracs[iFlow]))
+
+            iFlow += 1
+
+###############################################################################
 
     def printFloatLegPV(self):
         ''' Prints the floating leg dates, accrual factors, discount factors,

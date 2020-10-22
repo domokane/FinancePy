@@ -232,7 +232,7 @@ class FinOISCurve(FinDiscountCurve):
                 raise FinError("First Swap must mature after last FRA")
 
         # Now determine which instruments are used
-        self._usedDeposits = []
+        self._usedDeposits = oisDeposits
         self._usedFRAs = oisFRAs
         self._usedSwaps = oisSwaps
         
@@ -593,6 +593,10 @@ class FinOISCurve(FinDiscountCurve):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUATION DATE", self._valuationDate)
+
+        for depo in self._usedDeposits:
+            s += labelToString("DEPOSIT", "")
+            s += depo.__repr__()
 
         for fra in self._usedFRAs:
             s += labelToString("FRA", "")

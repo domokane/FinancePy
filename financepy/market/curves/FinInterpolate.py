@@ -18,6 +18,7 @@ class FinInterpTypes(Enum):
     FLAT_FORWARDS = 2
     LINEAR_FORWARDS = 3
     LINEAR_SWAP_RATES = 4
+#    CUBIC_SPLINE_LOGDFS = 5
 
 ###############################################################################
 
@@ -31,9 +32,19 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
     value of x can be an array so that the function is vectorised. '''
 
     if type(t) is float or type(t) is np.float64:
+        
+        if t < 0.0:
+            print(t)
+            raise FinError("Interpolate time must be >= 0")
+
         u = _uinterpolate(t, times, dfs, method)
         return u
     elif type(t) is np.ndarray:
+
+        if np.any(t < 0.0):
+            print(t)
+            raise FinError("Interpolate time must be >= 0")
+
         v = _vinterpolate(t, times, dfs, method)
         return v
     else:
