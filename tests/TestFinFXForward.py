@@ -25,8 +25,8 @@ def test_FinFXForward():
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    valueDate = FinDate(13, 2, 2018)
-    expiryDate = valueDate.addMonths(12)
+    valuationDate = FinDate(13, 2, 2018)
+    expiryDate = valuationDate.addMonths(12)
     # Forward is on EURUSD which is expressed as number of USD per EUR
     # ccy1 = EUR and ccy2 = USD
     forName = "EUR"
@@ -40,7 +40,7 @@ def test_FinFXForward():
     ###########################################################################
 
     spotDays = 0
-    settlementDate = valueDate.addWeekDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     maturityDate = settlementDate.addMonths(12)
     notional = 100.0
     calendarType = FinCalendarTypes.TARGET
@@ -52,7 +52,7 @@ def test_FinFXForward():
     depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    forDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -61,7 +61,7 @@ def test_FinFXForward():
     depo = FinIborDeposit(settlementDate, maturityDate, depositRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    domDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     notional = 100.0
     notionalCurrency = forName
@@ -74,10 +74,10 @@ def test_FinFXForward():
 
     testCases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwdValue = fxForward.value(valueDate, spotFXRate,
+    fwdValue = fxForward.value(valuationDate, spotFXRate,
                                domDiscountCurve, forDiscountCurve)
 
-    fwdFXRate = fxForward.forward(valueDate, spotFXRate,
+    fwdFXRate = fxForward.forward(valuationDate, spotFXRate,
                                   domDiscountCurve,
                                   forDiscountCurve)
 

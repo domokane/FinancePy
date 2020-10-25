@@ -6,6 +6,7 @@ from .FinIborFRA import *
 from .FinIborFuture import *
 from .FinIborConventions import *
 from .FinIborSwap import *
+from .FinIborSwaption import *
 from .FinOISCurve import *
 from .FinOIS import *
 from .FinIborSingleCurve import *

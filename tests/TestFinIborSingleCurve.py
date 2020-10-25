@@ -79,7 +79,7 @@ def test_FinIborDepositsOnly():
     fras = []
     swaps = []
 
-    liborCurve = FinIborSingleCurve(settlementDate,
+    liborCurve = FinIborSingleCurve(valuationDate,
                                     depos,
                                     fras,
                                     swaps)
@@ -129,7 +129,7 @@ def test_FinIborFRAsOnly():
     depos = []
     swaps = []
 
-    liborCurve = FinIborSingleCurve(settlementDate,
+    liborCurve = FinIborSingleCurve(valuationDate,
                                     depos,
                                     fras,
                                     swaps)

@@ -260,12 +260,15 @@ def futureToFRARate(price, convexity):
 
 def test_FinOISDepositsFuturesSwaps():
 
-    depos = []
-
+    
     spotDate = FinDate(6, 6, 2018)
     spotDays = 0
     settleDt = spotDate.addWeekDays(spotDays)
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
+
+    depo = FinIborDeposit(settleDt, "1D", 1.712/100.0, depoDCCType)
+    depos = [depo]
+
     fras = []
 
     fraRate = futureToFRARate(97.6675, -0.00005)
@@ -464,7 +467,11 @@ def test_bloombergPricingExample():
     # We do the O/N rate which settles on trade date
     spotDays = 0
     settleDt = valuationDate.addWeekDays(spotDays)
+    accrual = FinDayCountTypes.THIRTY_E_360
 
+    depo = FinIborDeposit(settleDt, "1D", 1.712/100.0, accrual)
+    depos = [depo]
+    
     futs = []
     fut = FinIborFuture(valuationDate, 1); futs.append(fut)
     fut = FinIborFuture(valuationDate, 2); futs.append(fut)
@@ -506,7 +513,7 @@ def test_bloombergPricingExample():
     swap = FinOIS(settleDt, "40Y", payRec, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = FinOIS(settleDt, "50Y", payRec, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    oisCurve = FinOISCurve(valuationDate, [], fras, swaps)
+    oisCurve = FinOISCurve(valuationDate, depos, fras, swaps)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0

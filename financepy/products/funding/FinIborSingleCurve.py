@@ -4,6 +4,7 @@
 
 import numpy as np
 from scipy import optimize
+import copy
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
@@ -12,8 +13,11 @@ from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolate import FinInterpTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...products.funding.FinIborDeposit import FinIborDeposit
+from ...products.funding.FinIborFRA import FinIborFRA
+from ...products.funding.FinIborSwap import FinIborSwap
 
-swaptol = 1e-8
+swaptol = 1e-10
 
 ##############################################################################
 # TODO: CHANGE times to dfTimes
@@ -84,7 +88,7 @@ class FinIborSingleCurve(FinDiscountCurve):
 ###############################################################################
 
     def __init__(self,
-                 valuationDate: FinDate,
+                 valuationDate: FinDate, # This is the trade date (not T+2)
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
@@ -98,6 +102,8 @@ class FinIborSingleCurve(FinDiscountCurve):
         flat forwards between these coupon dates.
 
         The curve will assign a discount factor of 1.0 to the valuation date.
+        If no instrument is starting on the valuation date, the curve is then
+        assumed to be flat out to the first instrument using its zero rate.
         '''
 
         checkArgumentTypes(getattr(self, _funcName(), None), locals())
@@ -130,15 +136,29 @@ class FinIborSingleCurve(FinDiscountCurve):
         numFRAs = len(iborFRAs)
         numSwaps = len(iborSwaps)
 
+        depoStartDate = self._valuationDate
+        swapStartDate = self._valuationDate
+
         if numDepos + numFRAs + numSwaps == 0:
             raise FinError("No calibration instruments.")
 
         # Validation of the inputs.
         if numDepos > 0:
+            
+            depoStartDate = iborDeposits[0]._startDate
+
             for depo in iborDeposits:
-                startDt = depo._startDate
-                if startDt < self._valuationDate:
-                    raise FinError("First deposit starts before value date.")
+
+                if isinstance(depo, FinIborDeposit) is False:
+                    raise FinError("Deposit is not of type FinIborDeposit")
+
+                startDate = depo._startDate
+
+                if startDate < self._valuationDate:
+                    raise FinError("First deposit starts before valuation date.")
+
+                if startDate < depoStartDate:
+                    depoStartDate = startDate
 
             for depo in iborDeposits:
                 startDt = depo._startDate
@@ -148,21 +168,26 @@ class FinIborSingleCurve(FinDiscountCurve):
 
         # Ensure order of depos
         if numDepos > 1:
+            
             prevDt = iborDeposits[0]._maturityDate
-
             for depo in iborDeposits[1:]:
                 nextDt = depo._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Deposits must be in increasing maturity")
                 prevDt = nextDt
 
+        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
+        # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
-        if numDepos > 1:
-            if iborDeposits[0]._startDate > self._valuationDate:
-                raise FinError("Valuation date must not be before first deposit settles.")
+        # if numDepos > 1:
+        #    if iborDeposits[0]._startDate > self._valuationDate:
+        #        raise FinError("Valuation date must not be before first deposit settles.")
 
         if numFRAs > 0:
             for fra in iborFRAs:
+                if isinstance(fra, FinIborFRA) is False:
+                    raise FinError("FRA is not of type FinIborFRA")
+
                 startDt = fra._startDate
                 if startDt < self._valuationDate:
                     raise FinError("FRAs starts before valuation date")
@@ -176,10 +201,20 @@ class FinIborSingleCurve(FinDiscountCurve):
                 prevDt = nextDt
 
         if numSwaps > 0:
+
+            swapStartDate = iborSwaps[0]._startDate
+
             for swap in iborSwaps:
+
+                if isinstance(swap, FinIborSwap) is False:
+                    raise FinError("Swap is not of type FinIborSwap")
+
                 startDt = swap._startDate
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
+
+                if swap._startDate < swapStartDate:
+                    swapStartDate = swap._startDate
 
         if numSwaps > 1:
 
@@ -234,7 +269,25 @@ class FinIborSingleCurve(FinDiscountCurve):
 
         if numFRAs > 0 and numSwaps > 0:
             if firstSwapMaturityDate <= lastFRAMaturityDate:
-                raise FinError("First Swap must mature after last FRA")
+                raise FinError("First Swap must mature after last FRA ends")
+            
+        # If both depos and swaps start after T, we need a rate to get them to
+        # the first deposit. So we create a synthetic deposit rate contract.
+        
+        if swapStartDate > self._valuationDate:
+
+            if numDepos == 0:
+                raise FinError("Need a deposit rate to pin down short end.")
+
+            if depoStartDate > self._valuationDate:
+                firstDepo = iborDeposits[0]
+                if firstDepo._startDate > self._valuationDate:
+                    print("Inserting synthetic deposit")
+                    syntheticDeposit = copy.deepcopy(firstDepo)
+                    syntheticDeposit._startDate = self._valuationDate
+                    syntheticDeposit._maturityDate = firstDepo._startDate
+                    iborDeposits.insert(0, syntheticDeposit)
+                    numDepos += 1
 
         # Now determine which instruments are used
         self._usedDeposits = iborDeposits

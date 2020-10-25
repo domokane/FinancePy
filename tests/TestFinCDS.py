@@ -183,10 +183,12 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     tradeDate = FinDate(2019, 8, 9)
     valuationDate = tradeDate.addDays(1)
 
+    m = 1.0  # 0.00000000000
+
     dcType = FinDayCountTypes.ACT_360
     depos = []
-
-    m = 1.0  # 0.00000000000
+    depo1 = FinIborDeposit(valuationDate, "1D", m * 0.0220, dcType)
+    depos.append(depo1)
 
     spotDays = 2
     settlementDate = valuationDate.addDays(spotDays)
@@ -318,7 +320,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap10)
 
-    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     cdsMarketContracts = []
 
@@ -362,7 +364,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     recoveryRate = 0.40
 
-    issuerCurve = FinCDSCurve(settlementDate,
+    issuerCurve = FinCDSCurve(valuationDate,
                               cdsMarketContracts,
                               liborCurve,
                               recoveryRate)
@@ -381,11 +383,11 @@ def test_fullPriceCDS1():
     liborCurve, issuerCurve = buildFullIssuerCurve1(0.0, 0.0)
 
     # This is the 10 year contract at an off market coupon
-    maturityDate = FinDate(2029, 6, 20)
+    maturityDate = FinDate(20, 6, 2029)
     cdsCoupon = 0.0150
     notional = ONE_MILLION
-    longProtection = False
-    tradeDate = FinDate(2019, 8, 9)
+    longProtection = True
+    tradeDate = FinDate(9, 8, 2019)
     valuationDate = tradeDate.addDays(1)
     effectiveDate = valuationDate
 
@@ -411,6 +413,8 @@ def test_fullPriceCDS1():
     p = cdsContract.cleanPrice(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("CLEAN_PRICE", p)
 
+    # MARKIT PRICE IS 168517
+    
     accruedDays = cdsContract.accruedDays()
     testCases.print("ACCRUED_DAYS", accruedDays)
 
@@ -467,6 +471,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     m = 1.0
 
+    valuationDate = FinDate(24, 8, 2020)
     settlementDate = FinDate(24, 8, 2020)
     dcType = FinDayCountTypes.ACT_360
     depos = []
@@ -536,7 +541,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap4)
 
-    liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, [], swaps)
 
     cdsCoupon = 0.01 + mktSpreadBump
 

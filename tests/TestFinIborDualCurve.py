@@ -78,9 +78,9 @@ def buildOIS(valuationDate):
 
     swapRate = 0.000
     maturityDate = settlementDate.addMonths(60)
-    swap = FinIborSwap(settlementDate, maturityDate, swapType, swapRate, 
-                        fixedFreqType,
-                        fixedDCCType)
+    swap = FinOIS(settlementDate, maturityDate, swapType, swapRate, 
+                  fixedFreqType,
+                  fixedDCCType)
     swaps.append(swap)
 
     # maturityDate = settlementDate.addMonths(72)
@@ -292,6 +292,11 @@ def test_bloombergPricingExample():
 
 def test_swapValuationExample():
     
+    # Example from
+    # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
+    
+    vBloomberg = 388147
+
     valuationDate = FinDate(30, 11, 2018)
 
     startDate = FinDate(27, 12, 2017)
@@ -366,11 +371,13 @@ def test_swapValuationExample():
     iborFras = fras.copy()
     iborSwaps = swaps.copy()
     
-    iborCurve = FinIborSingleCurve(settlementDate, iborDepos, iborFras, iborSwaps, interpType)
-    
-    v1 = offMarketSwap.value(valuationDate, iborCurve, iborCurve, -0.268/100.0)
-    
-    print(v1)
+    iborCurve = FinIborSingleCurve(valuationDate, iborDepos, iborFras, iborSwaps, interpType)    
+    v1 = offMarketSwap.value(valuationDate, iborCurve, iborCurve, -0.268/100.0)    
+
+    testCases.banner("DERISCOPE EXAMPLE REPLICATION")    
+    testCases.header("LABEL", "VALUE")
+    testCases.print("BBG VALUE", vBloomberg)
+    testCases.print("FP ONE CURVE VALUE", v1)
     
     ###############################################################################
     
@@ -430,11 +437,21 @@ def test_swapValuationExample():
     
     oisCurveFF = FinOISCurve(valuationDate, oisDepos, oisFras, oisSwaps, interpType)
     
-    iborDualCurve = FinIborDualCurve(settlementDate, oisCurveFF, iborDepos, iborFras, iborSwaps, interpType)
+    iborDualCurve = FinIborDualCurve(valuationDate, oisCurveFF, iborDepos, iborFras, iborSwaps, interpType)
     
     v2 = offMarketSwap.value(valuationDate, oisCurveFF, iborDualCurve, -0.268/100.0)
     
-    print(v2)
+    testCases.print("FP DUAL CURVE VALUE", v2)
+
+    swapRate = offMarketSwap.swapRate(valuationDate, oisCurveFF, iborCurve, -0.268/100.0)
+
+    testCases.print("FP DUAL CURVE SWAP RATE", swapRate)
+
+#    offMarketSwap.printFixedLegFlows()
+#    offMarketSwap.printFloatLegFlows()
+#    offMarketSwap.printFixedLegPV()
+#    offMarketSwap.printFloatLegPV()
+    
 
 ###############################################################################
 

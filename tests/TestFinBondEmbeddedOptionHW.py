@@ -34,7 +34,8 @@ def test_FinBondEmbeddedOptionMATLAB():
     # WHICH MIGHT BE A BETTER MATCH
 
     settlementDate = FinDate(1, 1, 2007)
-
+    valuationDate = settlementDate
+    
     ###########################################################################
 
     dcType = FinDayCountTypes.THIRTY_E_360
@@ -44,7 +45,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
     swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discountCurve = FinIborSingleCurve(settlementDate, [], [], swaps)
+    discountCurve = FinIborSingleCurve(valuationDate, [], [], swaps)
 
     ###########################################################################
 

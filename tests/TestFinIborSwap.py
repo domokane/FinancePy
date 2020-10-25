@@ -36,7 +36,7 @@ def buildIborSingleCurve(valuationDate):
     swaps = []
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinIborDeposit(settlementDate, maturityDate, -0.00251, dcType)
+    depo1 = FinIborDeposit(valuationDate, maturityDate, -0.00251, dcType)
     depos.append(depo1)
 
     # Series of 1M futures
@@ -244,7 +244,7 @@ def buildIborSingleCurve(valuationDate):
     
     ########################################
     
-    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 

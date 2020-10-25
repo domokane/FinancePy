@@ -25,15 +25,21 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildIborCurve(valueDate):
+def buildIborCurve(valuationDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
+    depositRate = 0.050
+
+    depo0 = FinIborDeposit(
+        valuationDate,
+        "1D",
+        depositRate,
+        depoDCCType)
 
     spotDays = 2
-    settlementDate = valueDate.addWeekDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
-    depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
     depo1 = FinIborDeposit(
         settlementDate,
@@ -69,6 +75,7 @@ def buildIborCurve(valueDate):
         depositRate,
         depoDCCType)
 
+    depos.append(depo0)
     depos.append(depo1)
     depos.append(depo2)
     depos.append(depo3)
@@ -172,7 +179,7 @@ def buildIborCurve(valueDate):
         fixedDCCType)
     swaps.append(swap9)
 
-    liborCurve = FinIborSingleCurve(settlementDate,
+    liborCurve = FinIborSingleCurve(valuationDate,
                                     depos,
                                     fras,
                                     swaps)

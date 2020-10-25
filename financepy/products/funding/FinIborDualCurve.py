@@ -33,8 +33,6 @@ def _f(df, *args):
     indexCurve._dfValues[numPoints - 1] = df
     v_swap = swap.value(valueDate, discountCurve, indexCurve, None, 1.0)
     v_swap /= swap._notional
-#    print("FINIBORDUALCURVE calling _f", numPoints, df, v_swap)
-
     return v_swap
 
 ###############################################################################
@@ -111,18 +109,29 @@ class FinIborDualCurve(FinDiscountCurve):
         numFRAs = len(iborFRAs)
         numSwaps = len(iborSwaps)
 
+        depoStartDate = self._valuationDate
+        swapStartDate = self._valuationDate
+
         if numDepos + numFRAs + numSwaps == 0:
             raise FinError("No calibration instruments.")
 
         # Validation of the inputs.
         if numDepos > 0:
+
+            depoStartDate = iborDeposits[0]._startDate
+
             for depo in iborDeposits:
+
                 if isinstance(depo, FinIborDeposit) is False:
                     raise FinError("Deposit is not of type FinIborDeposit")
 
                 startDt = depo._startDate
+
                 if startDt < self._valuationDate:
                     raise FinError("First deposit starts before value date.")
+
+                if startDt < depoStartDate:
+                    depoStartDate = startDate
 
             for depo in iborDeposits:
                 startDt = depo._startDate
@@ -132,18 +141,20 @@ class FinIborDualCurve(FinDiscountCurve):
 
         # Ensure order of depos
         if numDepos > 1:
-            prevDt = iborDeposits[0]._maturityDate
 
+            prevDt = iborDeposits[0]._maturityDate
             for depo in iborDeposits[1:]:
                 nextDt = depo._maturityDate
                 if nextDt <= prevDt:
                     raise FinError("Deposits must be in increasing maturity")
                 prevDt = nextDt
 
+        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
+        # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
-        if numDepos > 1:
-            if iborDeposits[0]._startDate > self._valuationDate:
-                raise FinError("Valuation date must not be before first deposit settles.")
+        # if numDepos > 1:
+        #    if iborDeposits[0]._startDate > self._valuationDate:
+        #        raise FinError("Valuation date must not be before first deposit settles.")
 
         if numFRAs > 0:
             for fra in iborFRAs:
@@ -163,12 +174,20 @@ class FinIborDualCurve(FinDiscountCurve):
                 prevDt = nextDt
 
         if numSwaps > 0:
+
+            swapStartDate = iborSwaps[0]._startDate
+
             for swap in iborSwaps:
+
                 if isinstance(swap, FinIborSwap) is False:
                     raise FinError("Swap is not of type FinIborSwap")
+
                 startDt = swap._startDate
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
+
+                if swap._startDate < swapStartDate:
+                    swapStartDate = swap._startDate
 
         if numSwaps > 1:
 
@@ -224,6 +243,24 @@ class FinIborDualCurve(FinDiscountCurve):
         if numFRAs > 0 and numSwaps > 0:
             if firstSwapMaturityDate <= lastFRAMaturityDate:
                 raise FinError("First Swap must mature after last FRA")
+
+        # If both depos and swaps start after T, we need a rate to get them to
+        # the first deposit. So we create a synthetic deposit rate contract.
+        
+        if swapStartDate > self._valuationDate:
+
+            if numDepos == 0:
+                raise FinError("Need a deposit rate to pin down short end.")
+
+            if depoStartDate > self._valuationDate:
+                firstDepo = iborDeposits[0]
+                if firstDepo._startDate > self._valuationDate:
+                    print("Inserting synthetic deposit")
+                    syntheticDeposit = copy.deepcopy(firstDepo)
+                    syntheticDeposit._startDate = self._valuationDate
+                    syntheticDeposit._maturityDate = firstDepo._startDate
+                    iborDeposits.insert(0, syntheticDeposit)
+                    numDepos += 1
 
         # Now determine which instruments are used
         self._usedDeposits = iborDeposits

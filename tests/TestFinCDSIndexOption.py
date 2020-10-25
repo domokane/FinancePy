@@ -96,7 +96,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     return liborCurve
 

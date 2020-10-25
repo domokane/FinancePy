@@ -66,7 +66,7 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    liborCurve = FinIborSingleCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -146,7 +146,7 @@ def testFinIborSwaptionModels():
 
 def test_FinIborSwaptionQLExample():
 
-    #   valuationDate = FinDate(28, 2, 2014)
+    valuationDate = FinDate(4, 3, 2014)
     settlementDate = FinDate(4, 3, 2014)
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
@@ -192,7 +192,7 @@ def test_FinIborSwaptionQLExample():
     swap = FinIborSwap(settlementDate, "30Y", swapType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    liborCurve = FinIborSingleCurve(settlementDate, depos, [], swaps,
+    liborCurve = FinIborSingleCurve(valuationDate, depos, [], swaps,
                                     FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlementDate.addTenor("5Y")

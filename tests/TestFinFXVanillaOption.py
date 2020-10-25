@@ -163,7 +163,7 @@ def test_FinFXVanillaOptionBloombergExample():
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    valueDate = FinDate(13, 2, 2018)
+    valuationDate = FinDate(13, 2, 2018)
     expiryDate = FinDate(15, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
@@ -180,7 +180,7 @@ def test_FinFXVanillaOptionBloombergExample():
     volatility = 0.20
 
     spotDays = 0
-    settlementDate = valueDate.addWeekDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
     maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
     notionalCurrency = "EUR"
@@ -192,8 +192,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinIborDeposit(settlementDate, maturityDate, domDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = FinIborSingleCurve(settlementDate,
-                                     depos, fras, swaps)
+    domDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -201,8 +200,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = FinIborDeposit(settlementDate, maturityDate, forDepoRate,
                            FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = FinIborSingleCurve(settlementDate,
-                                     depos, fras, swaps)
+    forDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     model = FinFXModelBlackScholes(volatility)
 
@@ -214,14 +212,14 @@ def test_FinFXVanillaOptionBloombergExample():
                                     notionalCurrency, 2)
 
     value = callOption.value(
-        valueDate,
+        valuationDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
         model)
 
     delta = callOption.delta(
-        valueDate,
+        valuationDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
@@ -236,15 +234,15 @@ def test_FinFXVanillaOptionBloombergExample():
 def test_FinFXVanillaOptionHullExample():
 
     #   Example from Hull 4th edition page 284
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = valueDate.addMonths(4)
+    valuationDate = FinDate(2015, 1, 1)
+    expiryDate = valuationDate.addMonths(4)
     spotFXRate = 1.60
     volatility = 0.1411
     domInterestRate = 0.08
     forInterestRate = 0.11
     model = FinFXModelBlackScholes(volatility)
-    domDiscountCurve = FinDiscountCurveFlat(valueDate, domInterestRate)
-    forDiscountCurve = FinDiscountCurveFlat(valueDate, forInterestRate)
+    domDiscountCurve = FinDiscountCurveFlat(valuationDate, domInterestRate)
+    forDiscountCurve = FinDiscountCurveFlat(valuationDate, forInterestRate)
 
     numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 
@@ -261,7 +259,7 @@ def test_FinFXVanillaOptionHullExample():
                                         "USD")
 
         value = callOption.value(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -270,7 +268,7 @@ def test_FinFXVanillaOptionHullExample():
         start = time.time()
 
         valueMC = callOption.valueMC(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -299,14 +297,14 @@ def test_FinFXVanillaOptionHullExample():
                                         "USD")
 
         value = callOption.value(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         start = time.time()
         valueMC = callOption.valueMC(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -333,14 +331,14 @@ def test_FinFXVanillaOptionHullExample():
                                        "USD")
 
         value = putOption.value(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         start = time.time()
         valueMC = putOption.valueMC(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -370,25 +368,25 @@ def test_FinFXVanillaOptionHullExample():
                                         1000000,
                                         "USD")
         value = callOption.value(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         delta = callOption.delta(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         vega = callOption.vega(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         theta = callOption.theta(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -415,25 +413,25 @@ def test_FinFXVanillaOptionHullExample():
                                        "USD")
 
         value = putOption.value(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         delta = putOption.delta(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         vega = putOption.vega(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         theta = putOption.theta(
-            valueDate,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -457,13 +455,13 @@ def test_FinFXVanillaOptionHullExample():
                                         1000000,
                                         "USD")
 
-        value = callOption.value(valueDate,
+        value = callOption.value(valuationDate,
                                  spotFXRate,
                                  domDiscountCurve,
                                  forDiscountCurve,
                                  model)['v']
 
-        impliedVol = callOption.impliedVolatility(valueDate,
+        impliedVol = callOption.impliedVolatility(valuationDate,
                                                   spotFXRate,
                                                   domDiscountCurve,
                                                   forDiscountCurve,
