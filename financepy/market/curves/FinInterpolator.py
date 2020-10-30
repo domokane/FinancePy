@@ -10,6 +10,7 @@ from ...finutils.FinGlobalVariables import gSmall
 
 from scipy.interpolate import PchipInterpolator
 from scipy.interpolate import interp1d
+from scipy.interpolate import CubicSpline
 
 ###############################################################################
 
@@ -19,11 +20,16 @@ from enum import Enum
 class FinInterpTypes(Enum):
                 FLAT_FWD_RATES = 1
                 LINEAR_FWD_RATES = 2
-                LINEAR_SWAP_RATES = 3
                 LINEAR_ZERO_RATES = 4
-                LINEAR_LOG_DFS = 5
-                CUBIC_ZERO_RATES = 6
-                CUBIC_LOG_DFS = 7
+#                LINEAR_LOG_DISCOUNT = 5  # SAME AS FLAT FORWARDS
+#                FINCUBIC_LOG_DISCOUNT = 6 # BAD AS IT WIGGLES - WORKS FOR RATES
+                FINCUBIC_ZERO_RATES = 7
+                NATCUBIC_LOG_DISCOUNT = 8
+                NATCUBIC_ZERO_RATES = 9
+                PCHIP_ZERO_RATES = 10
+                PCHIP_LOG_DISCOUNT = 11
+
+# LINEAR_SWAP_RATES = 3
 
 ###############################################################################
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -67,9 +73,6 @@ def _uinterpolate(t, times, dfs, method):
     interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. '''
     
-    if method == FinInterpTypes.LINEAR_SWAP_RATES.value:
-        method = FinInterpTypes.FLAT_FWD_RATES.value
-
     small = 1e-10
     numPoints = times.size
 
@@ -210,26 +213,67 @@ class FinInterpolator():
         if len(times) == 1:
             return
 
-        if self._interpType == FinInterpTypes.CUBIC_LOG_DFS:
+        if self._interpType == FinInterpTypes.PCHIP_LOG_DISCOUNT:
 
-            logDfs = np.log(self._dfs)
-            self._interpFn = PchipInterpolator(self._times, logDfs)
-    
-        elif self._interpType  == FinInterpTypes.LINEAR_LOG_DFS:
+             logDfs = np.log(self._dfs)
+             self._interpFn = PchipInterpolator(self._times, logDfs)
 
-            logDfs = np.log(self._dfs)
-            self._interpFn = interp1d(self._times, logDfs, 
-                                      fill_value="extrapolate")
+        elif self._interpType  == FinInterpTypes.PCHIP_ZERO_RATES:
 
-        elif self._interpType  == FinInterpTypes.CUBIC_ZERO_RATES:
+             gSmallVector = np.ones(len(self._times)) * gSmall
+             zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
 
+             if self._times[0] == 0.0:
+                 zeroRates[0] = zeroRates[1]
+
+             self._interpFn = PchipInterpolator(self._times, zeroRates)
+
+        # if self._interpType == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+
+        #     ''' Second derivatives at left is zero and first derivative at
+        #     right is clamped to zero. '''
+        #     logDfs = np.log(self._dfs)
+        #     self._interpFn = CubicSpline(self._times, logDfs,
+        #                                  bc_type=((2, 0.0), (1, 0.0)))
+
+        elif self._interpType == FinInterpTypes.FINCUBIC_ZERO_RATES:
+
+            ''' Second derivatives at left is zero and first derivative at
+            right is clamped to zero. '''
             gSmallVector = np.ones(len(self._times)) * gSmall
             zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
 
             if self._times[0] == 0.0:
                 zeroRates[0] = zeroRates[1]
 
-            self._interpFn = PchipInterpolator(self._times, zeroRates)
+            self._interpFn = CubicSpline(self._times, zeroRates,
+                                         bc_type=((2, 0.0), (1, 0.0)))
+
+        elif self._interpType == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
+
+            ''' Second derivatives are clamped to zero at end points '''
+            logDfs = np.log(self._dfs)
+            self._interpFn = CubicSpline(self._times, logDfs,
+                                         bc_type = 'natural')
+    
+        elif self._interpType == FinInterpTypes.NATCUBIC_ZERO_RATES:
+
+            ''' Second derivatives are clamped to zero at end points '''
+            gSmallVector = np.ones(len(self._times)) * gSmall
+            zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
+
+            if self._times[0] == 0.0:
+                zeroRates[0] = zeroRates[1]
+
+            self._interpFn = CubicSpline(self._times, zeroRates,
+                                         bc_type = 'natural')
+
+#        elif self._interpType  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+#
+#            logDfs = np.log(self._dfs)
+#            self._interpFn = interp1d(self._times, logDfs, 
+#                                      fill_value="extrapolate")
+
             
     ###########################################################################
 
@@ -264,17 +308,33 @@ class FinInterpolator():
         else:
             raise FinError("t is not a recognized type")
         
-        if self._interpType == FinInterpTypes.CUBIC_LOG_DFS:
+        if self._interpType == FinInterpTypes.PCHIP_LOG_DISCOUNT:
         
             out = np.exp(self._interpFn(tvec))
-    
-        elif self._interpType == FinInterpTypes.LINEAR_LOG_DFS:
-    
-            out = np.exp(self._interpFn(tvec))
 
-        elif self._interpType == FinInterpTypes.CUBIC_ZERO_RATES:
+        elif self._interpType == FinInterpTypes.PCHIP_ZERO_RATES:
     
             out = np.exp(-tvec * self._interpFn(tvec))
+
+        # if self._interpType == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+        
+        #     out = np.exp(self._interpFn(tvec))
+
+        elif self._interpType == FinInterpTypes.FINCUBIC_ZERO_RATES:
+        
+            out = np.exp(-tvec * self._interpFn(tvec))
+
+        elif self._interpType == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
+        
+            out = np.exp(self._interpFn(tvec))
+
+        elif self._interpType == FinInterpTypes.NATCUBIC_ZERO_RATES:
+        
+            out = np.exp(-tvec * self._interpFn(tvec))
+    
+#        elif self._interpType == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+#    
+#            out = np.exp(self._interpFn(tvec))
 
         else:
 

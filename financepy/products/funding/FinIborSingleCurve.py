@@ -68,17 +68,21 @@ def _costFunction(dfs, *args):
 
 #    print("Discount factors:", dfs)
 
-    liborCurve = args[0]
+    curve = args[0]
     valuationDate = liborCurve._valuationDate
-    liborCurve._dfs = dfs
+    curve._dfs = dfs
     
     times = liborCurve._times
     values = -np.log(dfs)
-    
-    if liborCurve._interpType == FinInterpTypes.CUBIC_SPLINE_LOGDFS:
-        liborCurve._splineFunction = CubicSpline(times, values)
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
+
+
+    if curve._interpType == FinInterpTypes.CUBIC_SPLINE_LOGDFS:
+        curve._splineFunction = CubicSpline(times, values)
     elif liborCurve._interpType == FinInterpTypes.PCHIP_CUBIC_SPLINE:
-        liborCurve._splineFunction = PchipInterpolator(times, values)
+        curve._splineFunction = PchipInterpolator(times, values)
 
     cost = 0.0
     for depo in liborCurve._usedDeposits:
@@ -170,11 +174,7 @@ class FinIborSingleCurve(FinDiscountCurve):
     def _buildCurve(self):
         ''' Build curve based on interpolation. '''
 
-        if self._interpType == FinInterpTypes.LINEAR_SWAP_RATES:
-            self._buildCurveLinearSwapRateInterpolation()
-            self._interpType = FinInterpTypes.LINEAR_ZERO_RATES
-        else:
-            self._buildCurveUsing1DSolver()
+        self._buildCurveUsing1DSolver()
 
 ###############################################################################
 

@@ -107,10 +107,7 @@ class FinInflationSwapCurve(FinDiscountCurve):
 
     def _buildCurve(self):
         ''' Build curve based on interpolation. '''
-        if self._interpType == FinInterpTypes.LINEAR_SWAP_RATES:
-            self._buildCurveLinearSwapRateInterpolation()
-        else:
-            self._buildCurveUsingSolver()
+        self._buildCurveUsingSolver()
 
 ###############################################################################
 

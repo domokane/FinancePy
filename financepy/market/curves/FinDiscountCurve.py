@@ -283,26 +283,18 @@ class FinDiscountCurve():
         ''' Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. '''
 
-        if self._interpType is FinInterpTypes.CUBIC_LOG_DFS:
-
-            df = self._interpolator.interpolate(t)
-
-        elif self._interpType is FinInterpTypes.CUBIC_ZERO_RATES:
-
-             df = self._interpolator.interpolate(t)
-
-        elif self._interpType is FinInterpTypes.LINEAR_LOG_DFS:
-
-             df = self._interpolator.interpolate(t)
+        if self._interpType is FinInterpTypes.FLAT_FWD_RATES or\
+            self._interpType is FinInterpTypes.LINEAR_ZERO_RATES or\
+                self._interpType is FinInterpTypes.LINEAR_FWD_RATES:
+                    
+                    df = interpolate(t,
+                                     self._times,
+                                     self._dfs,
+                                     self._interpType.value)        
 
         else:
 
- #            df = self._interpolator.interpolate(t)
-
-            df = interpolate(t,
-                             self._times,
-                             self._dfs,
-                             self._interpType.value)        
+             df = self._interpolator.interpolate(t)
 
         return df
 

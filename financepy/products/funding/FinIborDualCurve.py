@@ -11,7 +11,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolator import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes, FinInterpolator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.funding.FinIborDeposit import FinIborDeposit
 from ...products.funding.FinIborFRA import FinIborFRA
@@ -27,12 +27,15 @@ swaptol = 1e-10
 def _f(df, *args):
     ''' Root search objective function for swaps '''
     discountCurve = args[0]
-    indexCurve = args[1]
+    curve = args[1]
     valueDate = args[2]
     swap = args[3]
-    numPoints = len(indexCurve._times)
-    indexCurve._dfs[numPoints - 1] = df
-    v_swap = swap.value(valueDate, discountCurve, indexCurve, None, 1.0)
+    numPoints = len(curve._times)
+    curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
+    v_swap = swap.value(valueDate, discountCurve, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
 
@@ -41,13 +44,17 @@ def _f(df, *args):
 
 def _g(df, *args):
     ''' Root search objective function for swaps '''
+
     discountCurve = args[0]
-    indexCurve = args[1]
+    curve = args[1]
     valueDate = args[2]
     fra = args[3]
-    numPoints = len(indexCurve._times)
-    indexCurve._dfs[numPoints - 1] = df
-    v_fra = fra.value(valueDate, discountCurve, indexCurve)
+    numPoints = len(curve._times)
+    curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
+    v_fra = fra.value(valueDate, discountCurve, curve)
     v_fra /= fra._notional
     return v_fra
 
@@ -92,11 +99,8 @@ class FinIborDualCurve(FinDiscountCurve):
 
     def _buildCurve(self):
         ''' Build curve based on interpolation. '''
-#        if self._interpType == FinInterpTypes.LINEAR_SWAP_RATES:
-#            self._buildCurveLinearSwapRateInterpolation()
-#        else:
-            
-        self._buildCurveUsingSolver()
+
+        self._buildCurveUsing1DSolver()
 
 ###############################################################################
 
@@ -271,11 +275,13 @@ class FinIborDualCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsingSolver(self):
+    def _buildCurveUsing1DSolver(self):
         ''' Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. '''
+
+        self._interpolator = FinInterpolator(self._interpType)
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -285,6 +291,7 @@ class FinIborDualCurve(FinDiscountCurve):
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, dfMat)
+        self._interpolator.fit(self._times, self._dfs)
 
         # A deposit is not margined and not indexed to Libor so should
         # probably not be used to build an indexed Libor curve from
@@ -294,6 +301,7 @@ class FinIborDualCurve(FinDiscountCurve):
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
             self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldtmat = tmat
 
@@ -312,7 +320,6 @@ class FinIborDualCurve(FinDiscountCurve):
             else:
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
-
                 argtuple = (self._discountCurve, self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
@@ -338,137 +345,146 @@ class FinIborDualCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveLinearSwapRateInterpolation(self):
-        ''' Construct the discount curve using a bootstrap approach. This is
-        the linear swap rate method that is fast and exact as it does not
-        require the use of a solver. It is also market standard. '''
+    # def _buildCurveLinearSwapRateInterpolation(self):
+    #     ''' Construct the discount curve using a bootstrap approach. This is
+    #     the linear swap rate method that is fast and exact as it does not
+    #     require the use of a solver. It is also market standard. '''
 
-        self._times = np.array([])
-        self._dfs = np.array([])
+    #     self._interpolator = FinInterpolator(self._interpType)
 
-        # time zero is now.
-        tmat = 0.0
-        dfMat = 1.0
-        self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, dfMat)
+    #     self._times = np.array([])
+    #     self._dfs = np.array([])
 
-        for depo in self._usedDeposits:
-            dfSettle = self.df(depo._startDate)
-            dfMat = depo._maturityDf() * dfSettle
-            tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
-            self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
+    #     # time zero is now.
+    #     tmat = 0.0
+    #     dfMat = 1.0
+    #     self._times = np.append(self._times, 0.0)
+    #     self._dfs = np.append(self._dfs, dfMat)
+    #     self._interpolator.fit(self._times, self._dfs)
 
-        oldtmat = tmat
+    #     for depo in self._usedDeposits:
+    #         dfSettle = self.df(depo._startDate)
+    #         dfMat = depo._maturityDf() * dfSettle
+    #         tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
+    #         self._times = np.append(self._times, tmat)
+    #         self._dfs = np.append(self._dfs, dfMat)
+    #         self._interpolator.fit(self._times, self._dfs)
 
-        for fra in self._usedFRAs:
+    #     oldtmat = tmat
 
-            tset = (fra._startDate - self._valuationDate) / gDaysInYear
-            tmat = (fra._maturityDate - self._valuationDate) / gDaysInYear
+    #     for fra in self._usedFRAs:
 
-            # if both dates are after the previous FRA/FUT then need to
-            # solve for 2 discount factors simultaneously using root search
+    #         tset = (fra._startDate - self._valuationDate) / gDaysInYear
+    #         tmat = (fra._maturityDate - self._valuationDate) / gDaysInYear
 
-            if tset < oldtmat and tmat > oldtmat:
-                dfMat = fra.maturityDf(self)
-                self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
-            else:
-                self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
+    #         # if both dates are after the previous FRA/FUT then need to
+    #         # solve for 2 discount factors simultaneously using root search
 
-                argtuple = (self, self._valuationDate, fra)
-                dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
-                                        args=argtuple, tol=swaptol,
-                                        maxiter=50, fprime2=None)
+    #         if tset < oldtmat and tmat > oldtmat:
+    #             dfMat = fra.maturityDf(self)
+    #             self._times = np.append(self._times, tmat)
+    #             self._dfs = np.append(self._dfs, dfMat)
+    #             self._interpolator.fit(self._times, self._dfs)
+    #         else:
+    #             self._times = np.append(self._times, tmat)
+    #             self._dfs = np.append(self._dfs, dfMat)
+    #             self._interpolator.fit(self._times, self._dfs)
 
-        if len(self._usedSwaps) == 0:
-            if self._checkRefit is True:
-                self._checkRefits(1e-10, swaptol, 1e-5)
-            return
+    #             argtuple = (self._discountCurve, self, self._valuationDate, fra)
+    #             dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
+    #                                     args=argtuple, tol=swaptol,
+    #                                     maxiter=50, fprime2=None)
 
-        #######################################################################
-        # ADD SWAPS TO CURVE
-        #######################################################################
+    #     if len(self._usedSwaps) == 0:
+    #         if self._checkRefit is True:
+    #             self._checkRefits(1e-10, swaptol, 1e-5)
+    #         return
 
-        # Find where the FRAs and Depos go up to as this bit of curve is done
-        foundStart = False
-        lastDate = self._valuationDate
-        if len(self._usedDeposits) != 0:
-            lastDate = self._usedDeposits[-1]._maturityDate
+    #     #######################################################################
+    #     # ADD SWAPS TO CURVE
+    #     #######################################################################
 
-        if len(self._usedFRAs) != 0:
-            lastDate = self._usedFRAs[-1]._maturityDate
+    #     # Find where the FRAs and Depos go up to as this bit of curve is done
+    #     foundStart = False
+    #     lastDate = self._valuationDate
+    #     if len(self._usedDeposits) != 0:
+    #         lastDate = self._usedDeposits[-1]._maturityDate
 
-        # We use the longest swap assuming it has a superset of ALL of the
-        # swap flow dates used in the curve construction
-        longestSwap = self._usedSwaps[-1]
-        couponDates = longestSwap._adjustedFixedDates
-        numFlows = len(couponDates)
+    #     if len(self._usedFRAs) != 0:
+    #         lastDate = self._usedFRAs[-1]._maturityDate
 
-        # Find where first coupon without discount factor starts
-        startIndex = 0
-        for i in range(0, numFlows):
-            if couponDates[i] > lastDate:
-                startIndex = i
-                foundStart = True
-                break
+    #     # We use the longest swap assuming it has a superset of ALL of the
+    #     # swap flow dates used in the curve construction
+    #     longestSwap = self._usedSwaps[-1]
+    #     couponDates = longestSwap._adjustedFixedDates
+    #     numFlows = len(couponDates)
 
-        if foundStart is False:
-            raise FinError("Found start is false. Swaps payments inside FRAs")
+    #     # Find where first coupon without discount factor starts
+    #     startIndex = 0
+    #     for i in range(0, numFlows):
+    #         if couponDates[i] > lastDate:
+    #             startIndex = i
+    #             foundStart = True
+    #             break
 
-        swapRates = []
-        swapTimes = []
+    #     if foundStart is False:
+    #         raise FinError("Found start is false. Swaps payments inside FRAs")
 
-        # I use the last coupon date for the swap rate interpolation as this
-        # may be different from the maturity date due to a holiday adjustment
-        # and the swap rates need to align with the coupon payment dates
-        for swap in self._usedSwaps:
-            swapRate = swap._fixedCoupon
-            maturityDate = swap._adjustedFixedDates[-1]
-            tswap = (maturityDate - self._valuationDate) / gDaysInYear
-            swapTimes.append(tswap)
-            swapRates.append(swapRate)
+    #     swapRates = []
+    #     swapTimes = []
 
-        interpolatedSwapRates = [0.0]
-        interpolatedSwapTimes = [0.0]
+    #     # I use the last coupon date for the swap rate interpolation as this
+    #     # may be different from the maturity date due to a holiday adjustment
+    #     # and the swap rates need to align with the coupon payment dates
+    #     for swap in self._usedSwaps:
+    #         swapRate = swap._fixedCoupon
+    #         maturityDate = swap._adjustedFixedDates[-1]
+    #         tswap = (maturityDate - self._valuationDate) / gDaysInYear
+    #         swapTimes.append(tswap)
+    #         swapRates.append(swapRate)
 
-        for dt in couponDates[1:]:
-            swapTime = (dt - self._valuationDate) / gDaysInYear
-            swapRate = np.interp(swapTime, swapTimes, swapRates)
-            interpolatedSwapRates.append(swapRate)
-            interpolatedSwapTimes.append(swapTime)
+    #     interpolatedSwapRates = [0.0]
+    #     interpolatedSwapTimes = [0.0]
 
-        # Do I need this line ?
-        interpolatedSwapRates[0] = interpolatedSwapRates[1]
+    #     for dt in couponDates[1:]:
+    #         swapTime = (dt - self._valuationDate) / gDaysInYear
+    #         swapRate = np.interp(swapTime, swapTimes, swapRates)
+    #         interpolatedSwapRates.append(swapRate)
+    #         interpolatedSwapTimes.append(swapTime)
 
-        accrualFactors = longestSwap._fixedYearFracs
+    #     # Do I need this line ?
+    #     interpolatedSwapRates[0] = interpolatedSwapRates[1]
 
-        acc = 0.0
-        df = 1.0
-        pv01 = 0.0
-        dfSettle = self.df(longestSwap._startDate)
+    #     accrualFactors = longestSwap._fixedYearFracs
 
-        for i in range(1, startIndex):
-            dt = couponDates[i]
-            df = self.df(dt)
-            acc = accrualFactors[i-1]
-            pv01 += acc * df
+    #     acc = 0.0
+    #     df = 1.0
+    #     pv01 = 0.0
+    #     dfSettle = self.df(longestSwap._startDate)
 
-        for i in range(startIndex, numFlows):
+    #     for i in range(1, startIndex):
+    #         dt = couponDates[i]
+    #         df = self.df(dt)
+    #         acc = accrualFactors[i-1]
+    #         pv01 += acc * df
 
-            dt = couponDates[i]
-            tmat = (dt - self._valuationDate) / gDaysInYear
-            swapRate = interpolatedSwapRates[i]
-            acc = accrualFactors[i-1]
-            pv01End = (acc * swapRate + 1.0)
-            dfMat = (dfSettle - swapRate * pv01) / pv01End
-            self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
-            pv01 += acc * dfMat
+    #     for i in range(startIndex, numFlows):
 
-        if self._checkRefit is True:
-            self._checkRefits(1e-10, swaptol, 1e-5)
+    #         dt = couponDates[i]
+    #         tmat = (dt - self._valuationDate) / gDaysInYear
+    #         swapRate = interpolatedSwapRates[i]
+    #         acc = accrualFactors[i-1]
+    #         pv01End = (acc * swapRate + 1.0)
+    #         dfMat = (dfSettle - swapRate * pv01) / pv01End
+
+    #         self._times = np.append(self._times, tmat)
+    #         self._dfs = np.append(self._dfs, dfMat)
+    #         self._interpolator.fit(self._times, self._dfs)
+
+    #         pv01 += acc * dfMat
+
+    #     if self._checkRefit is True:
+    #         self._checkRefits(1e-10, swaptol, 1e-5)
 
 ###############################################################################
 

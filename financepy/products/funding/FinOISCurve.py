@@ -11,7 +11,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, gridIndex
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolator import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes, FinInterpolator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinDayCount import FinDayCountTypes
 
@@ -58,6 +58,9 @@ def _f(df, *args):
     swap = args[2]
     numPoints = len(curve._times)
     curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valueDate, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -72,6 +75,9 @@ def _g(df, *args):
     fra = args[2]
     numPoints = len(curve._times)
     curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
     v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
@@ -117,6 +123,7 @@ class FinOISCurve(FinDiscountCurve):
         self._validateInputs(oisDeposits, oisFRAs, oisSwaps)
         self._interpType = interpType
         self._checkRefit = checkRefit
+        self._interpolator = None
         self._buildCurve()
 
 ###############################################################################
@@ -124,10 +131,7 @@ class FinOISCurve(FinDiscountCurve):
     def _buildCurve(self):
         ''' Build curve based on interpolation. '''
             
-        if self._interpType == FinInterpTypes.LINEAR_SWAP_RATES:
-            self._buildCurveLinearSwapRateInterpolation()
-        else:
-            self._buildCurveUsingSolver()
+        self._buildCurveUsing1DSolver()
 
 ###############################################################################
 
@@ -306,11 +310,13 @@ class FinOISCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsingSolver(self):
+    def _buildCurveUsing1DSolver(self):
         ''' Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. '''
+
+        self._interpolator = FinInterpolator(self._interpType)
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -320,6 +326,7 @@ class FinOISCurve(FinDiscountCurve):
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, dfMat)
+        self._interpolator.fit(self._times, self._dfs)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
@@ -327,6 +334,7 @@ class FinOISCurve(FinDiscountCurve):
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
             self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldtmat = tmat
 
@@ -376,6 +384,8 @@ class FinOISCurve(FinDiscountCurve):
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. '''
 
+        self._interpolator = FinInterpolator(self._interpType)
+
         self._times = np.array([])
         self._dfs = np.array([])
 
@@ -391,6 +401,7 @@ class FinOISCurve(FinDiscountCurve):
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
             self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldtmat = tmat
 
@@ -406,9 +417,11 @@ class FinOISCurve(FinDiscountCurve):
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
+                self._interpolator.fit(self._times, self._dfs)
             else:
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
+                self._interpolator.fit(self._times, self._dfs)
 
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -500,6 +513,7 @@ class FinOISCurve(FinDiscountCurve):
 
             self._times = np.append(self._times, tmat)
             self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
             pv01 += acc * dfMat
 

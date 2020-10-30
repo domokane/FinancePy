@@ -250,7 +250,7 @@ def test_bloombergPricingExample():
 #    print(oisCurve)
 
     liborDualCurve = FinIborDualCurve(valuationDate, oisCurve, depos, fras, swaps,
-                                      FinInterpTypes.LINEAR_SWAP_RATES, True)
+                                      FinInterpTypes.FLAT_FWD_RATES, True)
 #    print(liborDualCurve) 
     
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
