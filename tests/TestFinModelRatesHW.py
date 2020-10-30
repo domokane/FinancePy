@@ -78,14 +78,14 @@ def test_HullWhiteExampleTwo():
     vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
-    numStepsList = range(100, 500, 50)
+    numStepsList = range(100, 500, 100)
     analVector = []
     treeVector = []
 
     testCases.banner("Comparing option on zero coupon bond analytical vs Tree")
 
-    testCases.header("NUMTIMESTEP", "VTREE_CALL", "VTREE_PUT", 
-                     "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF", "TIME")
+    testCases.header("NUMTIMESTEP", "TIME", "VTREE_CALL", "VTREE_PUT", 
+                     "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF")
 
     for numTimeSteps in numStepsList:
 
@@ -108,8 +108,8 @@ def test_HullWhiteExampleTwo():
         diffC = vTreeCall - vAnal['call']
         diffP = vTreePut - vAnal['put']
         
-        testCases.print(numTimeSteps, vTreeCall, vAnal['call'],
-                        vTreePut, vAnal['put'], diffC, diffP, period)
+        testCases.print(numTimeSteps, period, vTreeCall, vAnal['call'],
+                        vTreePut, vAnal['put'], diffC, diffP)
 
  #   plt.plot(numStepsList, treeVector)
  #   plt.plot(numStepsList, analVector)
@@ -164,7 +164,7 @@ def test_HullWhiteBondOption():
     model = FinModelRatesHW(sigma, a, None)
 
     #  Test convergence
-    numStepsList = range(20, 500, 10)
+    numStepsList = range(50, 500, 50)
     texp = (expiryDate - settlementDate)/gDaysInYear
 
     vJam = model.europeanBondOptionJamshidian(texp, strikePrice, face,
@@ -173,7 +173,7 @@ def test_HullWhiteBondOption():
     
     testCases.banner("Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry.")
 
-    testCases.header("NUMSTEPS", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN", "TIME")
+    testCases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN")
 
     for numTimeSteps in numStepsList:
 
@@ -195,7 +195,7 @@ def test_HullWhiteBondOption():
         end = time.time()
         period = end-start
 
-        testCases.print(numTimeSteps, v1, v2, vJam, period)
+        testCases.print(numTimeSteps, period, v1, v2, vJam)
 
 #    plt.plot(numStepsList, treeVector)
 
@@ -298,7 +298,7 @@ def test_HullWhiteCallableBond():
     a = 0.01
 
     # Test convergence
-    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    numStepsList = [100, 200, 500, 1000]
     tmat = (maturityDate - settlementDate)/gDaysInYear
 
     testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")

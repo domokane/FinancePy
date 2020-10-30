@@ -13,8 +13,8 @@ Equity volatility as a function of option strike. This is usually a skew shape.
 ### FinFXVolSurface
 FX volatility as a function of option expiry and strike. This class constructs the surface from the ATM volatility and 25 delta strangles and risk reversals and does so for multiple expiry dates.
 
-## FinLiborCapFloorVol
+## FinIborCapFloorVol
 Libor cap/floor volatility as a function of option expiry (cap/floor start date). Takes in cap (flat) volatility and boostraps the caplet volatility. This is assumed to be piecewise flat.
 
-## FinLiborCapFloorVolFn
+## FinIborCapFloorVolFn
 Parametric function for storing the cap and caplet volatilities based on form proposed by Rebonato. 

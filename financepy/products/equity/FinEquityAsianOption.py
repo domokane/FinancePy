@@ -130,11 +130,11 @@ def _valueMC_NUMBA(t0,
         s_2_arithmetic /= n
 
         if optionType == FinOptionTypes.EUROPEAN_CALL:
-            payoff_a += max(s_1_arithmetic - K, 0)
-            payoff_a += max(s_2_arithmetic - K, 0)
+            payoff_a += max(s_1_arithmetic - K, 0.0)
+            payoff_a += max(s_2_arithmetic - K, 0.0)
         elif optionType == FinOptionTypes.EUROPEAN_PUT:
-            payoff_a += max(K - s_1_arithmetic, 0)
-            payoff_a += max(K - s_2_arithmetic, 0)
+            payoff_a += max(K - s_1_arithmetic, 0.0)
+            payoff_a += max(K - s_2_arithmetic, 0.0)
         else:
             return None
 
@@ -218,11 +218,11 @@ def _valueMC_fast_NUMBA(t0: float,
             s_2_arithmetic[ip] += s_2[ip] / n
 
     if optionType == FinOptionTypes.EUROPEAN_CALL:
-        payoff_a_1 = np.maximum(s_1_arithmetic - K, 0)
-        payoff_a_2 = np.maximum(s_2_arithmetic - K, 0)
+        payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
+        payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
     elif optionType == FinOptionTypes.EUROPEAN_PUT:
-        payoff_a_1 = np.maximum(K - s_1_arithmetic, 0)
-        payoff_a_2 = np.maximum(K - s_2_arithmetic, 0)
+        payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
+        payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
     else:
         raise FinError("Unknown option type.")
 

@@ -56,16 +56,15 @@ def _valueOnce(stockPrice,
                riskFreeRate,
                dividendYield,
                volatility,
-               t1,
-               t2,
-               optionType1,
-               optionType2,
-               k1,
-               k2,
+               t1, t2,
+               optionType1, optionType2,
+               k1, k2,
                numSteps):
 
     if numSteps < 3:
         numSteps = 3
+
+    # TODO EUROPEAN call-put works but AMERICAN call-put needs to be tested
 
     # Need equally spaced time intervals for a recombining tree
     # Downside is that we may not measure periods exactly
@@ -128,15 +127,16 @@ def _valueOnce(stockPrice,
         s = stockValues[index + iNode]
         if optionType2 == FinOptionTypes.EUROPEAN_CALL\
            or optionType2 == FinOptionTypes.AMERICAN_CALL:
-            optionValues[index + iNode] = max(s - k2, 0)
+            optionValues[index + iNode] = max(s - k2, 0.0)
         elif optionType2 == FinOptionTypes.EUROPEAN_PUT\
            or optionType2 == FinOptionTypes.AMERICAN_PUT:
-            optionValues[index + iNode] = max(k2 - s, 0)
+            optionValues[index + iNode] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
     for iTime in range(numSteps - 1, numSteps1, -1):
         index = int(0.5 * iTime * (iTime + 1))
         for iNode in range(0, iTime + 1):
+            s = stockValues[index + iNode]
             nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
             nextNodeDn = nextIndex + iNode
             nextNodeUp = nextIndex + iNode + 1
@@ -146,12 +146,12 @@ def _valueOnce(stockPrice,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            exerciseValue = 0.0
+            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
-                exerciseValue = max(s - k2, 0)
+                exerciseValue = max(s - k2, 0.0)
             elif optionType1 == FinOptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k2 - s, 0)
+                exerciseValue = max(k2 - s, 0.0)
 
             optionValues[index + iNode] = max(exerciseValue, holdValue)
 
@@ -159,6 +159,7 @@ def _valueOnce(stockPrice,
     iTime = numSteps1
     index = int(0.5 * iTime * (iTime + 1))
     for iNode in range(0, iTime + 1):
+        s = stockValues[index + iNode]
         nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
         nextNodeDn = nextIndex + iNode
         nextNodeUp = nextIndex + iNode + 1
@@ -170,10 +171,10 @@ def _valueOnce(stockPrice,
 
         if optionType1 == FinOptionTypes.EUROPEAN_CALL\
            or optionType1 == FinOptionTypes.AMERICAN_CALL:
-            optionValues[index + iNode] = max(holdValue - k1, 0)
+            optionValues[index + iNode] = max(holdValue - k1, 0.0)
         elif optionType1 == FinOptionTypes.EUROPEAN_PUT\
            or optionType1 == FinOptionTypes.AMERICAN_PUT:
-            optionValues[index + iNode] = max(k1 - holdValue, 0)
+            optionValues[index + iNode] = max(k1 - holdValue, 0.0)
 
     # begin backward steps from t1 expiry to value date
     for iTime in range(numSteps1 - 1, -1, -1):
@@ -189,10 +190,12 @@ def _valueOnce(stockPrice,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
+            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
+
             if optionType1 == FinOptionTypes.AMERICAN_CALL:
-                exerciseValue = max(holdValue - k1, 0)
+                exerciseValue = max(holdValue - k1, 0.0)
             elif optionType1 == FinOptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k1 - holdValue, 0)
+                exerciseValue = max(k1 - holdValue, 0.0)
 
             optionValues[index + iNode] = max(exerciseValue, holdValue)
 

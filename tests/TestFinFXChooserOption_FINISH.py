@@ -118,7 +118,7 @@ def test_FinEquityCompoundOption():
 
             cmpdOption = FinEquityCompoundOption(
                 expiryDate1, optionType1, k1, expiryDate2, optionType2, k2)
-            stockPrices = range(70, 100)
+            stockPrices = range(70, 100, 5)
 
             for stockPrice in stockPrices:
                 value = cmpdOption.value(

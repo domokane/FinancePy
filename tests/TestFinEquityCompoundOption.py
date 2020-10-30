@@ -30,78 +30,66 @@ def test_FinEquityCompoundOption():
     model = FinEquityModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
-    optionType1 = FinOptionTypes.EUROPEAN_CALL
-    optionType2 = FinOptionTypes.EUROPEAN_PUT
+    numStepsList = [100, 200, 500, 1000, 2000, 5000]
 
-    numStepsList = [200,
-                    300,
-                    400,
-                    500,
-                    600,
-                    700,
-                    800,
-                    900,
-                    1000,
-                    2000,
-                    3000,
-                    4000,
-                    5000]
+    ###########################################################################
 
-    cmpdOption = FinEquityCompoundOption(expiryDate1,
-                                         optionType1,
-                                         k1,
-                                         expiryDate2,
-                                         optionType2,
-                                         k2)
     stockPrice = 85.0
 
-    testCases.header(
-        "TYPE1",
-        "TYPE2",
-        "K1",
-        "K2",
-        "S",
-        "Exact",
-        "TreeSteps",
-        "TreeValue")
-    for numSteps in numStepsList:
+    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S", "TreeSteps", "Exact", "TreeValue")
 
-        value = cmpdOption.value(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model)
-        values = cmpdOption._valueTree(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model,
-            numSteps)
-        testCases.print(
-            optionType1,
-            optionType2,
-            k1,
-            k2,
-            stockPrice,
-            value,
-            numSteps,
-            values[0])
+    for optionType1 in [
+            FinOptionTypes.EUROPEAN_CALL,
+            FinOptionTypes.EUROPEAN_PUT]:
+        for optionType2 in [
+                FinOptionTypes.EUROPEAN_CALL,
+                FinOptionTypes.EUROPEAN_PUT]:
 
-    testCases.header(
-        "TYPE1",
-        "TYPE2",
-        "K1",
-        "K2",
-        "S",
-        "Exact",
-        "TreeSteps",
-        "TreeValue",
-        "Diff",
-        "DELTA",
-        "GAMMA",
-        "THETA")
+            cmpdOption = FinEquityCompoundOption(expiryDate1, optionType1, k1,
+                                                 expiryDate2, optionType2, k2)
+
+            for numSteps in numStepsList:
+        
+                value = cmpdOption.value(valueDate, stockPrice, discountCurve,
+                                         dividendYield, model)
+
+                values = cmpdOption._valueTree(valueDate, stockPrice, discountCurve,
+                                               dividendYield, model, numSteps)
+        
+                testCases.print(optionType1, optionType2, k1, k2, stockPrice,
+                                numSteps, value, values[0])
+
+    ###########################################################################
+
+    stockPrice = 85.0
+
+    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S", "TreeSteps", "Exact", "TreeValue")
+
+    for optionType1 in [
+            FinOptionTypes.AMERICAN_CALL,
+            FinOptionTypes.AMERICAN_PUT]:
+        for optionType2 in [
+                FinOptionTypes.AMERICAN_CALL,
+                FinOptionTypes.AMERICAN_PUT]:
+
+            cmpdOption = FinEquityCompoundOption(expiryDate1, optionType1, k1,
+                                                 expiryDate2, optionType2, k2)
+
+            for numSteps in numStepsList:
+        
+                value = cmpdOption.value(valueDate, stockPrice, discountCurve,
+                                         dividendYield, model, numSteps)
+
+                values = cmpdOption._valueTree(valueDate, stockPrice, discountCurve,
+                                               dividendYield, model, numSteps)
+        
+                testCases.print(optionType1, optionType2, k1, k2, stockPrice,
+                                numSteps, value, values[0])
+
+    ###########################################################################
+
+    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S", "Exact", "TreeSteps",
+                     "TreeValue", "Diff", "DELTA", "GAMMA", "THETA")
 
     for optionType1 in [
             FinOptionTypes.EUROPEAN_CALL,
@@ -113,7 +101,7 @@ def test_FinEquityCompoundOption():
             cmpdOption = FinEquityCompoundOption(
                 expiryDate1, optionType1, k1,
                 expiryDate2, optionType2, k2)
-            stockPrices = range(70, 100)
+            stockPrices = range(70, 100, 10)
 
             for stockPrice in stockPrices:
                 value = cmpdOption.value(

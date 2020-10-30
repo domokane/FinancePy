@@ -24,7 +24,7 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...market.curves.FinInterpolate import interpolate, FinInterpTypes
+from ...market.curves.FinInterpolator import interpolate, FinInterpTypes
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
@@ -275,7 +275,7 @@ class FinCDSBasket(object):
                 recoveryRates[iCredit] = issuerCurve._recoveryRate
                 issuerSurvivalProbabilities[iCredit] = interpolate(
                     t, issuerCurve._times, issuerCurve._values,
-                    FinInterpTypes.FLAT_FORWARDS.value)
+                    FinInterpTypes.FLAT_FWD_RATES.value)
 
             lossDbn = homogeneousBasketLossDbn(issuerSurvivalProbabilities,
                                                recoveryRates,

@@ -49,13 +49,13 @@ def payoffValue(s, payoffTypeValue, payoffParams):
         k = payoffParams[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
-        payoff = np.maximum(assetn - k, 0)
+        payoff = np.maximum(assetn - k, 0.0)
     elif payoffTypeValue == FinEquityRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoffParams[0]
         k = payoffParams[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
-        payoff = np.maximum(k - assetn, 0)
+        payoff = np.maximum(k - assetn, 0.0)
     else:
         raise FinError("Unknown payoff type")
 

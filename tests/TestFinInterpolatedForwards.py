@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 
 import numpy as np
@@ -33,9 +33,9 @@ def test_FinInterpolatedForwards():
     tDates = curveDate.addYears(tValues)
     tInterpDates = curveDate.addYears(tInterpValues)
 
-    for method in FinInterpTypes:
+    for interpType in FinInterpTypes:
 
-        discountCurve = FinDiscountCurve(curveDate, tDates, dfValues, method)
+        discountCurve = FinDiscountCurve(curveDate, tDates, dfValues, interpType)
         dfInterpValues = discountCurve.df(tInterpDates)
         fwdInterpValues = discountCurve.fwd(tInterpDates)
         zeroInterpValues = discountCurve.zeroRate(tInterpDates)
@@ -44,13 +44,13 @@ def test_FinInterpolatedForwards():
             plt.figure(figsize=(8, 6))
             plt.plot(tValues, dfValues, 'o', color='g', label="DFS:")
             plt.plot(tInterpValues, dfInterpValues, color='r',
-                     label="DF:" + str(method))
+                     label="DF:" + str(interpType))
             plt.legend()
             plt.figure(figsize=(8, 6))
             plt.plot(tInterpValues, fwdInterpValues, color='r',
-                     label="FWD:" + str(method))
+                     label="FWD:" + str(interpType))
             plt.plot(tInterpValues, zeroInterpValues, color='b',
-                     label="ZERO:" + str(method))
+                     label="ZERO:" + str(interpType))
             plt.plot(tValues, rValues, 'o', color='g',  label="ZERO RATES")
             plt.legend()
 

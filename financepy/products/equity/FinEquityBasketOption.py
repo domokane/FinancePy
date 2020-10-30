@@ -225,9 +225,9 @@ class FinEquityBasketOption():
                                     seed)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            payoff = np.maximum(np.mean(Sall, axis=1) - k, 0)
+            payoff = np.maximum(np.mean(Sall, axis=1) - k, 0.0)
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            payoff = np.maximum(k - np.mean(Sall, axis=1), 0)
+            payoff = np.maximum(k - np.mean(Sall, axis=1), 0.0)
         else:
             raise FinError("Unknown option type.")
 

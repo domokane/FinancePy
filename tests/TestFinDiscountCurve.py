@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 
@@ -29,18 +29,18 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurve():
 
     # Create a curve from times and discount factors
-    start = FinDate(1, 1, 2018)
+    startDate = FinDate(1, 1, 2018)
     years = np.linspace(0, 10, 6)
     rate = 0.05 + 0.005*years - 0.0003*years*years
     dfs = np.exp(-rate * years)
-    dates = start.addYears(years)
+    dates = startDate.addYears(years)
 
-    curve = FinDiscountCurve(start, dates, dfs, FinInterpTypes.FLAT_FORWARDS)
+    curve = FinDiscountCurve(startDate, dates, dfs, FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
     plotYears = np.linspace(0, 12, 12*12+1)
-    plotDates = start.addYears(plotYears)
+    plotDates = startDate.addYears(plotYears)
 
     # Examine dependency of curve on compounding rate
     zeroRates_A = curve.zeroRate(plotDates, FinFrequencyTypes.ANNUAL)
@@ -67,10 +67,10 @@ def test_FinDiscountCurve():
 
     for interp in FinInterpTypes:
 
-        curve = FinDiscountCurve(start, dates, dfs, interp)
+        curve = FinDiscountCurve(startDate, dates, dfs, interp)
         fwdRates = curve.fwd(plotDates)
         zeroRates = curve.zeroRate(plotDates, FinFrequencyTypes.ANNUAL)
-        parRates = curve.swapRate(start, plotDates, FinFrequencyTypes.ANNUAL)
+        parRates = curve.swapRate(startDate, plotDates, FinFrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))

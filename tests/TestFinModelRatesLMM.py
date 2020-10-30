@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time as time
-from financepy.market.volatility.FinLiborCapVolCurve import FinLiborCapVolCurve
+from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.products.libor.FinLiborSwaption import FinSwapTypes
-from financepy.products.libor.FinLiborSwaption import FinLiborSwaption
+from financepy.products.funding.FinIborSwaption import FinSwapTypes
+from financepy.products.funding.FinIborSwaption import FinIborSwaption
 from financepy.finutils.FinHelperFunctions import checkVectorDifferences
 
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsNF
@@ -73,7 +73,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
-    volCurve = FinLiborCapVolCurve(valuationDate,
+    volCurve = FinIborCapVolCurve(valuationDate,
                                    capVolDates,
                                    capVolatilities,
                                    dayCountType)
@@ -164,8 +164,8 @@ def getForwardCurve(numFwds, r):
 #         notional = 1.0
 
 #         # Pricing a PAYER
-#         swaptionType = FinLiborSwaptionTypes.PAYER
-#         swaption = FinLiborSwaption(settlementDate,
+#         swaptionType = FinIborSwaptionTypes.PAYER
+#         swaption = FinIborSwaption(settlementDate,
 #                                     exerciseDate,
 #                                     maturityDate,
 #                                     swaptionType,

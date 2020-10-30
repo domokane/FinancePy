@@ -285,13 +285,13 @@ class FinFXBarrierOption(FinFXOption):
 
         if simpleCall:
             sT = Sall[:, -1]
-            c = (np.maximum(sT - K, 0)).mean()
+            c = (np.maximum(sT - K, 0.0)).mean()
             c = c * exp(-rd * t)
             return c
 
         if simplePut:
             sT = Sall[:, -1]
-            p = (np.maximum(K - sT, 0)).mean()
+            p = (np.maximum(K - sT, 0.0)).mean()
             p = p * exp(-rd * t)
             return p
 
@@ -328,25 +328,25 @@ class FinFXBarrierOption(FinFXOption):
         ones = np.ones(numPaths)
 
         if optionType == FinFXBarrierTypes.DOWN_AND_OUT_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * \
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
                 (ones - barrierCrossedFromAbove)
         elif optionType == FinFXBarrierTypes.DOWN_AND_IN_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * barrierCrossedFromAbove
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrierCrossedFromAbove
         elif optionType == FinFXBarrierTypes.UP_AND_IN_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * barrierCrossedFromBelow
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrierCrossedFromBelow
         elif optionType == FinFXBarrierTypes.UP_AND_OUT_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * \
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
                 (ones - barrierCrossedFromBelow)
         elif optionType == FinFXBarrierTypes.UP_AND_IN_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * barrierCrossedFromBelow
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrierCrossedFromBelow
         elif optionType == FinFXBarrierTypes.UP_AND_OUT_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * \
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
                 (ones - barrierCrossedFromBelow)
         elif optionType == FinFXBarrierTypes.DOWN_AND_OUT_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * \
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
                 (ones - barrierCrossedFromAbove)
         elif optionType == FinFXBarrierTypes.DOWN_AND_IN_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * barrierCrossedFromAbove
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrierCrossedFromAbove
         else:
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))

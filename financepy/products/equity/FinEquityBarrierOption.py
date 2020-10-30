@@ -330,12 +330,12 @@ class FinEquityBarrierOption(FinEquityOption):
                 processType, t, modelParams, 1, numPaths, seed)
 
         if simpleCall:
-            c = (np.maximum(Sall[:, -1] - K, 0)).mean()
+            c = (np.maximum(Sall[:, -1] - K, 0.0)).mean()
             c = c * np.exp(-r * t)
             return c
 
         if simplePut:
-            p = (np.maximum(K - Sall[:, -1], 0)).mean()
+            p = (np.maximum(K - Sall[:, -1], 0.0)).mean()
             p = p * np.exp(-r * t)
             return p
 
@@ -368,25 +368,25 @@ class FinEquityBarrierOption(FinEquityOption):
         ones = np.ones(numPaths)
 
         if optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * \
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
                 (ones - barrierCrossedFromAbove)
         elif optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * barrierCrossedFromAbove
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrierCrossedFromAbove
         elif optionType == FinEquityBarrierTypes.UP_AND_IN_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * barrierCrossedFromBelow
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrierCrossedFromBelow
         elif optionType == FinEquityBarrierTypes.UP_AND_OUT_CALL:
-            payoff = np.maximum(Sall[:, -1] - K, 0) * \
+            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
                 (ones - barrierCrossedFromBelow)
         elif optionType == FinEquityBarrierTypes.UP_AND_IN_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * barrierCrossedFromBelow
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrierCrossedFromBelow
         elif optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * \
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
                 (ones - barrierCrossedFromBelow)
         elif optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * \
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
                 (ones - barrierCrossedFromAbove)
         elif optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT:
-            payoff = np.maximum(K - Sall[:, -1], 0) * barrierCrossedFromAbove
+            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrierCrossedFromAbove
         else:
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))

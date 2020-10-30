@@ -7,7 +7,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBondMortgage import FinBondMortgage
 from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

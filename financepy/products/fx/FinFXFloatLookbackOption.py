@@ -184,11 +184,11 @@ class FinFXFloatLookbackOption(FinFXOption):
         if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)
             SMin = np.minimum(SMin, smin)
-            payoff = np.maximum(Sall[:, -1] - SMin, 0)
+            payoff = np.maximum(Sall[:, -1] - SMin, 0.0)
         elif optionType == FinOptionTypes.EUROPEAN_PUT:
             SMax = np.max(Sall, axis=1)
             SMax = np.maximum(SMax, smax)
-            payoff = np.maximum(SMax - Sall[:, -1], 0)
+            payoff = np.maximum(SMax - Sall[:, -1], 0.0)
         else:
             raise FinError("Unknown lookback option type:" + str(optionType))
 

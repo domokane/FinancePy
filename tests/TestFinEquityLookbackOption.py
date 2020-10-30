@@ -28,7 +28,7 @@ def test_FinEquityLookBackOption():
     interestRate = 0.05
     dividendYield = 0.01
     numPathsRange = [10000]
-    stockPriceRange = range(90, 110, 2)
+    stockPriceRange = range(90, 110, 10)
     numStepsPerYear = 252
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
@@ -217,7 +217,7 @@ def test_FinEquityLookBackOption():
 ###############################################################################
 ###############################################################################
 
-    stockPriceRange = range(90, 110, 2)
+    stockPriceRange = range(90, 110, 10)
     numStepsPerYear = 252
 
     testCases.header(

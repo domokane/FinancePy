@@ -1,0 +1,31 @@
+name: test_action
+
+on: [push, pull_request]
+
+jobs:
+ build:
+  runs-on: ubuntu-latest
+  steps: 
+   - name: checkout repo content
+     uses: actions/checkout@v2
+   - name: setup python
+     uses: actions/setup-python@v2
+     with:
+       python-version: 3.7.6
+   - name: run test script
+     run: |
+       pip install numpy==1.18.5
+       pip install llvmlite==0.33.0
+       pip install scipy==1.5.0
+       pip install numba==0.49
+       pip install pandas==1.0.5
+       pip install matplotlib==3.2.2       
+       pip install ipython==7.16.1
+       python setup.py install
+       python tests/runAllTests.py
+   - name: Archive code coverage results
+     uses: actions/upload-artifact@v2
+     with:
+        name: result-differences-file-upload
+        path: tests/differences/*.testLog
+

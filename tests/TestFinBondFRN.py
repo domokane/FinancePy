@@ -4,13 +4,13 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 import sys
@@ -22,7 +22,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(valueDate):
+def buildIborCurve(valuationDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -30,39 +30,39 @@ def buildLiborCurve(valueDate):
     payFixed = FinSwapTypes.PAYER
 
     spotDays = 2
-    settlementDate = valueDate.addWeekDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(
+    depo1 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(3)
-    depo2 = FinLiborDeposit(
+    depo2 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(6)
-    depo3 = FinLiborDeposit(
+    depo3 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(9)
-    depo4 = FinLiborDeposit(
+    depo4 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)
 
     maturityDate = settlementDate.addMonths(12)
-    depo5 = FinLiborDeposit(
+    depo5 = FinIborDeposit(
         settlementDate,
         maturityDate,
         depositRate,
@@ -82,7 +82,7 @@ def buildLiborCurve(valueDate):
 
     swapRate = 0.05
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(
+    swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -92,7 +92,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(
+    swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -102,7 +102,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap2)
 
     maturityDate = settlementDate.addMonths(48)
-    swap3 = FinLiborSwap(
+    swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -112,7 +112,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap3)
 
     maturityDate = settlementDate.addMonths(60)
-    swap4 = FinLiborSwap(
+    swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -122,7 +122,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap4)
 
     maturityDate = settlementDate.addMonths(72)
-    swap5 = FinLiborSwap(
+    swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -132,7 +132,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap5)
 
     maturityDate = settlementDate.addMonths(84)
-    swap6 = FinLiborSwap(
+    swap6 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -142,7 +142,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap6)
 
     maturityDate = settlementDate.addMonths(96)
-    swap7 = FinLiborSwap(
+    swap7 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -152,7 +152,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap7)
 
     maturityDate = settlementDate.addMonths(108)
-    swap8 = FinLiborSwap(
+    swap8 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -162,7 +162,7 @@ def buildLiborCurve(valueDate):
     swaps.append(swap8)
 
     maturityDate = settlementDate.addMonths(120)
-    swap9 = FinLiborSwap(
+    swap9 = FinIborSwap(
         settlementDate,
         maturityDate,
         swapRate,
@@ -171,11 +171,11 @@ def buildLiborCurve(valueDate):
         fixedDCCType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborCurve(settlementDate,
-                               depos,
-                               fras,
-                               swaps)
-
+    liborCurve = FinIborSingleCurve(valuationDate,
+                                    depos,
+                                    fras,
+                                    swaps)
+    
     if 1 == 0:
         import numpy as np
         numSteps = 40
@@ -221,24 +221,24 @@ def test_FinBondFRN():
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 96.793
-    resetLibor = 0.0143456 - quotedMargin
-    currentLibor = 0.0120534
-    futureLibors = 0.0130522
+    resetIbor = 0.0143456 - quotedMargin
+    currentIbor = 0.0120534
+    futureIbors = 0.0130522
 
     settlementDate = FinDate(21, 7, 2017)
 
     dm = bond.discountMargin(settlementDate,
-                             resetLibor,
-                             currentLibor,
-                             futureLibors,
+                             resetIbor,
+                             currentIbor,
+                             futureIbors,
                              cleanPrice)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
     fullPrice = bond.fullPriceFromDM(settlementDate,
-                                     resetLibor,
-                                     currentLibor,
-                                     futureLibors,
+                                     resetIbor,
+                                     currentIbor,
+                                     futureIbors,
                                      dm)
 
     testCases.print("Full Price = ", fullPrice)
@@ -253,57 +253,57 @@ def test_FinBondFRN():
     testCases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settlementDate,
-                               resetLibor,
-                               currentLibor,
-                               futureLibors,
+                               resetIbor,
+                               currentIbor,
+                               futureIbors,
                                dm)
 
     testCases.print("Dollar Principal = ", principal)
 
     duration = bond.dollarDuration(settlementDate,
-                                   resetLibor,
-                                   currentLibor,
-                                   futureLibors,
+                                   resetIbor,
+                                   currentIbor,
+                                   futureIbors,
                                    dm)
 
     testCases.print("Dollar Rate Duration = ", duration)
 
     modifiedDuration = bond.modifiedRateDuration(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
+                                                 resetIbor,
+                                                 currentIbor,
+                                                 futureIbors,
                                                  dm)
 
     testCases.print("Modified Rate Duration = ", modifiedDuration)
 
     macauleyDuration = bond.macauleyRateDuration(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
+                                                 resetIbor,
+                                                 currentIbor,
+                                                 futureIbors,
                                                  dm)
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
     convexity = bond.convexityFromDM(settlementDate,
-                                     resetLibor,
-                                     currentLibor,
-                                     futureLibors,
+                                     resetIbor,
+                                     currentIbor,
+                                     futureIbors,
                                      dm)
 
     testCases.print("Convexity = ", convexity)
 
     duration = bond.dollarCreditDuration(settlementDate,
-                                         resetLibor,
-                                         currentLibor,
-                                         futureLibors,
+                                         resetIbor,
+                                         currentIbor,
+                                         futureIbors,
                                          dm)
 
     testCases.print("Dollar Credit Duration = ", duration)
 
     modifiedDuration = bond.modifiedCreditDuration(settlementDate,
-                                                   resetLibor,
-                                                   currentLibor,
-                                                   futureLibors,
+                                                   resetIbor,
+                                                   currentIbor,
+                                                   futureIbors,
                                                    dm)
 
     testCases.print("Modified Credit Duration = ", modifiedDuration)
@@ -331,22 +331,22 @@ def test_FinBondFRN():
 
     testCases.header("FIELD", "VALUE")
     cleanPrice = 93.08
-    resetLibor = 0.00537 - quotedMargin
-    currentLibor = 0.027558
-    futureLibors = 0.03295
+    resetIbor = 0.00537 - quotedMargin
+    currentIbor = 0.027558
+    futureIbors = 0.03295
 
     dm = bond.discountMargin(settlementDate,
-                             resetLibor,
-                             currentLibor,
-                             futureLibors,
+                             resetIbor,
+                             currentIbor,
+                             futureIbors,
                              cleanPrice)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
     
     fullPrice = bond.fullPriceFromDM(settlementDate,
-                                     resetLibor,
-                                     currentLibor,
-                                     futureLibors,
+                                     resetIbor,
+                                     currentIbor,
+                                     futureIbors,
                                      dm)
 
     testCases.print("Full Price = ", fullPrice)
@@ -361,65 +361,65 @@ def test_FinBondFRN():
     testCases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settlementDate,
-                               resetLibor,
-                               currentLibor,
-                               futureLibors,
+                               resetIbor,
+                               currentIbor,
+                               futureIbors,
                                dm)
 
     testCases.print("Dollar Principal = ", principal)
 
     duration = bond.dollarDuration(settlementDate,
-                                       resetLibor,
-                                       currentLibor,
-                                       futureLibors,
+                                       resetIbor,
+                                       currentIbor,
+                                       futureIbors,
                                        dm)
 
     testCases.print("Dollar Rate Duration = ", duration)
 
     modifiedDuration = bond.modifiedRateDuration(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
+                                                 resetIbor,
+                                                 currentIbor,
+                                                 futureIbors,
                                                  dm)
 
     testCases.print("Modified Rate Duration = ", modifiedDuration)
 
     macauleyDuration = bond.macauleyRateDuration(settlementDate,
-                                                 resetLibor,
-                                                 currentLibor,
-                                                 futureLibors,
+                                                 resetIbor,
+                                                 currentIbor,
+                                                 futureIbors,
                                                  dm)
 
     testCases.print("Macauley Duration = ", macauleyDuration)
 
     convexity = bond.convexityFromDM(settlementDate,
-                                     resetLibor,
-                                     currentLibor,
-                                     futureLibors,
+                                     resetIbor,
+                                     currentIbor,
+                                     futureIbors,
                                      dm)
 
     testCases.print("Convexity = ", convexity)
 
     principal = bond.principal(settlementDate,
-                               resetLibor,
-                               currentLibor,
-                               futureLibors,
+                               resetIbor,
+                               currentIbor,
+                               futureIbors,
                                dm)
 
     testCases.print("Principal = ", principal)
 
     duration = bond.dollarCreditDuration(settlementDate,
-                                         resetLibor,
-                                         currentLibor,
-                                         futureLibors,
+                                         resetIbor,
+                                         currentIbor,
+                                         futureIbors,
                                          dm)
 
     testCases.print("Dollar Credit Duration = ", duration)
 
     modifiedDuration = bond.modifiedCreditDuration(settlementDate,
-                                                   resetLibor,
-                                                   currentLibor,
-                                                   futureLibors,
+                                                   resetIbor,
+                                                   currentIbor,
+                                                   futureIbors,
                                                    dm)
 
     testCases.print("Modified Credit Duration = ", modifiedDuration)

@@ -23,7 +23,7 @@ from ...products.credit.FinCDSCurve import FinCDSCurve
 
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
-from ...market.curves.FinInterpolate import FinInterpTypes, interpolate
+from ...market.curves.FinInterpolator import FinInterpTypes, interpolate
 from ...finutils.FinError import FinError
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
@@ -161,7 +161,7 @@ class FinCDSTranche(object):
                 qRow = issuerCurve._values
                 recoveryRates[j] = issuerCurve._recoveryRate
                 qVector[j] = interpolate(
-                    t, vTimes, qRow, FinInterpTypes.FLAT_FORWARDS.value)
+                    t, vTimes, qRow, FinInterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
                 qt1[i] = trSurvProbRecursion(

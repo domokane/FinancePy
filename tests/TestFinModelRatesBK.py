@@ -114,7 +114,7 @@ def test_BKExampleTwo():
                          couponFlows, exerciseType)
 
     # Test convergence
-    numStepsList = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    numStepsList = [100, 200, 300, 500, 1000]
     exerciseType = FinExerciseTypes.AMERICAN
 
     testCases.header("TIMESTEPS", "TIME", "VALUE")

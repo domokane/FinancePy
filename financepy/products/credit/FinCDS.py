@@ -17,7 +17,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString, tableToString
-from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
@@ -39,15 +39,15 @@ def _riskyPV01_NUMBA(teff,
                      accrualFactorPCDToNow,
                      paymentTimes,
                      yearFracs,
-                     npLiborTimes,
-                     npLiborValues,
+                     npIborTimes,
+                     npIborValues,
                      npSurvTimes,
                      npSurvValues,
                      pv01Method):
     ''' Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01.'''
 
-    method = FinInterpTypes.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FWD_RATES.value
 
     couponAccruedIndicator = 1
 
@@ -61,7 +61,7 @@ def _riskyPV01_NUMBA(teff,
     # taking into account what coupon has already accrued and what has not
     qeff = _uinterpolate(teff, npSurvTimes, npSurvValues, method)
     q1 = _uinterpolate(tncd, npSurvTimes, npSurvValues, method)
-    z1 = _uinterpolate(tncd, npLiborTimes, npLiborValues, method)
+    z1 = _uinterpolate(tncd, npIborTimes, npIborValues, method)
 
     # this is the part of the coupon accrued from previous coupon date to now
     # accrualFactorPCDToNow = dayCount.yearFrac(pcd,teff)
@@ -85,7 +85,7 @@ def _riskyPV01_NUMBA(teff,
         t2 = paymentTimes[it]
 
         q2 = _uinterpolate(t2, npSurvTimes, npSurvValues, method)
-        z2 = _uinterpolate(t2, npLiborTimes, npLiborValues, method)
+        z2 = _uinterpolate(t2, npIborTimes, npIborValues, method)
 
         accrualFactor = yearFracs[it]
 
@@ -126,8 +126,8 @@ def _riskyPV01_NUMBA(teff,
               float64, int64, int64), fastmath=True, cache=True)
 def _protectionLegPV_NUMBA(teff,
                            tmat,
-                           npLiborTimes,
-                           npLiborValues,
+                           npIborTimes,
+                           npIborValues,
                            npSurvTimes,
                            npSurvValues,
                            contractRecovery,
@@ -136,10 +136,10 @@ def _protectionLegPV_NUMBA(teff,
     ''' Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. '''
 
-    method = FinInterpTypes.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FWD_RATES.value
     dt = (tmat - teff) / numStepsPerYear
     t = teff
-    z1 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+    z1 = _uinterpolate(t, npIborTimes, npIborValues, method)
     q1 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
 
     protPV = 0.0
@@ -150,7 +150,7 @@ def _protectionLegPV_NUMBA(teff,
         for _ in range(0, numStepsPerYear):
 
             t = t + dt
-            z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+            z2 = _uinterpolate(t, npIborTimes, npIborValues, method)
             q2 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
             # This needs to be updated to handle small h+r
             h12 = -log(q2 / q1) / dt
@@ -167,7 +167,7 @@ def _protectionLegPV_NUMBA(teff,
         for _ in range(0, numStepsPerYear):
 
             t += dt
-            z2 = _uinterpolate(t, npLiborTimes, npLiborValues, method)
+            z2 = _uinterpolate(t, npIborTimes, npIborValues, method)
             q2 = _uinterpolate(t, npSurvTimes, npSurvValues, method)
             dq = q1 - q2
             dprotPV = 0.5 * (z1 + z2) * dq
@@ -640,7 +640,7 @@ class FinCDS(object):
         v = _protectionLegPV_NUMBA(teff,
                                    tmat,
                                    liborCurve._times,
-                                   liborCurve._dfValues,
+                                   liborCurve._dfs,
                                    issuerCurve._times,
                                    issuerCurve._values,
                                    contractRecovery,
@@ -681,7 +681,7 @@ class FinCDS(object):
                                       np.array(paymentTimes),
                                       np.array(yearFracs),
                                       liborCurve._times,
-                                      liborCurve._dfValues,
+                                      liborCurve._dfs,
                                       issuerCurve._times,
                                       issuerCurve._values,
                                       pv01Method)

@@ -9,7 +9,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 import numpy as np
 import sys
@@ -33,7 +33,7 @@ def test_FinDiscountCurveZeros():
                                   zeroRates,
                                   freqType,
                                   dayCountType,
-                                  FinInterpTypes.FLAT_FORWARDS)
+                                  FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF")
 
@@ -72,7 +72,7 @@ def test_FinDiscountCurveZeros():
                                       zeroRates,
                                       freqType,
                                       dayCountType,
-                                      FinInterpTypes.FLAT_FORWARDS)
+                                      FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     period = end - start

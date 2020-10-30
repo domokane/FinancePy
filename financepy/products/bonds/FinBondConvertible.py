@@ -23,7 +23,7 @@ from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
 
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 
 ###############################################################################
 
@@ -51,7 +51,7 @@ def _valueConvertible(tmat,
                       # Tree details
                       numStepsPerYear):
 
-    interp = FinInterpTypes.FLAT_FORWARDS.value
+    interp = FinInterpTypes.FLAT_FWD_RATES.value
 
     if len(couponTimes) > 0:
         if couponTimes[-1] > tmat:

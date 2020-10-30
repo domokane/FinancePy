@@ -7,8 +7,8 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSBasket import FinCDSBasket
 from financepy.products.credit.FinCDS import FinCDS
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -31,7 +31,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildLiborCurve(tradeDate):
+def buildIborCurve(tradeDate):
 
     valuationDate = tradeDate.addDays(1)
     dcType = FinDayCountTypes.ACT_360
@@ -45,7 +45,7 @@ def buildLiborCurve(tradeDate):
     settlementDate = valuationDate
 
     maturityDate = settlementDate.addMonths(12)
-    swap1 = FinLiborSwap(
+    swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -55,7 +55,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(24)
-    swap2 = FinLiborSwap(
+    swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -65,7 +65,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap2)
 
     maturityDate = settlementDate.addMonths(36)
-    swap3 = FinLiborSwap(
+    swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -75,7 +75,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap3)
 
     maturityDate = settlementDate.addMonths(48)
-    swap4 = FinLiborSwap(
+    swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -85,7 +85,7 @@ def buildLiborCurve(tradeDate):
     swaps.append(swap4)
 
     maturityDate = settlementDate.addMonths(60)
-    swap5 = FinLiborSwap(
+    swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -94,7 +94,7 @@ def buildLiborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    liborCurve = FinLiborCurve(settlementDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     return liborCurve
 
@@ -129,7 +129,7 @@ def loadHomogeneousSpreadCurves(valuationDate,
                               recoveryRate)
 
     issuerCurves = []
-    for iCredit in range(0, numCredits):
+    for _ in range(0, numCredits):
         issuerCurves.append(issuerCurve)
 
     return issuerCurves
@@ -185,7 +185,7 @@ def test_FinCDSBasket():
     stepInDate = tradeDate.addDays(1)
     valuationDate = tradeDate.addDays(1)
 
-    liborCurve = buildLiborCurve(tradeDate)
+    liborCurve = buildIborCurve(tradeDate)
 
     basketMaturity = FinDate(2011, 12, 20)
 
@@ -306,7 +306,7 @@ def test_FinCDSBasket():
         rho = beta ** 2
         corrMatrix = corrMatrixGenerator(rho, numCredits)
         for ntd in range(1, numCredits + 1):
-            for doF in [3, 10]:
+            for doF in [3, 6]:
                 start = time.time()
 
                 v = basket.valueStudentT_MC(valuationDate,
@@ -379,7 +379,7 @@ def testFinGBMProcess():
     corrMatrix = corrMatrixGenerator(rho, numAssets)
     seed = 1912
 
-    x = getPathsAssets(numAssets, numPaths, numTimeSteps, t,
+    _ = getPathsAssets(numAssets, numPaths, numTimeSteps, t,
                        mus, stockPrices, volatilities,
                        corrMatrix, seed)
 

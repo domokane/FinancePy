@@ -8,12 +8,12 @@ from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import accruedInterpolator
-from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinGlobalTypes import FinExerciseTypes
 from ..finutils.FinGlobalVariables import gSmall
 
-interp = FinInterpTypes.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FWD_RATES.value
 
 ###############################################################################
 # TODO : Calculate accrued in bond option according to accrual convention
@@ -870,7 +870,7 @@ class FinModelRatesBK():
         if isinstance(dfValues, np.ndarray) is False:
             raise FinError("DF VALUES must be a numpy vector")
 
-        interp = FinInterpTypes.FLAT_FORWARDS.value
+        interp = FinInterpTypes.FLAT_FWD_RATES.value
 
         treeMaturity = tmat * (self._numTimeSteps+1)/self._numTimeSteps
         treeTimes = np.linspace(0.0, treeMaturity, self._numTimeSteps + 2)
@@ -884,7 +884,7 @@ class FinModelRatesBK():
             dfTree[i] = _uinterpolate(t, dfTimes, dfValues, interp)
 
         self._dfTimes = dfTimes
-        self._dfValues = dfValues
+        self._dfs = dfValues
         
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
             = buildTreeFast(self._a, self._sigma,
@@ -916,7 +916,7 @@ class FinModelRatesBK():
                                            strikePrice, faceAmount,
                                            couponTimes, couponFlows,
                                            exerciseTypeInt,
-                                           self._dfTimes, self._dfValues,
+                                           self._dfTimes, self._dfs,
                                            self._treeTimes, self._Q,
                                            self._pu, self._pm, self._pd,
                                            self._rt,
@@ -949,7 +949,7 @@ class FinModelRatesBK():
                                          strikePrice, faceAmount,
                                          couponTimes, couponFlows,
                                          exerciseTypeInt,
-                                         self._dfTimes, self._dfValues,
+                                         self._dfTimes, self._dfs,
                                          self._treeTimes, self._Q,
                                          self._pu, self._pm, self._pd,
                                          self._rt,
@@ -982,7 +982,7 @@ class FinModelRatesBK():
                                            self._pu, self._pm, self._pd,
                                            self._rt, self._dt,
                                            self._treeTimes,
-                                           self._dfTimes, self._dfValues)
+                                           self._dfTimes, self._dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}

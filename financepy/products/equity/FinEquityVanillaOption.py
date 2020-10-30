@@ -19,7 +19,7 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from financepy.finutils.FinSobol import getGaussianSobol
+from financepy.models.FinSobol import getGaussianSobol
 
 from scipy.stats import norm
 N = norm.cdf
@@ -491,11 +491,11 @@ class FinEquityVanillaOption():
 
         # Not sure if it is correct to do antithetics with sobols but why not ?
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            payoff_a_1 = np.maximum(s_1 - K, 0)
-            payoff_a_2 = np.maximum(s_2 - K, 0)
+            payoff_a_1 = np.maximum(s_1 - K, 0.0)
+            payoff_a_2 = np.maximum(s_2 - K, 0.0)
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            payoff_a_1 = np.maximum(K - s_1, 0)
-            payoff_a_2 = np.maximum(K - s_2, 0)
+            payoff_a_1 = np.maximum(K - s_1, 0.0)
+            payoff_a_2 = np.maximum(K - s_2, 0.0)
         else:
             raise FinError("Unknown option type.")
 

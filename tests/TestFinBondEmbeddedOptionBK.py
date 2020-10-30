@@ -14,8 +14,10 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
@@ -36,18 +38,19 @@ def test_FinBondEmbeddedOptionMATLAB():
     # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
     # WHICH MIGHT BE A BETTER MATCH - ALSO THEY DO NOT USE A REALISTIC VOL
 
-    settlementDate = FinDate(1, 1, 2007)
+    valuationDate = FinDate(1, 1, 2007)
+    settlementDate = valuationDate
 
     ###########################################################################
 
     swapType = FinSwapTypes.PAYER
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swap1 = FinLiborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
-    swap2 = FinLiborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
-    swap3 = FinLiborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
+    swap1 = FinIborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
+    swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
+    swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discountCurve = FinLiborCurve(settlementDate, [], [], swaps)
+    discountCurve = FinIborSingleCurve(valuationDate, [], [], swaps)
 
     ###########################################################################
 
@@ -111,12 +114,12 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # 68.38 found in blog article. But this is for 40 grid points.
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
-    valueDate = FinDate(16, 8, 2016)
-    settlementDate = valueDate.addWeekDays(3)
+    valuationDate = FinDate(16, 8, 2016)
+    settlementDate = valuationDate.addWeekDays(3)
 
     ###########################################################################
 
-    discountCurve = FinDiscountCurveFlat(valueDate, 0.035,
+    discountCurve = FinDiscountCurveFlat(valuationDate, 0.035,
                                          FinFrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
@@ -158,7 +161,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 200, 10)  # 1000, 10)
+    timeSteps = range(100, 200, 20)  # 1000, 10)
     values = []
     for numTimeSteps in timeSteps:
         model = FinModelRatesBK(sigma, a, numTimeSteps)

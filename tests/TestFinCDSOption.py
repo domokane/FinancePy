@@ -6,9 +6,9 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSOption import FinCDSOption
 from financepy.products.credit.FinCDS import FinCDS
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborDeposit import FinLiborDeposit
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -40,19 +40,19 @@ def buildFullIssuerCurve(valuationDate):
     settlementDate = valuationDate.addDays(spotDays)
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinLiborDeposit(settlementDate, maturityDate, m * 0.0016, dcType)
+    depo1 = FinIborDeposit(settlementDate, maturityDate, m * 0.0016, dcType)
 
     maturityDate = settlementDate.addMonths(2)
-    depo2 = FinLiborDeposit(settlementDate, maturityDate, m * 0.0020, dcType)
+    depo2 = FinIborDeposit(settlementDate, maturityDate, m * 0.0020, dcType)
 
     maturityDate = settlementDate.addMonths(3)
-    depo3 = FinLiborDeposit(settlementDate, maturityDate, m * 0.0024, dcType)
+    depo3 = FinIborDeposit(settlementDate, maturityDate, m * 0.0024, dcType)
 
     maturityDate = settlementDate.addMonths(6)
-    depo4 = FinLiborDeposit(settlementDate, maturityDate, m * 0.0033, dcType)
+    depo4 = FinIborDeposit(settlementDate, maturityDate, m * 0.0033, dcType)
 
     maturityDate = settlementDate.addMonths(12)
-    depo5 = FinLiborDeposit(settlementDate, maturityDate, m * 0.0056, dcType)
+    depo5 = FinIborDeposit(settlementDate, maturityDate, m * 0.0056, dcType)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -70,7 +70,7 @@ def buildFullIssuerCurve(valuationDate):
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
 
     maturityDate = settlementDate.addMonths(24)
-    swap1 = FinLiborSwap(
+    swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -80,7 +80,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(36)
-    swap2 = FinLiborSwap(
+    swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -90,7 +90,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap2)
 
     maturityDate = settlementDate.addMonths(48)
-    swap3 = FinLiborSwap(
+    swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -100,7 +100,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap3)
 
     maturityDate = settlementDate.addMonths(60)
-    swap4 = FinLiborSwap(
+    swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -110,7 +110,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap4)
 
     maturityDate = settlementDate.addMonths(72)
-    swap5 = FinLiborSwap(
+    swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -120,7 +120,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap5)
 
     maturityDate = settlementDate.addMonths(84)
-    swap6 = FinLiborSwap(
+    swap6 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -130,7 +130,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap6)
 
     maturityDate = settlementDate.addMonths(96)
-    swap7 = FinLiborSwap(
+    swap7 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -140,7 +140,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap7)
 
     maturityDate = settlementDate.addMonths(108)
-    swap8 = FinLiborSwap(
+    swap8 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -150,7 +150,7 @@ def buildFullIssuerCurve(valuationDate):
     swaps.append(swap8)
 
     maturityDate = settlementDate.addMonths(120)
-    swap9 = FinLiborSwap(
+    swap9 = FinIborSwap(
         settlementDate,
         maturityDate,
         FinSwapTypes.PAYER,
@@ -159,10 +159,9 @@ def buildFullIssuerCurve(valuationDate):
         dcType)
     swaps.append(swap9)
 
-    liborCurve = FinLiborCurve(valuationDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     cdsMarketContracts = []
-
     cdsCoupon = 0.005743
     maturityDate = valuationDate.nextCDSDate(6)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
@@ -318,7 +317,7 @@ def test_fullPriceCDSwaption():
 
     testCases.header("STRIKE", "FULL VALUE", "IMPLIED VOL")
 
-    for strike in np.linspace(100, 300, 21):
+    for strike in np.linspace(100, 300, 41):
 
         cdsOption = FinCDSOption(expiryDate,
                                  maturityDate,

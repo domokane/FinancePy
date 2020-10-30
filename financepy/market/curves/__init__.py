@@ -1,4 +1,4 @@
-from .FinInterpolate import *
+from .FinInterpolator import *
 from .FinDiscountCurve import *
 from .FinDiscountCurveFlat import *
 from .FinDiscountCurveNS import *

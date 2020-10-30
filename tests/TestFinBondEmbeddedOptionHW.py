@@ -13,8 +13,8 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelRatesHW import FinModelRatesHW
 
-from financepy.products.libor.FinLiborSwap import FinLiborSwap
-from financepy.products.libor.FinLiborCurve import FinLiborCurve
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
@@ -34,17 +34,18 @@ def test_FinBondEmbeddedOptionMATLAB():
     # WHICH MIGHT BE A BETTER MATCH
 
     settlementDate = FinDate(1, 1, 2007)
-
+    valuationDate = settlementDate
+    
     ###########################################################################
 
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
     swapType = FinSwapTypes.PAYER
-    swap1 = FinLiborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
-    swap2 = FinLiborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
-    swap3 = FinLiborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
+    swap1 = FinIborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
+    swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
+    swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discountCurve = FinLiborCurve(settlementDate, [], [], swaps)
+    discountCurve = FinIborSingleCurve(valuationDate, [], [], swaps)
 
     ###########################################################################
 
@@ -157,7 +158,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 1000, 20)
+    timeSteps = range(100, 1000, 100)
     values = []
     for numTimeSteps in timeSteps:
         model = FinModelRatesHW(sigma, a, numTimeSteps)

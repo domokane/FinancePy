@@ -274,6 +274,7 @@ def normpdf(x: float):
 @njit(float64(float64), fastmath=True, cache=True)
 def normcdf_fast(x: float):
     ''' Fast Normal CDF function based on XXX '''
+
     a1 = 0.319381530
     a2 = -0.356563782
     a3 = 1.781477937
