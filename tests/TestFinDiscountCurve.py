@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 
@@ -35,7 +35,7 @@ def test_FinDiscountCurve():
     dfs = np.exp(-rate * years)
     dates = startDate.addYears(years)
 
-    curve = FinDiscountCurve(startDate, dates, dfs, FinInterpTypes.FLAT_FORWARDS)
+    curve = FinDiscountCurve(startDate, dates, dfs, FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 

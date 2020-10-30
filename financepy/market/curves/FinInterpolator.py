@@ -2,11 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
-from math import exp, log, fabs
 from numba import njit, float64, int64
 import numpy as np
 from ...finutils.FinError import FinError
+from ...finutils.FinGlobalVariables import gSmall
+
+
+from scipy.interpolate import PchipInterpolator
+from scipy.interpolate import interp1d
 
 ###############################################################################
 
@@ -14,19 +17,22 @@ from enum import Enum
 
 
 class FinInterpTypes(Enum):
-    LINEAR_ZERO_RATES = 1
-    FLAT_FORWARDS = 2
-    LINEAR_FORWARDS = 3
-    LINEAR_SWAP_RATES = 4
-#    CUBIC_SPLINE_LOGDFS = 5
+                FLAT_FWD_RATES = 1
+                LINEAR_FWD_RATES = 2
+                LINEAR_SWAP_RATES = 3
+                LINEAR_ZERO_RATES = 4
+                LINEAR_LOG_DFS = 5
+                CUBIC_ZERO_RATES = 6
+                CUBIC_LOG_DFS = 7
 
 ###############################################################################
-
+# TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+###############################################################################
 
 def interpolate(t: (float, np.ndarray),  # time or array of times
                 times: np.ndarray,  # Vector of times on grid
                 dfs: np.ndarray,  # Vector of discount factors
-                method: int):  # Interpolation method
+                method: int):  # Interpolation method which is value of enum
     ''' Fast interpolation of discount factors at time x given discount factors
     at times provided using one of the methods in the enum FinInterpTypes. The
     value of x can be an array so that the function is vectorised. '''
@@ -35,7 +41,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
         
         if t < 0.0:
             print(t)
-            raise FinError("Interpolate time must be >= 0")
+            raise FinError("Interpolate times must all be >= 0")
 
         u = _uinterpolate(t, times, dfs, method)
         return u
@@ -43,7 +49,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
 
         if np.any(t < 0.0):
             print(t)
-            raise FinError("Interpolate time must be >= 0")
+            raise FinError("Interpolate times must all be >= 0")
 
         v = _vinterpolate(t, times, dfs, method)
         return v
@@ -52,7 +58,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
 
 ###############################################################################
 
-
+        
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)
 def _uinterpolate(t, times, dfs, method):
@@ -60,9 +66,9 @@ def _uinterpolate(t, times, dfs, method):
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. '''
-
+    
     if method == FinInterpTypes.LINEAR_SWAP_RATES.value:
-        method = FinInterpTypes.FLAT_FORWARDS.value
+        method = FinInterpTypes.FLAT_FWD_RATES.value
 
     small = 1e-10
     numPoints = times.size
@@ -112,7 +118,7 @@ def _uinterpolate(t, times, dfs, method):
     # This is also FLAT FORWARDS
     ###########################################################################
 
-    elif method == FinInterpTypes.FLAT_FORWARDS.value:
+    elif method == FinInterpTypes.FLAT_FWD_RATES.value:
 
         if i == 1:
             rt1 = -np.log(dfs[i-1])
@@ -135,16 +141,16 @@ def _uinterpolate(t, times, dfs, method):
 
         return yvalue
 
-    elif method == FinInterpTypes.LINEAR_FORWARDS.value:
+    elif method == FinInterpTypes.LINEAR_FWD_RATES.value:
 
         if i == 1:
-            y2 = -log(fabs(dfs[i]) + small)
+            y2 = -np.log(dfs[i] + small)
             yvalue = t * y2 / (times[i] + small)
-            yvalue = exp(-yvalue)
+            yvalue = np.exp(-yvalue)
         elif i < numPoints:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -log(dfs[i-1]/dfs[i-2])/(times[i-1]-times[i-2])
-            fwd2 = -log(dfs[i]/dfs[i-1])/(times[i]-times[i-1])
+            fwd1 = -np.log(dfs[i-1]/dfs[i-2])/(times[i-1]-times[i-2])
+            fwd2 = -np.log(dfs[i]/dfs[i-1])/(times[i]-times[i-1])
             dt = times[i] - times[i-1]
             fwd = ((times[i]-t)*fwd1 + (t-times[i-1])*fwd2)/dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
@@ -155,6 +161,7 @@ def _uinterpolate(t, times, dfs, method):
         return yvalue
 
     else:
+        print(method)
         raise FinError("Invalid interpolation scheme.")
 
 ###############################################################################
@@ -176,5 +183,107 @@ def _vinterpolate(xValues,
         yvalues[i] = _uinterpolate(xValues[i], xvector, dfs, method)
 
     return yvalues
+
+###############################################################################
+
+
+class FinInterpolator():
+
+    def __init__(self,
+                 interpolatorType: FinInterpTypes):
+        
+        self._interpType = interpolatorType
+        self._interpFn = None
+        self._times = None
+        self._dfs = None
+        self._refitCurve = False
+        
+    ###########################################################################
+    
+    def fit(self,
+            times: np.ndarray,
+            dfs: np.ndarray):
+
+        self._times = times
+        self._dfs = dfs
+
+        if len(times) == 1:
+            return
+
+        if self._interpType == FinInterpTypes.CUBIC_LOG_DFS:
+
+            logDfs = np.log(self._dfs)
+            self._interpFn = PchipInterpolator(self._times, logDfs)
+    
+        elif self._interpType  == FinInterpTypes.LINEAR_LOG_DFS:
+
+            logDfs = np.log(self._dfs)
+            self._interpFn = interp1d(self._times, logDfs, 
+                                      fill_value="extrapolate")
+
+        elif self._interpType  == FinInterpTypes.CUBIC_ZERO_RATES:
+
+            gSmallVector = np.ones(len(self._times)) * gSmall
+            zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
+
+            if self._times[0] == 0.0:
+                zeroRates[0] = zeroRates[1]
+
+            self._interpFn = PchipInterpolator(self._times, zeroRates)
+            
+    ###########################################################################
+
+    def interpolate(self,
+                    t: float):
+        ''' Interpolation of discount factors at time x given discount factors
+        at times provided using one of the methods in the enum FinInterpTypes.
+        The value of x can be an array so that the function is vectorised. '''
+
+        if self._dfs is None:
+            raise FinError("Dfs have not been set.")
+
+        if type(t) is float or type(t) is np.float64:
+
+            if t < 0.0:
+                print(t)
+                raise FinError("Interpolate times must all be >= 0")
+
+            if np.abs(t) < gSmall:
+                return 1.0
+
+            tvec = np.array([t])
+
+        elif type(t) is np.ndarray:
+
+            if np.any(t < 0.0):
+                print(t)
+                raise FinError("Interpolate times must all be >= 0")
+
+            tvec = t
+
+        else:
+            raise FinError("t is not a recognized type")
+        
+        if self._interpType == FinInterpTypes.CUBIC_LOG_DFS:
+        
+            out = np.exp(self._interpFn(tvec))
+    
+        elif self._interpType == FinInterpTypes.LINEAR_LOG_DFS:
+    
+            out = np.exp(self._interpFn(tvec))
+
+        elif self._interpType == FinInterpTypes.CUBIC_ZERO_RATES:
+    
+            out = np.exp(-tvec * self._interpFn(tvec))
+
+        else:
+
+            out = _vinterpolate(tvec, self._times, self._dfs,
+                                self._interpType.value)
+
+        if type(t) is float or type(t) is np.float64:
+            return out[0]
+        else:
+            return out
 
 ###############################################################################

@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from .FinInterpolate import interpolate, FinInterpTypes
+from .FinInterpolator import FinInterpolator, FinInterpTypes, interpolate
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
@@ -32,7 +32,7 @@ class FinDiscountCurve():
                  valuationDate: FinDate,
                  dfDates: list,
                  dfValues: np.ndarray,
-                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         ''' Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
         are explicity linking dates and discount factors, we do not need to
@@ -50,7 +50,7 @@ class FinDiscountCurve():
             raise FinError("Times and Values are not the same")
 
         self._times = [0.0]
-        self._dfValues = [1.0]
+        self._dfs = [1.0]
         self._dfDates = dfDates
 
         numPoints = len(dfDates)
@@ -58,13 +58,13 @@ class FinDiscountCurve():
         startIndex = 0
         if numPoints > 0:
             if dfDates[0] == valuationDate:
-                self._dfValues[0] = dfValues[0]
+                self._dfs[0] = dfValues[0]
                 startIndex = 1
 
         for i in range(startIndex, numPoints):
             t = (dfDates[i] - valuationDate) / gDaysInYear
             self._times.append(t)
-            self._dfValues.append(dfValues[i])
+            self._dfs.append(dfValues[i])
 
         self._times = np.array(self._times)
 
@@ -73,10 +73,12 @@ class FinDiscountCurve():
             raise FinError("Times are not sorted in increasing order")
 
         self._valuationDate = valuationDate
-        self._dfValues = np.array(self._dfValues)
+        self._dfs = np.array(self._dfs)
         self._interpType = interpType
         self._frequencyType = FinFrequencyTypes.CONTINUOUS
         self._dayCountType = None  # Not needed for this curve
+        self._interpolator = FinInterpolator(self._interpType)
+        self._interpolator.fit(self._times, self._dfs)
 
 ###############################################################################
 
@@ -245,13 +247,15 @@ class FinDiscountCurve():
                 prevDt = nextDt
 
             if abs(pv01) < gSmall:
-                parRate = None
+                parRate = 0.0
             else:
                 dfStart = self.df(startDate)
                 parRate = (dfStart - df) / pv01
 
             parRates.append(parRate)
  
+        parRates = np.array(parRates)
+
         if isinstance(maturityDate, FinDate):
             return parRates[0]
         else:
@@ -279,11 +283,27 @@ class FinDiscountCurve():
         ''' Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. '''
 
-        df = interpolate(t,
-                         self._times,
-                         self._dfValues,
-                         self._interpType.value)
-        
+        if self._interpType is FinInterpTypes.CUBIC_LOG_DFS:
+
+            df = self._interpolator.interpolate(t)
+
+        elif self._interpType is FinInterpTypes.CUBIC_ZERO_RATES:
+
+             df = self._interpolator.interpolate(t)
+
+        elif self._interpType is FinInterpTypes.LINEAR_LOG_DFS:
+
+             df = self._interpolator.interpolate(t)
+
+        else:
+
+ #            df = self._interpolator.interpolate(t)
+
+            df = interpolate(t,
+                             self._times,
+                             self._dfs,
+                             self._interpType.value)        
+
         return df
 
 ###############################################################################
@@ -354,7 +374,7 @@ class FinDiscountCurve():
         curve. This is used for interest rate risk. '''
 
         times = self._times.copy()
-        values = self._dfValues.copy()
+        values = self._dfs.copy()
 
         n = len(self._times)
         for i in range(0, n):
@@ -420,7 +440,7 @@ class FinDiscountCurve():
         s += labelToString("DATES", "DISCOUNT FACTORS")
         for i in range(0, numPoints):
             s += labelToString("%12s" % self._dfDates[i],
-                               "%12.8f" % self._dfValues[i])
+                               "%12.8f" % self._dfs[i])
 
         return s
 

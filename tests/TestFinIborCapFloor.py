@@ -26,7 +26,7 @@ from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from financepy.models.FinModelBlack import FinModelBlack

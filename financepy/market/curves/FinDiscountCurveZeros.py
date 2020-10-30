@@ -13,7 +13,7 @@ from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import timesFromDates
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import checkArgumentTypes
-from .FinInterpolate import FinInterpTypes
+from .FinInterpolator import FinInterpTypes, FinInterpolator
 
 
 ###############################################################################
@@ -37,7 +37,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
                  zeroRates: (list, np.ndarray),
                  frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA,
-                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         ''' Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
         dates and then another same-length vector of rates. The rate is to the
@@ -81,7 +81,9 @@ class FinDiscountCurveZeros(FinDiscountCurve):
                              self._frequencyType,
                              self._dayCountType)
 
-        self._dfValues = np.array(dfs)
+        self._dfs = np.array(dfs)
+        self._interpolator = FinInterpolator(self._interpType)
+        self._interpolator.fit(self._times, self._dfs)
 
 # ###############################################################################
 

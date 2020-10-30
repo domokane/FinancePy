@@ -13,7 +13,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinHelperFunctions import inputTime
 from ...finutils.FinHelperFunctions import tableToString
-from ...market.curves.FinInterpolate import FinInterpTypes, interpolate
+from ...market.curves.FinInterpolator import FinInterpTypes, interpolate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -43,7 +43,7 @@ class FinBondZeroCurve(FinDiscountCurve):
                  valuationDate: FinDate,
                  bonds: list,
                  cleanPrices: list,
-                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         ''' Fit a discount curve to a set of bond yields using the type of
         curve specified. '''
 

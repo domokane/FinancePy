@@ -7,7 +7,6 @@ import datetime as dt
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinCalendar import FinCalendar
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -481,7 +480,7 @@ def test_FinBondExDividend():
 
     settlementDate = FinDate(25, 8, 2010)
 
-    for i in range(0, 13):
+    for _ in range(0, 13):
         settlementDate = settlementDate.addDays(1)
         accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
         testCases.print(settlementDate, accrued)

@@ -156,7 +156,7 @@ class FinIborBermudanSwaption(object):
                 callTimes.append(cpnTime)
 
         dfTimes = discountCurve._times
-        dfValues = discountCurve._dfValues
+        dfValues = discountCurve._dfs
 
         faceAmount = 1.0
         strikePrice = 1.0

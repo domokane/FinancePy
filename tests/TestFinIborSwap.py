@@ -19,7 +19,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -362,7 +362,7 @@ def test_dp_example():
     valuationDate = startDate
 
     curve = FinDiscountCurve(valuationDate, dts, np.array(dfs),
-                             FinInterpTypes.FLAT_FORWARDS)
+                             FinInterpTypes.FLAT_FWD_RATES)
 
     v = swap.value(valuationDate, curve, curve)
 

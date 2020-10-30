@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -49,7 +49,7 @@ def test_FinDiscountCurves():
     curvesList = []
 
     finDiscountCurve = FinDiscountCurve(valuationDate, dates, discountFactors,
-                                        FinInterpTypes.FLAT_FORWARDS)
+                                        FinInterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
     finDiscountCurveFlat = FinDiscountCurveFlat(valuationDate, 0.05)

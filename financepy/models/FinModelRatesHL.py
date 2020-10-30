@@ -7,10 +7,10 @@ from numba import njit
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N
-from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 
-interp = FinInterpTypes.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FWD_RATES.value
 
 ###############################################################################
 # dr = theta(t) dt + sigma * dW

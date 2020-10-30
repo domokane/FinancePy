@@ -11,7 +11,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, gridIndex
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinDayCount import FinDayCountTypes
 
@@ -57,7 +57,7 @@ def _f(df, *args):
     valueDate = args[1]
     swap = args[2]
     numPoints = len(curve._times)
-    curve._dfValues[numPoints - 1] = df
+    curve._dfs[numPoints - 1] = df
     v_swap = swap.value(valueDate, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -71,7 +71,7 @@ def _g(df, *args):
     valueDate = args[1]
     fra = args[2]
     numPoints = len(curve._times)
-    curve._dfValues[numPoints - 1] = df
+    curve._dfs[numPoints - 1] = df
     v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
@@ -99,7 +99,7 @@ class FinOISCurve(FinDiscountCurve):
                  oisDeposits: list,
                  oisFRAs: list,
                  oisSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES,
                  checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
@@ -313,20 +313,20 @@ class FinOISCurve(FinDiscountCurve):
         involves the use of a solver. '''
 
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
         oldtmat = tmat
 
@@ -341,10 +341,10 @@ class FinOISCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
 
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -358,7 +358,7 @@ class FinOISCurve(FinDiscountCurve):
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
             argtuple = (self, self._valuationDate, swap)
 
@@ -377,20 +377,20 @@ class FinOISCurve(FinDiscountCurve):
         require the use of a solver. It is also market standard. '''
 
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
         oldtmat = tmat
 
@@ -405,10 +405,10 @@ class FinOISCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
 
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -499,7 +499,7 @@ class FinOISCurve(FinDiscountCurve):
             dfMat = (dfSettle - swapRate * pv01) / pv01End
 
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
             pv01 += acc * dfMat
 
@@ -613,7 +613,7 @@ class FinOISCurve(FinDiscountCurve):
         s += labelToString("GRID TIMES", "GRID DFS")
         for i in range(0, numPoints):
             s += labelToString("% 10.6f" % self._times[i],
-                               "%12.10f" % self._dfValues[i])
+                               "%12.10f" % self._dfs[i])
 
         return s
 

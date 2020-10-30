@@ -69,7 +69,7 @@ class FinBondOption():
         tmat = (self._bond._maturityDate - valuationDate) / gDaysInYear
 
         dfTimes = discountCurve._times
-        dfValues = discountCurve._dfValues
+        dfValues = discountCurve._dfs
 
         # We need all of the flows in case the option is American and some occur before expiry
         flowDates = self._bond._flowDates

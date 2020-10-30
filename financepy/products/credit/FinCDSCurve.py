@@ -10,7 +10,7 @@ from numba import njit, float64
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import _uinterpolate, FinInterpTypes
+from ...market.curves.FinInterpolator import _uinterpolate, FinInterpTypes
 from ...finutils.FinHelperFunctions import inputTime, tableToString
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
@@ -49,7 +49,7 @@ class FinCDSCurve():
                  liborCurve,
                  recoveryRate: float = 0.40,
                  useCache: bool = False,
-                 interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS):
+                 interpolationMethod: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         ''' Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method. '''

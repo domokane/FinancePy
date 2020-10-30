@@ -4,6 +4,10 @@
 
 import numpy as np
 from scipy import optimize
+
+from scipy.interpolate import CubicSpline
+from scipy.interpolate import PchipInterpolator
+
 import copy
 
 from ...finutils.FinError import FinError
@@ -11,7 +15,7 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes, FinInterpolator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.funding.FinIborDeposit import FinIborDeposit
 from ...products.funding.FinIborFRA import FinIborFRA
@@ -26,11 +30,15 @@ swaptol = 1e-10
 
 def _f(df, *args):
     ''' Root search objective function for swaps '''
+
     curve = args[0]
     valueDate = args[1]
     swap = args[2]
     numPoints = len(curve._times)
-    curve._dfValues[numPoints - 1] = df
+    curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valueDate, curve, curve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -40,20 +48,62 @@ def _f(df, *args):
 
 def _g(df, *args):
     ''' Root search objective function for swaps '''
-    liborCurve = args[0]
+    curve = args[0]
     valueDate = args[1]
     fra = args[2]
-    numPoints = len(liborCurve._times)
-    liborCurve._dfValues[numPoints - 1] = df
-    v_fra = fra.value(valueDate, liborCurve)
+    numPoints = len(curve._times)
+    curve._dfs[numPoints - 1] = df
+
+    # For curves that need a fit function, we fit it now 
+    curve._interpolator.fit(curve._times, curve._dfs)     
+    v_fra = fra.value(valueDate, curve)
     v_fra /= fra._notional
     return v_fra
 
 ###############################################################################
 
 
+def _costFunction(dfs, *args):
+    ''' Root search objective function for swaps '''
+
+#    print("Discount factors:", dfs)
+
+    liborCurve = args[0]
+    valuationDate = liborCurve._valuationDate
+    liborCurve._dfs = dfs
+    
+    times = liborCurve._times
+    values = -np.log(dfs)
+    
+    if liborCurve._interpType == FinInterpTypes.CUBIC_SPLINE_LOGDFS:
+        liborCurve._splineFunction = CubicSpline(times, values)
+    elif liborCurve._interpType == FinInterpTypes.PCHIP_CUBIC_SPLINE:
+        liborCurve._splineFunction = PchipInterpolator(times, values)
+
+    cost = 0.0
+    for depo in liborCurve._usedDeposits:
+        v = depo.value(valuationDate, liborCurve) / depo._notional
+#        print("DEPO:", depo._maturityDate, v)
+        cost += (v-1.0)**2
+
+    for fra in liborCurve._usedFRAs:
+        v = fra.value(valuationDate, liborCurve) / fra._notional
+#        print("FRA:", fra._maturityDate, v)
+        cost += v*v
+
+    for swap in liborCurve._usedSwaps:
+        v = swap.value(valuationDate, liborCurve) / swap._notional
+#        print("SWAP:", swap._maturityDate, v)
+        cost += v*v
+
+    print("Cost:", cost)
+    return cost
+
+###############################################################################
+
+
 class FinIborSingleCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Ibor
+    ''' Constructs one discount and index curve as implied by prices of Ibor
     deposits, FRAs and IRS. Discounting is assumed to be at Libor and the value
     of the floating leg (including a notional) is assumed to be par. This 
     approach has been overtaken since 2008 as OIS discounting has become the
@@ -92,7 +142,7 @@ class FinIborSingleCurve(FinDiscountCurve):
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES,
                  checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
@@ -111,18 +161,20 @@ class FinIborSingleCurve(FinDiscountCurve):
         self._valuationDate = valuationDate
         self._validateInputs(iborDeposits, iborFRAs, iborSwaps)
         self._interpType = interpType
-        self._checkRefit = checkRefit
+        self._checkRefit = checkRefit        
+        self._interpolator = None
         self._buildCurve()
 
 ###############################################################################
 
     def _buildCurve(self):
         ''' Build curve based on interpolation. '''
-        
+
         if self._interpType == FinInterpTypes.LINEAR_SWAP_RATES:
             self._buildCurveLinearSwapRateInterpolation()
+            self._interpType = FinInterpTypes.LINEAR_ZERO_RATES
         else:
-            self._buildCurveUsingSolver()
+            self._buildCurveUsing1DSolver()
 
 ###############################################################################
 
@@ -297,27 +349,31 @@ class FinIborSingleCurve(FinDiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsingSolver(self):
+    def _buildCurveUsing1DSolver(self):
         ''' Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. '''
 
+        self._interpolator = FinInterpolator(self._interpType)
+
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
+        self._interpolator.fit(self._times, self._dfs)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldtmat = tmat
 
@@ -332,11 +388,10 @@ class FinIborSingleCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
-
+                self._dfs = np.append(self._dfs, dfMat)
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
@@ -349,7 +404,7 @@ class FinIborSingleCurve(FinDiscountCurve):
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
             argtuple = (self, self._valuationDate, swap)
 
@@ -362,26 +417,68 @@ class FinIborSingleCurve(FinDiscountCurve):
 
 ###############################################################################
 
+    def _buildCurveUsingQuadraticMinimiser(self):
+        ''' Construct the discount curve using a minimisation approach. This is
+        the This enables a more complex interpolation scheme. '''
+
+        tmat = 0.0
+        dfMat = 1.0
+
+        gridTimes = [tmat]
+        gridDfs = [dfMat]
+
+        for depo in self._usedDeposits:
+            tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
+            gridTimes.append(tmat)
+
+        for fra in self._usedFRAs:
+            tmat = (fra._maturityDate - self._valuationDate) / gDaysInYear
+            gridTimes.append(tmat)
+            gridDfs.append(dfMat)
+
+        for swap in self._usedSwaps:
+            tmat = (swap._maturityDate - self._valuationDate) / gDaysInYear
+            gridTimes.append(tmat)
+
+        self._times = np.array(gridTimes)
+        self._dfs = np.exp(-self._times * 0.05)
+        
+        argtuple = (self)
+
+        res = optimize.minimize(_costFunction, self._dfs, method = 'BFGS',
+                                args = argtuple, options = {'gtol':1e-3})    
+
+        self._dfs = np.array(res.x)
+
+        if self._checkRefit is True:
+            self._checkRefits(1e-10, swaptol, 1e-5)
+
+###############################################################################
+
     def _buildCurveLinearSwapRateInterpolation(self):
         ''' Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. '''
 
+        self._interpolator = FinInterpolator(self._interpType)
+
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
+        self._interpolator.fit(self._times, self._dfs)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldtmat = tmat
 
@@ -396,10 +493,13 @@ class FinIborSingleCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
+                self._interpolator.fit(self._times, self._dfs)
+
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
+                self._interpolator.fit(self._times, self._dfs)
 
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -490,7 +590,8 @@ class FinIborSingleCurve(FinDiscountCurve):
             dfMat = (dfSettle - swapRate * pv01) / pv01End
 
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
+            self._interpolator.fit(self._times, self._dfs)
 
             pv01 += acc * dfMat
 
@@ -526,7 +627,7 @@ class FinIborSingleCurve(FinDiscountCurve):
                 raise FinError("Swap not repriced.")
 
 ###############################################################################
-
+        
     def __repr__(self):
         ''' Print out the details of the Ibor curve. '''
 
@@ -552,7 +653,7 @@ class FinIborSingleCurve(FinDiscountCurve):
         s += labelToString("GRID TIMES", "GRID DFS")
         for i in range(0, numPoints):
             s += labelToString("% 10.6f" % self._times[i],
-                               "%12.10f" % self._dfValues[i])
+                               "%12.10f" % self._dfs[i])
 
         return s
 

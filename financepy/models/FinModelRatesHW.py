@@ -9,12 +9,12 @@ from math import ceil
 
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N, accruedInterpolator
-from ..market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinGlobalTypes import FinExerciseTypes
 from ..finutils.FinGlobalVariables import gSmall
 
-interp = FinInterpTypes.FLAT_FORWARDS.value
+interp = FinInterpTypes.FLAT_FWD_RATES.value
 
 small = 1e-10
 
@@ -989,8 +989,8 @@ class FinModelRatesHW():
         dt = self._dt
         tdelta = texp + dt
 
-        ptexp = _uinterpolate(texp, self._dfTimes, self._dfValues, interp)
-        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
+        ptexp = _uinterpolate(texp, self._dfTimes, self._dfs, interp)
+        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfs, interp)
 
         _, numNodes = self._Q.shape
         expiryStep = int(texp/dt+0.50)
@@ -1015,7 +1015,7 @@ class FinModelRatesHW():
 
                 if tcpn >= texp:
 
-                    ptcpn = _uinterpolate(tcpn, self._dfTimes, self._dfValues,
+                    ptcpn = _uinterpolate(tcpn, self._dfTimes, self._dfs,
                                           interp)
 
                     zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
@@ -1069,9 +1069,9 @@ class FinModelRatesHW():
         dt = self._dt
         tdelta = texp + dt
 
-        ptexp = _uinterpolate(texp, self._dfTimes, self._dfValues, interp)
-        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfValues, interp)
-        ptmat = _uinterpolate(tmat, self._dfTimes, self._dfValues, interp)
+        ptexp = _uinterpolate(texp, self._dfTimes, self._dfs, interp)
+        ptdelta = _uinterpolate(tdelta, self._dfTimes, self._dfs, interp)
+        ptmat = _uinterpolate(tmat, self._dfTimes, self._dfs, interp)
 
         _, numNodes = self._Q.shape
         expiryStep = int(texp/dt+0.50)
@@ -1119,7 +1119,7 @@ class FinModelRatesHW():
             = bermudanSwaption_Tree_Fast(texp, tmat, strike, face,
                                          couponTimes, couponFlows,
                                          exerciseTypeInt,
-                                         self._dfTimes, self._dfValues,
+                                         self._dfTimes, self._dfs,
                                          self._treeTimes, self._Q,
                                          self._pu, self._pm, self._pd,
                                          self._rt,
@@ -1148,7 +1148,7 @@ class FinModelRatesHW():
                                               couponTimes,
                                               couponFlows,
                                               self._dfTimes,
-                                              self._dfValues)
+                                              self._dfs)
 
                 callValue = v['call']
                 putValue = v['put']
@@ -1176,7 +1176,7 @@ class FinModelRatesHW():
                                            self._pu, self._pm, self._pd,
                                            self._rt, self._dt,
                                            self._treeTimes,
-                                           self._dfTimes, self._dfValues)
+                                           self._dfTimes, self._dfs)
 
             else:
                 raise FinError("Unknown HW model implementation choice.")
@@ -1194,7 +1194,7 @@ class FinModelRatesHW():
                                            self._pu, self._pm, self._pd,
                                            self._rt, self._dt,
                                            self._treeTimes,
-                                           self._dfTimes, self._dfValues)
+                                           self._dfTimes, self._dfs)
 
         return {'call': callValue, 'put': putValue}
 
@@ -1231,7 +1231,7 @@ class FinModelRatesHW():
                                            self._pu, self._pm, self._pd,
                                            self._rt, self._dt,
                                            self._treeTimes,
-                                           self._dfTimes, self._dfValues)
+                                           self._dfTimes, self._dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}
@@ -1288,7 +1288,7 @@ class FinModelRatesHW():
             dfTree[i] = _uinterpolate(t, dfTimes, dfValues, interp)
 
         self._dfTimes = dfTimes
-        self._dfValues = dfValues
+        self._dfs = dfValues
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
             = buildTree_Fast(self._a, self._sigma,

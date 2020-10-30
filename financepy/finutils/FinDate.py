@@ -611,6 +611,23 @@ class FinDate():
         return datetime.date(self._d, self._m, self._y)
 
     ###########################################################################
+    # TODO: Find elegant way to return long and short strings
+    ###########################################################################
+
+    def str(self, format):
+        ''' returns a formatted string of the date '''
+        dateStr = ""
+
+        if self._d < 10:
+            dateStr += "0" + str(self._d) + ""
+        else:
+            dateStr += "" + str(self._d) + ""
+
+        dateStr += shortMonthNames[self._m - 1]
+        dateStr += "" + str(self._y)
+        return dateStr
+
+    ###########################################################################
 
     def __repr__(self):
         ''' returns a formatted string of the date '''

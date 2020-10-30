@@ -19,7 +19,7 @@ from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinOIS import FinOIS
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 sys.path.append("..//..")
@@ -435,7 +435,7 @@ def test_derivativePricingExample():
 
     for _ in range(0, numRepeats):
         _ = FinOISCurve(valuationDate, fras, swaps,
-                              FinInterpTypes.FLAT_FORWARDS)
+                              FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     elapsed1 = end - start

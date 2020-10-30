@@ -26,7 +26,7 @@ from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -516,7 +516,7 @@ def testFinIborSwaptionMatlabExamples():
              FinDate(1, 1, 2011), FinDate(1, 7, 2011), FinDate(1, 1, 2012)]
 
     zeroRates = np.array([0.075] * 11)
-    interpType = FinInterpTypes.FLAT_FORWARDS
+    interpType = FinInterpTypes.FLAT_FWD_RATES
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     contFreq = FinFrequencyTypes.SEMI_ANNUAL
 
@@ -568,7 +568,7 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = np.array([0.07] * 11)
 
-    interpType = FinInterpTypes.FLAT_FORWARDS
+    interpType = FinInterpTypes.FLAT_FWD_RATES
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     contFreq = FinFrequencyTypes.SEMI_ANNUAL
 
@@ -640,7 +640,7 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = np.array([0.06] * 11)
 
-    interpType = FinInterpTypes.FLAT_FORWARDS
+    interpType = FinInterpTypes.FLAT_FWD_RATES
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     contFreq = FinFrequencyTypes.ANNUAL
 

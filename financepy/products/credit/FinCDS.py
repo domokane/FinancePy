@@ -17,7 +17,7 @@ from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinHelperFunctions import labelToString, tableToString
-from ...market.curves.FinInterpolate import FinInterpTypes, _uinterpolate
+from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
@@ -47,7 +47,7 @@ def _riskyPV01_NUMBA(teff,
     ''' Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01.'''
 
-    method = FinInterpTypes.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FWD_RATES.value
 
     couponAccruedIndicator = 1
 
@@ -136,7 +136,7 @@ def _protectionLegPV_NUMBA(teff,
     ''' Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. '''
 
-    method = FinInterpTypes.FLAT_FORWARDS.value
+    method = FinInterpTypes.FLAT_FWD_RATES.value
     dt = (tmat - teff) / numStepsPerYear
     t = teff
     z1 = _uinterpolate(t, npIborTimes, npIborValues, method)
@@ -640,7 +640,7 @@ class FinCDS(object):
         v = _protectionLegPV_NUMBA(teff,
                                    tmat,
                                    liborCurve._times,
-                                   liborCurve._dfValues,
+                                   liborCurve._dfs,
                                    issuerCurve._times,
                                    issuerCurve._values,
                                    contractRecovery,
@@ -681,7 +681,7 @@ class FinCDS(object):
                                       np.array(paymentTimes),
                                       np.array(yearFracs),
                                       liborCurve._times,
-                                      liborCurve._dfValues,
+                                      liborCurve._dfs,
                                       issuerCurve._times,
                                       issuerCurve._values,
                                       pv01Method)

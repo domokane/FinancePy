@@ -19,7 +19,7 @@ from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
@@ -599,7 +599,7 @@ def test_derivativePricingExample():
 
     for _ in range(0, numRepeats):
         _ = FinIborSingleCurve(valuationDate, depos, fras, swaps,
-                                   FinInterpTypes.FLAT_FORWARDS)
+                                   FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     elapsed1 = end - start
@@ -608,7 +608,7 @@ def test_derivativePricingExample():
 
     for _ in range(0, numRepeats):
         _ = FinIborSingleCurve(valuationDate, depos, fras, swaps,
-                                   FinInterpTypes.LINEAR_SWAP_RATES)
+                                   FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     elapsed2 = end - start
@@ -620,7 +620,7 @@ def test_derivativePricingExample():
 ###############################################################################
 
 
-def test_bloombergPricingExample():
+def test_bloombergPricingExample(interpType):
 
     ''' This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
@@ -682,7 +682,7 @@ def test_bloombergPricingExample():
     swap = FinIborSwap(settlementDate, "40Y", swapType, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = FinIborSwap(settlementDate, "50Y", swapType, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps, interpType)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
@@ -700,10 +700,36 @@ def test_bloombergPricingExample():
     # swaps[0].printFixedLegPV()
     # swaps[0].printFloatLegPV()
 
+    if 1==0:
+        plt.figure()
+    
+        years = np.linspace(0, 50, 500)    
+        dates = settlementDate.addYears(years)
+        fwds = liborCurve.fwd(dates)
+        plt.plot(years, fwds, label = "Fwd Rate")
+        plt.title(interpType)
+        plt.xlabel("Years")
+        plt.legend()
+    
+        years = np.linspace(0, 50, 500)    
+        dates = settlementDate.addYears(years)
+        fwds = liborCurve.zeroRate(dates)
+        plt.plot(years, fwds, label = "Zero Rate")
+        plt.title(interpType)
+        plt.xlabel("Years")
+        plt.ylabel("Rate")
+        plt.legend()
+    
 ###############################################################################
 
+if 1==0:
+    for interpType in FinInterpTypes:
+        start = time.time()
+        test_bloombergPricingExample(interpType)
+        end = time.time()
+        print(interpType, end - start)
 
-test_bloombergPricingExample()
+test_bloombergPricingExample(FinInterpTypes.FLAT_FWD_RATES)
 test_derivativePricingExample()
 test_FinIborDepositsOnly()
 test_FinIborFRAsOnly()

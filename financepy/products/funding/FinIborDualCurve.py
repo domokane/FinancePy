@@ -4,13 +4,14 @@
 
 import numpy as np
 from scipy import optimize
+import copy
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...market.curves.FinInterpolate import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.funding.FinIborDeposit import FinIborDeposit
 from ...products.funding.FinIborFRA import FinIborFRA
@@ -30,7 +31,7 @@ def _f(df, *args):
     valueDate = args[2]
     swap = args[3]
     numPoints = len(indexCurve._times)
-    indexCurve._dfValues[numPoints - 1] = df
+    indexCurve._dfs[numPoints - 1] = df
     v_swap = swap.value(valueDate, discountCurve, indexCurve, None, 1.0)
     v_swap /= swap._notional
     return v_swap
@@ -45,7 +46,7 @@ def _g(df, *args):
     valueDate = args[2]
     fra = args[3]
     numPoints = len(indexCurve._times)
-    indexCurve._dfValues[numPoints - 1] = df
+    indexCurve._dfs[numPoints - 1] = df
     v_fra = fra.value(valueDate, discountCurve, indexCurve)
     v_fra /= fra._notional
     return v_fra
@@ -66,7 +67,7 @@ class FinIborDualCurve(FinDiscountCurve):
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FORWARDS,
+                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES,
                  checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
@@ -277,13 +278,13 @@ class FinIborDualCurve(FinDiscountCurve):
         involves the use of a solver. '''
 
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
 
         # A deposit is not margined and not indexed to Libor so should
         # probably not be used to build an indexed Libor curve from
@@ -292,7 +293,7 @@ class FinIborDualCurve(FinDiscountCurve):
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
         oldtmat = tmat
 
@@ -307,10 +308,10 @@ class FinIborDualCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
 
                 argtuple = (self._discountCurve, self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -324,7 +325,7 @@ class FinIborDualCurve(FinDiscountCurve):
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
             argtuple = (self._discountCurve, self, self._valuationDate, swap)
 
@@ -343,20 +344,20 @@ class FinIborDualCurve(FinDiscountCurve):
         require the use of a solver. It is also market standard. '''
 
         self._times = np.array([])
-        self._dfValues = np.array([])
+        self._dfs = np.array([])
 
         # time zero is now.
         tmat = 0.0
         dfMat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfValues = np.append(self._dfValues, dfMat)
+        self._dfs = np.append(self._dfs, dfMat)
 
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._startDate)
             dfMat = depo._maturityDf() * dfSettle
             tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
 
         oldtmat = tmat
 
@@ -371,10 +372,10 @@ class FinIborDualCurve(FinDiscountCurve):
             if tset < oldtmat and tmat > oldtmat:
                 dfMat = fra.maturityDf(self)
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfValues = np.append(self._dfValues, dfMat)
+                self._dfs = np.append(self._dfs, dfMat)
 
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
@@ -463,7 +464,7 @@ class FinIborDualCurve(FinDiscountCurve):
             pv01End = (acc * swapRate + 1.0)
             dfMat = (dfSettle - swapRate * pv01) / pv01End
             self._times = np.append(self._times, tmat)
-            self._dfValues = np.append(self._dfValues, dfMat)
+            self._dfs = np.append(self._dfs, dfMat)
             pv01 += acc * dfMat
 
         if self._checkRefit is True:
@@ -525,7 +526,7 @@ class FinIborDualCurve(FinDiscountCurve):
 
         for i in range(0, numPoints):
             s += labelToString("% 10.6f" % self._times[i],
-                               "%12.10f" % self._dfValues[i])
+                               "%12.10f" % self._dfs[i])
         return s
 
 ###############################################################################

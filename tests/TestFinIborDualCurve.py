@@ -18,10 +18,10 @@ from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.products.funding.FinIborSwap import FinIborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.market.curves.FinInterpolate import FinInterpTypes
+from financepy.market.curves.FinInterpolator import FinInterpTypes
 
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDualCurve import FinIborDualCurve
@@ -222,7 +222,7 @@ def test_bloombergPricingExample():
     swap = FinIborSwap(settlementDate, "50Y", swapType, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
     liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps,
-                                    FinInterpTypes.LINEAR_SWAP_RATES,
+                                    FinInterpTypes.FLAT_FWD_RATES,
                                     True)
 #    print(liborCurve)
 

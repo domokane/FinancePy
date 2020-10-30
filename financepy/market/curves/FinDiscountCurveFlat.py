@@ -14,7 +14,7 @@ from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinHelperFunctions import timesFromDates
-from ...market.curves.FinInterpolate import FinInterpTypes
+from ...market.curves.FinInterpolator import FinInterpTypes
 
 ###############################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in
@@ -50,14 +50,14 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         self._dayCountType = dayCountType
 
         # This is used by some inherited functions so we choose the simplest
-        self._interpType = FinInterpTypes.FLAT_FORWARDS
+        self._interpType = FinInterpTypes.FLAT_FWD_RATES
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
         dates = self._valuationDate.addYears(years)
 
         # Set up a grid of times and discount factors for functions
-        self._dfValues = self.df(dates)
+        self._dfs = self.df(dates)
         self._times = timesFromDates(dates, self._valuationDate)
 
 ###############################################################################
