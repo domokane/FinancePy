@@ -17,15 +17,16 @@ N = norm.cdf
 ###############################################################################
 
 
-def bsValue(s, t, k, r, q, v, phi):
+def bsValue(s:float, 
+            t:float, 
+            k:float, 
+            r:float, 
+            q:float, 
+            v:float, 
+            phi:int):   # +1 for call, -1 for put
     ''' Price a derivative using Black-Scholes model where 
     phi is +1 for a call, and
     phi is -1 for a put.'''
-
-    # if phi == 1:
-    #     print("Call", s, t, k, r, q, v, phi)
-    # else:
-    #     print("Put", s, t, k, r, q, v, phi)
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
