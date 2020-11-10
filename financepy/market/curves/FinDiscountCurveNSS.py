@@ -32,7 +32,7 @@ class FinDiscountCurveNSS(FinDiscountCurve):
                  beta3: float,
                  tau1: float,
                  tau2: float,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Create a FinDiscountCurveNSS object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
@@ -54,14 +54,14 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         self._beta3 = beta3
         self._tau1 = tau1
         self._tau2 = tau2
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
 
 ###############################################################################
 
     def zeroRate(self,
                  dates: (list, FinDate),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculation of zero rates with specified frequency according to
         NSS parametrisation. This method overrides that in FinDiscountCurve.
@@ -71,7 +71,7 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         of dates so must use Numpy functions. The default frequency is a
         continuously compounded rate and ACT ACT day counting. '''
 
-        if isinstance(frequencyType, FinFrequencyTypes) is False:
+        if isinstance(freqType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
         if isinstance(dayCountType, FinDayCountTypes) is False:
@@ -89,13 +89,13 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         dfs = self._zeroToDf(self._valuationDate,
                              zeroRates,
                              dcTimes,
-                             self._frequencyType,
+                             self._freqType,
                              self._dayCountType)
 
         # Convert these to zero rates in the required frequency and day count
         zeroRates = self._dfToZero(dfs,
                                    dates,
-                                   frequencyType,
+                                   freqType,
                                    dayCountType)
 
         if isinstance(dates, FinDate):
@@ -145,7 +145,7 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         df = self._zeroToDf(self._valuationDate,
                             zeroRates,
                             dcTimes,
-                            self._frequencyType,
+                            self._freqType,
                             self._dayCountType)
 
         if isinstance(dates, FinDate):
@@ -164,7 +164,7 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         s += labelToString("BETA3", self._beta3)
         s += labelToString("TAU1", self._tau1)
         s += labelToString("TAU2", self._tau2)
-        s += labelToString("FREQUENCY", (self._frequencyType))
+        s += labelToString("FREQUENCY", (self._freqType))
         s += labelToString("DAY_COUNT", (self._dayCountType))
         return s
 

@@ -33,7 +33,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
     def __init__(self,
                  valuationDate: FinDate,
                  flatRate: (float, np.ndarray),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date a rate and a compound
@@ -46,7 +46,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
 
         self._valuationDate = valuationDate
         self._flatRate = flatRate
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
 
         # This is used by some inherited functions so we choose the simplest
@@ -70,7 +70,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         rBumped = self._flatRate + bumpSize
         discCurve = FinDiscountCurveFlat(self._valuationDate,
                                          rBumped,
-                                         frequencyType=self._frequencyType,
+                                         freqType=self._freqType,
                                          dayCountType=self._dayCountType)
         return discCurve
 
@@ -92,7 +92,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         dfs = self._zeroToDf(self._valuationDate,
                              self._flatRate,
                              dcTimes,
-                             self._frequencyType,
+                             self._freqType,
                              self._dayCountType)
 
         if isinstance(dates, FinDate):
@@ -105,7 +105,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("FLAT RATE", (self._flatRate))
-        s += labelToString("FREQUENCY", (self._frequencyType))
+        s += labelToString("FREQUENCY", (self._freqType))
         s += labelToString("DAY COUNT", (self._dayCountType))
         return s
 

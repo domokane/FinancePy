@@ -28,7 +28,7 @@ class FinDiscountCurvePWL(FinDiscountCurve):
                  valuationDate: FinDate,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Curve is defined by a vector of increasing times and zero rates.'''
 
@@ -44,7 +44,7 @@ class FinDiscountCurvePWL(FinDiscountCurve):
 
         self._zeroRates = np.array(zeroRates)
         self._zeroDates = zeroDates
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
 
         dcTimes = timesFromDates(zeroDates,
@@ -119,7 +119,7 @@ class FinDiscountCurvePWL(FinDiscountCurve):
         df = self._zeroToDf(self._valuationDate,
                             zeroRates,
                             dcTimes,
-                            self._frequencyType,
+                            self._freqType,
                             self._dayCountType)
 
         return df
@@ -131,8 +131,8 @@ class FinDiscountCurvePWL(FinDiscountCurve):
     #     ''' Returns the discount factor at time t taking into account the
     #     piecewise flat zero rate curve and the compunding frequency. '''
 
-    #     r = self._zeroRate(t, self._frequencyType)
-    #     df = zeroToDf(r, t, self._frequencyType)
+    #     r = self._zeroRate(t, self._freqType)
+    #     df = zeroToDf(r, t, self._freqType)
     #     return df
 
 ###############################################################################
@@ -142,7 +142,7 @@ class FinDiscountCurvePWL(FinDiscountCurve):
         s += labelToString("DATE", "ZERO RATE")
         for i in range(0, len(self._zeroDates)):
             s += labelToString(self._zeroDates[i], self._zeroRates[i])
-        s += labelToString("FREQUENCY", (self._frequencyType))
+        s += labelToString("FREQUENCY", (self._freqType))
         return s
 
 ###############################################################################

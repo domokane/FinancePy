@@ -27,7 +27,7 @@ class FinDiscountCurvePWF(FinDiscountCurve):
                  valuationDate: FinDate,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat. '''
@@ -44,7 +44,7 @@ class FinDiscountCurvePWF(FinDiscountCurve):
 
         self._zeroDates = zeroDates
         self._zeroRates = np.array(zeroRates)
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
 
         dcTimes = timesFromDates(zeroDates,
@@ -137,7 +137,7 @@ class FinDiscountCurvePWF(FinDiscountCurve):
         df = self._zeroToDf(self._valuationDate,
                             zeroRates,
                             dcTimes,
-                            self._frequencyType,
+                            self._freqType,
                             self._dayCountType)
 
         return df
@@ -149,7 +149,7 @@ class FinDiscountCurvePWF(FinDiscountCurve):
         s += labelToString("DATE", "ZERO RATE")
         for i in range(0, len(self._zeroDates)):
             s += labelToString(self._zeroDates[i], self._zeroRates[i])
-        s += labelToString("FREQUENCY", (self._frequencyType))
+        s += labelToString("FREQUENCY", (self._freqType))
         return s
 
 ###############################################################################

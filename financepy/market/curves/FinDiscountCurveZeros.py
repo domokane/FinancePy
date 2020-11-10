@@ -35,7 +35,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
                  valuationDate: FinDate,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA,
                  interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         ''' Create the discount curve from a vector of dates and zero rates
@@ -55,15 +55,15 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         if len(zeroDates) != len(zeroRates):
             raise FinError("Dates and Rates are not the same length")
 
-        if frequencyType not in FinFrequencyTypes:
-            raise FinError("Unknown Frequency type " + str(frequencyType))
+        if freqType not in FinFrequencyTypes:
+            raise FinError("Unknown Frequency type " + str(freqType))
 
         if dayCountType not in FinDayCountTypes:
             raise FinError("Unknown Cap Floor DayCountRule type " +
                            str(dayCountType))
 
         self._valuationDate = valuationDate
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
         self._interpType = interpType
 
@@ -78,7 +78,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
         dfs = self._zeroToDf(self._valuationDate,
                              self._zeroRates,
                              self._times,
-                             self._frequencyType,
+                             self._freqType,
                              self._dayCountType)
 
         self._dfs = np.array(dfs)
@@ -110,7 +110,7 @@ class FinDiscountCurveZeros(FinDiscountCurve):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUATION DATE", self._valuationDate)
-        s += labelToString("FREQUENCY TYPE", (self._frequencyType))
+        s += labelToString("FREQUENCY TYPE", (self._freqType))
         s += labelToString("DAY COUNT TYPE", (self._dayCountType))
         s += labelToString("INTERP TYPE", (self._interpType))
 

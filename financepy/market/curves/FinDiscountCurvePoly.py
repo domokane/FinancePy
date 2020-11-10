@@ -27,7 +27,7 @@ class FinDiscountCurvePoly(FinDiscountCurve):
     def __init__(self,
                  valuationDate: FinDate,
                  coefficients: (list, np.ndarray),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
         ''' Create zero rate curve parametrised using a cubic curve from
         coefficients and specifying a compounding frequency type and day count
@@ -38,14 +38,14 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         self._valuationDate = valuationDate
         self._coefficients = coefficients
         self._power = len(coefficients) - 1
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
 
 ###############################################################################
 
     def zeroRate(self,
                  dts: (list, FinDate),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculation of zero rates with specified frequency according to
         polynomial parametrisation. This method overrides FinDiscountCurve.
@@ -55,7 +55,7 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         of dates so must use Numpy functions. The default frequency is a
         continuously compounded rate and ACT ACT day counting. '''
 
-        if isinstance(frequencyType, FinFrequencyTypes) is False:
+        if isinstance(freqType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
         if isinstance(dayCountType, FinDayCountTypes) is False:
@@ -71,11 +71,11 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         dfs = self._zeroToDf(self._valuationDate,
                              zeroRates,
                              dcTimes,
-                             self._frequencyType,
+                             self._freqType,
                              self._dayCountType)
 
         # Convert these to zero rates in the required frequency and day count
-        zeroRates = self._dfToZero(dfs, dts, frequencyType, dayCountType)
+        zeroRates = self._dfToZero(dfs, dts, freqType, dayCountType)
         return zeroRates
 
 ###############################################################################
@@ -116,7 +116,7 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         dfs = self._zeroToDf(self._valuationDate,
                              zeroRates,
                              dcTimes,
-                             self._frequencyType,
+                             self._freqType,
                              self._dayCountType)
 
         return dfs
@@ -129,7 +129,7 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         s += labelToString("POWER", "COEFFICIENT")
         for i in range(0, len(self._coefficients)):
             s += labelToString(str(i), self._coefficients[i])
-        s += labelToString("FREQUENCY", (self._frequencyType))
+        s += labelToString("FREQUENCY", (self._freqType))
 
         return s
 

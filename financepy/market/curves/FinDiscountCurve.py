@@ -75,7 +75,7 @@ class FinDiscountCurve():
         self._valuationDate = valuationDate
         self._dfs = np.array(self._dfs)
         self._interpType = interpType
-        self._frequencyType = FinFrequencyTypes.CONTINUOUS
+        self._freqType = FinFrequencyTypes.CONTINUOUS
         self._dayCountType = None  # Not needed for this curve
         self._interpolator = FinInterpolator(self._interpType)
         self._interpolator.fit(self._times, self._dfs)
@@ -86,7 +86,7 @@ class FinDiscountCurve():
                   valuationDate: FinDate,
                   rates: (float, np.ndarray),
                   times: (float, np.ndarray),
-                  frequencyType: FinFrequencyTypes,
+                  freqType: FinFrequencyTypes,
                   dayCountType: FinDayCountTypes):
         ''' Convert a zero with a specified compounding frequency and day count
         convention to a discount factor for a single maturity date or a list of
@@ -97,16 +97,16 @@ class FinDiscountCurve():
 
         t = np.maximum(times, gSmall)
 
-        f = FinFrequency(frequencyType)
+        f = FinFrequency(freqType)
 
-        if frequencyType == FinFrequencyTypes.CONTINUOUS:
+        if freqType == FinFrequencyTypes.CONTINUOUS:
             df = np.exp(-rates*t)
-        elif frequencyType == FinFrequencyTypes.SIMPLE:
+        elif freqType == FinFrequencyTypes.SIMPLE:
             df = 1.0 / (1.0 + rates * t)
-        elif frequencyType == FinFrequencyTypes.ANNUAL or \
-            frequencyType == FinFrequencyTypes.SEMI_ANNUAL or \
-                frequencyType == FinFrequencyTypes.QUARTERLY or \
-                frequencyType == FinFrequencyTypes.MONTHLY:
+        elif freqType == FinFrequencyTypes.ANNUAL or \
+            freqType == FinFrequencyTypes.SEMI_ANNUAL or \
+                freqType == FinFrequencyTypes.QUARTERLY or \
+                freqType == FinFrequencyTypes.MONTHLY:
             df = 1.0 / np.power(1.0 + rates/f, f * t)
         else:
             raise FinError("Unknown Frequency type")
@@ -118,7 +118,7 @@ class FinDiscountCurve():
     def _dfToZero(self,
                   dfs: (float, np.ndarray),
                   maturityDts: (FinDate, list),
-                  frequencyType: FinFrequencyTypes,
+                  freqType: FinFrequencyTypes,
                   dayCountType: FinDayCountTypes):
         ''' Given a dates this first generates the discount factors. It then
         converts the discount factors to a zero rate with a chosen compounding
@@ -126,7 +126,7 @@ class FinDiscountCurve():
         frequency which are all choices of FinFrequencyTypes. Returns a list of
         discount factor. '''
 
-        f = FinFrequency(frequencyType)
+        f = FinFrequency(freqType)
 
         if isinstance(maturityDts, FinDate):
             dateList = [maturityDts]
@@ -152,9 +152,9 @@ class FinDiscountCurve():
 
             t = max(times[i], gSmall)
 
-            if frequencyType == FinFrequencyTypes.CONTINUOUS:
+            if freqType == FinFrequencyTypes.CONTINUOUS:
                 r = -np.log(df)/t
-            elif frequencyType == FinFrequencyTypes.SIMPLE:
+            elif freqType == FinFrequencyTypes.SIMPLE:
                 r = (1.0/df - 1.0)/t
             else:
                 r = (np.power(df, -1.0/(t * f))-1.0) * f
@@ -167,21 +167,21 @@ class FinDiscountCurve():
 
     def zeroRate(self,
                  dts: (list, FinDate),
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360):
         ''' Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
         dates so must use Numpy functions. Default frequency is a
         continuously compounded rate. '''
 
-        if isinstance(frequencyType, FinFrequencyTypes) is False:
+        if isinstance(freqType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
         if isinstance(dayCountType, FinDayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
         dfs = self.df(dts)
-        zeroRates = self._dfToZero(dfs, dts, frequencyType, dayCountType)
+        zeroRates = self._dfToZero(dfs, dts, freqType, dayCountType)
 
         if isinstance(dts, FinDate):
             return zeroRates[0]
@@ -195,7 +195,7 @@ class FinDiscountCurve():
     def swapRate(self,
                  startDate: FinDate,
                  maturityDate: (list, FinDate),
-                 frequencyType=FinFrequencyTypes.ANNUAL,
+                 freqType=FinFrequencyTypes.ANNUAL,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360):
         ''' Calculate the swap rate to maturity date. This is the rate paid by
         a swap that has a price of par today. This is the same as a Libor swap
@@ -208,15 +208,15 @@ class FinDiscountCurve():
         if startDate < self._valuationDate:
             raise FinError("Swap starts before the curve valuation date.")
 
-        if isinstance(frequencyType, FinFrequencyTypes) is False:
+        if isinstance(freqType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(frequencyType, FinFrequencyTypes) is False:
+        if isinstance(freqType, FinFrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if frequencyType == FinFrequencyTypes.SIMPLE:
+        if freqType == FinFrequencyTypes.SIMPLE:
             raise FinError("Cannot calculate par rate with simple yield freq.")
-        elif frequencyType == FinFrequencyTypes.CONTINUOUS:
+        elif freqType == FinFrequencyTypes.CONTINUOUS:
             raise FinError("Cannot calculate par rate with continuous freq.")
 
         if isinstance(maturityDate, FinDate):
@@ -230,7 +230,7 @@ class FinDiscountCurve():
 
             schedule = FinSchedule(startDate,
                                    maturityDt,
-                                   frequencyType)
+                                   freqType)
 
             flowDates = schedule._generate()
             flowDates[0] = startDate
