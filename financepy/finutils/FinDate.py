@@ -7,9 +7,32 @@ from .FinError import FinError
 from numba import njit, boolean, int64
 import numpy as np
 
+
+from enum import Enum
+
+class FinDateFormatTypes(Enum):
+    BLOOMBERG = 1
+    US_SHORT = 2
+    US_MEDIUM = 3
+    US_LONG = 4
+    US_LONGEST = 5
+    UK_SHORT = 6
+    UK_MEDIUM = 7
+    UK_LONG = 8
+    UK_LONGEST = 9
+
+# Set the default
+gDateFormatType = FinDateFormatTypes.UK_LONGEST
+
+def setFormatType(formatType):
+    global gDateFormatType
+    gDateFormatType = formatType
+
+###############################################################################    
+
 ENFORCE_DAY_FIRST = True
 
-##########################################################################
+###############################################################################
 
 shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 longDayNames = [
@@ -156,6 +179,7 @@ def weekDay(dayCount):
 class FinDate():
     ''' A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. '''
+
 
     MON = 0
     TUE = 1
@@ -631,17 +655,84 @@ class FinDate():
 
     def __repr__(self):
         ''' returns a formatted string of the date '''
-        dateStr = ""
-        dateStr += shortDayNames[self._weekday]
+
+        global gDateFormatType
+        
+        dayNameStr = shortDayNames[self._weekday]
 
         if self._d < 10:
-            dateStr += " 0" + str(self._d) + " "
+            dayStr = "0" + str(self._d)
         else:
-            dateStr += " " + str(self._d) + " "
+            dayStr = "" + str(self._d)
 
-        dateStr += shortMonthNames[self._m - 1]
-        dateStr += " " + str(self._y)
-        return dateStr
+        if self._m < 10:
+            shortMonthStr = "0" + str(self._m)
+        else:
+            shortMonthStr = str(self._m)
+
+        longMonthStr = shortMonthNames[self._m - 1]
+
+        shortYearStr = str(self._y)[2:]
+        longYearStr = str(self._y)
+
+
+        if gDateFormatType == FinDateFormatTypes.UK_LONGEST:
+
+            sep = " "
+            dateStr = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.UK_LONG:
+
+            sep = " "
+            dateStr = dayStr + sep + longMonthStr + sep + longYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.UK_MEDIUM:
+
+            sep = "/"
+            dateStr = dayStr + sep + shortMonthStr + sep + longYearStr
+            return dateStr
+    
+        elif gDateFormatType == FinDateFormatTypes.UK_SHORT:
+
+            sep = "/"
+            dateStr = dayStr + sep + shortMonthStr + sep + shortYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.US_LONGEST:
+
+            sep = " "
+            dateStr = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.US_LONG:
+
+            sep = " "
+            dateStr = longMonthStr + sep + dayStr + sep + longYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.US_MEDIUM:
+            
+            sep = "-"
+            dateStr = shortMonthStr + sep + dayStr + sep + longYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.US_SHORT:
+
+            sep = "-"
+            dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.BLOOMBERG:
+
+            sep = "/"
+            dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
+            return dateStr
+
+        else:
+            
+            raise FinError("Unknown date format")
 
     ###########################################################################
     # REMOVE THIS
@@ -649,8 +740,6 @@ class FinDate():
     def _print(self):
         ''' prints formatted string of the date. '''
         print(self)
-
-    ###########################################################################
 
 
 ###############################################################################
@@ -729,3 +818,7 @@ def dateRange(startDate: FinDate,
     return dateList
 
 ###############################################################################
+
+def testType():
+    global gDateFormatType
+    print("TEST TYPE", gDateFormatType)
