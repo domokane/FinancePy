@@ -193,7 +193,7 @@ class FinCDS(object):
                  runningCoupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -222,7 +222,7 @@ class FinCDS(object):
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._busDayAdjustType = busDayAdjustType
 
         self._generateAdjustedCDSPaymentDates()
@@ -232,7 +232,7 @@ class FinCDS(object):
 
     def _generateAdjustedCDSPaymentDates(self):
         ''' Generate CDS payment dates which have been holiday adjusted.'''
-        frequency = FinFrequency(self._frequencyType)
+        frequency = FinFrequency(self._freqType)
         calendar = FinCalendar(self._calendarType)
         startDate = self._stepInDate
         endDate = self._maturityDate
@@ -433,7 +433,7 @@ class FinCDS(object):
         for fra in newIssuerCurve._liborCurve._usedFRAs:
             fra._fraRate += bump
         for swap in newIssuerCurve._liborCurve._usedSwaps:
-            swap._fixedCoupon += bump
+            swap._fixedLeg._coupon += bump
 
         newIssuerCurve._liborCurve._buildCurve()
 
@@ -838,7 +838,7 @@ class FinCDS(object):
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")
         s += labelToString("DAYCOUNT", self._dayCountType)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType)

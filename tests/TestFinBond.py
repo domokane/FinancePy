@@ -4,6 +4,8 @@
 
 import os
 import datetime as dt
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -92,7 +94,7 @@ def buildIborCurve(valuationDate):
     swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -102,7 +104,7 @@ def buildIborCurve(valuationDate):
     swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -112,7 +114,7 @@ def buildIborCurve(valuationDate):
     swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -122,7 +124,7 @@ def buildIborCurve(valuationDate):
     swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -132,7 +134,7 @@ def buildIborCurve(valuationDate):
     swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -142,7 +144,7 @@ def buildIborCurve(valuationDate):
     swap6 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -152,7 +154,7 @@ def buildIborCurve(valuationDate):
     swap7 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -162,7 +164,7 @@ def buildIborCurve(valuationDate):
     swap8 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -172,7 +174,7 @@ def buildIborCurve(valuationDate):
     swap9 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         swapRate,
         fixedFreqType,
         fixedDCCType)
@@ -208,7 +210,7 @@ def test_FinBond():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     settlementDate = FinDate(19, 9, 2012)
     face = ONE_MILLION
 
@@ -227,7 +229,7 @@ def test_FinBond():
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
             bond = FinBond(issueDt, maturityDt, 
-                           coupon, frequencyType, accrualType, 100)
+                           coupon, freqType, accrualType, 100)
 
             ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
             accd = bond._accruedInterest

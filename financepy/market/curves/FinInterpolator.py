@@ -21,8 +21,6 @@ class FinInterpTypes(Enum):
                 FLAT_FWD_RATES = 1
                 LINEAR_FWD_RATES = 2
                 LINEAR_ZERO_RATES = 4
-#                LINEAR_LOG_DISCOUNT = 5  # SAME AS FLAT FORWARDS
-#                FINCUBIC_LOG_DISCOUNT = 6 # BAD AS IT WIGGLES - WORKS FOR RATES
                 FINCUBIC_ZERO_RATES = 7
                 NATCUBIC_LOG_DISCOUNT = 8
                 NATCUBIC_ZERO_RATES = 9

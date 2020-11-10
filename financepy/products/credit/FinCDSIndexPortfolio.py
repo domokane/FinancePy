@@ -26,7 +26,7 @@ class FinCDSIndexPortfolio():
     portfolio of CDS contracts with the same maturity date. '''
 
     def __init__(self,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -39,7 +39,7 @@ class FinCDSIndexPortfolio():
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._busDayAdjustType = busDayAdjustType
 
 ###############################################################################
@@ -481,7 +481,7 @@ class FinCDSIndexPortfolio():
     def __repr__(self):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("DAYCOUNT", self._dayCountType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)

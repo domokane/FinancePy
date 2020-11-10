@@ -25,7 +25,7 @@ class FinBondAnnuity(object):
     def __init__(self,
                  maturityDate: FinDate,
                  coupon: float,
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
@@ -36,8 +36,8 @@ class FinBondAnnuity(object):
 
         self._maturityDate = maturityDate
         self._coupon = coupon
-        self._frequencyType = frequencyType
-        self._frequency = FinFrequency(frequencyType)
+        self._freqType = freqType
+        self._frequency = FinFrequency(freqType)
 
         # ISDA Style conventions
         self._calendarType = calendarType
@@ -108,7 +108,7 @@ class FinBondAnnuity(object):
 
         self._flowDates = FinSchedule(settlementDate,
                                       self._maturityDate,
-                                      self._frequencyType,
+                                      self._freqType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
@@ -177,7 +177,7 @@ class FinBondAnnuity(object):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("MATURITY DATE", self._maturityDate)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUS_DAY_RULE", self._busDayAdjustType)
         s += labelToString("DATE_GEN_RULE", self._dateGenRuleType)

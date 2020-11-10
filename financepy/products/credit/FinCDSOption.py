@@ -52,7 +52,7 @@ class FinCDSOption():
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,
                  knockoutFlag: bool = True,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -77,7 +77,7 @@ class FinCDSOption():
         self._knockoutFlag = knockoutFlag
         self._notional = notional
 
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
         self._calendarType = calendarType
         self._businessDateAdjustType = busDayAdjustType
@@ -107,7 +107,7 @@ class FinCDSOption():
                      self._strikeCoupon,
                      self._notional,
                      self._longProtection,
-                     self._frequencyType,
+                     self._freqType,
                      self._dayCountType,
                      self._calendarType,
                      self._businessDateAdjustType,

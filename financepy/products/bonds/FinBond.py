@@ -91,7 +91,7 @@ class FinBond(object):
                  issueDate: FinDate,
                  maturityDate: FinDate,
                  coupon: float,  # Annualised bond coupon
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  faceAmount: float = 100.0):
         ''' Create FinBond object by providing the issue date, maturity Date,
@@ -106,9 +106,9 @@ class FinBond(object):
         self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._coupon = coupon
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._accrualType = accrualType
-        self._frequency = FinFrequency(frequencyType)
+        self._frequency = FinFrequency(freqType)
         self._faceAmount = faceAmount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0 # This is amount paid at maturity
@@ -136,7 +136,7 @@ class FinBond(object):
 
         self._flowDates = FinSchedule(self._issueDate,
                                       self._maturityDate,
-                                      self._frequencyType,
+                                      self._freqType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
@@ -170,7 +170,7 @@ class FinBond(object):
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
 
-        f = FinFrequency(self._frequencyType)
+        f = FinFrequency(self._freqType)
         c = self._coupon
         v = 1.0 / (1.0 + ytm/f)
 
@@ -620,7 +620,7 @@ class FinBond(object):
         s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE AMOUNT", self._faceAmount, "")
         return s

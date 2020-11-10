@@ -35,7 +35,7 @@ class FinBondMortgage(object):
                  startDate: FinDate,
                  endDate: FinDate,
                  principal: float,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
@@ -50,7 +50,7 @@ class FinBondMortgage(object):
         self._startDate = startDate
         self._endDate = endDate
         self._principal = principal
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
@@ -58,7 +58,7 @@ class FinBondMortgage(object):
 
         self._schedule = FinSchedule(startDate,
                                      endDate,
-                                     self._frequencyType,
+                                     self._freqType,
                                      self._calendarType,
                                      self._busDayAdjustType,
                                      self._dateGenRuleType)
@@ -69,7 +69,7 @@ class FinBondMortgage(object):
                         zeroRate: float):
         ''' Determine monthly repayment amount based on current zero rate. '''
 
-        frequency = FinFrequency(self._frequencyType)
+        frequency = FinFrequency(self._freqType)
 
         numFlows = len(self._schedule._adjustedDates)
         p = (1.0 + zeroRate/frequency) ** (numFlows-1)
@@ -92,7 +92,7 @@ class FinBondMortgage(object):
 
         numFlows = len(self._schedule._adjustedDates)
         principal = self._principal
-        frequency = FinFrequency(self._frequencyType)
+        frequency = FinFrequency(self._freqType)
 
         if mortgageType == FinBondMortgageTypes.REPAYMENT:
             monthlyFlow = self.repaymentAmount(zeroRate)
@@ -116,7 +116,7 @@ class FinBondMortgage(object):
         print("START DATE:", self._startDate)
         print("MATURITY DATE:", self._endDate)
         print("MORTGAGE TYPE:", self._mortgageType)
-        print("FREQUENCY:", self._frequencyType)
+        print("FREQUENCY:", self._freqType)
         print("CALENDAR:", self._calendarType)
         print("BUSDAYRULE:", self._busDayAdjustType)
         print("DATEGENRULE:", self._dateGenRuleType)
@@ -143,7 +143,7 @@ class FinBondMortgage(object):
         s += labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._endDate)
         s += labelToString("MORTGAGE TYPE", self._mortgageType)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType)

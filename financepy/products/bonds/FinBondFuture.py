@@ -56,7 +56,7 @@ class FinBondFuture(object):
         newBond = FinBond(issueDate,
                           newMat,
                           bond._coupon,
-                          bond._frequencyType,
+                          bond._freqType,
                           bond._accrualType,
                           face)
 

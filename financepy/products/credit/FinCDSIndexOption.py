@@ -36,7 +36,7 @@ class FinCDSIndexOption(object):
                  strikeCoupon: float,
                  notional: float = ONE_MILLION,
                  longProtection: bool = True,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -65,7 +65,7 @@ class FinCDSIndexOption(object):
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._busDayAdjustType = busDayAdjustType
 
         self._cdsContract = FinCDS(self._expiryDate,
@@ -73,7 +73,7 @@ class FinCDSIndexOption(object):
                                    self._indexCoupon,
                                    1.0,
                                    self._longProtection,
-                                   self._frequencyType,
+                                   self._freqType,
                                    self._dayCountType,
                                    self._calendarType,
                                    self._busDayAdjustType,
@@ -346,7 +346,7 @@ class FinCDSIndexOption(object):
         s += labelToString("INDEX COUPON", self._indexCoupon*10000, "bp\n")
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("LONG PROTECTION", self._longProtection)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("DAYCOUNT", self._dayCountType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)

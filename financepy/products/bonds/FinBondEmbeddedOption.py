@@ -50,7 +50,7 @@ class FinBondEmbeddedOption(object):
                  issueDate: FinDate,
                  maturityDate: FinDate,  # FinDate
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  callDates: List[FinDate],
                  callPrices: List[float],
@@ -65,13 +65,13 @@ class FinBondEmbeddedOption(object):
         self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._coupon = coupon
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._accrualType = accrualType
 
         self._bond = FinBond(issueDate,
                              maturityDate,
                              coupon,
-                             frequencyType,
+                             freqType,
                              accrualType,
                              faceAmount)
 
@@ -226,7 +226,7 @@ class FinBondEmbeddedOption(object):
         s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE AMOUNT", self._faceAmount)
 

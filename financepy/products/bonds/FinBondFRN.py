@@ -50,7 +50,7 @@ class FinBondFRN(object):
                  issueDate: FinDate,
                  maturityDate: FinDate,
                  quotedMargin: float,    # Fixed spread paid on top of index
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  faceAmount: float = 100.0):
         ''' Create FinFloatingRateNote object given its maturity date, its
@@ -62,10 +62,10 @@ class FinBondFRN(object):
         self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._quotedMargin = quotedMargin
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._accrualType = accrualType
         self._flowDates = []
-        self._frequency = FinFrequency(frequencyType)
+        self._frequency = FinFrequency(freqType)
         self._faceAmount = faceAmount   # This is the position size
         self._par = 100.0   # This is how price is quoted
         self._redemption = 1.0 # This is amount paid at maturity TODO NOT USED
@@ -92,7 +92,7 @@ class FinBondFRN(object):
 
         self._flowDates = FinSchedule(self._issueDate,
                                       self._maturityDate,
-                                      self._frequencyType,
+                                      self._freqType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
@@ -431,7 +431,7 @@ class FinBondFRN(object):
         (accFactor, num, _) = dc.yearFrac(self._pcd,
                                           settlementDate,
                                           self._ncd,
-                                          self._frequencyType)
+                                          self._freqType)
 
         self._alpha = 1.0 - accFactor * self._frequency
         nextCoupon = resetIbor + self._quotedMargin
@@ -459,7 +459,7 @@ class FinBondFRN(object):
         s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("QUOTED MARGIN (bp)", self._quotedMargin * 10000.0)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE AMOUNT", self._faceAmount)
         return s

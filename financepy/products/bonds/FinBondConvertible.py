@@ -261,7 +261,7 @@ class FinBondConvertible(object):
     def __init__(self,
                  maturityDate: FinDate,  # bond maturity date
                  coupon: float,  # annual coupon
-                 frequencyType: FinFrequencyTypes,  # coupon frequency type
+                 freqType: FinFrequencyTypes,  # coupon frequency type
                  startConvertDate: FinDate,  # conversion starts on this date
                  conversionRatio: float,  # num shares per face of notional
                  callDates: List[FinDate],  # list of call dates
@@ -284,8 +284,8 @@ class FinBondConvertible(object):
         self._maturityDate = maturityDate
         self._coupon = coupon
         self._accrualType = accrualType
-        self._frequency = FinFrequency(frequencyType)
-        self._frequencyType = frequencyType
+        self._frequency = FinFrequency(freqType)
+        self._freqType = freqType
 
         self._callDates = callDates
         self._callPrices = callPrices
@@ -341,7 +341,7 @@ class FinBondConvertible(object):
 
         self._flowDates = FinSchedule(settlementDate,
                                       self._maturityDate,
-                                      self._frequencyType,
+                                      self._freqType,
                                       calendarType,
                                       busDayRuleType,
                                       dateGenRuleType)._generate()
@@ -586,7 +586,7 @@ class FinBondConvertible(object):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE AMOUNT", self._faceAmount)
         s += labelToString("CONVERSION RATIO", self._conversionRatio)

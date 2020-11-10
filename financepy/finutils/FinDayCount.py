@@ -76,7 +76,7 @@ class FinDayCount(object):
                  dt1: FinDate,    # Start of coupon period
                  dt2: FinDate,    # Settlement (for bonds) or period end(swaps)
                  dt3: FinDate = None,   # End of coupon period for accrued
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  isTerminationDate: bool = False):  # Is dt2 a termination date
         ''' This method performs two functions:
 
@@ -210,7 +210,7 @@ class FinDayCount(object):
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
 
-            freq = FinFrequency(frequencyType)
+            freq = FinFrequency(freqType)
 
             if dt3 is None or freq is None:
                 raise FinError("ACT_ACT_ICMA requires three dates and a freq")
@@ -239,7 +239,7 @@ class FinDayCount(object):
             # The ISDA calculator sheet appears to split this across the
             # non-leap and the leap year which I do not see in any conventions.
 
-            freq = FinFrequency(frequencyType)
+            freq = FinFrequency(freqType)
 
             if dt3 is None:
                 y3 = y2

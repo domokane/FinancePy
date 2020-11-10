@@ -24,28 +24,28 @@ class FinFrequencyTypes(Enum):
 ###############################################################################
 
 
-def FinFrequency(frequencyType):
+def FinFrequency(freqType):
     ''' This is a function that takes in a Frequency Type and returns an
     integer for the number of times a year a payment occurs.'''
-    if frequencyType in FinFrequencyTypes:
-        if frequencyType == FinFrequencyTypes.CONTINUOUS:
+    if freqType in FinFrequencyTypes:
+        if freqType == FinFrequencyTypes.CONTINUOUS:
             return -1
-        elif frequencyType == FinFrequencyTypes.SIMPLE:
+        elif freqType == FinFrequencyTypes.SIMPLE:
             return 0
-        elif frequencyType == FinFrequencyTypes.ANNUAL:
+        elif freqType == FinFrequencyTypes.ANNUAL:
             return 1
-        elif frequencyType == FinFrequencyTypes.SEMI_ANNUAL:
+        elif freqType == FinFrequencyTypes.SEMI_ANNUAL:
             return 2
-        elif frequencyType == FinFrequencyTypes.TRI_ANNUAL:
+        elif freqType == FinFrequencyTypes.TRI_ANNUAL:
             return 3
-        elif frequencyType == FinFrequencyTypes.QUARTERLY:
+        elif freqType == FinFrequencyTypes.QUARTERLY:
             return 4
-        elif frequencyType == FinFrequencyTypes.MONTHLY:
+        elif freqType == FinFrequencyTypes.MONTHLY:
             return 12
-    elif isinstance(frequencyType, int):
-        return frequencyType
+    elif isinstance(freqType, int):
+        return freqType
     else:
-        print("Frequency type", frequencyType)
+        print("Frequency type", freqType)
         raise FinError("Unknown frequency type")
 
 ###############################################################################

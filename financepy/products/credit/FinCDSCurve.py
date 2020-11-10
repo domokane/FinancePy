@@ -203,12 +203,12 @@ class FinCDSCurve():
 
     def zeroRate(self,
                  dt,
-                 frequencyType=FinFrequencyTypes.CONTINUOUS):
+                 freqType=FinFrequencyTypes.CONTINUOUS):
         ''' Calculate the zero rate to date dt in the chosen compounding
         frequency where -1 is continuous is the default. '''
 
         t = inputTime(dt, self)
-        f = FinFrequency(frequencyType)
+        f = FinFrequency(freqType)
         df = self.df(t)
         q = self.survProb(t)
         dfq = df * q

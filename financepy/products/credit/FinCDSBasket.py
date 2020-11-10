@@ -45,7 +45,7 @@ class FinCDSBasket(object):
                  notional: float = ONE_MILLION,
                  runningCoupon: float = 0.0,
                  longProtection: bool = True,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -61,7 +61,7 @@ class FinCDSBasket(object):
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._busDayAdjustType = busDayAdjustType
 
         self._cdsContract = FinCDS(self._stepInDate,
@@ -69,7 +69,7 @@ class FinCDSBasket(object):
                                    self._runningCoupon,
                                    1.0,
                                    self._longProtection,
-                                   self._frequencyType,
+                                   self._freqType,
                                    self._dayCountType,
                                    self._calendarType,
                                    self._busDayAdjustType,
@@ -323,7 +323,7 @@ class FinCDSBasket(object):
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("RUNNING COUPON", self._runningCoupon*10000, "bp\n")
         s += labelToString("DAYCOUNT", self._dayCountType)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType)

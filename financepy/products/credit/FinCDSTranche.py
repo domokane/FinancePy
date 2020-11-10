@@ -53,7 +53,7 @@ class FinCDSTranche(object):
                  notional: float = ONE_MILLION,
                  runningCoupon: float = 0.0,
                  longProtection: bool = True,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -75,7 +75,7 @@ class FinCDSTranche(object):
         self._dayCountType = dayCountType
         self._dateGenRuleType = dateGenRuleType
         self._calendarType = calendarType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._busDayAdjustType = busDayAdjustType
 
         notional = 1.0
@@ -85,7 +85,7 @@ class FinCDSTranche(object):
                                    self._runningCoupon,
                                    notional,
                                    self._longProtection,
-                                   self._frequencyType,
+                                   self._freqType,
                                    self._dayCountType,
                                    self._calendarType,
                                    self._busDayAdjustType,
