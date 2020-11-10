@@ -63,9 +63,9 @@ def test_BKExampleTwo():
     expiryDate = settlementDate.addTenor("18m")
     maturityDate = settlementDate.addTenor("10Y")
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     couponTimes = []
     couponFlows = []

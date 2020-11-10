@@ -30,7 +30,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2019)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
@@ -40,7 +40,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,
@@ -62,7 +62,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2028)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
@@ -71,7 +71,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,
@@ -93,7 +93,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2028)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.MONTHLY
+    freqType = FinFrequencyTypes.MONTHLY
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
@@ -102,7 +102,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,
@@ -124,7 +124,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2028)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
@@ -133,7 +133,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,
@@ -155,7 +155,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2028)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
@@ -164,7 +164,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,
@@ -186,7 +186,7 @@ def test_FinBondAnnuity():
 
     maturityDate = FinDate(20, 6, 2028)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
@@ -195,7 +195,7 @@ def test_FinBondAnnuity():
     annuity = FinBondAnnuity(
         maturityDate,
         coupon,
-        frequencyType,
+        freqType,
         calendarType,
         busDayAdjustType,
         dateGenRuleType,

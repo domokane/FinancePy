@@ -27,7 +27,7 @@ class FinInflationBond(FinBond):
                  issueDate: FinDate,
                  maturityDate: FinDate,
                  coupon: float,  # Annualised bond coupon before inflation
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  accrualType: FinDayCountTypes,
                  faceAmount: float,
                  baseCPIValue: float, 
@@ -45,9 +45,9 @@ class FinInflationBond(FinBond):
         self._issueDate = issueDate
         self._maturityDate = maturityDate
         self._coupon = coupon
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._accrualType = accrualType
-        self._frequency = FinFrequency(frequencyType)
+        self._frequency = FinFrequency(freqType)
         self._faceAmount = faceAmount  # This is the bond holding size
         self._baseCPIValue = baseCPIValue # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted
@@ -120,7 +120,7 @@ class FinInflationBond(FinBond):
         s += labelToString("ISSUE DATE", self._issueDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("ACCRUAL TYPE", self._accrualType)
         s += labelToString("FACE AMOUNT", self._faceAmount)
         s += labelToString("BASE CPI VALUE", self._baseCPIValue, "")

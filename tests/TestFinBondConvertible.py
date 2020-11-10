@@ -27,7 +27,7 @@ def test_FinBondConvertible():
     maturityDate = FinDate(15, 3, 2022)
     conversionRatio = 38.4615  # adjust for face
     coupon = 0.0575
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualBasis = FinDayCountTypes.ACT_365F
     face = 1000.0
 
@@ -45,7 +45,7 @@ def test_FinBondConvertible():
 
     bond = FinBondConvertible(maturityDate,
                               coupon,
-                              frequencyType,
+                              freqType,
                               startConvertDate,
                               conversionRatio,
                               callDates,
