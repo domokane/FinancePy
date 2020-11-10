@@ -24,13 +24,13 @@ def test_FinEquityCliquetOptionHaug():
 
     startDate = FinDate(1, 1, 2015)
     finalExpiryDate = FinDate(1, 1, 2017)
-    frequencyType = FinFrequencyTypes.QUARTERLY
+    freqType = FinFrequencyTypes.QUARTERLY
     optionType = FinOptionTypes.EUROPEAN_CALL
 
     cliquetOption = FinEquityCliquetOption(startDate,
                                            finalExpiryDate,
                                            optionType,
-                                           frequencyType)
+                                           freqType)
 
     valueDate = FinDate(1, 8, 2016)
     stockPrice = 50.0

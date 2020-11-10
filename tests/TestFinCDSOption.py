@@ -73,7 +73,7 @@ def buildFullIssuerCurve(valuationDate):
     swap1 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0044 + irBump,
         fixedFreq,
         dcType)
@@ -83,7 +83,7 @@ def buildFullIssuerCurve(valuationDate):
     swap2 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0078 + irBump,
         fixedFreq,
         dcType)
@@ -93,7 +93,7 @@ def buildFullIssuerCurve(valuationDate):
     swap3 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0119 + irBump,
         fixedFreq,
         dcType)
@@ -103,7 +103,7 @@ def buildFullIssuerCurve(valuationDate):
     swap4 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0158 + irBump,
         fixedFreq,
         dcType)
@@ -113,7 +113,7 @@ def buildFullIssuerCurve(valuationDate):
     swap5 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0192 + irBump,
         fixedFreq,
         dcType)
@@ -123,7 +123,7 @@ def buildFullIssuerCurve(valuationDate):
     swap6 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0219 + irBump,
         fixedFreq,
         dcType)
@@ -133,7 +133,7 @@ def buildFullIssuerCurve(valuationDate):
     swap7 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0242 + irBump,
         fixedFreq,
         dcType)
@@ -143,7 +143,7 @@ def buildFullIssuerCurve(valuationDate):
     swap8 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0261 + irBump,
         fixedFreq,
         dcType)
@@ -153,7 +153,7 @@ def buildFullIssuerCurve(valuationDate):
     swap9 = FinIborSwap(
         settlementDate,
         maturityDate,
-        FinSwapTypes.PAYER,
+        FinSwapTypes.PAY,
         m * 0.0276 + irBump,
         fixedFreq,
         dcType)

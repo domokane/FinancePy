@@ -40,10 +40,10 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swapType = FinSwapTypes.PAYER
-    swap1 = FinIborSwap(settlementDate, "1Y", swapType, 0.0350, fixedFreq, dcType)
-    swap2 = FinIborSwap(settlementDate, "2Y", swapType, 0.0400, fixedFreq, dcType)
-    swap3 = FinIborSwap(settlementDate, "3Y", swapType, 0.0450, fixedFreq, dcType)
+    fixedLegType = FinSwapTypes.PAY
+    swap1 = FinIborSwap(settlementDate, "1Y", fixedLegType, 0.0350, fixedFreq, dcType)
+    swap2 = FinIborSwap(settlementDate, "2Y", fixedLegType, 0.0400, fixedFreq, dcType)
+    swap3 = FinIborSwap(settlementDate, "3Y", fixedLegType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
     discountCurve = FinIborSingleCurve(valuationDate, [], [], swaps)
 
@@ -53,9 +53,9 @@ def test_FinBondEmbeddedOptionMATLAB():
     maturityDate = FinDate(1, 1, 2010)
     
     coupon = 0.0525
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     callDates = []
     callPrices = []
@@ -77,7 +77,7 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     puttableBond = FinBondEmbeddedOption(issueDate,
                                          maturityDate, coupon,
-                                         frequencyType, accrualType,
+                                         freqType, accrualType,
                                          callDates, callPrices,
                                          putDates, putPrices)
 
@@ -123,9 +123,9 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     issueDate = FinDate(15, 9, 2010)
     maturityDate = FinDate(15, 9, 2022)
     coupon = 0.025
-    frequencyType = FinFrequencyTypes.QUARTERLY
+    freqType = FinFrequencyTypes.QUARTERLY
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     ###########################################################################
     # Set up the call and put times and prices
@@ -149,7 +149,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
     puttableBond = FinBondEmbeddedOption(issueDate,
                                          maturityDate, coupon,
-                                         frequencyType, accrualType,
+                                         freqType, accrualType,
                                          callDates, callPrices,
                                          putDates, putPrices)
 

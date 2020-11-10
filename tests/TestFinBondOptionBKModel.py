@@ -34,9 +34,9 @@ def test_FinBondOption():
     issueDate = FinDate(1, 12, 2018)
     maturityDate = settlementDate.addTenor("10Y")
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
     times = np.linspace(0, tmat, 20)
@@ -178,9 +178,9 @@ def test_FinBondOptionAmericanConvergenceONE():
     maturityDate = FinDate(1, 9, 2025)
     issueDate = FinDate(1, 9, 2016)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     # Option Details
     expiryDate = FinDate(1, 12, 2020)
@@ -240,9 +240,9 @@ def test_FinBondOptionAmericanConvergenceTWO():
     issueDate = FinDate(1, 9, 2014)
     maturityDate = FinDate(1, 9, 2025)
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
     expiryDate = settlementDate.addTenor("18m")
     face = 100.0
 
@@ -343,9 +343,9 @@ def test_FinBondOptionZEROVOLConvergence():
     issueDate = FinDate(1, 9, 2014)
     maturityDate = FinDate(1, 9, 2025)
     coupon = 0.06
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     # Option Details
     expiryDate = FinDate(1, 12, 2021)

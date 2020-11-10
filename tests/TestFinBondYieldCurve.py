@@ -7,6 +7,8 @@ import datetime as dt
 import sys
 import os
 
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -16,7 +18,6 @@ from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondYieldCurve import FinBondYieldCurve
 from financepy.products.bonds.FinBondYieldCurveModel import *
 
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -33,7 +34,7 @@ def test_FinBondYieldCurve():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     settlement = FinDate(2012, 9, 19)
 
@@ -48,7 +49,7 @@ def test_FinBondYieldCurve():
         issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
         coupon = bond['coupon']/100.0
         cleanPrice = bond['mid']
-        bond = FinBond(issueDt, maturityDt, coupon, frequencyType, accrualType)
+        bond = FinBond(issueDt, maturityDt, coupon, freqType, accrualType)
         yld = bond.yieldToMaturity(settlement, cleanPrice)
         bonds.append(bond)
         ylds.append(yld)

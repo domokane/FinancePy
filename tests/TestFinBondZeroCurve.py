@@ -31,7 +31,7 @@ def test_FinBondZeroCurve():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     settlement = FinDate(19, 9, 2012)
 
@@ -45,7 +45,7 @@ def test_FinBondZeroCurve():
         issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
         coupon = bondRow['coupon']/100.0
         cleanPrice = bondRow['mid']
-        bond = FinBond(issueDt, maturityDt, coupon, frequencyType, accrualType)
+        bond = FinBond(issueDt, maturityDt, coupon, freqType, accrualType)
         bonds.append(bond)
         cleanPrices.append(cleanPrice)
 

@@ -42,7 +42,7 @@ class FinEquityCliquetOption(FinEquityOption):
                  startDate: FinDate,
                  finalExpiryDate: FinDate,
                  optionType: FinOptionTypes,
-                 frequencyType: FinFrequencyTypes,
+                 freqType: FinFrequencyTypes,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
@@ -63,7 +63,7 @@ class FinEquityCliquetOption(FinEquityOption):
         self._startDate = startDate
         self._finalExpiryDate = finalExpiryDate
         self._optionType = optionType
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
@@ -71,7 +71,7 @@ class FinEquityCliquetOption(FinEquityOption):
 
         self._expiryDates = FinSchedule(self._startDate,
                                         self._finalExpiryDate,
-                                        self._frequencyType,
+                                        self._freqType,
                                         self._calendarType,
                                         self._busDayAdjustType,
                                         self._dateGenRuleType)._generate()
@@ -146,7 +146,7 @@ class FinEquityCliquetOption(FinEquityOption):
         s += labelToString("START DATE", self._startDate)
         s += labelToString("FINAL EXPIRY DATE", self._finalExpiryDate)
         s += labelToString("OPTION TYPE", self._optionType)
-        s += labelToString("FREQUENCY TYPE", self._frequencyType)
+        s += labelToString("FREQUENCY TYPE", self._freqType)
         s += labelToString("DAY COUNT TYPE", self._dayCountType)
         s += labelToString("CALENDAR TYPE", self._calendarType)
         s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)

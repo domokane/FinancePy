@@ -150,7 +150,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     valuationDate = FinDate(1, 1, startYear)
 #     settlementDate = valuationDate
 #     capMaturityDate = FinDate(1, 1, endYear)
-#     frequencyType = FinFrequencyTypes.ANNUAL
+#     freqType = FinFrequencyTypes.ANNUAL
 #     dayCountType = FinDayCountTypes.ACT_360
 #     capFloorRate = 0.04
 
@@ -178,7 +178,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     lmmProducts = FinIborLMMProducts(settlementDate,
 #                                       capMaturityDate,
-#                                       frequencyType,
+#                                       freqType,
 #                                       dayCountType)
 
 #     # Set up forward rate vol structure

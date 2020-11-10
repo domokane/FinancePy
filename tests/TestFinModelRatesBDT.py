@@ -49,7 +49,7 @@ def testBlackModelCheck():
     notional = 100.0
 
     # Pricing a PAYER
-    swaptionType = FinSwapTypes.PAYER
+    swaptionType = FinSwapTypes.PAY
     swaption = FinIborSwaption(settlementDate,
                                 exerciseDate,
                                 maturityDate,
@@ -117,9 +117,9 @@ def test_BDTExampleTwo():
     expiryDate = settlementDate.addTenor("18m")
     maturityDate = settlementDate.addTenor("10Y")
     coupon = 0.05
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
     couponTimes = []
     couponFlows = []
@@ -208,7 +208,7 @@ def test_BDTExampleThree():
     curve = FinDiscountCurve(settlementDate, dates, dfs)
 
     coupon = 0.06
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
     strikePrice = 100.0
     face = 100.0
@@ -240,7 +240,7 @@ def test_BDTExampleThree():
                 tmat = (maturityDate - settlementDate) / gDaysInYear
                 texp = (expiryDate - settlementDate) / gDaysInYear
 
-                bond = FinBond(issueDate, maturityDate, coupon, frequencyType, accrualType)
+                bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
 
                 couponTimes = []
                 couponFlows = []

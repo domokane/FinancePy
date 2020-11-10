@@ -28,7 +28,7 @@ def test_FinBondPortfolio():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    frequencyType = FinFrequencyTypes.SEMI_ANNUAL
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
 
     settlement = FinDate(2012, 9, 19)
@@ -46,7 +46,7 @@ def test_FinBondPortfolio():
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
             bond = FinBond(issueDt, maturityDt, 
-                           coupon, frequencyType, accrualType)
+                           coupon, freqType, accrualType)
 
             ytm = bond.yieldToMaturity(settlement, cleanPrice)
             accd = bond._accruedInterest

@@ -27,7 +27,7 @@ def buildIborCurve(valuationDate):
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    payFixed = FinSwapTypes.PAYER
+    payFixed = FinSwapTypes.PAY
 
     spotDays = 2
     settlementDate = valuationDate.addWeekDays(spotDays)
