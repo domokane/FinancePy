@@ -54,7 +54,7 @@ class FinIborCapFloor():
                  optionType: FinCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
@@ -83,7 +83,7 @@ class FinIborCapFloor():
         self._optionType = optionType
         self._strikeRate = strikeRate
         self._lastFixing = lastFixing
-        self._frequencyType = frequencyType
+        self._freqType = freqType
         self._dayCountType = dayCountType
         self._notional = notional
         self._dateGenRuleType = dateGenRuleType
@@ -104,7 +104,7 @@ class FinIborCapFloor():
 
         self._capFloorLetDates = FinSchedule(self._startDate,
                                              self._maturityDate,
-                                             self._frequencyType,
+                                             self._freqType,
                                              self._calendarType,
                                              self._busDayAdjustType,
                                              self._dateGenRuleType)._generate()
@@ -304,7 +304,7 @@ class FinIborCapFloor():
         print("MATURITY DATE:", self._maturityDate)
         print("OPTION TYPE", str(self._optionType))
         print("STRIKE (%):", self._strikeRate * 100)
-        print("FREQUENCY:", str(self._frequencyType))
+        print("FREQUENCY:", str(self._freqType))
         print("DAY COUNT:", str(self._dayCountType))
         print("VALUATION DATE", self._valuationDate)
 
@@ -347,7 +347,7 @@ class FinIborCapFloor():
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("STRIKE COUPON", self._strikeRate * 100)
         s += labelToString("OPTION TYPE", str(self._optionType))
-        s += labelToString("FREQUENCY", str(self._frequencyType))
+        s += labelToString("FREQUENCY", str(self._freqType))
         s += labelToString("DAY COUNT", str(self._dayCountType), "")
         return s
 

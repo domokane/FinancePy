@@ -256,7 +256,7 @@
 #         s = labelToString("MATURITY DATE", self._maturityDate)
 #         s += labelToString("EXERCISE DATE", self._exerciseDate)
 #         s += labelToString("COUPON", self._coupon)
-#         s += labelToString("FREQUENCY", self._frequencyType)
+#         s += labelToString("FREQUENCY", self._freqType)
 #         s += labelToString("ACCRUAL TYPE", self._accrualType)
 #         s += labelToString("FACE AMOUNT", self._face)
 #         s += labelToString("CONVERSION RATIO", self._conversionRatio)

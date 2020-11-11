@@ -6,6 +6,9 @@
 import time
 import numpy as np
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
@@ -66,12 +69,12 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     swaps = []
     fixedBasis = FinDayCountTypes.ACT_365F
     fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
-    swapType = FinSwapTypes.PAYER
+    fixedLegType = FinSwapTypes.PAY
 
     swapRate = 0.05
-    swap1 = FinIborSwap(settlementDate, "1Y", swapType, swapRate, fixedFreq, fixedBasis)
-    swap2 = FinIborSwap(settlementDate, "3Y", swapType, swapRate, fixedFreq, fixedBasis)
-    swap3 = FinIborSwap(settlementDate, "5Y", swapType, swapRate, fixedFreq, fixedBasis)
+    swap1 = FinIborSwap(settlementDate, "1Y", fixedLegType, swapRate, fixedFreq, fixedBasis)
+    swap2 = FinIborSwap(settlementDate, "3Y", fixedLegType, swapRate, fixedFreq, fixedBasis)
+    swap3 = FinIborSwap(settlementDate, "5Y", fixedLegType, swapRate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -315,13 +318,13 @@ def test_FinIborCapFloorQLExample():
              0.009599, 0.011203, 0.015068, 0.017583,
              0.018998, 0.020080]
 
-    frequencyType = FinFrequencyTypes.ANNUAL
+    freqType = FinFrequencyTypes.ANNUAL
     dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
     discountCurve = FinDiscountCurveZeros(valuationDate,
                                           dates,
                                           rates,
-                                          frequencyType,
+                                          freqType,
                                           dayCountType,
                                           FinInterpTypes.LINEAR_ZERO_RATES)
 
@@ -329,7 +332,7 @@ def test_FinIborCapFloorQLExample():
     endDate = FinDate(14, 6, 2026)
     calendarType = FinCalendarTypes.US
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
-    frequencyType = FinFrequencyTypes.QUARTERLY
+    freqType = FinFrequencyTypes.QUARTERLY
     dateGenRuleType = FinDateGenRuleTypes.FORWARD
     lastFixing = 0.0065560
     notional = 1000000
@@ -338,7 +341,7 @@ def test_FinIborCapFloorQLExample():
     strikeRate = 0.02
 
     cap = FinIborCapFloor(startDate, endDate, optionType, strikeRate,
-                           lastFixing, frequencyType,  dayCountType, notional,
+                           lastFixing, freqType,  dayCountType, notional,
                            calendarType, busDayAdjustType, dateGenRuleType)
 
     blackVol = 0.547295

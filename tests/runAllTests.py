@@ -5,13 +5,17 @@
 import glob
 from os.path import dirname, basename, join
 
+import sys
+sys.path.append("..")
+
 from financepy.finutils.FinError import FinError
+
+from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
+setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
 # I put this here to get the library loaded and header printed before loop
 from FinTestCases import FinTestCases
 
-import sys
-sys.path.append("..")
 
 print("Looking in folder:", dirname(__file__))
 modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
@@ -25,7 +29,8 @@ m = numModules
 
 for moduleFileName in modules[n:m+1]:
 
-    try:
+#    try:
+    if 1==1:
 
         moduleTextName = basename(moduleFileName[:-3])    
         print("TEST: %3d out of %3d: MODULE: %-35s "% (n+1, numModules,
@@ -44,26 +49,26 @@ for moduleFileName in modules[n:m+1]:
         n = n + 1
 
     # Want testing to continue even if a module has an exception
-    except FinError as err:
-        print("FinError:", err._message, "************") 
-        n = n + 1
-        pass
-    except ValueError as err:
-        print("Value Error:", err.args[0], "************")
-        n = n + 1
-        pass
-    except NameError as err:
-        print("Name Error:", err.args[0], "************")
-        n = n + 1
-        pass
-    except BaseException as e:
-        print("Base error:", e)
-        n = n + 1
-        pass
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        n = n + 1
-        pass
+    # except FinError as err:
+    #     print("FinError:", err._message, "************") 
+    #     n = n + 1
+    #     pass
+    # except ValueError as err:
+    #     print("Value Error:", err.args[0], "************")
+    #     n = n + 1
+    #     pass
+    # except NameError as err:
+    #     print("Name Error:", err.args[0], "************")
+    #     n = n + 1
+    #     pass
+    # except BaseException as e:
+    #     print("Base error:", e)
+    #     n = n + 1
+    #     pass
+    # except:
+    #     print("Unexpected error:", sys.exc_info()[0])
+    #     n = n + 1
+    #     pass
         
 ###############################################################################    
 

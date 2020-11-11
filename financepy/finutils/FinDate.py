@@ -22,9 +22,9 @@ class FinDateFormatTypes(Enum):
     UK_LONGEST = 9
 
 # Set the default
-gDateFormatType = FinDateFormatTypes.UK_LONGEST
+gDateFormatType = FinDateFormatTypes.UK_LONG
 
-def setFormatType(formatType):
+def setDateFormatType(formatType):
     global gDateFormatType
     gDateFormatType = formatType
 
@@ -684,7 +684,7 @@ class FinDate():
 
         elif gDateFormatType == FinDateFormatTypes.UK_LONG:
 
-            sep = " "
+            sep = "-"
             dateStr = dayStr + sep + longMonthStr + sep + longYearStr
             return dateStr
 
@@ -708,7 +708,7 @@ class FinDate():
 
         elif gDateFormatType == FinDateFormatTypes.US_LONG:
 
-            sep = " "
+            sep = "-"
             dateStr = longMonthStr + sep + dayStr + sep + longYearStr
             return dateStr
 

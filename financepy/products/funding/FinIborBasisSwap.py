@@ -28,7 +28,7 @@ class FinIborBasisSwap(object):
     which the implied index rates are extracted. '''
     
     def __init__(self,
-                 startDate: FinDate,  # Date interest starts to accrue
+                 effectiveDate: FinDate,  # Date interest starts to accrue
                  terminationDateOrTenor: (FinDate, str),  # Date contract ends
                  payFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  payDayCountType: FinDayCountTypes  = FinDayCountTypes.THIRTY_E_360,
@@ -53,16 +53,16 @@ class FinIborBasisSwap(object):
         if type(terminationDateOrTenor) == FinDate:
             self._terminationDate = terminationDateOrTenor
         else:
-            self._terminationDate = startDate.addTenor(terminationDateOrTenor)
+            self._terminationDate = effectiveDate.addTenor(terminationDateOrTenor)
 
         calendar = FinCalendar(calendarType)
         self._maturityDate = calendar.adjust(self._terminationDate,
                                              busDayAdjustType)
 
-        if startDate > self._maturityDate:
+        if effectiveDate > self._maturityDate:
             raise FinError("Start date after maturity date")
 
-        self._startDate = startDate
+        self._effectiveDate = effectiveDate
         self._notional = notional
         self._basisSwapSpread = basisSwapSpread
         self._payFreqType = payFreqType
@@ -94,13 +94,13 @@ class FinIborBasisSwap(object):
 
 ##########################################################################
 
-    def _generatePayFloatLegPaymentDates(self, frequencyType):
+    def _generatePayFloatLegPaymentDates(self, freqType):
         ''' Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date'''
         
-        floatDates = FinSchedule(self._startDate,
+        floatDates = FinSchedule(self._effectiveDate,
                                  self._terminationDate,
-                                 frequencyType,
+                                 freqType,
                                  self._calendarType,
                                  self._busDayAdjustType,
                                  self._dateGenRuleType)._generate()
@@ -171,7 +171,7 @@ class FinIborBasisSwap(object):
 
         ''' If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. '''
-        if valuationDate <= self._startDate:
+        if valuationDate <= self._effectiveDate:
             startIndex = 1
 
         self._floatStartIndex = startIndex
@@ -184,7 +184,7 @@ class FinIborBasisSwap(object):
         prevDt = self._adjustedFloatDates[startIndex - 1]
         nextDt = self._adjustedFloatDates[startIndex]
         alpha = basis.yearFrac(prevDt, nextDt)[0]
-        df1_index = indexCurve.df(self._startDate)  # Cannot be pcd as has past
+        df1_index = indexCurve.df(self._effectiveDate)  # Cannot be pcd as has past
         df2_index = indexCurve.df(nextDt)
 
         floatRate = 0.0
@@ -248,7 +248,7 @@ class FinIborBasisSwap(object):
         forward libor rates, implied cash amounts, their present value and
         their cumulative PV using the last valuation performed. '''
 
-        print("START DATE:", self._startDate)
+        print("START DATE:", self._effectiveDate)
         print("MATURITY DATE:", self._maturityDate)
         print("SPREAD COUPON (%):", self._floatSpread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._floatFrequencyType))
@@ -296,7 +296,7 @@ class FinIborBasisSwap(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._startDate)
+        s += labelToString("START DATE", self._effectiveDate)
         s += labelToString("TERMINATION DATE", self._terminationDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("NOTIONAL", self._notional)

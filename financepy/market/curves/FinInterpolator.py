@@ -56,6 +56,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
             raise FinError("Interpolate times must all be >= 0")
 
         v = _vinterpolate(t, times, dfs, method)
+
         return v
     else:
         raise FinError("Unknown input type" + type(t))

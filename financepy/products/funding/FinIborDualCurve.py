@@ -19,24 +19,27 @@ from ...products.funding.FinIborSwap import FinIborSwap
 
 swaptol = 1e-10
 
-##############################################################################
+###############################################################################
 # TODO: CHANGE times to dfTimes
-##############################################################################
+###############################################################################
 
 
 def _f(df, *args):
     ''' Root search objective function for swaps '''
     discountCurve = args[0]
-    curve = args[1]
+    indexCurve = args[1]
     valueDate = args[2]
     swap = args[3]
-    numPoints = len(curve._times)
-    curve._dfs[numPoints - 1] = df
+
+    numPoints = len(indexCurve._times)
+    indexCurve._dfs[numPoints - 1] = df
 
     # For curves that need a fit function, we fit it now 
-    curve._interpolator.fit(curve._times, curve._dfs)     
-    v_swap = swap.value(valueDate, discountCurve, curve, None, 1.0)
-    v_swap /= swap._notional
+    indexCurve._interpolator.fit(indexCurve._times, indexCurve._dfs)     
+    v_swap = swap.value(valueDate, discountCurve, indexCurve, None)
+
+    notional = swap._fixedLeg._notional
+    v_swap /= notional
     return v_swap
 
 ###############################################################################
@@ -158,7 +161,7 @@ class FinIborDualCurve(FinDiscountCurve):
         # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
         # if numDepos > 1:
-        #    if iborDeposits[0]._startDate > self._valuationDate:
+        #    if iborDeposits[0]._effectiveDate > self._valuationDate:
         #        raise FinError("Valuation date must not be before first deposit settles.")
 
         if numFRAs > 0:
@@ -180,26 +183,26 @@ class FinIborDualCurve(FinDiscountCurve):
 
         if numSwaps > 0:
 
-            swapStartDate = iborSwaps[0]._startDate
+            swapStartDate = iborSwaps[0]._effectiveDate
 
             for swap in iborSwaps:
 
                 if isinstance(swap, FinIborSwap) is False:
                     raise FinError("Swap is not of type FinIborSwap")
 
-                startDt = swap._startDate
+                startDt = swap._effectiveDate
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
 
-                if swap._startDate < swapStartDate:
-                    swapStartDate = swap._startDate
+                if swap._effectiveDate < swapStartDate:
+                    swapStartDate = swap._effectiveDate
 
         if numSwaps > 1:
 
             # Swaps must all start on the same date for the bootstrap
-            startDt = iborSwaps[0]._startDate
+            startDt = iborSwaps[0]._effectiveDate
             for swap in iborSwaps[1:]:
-                nextStartDt = swap._startDate
+                nextStartDt = swap._effectiveDate
                 if nextStartDt != startDt:
                     raise FinError("Swaps must all have same start date.")
 
@@ -213,9 +216,9 @@ class FinIborDualCurve(FinDiscountCurve):
 
             # Swaps must have same cashflows for bootstrap to work
             longestSwap = iborSwaps[-1]
-            longestSwapCpnDates = longestSwap._adjustedFixedDates
+            longestSwapCpnDates = longestSwap._fixedLeg._paymentDates
             for swap in iborSwaps[0:-1]:
-                swapCpnDates = swap._adjustedFixedDates
+                swapCpnDates = swap._fixedLeg._paymentDates
                 numFlows = len(swapCpnDates)
                 for iFlow in range(0, numFlows):
                     if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
@@ -262,7 +265,7 @@ class FinIborDualCurve(FinDiscountCurve):
                 if firstDepo._startDate > self._valuationDate:
                     print("Inserting synthetic deposit")
                     syntheticDeposit = copy.deepcopy(firstDepo)
-                    syntheticDeposit._startDate = self._valuationDate
+                    syntheticDeposit._effectiveDate = self._valuationDate
                     syntheticDeposit._maturityDate = firstDepo._startDate
                     iborDeposits.insert(0, syntheticDeposit)
                     numDepos += 1
@@ -328,7 +331,7 @@ class FinIborDualCurve(FinDiscountCurve):
         for swap in self._usedSwaps:
             # I use the lastPaymentDate in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
-            maturityDate = swap._lastPaymentDate
+            maturityDate = swap._fixedLeg._paymentDates[-1]
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
@@ -363,7 +366,7 @@ class FinIborDualCurve(FinDiscountCurve):
     #     self._interpolator.fit(self._times, self._dfs)
 
     #     for depo in self._usedDeposits:
-    #         dfSettle = self.df(depo._startDate)
+    #         dfSettle = self.df(depo._effectiveDate)
     #         dfMat = depo._maturityDf() * dfSettle
     #         tmat = (depo._maturityDate - self._valuationDate) / gDaysInYear
     #         self._times = np.append(self._times, tmat)
@@ -460,7 +463,7 @@ class FinIborDualCurve(FinDiscountCurve):
     #     acc = 0.0
     #     df = 1.0
     #     pv01 = 0.0
-    #     dfSettle = self.df(longestSwap._startDate)
+    #     dfSettle = self.df(longestSwap._effectiveDate)
 
     #     for i in range(1, startIndex):
     #         dt = couponDates[i]
@@ -505,9 +508,9 @@ class FinIborDualCurve(FinDiscountCurve):
 
         for swap in self._usedSwaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap._startDate, self._discountCurve, 
-                           self, None, principal=0.0)
-            v = v / swap._notional
+            v = swap.value(swap._effectiveDate, self._discountCurve, 
+                           self, None)
+            v = v / swap._fixedLeg._notional
             if abs(v) > swapTol:
                 print("Swap with maturity " + str(swap._maturityDate)
                       + " Not Repriced. Has Value", v)

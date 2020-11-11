@@ -7,22 +7,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time as time
 
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.funding.FinOISCurve import FinOISCurve
 from financepy.products.funding.FinIborFRA import FinIborFRA
 from financepy.products.funding.FinIborFuture import FinIborFuture
 from financepy.products.funding.FinOIS import FinOIS
+from financepy.products.funding.FinOISCurve import FinOISCurve
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -133,87 +134,87 @@ def test_FinOISDepositsFRAsSwaps():
 #                        fixedDCCType)
 #    swaps.append(swap)
 
-    swapType = FinSwapTypes.PAYER
+    fixedLegType = FinfixedLegTypes.PAY
     maturityDate = settleDt.addMonths(36)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(48)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(60)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(72)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(84)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(96)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(108)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate, 
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate, 
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(120)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(132)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(144)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(180)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(240)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(300)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturityDate = settleDt.addMonths(360)
-    swap = FinOIS(settleDt, maturityDate, swapType, swapRate,
+    swap = FinOIS(settleDt, maturityDate, fixedLegType, swapRate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
@@ -313,7 +314,7 @@ def test_FinOISDepositsFuturesSwaps():
     startDate = spotDate.addWeekDays(spotDays)
 
     swaps = []
-    swapType = FinSwapTypes.PAYER
+    fixedLegType = FinSwapTypes.PAY
     fixedDCCType = FinDayCountTypes.THIRTY_E_360
     fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
     floatFreqType = FinFrequencyTypes.QUARTERLY
@@ -324,11 +325,12 @@ def test_FinOISDepositsFuturesSwaps():
     busDayAdjustRule = FinBusDayAdjustTypes.PRECEDING
 
     swapRate = 0.02776305
+    paymentLag = 1
 
-    swap = FinOIS(startDate, "2Y", swapType, swapRate,
-                           fixedFreqType, fixedDCCType, notional,
-                           floatSpread, floatFreqType, floatDCCType,
-                           calendarType, busDayAdjustRule)
+    swap = FinOIS(startDate, "2Y", fixedLegType, 
+                  swapRate, fixedFreqType, fixedDCCType, notional,
+                  paymentLag, floatSpread, floatFreqType, floatDCCType,
+                  calendarType, busDayAdjustRule)
 
     swaps.append(swap)
 
@@ -396,38 +398,38 @@ def test_derivativePricingExample():
     dayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
 #    dayCountType = FinDayCountTypes.ACT_360
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    swapType = FinSwapTypes.PAYER
+    fixedLegType = FinfixedLegTypes.PAY
     
     swapRate = 0.0058
-    swap = FinOIS(settleDt, "1Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "1Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0060
-    swap = FinOIS(settleDt, "2Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "2Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0072
-    swap = FinOIS(settleDt, "3Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "3Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0096
-    swap = FinOIS(settleDt, "4Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "4Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0124
-    swap = FinOIS(settleDt, "5Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "5Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0173
-    swap = FinOIS(settleDt, "7Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "7Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0219
-    swap = FinOIS(settleDt, "10Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "10Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     swapRate = 0.0283
-    swap = FinOIS(settleDt, "30Y", swapType, swapRate, freqType, dayCountType)
+    swap = FinOIS(settleDt, "30Y", fixedLegType, swapRate, freqType, dayCountType)
     swaps.append(swap)
 
     numRepeats = 10
@@ -492,7 +494,8 @@ def test_bloombergPricingExample():
     freq = FinFrequencyTypes.SEMI_ANNUAL
     spotDays = 2
     settleDt = valuationDate.addWeekDays(spotDays)
-    payRec = FinSwapTypes.PAYER
+    payRec = FinSwapTypes.PAY
+    lag = 1 # Not used
 
     swaps = []
     swap = FinOIS(settleDt, "2Y", payRec, (2.77417+2.77844)/200, freq, accrual); swaps.append(swap)
@@ -515,18 +518,21 @@ def test_bloombergPricingExample():
 
     oisCurve = FinOISCurve(valuationDate, depos, fras, swaps)
 
+#    swaps[0]._fixedLeg.printValuation()
+#    swaps[0]._floatLeg.printValuation()
+    
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
 
     testCases.header("VALUATION TO TODAY DATE"," PV")
-    testCases.print("VALUE:", swaps[0].value(valuationDate, oisCurve, None, principal))
-    testCases.print("FIXED:", swaps[0].fixedLegValue(valuationDate, oisCurve, principal))
-    testCases.print("FLOAT:", swaps[0].floatLegValue(valuationDate, oisCurve, None, principal))
+    testCases.print("VALUE:", swaps[0].value(valuationDate, oisCurve, None))
+    testCases.print("FIXED:", -swaps[0]._fixedLeg.value(valuationDate, oisCurve))
+    testCases.print("FLOAT:", swaps[0]._floatLeg.value(valuationDate, oisCurve, None))
 
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE"," PV")
-    testCases.print("VALUE:", swaps[0].value(settleDt, oisCurve, None, principal))
-    testCases.print("FIXED:", swaps[0].fixedLegValue(settleDt, oisCurve, principal))
-    testCases.print("FLOAT:", swaps[0].floatLegValue(settleDt, oisCurve, None, principal))
+    testCases.print("VALUE:", swaps[0].value(settleDt, oisCurve, None))
+    testCases.print("FIXED:", -swaps[0]._fixedLeg.value(settleDt, oisCurve))
+    testCases.print("FLOAT:", swaps[0]._floatLeg.value(settleDt, oisCurve, None))
 
     # swaps[0].printFixedLegPV()
     # swaps[0].printFloatLegPV()
@@ -538,6 +544,6 @@ test_bloombergPricingExample()
 #test_derivativePricingExample()
 #test_FinOISFRAsOnly()
 #test_FinOISDepositsFRAsSwaps()
-test_FinOISDepositsFuturesSwaps()
+#test_FinOISDepositsFuturesSwaps()
 
 testCases.compareTestCases()

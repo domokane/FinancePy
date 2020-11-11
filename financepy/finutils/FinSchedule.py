@@ -22,9 +22,9 @@ class FinSchedule(object):
     Next Coupon Date (NCD). '''
 
     def __init__(self,
-                 startDate: FinDate,   # Also known as the effective date
-                 endDate: FinDate,  # Also known as the termination date
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 effectiveDate: FinDate,   # Also known as the start date
+                 terminationDate: FinDate,  # Also known as the termination date
+                 freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
@@ -35,9 +35,9 @@ class FinSchedule(object):
         checkArgumentTypes(self.__init__, locals())
 
         # validation complete
-        self._startDate = startDate
-        self._endDate = endDate
-        self._frequencyType = frequencyType
+        self._effectiveDate = effectiveDate
+        self._terminationDate = terminationDate
+        self._freqType = freqType
         self._calendarType = calendarType
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
@@ -69,7 +69,7 @@ class FinSchedule(object):
         # NEED TO INCORPORATE ADJUST TERMINATION DATE FLAG
 
         calendar = FinCalendar(self._calendarType)
-        frequency = FinFrequency(self._frequencyType)
+        frequency = FinFrequency(self._freqType)
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []
@@ -77,10 +77,10 @@ class FinSchedule(object):
 
         if self._dateGenRuleType == FinDateGenRuleTypes.BACKWARD:
 
-            nextDate = self._endDate
+            nextDate = self._terminationDate
             flowNum = 0
 
-            while nextDate > self._startDate:
+            while nextDate > self._effectiveDate:
                 unadjustedScheduleDates.append(nextDate)
                 nextDate = nextDate.addMonths(-numMonths)
                 flowNum += 1
@@ -104,13 +104,13 @@ class FinSchedule(object):
         elif self._dateGenRuleType == FinDateGenRuleTypes.FORWARD:
 
             # This needs checking
-            nextDate = self._startDate
+            nextDate = self._effectiveDate
             flowNum = 0
 
             unadjustedScheduleDates.append(nextDate)
             flowNum = 1
 
-            while nextDate < self._endDate:
+            while nextDate < self._terminationDate:
                 unadjustedScheduleDates.append(nextDate)
                 nextDate = nextDate.addMonths(numMonths)
                 flowNum = flowNum + 1
@@ -123,7 +123,10 @@ class FinSchedule(object):
 
                 self._adjustedDates.append(dt)
 
-            self._adjustedDates.append(self._endDate)
+            self._adjustedDates.append(self._terminationDate)
+
+        if self._adjustedDates[0] < self._effectiveDate:
+            self._adjustedDates[0] = self._effectiveDate
 
         return self._adjustedDates
 
@@ -139,18 +142,18 @@ class FinSchedule(object):
 
         self._adjustedDates = []
         calendar = FinCalendar(self._calendarType)
-        frequency = FinFrequency(self._frequencyType)
+        frequency = FinFrequency(self._freqType)
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []
 
         if self._dateGenRuleType == FinDateGenRuleTypes.BACKWARD:
 
-            nextDate = self._endDate
+            nextDate = self._terminationDate
             print("END:", nextDate)
             flowNum = 0
 
-            while nextDate > self._startDate:
+            while nextDate > self._effectiveDate:
                 unadjustedScheduleDates.append(nextDate)
                 nextDate = nextDate.addMonths(-numMonths)
                 nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
@@ -174,7 +177,7 @@ class FinSchedule(object):
             unadjustedScheduleDates.append(nextDate)
             flowNum = 1
 
-            while nextDate < self._endDate:
+            while nextDate < self._terminationDate:
                 unadjustedScheduleDates.append(nextDate)
                 nextDate = nextDate.addMonths(numMonths)
                 nextDate = calendar.adjust(nextDate, self._busDayAdjustType)
@@ -185,7 +188,10 @@ class FinSchedule(object):
                 dt = unadjustedScheduleDates[i]
                 self._adjustedDates.append(dt)
 
-            self._adjustedDates.append(self._endDate)
+            self._adjustedDates.append(self._terminationDate)
+
+        if self._adjustedDates[0] < self._effectiveDate:
+            self._adjustedDates[0] = self._effectiveDate
 
         return self._adjustedDates
 
@@ -195,9 +201,9 @@ class FinSchedule(object):
         ''' Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations. '''
 
-        s = labelToString("START DATE", self._startDate)
-        s += labelToString("END DATE", self._endDate)
-        s += labelToString("FREQUENCY", self._frequencyType)
+        s = labelToString("EFFECTIVE DATE", self._effectiveDate)
+        s += labelToString("END DATE", self._terminationDate)
+        s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)
         s += labelToString("BUSDAYRULE", self._busDayAdjustType)
         s += labelToString("DATEGENRULE", self._dateGenRuleType, "")

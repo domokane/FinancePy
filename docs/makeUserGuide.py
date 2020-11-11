@@ -680,7 +680,7 @@ def parseEnum(lines, startLine, endLine):
 
     enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
     enumDescription.append("\n")
-    enumDescription.append("This enumerated type has the following values:")
+    enumDescription.append("This enumerated type has the following values:\n")
     enumDescription.append("\\begin{itemize}[nosep]")
     enumDescription.append("\n")
     for enumType in enumTypes:

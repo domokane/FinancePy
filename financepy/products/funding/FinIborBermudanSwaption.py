@@ -40,8 +40,8 @@ class FinIborBermudanSwaption(object):
     def __init__(self,
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
-                 swapMaturityDate: FinDate,
-                 swapType: FinSwapTypes,
+                 maturityDate: FinDate,
+                 fixedLegType: FinSwapTypes,
                  exerciseType: FinExerciseTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
@@ -61,7 +61,7 @@ class FinIborBermudanSwaption(object):
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
 
-        if exerciseDate > swapMaturityDate:
+        if exerciseDate > maturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
         if exerciseType == FinExerciseTypes.AMERICAN:
@@ -69,8 +69,8 @@ class FinIborBermudanSwaption(object):
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
-        self._swapMaturityDate = swapMaturityDate
-        self._swapType = swapType
+        self._maturityDate = maturityDate
+        self._fixedLegType = fixedLegType
         self._exerciseType = exerciseType
 
         self._fixedCoupon = fixedCoupon
@@ -103,8 +103,8 @@ class FinIborBermudanSwaption(object):
 
         # The underlying is a swap in which we pay the fixed amount
         swap = FinIborSwap(self._exerciseDate,
-                            self._swapMaturityDate,
-                            self._swapType,
+                            self._maturityDate,
+                            self._fixedLegType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -120,30 +120,30 @@ class FinIborBermudanSwaption(object):
         swap.pv01(valuationDate, discountCurve)
 
         texp = (self._exerciseDate - valuationDate) / gDaysInYear
-        tmat = (self._swapMaturityDate - valuationDate) / gDaysInYear
+        tmat = (self._maturityDate - valuationDate) / gDaysInYear
 
         cpnTimes = [texp]
         cpnFlows = [0.0]
 
-        numFlows = len(swap._adjustedFixedDates)
+        numFlows = len(swap._fixedLeg._paymentDates)
 
         # The first flow is always the PCD
 
         for iFlow in range(1, numFlows):
 
-            pcd = swap._adjustedFixedDates[iFlow-1]
-            ncd = swap._adjustedFixedDates[iFlow]
+            pcd = swap._fixedLeg._paymentDates[iFlow-1]
+            ncd = swap._fixedLeg._paymentDates[iFlow]
 
             if ncd > valuationDate:
 
                 if len(cpnTimes) == 0:
                     cpnTime = (pcd - valuationDate) / gDaysInYear
-                    cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+                    cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
                     cpnTimes.append(cpnTime)
                     cpnFlows.append(cpnFlow)
                     
                 cpnTime = (ncd - valuationDate) / gDaysInYear
-                cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+                cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
                 cpnTimes.append(cpnTime)
                 cpnFlows.append(cpnFlow)
 
@@ -181,10 +181,10 @@ class FinIborBermudanSwaption(object):
                                    cpnFlows,
                                    self._exerciseType)
 
-        if self._swapType == FinSwapTypes.RECEIVER:
+        if self._fixedLegType == FinSwapTypes.RECEIVE:
             v = self._notional * v['rec']
             return v
-        elif self._swapType == FinSwapTypes.PAYER:
+        elif self._fixedLegType == FinSwapTypes.PAY:
             v = self._notional * v['pay']
             return v
 
@@ -193,8 +193,8 @@ class FinIborBermudanSwaption(object):
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
-        s += labelToString("MATURITY DATE", self._swapMaturityDate)
-        s += labelToString("SWAP TYPE", self._swapType)
+        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("SWAP FIXED LEG TYPE", self._fixedLegType)
         s += labelToString("EXERCISE TYPE", self._exerciseType)
         s += labelToString("FIXED COUPON", self._fixedCoupon)
         s += labelToString("FIXED FREQUENCY", self._fixedFrequencyType)
@@ -202,7 +202,6 @@ class FinIborBermudanSwaption(object):
         s += labelToString("FLOAT FREQUENCY", self._floatFrequencyType)
         s += labelToString("FLOAT DAYCOUNT TYPE", self._floatDayCountType)
         s += labelToString("NOTIONAL", self._notional)
-
         return s
 
 ###############################################################################

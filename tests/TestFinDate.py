@@ -5,12 +5,16 @@
 import numpy as np
 import time
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate, dateRange
-import sys
-sys.path.append("..//..")
+from financepy.finutils.FinDate import FinDateFormatTypes
+from financepy.finutils.FinDate import setDateFormatType
 
+import financepy.finutils.FinDate
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -173,8 +177,20 @@ def test_FinDateSpeed():
     mem = sys.getsizeof(dateList)
     testCases.print("Mem:", mem)
 
+
 ###############################################################################
 
+
+def test_FinDateFormat():
+
+    dt = FinDate(20, 10, 2019)    
+    testCases.header("FORMAT", "DATE")
+
+    for formatType in FinDateFormatTypes:
+        setDateFormatType(formatType) 
+        testCases.print(formatType.name, dt)
+
+###############################################################################
 
 test_FinDate()
 test_FinDateTenors()
@@ -182,5 +198,8 @@ test_FinDateRange()
 test_FinDateAddMonths()
 test_FinDateAddYears()
 test_FinDateSpeed()
+test_FinDateFormat()
 
 testCases.compareTestCases()
+
+setDateFormatType(FinDateFormatTypes.UK_LONGEST)

@@ -21,7 +21,7 @@ class FinFXVarianceSwap(object):
     ''' Class for managing an FX variance swap contract. '''
 
     def __init__(self,
-                 startDate: FinDate,
+                 effectiveDate: FinDate,
                  maturityDateOrTenor: [FinDate, str],
                  strikeVariance: float,
                  notional: float = ONE_MILLION,
@@ -33,12 +33,12 @@ class FinFXVarianceSwap(object):
         if type(maturityDateOrTenor) == FinDate:
             maturityDate = maturityDateOrTenor
         else:
-            maturityDate = startDate.addTenor(maturityDateOrTenor)
+            maturityDate = effectiveDate.addTenor(maturityDateOrTenor)
 
-        if startDate >= maturityDate:
+        if effectiveDate >= maturityDate:
             raise FinError("Start date after or same as maturity date")
 
-        self._startDate = startDate
+        self._effectiveDate = effectiveDate
         self._maturityDate = maturityDate
         self._strikeVariance = strikeVariance
         self._notional = notional
@@ -63,8 +63,8 @@ class FinFXVarianceSwap(object):
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. '''
 
-        t1 = (valuationDate - self._startDate) / gDaysInYear
-        t2 = (self._maturityDate - self._startDate) / gDaysInYear
+        t1 = (valuationDate - self._effectiveDate) / gDaysInYear
+        t2 = (self._maturityDate - self._effectiveDate) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
         expectedVariance += (t2-t1) * fairStrikeVar / t2

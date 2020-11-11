@@ -7,7 +7,7 @@ from os.path import join, exists, split
 import time
 
 from enum import Enum
-from financepy.finutils.FinError import FinError
+#from ..financepy.finutils.FinError import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
@@ -314,6 +314,12 @@ class FinTestCases():
 
                 if self._headerFields[colNum] == "TIME":
                     time1 = float(goldenFields[colNum])
+                    
+#                    if isinstance(compareFields[colNum], str):
+#                        self.printLog("Row# ", rowNum,
+#                              " WARNING: The field in the new log is not a time")
+                        
+
                     time2 = float(compareFields[colNum])
                     change = (time2 / abs(time1 + 1e-10) - 1.0) * 100.0
 

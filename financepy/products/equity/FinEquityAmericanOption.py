@@ -109,6 +109,7 @@ class FinEquityAmericanOption(FinEquityOption):
                 values.append(v)
 
             values = np.array(values)
+            
         else:
             raise FinError("Unknown Model Type")
 

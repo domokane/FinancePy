@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import matplotlib.pyplot as plt
+
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
@@ -21,7 +24,6 @@ from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 from financepy.finutils.FinHelperFunctions import printTree
 from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 
-import matplotlib.pyplot as plt
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

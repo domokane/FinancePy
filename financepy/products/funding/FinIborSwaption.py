@@ -49,8 +49,8 @@ class FinIborSwaption():
     def __init__(self,
                  settlementDate: FinDate,
                  exerciseDate: FinDate,
-                 swapMaturityDate: FinDate,
-                 swapType: FinSwapTypes,
+                 maturityDate: FinDate,
+                 fixedLegType: FinSwapTypes,
                  fixedCoupon: float,
                  fixedFrequencyType: FinFrequencyTypes,
                  fixedDayCountType: FinDayCountTypes,
@@ -71,13 +71,13 @@ class FinIborSwaption():
         if settlementDate > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
 
-        if exerciseDate > swapMaturityDate:
+        if exerciseDate > maturityDate:
             raise FinError("Exercise date must be before swap maturity date")
 
         self._settlementDate = settlementDate
         self._exerciseDate = exerciseDate
-        self._swapMaturityDate = swapMaturityDate
-        self._swapType = swapType
+        self._maturityDate = maturityDate
+        self._fixedLegType = fixedLegType
 
         self._fixedCoupon = fixedCoupon
         self._fixedFrequencyType = fixedFrequencyType
@@ -108,10 +108,11 @@ class FinIborSwaption():
         valuation. '''
 
         floatSpread = 0.0
+        principal = 0.0
 
         swap = FinIborSwap(self._exerciseDate,
-                            self._swapMaturityDate,
-                            self._swapType,
+                            self._maturityDate,
+                            self._fixedLegType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -133,7 +134,7 @@ class FinIborSwaption():
         s = swap.swapRate(valuationDate, discountCurve)
 
         texp = (self._exerciseDate - self._settlementDate) / gDaysInYear
-        tmat = (self._swapMaturityDate - self._settlementDate) / gDaysInYear
+        tmat = (self._maturityDate - self._settlementDate) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -146,12 +147,14 @@ class FinIborSwaption():
         cpnFlows = [0.0]
 
         # The first flow is always the previous coupon date
-        numFlows = len(swap._adjustedFixedDates)
+        numFlows = len(swap._fixedLeg._paymentDates)
 
         for iFlow in range(1, numFlows):
-            flowDate = swap._adjustedFixedDates[iFlow]
+
+            flowDate = swap._fixedLeg._paymentDates[iFlow]
+
             cpnTime = (flowDate - valuationDate) / gDaysInYear
-            cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+            cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
             cpnTimes.append(cpnTime)
             cpnFlows.append(cpnFlow)
 
@@ -171,37 +174,37 @@ class FinIborSwaption():
 
         if isinstance(model, FinModelBlack):
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
 
@@ -215,9 +218,9 @@ class FinIborSwaption():
                                                   dfTimes,
                                                   dfValues)
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = swaptionPx['put']
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
@@ -237,9 +240,9 @@ class FinIborSwaption():
                                                 cpnFlows,
                                                 FinExerciseTypes.EUROPEAN)
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
@@ -255,9 +258,9 @@ class FinIborSwaption():
                                                 cpnFlows,
                                                 FinExerciseTypes.EUROPEAN)
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = swaptionPx['pay']
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = swaptionPx['rec']
 
             swaptionPrice /= pv01
@@ -290,10 +293,11 @@ class FinIborSwaption():
         Black volatility for the standard arbitrage-free valuation. '''
 
         floatSpread = 0.0
+        principal = 0.0
 
         swap = FinIborSwap(self._exerciseDate,
-                            self._swapMaturityDate,
-                            self._swapType,
+                            self._maturityDate,
+                            self._fixedLegType,
                             self._fixedCoupon,
                             self._fixedFrequencyType,
                             self._fixedDayCountType,
@@ -319,10 +323,10 @@ class FinIborSwaption():
 
         if isinstance(model, FinModelBlack):
 
-            if self._swapType == FinSwapTypes.PAYER:
+            if self._fixedLegType == FinSwapTypes.PAY:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_CALL)
-            elif self._swapType == FinSwapTypes.RECEIVER:
+            elif self._fixedLegType == FinSwapTypes.RECEIVE:
                 swaptionPrice = model.value(s, k, texp, df,
                                             FinOptionTypes.EUROPEAN_PUT)
         else:
@@ -368,8 +372,8 @@ class FinIborSwaption():
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("SETTLEMENT DATE", self._settlementDate)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
-        s += labelToString("SWAP TYPE", str(self._swapType))
-        s += labelToString("SWAP MATURITY DATE", self._swapMaturityDate)
+        s += labelToString("SWAP FIXED LEG TYPE", str(self._fixedLegType))
+        s += labelToString("SWAP MATURITY DATE", self._maturityDate)
         s += labelToString("SWAP NOTIONAL", self._notional)
         s += labelToString("FIXED COUPON", self._fixedCoupon * 100)
         s += labelToString("FIXED FREQUENCY", str(self._fixedFrequencyType))

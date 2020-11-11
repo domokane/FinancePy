@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinInterpolator import FinInterpolator, FinInterpTypes
 import numpy as np
 import math
-import sys
 import matplotlib.pyplot as plt
 
-sys.path.append("..//..")
+import sys
+sys.path.append("..")
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.FinInterpolator import FinInterpolator, FinInterpTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -52,7 +52,8 @@ def _fois(oir, *args):
 ###############################################################################
 
 def _f(df, *args):
-    ''' Root search objective function for swaps '''
+    ''' Root search objective function for OIS '''
+
     curve = args[0]
     valueDate = args[1]
     swap = args[2]
@@ -61,8 +62,9 @@ def _f(df, *args):
 
     # For curves that need a fit function, we fit it now 
     curve._interpolator.fit(curve._times, curve._dfs)     
-    v_swap = swap.value(valueDate, curve, None, 1.0)
-    v_swap /= swap._notional
+    v_swap = swap.value(valueDate, curve, curve, None)
+    notional = swap._fixedLeg._notional
+    v_swap /= notional
     return v_swap
 
 ###############################################################################
@@ -214,28 +216,21 @@ class FinOISCurve(FinDiscountCurve):
 
         if numSwaps > 0:
 
-            swapStartDate = oisSwaps[0]._startDate
+            swapStartDate = oisSwaps[0]._effectiveDate
 
             for swap in oisSwaps:
 
                 if isinstance(swap, FinOIS) is False:
                     raise FinError("Swap is not of type FinOIS")
 
-                startDt = swap._startDate
+                startDt = swap._effectiveDate
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
 
-                if swap._startDate < swapStartDate:
-                    swapStartDate = swap._startDate
+                if swap._effectiveDate < swapStartDate:
+                    swapStartDate = swap._effectiveDate
 
         if numSwaps > 1:
-
-            # Swaps must all start on the same date for the bootstrap
-#            startDt = oisSwaps[0]._startDate
-#            for swap in oisSwaps[1:]:
-#                nextStartDt = swap._startDate
-#                if nextStartDt != startDt:
-#                    raise FinError("Swaps must all have same start date.")
 
             # Swaps must be increasing in tenor/maturity
             prevDt = oisSwaps[0]._maturityDate
@@ -245,6 +240,7 @@ class FinOISCurve(FinDiscountCurve):
                     raise FinError("Swaps must be in increasing maturity")
                 prevDt = nextDt
 
+        # TODO: REINSTATE THESE CHECKS ?
             # Swaps must have same cashflows for linear swap bootstrap to work
 #            longestSwap = oisSwaps[-1]
 #            longestSwapCpnDates = longestSwap._adjustedFixedDates
@@ -317,7 +313,6 @@ class FinOISCurve(FinDiscountCurve):
         involves the use of a solver. '''
 
         self._interpolator = FinInterpolator(self._interpType)
-
         self._times = np.array([])
         self._dfs = np.array([])
 
@@ -353,7 +348,6 @@ class FinOISCurve(FinDiscountCurve):
             else:
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
-
                 argtuple = (self, self._valuationDate, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
@@ -362,7 +356,7 @@ class FinOISCurve(FinDiscountCurve):
         for swap in self._usedSwaps:
             # I use the lastPaymentDate in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
-            maturityDate = swap._lastPaymentDate
+            maturityDate = swap._fixedLeg._paymentDates[-1]
             tmat = (maturityDate - self._valuationDate) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
@@ -533,7 +527,7 @@ class FinOISCurve(FinDiscountCurve):
 
         for swap in self._usedSwaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap._startDate, self, self, None, principal=0.0)
+            v = swap.value(swap._effectiveDate, self, self, None, principal=0.0)
             v = v / swap._notional
             if abs(v) > swapTol:
                 print("Swap with maturity " + str(swap._maturityDate)

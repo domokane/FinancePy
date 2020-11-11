@@ -11,3 +11,5 @@ from .FinOISCurve import *
 from .FinOIS import *
 from .FinIborSingleCurve import *
 from .FinIborDualCurve import *
+from .FinFixedLeg import *
+from .FinFloatLeg import *
