@@ -2,11 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityCompoundOption import FinEquityCompoundOption
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 
@@ -27,7 +30,7 @@ def test_FinEquityCompoundOption():
     interestRate = 0.035
     dividendYield = 0.01
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     numStepsList = [100, 200, 500, 1000, 2000, 5000]

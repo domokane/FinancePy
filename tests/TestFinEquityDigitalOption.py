@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption, FinDigitalOptionTypes
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -29,7 +29,7 @@ def test_FinEquityDigitalOption():
     interestRate = 0.05
     dividendYield = 0.01
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     import time
 
     callOptionValues = []

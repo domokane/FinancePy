@@ -9,12 +9,15 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...products.equity.FinEquityModelTypes import FinEquityModel
-from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from ...models.FinModelCRRTree import crrTreeValAvg
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption
+
+from ...models.FinModel import FinModel
+from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...models.FinModelBlackScholes import FinModelBlackScholesTypes
+from ...models.FinModelCRRTree import crrTreeValAvg
 
 from scipy.stats import norm
 N = norm.cdf
@@ -59,7 +62,7 @@ class FinEquityAmericanOption(FinEquityOption):
               stockPrice: (np.ndarray, float),
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model):
+              model: FinModel):
         ''' Valuation of an American option using a CRR tree to take into
         account the value of early exercise. '''
 
@@ -71,8 +74,8 @@ class FinEquityAmericanOption(FinEquityOption):
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
+        if isinstance(model, FinModel) is False:
+            raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
@@ -86,39 +89,14 @@ class FinEquityAmericanOption(FinEquityOption):
         S0 = stockPrice
         K = self._strikePrice
 
-        if type(model) == FinEquityModelBlackScholes:
-
-            volatility = model._volatility
-
-            if np.any(volatility) < 0.0:
-                raise FinError("Volatility should not be negative.")
-
-            volatility = np.maximum(volatility, 1e-10)
-
-            numStepsPerYear = model._numStepsPerYear
-
-            if isinstance(S0, float):
-                sArray = [S0]
-            else:
-                sArray = S0
-
-            values = []
-            for s in sArray:
-                v = crrTreeValAvg(s, r, q, volatility, numStepsPerYear,
-                                  texp, self._optionType.value, K)['value']
-                values.append(v)
-
-            values = np.array(values)
-            
-        else:
-            raise FinError("Unknown Model Type")
-
-        values = values * self._numOptions
+        v = model.value(S0, texp, K, r, q, self._optionType)
+                    
+        v = v * self._numOptions
 
         if isinstance(S0, float):
-            return values[0]
+            return v
         else:
-            return values
+            return v[0]
 
 ###############################################################################
 

@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 import numpy as np
-from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
-from financepy.finutils.FinDate import FinDate
 
 import sys
-sys.path.append("..//..")
+sys.path.append("..")
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
+from financepy.finutils.FinDate import FinDate
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

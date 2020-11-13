@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import os
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -19,9 +22,6 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 import time
-import sys
-sys.path.append("..//..")
-
 
 #import numpy as np
 

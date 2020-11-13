@@ -3,10 +3,10 @@
 ###############################################################################
 
 import sys
+sys.path.append("..")
+
 import os
 import datetime as dt
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -14,10 +14,8 @@ from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondZeroCurve import FinBondZeroCurve
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
-sys.path.append("..//..")
-sys.path.append("..")
 
 plotGraphs = False
 

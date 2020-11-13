@@ -6,7 +6,7 @@
 from enum import Enum
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from .FinEquityModelTypes import FinEquityModelBlackScholes
+from ...models.FinModelBlackScholes import FinModelBlackScholes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...finutils.FinDate import FinDate
 
@@ -93,7 +93,7 @@ class FinEquityOption(object):
         v = self.value(valueDate, stockPrice, discountCurve,
                        dividendYield, model)
 
-        model = FinEquityModelBlackScholes(model._volatility + bump)
+        model = FinModelBlackScholes(model._volatility + bump)
 
         vBumped = self.value(valueDate, stockPrice, discountCurve,
                              dividendYield, model)

@@ -8,18 +8,19 @@ import numpy as np
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
+from ...finutils.FinGlobalTypes import FinOptionTypes
 
-from ...products.equity.FinEquityOption import FinEquityOption
-from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...models.FinModelBlackScholes import bsValue
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...products.equity.FinEquityOption import FinEquityOption
+from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
+
+from ...models.FinModelBlackScholes import bsValue, FinModelBlackScholes
+from ...models.FinModel import FinModel
 
 from scipy.stats import norm
 N = norm.cdf
@@ -83,7 +84,7 @@ class FinEquityCliquetOption(FinEquityOption):
               stockPrice: float,
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model):
+              model:FinModel):
         ''' Value the cliquet option as a sequence of options using the Black-
         Scholes model. '''
 
@@ -98,7 +99,7 @@ class FinEquityCliquetOption(FinEquityOption):
         self._dfs = []
         self._actualDates = []
 
-        if type(model) == FinEquityModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
 
             vol = model._volatility
             vol = max(vol, 1e-6)

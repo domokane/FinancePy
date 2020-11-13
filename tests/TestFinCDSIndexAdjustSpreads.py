@@ -2,6 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from os.path import dirname, join
+
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
@@ -13,10 +18,6 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
-
-from os.path import dirname, join
-import sys
-sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

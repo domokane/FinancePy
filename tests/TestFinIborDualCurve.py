@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import time as time
 
+import sys
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -29,10 +29,6 @@ from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDualCurve import FinIborDualCurve
 from financepy.products.funding.FinOISCurve import FinOISCurve
 from financepy.products.funding.FinOIS import FinOIS
-
-
-
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

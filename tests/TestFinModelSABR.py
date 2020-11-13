@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
-
-from financepy.models.FinModelSABR import blackVolFromSABR
 import sys
-sys.path.append("..//..")
+sys.path.append("..")
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.models.FinModelSABR import blackVolFromSABR
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -2,16 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
-
-from financepy.finutils.FinMath import normcdf, norminvcdf
 import numpy as np
 import time
+
 import sys
-sys.path.append("..//..")
 sys.path.append("..")
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.finutils.FinMath import normcdf, norminvcdf
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

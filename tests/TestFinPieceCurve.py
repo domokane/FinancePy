@@ -3,11 +3,11 @@
 ###############################################################################
 
 import sys
+sys.path.append("..")
+
 import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

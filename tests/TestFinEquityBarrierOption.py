@@ -2,17 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierTypes
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierOption
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -32,7 +33,7 @@ def test_FinEquityBarrierOption():
     scheme = FinGBMNumericalScheme.NORMAL
     processType = FinProcessTypes.GBM
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     #######################################################################
 

@@ -4,20 +4,18 @@
 
 import numpy as np
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-
+from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
-from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
 
 ##########################################################################
 

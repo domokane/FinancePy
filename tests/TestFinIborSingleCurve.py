@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import time as time
 
+import sys
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -25,8 +25,6 @@ from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
-
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -690,14 +688,16 @@ def test_bloombergPricingExample(interpType):
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
 
+    # Pay fixed so make fixed leg value negative
     testCases.header("VALUATION TO TODAY DATE"," PV")
     testCases.print("VALUE:", swaps[0].value(valuationDate, liborCurve, liborCurve, None))
-    testCases.print("FIXED:", swaps[0]._fixedLeg.value(valuationDate, liborCurve))
+    testCases.print("FIXED:", -swaps[0]._fixedLeg.value(valuationDate, liborCurve))
     testCases.print("FLOAT:", swaps[0]._floatLeg.value(valuationDate, liborCurve, liborCurve, None))
 
+    # Pay fixed so make fixed leg value negative
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE"," PV")
     testCases.print("VALUE:", swaps[0].value(settlementDate, liborCurve, liborCurve, None))
-    testCases.print("FIXED:", swaps[0]._fixedLeg.value(settlementDate, liborCurve))
+    testCases.print("FIXED:", -swaps[0]._fixedLeg.value(settlementDate, liborCurve))
     testCases.print("FLOAT:", swaps[0]._floatLeg.value(settlementDate, liborCurve, liborCurve, None))
 
     # swaps[0].printFixedLegPV()

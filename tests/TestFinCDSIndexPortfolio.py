@@ -4,6 +4,10 @@
 
 import os
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
@@ -15,9 +19,6 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
-
-import sys
-sys.path.append("..//..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

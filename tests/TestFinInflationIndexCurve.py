@@ -8,7 +8,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 
 import sys
-sys.path.append("..//..")
+sys.path.append("..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

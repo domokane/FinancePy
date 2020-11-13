@@ -4,18 +4,19 @@
 
 import time
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAsianOption import FinEquityAsianOption
 from financepy.products.equity.FinEquityAsianOption import FinAsianOptionValuationMethods
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
-from financepy.finutils.FinDate import FinDate
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 
-import sys
-sys.path.append("..//..")
+from financepy.finutils.FinDate import FinDate
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -43,7 +44,7 @@ def testConvergence():
     K = 100
     seed = 1976
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     asianOption = FinEquityAsianOption(startAveragingDate,
@@ -156,7 +157,7 @@ def testTimeEvolution():
     K = 100
     seed = 1976
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     asianOption = FinEquityAsianOption(startAveragingDate,
                                        expiryDate,
@@ -281,7 +282,7 @@ def testMCTimings():
     K = 100
     seed = 1976
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     asianOption = FinEquityAsianOption(startAveragingDate,

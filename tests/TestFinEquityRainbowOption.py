@@ -2,6 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+import numpy as np
+from math import sqrt
+import time
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOption
@@ -9,11 +16,6 @@ from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOpt
 from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-import numpy as np
-from math import sqrt
-import time
-import sys
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

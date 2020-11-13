@@ -2,16 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityChooserOption import FinEquityChooserOption
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-
-import sys
-sys.path.append("..//..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -32,7 +31,7 @@ def test_FinEquityChooserOptionHaug():
     interestRate = 0.10
     dividendYield = 0.05
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     chooserOption = FinEquityChooserOption(chooseDate,
@@ -74,7 +73,7 @@ def test_FinEquityChooserOptionMatlab():
     interestRate = 0.10
     dividendYield = 0.05
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     chooserOption = FinEquityChooserOption(chooseDate,
@@ -116,7 +115,7 @@ def test_FinEquityChooserOptionDerivicom():
     interestRate = 0.08
     dividendYield = 0.0625
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     chooserOption = FinEquityChooserOption(chooseDate,

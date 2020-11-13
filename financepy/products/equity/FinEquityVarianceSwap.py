@@ -10,7 +10,7 @@ from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
-from .FinEquityOption import FinEquityModelBlackScholes
+from ...models.FinModelBlackScholes import FinModelBlackScholes
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
@@ -196,7 +196,7 @@ class FinEquityVarianceSwap(object):
             k = putK[n]
             vol = volatilityCurve.volatility(k)
             opt = FinEquityVanillaOption(self._maturityDate, k, putType)
-            model = FinEquityModelBlackScholes(vol)
+            model = FinModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
                           dividendYield, model)
             piPut += v * self._putWts[n]
@@ -206,7 +206,7 @@ class FinEquityVarianceSwap(object):
             k = callK[n]
             vol = volatilityCurve.volatility(k)
             opt = FinEquityVanillaOption(self._maturityDate, k, callType)
-            model = FinEquityModelBlackScholes(vol)
+            model = FinModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
                           dividendYield, model)
             piCall += v * self._callWts[n]

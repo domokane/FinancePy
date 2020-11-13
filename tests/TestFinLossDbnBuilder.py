@@ -2,15 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinModelGaussianCopula1F import lossDbnRecursionGCD
 from financepy.models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
-import matplotlib.pyplot as plt
-import numpy as np
-import time
-import sys
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

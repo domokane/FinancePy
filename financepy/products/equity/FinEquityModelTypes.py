@@ -16,19 +16,23 @@ class FinEquityModel(object):
 ###############################################################################
 
 
-class FinEquityModelBlackScholes(FinEquityModel):
-    def __init__(self, volatility, numStepsPerYear=100, useTree=False):
-        self._parentType = FinEquityModel
-        self._volatility = volatility
-        self._numStepsPerYear = numStepsPerYear
-        self._useTree = useTree
+# class FinEquityModelBlackScholes(FinEquityModel):
+#     def __init__(self, 
+#                  volatility: float, 
+#                  implementation, parameters):
 
-    def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VOLATILITY", self._volatility)
-        s += labelToString("NUM STEPS PER YEAR", self._numStepsPerYear)
-        s += labelToString("USE TREE", self._useTree)
-        return s
+#         checkArgumentTypes(self.__init__, locals())
+
+#         self._volatility = volatility
+#         self._implementation = implementation 
+#         self._parameters = parameters
+
+#     def __repr__(self):
+#         s = labelToString("OBJECT TYPE", type(self).__name__)
+#         s += labelToString("VOLATILITY", self._volatility)
+#         s += labelToString("IMPLEMENTATION", self._implementation)
+#         s += labelToString("PARAMETERS", self._parameters)
+#         return s
 
 ###############################################################################
 

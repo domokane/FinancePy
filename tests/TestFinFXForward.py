@@ -2,19 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
+import sys
+sys.path.append("..")
 
 from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
-
 from financepy.finutils.FinDate import FinDate
-import sys
-sys.path.append("..//..")
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

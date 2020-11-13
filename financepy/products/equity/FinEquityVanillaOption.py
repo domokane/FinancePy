@@ -12,14 +12,13 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...models.FinModelBlackScholes import bsValue
-from ...products.equity.FinEquityModelTypes import FinEquityModel
-from ...products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from financepy.models.FinSobol import getGaussianSobol
+from ...models.FinModel import FinModel
+from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...models.FinSobol import getGaussianSobol
 
 from scipy.stats import norm
 N = norm.cdf
@@ -36,7 +35,7 @@ def _f(volatility, *args):
     dividendYield = args[4]
     price = args[5]
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     objFn = self.value(valueDate,
                        stockPrice,
@@ -46,7 +45,6 @@ def _f(volatility, *args):
 
     objFn = objFn - price
 
-#    print(volatility, price, objFn)
     return objFn
 
 ###############################################################################
@@ -60,7 +58,8 @@ def _fvega(volatility, *args):
     discountCurve = args[3]
     dividendYield = args[4]
 
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
+
     fprime = self.vega(
         valueDate,
         stockPrice,
@@ -102,8 +101,8 @@ class FinEquityVanillaOption():
               stockPrice: (np.ndarray, float),
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model: FinEquityModel):
-        ''' Option valuation using Black-Scholes model. '''
+              model: FinModel):
+        ''' Equity Vanilla Option valuation using Black-Scholes model. '''
 
         if type(valueDate) == FinDate:
             texp = (self._expiryDate - valueDate) / gDaysInYear
@@ -113,32 +112,20 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if isinstance(model, FinEquityModel) is False:
-            raise FinError("Model is not inherited off type FinEquityModel.")
-
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        df = discountCurve.df(self._expiryDate)
         texp = np.maximum(texp, 1e-10)
+        df = discountCurve.df(self._expiryDate)
         s0 = stockPrice
         r = -np.log(df)/texp
         q = dividendYield
         k = self._strikePrice
 
-        if type(model) == FinEquityModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
-            v = model._volatility
+            v_opt = model.value(s0, texp, k, r, q, self._optionType)
 
-            if np.any(v) < 0.0:
-                raise FinError("Volatility should not be negative.")
-
-            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                v_opt = bsValue(s0, texp, k, r, q, v, +1)
-            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                v_opt = bsValue(s0, texp, k, r, q, v, -1)
-            else:
-                raise FinError("Unknown option type")
         else:
             raise FinError("Unknown Model Type")
 
@@ -163,8 +150,8 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
+        if isinstance(model, FinModel) is False:
+            raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
@@ -175,7 +162,7 @@ class FinEquityVanillaOption():
         r = -np.log(df)/t
         q = dividendYield
 
-        if type(model) == FinEquityModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             volatility = model._volatility
 
@@ -207,7 +194,7 @@ class FinEquityVanillaOption():
               stockPrice: float,
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model):
+              model:FinModel):
         ''' Calculate the analytical gamma of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
@@ -218,9 +205,6 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
-
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
 
@@ -229,7 +213,7 @@ class FinEquityVanillaOption():
         df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
-        if type(model) == FinEquityModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
 
             volatility = model._volatility
 
@@ -258,7 +242,7 @@ class FinEquityVanillaOption():
              stockPrice: float,
              discountCurve: FinDiscountCurve,
              dividendYield: float,
-             model):
+             model:FinModel):
         ''' Calculate the analytical vega of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
@@ -269,8 +253,8 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
+        if isinstance(model, FinModel) is False:
+            raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
@@ -280,7 +264,7 @@ class FinEquityVanillaOption():
         df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
-        if type(model) == FinEquityModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
 
             volatility = model._volatility
 
@@ -308,7 +292,7 @@ class FinEquityVanillaOption():
               stockPrice: float,
               discountCurve: FinDiscountCurve,
               dividendYield: float,
-              model):
+              model:FinModel):
         ''' Calculate the analytical theta of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
@@ -319,8 +303,8 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
+        if isinstance(model, FinModel) is False:
+            raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
@@ -330,7 +314,7 @@ class FinEquityVanillaOption():
         df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
-        if type(model) == FinEquityModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
 
             volatility = model._volatility
 
@@ -376,7 +360,7 @@ class FinEquityVanillaOption():
             stockPrice: float,
             discountCurve: FinDiscountCurve,
             dividendYield: float,
-            model):
+            model:FinModel):
         ''' Calculate the analytical rho of a European vanilla option. '''
 
         if type(valueDate) == FinDate:
@@ -387,8 +371,8 @@ class FinEquityVanillaOption():
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if model._parentType != FinEquityModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
+        if isinstance(model, FinModel) is False:
+            raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
@@ -398,7 +382,7 @@ class FinEquityVanillaOption():
         df = discountCurve._df(t)
         interestRate = -np.log(df)/t
 
-        if type(model) == FinEquityModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
 
             volatility = model._volatility
 
@@ -451,14 +435,14 @@ class FinEquityVanillaOption():
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
                 dividendYield: float,
-                model,
+                model:FinModel,
                 numPaths: int = 10000,
                 seed: int = 4242,
                 useSobol: bool = False):
         ''' Value European style call or put option using Monte Carlo. This is
         mainly for educational purposes. Sobol numbers can be used. '''
 
-        if model._parentType == FinEquityModel:
+        if isinstance(model, FinModel):
             volatility = model._volatility
         else:
             raise FinError("Model Type invalid")

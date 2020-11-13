@@ -3,13 +3,42 @@
 ##############################################################################
 
 import numpy as np
-from financepy.finutils.FinMath import normcdf_fast, normpdf
-
-from financepy.models.FinModelBlackScholes import bsValue
 from scipy import optimize
 
-normcdf = normcdf_fast
-NP = normpdf
+from ..finutils.FinMath import normpdf as NP
+from ..finutils.FinGlobalVariables import gSmall
+
+from scipy.stats import norm
+
+N = norm.cdf
+
+
+###############################################################################
+# Analytical Black Scholes model implementation and approximations
+###############################################################################
+
+def bsValue(s:float, 
+            t:float, 
+            k:float, 
+            r:float, 
+            q:float, 
+            v:float, 
+            phi:int):   # +1 for call, -1 for put
+    ''' Price a derivative using Black-Scholes model where 
+    phi is +1 for a call, and
+    phi is -1 for a put.'''
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    sqrtT = np.sqrt(t)
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / v / sqrtT + v * sqrtT / 2.0
+    d2 = d1 - v * sqrtT
+    v = phi * ss * N(phi*d1) - phi * kk * N(phi*d2)
+    return v
 
 ###############################################################################
 # This module contains a number of analytical approximations for the price of
@@ -30,15 +59,15 @@ def _fcall(si, *args):
     v2 = v*v
 
     M = 2.0 * r / v2
-    N = 2.0 * b / v2
+    W = 2.0 * b / v2
     K = 1.0 - np.exp(-r * t)
 
-    q2 = (1.0 - N + np.sqrt((N - 1.0)**2 + 4.0 * M/K)) / 2.0
+    q2 = (1.0 - W + np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
 
     objFn = si - k
     objFn = objFn - bsValue(si, t, k, r, q, v, +1) 
-    objFn = objFn - (1.0 - np.exp(-q*t) * normcdf(d1)) * si / q2
+    objFn = objFn - (1.0 - np.exp(-q*t) * N(d1)) * si / q2
     return objFn
 
 ###############################################################################
@@ -55,26 +84,25 @@ def _fput(si, *args):
     b = r - q
     v2 = v*v
 
-    N = 2.0 * b / v2
+    W = 2.0 * b / v2
     K = 1.0 - np.exp(-r * t)
 
-    q1 = (1.0 - N - np.sqrt((N - 1.0)**2 + 4.0 * K)) / 2.0
+    q1 = (1.0 - W - np.sqrt((W - 1.0)**2 + 4.0 * K)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     objFn = si - k
     objFn = objFn - bsValue(si, t, k, r, q, v, -1)
-    objFn = objFn - (1.0 - np.exp(-q*t) * normcdf(-d1)) * si / q1
+    objFn = objFn - (1.0 - np.exp(-q*t) * N(-d1)) * si / q1
     return objFn
 
 ###############################################################################
 
-def americanOptionBAW(self, 
-                      stockPrice: float, 
-                      timeToExpiry: float, 
-                      strikePrice: float, 
-                      riskFreeRate: float, 
-                      dividendRate: float, 
-                      volatility: float, 
-                      phi:int):
+def bawValue(stockPrice: float, 
+             timeToExpiry: float, 
+             strikePrice: float, 
+             riskFreeRate: float, 
+             dividendRate: float, 
+             volatility: float, 
+             phi:int):
     ''' American Option Pricing Approximation using the Barone-Adesi-Whaley
     approximation for the Black Scholes Model '''
 
@@ -84,9 +112,9 @@ def americanOptionBAW(self,
     r = riskFreeRate
     q = dividendRate
     v = volatility
-    b = self._riskFreeRate - self._dividendRate
+    b = riskFreeRate - dividendRate
 
-    if self._phi == 1:
+    if phi == 1:
 
         if b >= r:
             return bsValue(s, t, k, r, q, v, +1)
@@ -97,11 +125,11 @@ def americanOptionBAW(self,
                                 tol=1e-7, maxiter=50, fprime2=None)
                     
         M = 2.0 * r / (v*v)
-        N = 2.0 * b / (v*v) 
+        W = 2.0 * b / (v*v) 
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar/k) + (b + v*v/ 2.0) * t) / (v * np.sqrt(t))
-        q2 = (-1.0 * (N - 1.0) + np.sqrt((N - 1.0)**2 + 4.0 * M/K)) / 2.0
-        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * normcdf(d1))
+        q2 = (-1.0 * (W - 1.0) + np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
+        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * N(d1))
 
         if s < sstar:
             return bsValue(s, t, k, r, q, v, +1) + A2 * ((s/sstar)**q2)
@@ -116,11 +144,11 @@ def americanOptionBAW(self,
         v2 = v * v
         
         M = 2.0 * r / v2
-        N = 2.0 * b / v2
+        W = 2.0 * b / v2
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
-        q1 = (-1.0 * (N - 1.0) - np.sqrt((N - 1.0)**2 + 4.0 * M/K)) / 2.0
-        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * normcdf(-d1))
+        q1 = (-1.0 * (W - 1.0) - np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
+        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * N(-d1))
 
         if s > sstar:
             return bsValue(s, t, k, r, q, v, -1) + a1 * ((s/sstar)**q1)
@@ -144,6 +172,6 @@ if __name__ == '__main__':
     for t in [0.1, 0.5]:
         for v in [0.15, 0.25, 0.35]:
             for s in [90.0, 100.0, 110.0]:
-                bawPrice = valueAmericanOptionBAW(s, t, k, r, q, v, +1)
+                bawPrice = valueBAW(s, t, k, r, q, v, +1)
                 print("%9.5f %9.5f %9.5f %9.5f"% (s, t, v, bawPrice))
 

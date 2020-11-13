@@ -2,17 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+import sys
+sys.path.append("..")
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurveNSS import FinDiscountCurveNSS
 from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-sys.path.append("..//..")
 
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False

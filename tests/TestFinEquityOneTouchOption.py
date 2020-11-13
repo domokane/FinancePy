@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityOneTouchOption import FinEquityOneTouchOption
 from financepy.products.equity.FinEquityOneTouchOption import FinTouchOptionPayoffTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.equity.FinEquityModelTypes import FinEquityModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.finutils.FinDate import FinDate
-
-import sys
-sys.path.append("..//..")
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -28,7 +28,7 @@ def test_FinEquityOneTouchOption():
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     volatility = 0.20
     barrierLevel = 100.0  # H
-    model = FinEquityModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     dividendYield = 0.03
     numPaths = 10000
     numStepsPerYear = 252

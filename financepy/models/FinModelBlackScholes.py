@@ -5,39 +5,104 @@
 # TODO Fix this
 
 import numpy as np
-from numba import njit
 
 from scipy.stats import norm
 from ..finutils.FinGlobalVariables import gSmall
+from ..finutils.FinGlobalTypes import FinOptionTypes
+
 N = norm.cdf
 
-###############################################################################
-# This is intended to be a fast calculator and validation is left to calling
-# functions.
-###############################################################################
+from .FinModel import FinModel
+from .FinModelCRRTree import crrTreeValAvg
+from .FinModelBlackScholesAnalytical import bawValue
+from .FinModelBlackScholesAnalytical import bsValue
 
 
-def bsValue(s:float, 
-            t:float, 
-            k:float, 
-            r:float, 
-            q:float, 
-            v:float, 
-            phi:int):   # +1 for call, -1 for put
-    ''' Price a derivative using Black-Scholes model where 
-    phi is +1 for a call, and
-    phi is -1 for a put.'''
+from enum import Enum
 
-    k = np.maximum(k, gSmall)
-    t = np.maximum(t, gSmall)
-    v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
-    ss = s * np.exp(-q*t)
-    kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / v / sqrtT + v * sqrtT / 2.0
-    d2 = d1 - v * sqrtT
-    v = phi * ss * N(phi*d1) - phi * kk * N(phi*d2)
-    return v
+class FinModelBlackScholesTypes(Enum):
+        ANALYTICAL = 1
+        CRR_TREE = 2
+        BARONE_ADESI = 3
 
 ###############################################################################
+
+class FinModelBlackScholes(FinModel):
+    
+    def __init__(self,
+                 volatility: float, 
+                 implementationType: FinModelBlackScholesTypes = FinModelBlackScholesTypes.ANALYTICAL,
+                 parametersDict: dict = None):
+
+        self._volatility = volatility
+        self._implementationType = implementationType
+        self._parametersDict = parametersDict
+
+    def value(self, 
+              spotPrice: float, 
+              timeToExpiry: float, 
+              strikePrice: float, 
+              riskFreeRate: float, 
+              dividendRate: float, 
+              optionType: FinOptionTypes):
+
+        if self._implementationType == FinModelBlackScholesTypes.ANALYTICAL:
+
+            if optionType == FinOptionTypes.EUROPEAN_CALL:
+                phi = +1
+            elif optionType == FinOptionTypes.EUROPEAN_PUT:
+                phi = -1
+            else:
+                print(optionType)
+                raise FinError("Unsupported Option Type")
+
+            v =  bsValue(spotPrice, 
+                         timeToExpiry,
+                         strikePrice,
+                         riskFreeRate,
+                         dividendRate,
+                         self._volatility,
+                         phi)
+
+            return v
+
+        elif self._implementationType == FinModelBlackScholesTypes.BARONE_ADESI:
+
+            if optionType == FinOptionTypes.AMERICAN_CALL:
+                phi = +1
+            elif optionType == FinOptionTypes.AMERICAN_PUT:
+                phi = -1
+            else:
+                print(optionType)
+                raise FinError("Unsupported Option Type")
+
+            v =  bawValue(spotPrice, 
+                          timeToExpiry,
+                          strikePrice,
+                          riskFreeRate,
+                          dividendRate,
+                          self._volatility,
+                          phi)
+
+            return v
+
+        elif self._implementationType == FinModelBlackScholesTypes.CRR_TREE:
+
+            numStepsPerYear = self._parametersDict["numStepsPerYear"]
+
+            v = crrTreeValAvg(spotPrice, riskFreeRate, 
+                              dividendRate, 
+                              self._volatility, 
+                              numStepsPerYear,
+                              timeToExpiry, optionType.value, 
+                              strikePrice)['value']
+
+            return v
+
+        else:
+            
+            raise FinError("Unsupported implementation type")
+
+###############################################################################
+
