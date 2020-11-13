@@ -3,12 +3,15 @@
 ###############################################################################
 
 import numpy as np
+import matplotlib.pyplot as plt
+
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
-import matplotlib.pyplot as plt
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -4,9 +4,9 @@
 
 import datetime as dt
 
-import sys
 import os
 
+import sys
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode

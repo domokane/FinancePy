@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
@@ -10,7 +12,6 @@ from financepy.finutils.FinSchedule import FinSchedule
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinDate import FinDate
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

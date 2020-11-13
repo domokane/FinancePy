@@ -4,6 +4,9 @@
 
 # TODO Set up test cases correctly
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
@@ -11,7 +14,6 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDate import FinDate
-
 
 from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 

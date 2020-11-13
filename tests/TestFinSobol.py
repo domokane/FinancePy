@@ -1,7 +1,11 @@
-from financepy.models.FinSobol import getUniformSobol, getGaussianSobol
 
 import time
 from numba import jit
+
+import sys
+sys.path.append("..")
+
+from financepy.models.FinSobol import getUniformSobol, getGaussianSobol
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 

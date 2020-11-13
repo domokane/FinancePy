@@ -3,9 +3,13 @@
 ##############################################################################
 
 import numpy as np
+import matplotlib.pyplot as plt
+
+import sys
+sys.path.append("..")
+
 from financepy.finutils.FinMath import accruedInterpolator
 from FinTestCases import FinTestCases, globalTestCaseMode
-import matplotlib.pyplot as plt
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
