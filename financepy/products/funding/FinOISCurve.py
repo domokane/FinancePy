@@ -597,7 +597,7 @@ class FinOISCurve(FinDiscountCurve):
 ###############################################################################
 
     def __repr__(self):
-        ''' Print out the details of the Ibor curve. '''
+        ''' Print out the details of the Libor curve. '''
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUATION DATE", self._valuationDate)

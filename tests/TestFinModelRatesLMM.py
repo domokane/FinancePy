@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import time as time
+
 import sys
 sys.path.append("..")
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes

@@ -4,7 +4,6 @@
 
 import os
 import datetime as dt
-
 import sys
 sys.path.append("..")
 
@@ -25,7 +24,6 @@ from financepy.finutils.FinGlobalTypes import FinSwapTypes
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
-
 
 
 def buildIborCurve(valuationDate):

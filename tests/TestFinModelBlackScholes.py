@@ -26,6 +26,7 @@ from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanO
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+# TODO Complete output of results to log files
 
 def testFinModelBlackScholes():
 
