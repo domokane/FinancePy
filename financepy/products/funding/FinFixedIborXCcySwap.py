@@ -17,16 +17,12 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-<<<<<<< HEAD:financepy/products/funding/swaps/FinFixedFixedXCcySwap.py
-class FinFixedFixedXCcySwap(object):
-=======
-class FinIborIborXCcySwap(object):
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinIborIborXCcySwap.py
+class FinFixedIborXCcySwap(object):
     ''' Class for managing a cross currency swap contract. This is a contract
-    in which a fixed or floating payment leg in one currency is exchanged for a
-    series of fixed or floating rates in a second currency. There is an
-    exchange of par. The contract is entered into at zero initial cost and it
-    lasts from a start date to a specified maturity date.
+    in which a fixed payment leg in one currency is exchanged for floating
+    payments in a second currency. There is an exchange of par at maturity.
+    The contract is entered into at zero initial cost and it lasts from a start
+    date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curves (one for each leg) which is separate
@@ -128,7 +124,7 @@ class FinIborIborXCcySwap(object):
               indexCurve,
               firstFixingRate=None,
               principal=0.0):
-        ''' Value the interest rate swap on a value date given a single Ibor
+        ''' Value the interest rate swap on a value date given a single Libor
         discount curve. '''
 
         fixedLegValue = self.fixedLegValue(valuationDate,

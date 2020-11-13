@@ -11,11 +11,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
 from os.path import dirname, join

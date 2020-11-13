@@ -244,9 +244,13 @@ def buildIborSingleCurve(valuationDate):
                              swapRate, fixedFreq, dcType)
     swaps.append(swap19)
     
+<<<<<<< HEAD:tests/TestFinIborSwap.py
     ########################################
     
     liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
+=======
+    liborCurve = FinIborCurve(settlementDate, depos, fras, swaps)
+>>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:tests/TestFinLiborSwap.py
 
     testCases.header("LABEL", "DATE", "VALUE")
 
@@ -311,7 +315,11 @@ def test_LiborSwap():
 
     valuationDate = FinDate(30, 11, 2018)
     settlementDate = valuationDate.addDays(2)
+<<<<<<< HEAD:tests/TestFinIborSwap.py
     liborCurve = buildIborSingleCurve(valuationDate)
+=======
+    liborCurve = buildIborCurve(valuationDate)
+>>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:tests/TestFinLiborSwap.py
     v = swap.value(settlementDate, liborCurve, liborCurve, firstFixing)
 
     v_bbg = 388147.0

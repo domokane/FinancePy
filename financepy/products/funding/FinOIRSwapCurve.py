@@ -64,13 +64,12 @@ def _g(df, *args):
 ###############################################################################
 
 
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
 def _costFunction(dfs, *args):
     ''' Root search objective function for swaps '''
 
 #    print("Discount factors:", dfs)
 
-    curve = args[0]
+    liborCurve = args[0]
     valuationDate = liborCurve._valuationDate
     curve._dfs = dfs
     
@@ -140,21 +139,10 @@ class FinIborSingleCurveOLD(FinDiscountCurve):
     it is slower. Its advantage is that we can switch interpolation schemes
     to provide a smoother or other functional curve shape which may have a more
     economically justifiable shape. However the root search makes it slower.'''
-=======
-class FinOIRSwapCurve(FinDiscountCurve):
-    ''' Constructs a discount curve as implied by the prices of Overnight
-    Index Rate swaps. The curve date is the date on which we are
-    performing the valuation based on the information available on the
-    curve date. Typically it is the date on which an amount of 1 unit paid
-    has a present value of 1. This class inherits from FinDiscountCurve
-    and so it has all of the methods that that class has.
-    '''
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
 
 ###############################################################################
 
     def __init__(self,
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
                  valuationDate: FinDate, # This is the trade date (not T+2)
                  iborDeposits: list,
                  iborFRAs: list,
@@ -163,16 +151,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
                  checkRefit: bool = False):  # Set to True to test it works
         ''' Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
-=======
-                 valuationDate: FinDate,
-                 iborDeposits: list,
-                 iborFRAs: list,
-                 iborSwaps: list,
-                 interpType: FinInterpTypes = FinInterpTypes.LINEAR_SWAP_RATES,
-                 checkRefit: bool = False):  # Set to True to test it works
-        ''' Create an instance of an overnight index rate swap curve given a
-        valuation date and a set of OIS rates. Some of these may
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
         linear interpolation for swap rates on coupon dates and to then assume
@@ -205,28 +183,20 @@ class FinOIRSwapCurve(FinDiscountCurve):
                         iborDeposits,
                         iborFRAs,
                         iborSwaps):
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
         ''' Validate the inputs for each of the Ibor products. '''
-=======
-        ''' Validate the inputs for each of the Libor products. '''
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
 
         numDepos = len(iborDeposits)
         numFRAs = len(iborFRAs)
         numSwaps = len(iborSwaps)
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
 
         depoStartDate = self._valuationDate
         swapStartDate = self._valuationDate
-=======
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
 
         if numDepos + numFRAs + numSwaps == 0:
             raise FinError("No calibration instruments.")
 
         # Validation of the inputs.
         if numDepos > 0:
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
             
             depoStartDate = iborDeposits[0]._startDate
 
@@ -243,13 +213,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
                 if startDate < depoStartDate:
                     depoStartDate = startDate
 
-=======
-            for depo in iborDeposits:
-                startDt = depo._startDate
-                if startDt < self._valuationDate:
-                    raise FinError("First deposit starts before value date.")
-
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
             for depo in iborDeposits:
                 startDt = depo._startDate
                 endDt = depo._maturityDate
@@ -258,13 +221,8 @@ class FinOIRSwapCurve(FinDiscountCurve):
 
         # Ensure order of depos
         if numDepos > 1:
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
             
             prevDt = iborDeposits[0]._maturityDate
-=======
-            prevDt = iborDeposits[0]._maturityDate
-
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
             for depo in iborDeposits[1:]:
                 nextDt = depo._maturityDate
                 if nextDt <= prevDt:
@@ -274,7 +232,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
         # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
         # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
         # if numDepos > 1:
         #    if iborDeposits[0]._effectiveDate > self._valuationDate:
         #        raise FinError("Valuation date must not be before first deposit settles.")
@@ -284,14 +241,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
                 if isinstance(fra, FinIborFRA) is False:
                     raise FinError("FRA is not of type FinIborFRA")
 
-=======
-        if numDepos > 1:
-            if iborDeposits[0]._startDate > self._valuationDate:
-                raise FinError("Valuation date must not be before first deposit settles.")
-
-        if numFRAs > 0:
-            for fra in iborFRAs:
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
                 startDt = fra._startDate
                 if startDt < self._valuationDate:
                     raise FinError("FRAs starts before valuation date")
@@ -305,7 +254,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
                 prevDt = nextDt
 
         if numSwaps > 0:
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
 
             swapStartDate = iborSwaps[0]._effectiveDate
 
@@ -315,10 +263,6 @@ class FinOIRSwapCurve(FinDiscountCurve):
                     raise FinError("Swap is not of type FinIborSwap")
 
                 startDt = swap._effectiveDate
-=======
-            for swap in iborSwaps:
-                startDt = swap._startDate
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
                 if startDt < self._valuationDate:
                     raise FinError("Swaps starts before valuation date.")
 
@@ -328,15 +272,9 @@ class FinOIRSwapCurve(FinDiscountCurve):
         if numSwaps > 1:
 
             # Swaps must all start on the same date for the bootstrap
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
             startDt = iborSwaps[0]._effectiveDate
             for swap in iborSwaps[1:]:
                 nextStartDt = swap._effectiveDate
-=======
-            startDt = iborSwaps[0]._startDate
-            for swap in iborSwaps[1:]:
-                nextStartDt = swap._startDate
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
                 if nextStartDt != startDt:
                     raise FinError("Swaps must all have same start date.")
 
@@ -349,14 +287,9 @@ class FinOIRSwapCurve(FinDiscountCurve):
                 prevDt = nextDt
 
             # Swaps must have same cashflows for bootstrap to work
-<<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
             longestSwap = iborSwaps[-1]            
             longestSwapCpnDates = longestSwap._adjustedFixedDates
 
-=======
-            longestSwap = iborSwaps[-1]
-            longestSwapCpnDates = longestSwap._adjustedFixedDates
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/FinOIRSwapCurve.py
             for swap in iborSwaps[0:-1]:
                 swapCpnDates = swap._adjustedFixedDates
                 numFlows = len(swapCpnDates)
