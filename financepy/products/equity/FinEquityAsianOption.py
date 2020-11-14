@@ -120,6 +120,7 @@ def _valueMC_NUMBA(t0,
 
             s_1 = s_1 * np.exp((mu - v2 / 2.0) * dt +
                                g[obs] * np.sqrt(dt) * volatility)
+
             s_2 = s_2 * np.exp((mu - v2 / 2.0) * dt -
                                g[obs] * np.sqrt(dt) * volatility)
 

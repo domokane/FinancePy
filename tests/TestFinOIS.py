@@ -36,7 +36,6 @@ def test_FinFixedOIS():
     floatSpread = 0.0
     notional = ONE_MILLION
     paymentLag = 1
-    gearing = 1.0
     
     ois = FinOIS(effectiveDate,
                  endDate,

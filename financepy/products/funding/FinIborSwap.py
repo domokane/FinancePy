@@ -17,7 +17,6 @@ from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinAmount import FinAmount
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinCurrency import FinCurrencyTypes
 
 from .FinFixedLeg import FinFixedLeg
 from .FinFloatLeg import FinFloatLeg
@@ -26,7 +25,7 @@ from .FinFloatLeg import FinFloatLeg
 
 
 class FinIborSwap(object):
-    ''' Class for managing a Fixed vs IBOR swap contract. This is a contract
+    ''' Class for managing a standard Fixed vs IBOR swap. This is a contract
     in which a fixed payment leg is exchanged for a series of floating rates
     payments linked to some IBOR index rate. There is no exchange of principal.
     The contract is entered into at zero initial cost. The contract lasts from
@@ -135,7 +134,7 @@ class FinIborSwap(object):
         value = fixedLegValue + floatLegValue
         return value
 
-##########################################################################
+###############################################################################
 
     def pv01(self, valuationDate, discountCurve):
         ''' Calculate the value of 1 basis point coupon on the fixed leg. '''
@@ -147,7 +146,7 @@ class FinIborSwap(object):
         pv01 = pv / self._fixedLeg._coupon / self._fixedLeg._notional
         return pv01
 
-##########################################################################
+###############################################################################
 
     def swapRate(self, 
                  valuationDate:FinDate,
@@ -234,7 +233,6 @@ class FinIborSwap(object):
         the dates and sizes of the promised fixed leg flows. '''
 
         self._fixedLeg.printPayments()
-        
         self._floatLeg.printPayments()
 
 ##########################################################################

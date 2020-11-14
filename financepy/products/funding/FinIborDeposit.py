@@ -64,7 +64,6 @@ class FinIborDeposit(object):
 
         maturityDate = calendar.adjust(maturityDate,
                                        self._busDayAdjustType)
-
         if startDate > maturityDate:
             raise FinError("Start date cannot be after maturity date")
 

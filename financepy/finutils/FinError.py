@@ -15,7 +15,6 @@ ipython = get_ipython()
 
 ###############################################################################
 
-
 def _hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                     exception_only=False, running_compiled_code=False):
     etype, value, _ = sys.exc_info()
@@ -32,8 +31,8 @@ def func_name():
 
 
 def suppressErrors():
-    print(sys.tracebacklimit)
-    print(ipython.showtrackeback)
+#    print(sys.tracebacklimit)
+#    print(ipython.showtrackeback)
 
     sys.tracebacklimit = 0
     ipython.showtraceback = _hide_traceback

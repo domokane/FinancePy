@@ -22,7 +22,7 @@ modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
 numModules = len(modules)
 
 ''' This is the index of the file - change this to start later in the list '''
-n = 60
+n = 0
 m = numModules
 
 ###############################################################################
