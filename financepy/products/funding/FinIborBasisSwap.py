@@ -13,6 +13,7 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinCurrency import FinCurrencyTypes
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from .FinFixedLeg import FinFixedLeg
 from .FinFloatLeg import FinFloatLeg
@@ -129,7 +130,7 @@ class FinIborBasisSwap(object):
                                                indexCurveLeg2,
                                                firstFixingRateLeg2)
 
-        value = fixedLegValue + floatLegValue
+        value = floatLeg1Value + floatLeg2Value
         return value
 
 ###############################################################################
