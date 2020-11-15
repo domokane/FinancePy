@@ -2,10 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import numpy as np
+
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
+from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes
@@ -134,21 +136,17 @@ class FinOIS(object):
 
     def value(self,
               valuationDate: FinDate,
-              discountCurve: FinDiscountCurve,
-              indexCurve: FinDiscountCurve=None,
+              oisCurve: FinDiscountCurve,
               firstFixingRate=None):
         ''' Value the interest rate swap on a value date given a single Ibor
         discount curve. '''
 
-        if indexCurve is None:
-            indexCurve = discountCurve
-
         fixedLegValue = self._fixedLeg.value(valuationDate,
-                                             discountCurve)
+                                             oisCurve)
 
         floatLegValue = self._floatLeg.value(valuationDate,
-                                             discountCurve,
-                                             indexCurve,
+                                             oisCurve,
+                                             oisCurve,
                                              firstFixingRate)
 
         value = fixedLegValue + floatLegValue
@@ -168,7 +166,7 @@ class FinOIS(object):
 
 ##########################################################################
 
-    def swapRate(self, valuationDate, discountCurve):
+    def swapRate(self, valuationDate, oisCurve):
         ''' Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -176,68 +174,36 @@ class FinOIS(object):
         factor. If the swap fixed leg has begun then we have a spot
         starting swap. '''
 
-        pv01 = self.pv01(valuationDate, discountCurve)
+        pv01 = self.pv01(valuationDate, oisCurve)
 
         if valuationDate < self._effectiveDate:
-            df0 = discountCurve.df(self._effectiveDate)
+            df0 = oisCurve.df(self._effectiveDate)
         else:
-            df0 = discountCurve.df(valuationDate)
+            df0 = oisCurve.df(valuationDate)
 
         floatLegPV = 0.0
 
-        if indexCurve is None:
-            dfT = discountCurve.df(self._maturityDate)
-            floatLegPV = (df0 - dfT) 
-        else:
-            floatLegPV = self._floatLeg.value(valuationDate,
-                                              discountCurve,
-                                              indexCurve, 
-                                              firstFixing)
-
-            floatLegPV /= self._fixedLeg._notional
-
+        dfT = oisCurve.df(self._maturityDate)
+        floatLegPV = (df0 - dfT) 
+        floatLegPV /= self._fixedLeg._notional
         cpn = floatLegPV / pv01           
         return cpn
 
+###############################################################################
 
+    def printFixedLegPV(self):
+        ''' Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. '''
 
-##########################################################################
+        self._fixedLeg.printValuation()
 
-    def cashSettledPV01(self,
-                        valuationDate,
-                        flatSwapRate,
-                        freqType):
-        ''' Calculate the forward value of an annuity of a forward starting
-        swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinIborSwaption
-        class. This method does not affect the standard valuation methods.'''
+###############################################################################
 
-        m = FinFrequency(freqType)
+    def printFloatLegPV(self):
+        ''' Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. '''
 
-        if m == 0:
-            raise FinError("Frequency cannot be zero.")
-
-        ''' The swap may have started in the past but we can only value
-        payments that have occurred after the valuation date. '''
-        startIndex = 0
-        while self._adjustedFixedDates[startIndex] < valuationDate:
-            startIndex += 1
-
-        ''' If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. '''
-        if valuationDate <= self._effectiveDate:
-            startIndex = 1
-
-        ''' Now PV fixed leg flows. '''
-        flatPV01 = 0.0
-        df = 1.0
-        alpha = 1.0 / m
-
-        for _ in self._adjustedFixedDates[startIndex:]:
-            df = df / (1.0 + alpha * flatSwapRate)
-            flatPV01 += df * alpha
-
-        return flatPV01
+        self._floatLeg.printValuation()
 
 ###############################################################################
 

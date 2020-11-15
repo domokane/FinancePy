@@ -41,8 +41,8 @@
 
 
 # class FinSwaptionTypes(Enum):
-#     PAYER = 1
-#     RECEIVER = 2
+#     PAY = 1
+#     RECEIVE = 2
 
 # class FinSwaptionExerciseTypes(Enum):
 #     EUROPEAN = 1
@@ -179,7 +179,7 @@
 #         callPrices = np.array(self._callPrices)
 
 #         # Generate bond put times and prices
-#         if self._swaptionType == FinIborSwaptionType.PAYER:
+#         if self._swaptionType == FinIborSwaptionType.PAY:
 #             callPrice = 100.0
 #             putPrice = 1e10
 #         else:

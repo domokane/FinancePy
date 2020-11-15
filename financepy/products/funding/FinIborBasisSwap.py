@@ -132,6 +132,22 @@ class FinIborBasisSwap(object):
 
 ###############################################################################
 
+    def printFloatLeg1PV(self):
+        ''' Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. '''
+
+        self._floatLeg1.printValuation()
+
+###############################################################################
+
+    def printFloatLeg2PV(self):
+        ''' Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. '''
+
+        self._floatLeg2.printValuation()
+
+###############################################################################
+
     def printFlows(self):
         ''' Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. '''

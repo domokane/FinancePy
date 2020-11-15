@@ -128,7 +128,7 @@ def getForwardCurve(numFwds, r):
 #     fwdsNF = LMMSimulateFwdsNF(numFwds, numPaths, fwd0,
 #                                zetas, correl, taus, seed)
 #     strike = r
-#     payerSwaption = 1
+#     PAYSwaption = 1
 #     useSobol = 0
 #     numeraireIndex = 0
 
@@ -142,10 +142,10 @@ def getForwardCurve(numFwds, r):
 #         print(a, b)
 
 #         swaptionPrice1F = LMMSwaptionPricer(strike, a, b, numPaths,
-#                                             fwd0, fwds1F, taus, payerSwaption)
+#                                             fwd0, fwds1F, taus, PAYSwaption)
 
 #         swaptionPriceNF = LMMSwaptionPricer(strike, a, b, numPaths,
-#                                             fwd0, fwdsNF, taus, payerSwaption)
+#                                             fwd0, fwdsNF, taus, PAYSwaption)
 
 #         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
 
@@ -167,7 +167,7 @@ def getForwardCurve(numFwds, r):
 #         floatDayCountType = FinDayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
-#         # Pricing a PAYER
+#         # Pricing a PAY
 #         swaptionType = FinIborSwaptionTypes.PAY
 #         swaption = FinIborSwaption(settlementDate,
 #                                     exerciseDate,

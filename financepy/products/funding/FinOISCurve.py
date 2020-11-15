@@ -61,7 +61,7 @@ def _f(df, *args):
 
     # For curves that need a fit function, we fit it now 
     curve._interpolator.fit(curve._times, curve._dfs)     
-    v_swap = swap.value(valueDate, curve, curve, None)
+    v_swap = swap.value(valueDate, curve, None)
     notional = swap._fixedLeg._notional
     v_swap /= notional
     return v_swap

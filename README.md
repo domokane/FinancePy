@@ -8,6 +8,8 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
+I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However Anaconda3-2020.02 works.
+ 
 ## Using FinancePy in a Jupyter Notebook
 
 Once financepy has been installed, it is easy to get started.

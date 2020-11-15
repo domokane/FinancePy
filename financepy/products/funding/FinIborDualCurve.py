@@ -265,7 +265,7 @@ class FinIborDualCurve(FinDiscountCurve):
                 if firstDepo._startDate > self._valuationDate:
                     print("Inserting synthetic deposit")
                     syntheticDeposit = copy.deepcopy(firstDepo)
-                    syntheticDeposit._effectiveDate = self._valuationDate
+                    syntheticDeposit._startDate = self._valuationDate
                     syntheticDeposit._maturityDate = firstDepo._startDate
                     iborDeposits.insert(0, syntheticDeposit)
                     numDepos += 1

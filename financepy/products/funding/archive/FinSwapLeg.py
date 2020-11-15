@@ -156,7 +156,7 @@ class FinSwapLeg(object):
 
         value = fixedLegValue - floatLegValue
 
-        if self._swapType == FinSwapTypes.PAYER:
+        if self._swapType == FinSwapTypes.PAY:
             value = value * (-1.0)
 
         return value

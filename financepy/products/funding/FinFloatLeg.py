@@ -117,8 +117,8 @@ class FinFloatLeg(object):
 
             self._paymentDates.append(paymentDate)
 
-            (yearFrac, num, den) = dayCounter.yearFrac(prevDt, 
-                                                       nextDt)        
+            (yearFrac, num, _) = dayCounter.yearFrac(prevDt, 
+                                                     nextDt)        
             
             self._yearFracs.append(yearFrac)
             self._accruedDays.append(num)

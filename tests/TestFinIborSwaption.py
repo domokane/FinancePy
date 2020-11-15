@@ -376,7 +376,7 @@ def testFinIborSwaptionMatlabExamples():
     fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
-    # Pricing a PAYER
+    # Pricing a PAY
     swaptionType = FinSwapTypes.PAY
     swaption = FinIborSwaption(settlementDate,
                                 exerciseDate,
@@ -481,7 +481,7 @@ def testFinIborSwaptionMatlabExamples():
     floatDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     notional = 1000.0
 
-    # Pricing a PAYER
+    # Pricing a PAY
     swaptionType = FinSwapTypes.PAY
     swaption = FinIborSwaption(settlementDate,
                                 exerciseDate,

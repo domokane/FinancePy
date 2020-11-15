@@ -50,7 +50,7 @@ def testBlackModelCheck():
     fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
-    # Pricing a PAYER
+    # Pricing a PAY
     swaptionType = FinSwapTypes.PAY
     swaption = FinIborSwaption(settlementDate,
                                 exerciseDate,

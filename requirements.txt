@@ -1,9 +1,11 @@
 ##### Imports used in Test files but not required by financepy
-pandas>=1.1.1
-matplotlib>=3.3.1
+pandas>=1.0.5
+matplotlib>=3.2.2
 
 ##### Imports required by core library
-numba>=0.51.2 
-numpy>=1.19.1
-scipy>=1.5.2
+numba>=0.49 
+numpy>=1.18.5
+scipy>=1.5.0
+ipython>=7.16.1
+
 

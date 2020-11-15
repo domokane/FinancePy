@@ -2,24 +2,26 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import os
-import datetime as dt
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate, fromDatetime
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.bonds.FinBond import FinYTMCalcType
+import os
+import datetime as dt
+
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.products.bonds.FinBond import FinYTMCalcType
+from financepy.products.bonds.FinBond import FinBond
+from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.finutils.FinMath import ONE_MILLION
+from financepy.finutils.FinDate import FinDate, fromDatetime
+from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinCalendar import FinCalendarTypes
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -228,7 +230,7 @@ def test_FinBond():
 
             coupon = bond['coupon']/100.0
             cleanPrice = bond['mid']
-            bond = FinBond(issueDt, maturityDt, 
+            bond = FinBond(issueDt, maturityDt,
                            coupon, freqType, accrualType, 100)
 
             ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
@@ -249,7 +251,7 @@ def test_FinBond():
     coupon = 0.085
     face = ONE_MILLION
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    bond = FinBond(issueDate, maturityDate, 
+    bond = FinBond(issueDate, maturityDate,
                    coupon, freqType, accrualConvention, face)
 
     testCases.header("FIELD", "VALUE")
@@ -447,8 +449,9 @@ def test_FinBond():
 
 ###############################################################################
 
+
 def test_FinBondExDividend():
-    
+
     issueDate = FinDate(7, 9, 2000)
     maturityDate = FinDate(7, 9, 2020)
     coupon = 0.05
@@ -458,13 +461,14 @@ def test_FinBondExDividend():
     exDivDays = 7
     testCases.header("LABEL", "VALUE")
 
-    calendarType = FinCalendarTypes.UK        
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType, face)    
+    calendarType = FinCalendarTypes.UK
+    bond = FinBond(issueDate, maturityDate, coupon,
+                   freqType, accrualType, face)
     settlementDate = FinDate(7, 9, 2003)
     accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
     testCases.print("SettlementDate:", settlementDate)
     testCases.print("Accrued:", accrued)
-    
+
     ###########################################################################
     testCases.banner("=======================================================")
     testCases.header("SETTLEMENT", "ACCRUED")
@@ -477,17 +481,20 @@ def test_FinBondExDividend():
     face = 100.0
     exDivDays = 7
 
-    calendarType = FinCalendarTypes.UK        
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType, face)    
+    calendarType = FinCalendarTypes.UK
+    bond = FinBond(issueDate, maturityDate, coupon,
+                   freqType, accrualType, face)
 
     settlementDate = FinDate(25, 8, 2010)
 
     for _ in range(0, 13):
         settlementDate = settlementDate.addDays(1)
-        accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+        accrued = bond.calcAccruedInterest(
+            settlementDate, exDivDays, calendarType)
         testCases.print(settlementDate, accrued)
-        
+
 ###############################################################################
+
 
 test_FinBond()
 test_FinBondExDividend()
