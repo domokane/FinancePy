@@ -8,7 +8,7 @@ from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes, FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -23,11 +23,11 @@ class FinIborBasisSwap(object):
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment in a different LIBOR tenor. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
-    from a start date to a specified maturity date.
+    from an effective date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which is separate from the curves from
-    which the implied index rates are extracted. '''
+    is done on a supplied discount curve which can be different from the two 
+    index curves from which the implied index rates are extracted. '''
     
     def __init__(self,
                  effectiveDate: FinDate,  # Date interest starts to accrue
@@ -158,7 +158,8 @@ class FinIborBasisSwap(object):
 ##########################################################################
 
     def __repr__(self):
-        s = self._floatLeg1.__repr__()
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += self._floatLeg1.__repr__()
         s += "\n"
         s += self._floatLeg2.__repr__()
         return s

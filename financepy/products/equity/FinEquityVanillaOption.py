@@ -76,9 +76,9 @@ class FinEquityVanillaOption():
     For American calls and puts see the FinEquityAmericanOption class. '''
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiryDate: (FinDate, list),
                  strikePrice: (float, np.ndarray),
-                 optionType: FinOptionTypes,
+                 optionType: (FinOptionTypes, list),
                  numOptions: float = 1.0):
         ''' Create the Equity Vanilla option object by specifying the expiry
         date, the option strike, the option type and the number of options. '''
@@ -97,7 +97,7 @@ class FinEquityVanillaOption():
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valueDate: (FinDate, list),
               stockPrice: (np.ndarray, float),
               discountCurve: FinDiscountCurve,
               dividendYield: float,
@@ -490,7 +490,8 @@ class FinEquityVanillaOption():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("EXPIRY DATE", self._expiryDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("NUMBER", self._numOptions, "")

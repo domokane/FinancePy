@@ -343,7 +343,8 @@ class FinIborCapFloor():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("STRIKE COUPON", self._strikeRate * 100)
         s += labelToString("OPTION TYPE", str(self._optionType))

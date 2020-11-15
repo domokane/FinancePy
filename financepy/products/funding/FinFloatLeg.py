@@ -19,7 +19,7 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 class FinFloatLeg(object):
     ''' Class for managing the floating leg of a swap. A float leg consists of
     a sequence of flows calculated according to an ISDA schedule and with a 
-    coupon determined by an index curve which changes over life of the swap. '''
+    coupon determined by an index curve which changes over life of the swap.'''
     
     def __init__(self,
                  effectiveDate: FinDate,  # Date interest starts to accrue
@@ -78,10 +78,9 @@ class FinFloatLeg(object):
 ###############################################################################
 
     def generatePaymentDates(self):
+        ''' Generate the floating leg payment dates and accrual factors. The
+        coupons cannot be generated yet as we do not have the index curve. '''
 
-        # These are generated immediately as they are for the entire
-        # life of the swap. Given a valuation date we can determine
-        # which cash flows are in the future and value the swap
         scheduleDates = FinSchedule(self._effectiveDate,
                                     self._terminationDate,
                                     self._freqType,
@@ -133,11 +132,9 @@ class FinFloatLeg(object):
               indexCurve: FinDiscountCurve,
               firstFixingRate: float=None):
         ''' Value the floating leg with payments from an index curve and
-        discounting based on a supplied discount curve. The valuation date can
-        be the today date. In this case the price of the floating leg will not
-        be par (assuming we added on a principal repayment). This is only the
-        case if we set the valuation date to be the swap's actual settlement
-        date. '''
+        discounting based on a supplied discount curve as of the valuation date
+        supplied. For an existing swap, the user must enter the next fixing
+        coupon. '''
 
         if discountCurve is None:
             raise FinError("Discount curve is None")
