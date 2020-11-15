@@ -219,7 +219,7 @@ def test_FinBond():
         testCases.header("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS",
                          "ACCRUED", "YTM")
 
-        for index, bond in bondDataFrame.iterrows():
+        for _, bond in bondDataFrame.iterrows():
 
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')

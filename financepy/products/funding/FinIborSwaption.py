@@ -108,7 +108,6 @@ class FinIborSwaption():
         valuation. '''
 
         floatSpread = 0.0
-        principal = 0.0
 
         swap = FinIborSwap(self._exerciseDate,
                             self._maturityDate,
@@ -293,7 +292,6 @@ class FinIborSwaption():
         Black volatility for the standard arbitrage-free valuation. '''
 
         floatSpread = 0.0
-        principal = 0.0
 
         swap = FinIborSwap(self._exerciseDate,
                             self._maturityDate,

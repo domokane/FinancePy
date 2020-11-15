@@ -19,9 +19,6 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from ...products.funding.FinIborSwap import FinIborSwap
 
-from ...models.FinModelRatesHW import FinModelRatesHW
-from ...models.FinModelRatesBK import FinModelRatesBK
-from ...models.FinModelRatesBDT import FinModelRatesBDT
 from ...models.FinModelBlack import FinModelBlack
 from ...models.FinModelBlackShifted import FinModelBlackShifted
 from ...models.FinModelSABR import FinModelSABR

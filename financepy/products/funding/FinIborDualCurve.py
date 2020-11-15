@@ -139,7 +139,7 @@ class FinIborDualCurve(FinDiscountCurve):
                     raise FinError("First deposit starts before value date.")
 
                 if startDt < depoStartDate:
-                    depoStartDate = startDate
+                    depoStartDate = startDt
 
             for depo in iborDeposits:
                 startDt = depo._startDate

@@ -41,7 +41,7 @@ def test_FinBondYieldCurve():
     bonds = []
     ylds = []
 
-    for index, bond in bondDataFrame.iterrows():
+    for _, bond in bondDataFrame.iterrows():
 
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')

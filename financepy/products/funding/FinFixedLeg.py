@@ -5,9 +5,8 @@
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
+from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule

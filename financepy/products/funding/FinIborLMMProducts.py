@@ -22,7 +22,7 @@ from ...finutils.FinFrequency import FinFrequencyTypes
 from ...finutils.FinDayCount import FinDayCount
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
 
 from ...models.FinModelRatesLMM import LMMSimulateFwds1F
@@ -34,7 +34,6 @@ from ...models.FinModelRatesLMM import LMMCapFlrPricer
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinMath import ONE_MILLION
 
-from ...finutils.FinGlobalTypes import FinExerciseTypes
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...finutils.FinGlobalTypes import FinCapFloorTypes
 

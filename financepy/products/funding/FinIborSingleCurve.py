@@ -20,7 +20,6 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.funding.FinIborDeposit import FinIborDeposit
 from ...products.funding.FinIborFRA import FinIborFRA
 from ...products.funding.FinIborSwap import FinIborSwap
-#from ...products.funding.FinIborSwapNew import FinIborSwapNew
 
 swaptol = 1e-10
 
@@ -70,21 +69,20 @@ def _costFunction(dfs, *args):
 
 #    print("Discount factors:", dfs)
 
-    curve = args[0]
+    liborCurve = args[0]
     valuationDate = liborCurve._valuationDate
-    curve._dfs = dfs
+    liborCurve._dfs = dfs
     
     times = liborCurve._times
     values = -np.log(dfs)
 
     # For curves that need a fit function, we fit it now 
-    curve._interpolator.fit(curve._times, curve._dfs)     
+    liborCurve._interpolator.fit(liborCurve._times, liborCurve._dfs)
 
-
-    if curve._interpType == FinInterpTypes.CUBIC_SPLINE_LOGDFS:
-        curve._splineFunction = CubicSpline(times, values)
+    if liborCurve._interpType == FinInterpTypes.CUBIC_SPLINE_LOGDFS:
+        liborCurve._splineFunction = CubicSpline(times, values)
     elif liborCurve._interpType == FinInterpTypes.PCHIP_CUBIC_SPLINE:
-        curve._splineFunction = PchipInterpolator(times, values)
+        liborCurve._splineFunction = PchipInterpolator(times, values)
 
     cost = 0.0
     for depo in liborCurve._usedDeposits:

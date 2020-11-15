@@ -23,7 +23,6 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-
 def test_FinBondPortfolio():
 
     import pandas as pd
@@ -40,7 +39,7 @@ def test_FinBondPortfolio():
 
     for accrualType in FinDayCountTypes:
 
-        for index, bond in bondDataFrame.iterrows():
+        for _, bond in bondDataFrame.iterrows():
 
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
