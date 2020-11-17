@@ -14,9 +14,9 @@ from ..finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-class FinModelMertonCredit():
+class FinModelMertonCreditMkt():
     ''' Implementation of the Merton Credit Model according to the original
-    formulation by Merton with the inputs being the asset value of the firm, 
+    formulation by Merton with the inputs being the equity value of the firm, 
     the liabilities (bond face), the time to maturity in years, the risk-free 
     rate, the asset growth rate and the volatility. '''
 

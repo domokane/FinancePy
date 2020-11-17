@@ -8,6 +8,8 @@ from numba import njit, boolean, int64
 import numpy as np
 
 
+###############################################################################    
+
 from enum import Enum
 
 class FinDateFormatTypes(Enum):
@@ -25,6 +27,7 @@ class FinDateFormatTypes(Enum):
 gDateFormatType = FinDateFormatTypes.UK_LONG
 
 def setDateFormatType(formatType):
+    ''' Function that sets the global date format type. '''
     global gDateFormatType
     gDateFormatType = formatType
 

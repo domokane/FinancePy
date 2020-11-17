@@ -44,8 +44,7 @@ def buildIborCurve(valuationDate):
     settlementDate = valuationDate.addWeekDays(spotDays)
 
     maturityDate = settlementDate.addMonths(1)
-    depo1 = FinIborDeposit(
-        settlementDate,
+    depo1 = FinIborDeposit(settlementDate,
         maturityDate,
         depositRate,
         depoDCCType)

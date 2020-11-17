@@ -66,7 +66,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     putPrices = []
 
     putDate = FinDate(1, 1, 2008)
-    for i in range(0, 24):
+    for _ in range(0, 24):
         putDates.append(putDate)
         putPrices.append(100)
         putDate = putDate.addMonths(1)

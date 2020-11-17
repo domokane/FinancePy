@@ -19,6 +19,8 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...models.FinModel import FinModel
 from ...models.FinModelBlackScholes import FinModelBlackScholes
 from ...models.FinSobol import getGaussianSobol
+from ...models.FinModelBlackScholesMC import _valueMC_NUMBA
+from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA
 
 from scipy.stats import norm
 N = norm.cdf
@@ -427,7 +429,65 @@ class FinEquityVanillaOption():
                                 tol=1e-5, maxiter=50, fprime2=None)
         return sigma
 
-# 
+###############################################################################
+
+    def valueMC_NUMBA(self,
+                      valueDate: FinDate,
+                      stockPrice: float,
+                      discountCurve: FinDiscountCurve,
+                      dividendYield: float,
+                      model:FinModel,
+                      numPaths: int = 10000,
+                      seed: int = 4242,
+                      useSobol: bool = False):
+
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
+        vol = model._volatility
+
+        v = _valueMC_NUMBA(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed)
+
+        return v
+    
+    
+###############################################################################
+
+    def valueMC_NONUMBA(self,
+                      valueDate: FinDate,
+                      stockPrice: float,
+                      discountCurve: FinDiscountCurve,
+                      dividendYield: float,
+                      model:FinModel,
+                      numPaths: int = 10000,
+                      seed: int = 4242,
+                      useSobol: bool = False):
+
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
+        vol = model._volatility
+
+        v = _valueMC_NONUMBA(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed)
+
+        return v
+
 ###############################################################################
 
     def valueMC(self,
