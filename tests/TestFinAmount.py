@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 import sys
 sys.path.append("..")

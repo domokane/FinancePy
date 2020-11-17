@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
@@ -388,7 +388,7 @@ def test_FinBondOptionZEROVOLConvergence():
 
     dfExpiry = discountCurve.df(expiryDate)
     fwdCleanValue = bond.cleanPriceFromDiscountCurve(expiryDate, discountCurve)
-    fwdFullValue = bond.fullPriceFromDiscountCurve(expiryDate, discountCurve)
+#    fwdFullValue = bond.fullPriceFromDiscountCurve(expiryDate, discountCurve)
 #    print("BOND FwdCleanBondPx", fwdCleanValue)
 #    print("BOND FwdFullBondPx", fwdFullValue)
 #    print("BOND Accrued:", bond._accruedInterest)

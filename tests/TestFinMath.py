@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinMath import normcdf, norminvcdf
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

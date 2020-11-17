@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted

@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 from financepy.finutils.FinSchedule import FinSchedule

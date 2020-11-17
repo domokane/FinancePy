@@ -9,7 +9,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 from financepy.products.funding.FinIborCapFloor import FinIborCapFloor

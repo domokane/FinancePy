@@ -18,7 +18,7 @@ from financepy.products.funding.FinFixedLeg import FinFixedLeg
 from financepy.products.funding.FinFloatLeg import FinFloatLeg
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

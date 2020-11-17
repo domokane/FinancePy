@@ -7,7 +7,7 @@ sys.path.append("..")
 
 import numpy as np
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

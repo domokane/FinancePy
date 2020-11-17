@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes

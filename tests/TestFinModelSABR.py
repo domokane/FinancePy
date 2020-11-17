@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.FinModelSABR import blackVolFromSABR
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

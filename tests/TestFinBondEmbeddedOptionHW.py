@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinDate import FinDate
@@ -138,7 +138,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     callDates = [nextCallDate]
     callPrices = [100.0]
 
-    for i in range(1, 24):
+    for _ in range(1, 24):
         nextCallDate = nextCallDate.addMonths(3)
         callDates.append(nextCallDate)
         callPrices.append(100.0)

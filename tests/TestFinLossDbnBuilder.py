@@ -9,7 +9,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinModelGaussianCopula1F import lossDbnRecursionGCD
 from financepy.models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial

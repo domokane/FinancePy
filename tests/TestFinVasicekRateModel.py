@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.FinModelRatesVasicek import zeroPrice, zeroPrice_MC
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

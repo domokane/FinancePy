@@ -8,7 +8,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinModelHeston import FinModelHeston, FinHestonNumericalScheme
 from financepy.finutils.FinGlobalTypes import FinOptionTypes

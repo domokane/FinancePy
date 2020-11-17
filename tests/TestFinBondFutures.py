@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from .FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.bonds.FinBondFuture import FinBondFuture
 from financepy.products.bonds.FinBond import FinBond
