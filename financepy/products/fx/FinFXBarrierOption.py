@@ -49,6 +49,7 @@ class FinFXBarrierOption(FinFXOption):
 
         self._expiryDate = expiryDate
         self._strikeFXRate = float(strikeFXRate)
+        self._currencyPair = currencyPair
         self._barrierLevel = float(barrierLevel)
         self._numObservationsPerYear = int(numObservationsPerYear)
         self._optionType = optionType
@@ -355,4 +356,27 @@ class FinFXBarrierOption(FinFXOption):
 
         return v
 
-##########################################################################
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE FX RATE", self._strikeFXRate)
+        s += labelToString("CURRENCY PAIR", self._currencyPair)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("BARRIER LEVEL", self._barrierLevel)
+        s += labelToString("NUM OBSERVATIONS", self._numObservationsPerYear)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("NOTIONAL CURRENCY", self._notionalCurrency, "")
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        print(self)
+
+
+###############################################################################
+
