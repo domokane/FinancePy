@@ -14,7 +14,7 @@ from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
 setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
 # I put this here to get the library loaded and header printed before loop
-from .FinTestCases import FinTestCases
+from FinTestCases import FinTestCases
 
 print("Looking in folder:", dirname(__file__))
 modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
