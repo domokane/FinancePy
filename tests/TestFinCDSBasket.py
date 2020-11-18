@@ -9,7 +9,7 @@ from os.path import dirname, join
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSBasket import FinCDSBasket

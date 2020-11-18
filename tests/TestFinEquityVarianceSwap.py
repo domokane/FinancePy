@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve

@@ -7,7 +7,7 @@ sys.path.append("..")
 
 import os
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSTranche import FinLossDistributionBuilder
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio

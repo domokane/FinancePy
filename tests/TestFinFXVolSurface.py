@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface

@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTree
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes

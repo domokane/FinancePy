@@ -12,7 +12,7 @@ from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinDate import FinDate
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

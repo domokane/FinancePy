@@ -6,7 +6,7 @@
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
 from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.finutils.FinGlobalTypes import FinOptionTypes

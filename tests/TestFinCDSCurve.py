@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.funding.FinIborSwap import FinIborSwap

@@ -6,7 +6,7 @@ import sys
 import numpy as np
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve

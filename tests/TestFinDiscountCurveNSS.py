@@ -11,7 +11,7 @@ from financepy.finutils.FinMath import scale
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False

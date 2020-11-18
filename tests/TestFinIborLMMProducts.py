@@ -19,7 +19,7 @@ from financepy.products.funding.FinIborLMMProducts import FinIborLMMProducts
 
 from financepy.products.funding.FinIborCapFloor import FinIborCapFloor
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOption
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption

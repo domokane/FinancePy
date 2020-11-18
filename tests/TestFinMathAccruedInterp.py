@@ -9,7 +9,7 @@ import sys
 sys.path.append("..")
 
 from financepy.finutils.FinMath import accruedInterpolator
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

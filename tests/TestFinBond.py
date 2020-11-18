@@ -20,7 +20,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

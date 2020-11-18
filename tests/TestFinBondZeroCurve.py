@@ -14,7 +14,7 @@ from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondZeroCurve import FinBondZeroCurve
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False

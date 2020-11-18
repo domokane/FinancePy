@@ -9,7 +9,7 @@ import numpy as np
 from math import sqrt
 import time
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOption
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOptionTypes

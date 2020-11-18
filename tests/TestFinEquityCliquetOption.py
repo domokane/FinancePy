@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityCliquetOption import FinEquityCliquetOption
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes

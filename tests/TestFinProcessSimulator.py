@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from .FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.models.FinProcessSimulator import FinVasicekNumericalScheme
 from financepy.models.FinProcessSimulator import FinCIRNumericalScheme
