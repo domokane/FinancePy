@@ -845,10 +845,10 @@ if 1 == 1:
     print("pdflatex " + userGuideFileName)
     os.system("pdflatex " + userGuideFileName)
     pdfFileName1 = fileName + ".pdf"
-    pdfFileName2 = '../' + pdfFileName1
+    pdfFileName2 = '..\\' + pdfFileName1
     # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
-    print("Copying ", pdfFileName1, " to ", pdfFileName2)
-    shutil.copyfile(pdfFileName1, pdfFileName2)
+    print("Moving ", pdfFileName1, " to ", pdfFileName2)
+    shutil.move(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
-    open_file(pdfFileName1)
+    open_file(pdfFileName2)

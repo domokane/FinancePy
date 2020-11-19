@@ -15,7 +15,7 @@ from .FinModelMertonCredit import FinModelMertonCredit
 
 ###############################################################################
 
-def fobj(x, *args):
+def _fobj(x, *args):
     ''' Find value of asset value and vol that fit equity value and vol '''
 
     A, vA = x
@@ -46,7 +46,8 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
     formulation by Merton with the inputs being the equity value of the firm, 
     the liabilities (bond face), the time to maturity in years, the risk-free 
     rate, the asset growth rate and the equity volatility. The asset value and
-    asset volatility are computed internally. '''
+    asset volatility are computed internally by solving two non-linear 
+    simultaneous equations. '''
 
     def __init__(self,
                  equityValue: (float, list, np.ndarray),
@@ -153,7 +154,7 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
             # I initialise asset value and vol to equity value and vol
             x0 = np.array([argtuple[0], argtuple[1]])
 
-            result = optimize.minimize(fobj, x0, args=argtuple, tol = 1e-9)
+            result = optimize.minimize(_fobj, x0, args=argtuple, tol = 1e-9)
                 
             self._A.append(result.x[0])
             self._vA.append(result.x[1])
