@@ -9,8 +9,6 @@ from os.path import dirname, join
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
 from financepy.products.credit.FinCDSBasket import FinCDSBasket
 from financepy.products.credit.FinCDS import FinCDS
@@ -24,8 +22,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.models.FinGBMProcess import getPathsAssets
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
-
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

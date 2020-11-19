@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import numpy as np
+
 import sys
 sys.path.append("..")
 
-import numpy as np
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
@@ -17,6 +16,7 @@ from financepy.products.inflation.FinInflationIndexCurve import FinInflationInde
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

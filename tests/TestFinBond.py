@@ -2,13 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import sys
-sys.path.append("..")
-
 import os
 import datetime as dt
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+import sys
+sys.path.append("..")
 
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.products.bonds.FinBond import FinYTMCalcType
@@ -23,6 +21,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

@@ -3,13 +3,10 @@
 ###############################################################################
 
 import datetime as dt
-
 import os
 
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
@@ -18,7 +15,7 @@ from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondYieldCurve import FinBondYieldCurve
 from financepy.products.bonds.FinBondYieldCurveModel import *
 
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

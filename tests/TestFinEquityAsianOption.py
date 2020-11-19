@@ -7,18 +7,14 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAsianOption import FinEquityAsianOption
 from financepy.products.equity.FinEquityAsianOption import FinAsianOptionValuationMethods
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-
 from financepy.finutils.FinDate import FinDate
 
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

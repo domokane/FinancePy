@@ -5,10 +5,10 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.FinModelMertonCredit import FinModelMertonCredit
 from financepy.models.FinModelMertonCreditMkt import FinModelMertonCreditMkt
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

@@ -4,11 +4,10 @@
 
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
@@ -22,8 +21,7 @@ from financepy.products.bonds.FinBondOption import FinBondOption
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.models.FinModelRatesHW import FinModelRatesHW, FinHWEuropeanCalcType
 
-import matplotlib.pyplot as plt
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False

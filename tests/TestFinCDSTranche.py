@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import os
+import time
+
 import sys
 sys.path.append("..")
-
-import os
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.credit.FinCDSTranche import FinLossDistributionBuilder
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
@@ -21,10 +20,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 
-import time
-
-#import numpy as np
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

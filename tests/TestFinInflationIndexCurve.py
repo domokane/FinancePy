@@ -5,13 +5,13 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinDate import FinDate
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+##############################################################################
 
 def test_FinInflationIndexCurve():
 

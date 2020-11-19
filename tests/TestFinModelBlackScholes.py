@@ -2,14 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import time
-import numpy as np
-import matplotlib.pyplot as plt
-
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -24,7 +18,10 @@ from financepy.models.FinModelBlackScholes import FinModelBlackScholesTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+##############################################################################
 
 # TODO Complete output of results to log files
 

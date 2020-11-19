@@ -1,6 +1,9 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import time as time
+import numpy as np
 
 import sys
 sys.path.append("..")
@@ -14,7 +17,6 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.products.funding.FinIborSwaption import FinSwapTypes
 from financepy.products.funding.FinIborSwaption import FinIborSwaption
 from financepy.finutils.FinHelperFunctions import checkVectorDifferences
-
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsNF
 from financepy.models.FinModelRatesLMM import LMMSimulateFwds1F
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsMF
@@ -27,15 +29,9 @@ from financepy.models.FinModelRatesLMM import LMMSwapPricer
 from financepy.models.FinModelRatesLMM import LMMFwdFwdCorrelation
 from financepy.models.FinModelRatesLMM import LMMRatchetCapletPricer
 from financepy.models.FinModelRatesLMM import LMMStickyCapletPricer
-# from financepy.models.FinModelRatesLMM import LMMFlexiCapPricer
-# from financepy.models.FinModelRatesLMM import LMMPrintForwards
-
-import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
 
 ###############################################################################
 

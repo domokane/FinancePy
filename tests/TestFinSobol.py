@@ -8,7 +8,6 @@ sys.path.append("..")
 from financepy.models.FinSobol import getUniformSobol, getGaussianSobol
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

@@ -5,14 +5,14 @@
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+##############################################################################
 
 def test_FinDayCount():
 

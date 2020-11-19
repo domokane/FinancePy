@@ -2,13 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+
 import sys
 sys.path.append("..")
 
-import numpy as np
-
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################

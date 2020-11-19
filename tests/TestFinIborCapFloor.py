@@ -9,8 +9,6 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
 from financepy.products.funding.FinIborCapFloor import FinIborCapFloor
 from financepy.products.funding.FinIborSwap import FinIborSwap
@@ -44,8 +42,10 @@ from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinSchedule import FinSchedule
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+##############################################################################
 
 def test_FinIborDepositsAndSwaps(valuationDate):
 

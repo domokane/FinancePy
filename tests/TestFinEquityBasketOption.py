@@ -2,21 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
 from financepy.finutils.FinDate import FinDate
-import numpy as np
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
 
 ###############################################################################
 

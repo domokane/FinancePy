@@ -2,25 +2,25 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.FinDiscountCurvePoly import FinDiscountCurvePoly
 from financepy.finutils.FinDate import FinDate
-import numpy as np
 
-##########################################################################
+from FinTestCases import FinTestCases, globalTestCaseMode
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
+##############################################################################
 # TODO
 # Inherit from FinDiscountCurve and add df method
 # Put in a convention for the rate
 # Use Frequency object
-##########################################################################
+##############################################################################
 
 PLOT_GRAPHS = False
-
-testCases = FinTestCases(__file__, globalTestCaseMode)
-
 
 def test_FinDiscountCurvePolynomial():
 

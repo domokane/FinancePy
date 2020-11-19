@@ -9,11 +9,10 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.models.FinModelGaussianCopula1F import lossDbnRecursionGCD
 from financepy.models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False

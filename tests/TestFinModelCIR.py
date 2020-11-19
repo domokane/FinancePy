@@ -8,11 +8,10 @@ import time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.models.FinModelRatesCIR import zeroPrice_MC, zeroPrice
 from financepy.models.FinModelRatesCIR import FinCIRNumericalScheme
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

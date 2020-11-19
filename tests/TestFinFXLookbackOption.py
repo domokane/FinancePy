@@ -16,6 +16,7 @@ from financepy.finutils.FinDate import FinDate
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
 
 def test_FinEquityLookBackOption():
     valueDate = FinDate(2015, 1, 1)

@@ -6,8 +6,6 @@ import sys
 import numpy as np
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborSwap import FinIborSwap
@@ -23,6 +21,7 @@ from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

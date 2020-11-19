@@ -9,8 +9,6 @@ import time as time
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
@@ -24,12 +22,12 @@ from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
-
 from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.funding.FinIborDualCurve import FinIborDualCurve
 from financepy.products.funding.FinOISCurve import FinOISCurve
 from financepy.products.funding.FinOIS import FinOIS
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False

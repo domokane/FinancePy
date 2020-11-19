@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+##############################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+##############################################################################
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,8 +8,6 @@ import time
 
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelRatesHW import FinModelRatesHW, FinHWEuropeanCalcType
@@ -19,6 +19,7 @@ from financepy.finutils.FinGlobalVariables import gDaysInYear
 from financepy.finutils.FinHelperFunctions import printTree
 from financepy.finutils.FinGlobalTypes import FinExerciseTypes
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

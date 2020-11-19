@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTree
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
@@ -14,15 +14,13 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffT
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.finutils.FinDate import FinDate
-
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
-import numpy as np
-import time
-
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+###############################################################################
 
 def test_FinBinomialTree():
 

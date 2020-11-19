@@ -3,15 +3,13 @@
 ###############################################################################
 
 import numpy as np
-
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.finutils.FinDate import FinDate
 
+from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
