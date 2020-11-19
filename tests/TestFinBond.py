@@ -8,6 +8,8 @@ sys.path.append("..")
 import os
 import datetime as dt
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.products.bonds.FinBond import FinYTMCalcType
 from financepy.products.bonds.FinBond import FinBond
@@ -20,8 +22,6 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from FinTestCases import FinTestCases, globalTestCaseMode
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

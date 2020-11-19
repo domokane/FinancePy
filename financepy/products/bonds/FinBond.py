@@ -443,7 +443,7 @@ class FinBond(object):
         (accFactor, num, _) = dc.yearFrac(self._pcd,
                                             settlementDate,
                                             self._ncd, 
-                                            self._frequency)
+                                            self._freqType)
         
         if settlementDate > exDividendDate:
             accFactor = accFactor - 1.0 / self._frequency
