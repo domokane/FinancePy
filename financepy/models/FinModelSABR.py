@@ -32,6 +32,7 @@ def blackVolFromSABR(alpha, beta, rho, nu, f, k, t):
         z = nu / alpha * (fk**(b / 2.0)) * logM
         denom = (fk**(b / 2)) * (1.0 + (b**2) / 24.0 *
                                  (logM**2) + (b**4) / 1920.0 * (logM**4))
+
         x = np.log((np.sqrt(1.0 - 2.0*rho*z + z**2.0) + z - rho)/(1.0 - rho))
         sigma = num*z/(denom*x)
 
