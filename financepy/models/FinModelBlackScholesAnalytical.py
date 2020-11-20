@@ -5,7 +5,6 @@
 import numpy as np
 from scipy import optimize
 
-from ..finutils.FinMath import normpdf as NP
 from ..finutils.FinGlobalVariables import gSmall
 
 from scipy.stats import norm

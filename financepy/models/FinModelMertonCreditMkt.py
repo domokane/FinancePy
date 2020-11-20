@@ -112,12 +112,12 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
             raise FinError("Len mu must be 1 or maximum length of arrays")
 
         self._nmax = nmax
-        self.solveForAssetValueAndVol()
+        self._solveForAssetValueAndVol()
         self._D = self.debtValue()
         
 ###############################################################################
 
-    def solveForAssetValueAndVol(self):
+    def _solveForAssetValueAndVol(self):
 
         self._A = []
         self._vA = []

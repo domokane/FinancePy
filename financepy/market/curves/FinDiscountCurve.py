@@ -427,7 +427,8 @@ class FinDiscountCurve():
 ###############################################################################
 
     def __repr__(self):
-        s = type(self).__name__ + "\n"
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         numPoints = len(self._dfDates)
         s += labelToString("DATES", "DISCOUNT FACTORS")
         for i in range(0, numPoints):

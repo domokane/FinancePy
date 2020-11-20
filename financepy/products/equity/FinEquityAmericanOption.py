@@ -8,16 +8,12 @@ import numpy as np
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
-from ...products.equity.FinEquityModelTypes import FinEquityModel
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from ...models.FinModel import FinModel
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...models.FinModelBlackScholes import FinModelBlackScholesTypes
-from ...models.FinModelCRRTree import crrTreeValAvg
 
 from scipy.stats import norm
 N = norm.cdf

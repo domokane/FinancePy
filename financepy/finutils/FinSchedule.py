@@ -201,7 +201,8 @@ class FinSchedule(object):
         ''' Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations. '''
 
-        s = labelToString("EFFECTIVE DATE", self._effectiveDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EFFECTIVE DATE", self._effectiveDate)
         s += labelToString("END DATE", self._terminationDate)
         s += labelToString("FREQUENCY", self._freqType)
         s += labelToString("CALENDAR", self._calendarType)

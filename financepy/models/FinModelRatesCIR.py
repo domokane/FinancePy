@@ -38,6 +38,17 @@ class FinModelRatesCIR():
         self._b = b
         self._sigma = sigma
 
+    def __repr__(self):
+        ''' Return string with class details. '''
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("Sigma", self._sigma)
+        s += labelToString("a", self._a)
+        s += labelToString("b", self._b)
+        return s
+
+###############################################################################
+
 ###############################################################################
 
 

@@ -11,7 +11,7 @@ from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -252,7 +252,9 @@ class FinIborSwap(object):
 ##########################################################################
 
     def __repr__(self):
-        s = self._fixedLeg.__repr__()
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += self._fixedLeg.__repr__()
         s += "\n"
         s += self._floatLeg.__repr__()
         return s

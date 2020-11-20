@@ -4,11 +4,9 @@
 
 # TODO Fix this
 
-import numpy as np
-
 from scipy.stats import norm
-from ..finutils.FinGlobalVariables import gSmall
 from ..finutils.FinGlobalTypes import FinOptionTypes
+from ..finutils.FinError import FinError
 
 N = norm.cdf
 

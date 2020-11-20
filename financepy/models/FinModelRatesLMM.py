@@ -3,12 +3,12 @@
 ##############################################################################
 
 import numpy as np
-
-from financepy.finutils.FinError import FinError
-from financepy.finutils.FinMath import N
 from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
-from financepy.models.FinSobol import getUniformSobol
-from financepy.finutils.FinMath import norminvcdf
+
+from ...finutils.FinError import FinError
+from ...finutils.FinMath import N
+from ...finutils.FinMath import norminvcdf
+from ...models.FinSobol import getUniformSobol
 
 # TO DO: SHITED LOGNORMAL
 # TO DO: TERMINAL MEASURE

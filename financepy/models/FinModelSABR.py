@@ -2,9 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from numba import njit, float64
-from ..finutils.FinGlobalTypes import FinOptionTypes
 import numpy as np
+from numba import njit, float64
+
+from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinMath import N
 from ..finutils.FinError import FinError
 

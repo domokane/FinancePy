@@ -268,7 +268,8 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("START DATE", self._startDate)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("START DATE", self._startDate)
         s += labelToString("MATURITY DATE", self._maturityDate)
         s += labelToString("STRIKE VARIANCE", self._strikeVariance)
         s += labelToString("NOTIONAL", self._notional)

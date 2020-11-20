@@ -156,7 +156,8 @@ class FinDiscountCurveNSS(FinDiscountCurve):
 ###############################################################################
 
     def __repr__(self):
-        s = type(self).__name__ + "\n"
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("PARAMETER", "VALUE")
         s += labelToString("BETA0", self._beta0)
         s += labelToString("BETA1", self._beta1)

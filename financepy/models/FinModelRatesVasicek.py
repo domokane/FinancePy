@@ -5,6 +5,7 @@
 from math import sqrt, exp
 from numba import njit, float64, int64
 import numpy as np
+
 from ..finutils.FinHelperFunctions import labelToString
 
 ##########################################################################
@@ -24,9 +25,10 @@ class FinModelRatesVasicek():
         self._sigma = sigma
 
     def __repr__(self):
-        s = labelToString("a", self._a)
-        s = labelToString("b", self._b)
-        s = labelToString("sigma", self._sigma)
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("a", self._a)
+        s += labelToString("b", self._b)
+        s += labelToString("sigma", self._sigma)
         return s
 
 ###############################################################################

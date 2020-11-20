@@ -12,7 +12,7 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...finutils.FinDayCount import FinDayCountTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
 from ...finutils.FinSchedule import FinSchedule

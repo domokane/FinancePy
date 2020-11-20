@@ -183,8 +183,9 @@ class FinIborCapVolCurve():
     def __repr__(self):
         ''' Output the contents of the FinCapVolCurve class object. '''
 
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         numTimes = len(self._times)
-        s = " TIME     TAU    CAP VOL    CAPLET VOL"
+        s += " TIME     TAU    CAP VOL    CAPLET VOL"
         for i in range(0, numTimes):
             t = self._times[i]
             tau = self._taus[i]

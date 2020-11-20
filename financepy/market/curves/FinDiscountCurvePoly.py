@@ -125,7 +125,8 @@ class FinDiscountCurvePoly(FinDiscountCurve):
 
     def __repr__(self):
         ''' Display internal parameters of curve. '''
-        s = type(self).__name__ + "\n"
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("POWER", "COEFFICIENT")
         for i in range(0, len(self._coefficients)):
             s += labelToString(str(i), self._coefficients[i])

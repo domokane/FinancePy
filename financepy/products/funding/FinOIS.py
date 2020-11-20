@@ -218,7 +218,8 @@ class FinOIS(object):
 ##########################################################################
 
     def __repr__(self):
-        s = self._fixedLeg.__repr__()
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += self._fixedLeg.__repr__()
         s += "\n"
         s += self._floatLeg.__repr__()
         return s

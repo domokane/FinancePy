@@ -3,16 +3,12 @@
 ##############################################################################
 
 from ...finutils.FinGlobalVariables import gDaysInYear
-from ...models.FinModelRatesHW import FinModelRatesHW
-from ...models.FinModelRatesBK import FinModelRatesBK
-from ...models.FinModelRatesBDT import FinModelRatesBDT
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from .FinBond import FinBond
-from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinGlobalTypes import FinOptionTypes, FinExerciseTypes
+from ...products.bonds.FinBond import FinBond
 
 from enum import Enum
 import numpy as np

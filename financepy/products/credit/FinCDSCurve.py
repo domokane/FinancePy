@@ -2,10 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from math import log
 import numpy as np
 import scipy.optimize as optimize
-from numba import njit, float64
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError

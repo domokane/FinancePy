@@ -4,6 +4,7 @@
 
 import numpy as np
 from numba import njit, float64
+
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinError import FinError
 from ..finutils.FinMath import N

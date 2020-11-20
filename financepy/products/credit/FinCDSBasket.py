@@ -28,7 +28,7 @@ from ...market.curves.FinInterpolator import interpolate, FinInterpTypes
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString, tableToString
+from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # TODO: Convert functions to use NUMBA!!

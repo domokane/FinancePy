@@ -145,7 +145,8 @@ class FinDiscountCurvePWF(FinDiscountCurve):
 ###############################################################################
 
     def __repr__(self):
-        s = type(self).__name__ + "\n"
+
+        s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("DATE", "ZERO RATE")
         for i in range(0, len(self._zeroDates)):
             s += labelToString(self._zeroDates[i], self._zeroRates[i])
