@@ -11,31 +11,28 @@ from scipy.stats import norm
 
 N = norm.cdf
 
-
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
 ###############################################################################
 
-def bsValue(s:float, 
-            t:float, 
-            k:float, 
-            r:float, 
-            q:float, 
-            v:float, 
-            phi:int):   # +1 for call, -1 for put
-    ''' Price a derivative using Black-Scholes model where 
-    phi is +1 for a call, and
-    phi is -1 for a put.'''
+def bsValue(s:float, # Stock Price today
+            t:float, # Years to Expiry
+            k:float, # Strike Price
+            r:float, # Risk Free Rate
+            q:float, # Dividend Yield
+            v:float, # Volatility
+            phi:int): # +1 for call, -1 for put
+    ''' Price a derivative using Black-Scholes model. ''' 
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
+    vsqrtT = v * np.sqrt(t)
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / v / sqrtT + v * sqrtT / 2.0
-    d2 = d1 - v * sqrtT
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    d2 = d1 - vsqrtT
     v = phi * ss * N(phi*d1) - phi * kk * N(phi*d2)
     return v
 

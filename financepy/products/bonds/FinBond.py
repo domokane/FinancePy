@@ -26,7 +26,7 @@ import numpy as np
 from ...finutils.FinDate import FinDate
 from ...finutils.FinError import FinError
 from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 from ...finutils.FinSchedule import FinSchedule
 from ...finutils.FinCalendar import FinCalendar
@@ -528,7 +528,11 @@ class FinBond(object):
             
             # coupons paid on a settlement date are included
             if dt >= settlementDate:
+
                 t = (dt - settlementDate) / gDaysInYear
+
+                t = np.maximum(t, gSmall)
+
                 df = discountCurve.df(dt)
                 # determine the Ibor implied zero rate
                 r = f * (np.power(df, -1.0 / t / f) - 1.0)
@@ -602,17 +606,78 @@ class FinBond(object):
 
 ###############################################################################
 
-    def cleanPriceFromSurvivalCurve(self,
-                                    discountCurve: FinDiscountCurve,
-                                    survivalCurve: FinDiscountCurve,
-                                    recoveryRate: float):
+    def fullPriceFromSurvivalCurve(self,
+                                   settlementDate: FinDate,
+                                   discountCurve: FinDiscountCurve,
+                                   survivalCurve: FinDiscountCurve,
+                                   recoveryRate: float):
         ''' Calculate discounted present value of flows assuming default model.
-        The survival curve treats 
-        This has not been completed. '''
+        The survival curve treats the coupons as zero recovery payments while
+        the recovery fraction of the par amount is paid at default. For the 
+        defaulting principal we discretise the time steps using the coupon
+        payment times. A finer discretisation may handle the time value with
+        more accuracy. I reduce any error by averaging period start and period
+        end payment present values. ''' 
 
-        print("This function has not been implemented yet")
-        return
+        f = self._frequency
+        c = self._coupon
 
+        pv = 0.0        
+        prevQ = 1.0
+        prevDf = 1.0
+
+        defaultingPrincipalPVPayStart = 0.0
+        defaultingPrincipalPVPayEnd = 0.0
+
+        for dt in self._flowDates[1:]:
+            
+            # coupons paid on a settlement date are included
+            if dt >= settlementDate:
+
+                df = discountCurve.df(dt)
+                q = survivalCurve.survProb(dt)
+
+                # Add PV of coupon conditional on surviving to payment date  
+                # Any default results in all subsequent coupons being lost
+                # with zero recovery
+
+                pv = pv + (c / f) * df * q
+                dq = q - prevQ
+
+                defaultingPrincipalPVPayStart += -dq * recoveryRate * prevDf
+                defaultingPrincipalPVPayStart += -dq * recoveryRate * df
+
+                # Add on PV of principal if default occurs in coupon period
+                prevQ = q
+                prevDf = df
+
+        pv = pv + 0.50 * defaultingPrincipalPVPayStart
+        pv = pv + 0.50 * defaultingPrincipalPVPayEnd
+        pv = pv + df * q * self._redemption
+        pv *= self._par
+        return pv
+
+###############################################################################
+
+    def cleanPriceFromSurvivalCurve(self,
+                                   settlementDate: FinDate,
+                                   discountCurve: FinDiscountCurve,
+                                   survivalCurve: FinDiscountCurve,
+                                   recoveryRate: float):
+        ''' Calculate clean price value of flows assuming default model.
+        The survival curve treats the coupons as zero recovery payments while
+        the recovery fraction of the par amount is paid at default. ''' 
+
+        self.calcAccruedInterest(settlementDate)
+
+        fullPrice = self.fullPriceFromSurvivalCurve(settlementDate,
+                                                    discountCurve,
+                                                    survivalCurve,
+                                                    recoveryRate)
+        
+        cleanPrice = fullPrice - self._accruedInterest
+        return cleanPrice
+    
 ###############################################################################
 
     def __repr__(self):
