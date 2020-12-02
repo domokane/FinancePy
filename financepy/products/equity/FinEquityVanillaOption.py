@@ -18,9 +18,12 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...models.FinModel import FinModel
 from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...models.FinSobol import getGaussianSobol
-from ...models.FinModelBlackScholesMC import _valueMC_NUMBA
-from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA
+
+from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA_NONUMPY
+from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_NUMBA
+from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_ONLY
+from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_ONLY
+from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_PARALLEL
 
 from scipy.stats import norm
 N = norm.cdf
@@ -431,22 +434,22 @@ class FinEquityVanillaOption():
 
 ###############################################################################
 
-    def valueMC_NUMBA(self,
-                      valueDate: FinDate,
-                      stockPrice: float,
-                      discountCurve: FinDiscountCurve,
-                      dividendYield: float,
-                      model:FinModel,
-                      numPaths: int = 10000,
-                      seed: int = 4242,
-                      useSobol: bool = False):
+    def valueMC_NUMPY_ONLY(self,
+                           valueDate: FinDate,
+                           stockPrice: float,
+                           discountCurve: FinDiscountCurve,
+                           dividendYield: float,
+                           model:FinModel,
+                           numPaths: int = 10000,
+                           seed: int = 4242,
+                           useSobol: int = 0):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
         vol = model._volatility
 
-        v = _valueMC_NUMBA(stockPrice, 
+        v = _valueMC_NUMPY_ONLY(stockPrice, 
                            t, 
                            self._strikePrice,
                            self._optionType.value,
@@ -454,29 +457,29 @@ class FinEquityVanillaOption():
                            dividendYield, 
                            vol, 
                            numPaths, 
-                           seed)
+                           seed,
+                           useSobol)
 
         return v
-    
-    
+
 ###############################################################################
 
-    def valueMC_NONUMBA(self,
-                      valueDate: FinDate,
-                      stockPrice: float,
-                      discountCurve: FinDiscountCurve,
-                      dividendYield: float,
-                      model:FinModel,
-                      numPaths: int = 10000,
-                      seed: int = 4242,
-                      useSobol: bool = False):
+    def valueMC_NUMBA_ONLY(self,
+                           valueDate: FinDate,
+                           stockPrice: float,
+                           discountCurve: FinDiscountCurve,
+                           dividendYield: float,
+                           model:FinModel,
+                           numPaths: int = 10000,
+                           seed: int = 4242,
+                           useSobol: int = 0):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
         vol = model._volatility
 
-        v = _valueMC_NONUMBA(stockPrice, 
+        v = _valueMC_NUMBA_ONLY(stockPrice, 
                            t, 
                            self._strikePrice,
                            self._optionType.value,
@@ -484,7 +487,100 @@ class FinEquityVanillaOption():
                            dividendYield, 
                            vol, 
                            numPaths, 
-                           seed)
+                           seed, 
+                           useSobol)
+
+        return v
+
+###############################################################################
+
+    def valueMC_NUMBA_PARALLEL(self,
+                           valueDate: FinDate,
+                           stockPrice: float,
+                           discountCurve: FinDiscountCurve,
+                           dividendYield: float,
+                           model:FinModel,
+                           numPaths: int = 10000,
+                           seed: int = 4242,
+                           useSobol: int = 0):
+
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
+        vol = model._volatility
+
+        v = _valueMC_NUMBA_PARALLEL(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed, 
+                           useSobol)
+
+#        _valueMC_NUMBA_ONLY.parallel_diagnostics(level=4)
+
+        return v
+
+###############################################################################
+
+    def valueMC_NUMPY_NUMBA(self,
+                      valueDate: FinDate,
+                      stockPrice: float,
+                      discountCurve: FinDiscountCurve,
+                      dividendYield: float,
+                      model:FinModel,
+                      numPaths: int = 10000,
+                      seed: int = 4242,
+                      useSobol: int = 0):
+
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
+        vol = model._volatility
+
+        v = _valueMC_NUMPY_NUMBA(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed,
+                           useSobol)
+
+        return v
+
+###############################################################################
+
+    def valueMC_NONUMBA_NONUMPY(self,
+                      valueDate: FinDate,
+                      stockPrice: float,
+                      discountCurve: FinDiscountCurve,
+                      dividendYield: float,
+                      model:FinModel,
+                      numPaths: int = 10000,
+                      seed: int = 4242,
+                      useSobol: int = 0):
+
+        t = (self._expiryDate - valueDate) / gDaysInYear
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/t
+        vol = model._volatility
+
+        v = _valueMC_NONUMBA_NONUMPY(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed,
+                           useSobol)
 
         return v
 
@@ -498,53 +594,26 @@ class FinEquityVanillaOption():
                 model:FinModel,
                 numPaths: int = 10000,
                 seed: int = 4242,
-                useSobol: bool = False):
+                useSobol: int = 0):
         ''' Value European style call or put option using Monte Carlo. This is
         mainly for educational purposes. Sobol numbers can be used. '''
 
-        if isinstance(model, FinModel):
-            volatility = model._volatility
-        else:
-            raise FinError("Model Type invalid")
-
-        if self._optionType != FinOptionTypes.EUROPEAN_CALL and \
-           self._optionType != FinOptionTypes.EUROPEAN_PUT:
-            raise FinError("Can only value European call or put.")
-
-        np.random.seed(seed)
         t = (self._expiryDate - valueDate) / gDaysInYear
-
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
+        vol = model._volatility
 
-        mu = r - dividendYield
-        v2 = volatility**2
-        K = self._strikePrice
-        sqrtdt = np.sqrt(t)
+        v = _valueMC_NUMBA_ONLY(stockPrice, 
+                           t, 
+                           self._strikePrice,
+                           self._optionType.value,
+                           r, 
+                           dividendYield, 
+                           vol, 
+                           numPaths, 
+                           seed, 
+                           useSobol)
 
-        # Use Antithetic variables
-        if useSobol is True:
-            g = getGaussianSobol(numPaths, 1)
-        else:
-            g = np.random.normal(0.0, 1.0, size=(1, numPaths))
-
-        s = stockPrice * np.exp((mu - v2 / 2.0) * t)
-        m = np.exp(g * sqrtdt * volatility)
-        s_1 = s * m
-        s_2 = s / m
-
-        # Not sure if it is correct to do antithetics with sobols but why not ?
-        if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            payoff_a_1 = np.maximum(s_1 - K, 0.0)
-            payoff_a_2 = np.maximum(s_2 - K, 0.0)
-        elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            payoff_a_1 = np.maximum(K - s_1, 0.0)
-            payoff_a_2 = np.maximum(K - s_2, 0.0)
-        else:
-            raise FinError("Unknown option type.")
-
-        payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * df / 2.0
         return v
 
 ###############################################################################

@@ -9,7 +9,7 @@ To upgrade an existing installation type:
 `pip install --upgrade financepy`
 
 I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However Anaconda3-2020.02 works.
- 
+
 ## Using FinancePy in a Jupyter Notebook
 
 Once financepy has been installed, it is easy to get started.
@@ -28,14 +28,13 @@ Although it is written entirely in Python, it can achieve speeds comparable to C
 
 The target audience for this library includes:
 
-* Students wishing to learn derivative pricing and Python.
-* Professors wishing to teach derivative pricing and Python.
+* Students of finance and students of python
+* Academics teaching finance or conducting research into finance
 * Traders wishing to price or risk-manage a derivative.
 * Quantitative analysts seeking to price or reverse engineer a price.
-* Risk managers wishing to replicate and understand a price.
+* Risk managers wishing to replicate and understand price sensitivity.
 * Portfolio managers wishing to check prices or calculate risk measures.
 * Fund managers wanting to value a portfolio or examine a trading strategy.
-* Structurers or financial engineers seeking to examine the pricing of a derivative structure.
 
 Users should have a good, but not advanced, understanding of Python. In terms of Python, the style of the library has been determined subject to the following criteria:
 
