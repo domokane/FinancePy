@@ -272,7 +272,7 @@ class FinFloatLeg(object):
                    self._paymentPVs[iFlow],
                    self._cumulativePVs[iFlow]))
 
-##########################################################################
+###############################################################################
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)

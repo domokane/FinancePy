@@ -7,9 +7,10 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..finutils.FinMath import N
 from ..finutils.FinHelperFunctions import labelToString
 from ..finutils.FinGlobalTypes import FinOptionTypes
+
+from ..finutils.FinMath import N
 
 ###############################################################################
 # NOTE: Keeping this separate from SABR for the moment.
@@ -56,9 +57,9 @@ class FinModelBlackShifted():
         d2 = d1 - vol * sqrtT
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
-            return df * ((f+s) * norm.cdf(d1) - (k+s) * N(d2))
+            return df * ((f+s) * N(d1) - (k+s) * N(d2))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
-            return df * ((k+s) * norm.cdf(-d2) - (f+s) * N(-d1))
+            return df * ((k+s) * N(-d2) - (f+s) * N(-d1))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")
 

@@ -35,16 +35,14 @@ def valueMC2(s0, t, K, r, q, v, numPaths, seed):
 
     np.random.seed(seed)
     g = np.random.standard_normal(numPaths)
-
     vsqrtt = v * np.sqrt(t)
-
     s = s0 * exp((r - q - v*v / 2.0) * t) 
-    s = s * np.exp(g * vsqrtt)
 
+    s = s * np.exp(g * vsqrtt)
     payoff = np.maximum(s - K, 0.0)
     averagePayoff = np.mean(payoff)
-    v = averagePayoff * np.exp(-r * t)
 
+    v = averagePayoff * np.exp(-r * t)
     return v
 
 ###############################################################################

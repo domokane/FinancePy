@@ -4,11 +4,10 @@
 
 # TODO Fix this
 
-from scipy.stats import norm
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinError import FinError
 
-N = norm.cdf
+from ..finutils.FinMath import N
 
 from .FinModel import FinModel
 from .FinModelCRRTree import crrTreeValAvg

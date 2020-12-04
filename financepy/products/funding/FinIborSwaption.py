@@ -12,7 +12,6 @@
 
 import numpy as np
 
-
 from ...finutils.FinCalendar import FinCalendarTypes
 from ...finutils.FinCalendar import FinBusDayAdjustTypes
 from ...finutils.FinCalendar import FinDateGenRuleTypes
@@ -209,6 +208,7 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesHW):
 
+            print("Warning: Prices changed. Please test.")
             swaptionPx = model.europeanBondOptionJamshidian(texp,
                                                   strikePrice,
                                                   faceAmount, 
@@ -230,6 +230,7 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBK):
 
+            print("Warning: Prices changed. Please test.")
             model.buildTree(tmat, dfTimes, dfValues)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,

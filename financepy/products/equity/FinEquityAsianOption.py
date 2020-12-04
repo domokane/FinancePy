@@ -9,7 +9,7 @@ from numba import njit
 # TODO: Add perturbatory risk using the analytical methods !!
 # TODO: Add Sobol to Monte Carlo
 
-from ...finutils.FinMath import N, covar
+from ...finutils.FinMath import covar
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
@@ -17,6 +17,9 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
+
+from ...finutils.FinMath import N
+
 
 ###############################################################################
 

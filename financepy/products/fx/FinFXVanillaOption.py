@@ -4,8 +4,6 @@
 
 import numpy as np
 from scipy import optimize
-from scipy.stats import norm
-
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -19,7 +17,8 @@ from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import blackVolFromSABR
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 
-N = norm.cdf
+from ...finutils.FinMath import N
+
 
 ###############################################################################
 
@@ -217,13 +216,19 @@ class FinFXVanillaOption():
             tdel = valueDate
             texp = tdel
 
-        if np.any(spotFXRate <= 0.0):
+        if spotFXRate <= 0.0:
             raise FinError("spotFXRate must be greater than zero.")
+
+#        if np.any(spotFXRate <= 0.0):
+#            raise FinError("spotFXRate must be greater than zero.")
 
         if model._parentType != FinFXModel:
             raise FinError("Model is not inherited off type FinFXModel.")
 
-        if np.any(tdel < 0.0):
+#        if np.any(tdel < 0.0):
+#            raise FinError("Time to expiry must be positive.")
+    
+        if tdel < 0.0:
             raise FinError("Time to expiry must be positive.")
 
         tdel = np.maximum(tdel, 1e-10)
@@ -247,7 +252,10 @@ class FinFXVanillaOption():
                                               model.nu,
                                               F0T, K, tdel)
 
-            if np.any(volatility) < 0.0:
+#            if np.any(volatility) < 0.0:
+#                raise FinError("Volatility should not be negative.")
+
+            if volatility < 0.0:
                 raise FinError("Volatility should not be negative.")
 
             volatility = np.maximum(volatility, 1e-10)

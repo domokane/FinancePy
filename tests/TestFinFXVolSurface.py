@@ -21,7 +21,7 @@ PLOT_GRAPHS = False
 ###############################################################################
 
 
-def test_FinFXMktVolSurface():
+def test_FinFXMktVolSurface1():
 
     ###########################################################################
 
@@ -66,14 +66,14 @@ def test_FinFXMktVolSurface():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration()
+        fxMarket.checkCalibration(False)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
 
     ###########################################################################
 
-    if 1 == 1:
+def test_FinFXMktVolSurface2():
 
         #print("==============================================================")
 
@@ -116,7 +116,8 @@ def test_FinFXMktVolSurface():
                                    atmMethod,
                                    deltaMethod)
 
-#        fxMarket.checkCalibration()
+        fxMarket.checkCalibration(False)
+
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
 
@@ -124,7 +125,7 @@ def test_FinFXMktVolSurface():
 
 #    ###########################################################################
 
-    if 1 == 1:
+def test_FinFXMktVolSurface3():
 
         # EURUSD Example from Paper by Uwe Wystup using Tables 4
 #        print("EURUSD EXAMPLE WYSTUP")
@@ -165,14 +166,14 @@ def test_FinFXMktVolSurface():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration()
+        fxMarket.checkCalibration(False)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
 
     ###########################################################################
 
-    if 1 == 1:
+def test_FinFXMktVolSurface4():
 
         # USDJPY Example from Paper by Uwe Wystup using Tables 4
 #        print("USDJPY EXAMPLE WYSTUP")
@@ -213,7 +214,7 @@ def test_FinFXMktVolSurface():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration()
+        fxMarket.checkCalibration(False)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
@@ -224,5 +225,9 @@ def test_FinFXMktVolSurface():
 ###############################################################################
 
 
-test_FinFXMktVolSurface()
+test_FinFXMktVolSurface1()
+test_FinFXMktVolSurface2()
+test_FinFXMktVolSurface3()
+test_FinFXMktVolSurface4()
+
 testCases.compareTestCases()

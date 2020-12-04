@@ -2,14 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import glob
-from os.path import dirname, basename, join
 
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinError import FinError
+import glob
+from os.path import dirname, basename, join
 
+from financepy.finutils.FinError import FinError
 from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
 setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
@@ -57,6 +57,10 @@ for moduleFileName in modules[n:m+1]:
         pass
     except NameError as err:
         print("Name Error:", err.args[0], "************")
+        n = n + 1
+        pass
+    except TypeError as err:
+        print("Type Error:", err.args[0], "************")
         n = n + 1
         pass
     except BaseException as e:

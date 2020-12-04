@@ -17,8 +17,7 @@ from ...models.FinGBMProcess import getPaths
 
 from numba import njit
 
-from scipy.stats import norm
-N = norm.cdf
+from ...finutils.FinMath import N
 
 ###############################################################################
 # TODO: Implement Sobol random numbers

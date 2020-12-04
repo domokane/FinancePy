@@ -39,7 +39,7 @@ def test_FinLossDbnBuilder():
         "LOSS3",
         "TIME")
 
-    for beta in []: # [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+    for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
 
         defaultProbs = np.ones(numCredits) * defaultProb
         betaVector = np.ones(numCredits) * beta
@@ -100,7 +100,7 @@ def test_FinLossDbnBuilder():
     # INHOMOGENEOUS CASE
     #######################################################################
 
-    numCredits = 20
+    numCredits = 100
     beta = 0.0
     defaultProb = 0.10
 

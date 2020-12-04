@@ -844,10 +844,22 @@ if 1 == 1:
     # Do it twice for the TOC
     print("pdflatex " + userGuideFileName)
     os.system("pdflatex " + userGuideFileName)
+    print("Doing it again for TOC")
+    os.system("pdflatex " + userGuideFileName)
+
     pdfFileName1 = fileName + ".pdf"
     pdfFileName2 = '..\\' + pdfFileName1
+
     # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
+
+    print("Removing unneeded files.")
+    os.remove(fileName + ".out")
+    os.remove(fileName + ".tex")
+    os.remove(fileName + ".toc")
+    os.remove(fileName + ".aux")
+    os.remove(fileName + ".log")
+
     print("Moving ", pdfFileName1, " to ", pdfFileName2)
     shutil.move(pdfFileName1, pdfFileName2)
     print(pdfFileName2)
