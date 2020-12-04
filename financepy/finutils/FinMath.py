@@ -4,7 +4,7 @@
 
 
 from math import exp, sqrt, fabs, log
-from numba import njit, boolean, int64, float64
+from numba import njit, boolean, int64, float64, vectorize
 import numpy as np
 from .FinError import FinError
 
@@ -258,7 +258,7 @@ def frange(start: int,
 
     return x
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -268,12 +268,12 @@ def normpdf(x: float):
     InvRoot2Pi = 0.3989422804014327
     return np.exp(-x * x / 2.0) * InvRoot2Pi
 
-##########################################################################
-
+###############################################################################
 
 @njit(float64(float64), fastmath=True, cache=True)
-def normcdf_fast(x: float):
-    ''' Fast Normal CDF function based on XXX '''
+def N(x):
+    ''' Fast Normal CDF function based on Hull OFAODS  4th Edition Page 252. 
+    This function is accurate to 6 decimal places. '''
 
     a1 = 0.319381530
     a2 = -0.356563782
@@ -290,14 +290,19 @@ def normcdf_fast(x: float):
 
     if x >= 0.0:
         c = (a1 * k + a2 * k2 + a3 * k3 + a4 * k4 + a5 * k5)
-        phi = 1.0 - c * nprime(x)
+        phi = 1.0 - c * exp(-x*x/2.0) * INVROOT2PI
     else:
-        phi = 1.0 - normcdf_fast(-x)
+        phi = 1.0 - N(-x)
 
     return phi
 
-##########################################################################
+###############################################################################
 
+@vectorize([float64(float64)], fastmath=True, cache=True)
+def NVect(x):
+    return N(x)
+
+###############################################################################
 
 @njit(float64(float64), fastmath=True, cache=True)
 def normcdf_integrate(x: float):
@@ -323,11 +328,10 @@ def normcdf_integrate(x: float):
     x = x + dx
     fx = exp(-x * x / 2.0)
     integral += fx / 2.0
-
     integral *= InvRoot2Pi * dx
     return integral
 
-##########################################################################
+###############################################################################
 
 
 @njit(float64(float64), fastmath=True, cache=True)
@@ -388,37 +392,38 @@ def normcdf_slow(z: float):
 
     return p
 
-##########################################################################
+###############################################################################
 
 
-@njit(float64(float64, int64), fastmath=True, cache=True)
-def normcdf(x: float,
-            fastFlag: int):
-    ''' This is the Normal CDF function which forks to one of three of the
-    implemented approximations. This is based on the choice of the fast flag
-    variable. A value of 1 is the fast routine, 2 is the slow and 3 is the
-    even slower integration scheme. '''
+# @njit([float64(float64)], fastmath=True, cache=True)
+# def normcdf(x: float):
+#     ''' This is the Normal CDF function which forks to one of three of the
+#     implemented approximations. This is based on the choice of the fast flag
+#     variable. A value of 1 is the fast routine, 2 is the slow and 3 is the
+#     even slower integration scheme. '''
 
-    if fastFlag == 1:
-        return normcdf_fast(x)
-    elif fastFlag == 2:
-        return normcdf_slow(x)
-    elif fastFlag == 3:
-        return normcdf_integrate(x)
-    else:
-        return 0.0
+#     return normcdf_fast(x)
 
-##########################################################################
+#     # if fastFlag == 1:
+#     #     return normcdf_fast(x)
+#     # elif fastFlag == 2:
+#     #     return normcdf_slow(x)
+#     # elif fastFlag == 3:
+#     #     return normcdf_integrate(x)
+#     # else:
+#     #     return 0.0
+
+###############################################################################
 
 
-@njit(float64(float64), fastmath=True, cache=True)
-def N(x: float):
-    ''' This is the shortcut to the default Normal CDF function and currently
-    is hardcoded to the fastest of the implemented routines. This is the most
-    widely used way to access the Normal CDF. '''
-    return normcdf(x, 1)
+# @vectorize([float64(float64)], fastmath=True, cache=True)
+# def N(x: float):
+#     ''' This is the shortcut to the default Normal CDF function and currently
+#     is hardcoded to the fastest of the implemented routines. This is the most
+#     widely used way to access the Normal CDF. '''
+#     return normcdf_fast(x)
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -456,7 +461,7 @@ def phi3(b1: float,
 
     return v
 
-##########################################################################
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -526,14 +531,14 @@ def norminvcdf(p):
 
     return inverseCDF
 
-##########################################################################
+###############################################################################
 # This is used for consistency with Haug and its conciseness. Consider renaming
 # phi2 to M
 @njit(fastmath=True, cache=True)
 def M(a, b, c):
     return phi2(a, b, c)
 
-##########################################################################
+###############################################################################
 
 
 @njit(float64(float64, float64, float64), fastmath=True, cache=True)
@@ -634,4 +639,4 @@ def corrMatrixGenerator(rho, n):
 
     return corrMatrix
 
-##########################################################################
+###############################################################################

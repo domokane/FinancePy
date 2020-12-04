@@ -7,9 +7,7 @@ from scipy import optimize
 
 from ..finutils.FinGlobalVariables import gSmall
 
-from scipy.stats import norm
-
-N = norm.cdf
+from ..finutils.FinMath import NVect, N
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -33,7 +31,7 @@ def bsValue(s:float, # Stock Price today
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    v = phi * ss * N(phi*d1) - phi * kk * N(phi*d2)
+    v = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)
     return v
 
 ###############################################################################

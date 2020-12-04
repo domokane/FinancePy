@@ -15,8 +15,8 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from scipy.stats import norm
-N = norm.cdf
+from ...finutils.FinMath import N
+
 
 ###############################################################################
 

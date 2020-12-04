@@ -8,16 +8,19 @@ from scipy.optimize import newton
 import matplotlib.pyplot as plt
 
 from ...finutils.FinError import FinError
+from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...products.fx.FinFXVanillaOption import solveForStrike
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-# N = norm.cdf
-from ...finutils.FinMath import normcdf_fast as N
+
+from ...finutils.FinMath import N
 
 ###############################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
@@ -116,18 +119,20 @@ class FinFXVolSurface():
     ''' Class to hold information characterising an FX volatility surface. '''
 
     def __init__(self,
-                 valueDate,
-                 spotFXRate,
-                 currencyPair,
+                 valueDate: FinDate,
+                 spotFXRate: float,
+                 currencyPair: str,
                  notionalCurrency,
-                 domDiscountCurve,
-                 forDiscountCurve,
+                 domDiscountCurve: FinDiscountCurve,
+                 forDiscountCurve: FinDiscountCurve,
                  tenors,
                  atmVols,
                  mktStrangle25DeltaVols,
                  riskReversal25DeltaVols,
                  atmMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod=FinFXDeltaMethod.SPOT_DELTA):
+
+        checkArgumentTypes(self.__init__, locals())
 
         self._valueDate = valueDate
         self._spotFXRate = spotFXRate
@@ -333,7 +338,7 @@ class FinFXVolSurface():
 
             # Determine parameters of vol surface using Powell minimisation
             args = (self, call, put)
-            tol = 1e-8
+            tol = 1e-6
             xopt = fmin_powell(obj, c0, args, disp=False, ftol=tol)
             v = obj(xopt, *args)
 
@@ -341,8 +346,19 @@ class FinFXVolSurface():
                 raise FinError("Failed to fit volatility smile curve.")
 
             # Calculate the 25 Delta call and put strikes from new vol surface
-            K_25_D_C = self.solveForSmileStrike(call, 0.25, i)
-            K_25_D_P = self.solveForSmileStrike(put, -0.25, i)
+            if i > 0:
+                x0 = self._K_25_D_C[i-1]
+            else:
+                x0 = self._spotFXRate
+
+            K_25_D_C = self.solveForSmileStrike(call, 0.25, i, x0)
+
+            if i > 0:
+                x0 = self._K_25_D_P[i-1]
+            else:
+                x0 = self._spotFXRate
+
+            K_25_D_P = self.solveForSmileStrike(put, -0.25, i, x0)
 
             # Store the set of strikes in the class
             self._K_25_D_C[i] = K_25_D_C
@@ -355,23 +371,27 @@ class FinFXVolSurface():
     def solveForSmileStrike(self,
                             vanillaOption,
                             deltaTarget,
-                            tenorIndex):
+                            tenorIndex, 
+                            initialValue = None):
         ''' Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
         strike. '''
 
+        if initialValue is None:
+            initialValue = self._spotFXRate
+
         argtuple = (self, vanillaOption, deltaTarget, tenorIndex)
 
-        sigma = newton(deltaFit, x0=self._spotFXRate, args=argtuple,
-                       tol=1e-5, maxiter=50, fprime2=None)
+        sigma = newton(deltaFit, x0=initialValue, args=argtuple,
+                       rtol=1e-4, maxiter=50, fprime2=None)
 
         return sigma
 
 ###############################################################################
 
-    def checkCalibration(self):
+    def checkCalibration(self, checkCalibrationFlag: bool):
 
-        if 1 == 0:
+        if checkCalibrationFlag:
             print("==========================================================")
             print("====== CHECK CALIBRATION =================================")
             print("==========================================================")
@@ -415,7 +435,7 @@ class FinFXVolSurface():
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
 
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("Value Date:", self._valueDate)
                 print("Expiry Date:", self._expiryDates[i])
                 print("T:", self._texp[i])
@@ -430,37 +450,37 @@ class FinFXVolSurface():
 
             sigma_K_25_D_P = self.volFunction(self._K_25_D_P[i], i)
 
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("K_25_D_P:    %9.7f    Vol: %9.4f    Delta: %9.8f"
                       % (self._K_25_D_P[i], 100.0*sigma_K_25_D_P, delta_put))
 
             sigma_K_25_D_P_MS = self.volFunction(self._K_25_D_P_MS[i], i)
 
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("K_25_D_P_MS: %9.7f    Vol: %9.4f"
                       % (self._K_25_D_P_MS[i], 100.0*sigma_K_25_D_P_MS))
 
             sigma_ATM = self.volFunction(self._K_ATM[i], i)
 
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("K_ATM:       %9.7f    Vol: %9.4f"
                       % (self._K_ATM[i], 100.0*sigma_ATM))
 
             sigma_K_25_D_C = self.volFunction(self._K_25_D_C[i], i)
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("K_25_D_C:    %9.7f    Vol: %9.4f    Delta: %9.8f"
                       % (self._K_25_D_C[i], 100.0*sigma_K_25_D_C, delta_call))
 
             sigma_K_25_D_C_MS = self.volFunction(self._K_25_D_C_MS[i], i)
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("K_25_D_C_MS: %9.7f    Vol: %9.4f"
                       % (self._K_25_D_C_MS[i], 100.0*sigma_K_25_D_C_MS))
 
             sigma_RR = sigma_K_25_D_C - sigma_K_25_D_P
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("RR: %9.5f" % (100.0*sigma_RR))
 
-            if 1 == 0:
+            if checkCalibrationFlag:
                 print("V_25_D_MS: %9.6f" % self._V_25_D_MS[i])
 
 ###############################################################################
@@ -520,3 +540,48 @@ class FinFXVolSurface():
         plt.legend(loc='upper right')
 
 ###############################################################################
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("VALUE DATE", self._valueDate)
+        s += labelToString("FX RATE", self._spotFXRate)
+        s += labelToString("CCY PAIR", self._currencyPair)
+        s += labelToString("NOTIONAL CCY", self._notionalCurrency)
+        s += labelToString("NUM TENORS", self._numVolCurves)
+        s += labelToString("ATM METHOD", self._atmMethod)
+
+        for i in range(0, self._numVolCurves):
+
+            s += "\n"
+
+            s += labelToString("TENOR", self._tenors[i])
+            s += labelToString("EXPIRY DATE", self._expiryDates[i])
+            s += labelToString("TIME (YRS)", self._texp[i])
+            s += labelToString("FWD FX", self._F0T[i])
+
+            s += labelToString("ATM VOLS", self._atmVols[i])
+            s += labelToString("MS VOLS", self._mktStrangle25DeltaVols[i])
+            s += labelToString("RR VOLS", self._riskReversal25DeltaVols[i])
+
+            s += labelToString("ATM Strike", self._K_ATM[i])
+            s += labelToString("ATM Delta", self._deltaATM[i])
+ 
+            s += labelToString("K_ATM", self._K_ATM[i])
+            s += labelToString("MS 25D Call Strike", self._K_25_D_C_MS)
+            s += labelToString("MS 25D Put Strike", self._K_25_D_P_MS)
+            s += labelToString("NEW 25D CALL STRIKE", self._K_25_D_C)
+            s += labelToString("NEW 25D PUT STRIKE", self._K_25_D_P)
+            s += labelToString("PARAMS", self._parameters[i])
+
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. '''
+        print(self)
+
+###############################################################################
+
+

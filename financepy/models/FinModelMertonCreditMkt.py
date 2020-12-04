@@ -4,8 +4,7 @@
 
 import numpy as np
 
-from scipy.stats import norm
-N = norm.cdf
+from ..finutils.FinMath import N
 
 from scipy import optimize
 

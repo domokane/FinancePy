@@ -25,8 +25,8 @@ from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_ONLY
 from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_ONLY
 from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_PARALLEL
 
-from scipy.stats import norm
-N = norm.cdf
+from ...finutils.FinMath import N
+
 
 ###############################################################################
 

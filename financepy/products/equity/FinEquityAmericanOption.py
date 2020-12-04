@@ -15,9 +15,6 @@ from ...products.equity.FinEquityOption import FinEquityOption
 
 from ...models.FinModel import FinModel
 
-from scipy.stats import norm
-N = norm.cdf
-
 ###############################################################################
 # TODO: Implement some analytical approximations
 # TODO: Tree with discrete dividends

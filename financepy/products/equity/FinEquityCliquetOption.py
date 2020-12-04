@@ -22,8 +22,6 @@ from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...models.FinModelBlackScholes import bsValue, FinModelBlackScholes
 from ...models.FinModel import FinModel
 
-from scipy.stats import norm
-N = norm.cdf
 
 ###############################################################################
 # TODO: Do we need to day count adjust option payoffs ?

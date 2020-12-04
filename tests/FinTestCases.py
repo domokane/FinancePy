@@ -2,12 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import sys
+sys.path.append("..")
 
 from os.path import join, exists, split
 import time
 
 from enum import Enum
-#from ..financepy.finutils.FinError import FinError
+from financepy.finutils.FinError import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
@@ -306,6 +308,7 @@ class FinTestCases():
             return (0, numErrors)
 
         for colNum in range(0, numCols):
+
             if compareFields[colNum] != goldenFields[colNum]:
 
                 if len(self._headerFields) <= colNum:
@@ -384,6 +387,7 @@ class FinTestCases():
 
         # We start at second row as first row has time stamp
         for rowNum in range(1, minNumLines):
+
             goldenRow = goldenContents[rowNum]
             compareRow = compareContents[rowNum]
 
@@ -404,7 +408,7 @@ class FinTestCases():
                     numErrors += 1
                 else:
                     self.printLog("Row# ", rowNum, " HEADER:  ==>",
-                             self._headerFields[0:-2])
+                             self._headerFields[0:-1])
 
                 self.printLog("Row# ", rowNum, " GOLDEN : ==>", goldenRow[:-2])
                 self.printLog("Row# ", rowNum, " COMPARE: ==>", compareRow[:-2])

@@ -193,7 +193,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 #    print("PARALLEL:", speedUp)
 
     ###########################################################################
-    # COMPUTED USING NUMSTEPS FROM 0.1M to 1M
+    # COMPUTED USING NUMSTEPS FROM 1M to 10M
     ###########################################################################
     
     CPP_t = np.array([0.075,0.155,0.223,0.313,0.359,0.421,0.495,0.556,0.64,0.702,
