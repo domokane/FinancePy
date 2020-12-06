@@ -204,7 +204,6 @@ class FinDate():
         user can also supply an hour, minute and second for intraday work.
 
         Example Input:
-        start_date = FinDate('1-1-2018', '%d-%m-%Y')
         start_date = FinDate(1, 1, 2018)
         '''
 
@@ -283,6 +282,10 @@ class FinDate():
 
     @classmethod
     def fromString(cls, dateString, formatString):
+        '''  Create a FinDate from a date and format string.
+        Example Input:
+        start_date = FinDate('1-1-2018', '%d-%m-%Y') '''
+ 
         d, m, y = parse_date(dateString, formatString)
         return cls(d, m, y)
 
