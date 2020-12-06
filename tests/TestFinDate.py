@@ -22,7 +22,7 @@ def test_FinDate():
 
     startDate = FinDate(1, 1, 2018)
 
-    assert FinDate(1, 1, 2018) == FinDate('1-1-2018', '%d-%m-%Y')
+    assert FinDate(1, 1, 2018) == FinDate.fromString('1-1-2018', '%d-%m-%Y')
 
     testCases.header("DATE", "MONTHS", "CDS DATE")
 
@@ -189,6 +189,43 @@ def test_FinDateFormat():
 
 ###############################################################################
 
+
+def test_IntraDay():
+
+    testCases.header("Date1", "Date2", "Diff")
+    d1 = FinDate(20, 10, 2019, 0, 0, 0)
+    d2 = FinDate(25, 10, 2019, 0, 0, 0)
+    diff = d2 - d1
+    testCases.print(d1, d2, diff)
+    testCases.print(d1._excelDate, d2._excelDate, diff)
+
+    ###########################################################################
+
+    d1 = FinDate(20, 10, 2019, 10, 0, 0)
+    d2 = FinDate(25, 10, 2019, 10, 25, 0)
+    diff = d2 - d1
+    testCases.print(d1, d2, diff)
+    testCases.print(d1._excelDate, d2._excelDate, diff)
+
+    ###########################################################################
+
+    d1 = FinDate(20, 10, 2019, 10, 0, 0)
+    d2 = FinDate(20, 10, 2019, 10, 25, 30)
+    diff = d2 - d1
+    testCases.print(d1, d2, diff)
+    testCases.print(d1._excelDate, d2._excelDate, diff)
+
+    ###########################################################################
+
+    d1 = FinDate(19, 10, 2019, 10, 0, 0)
+    d2 = FinDate(20, 10, 2019, 10, 25, 40)
+    diff = d2 - d1
+    testCases.print(d1, d2, diff)
+    testCases.print(d1._excelDate, d2._excelDate, diff)
+
+###############################################################################
+
+
 test_FinDate()
 test_FinDateTenors()
 test_FinDateRange()
@@ -196,6 +233,7 @@ test_FinDateAddMonths()
 test_FinDateAddYears()
 test_FinDateSpeed()
 test_FinDateFormat()
+test_IntraDay()
 
 testCases.compareTestCases()
 

@@ -85,10 +85,13 @@ def isLeapYear(y: int):
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
     return leapYear
 
+###############################################################################
+
 
 def parse_date(dateStr, dateFormat):
     dt_obj = datetime.datetime.strptime(dateStr, dateFormat)
     return dt_obj.day, dt_obj.month, dt_obj.year
+
 ###############################################################################
 # CREATE DATE COUNTER
 ###############################################################################
@@ -146,19 +149,19 @@ def calculateList():
                 if yy >= gStartYear:
                     gDateCounterList.append(-999)
 
-
-##############################################################################
+###############################################################################
 # The index in these functions is not the excel date index used as the 
 # internal representation of the date but the index of that date in the
 # padded date object used to store the dates in a way that allows for a
 # quick lookup. Do not confuse them as you will find they are out by months
-##############################################################################
+###############################################################################
 
 @njit(fastmath=True, cache=True)
 def dateIndex(d, m, y):
     idx = (y-gStartYear) * 12 * 31 + (m-1) * 31 + (d-1)
     return idx
 
+###############################################################################
 
 @njit(fastmath=True, cache=True)
 def dateFromIndex(idx):
@@ -194,10 +197,11 @@ class FinDate():
 
     ###########################################################################
 
-    def __init__(self, *args):  # Year number which must be between 1900 and 2100
+    def __init__(self, d, m, y, hh=0, mm=0, ss=0):  
         ''' Create a date given a day of month, month and year. The arguments
         must be in the order of day (of month), month number and then the year.
-        The year must be a 4-digit number greater than or equal to 1900.
+        The year must be a 4-digit number greater than or equal to 1900. The
+        user can also supply an hour, minute and second for intraday work.
 
         Example Input:
         start_date = FinDate('1-1-2018', '%d-%m-%Y')
@@ -206,11 +210,6 @@ class FinDate():
 
         global gStartYear
         global gEndYear
-
-        if isinstance(args[0], str):
-           d, m, y = parse_date(args[0], args[1])
-        else:
-           d, m, y = args[0], args[1], args[2]
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
@@ -252,13 +251,40 @@ class FinDate():
                 print(d, m, y)
                 raise FinError("Date: Not Leap year. Day not valid.")
 
+        if hh < 0 or hh > 23:
+            raise FinError("Hours must be in range 0-23")
+
+        if mm < 0 or mm > 59:
+            raise FinError("Minutes must be in range 0-59")
+
+        if ss < 0 or ss > 59:
+            raise FinError("Seconds must be in range 0-59")
+
         self._y = y
         self._m = m
         self._d = d
-        self._excelDate = 0
+        
+        self._hh = hh
+        self._mm = mm
+        self._ss = ss
+
+        self._excelDate = 0 # This is a float as it includes intraday time
 
         # update the excel date used for doing lots of financial calculations
         self._refresh()
+
+        dayFraction = self._hh/24.0
+        dayFraction += self._mm/24.0/60.0
+        dayFraction += self._ss/24.0/60.0/60.0
+
+        self._excelDate += dayFraction # This is a float as it includes intraday time
+
+    ###########################################################################
+
+    @classmethod
+    def fromString(cls, dateString, formatString):
+        d, m, y = parse_date(dateString, formatString)
+        return cls(d, m, y)
 
     ###########################################################################
 
@@ -773,7 +799,7 @@ def datediff(d1: FinDate,
              d2: FinDate):
     ''' Calculate the number of days between two Findates. '''
     dd = (d2._excelDate - d1._excelDate)
-    return dd
+    return int(dd)
 
 ###############################################################################
 
@@ -825,3 +851,5 @@ def dateRange(startDate: FinDate,
 def testType():
     global gDateFormatType
     print("TEST TYPE", gDateFormatType)
+    
+###############################################################################

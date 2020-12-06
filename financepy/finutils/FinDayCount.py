@@ -191,7 +191,7 @@ class FinDayCount(object):
                 denom2 = 365
 
             if y1 == y2:
-                num = dt2 - dt1
+                num = int(dt2 - dt1)
                 den = denom1
                 accFactor = (dt2 - dt1) / denom1
                 return (accFactor, num, den)
@@ -215,21 +215,21 @@ class FinDayCount(object):
             if dt3 is None or freq is None:
                 raise FinError("ACT_ACT_ICMA requires three dates and a freq")
 
-            num = dt2 - dt1
-            den = freq * (dt3 - dt1)
+            num = int(dt2 - dt1)
+            den = freq * int(dt3 - dt1)
             accFactor = num / den
             return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365F:
 
-            num = dt2 - dt1
+            num = int(dt2 - dt1)
             den = 365
             accFactor = num / den
             return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_360:
 
-            num = dt2 - dt1
+            num = int(dt2 - dt1)
             den = 360
             accFactor = num / den
             return (accFactor, num, den)
@@ -246,7 +246,7 @@ class FinDayCount(object):
             else:
                 y3 = dt3._y
 
-            num = dt2 - dt1
+            num = int(dt2 - dt1)
             den = 365
 
             if isLeapYear(y1):
