@@ -6,13 +6,13 @@ import numpy as np
 from scipy import optimize
 
 from ..finutils.FinGlobalVariables import gSmall
-
+from ..finutils.FinError import FinError
 from ..finutils.FinMath import NVect, N
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
 ###############################################################################
-
+@np.vectorize
 def bsValue(s:float, # Stock Price today
             t:float, # Years to Expiry
             k:float, # Strike Price
@@ -166,6 +166,6 @@ if __name__ == '__main__':
     for t in [0.1, 0.5]:
         for v in [0.15, 0.25, 0.35]:
             for s in [90.0, 100.0, 110.0]:
-                bawPrice = valueBAW(s, t, k, r, q, v, +1)
+                bawPrice = bawValue(s, t, k, r, q, v, +1)
                 print("%9.5f %9.5f %9.5f %9.5f"% (s, t, v, bawPrice))
 

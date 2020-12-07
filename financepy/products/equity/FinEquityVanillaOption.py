@@ -4,6 +4,7 @@
 
 
 import numpy as np
+from numba import vectorize
 
 from scipy import optimize
 
@@ -89,8 +90,13 @@ class FinEquityVanillaOption():
         date, the option strike, the option type and the number of options. '''
 
         checkArgumentTypes(self.__init__, locals())
+        valid_types = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
 
-        if optionType != FinOptionTypes.EUROPEAN_CALL and \
+        if isinstance(optionType, list):
+            op_type_filter = lambda x: 1 if x in valid_types else 0
+            if not all(map(op_type_filter, optionType)):
+                raise FinError("Unknown Option Type" + str(optionType))
+        elif optionType != FinOptionTypes.EUROPEAN_CALL and \
            optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(optionType))
 

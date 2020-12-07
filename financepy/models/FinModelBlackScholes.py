@@ -50,17 +50,20 @@ class FinModelBlackScholes(FinModel):
                 phi = +1
             elif optionType == FinOptionTypes.EUROPEAN_PUT:
                 phi = -1
+            elif isinstance(optionType, list):
+                phi=[]
+                for i in optionType:
+                    if i == FinOptionTypes.EUROPEAN_PUT:
+                        phi.append(-1)
+                    elif i == FinOptionTypes.EUROPEAN_CALL:
+                        phi.append(+1)
+                    else:
+                        raise FinError("Unsupported Option Type")
             else:
                 print(optionType)
                 raise FinError("Unsupported Option Type")
 
-            v =  bsValue(spotPrice, 
-                         timeToExpiry,
-                         strikePrice,
-                         riskFreeRate,
-                         dividendRate,
-                         self._volatility,
-                         phi)
+            v = bsValue(spotPrice, timeToExpiry, strikePrice, riskFreeRate, dividendRate, self._volatility, phi)
 
             return v
 
