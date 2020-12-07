@@ -230,7 +230,9 @@ def pairGCD(v1: float,
 def nprime(x: float):
     '''Calculate the first derivative of the Cumulative Normal CDF which is
     simply the PDF of the Normal Distribution '''
-    return normpdf(x)
+
+    InvRoot2Pi = 0.3989422804014327
+    return np.exp(-x * x / 2.0) * InvRoot2Pi
 
 ###############################################################################
 
@@ -301,6 +303,12 @@ def N(x):
 @vectorize([float64(float64)], fastmath=True, cache=True)
 def NVect(x):
     return N(x)
+
+###############################################################################
+
+@vectorize([float64(float64)], fastmath=True, cache=True)
+def NPrimeVect(x):
+    return nprime(x)
 
 ###############################################################################
 

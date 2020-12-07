@@ -22,6 +22,8 @@ class FinDateFormatTypes(Enum):
     UK_MEDIUM = 7
     UK_LONG = 8
     UK_LONGEST = 9
+    DATETIME = 10
+    
 
 # Set the default
 gDateFormatType = FinDateFormatTypes.UK_LONG
@@ -340,6 +342,26 @@ class FinDate():
             return True
 
         return False
+
+    ###########################################################################
+
+    def addHours(self, hours):
+        ''' Returns a new date that is h hours after the FinDate. '''
+
+        if hours < 0:
+            raise FinError("Number of hours must be positive")
+        
+        startHour = self._hh        
+        finalHour = startHour + hours
+        days = int(finalHour/24)
+        hour = finalHour % 24
+
+        # Move forward a specific number of days
+        dt1 = self.addDays(days)
+
+        # On that date we then move to the correct hour
+        dt2 = FinDate(dt1._d, dt1._m, dt1._y, hour, dt1._mm, dt1._ss)                
+        return dt2
 
     ###########################################################################
 
@@ -707,7 +729,7 @@ class FinDate():
         shortYearStr = str(self._y)[2:]
         longYearStr = str(self._y)
 
-
+        
         if gDateFormatType == FinDateFormatTypes.UK_LONGEST:
 
             sep = " "
@@ -760,6 +782,30 @@ class FinDate():
 
             sep = "/"
             dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
+            return dateStr
+
+        elif gDateFormatType == FinDateFormatTypes.DATETIME:
+
+            sep = "/"
+
+            if self._hh < 10:
+                hourStr = "0" + str(self._hh)
+            else:
+                hourStr = str(self._hh)
+
+            if self._mm < 10:
+                minuteStr = "0" + str(self._mm)
+            else:
+                minuteStr = str(self._mm)
+
+            if self._ss < 10:
+                secondStr = "0" + str(self._ss)
+            else:
+                secondStr = str(self._ss)
+
+            timeStr = hourStr + ":" + minuteStr + ":" + secondStr
+            dateStr = dayStr + sep + shortMonthStr + sep + longYearStr
+            dateStr = dateStr + " " + timeStr
             return dateStr
 
         else:

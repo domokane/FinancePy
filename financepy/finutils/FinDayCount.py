@@ -89,6 +89,11 @@ class FinDayCount(object):
         must be set to the next coupon date. You will also need to provide a
         coupon frequency for some conventions.
 
+        Note that if the date is intraday, i.e. hh,mm and ss do not equal zero
+        then that is used in the calculation of the year frac. This avoids 
+        discontinuities for short dated intra day products. It should not
+        affect normal dates for which hh=mm=ss=0.
+        
         This seems like a useful source:
         https://www.eclipsesoftware.biz/DayCountConventions.html
         Wikipedia also has a decent survey of the conventions
@@ -191,7 +196,7 @@ class FinDayCount(object):
                 denom2 = 365
 
             if y1 == y2:
-                num = int(dt2 - dt1)
+                num = dt2 - dt1
                 den = denom1
                 accFactor = (dt2 - dt1) / denom1
                 return (accFactor, num, den)
@@ -215,21 +220,21 @@ class FinDayCount(object):
             if dt3 is None or freq is None:
                 raise FinError("ACT_ACT_ICMA requires three dates and a freq")
 
-            num = int(dt2 - dt1)
-            den = freq * int(dt3 - dt1)
+            num = dt2 - dt1
+            den = freq * (dt3 - dt1)
             accFactor = num / den
             return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365F:
 
-            num = int(dt2 - dt1)
+            num = dt2 - dt1
             den = 365
             accFactor = num / den
             return (accFactor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_360:
 
-            num = int(dt2 - dt1)
+            num = dt2 - dt1
             den = 360
             accFactor = num / den
             return (accFactor, num, den)
@@ -246,7 +251,7 @@ class FinDayCount(object):
             else:
                 y3 = dt3._y
 
-            num = int(dt2 - dt1)
+            num = dt2 - dt1
             den = 365
 
             if isLeapYear(y1):

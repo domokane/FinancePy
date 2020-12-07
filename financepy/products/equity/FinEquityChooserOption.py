@@ -11,6 +11,7 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
+from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinDate import FinDate
@@ -41,8 +42,9 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bsValue(ss, tc-t, kc, rtc, q, v, +1.0)
-    v_put = bsValue(ss, tp-t, kp, rtp, q, v, -1.0)
+    v_call = bsValue(ss, tc-t, kc, rtc, q, v, FinOptionTypes.EUROPEAN_CALL.value)
+    v_put = bsValue(ss, tp-t, kp, rtp, q, v, FinOptionTypes.EUROPEAN_PUT.value)
+
     v = v_call - v_put
     return v
 

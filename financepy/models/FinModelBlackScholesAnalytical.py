@@ -4,23 +4,24 @@
 
 import numpy as np
 from scipy import optimize
+from numba import njit
 
+from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinGlobalVariables import gSmall
-
-from ..finutils.FinMath import NVect, N
+from ..finutils.FinMath import NVect, NPrimeVect, N
+from ..finutils.FinError import FinError
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
 ###############################################################################
 
-def bsValue(s:float, # Stock Price today
-            t:float, # Years to Expiry
-            k:float, # Strike Price
-            r:float, # Risk Free Rate
-            q:float, # Dividend Yield
-            v:float, # Volatility
-            phi:int): # +1 for call, -1 for put
+@njit(fastmath=True, cache=True)
+def bsValue(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
+
+    phi = 1
+    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+        phi = -1
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -35,9 +36,115 @@ def bsValue(s:float, # Stock Price today
     return v
 
 ###############################################################################
+
+@njit(fastmath=True, cache=True)
+def bsDelta(s, t, k, r, q, v, optionTypeValue):
+    ''' Price a derivative using Black-Scholes model. ''' 
+
+    phi = 1
+    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+        phi = -1
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    vsqrtT = v * np.sqrt(t)
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    delta = phi * np.exp(-q*t) * NVect(phi*d1)
+    return delta
+
+###############################################################################
+
+@njit(fastmath=True, cache=True)
+def bsGamma(s, t, k, r, q, v, optionTypeValue):
+    ''' Price a derivative using Black-Scholes model. ''' 
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    vsqrtT = v * np.sqrt(t)
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    gamma = np.exp(-q*t) * NPrimeVect(d1) / s / vsqrtT
+    return gamma
+
+###############################################################################
+
+@njit(fastmath=True, cache=True)
+def bsVega(s, t, k, r, q, v, optionTypeValue):
+    ''' Price a derivative using Black-Scholes model. ''' 
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    sqrtT = np.sqrt(t)
+    vsqrtT = v * sqrtT
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    vega = ss * sqrtT * NPrimeVect(d1)
+    return vega
+
+###############################################################################
+
+@njit(fastmath=True, cache=True)
+def bsTheta(s, t, k, r, q, v, optionTypeValue):
+    ''' Price a derivative using Black-Scholes model. ''' 
+
+    phi = 1
+    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+        phi = -1
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    sqrtT = np.sqrt(t)
+    vsqrtT = v * sqrtT
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    d2 = d1 - vsqrtT
+    theta = - ss * NPrimeVect(d1) * v / 2.0 / sqrtT
+    theta = theta - phi * r * k * np.exp(-r*t) * NVect(phi*d2)
+    theta = theta + phi * q * ss * NVect(phi*d1)
+    return theta
+
+###############################################################################
+
+@njit(fastmath=True, cache=True)
+def bsRho(s, t, k, r, q, v, optionTypeValue):
+    ''' Price a derivative using Black-Scholes model. ''' 
+
+    phi = 1
+    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+        phi = -1
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    sqrtT = np.sqrt(t)
+    vsqrtT = v * sqrtT
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    d2 = d1 - vsqrtT
+    rho = phi * k * t * np.exp(-r*t) * NVect(phi*d2)
+    return rho
+
+###############################################################################
+###############################################################################
 # This module contains a number of analytical approximations for the price of
 # an American style option starting with Barone-Adesi-Whaley
 # https://deriscope.com/docs/Barone_Adesi_Whaley_1987.pdf
+###############################################################################
 ###############################################################################
 
 def _fcall(si, *args):
@@ -166,6 +273,6 @@ if __name__ == '__main__':
     for t in [0.1, 0.5]:
         for v in [0.15, 0.25, 0.35]:
             for s in [90.0, 100.0, 110.0]:
-                bawPrice = valueBAW(s, t, k, r, q, v, +1)
+                bawPrice = bawValue(s, t, k, r, q, v, +1)
                 print("%9.5f %9.5f %9.5f %9.5f"% (s, t, v, bawPrice))
 

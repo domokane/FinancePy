@@ -46,21 +46,13 @@ class FinModelBlackScholes(FinModel):
 
         if self._implementationType == FinModelBlackScholesTypes.ANALYTICAL:
 
-            if optionType == FinOptionTypes.EUROPEAN_CALL:
-                phi = +1
-            elif optionType == FinOptionTypes.EUROPEAN_PUT:
-                phi = -1
-            else:
-                print(optionType)
-                raise FinError("Unsupported Option Type")
-
             v =  bsValue(spotPrice, 
                          timeToExpiry,
                          strikePrice,
                          riskFreeRate,
                          dividendRate,
                          self._volatility,
-                         phi)
+                         optionType.value)
 
             return v
 

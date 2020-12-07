@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from financepy.products.equity.FinEquityVanillaOption_OLD import FinEquityVanillaOption_OLD
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.finutils.FinDate import FinDate
@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityVanillaOption():
+def test_FinEquityVanillaOptionFactored():
 
     valueDate = FinDate(2015, 1, 1)
     expiryDate = FinDate(2015, 7, 1)
@@ -36,7 +36,7 @@ def test_FinEquityVanillaOption():
 
     for numPaths in numPathsList:
 
-        callOption = FinEquityVanillaOption(
+        callOption = FinEquityVanillaOption_OLD(
             expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valueDate, stockPrice, discountCurve,
                                  dividendYield, model)
@@ -46,6 +46,7 @@ def test_FinEquityVanillaOption():
         end = time.time()
         duration = end - start
         testCases.print(numPaths, value, valueMC, duration)
+
 
 ###############################################################################
 
@@ -58,7 +59,7 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        callOption = FinEquityVanillaOption_OLD(expiryDate, 100.0, 
                                             FinOptionTypes.EUROPEAN_CALL)
 
         value = callOption.value(valueDate, stockPrice, discountCurve,
@@ -88,7 +89,7 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        putOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        putOption = FinEquityVanillaOption_OLD(expiryDate, 100.0, 
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valueDate, stockPrice, discountCurve,
@@ -117,7 +118,7 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        callOption = FinEquityVanillaOption_OLD(expiryDate, 100.0, 
                                             FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valueDate, stockPrice, discountCurve,
                                  dividendYield, model)
@@ -138,7 +139,7 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
         
-        putOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        putOption = FinEquityVanillaOption_OLD(expiryDate, 100.0, 
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valueDate, stockPrice, discountCurve,
@@ -160,7 +161,7 @@ def test_FinEquityVanillaOption():
     stockPrices = range(60, 150, 10)
 
     for stockPrice in stockPrices:
-        callOption = FinEquityVanillaOption(
+        callOption = FinEquityVanillaOption_OLD(
             expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(
             valueDate,
@@ -175,5 +176,5 @@ def test_FinEquityVanillaOption():
 ###############################################################################
 
 
-test_FinEquityVanillaOption()
+test_FinEquityVanillaOptionFactored()
 testCases.compareTestCases()
