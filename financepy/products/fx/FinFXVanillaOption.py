@@ -21,7 +21,8 @@ from ...finutils.FinMath import N
 
 
 ###############################################################################
-
+# TODO: Refactor code to use FinBlackScholesAnalytic 
+###############################################################################
 
 def f(volatility, *args):
     ''' This is the objective function used in the determination of the FX
