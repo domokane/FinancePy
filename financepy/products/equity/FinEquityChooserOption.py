@@ -8,6 +8,7 @@ from scipy import optimize
 
 from ...finutils.FinMath import M
 from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
@@ -110,12 +111,12 @@ class FinEquityChooserOption(FinEquityOption):
         rtc = -np.log(dftc) / tc
         rtp = -np.log(dftp) / tp
 
-        t = max(t, 1e-6)
-        tc = max(tc, 1e-6)
-        tp = max(tp, 1e-6)
+        t = max(t, gSmall)
+        tc = max(tc, gSmall)
+        tp = max(tp, gSmall)
 
         v = model._volatility
-        v = max(v, 1e-6)
+        v = max(v, gSmall)
 
         s0 = stockPrice
         q = dividendYield

@@ -4,7 +4,7 @@
 
 import numpy as np
 from scipy import optimize
-from numba import njit
+from numba import njit, float64, int64, vectorize
 
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinGlobalVariables import gSmall
@@ -15,14 +15,15 @@ from ..finutils.FinError import FinError
 # Analytical Black Scholes model implementation and approximations
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsValue(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-        phi = 1
+        phi = 1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
-        phi = -1
+        phi = -1.0
     else:
         raise FinError("Unknown option type value")
 
@@ -35,19 +36,21 @@ def bsValue(s, t, k, r, q, v, optionTypeValue):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    value = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)
+    value = phi * ss * NVect(phi*d1)
+    value += - phi * kk * NVect(phi*d2)
     return value
 
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsDelta(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-        phi = 1
+        phi = 1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
-        phi = -1
+        phi = -1.0
     else:
         raise FinError("Unknown option type value")
 
@@ -64,7 +67,8 @@ def bsDelta(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsGamma(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
@@ -81,7 +85,8 @@ def bsGamma(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsVega(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
@@ -99,14 +104,15 @@ def bsVega(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsTheta(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-        phi = 1
+        phi = 1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
-        phi = -1
+        phi = -1.0
     else:
         raise FinError("Unknown option type value")
 
@@ -127,14 +133,15 @@ def bsTheta(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
-@njit(fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
 def bsRho(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-        phi = 1
+        phi = 1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
-        phi = -1
+        phi = -1.0
     else:
         raise FinError("Unknown option type value")
 
