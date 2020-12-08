@@ -35,8 +35,8 @@ def bsValue(s, t, k, r, q, v, optionTypeValue):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    v = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)
-    return v
+    value = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)
+    return value
 
 ###############################################################################
 
