@@ -19,9 +19,12 @@ from ..finutils.FinError import FinError
 def bsValue(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
-    phi = 1
-    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+    if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+        phi = 1
+    elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
         phi = -1
+    else:
+        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -41,9 +44,12 @@ def bsValue(s, t, k, r, q, v, optionTypeValue):
 def bsDelta(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
-    phi = 1
-    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+    if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+        phi = 1
+    elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
         phi = -1
+    else:
+        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -97,9 +103,12 @@ def bsVega(s, t, k, r, q, v, optionTypeValue):
 def bsTheta(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
-    phi = 1
-    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+    if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+        phi = 1
+    elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
         phi = -1
+    else:
+        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -122,9 +131,12 @@ def bsTheta(s, t, k, r, q, v, optionTypeValue):
 def bsRho(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
-    phi = 1
-    if optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
+    if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+        phi = 1
+    elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
         phi = -1
+    else:
+        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
