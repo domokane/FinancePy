@@ -6,6 +6,7 @@ import numpy as np
 from scipy.optimize import fmin_powell
 from scipy.optimize import newton
 import matplotlib.pyplot as plt
+import numba
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
@@ -88,6 +89,16 @@ def obj(cvec, *args):
 
 ###############################################################################
 
+@numba.jit("float64(float64, float64, float64, float64, float64, float64)", fastmath=True, nopython=True, cache=True)
+def volFunctionNumba(c0, c1, c2, F, K, texp):
+    x = np.log(F / K)
+    sigma0 = np.exp(c0)
+    arg = x / (sigma0 * np.sqrt(texp))
+    deltax = N(arg) - 0.50  # The -0.50 seems to be missing in book
+    f = c0 + c1 * deltax + c2 * (deltax * deltax)
+    return np.exp(f)
+
+###############################################################################
 
 def deltaFit(K, *args):
     ''' This is the objective function used in the determination of the FX
@@ -201,12 +212,7 @@ class FinFXVolSurface():
         F = self._F0T[tenorIndex]
         texp = self._texp[tenorIndex]
 
-        x = np.log(F/K)
-        sigma0 = np.exp(c0)
-        arg = x / (sigma0 * np.sqrt(texp))
-        deltax = N(arg) - 0.50  # The -0.50 seems to be missing in book
-        f = c0 + c1 * deltax + c2 * (deltax*deltax)
-        vol = np.exp(f)
+        vol = np.float64(volFunctionNumba(c0, c1, c2, F, K, texp))
 
         if vol.any() < 0.0:
             raise ValueError("Negative volatility. Not permitted.")
