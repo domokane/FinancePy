@@ -6,20 +6,22 @@ import numpy as np
 from scipy.optimize import fmin_powell
 from scipy.optimize import newton
 import matplotlib.pyplot as plt
-import numba
+from numba import njit, float64
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...finutils.FinDistribution import FinDistribution
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
-from ...products.fx.FinFXVanillaOption import solveForStrike
+from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
+from ...market.volatility.FinOptionVolatilityFns import volFunctionClarke
 
 from ...finutils.FinMath import N
 
@@ -28,10 +30,36 @@ from ...finutils.FinMath import N
 #       delta fit.
 ###############################################################################
 
+def g2(K, *args):
+    ''' This is the objective function used in the determination of the FX
+    Option implied strike which is computed in the class below. '''
+
+    self = args[0]
+    valueDate = args[1]
+    stockPrice = args[2]
+    domDF = args[3]
+    forDF = args[4]
+    delta = args[5]
+    deltaType = args[6]
+    volatility = args[7]
+
+    self._strikeFXRate = K
+
+    deltaDict = self.fastDelta(valueDate,
+                               stockPrice,
+                               domDF,
+                               forDF,
+                               volatility)
+
+    deltaOut = deltaDict[deltaType]
+    objFn = delta - deltaOut
+    return objFn
+
+###############################################################################
 
 def obj(cvec, *args):
     ''' Return a function that is minimised when the ATM, MS and RR vols have
-    been best fitted using the parametric volatility curve respresented by cvec
+    been best fitted using the parametric volatility curve represented by cvec
     '''
 
     self = args[0]
@@ -73,10 +101,10 @@ def obj(cvec, *args):
     term2 = (V_25_D_MS - target25StrangleValue)**2
 
     # Match the risk reversal volatility
-    K_25_D_C = self.solveForSmileStrike(call, 0.2500, i)
+    K_25_D_C = self.solveForSmileStrike(call, 0.2500, i, self._spotFXRate)
     sigma_K_25_D_C = self.volFunction(K_25_D_C, i)
 
-    K_25_D_P = self.solveForSmileStrike(put, -0.2500, i)
+    K_25_D_P = self.solveForSmileStrike(put, -0.2500, i, self._spotFXRate)
     sigma_K_25_D_P = self.volFunction(K_25_D_P, i)
 
     targetRRVol = self._riskReversal25DeltaVols[i]
@@ -85,18 +113,20 @@ def obj(cvec, *args):
 
     tot = term1 + term2 + term3
 
+#    print(cvec, tot)
     return tot
 
 ###############################################################################
 
-@numba.jit("float64(float64, float64, float64, float64, float64, float64)", fastmath=True, nopython=True, cache=True)
-def volFunctionNumba(c0, c1, c2, F, K, texp):
-    x = np.log(F / K)
-    sigma0 = np.exp(c0)
-    arg = x / (sigma0 * np.sqrt(texp))
-    deltax = N(arg) - 0.50  # The -0.50 seems to be missing in book
-    f = c0 + c1 * deltax + c2 * (deltax * deltax)
-    return np.exp(f)
+# @njit(float64(float64, float64, float64, float64, float64, float64),
+#            fastmath=True, cache=True)
+# def volFunctionNumba(c0, c1, c2, F, K, texp):
+#     x = np.log(F / K)
+#     sigma0 = np.exp(c0)
+#     arg = x / (sigma0 * np.sqrt(texp))
+#     deltax = N(arg) - 0.50  # The -0.50 seems to be missing in book
+#     f = c0 + c1 * deltax + c2 * (deltax * deltax)
+#     return np.exp(f)
 
 ###############################################################################
 
@@ -121,7 +151,45 @@ def deltaFit(K, *args):
 
     deltaOut = deltaDict[self._deltaMethodString]
     objFn = deltaTarget - deltaOut
+
+#    print("DeltaFit", K, objFn, deltaTarget, tenorIndex)
+
     return objFn
+
+###############################################################################
+
+def solveForStrike(valueDate,
+                   vanillaOption,
+                   spotFXRate,
+                   domDiscountCurve,
+                   forDiscountCurve,
+                   delta,
+                   deltaType,
+                   volatility):
+    ''' This function determines the implied strike of an FX option
+    given a delta and the other option details. It uses a one-dimensional
+    Newton root search algorith to determine the strike that matches an
+    input volatility. '''
+
+#    argtuple = (vanillaOption, valueDate, spotFXRate, domDiscountCurve,
+#                forDiscountCurve, delta, deltaType, volatility)
+
+#    sigma = optimize.newton(g, x0=spotFXRate, args=argtuple,
+#                            tol=1e-5, maxiter=100, fprime2=None)
+
+    # TODO: SHOULD I SHIFT THE VALUE DATE
+    tdel = (vanillaOption._deliveryDate - valueDate) / gDaysInYear
+    domDF = domDiscountCurve._df(tdel)
+    forDF = forDiscountCurve._df(tdel)
+
+    argtuple2 = (vanillaOption, valueDate, spotFXRate, domDF,
+                forDF, delta, deltaType, volatility)
+
+    sigma2 = newton(g2, x0=spotFXRate, args=argtuple2,
+                    tol=1e-5, maxiter=100, fprime2=None)
+
+#    print("==> Solve for strike", spotFXRate, sigma2)
+    return sigma2
 
 ###############################################################################
 
@@ -206,18 +274,57 @@ class FinFXVolSurface():
         ''' Return the volatility for a strike using a given polynomial
         interpolation following Section 3.9 of Iain Clark book. '''
 
-        c0 = self._parameters[tenorIndex][0]
-        c1 = self._parameters[tenorIndex][1]
-        c2 = self._parameters[tenorIndex][2]
+        params = self._parameters[tenorIndex]
         F = self._F0T[tenorIndex]
         texp = self._texp[tenorIndex]
 
-        vol = np.float64(volFunctionNumba(c0, c1, c2, F, K, texp))
+        vol = np.float64(volFunctionClarke(params, F, K, texp))
 
         if vol.any() < 0.0:
             raise ValueError("Negative volatility. Not permitted.")
 
         return vol
+
+###############################################################################
+
+    def impliedDbns(self, lowFX, highFX, numIntervals):
+        ''' Calculate the pdf for each tenor horizon. Returns a list of 
+        FinDistribution objects, one for each tenor horizon. '''
+
+        dbns = []
+
+        for iTenor in range(0, len(self._tenors)):
+            
+            F = self._F0T[iTenor]
+            texp = self._texp[iTenor]
+
+            dFX = (highFX - lowFX)/ numIntervals
+
+            domDF = self._domDiscountCurve._df(texp)
+            forDF = self._forDiscountCurve._df(texp)
+
+            rd = -np.log(domDF) / texp
+            rf = -np.log(forDF) / texp
+
+            params = self._parameters[iTenor]
+
+            strikes = []
+            vols = []
+
+            for iK in range(0, numIntervals):
+                strike = lowFX + iK*dFX                
+                vol = volFunctionClarke(params, F, strike, texp)
+                strikes.append(strike) 
+                vols.append(vol)
+            
+            strikes = np.array(strikes)
+            vols = np.array(vols)
+
+            dbn = optionImpliedDbn(self._spotFXRate, texp, rd, rf, strikes, vols)            
+
+            dbns.append(dbn)
+
+        return dbns
 
 ###############################################################################
 
@@ -228,15 +335,21 @@ class FinFXVolSurface():
         numParameters = 3
 
         self._F0T = np.zeros(numVolCurves)
+        self._K_ATM = np.zeros(numVolCurves)
+        self._deltaATM = np.zeros(numVolCurves)
+
         self._K_25_D_C = np.zeros(numVolCurves)
         self._K_25_D_P = np.zeros(numVolCurves)
         self._K_25_D_C_MS = np.zeros(numVolCurves)
         self._K_25_D_P_MS = np.zeros(numVolCurves)
-        self._K_ATM = np.zeros(numVolCurves)
         self._V_25_D_MS = np.zeros(numVolCurves)
-        self._deltaATM = np.zeros(numVolCurves)
+
         self._parameters = np.zeros([numVolCurves, numParameters])
         self._texp = np.zeros(numVolCurves)
+
+        atmVol = self._atmVols[0]
+        xopt = [np.log(atmVol), 0.050, 0.800]
+        c0 = xopt
 
         for i in range(0, self._numVolCurves):
 
@@ -253,7 +366,7 @@ class FinFXVolSurface():
             self._F0T[i] = F0T
             atmVol = self._atmVols[i]
 
-            c0 = [np.log(atmVol), 0.050, 0.800]
+            c0 = xopt
 
             # This follows exposition in Clarke Page 52
             if self._atmMethod == FinFXATMMethod.SPOT:
@@ -344,11 +457,15 @@ class FinFXVolSurface():
 
             # Determine parameters of vol surface using Powell minimisation
             args = (self, call, put)
-            tol = 1e-6
+            tol = 1e-7
             xopt = fmin_powell(obj, c0, args, disp=False, ftol=tol)
             v = obj(xopt, *args)
 
+            print(i, texp, xopt, v)
+
+            # The function is quadratic. So the quadratic value should be small
             if abs(v) > tol:
+                print("Using an xtol:", tol, " maybe make this smaller")
                 raise FinError("Failed to fit volatility smile curve.")
 
             # Calculate the 25 Delta call and put strikes from new vol surface
@@ -378,18 +495,15 @@ class FinFXVolSurface():
                             vanillaOption,
                             deltaTarget,
                             tenorIndex, 
-                            initialValue = None):
+                            initialValue):
         ''' Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
         strike. '''
 
-        if initialValue is None:
-            initialValue = self._spotFXRate
-
         argtuple = (self, vanillaOption, deltaTarget, tenorIndex)
 
         sigma = newton(deltaFit, x0=initialValue, args=argtuple,
-                       rtol=1e-4, maxiter=50, fprime2=None)
+                       rtol=1e-5, maxiter=50, fprime2=None)
 
         return sigma
 
@@ -401,6 +515,8 @@ class FinFXVolSurface():
             print("==========================================================")
             print("====== CHECK CALIBRATION =================================")
             print("==========================================================")
+        else:
+            return
 
         K_dummy = 0.0
 
@@ -438,56 +554,49 @@ class FinFXVolSurface():
             delta_put = put.delta(self._valueDate,
                                   self._spotFXRate,
                                   self._domDiscountCurve,
+                                  
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
 
-            if checkCalibrationFlag:
-                print("Value Date:", self._valueDate)
-                print("Expiry Date:", self._expiryDates[i])
-                print("T:", self._texp[i])
-                print("S0:", self._spotFXRate)
-                print("F0T:", self._F0T[i])
-                print("ATM Method:", self._atmMethod)
-                print("DeltaATM:", self._deltaATM[i])
-                print("DeltaMethod:", self._deltaMethod)
+            print("Value Date:", self._valueDate)
+            print("Expiry Date:", self._expiryDates[i])
+            print("T:", self._texp[i])
+            print("S0:", self._spotFXRate)
+            print("F0T:", self._F0T[i])
+            print("ATM Method:", self._atmMethod)
+            print("DeltaMethod:", self._deltaMethod)
+            print("DeltaATM:", self._deltaATM[i])
 
-                # Print key strikes and their volatilities
-                print("Parameters:", self._parameters[i])
-
-            sigma_K_25_D_P = self.volFunction(self._K_25_D_P[i], i)
-
-            if checkCalibrationFlag:
-                print("K_25_D_P:    %9.7f    Vol: %9.4f    Delta: %9.8f"
-                      % (self._K_25_D_P[i], 100.0*sigma_K_25_D_P, delta_put))
-
-            sigma_K_25_D_P_MS = self.volFunction(self._K_25_D_P_MS[i], i)
-
-            if checkCalibrationFlag:
-                print("K_25_D_P_MS: %9.7f    Vol: %9.4f"
-                      % (self._K_25_D_P_MS[i], 100.0*sigma_K_25_D_P_MS))
+            # Print key strikes and their volatilities
+            print("Parameters:", self._parameters[i])
 
             sigma_ATM = self.volFunction(self._K_ATM[i], i)
+            print("K_ATM:       %9.7f    Vol: %9.4f"
+                  % (self._K_ATM[i], 100.0*sigma_ATM))
 
-            if checkCalibrationFlag:
-                print("K_ATM:       %9.7f    Vol: %9.4f"
-                      % (self._K_ATM[i], 100.0*sigma_ATM))
+            sigma_K_25_D_P = self.volFunction(self._K_25_D_P[i], i)
+            print("K_25_D_P:    %9.7f    Vol: %9.4f    Delta: %9.8f"
+                  % (self._K_25_D_P[i], 100.0*sigma_K_25_D_P, delta_put))
 
             sigma_K_25_D_C = self.volFunction(self._K_25_D_C[i], i)
-            if checkCalibrationFlag:
-                print("K_25_D_C:    %9.7f    Vol: %9.4f    Delta: %9.8f"
-                      % (self._K_25_D_C[i], 100.0*sigma_K_25_D_C, delta_call))
+            print("K_25_D_C:    %9.7f    Vol: %9.4f    Delta: %9.8f"
+                  % (self._K_25_D_C[i], 100.0*sigma_K_25_D_C, delta_call))
 
-            sigma_K_25_D_C_MS = self.volFunction(self._K_25_D_C_MS[i], i)
-            if checkCalibrationFlag:
-                print("K_25_D_C_MS: %9.7f    Vol: %9.4f"
-                      % (self._K_25_D_C_MS[i], 100.0*sigma_K_25_D_C_MS))
+            sigma_RR = sigma_K_25_D_C - sigma_K_25_D_P            
+            print("RR: %9.5f" % (100.0*sigma_RR))
 
-            sigma_RR = sigma_K_25_D_C - sigma_K_25_D_P
-            if checkCalibrationFlag:
-                print("RR: %9.5f" % (100.0*sigma_RR))
+            sigma_K_25_D_P_MS = self.volFunction(self._K_25_D_P_MS[i], i)
+            print("K_25_D_P_MS: %9.7f    Vol: %9.4f"
+                  % (self._K_25_D_P_MS[i], 100.0*sigma_K_25_D_P_MS))
 
-            if checkCalibrationFlag:
-                print("V_25_D_MS: %9.6f" % self._V_25_D_MS[i])
+            sigma_K_25_D_C_MS = self.volFunction(self._K_25_D_C_MS[i], i)            
+            print("K_25_D_C_MS: %9.7f    Vol: %9.4f"
+                  % (self._K_25_D_C_MS[i], 100.0*sigma_K_25_D_C_MS))
+
+            sigma_SS = 0.5*(sigma_K_25_D_C + sigma_K_25_D_P) - sigma_ATM
+            print("SS: %9.5f" % (100.0*sigma_SS))
+
+            print("V_25_D_MS: %9.6f" % self._V_25_D_MS[i])
 
 ###############################################################################
 
@@ -555,6 +664,7 @@ class FinFXVolSurface():
         s += labelToString("NOTIONAL CCY", self._notionalCurrency)
         s += labelToString("NUM TENORS", self._numVolCurves)
         s += labelToString("ATM METHOD", self._atmMethod)
+        s += labelToString("DELTA METHOD", self._deltaMethod)
 
         for i in range(0, self._numVolCurves):
 
@@ -565,9 +675,9 @@ class FinFXVolSurface():
             s += labelToString("TIME (YRS)", self._texp[i])
             s += labelToString("FWD FX", self._F0T[i])
 
-            s += labelToString("ATM VOLS", self._atmVols[i])
-            s += labelToString("MS VOLS", self._mktStrangle25DeltaVols[i])
-            s += labelToString("RR VOLS", self._riskReversal25DeltaVols[i])
+            s += labelToString("ATM VOLS", self._atmVols[i]*100.0)
+            s += labelToString("MS VOLS", self._mktStrangle25DeltaVols[i]*100.0)
+            s += labelToString("RR VOLS", self._riskReversal25DeltaVols[i]*100.0)
 
             s += labelToString("ATM Strike", self._K_ATM[i])
             s += labelToString("ATM Delta", self._deltaATM[i])

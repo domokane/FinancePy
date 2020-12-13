@@ -14,6 +14,8 @@ from financepy.finutils.FinDate import FinDate
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+import matplotlib.pyplot as plt
+
 ###############################################################################
 
 PLOT_GRAPHS = False
@@ -66,11 +68,16 @@ def test_FinFXMktVolSurface1():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration(False)
+#        fxMarket.checkCalibration(True)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
 
+        dbns = fxMarket.impliedDbns(0.5, 2.5, 1000)
+
+#        for i in range(0, len(dbns)):
+#            plt.plot(dbns[i]._x, dbns[i]._densitydx)
+                
     ###########################################################################
 
 def test_FinFXMktVolSurface2():
@@ -116,7 +123,7 @@ def test_FinFXMktVolSurface2():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration(False)
+#        fxMarket.checkCalibration(True)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
@@ -166,7 +173,7 @@ def test_FinFXMktVolSurface3():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration(False)
+#        fxMarket.checkCalibration(True)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
@@ -214,7 +221,8 @@ def test_FinFXMktVolSurface4():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration(False)
+        print(fxMarket)
+        fxMarket.checkCalibration(True)
 
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
@@ -224,10 +232,17 @@ def test_FinFXMktVolSurface4():
 
 ###############################################################################
 
+import time
+
+start = time.time()
 
 test_FinFXMktVolSurface1()
-test_FinFXMktVolSurface2()
-test_FinFXMktVolSurface3()
-test_FinFXMktVolSurface4()
+#test_FinFXMktVolSurface2()
+#test_FinFXMktVolSurface3()
+#test_FinFXMktVolSurface4()
 
+end = time.time()
+
+elapsed = end - start
+print("Elapsed Time:", elapsed)
 testCases.compareTestCases()

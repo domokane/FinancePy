@@ -3,8 +3,8 @@
 ##############################################################################
 
 import numpy as np
-from scipy import optimize
 from numba import njit, float64, int64, vectorize
+from scipy import optimize
 
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinGlobalVariables import gSmall
@@ -36,8 +36,7 @@ def bsValue(s, t, k, r, q, v, optionTypeValue):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    value = phi * ss * NVect(phi*d1)
-    value += - phi * kk * NVect(phi*d2)
+    value = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)
     return value
 
 ###############################################################################

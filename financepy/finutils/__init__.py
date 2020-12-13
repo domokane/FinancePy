@@ -12,4 +12,6 @@ from .FinSchedule import *
 from .FinError import *
 from .FinCurrency import *
 from .FinAmount import *
+from .FinDistribution import *
+
 
