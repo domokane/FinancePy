@@ -20,6 +20,7 @@ from ..finutils.FinError import FinError
 def bsValue(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
+#    print("==>BSVALUE", s,t,k,r,q,v,optionTypeValue)
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:

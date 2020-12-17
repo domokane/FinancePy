@@ -10,6 +10,7 @@ from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
 from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
 from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
 from financepy.finutils.FinDate import FinDate
+from financepy.market.volatility.FinOptionVolatilityFns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -50,10 +51,20 @@ def test_FinFXMktVolSurface1():
         marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
+#        tenors = ['1Y']
+#        atmVols = [18.250]
+#        marketStrangle25DeltaVols = [0.95]
+#        riskReversal25DeltaVols = [-0.60]
+
         notionalCurrency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+#        deltaMethod = FinFXDeltaMethod.FORWARD_DELTA
+#        deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+#        deltaMethod = FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ
+
+        volFunctionType = FinVolFunctionTypes.CLARKE
 
         fxMarket = FinFXVolSurface(valueDate,
                                    spotFXRate,
@@ -66,18 +77,20 @@ def test_FinFXMktVolSurface1():
                                    marketStrangle25DeltaVols,
                                    riskReversal25DeltaVols,
                                    atmMethod,
-                                   deltaMethod)
+                                   deltaMethod, 
+                                   volFunctionType)
 
-#        fxMarket.checkCalibration(True)
+        fxMarket.checkCalibration(True)
 
-        if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+#        if PLOT_GRAPHS:
+#            fxMarket.plotVolCurves()
 
-        dbns = fxMarket.impliedDbns(0.5, 2.5, 1000)
+#        dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
 
 #        for i in range(0, len(dbns)):
 #            plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                
+#            print("SUM:", dbns[i].sum())
+
     ###########################################################################
 
 def test_FinFXMktVolSurface2():
@@ -123,10 +136,10 @@ def test_FinFXMktVolSurface2():
                                    atmMethod,
                                    deltaMethod)
 
-#        fxMarket.checkCalibration(True)
+        fxMarket.checkCalibration(True)
 
-        if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+#        if PLOT_GRAPHS:
+#            fxMarket.plotVolCurves()
 
 #    print("==================================================================")
 
@@ -173,10 +186,10 @@ def test_FinFXMktVolSurface3():
                                    atmMethod,
                                    deltaMethod)
 
-#        fxMarket.checkCalibration(True)
+        fxMarket.checkCalibration(True)
 
-        if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+#        if PLOT_GRAPHS:
+#            fxMarket.plotVolCurves()
 
     ###########################################################################
 
@@ -221,11 +234,10 @@ def test_FinFXMktVolSurface4():
                                    atmMethod,
                                    deltaMethod)
 
-        print(fxMarket)
         fxMarket.checkCalibration(True)
 
-        if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+#        if PLOT_GRAPHS:
+#            fxMarket.plotVolCurves()
 
     #    testCases.header("value", "delta")
     #    testCases.print(value, delta)
@@ -234,15 +246,17 @@ def test_FinFXMktVolSurface4():
 
 import time
 
-start = time.time()
+if __name__ == '__main__':
 
-test_FinFXMktVolSurface1()
-#test_FinFXMktVolSurface2()
-#test_FinFXMktVolSurface3()
-#test_FinFXMktVolSurface4()
+    start = time.time()
 
-end = time.time()
-
-elapsed = end - start
-print("Elapsed Time:", elapsed)
-testCases.compareTestCases()
+    test_FinFXMktVolSurface1()
+    #test_FinFXMktVolSurface2()
+    #test_FinFXMktVolSurface3()
+    #test_FinFXMktVolSurface4()
+    
+    end = time.time()
+    
+    elapsed = end - start
+    print("Elapsed Time:", elapsed)
+    testCases.compareTestCases()

@@ -12,9 +12,13 @@ from ..finutils.FinError import FinError
 ###############################################################################
 
 
-@njit(float64(float64, float64, float64, float64, float64, float64, float64),
-      fastmath=True, cache=True)
-def blackVolFromSABR(alpha, beta, rho, nu, f, k, t):
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+def volFunctionSABR(params, f, k, t):
+
+    alpha = params[0]
+    beta = params[1]
+    rho = params[2]
+    nu = params[3]
 
     if abs(rho) >= 0.999999999:
         raise FinError("Rho is a correlation and must be less than 1.0")

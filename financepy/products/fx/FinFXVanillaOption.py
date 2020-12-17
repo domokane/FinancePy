@@ -4,6 +4,7 @@
 
 import numpy as np
 from scipy import optimize
+from numba import njit
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -13,11 +14,13 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...products.fx.FinFXModelTypes import FinFXModelSABR
+from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
+
 from ...models.FinModelCRRTree import crrTreeValAvg
-from ...models.FinModelSABR import blackVolFromSABR
+from ...models.FinModelSABR import volFunctionSABR
 from ...models.FinModelBlackScholesAnalytical import bsValue, bsDelta
 
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 
 from ...finutils.FinMath import N
 
@@ -75,7 +78,32 @@ def fvega(volatility, *args):
 
 ###############################################################################
 
+@njit(fastmath=True, cache=True)
+def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
+    ''' Calculation of the FX Option delta. Used in the determination of
+    the volatility surface. Avoids discount curve interpolation so it 
+    should be slightly faster than the full calculation of delta. '''
 
+    pips_spot_delta = bsDelta(s, t, k, rd, rf, vol, optionTypeValue)
+
+    if deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA.value:
+        return pips_spot_delta
+    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA.value:
+        pips_fwd_delta = pips_spot_delta * np.exp(rf*t)
+        return pips_fwd_delta
+    elif deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+        vpctf = bsValue(s, t, k, rd, rf, vol, optionTypeValue) / s
+        pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+        return pct_spot_delta_prem_adj
+    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+        vpctf = bsValue(s, t, k, rd, rf, vol, optionTypeValue) / s
+        pct_fwd_delta_prem_adj = np.exp(rf*t) * (pips_spot_delta - vpctf)
+        return pct_fwd_delta_prem_adj
+    else:
+        raise FinError("Unknown FinFXDeltaMethod")
+
+###############################################################################
+    
 # def g(K, *args):
 #     ''' This is the objective function used in the determination of the FX
 #     Option implied strike which is computed in the class below. '''
@@ -236,12 +264,17 @@ class FinFXVanillaOption():
             raise FinError("Time to expiry must be positive.")
 
         tdel = np.maximum(tdel, 1e-10)
-
-        rd = domDiscountCurve.zeroRate(self._deliveryDate)
-        rf = forDiscountCurve.zeroRate(self._deliveryDate)
+        
+        # TODO RESOLVE TDEL versus TEXP 
+        domDF = domDiscountCurve._df(tdel)
+        forDF = forDiscountCurve._df(tdel)
+            
+        rd = -np.log(domDF) / tdel
+        rf = -np.log(forDF) / tdel
 
         S0 = spotFXRate
         K = self._strikeFXRate
+        F0T = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes or \
            type(model) == FinFXModelSABR:
@@ -249,11 +282,11 @@ class FinFXVanillaOption():
             if type(model) == FinFXModelBlackScholes:
                 volatility = model._volatility
             elif type(model) == FinFXModelSABR:
-                volatility = blackVolFromSABR(model.alpha,
-                                              model.beta,
-                                              model.rho,
-                                              model.nu,
-                                              F0T, K, tdel)
+                volatility = volFunctionSABR(model.alpha,
+                                             model.beta,
+                                             model.rho,
+                                             model.nu,
+                                             F0T, K, tdel)
 
             if volatility < 0.0:
                 raise FinError("Volatility should not be negative.")
@@ -391,7 +424,6 @@ class FinFXVanillaOption():
 
         S0 = spotFXRate
         K = self._strikeFXRate
-#        F = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes:
 
@@ -402,90 +434,52 @@ class FinFXVanillaOption():
 
             v = np.maximum(v, gSmall)
 
-#            lnS0k = np.log(S0/K)
-#            sqrtT = np.sqrt(texp)
-#            den = v * sqrtT
-#            mu = rd - rf
-#            v2 = v * v
-
-#            d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
-#            d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
-
-#            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
- #               w = +1.0
-#            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-#                w = -1.0
-#            else:
-#                raise FinError("Unknown option type")
-
-#            n1 = N(w*d1)
-#            n2 = N(w*d2)
-
-#            pips_spot_delta = w * np.exp(-rf*tdel) * n1
-#            pct_spot_delta_prem_adj = w * np.exp(-rd * tdel) * n2 * K / S0
-#            pips_fwd_delta = w*n1
-#            pct_fwd_delta_prem_adj = w*K*n2/F
-
-# JUST SWITCHED THIS TO USE BSVALUE - THERE IS A SMALL PERFORMANCE COST IN 
-# SOME CASES AS I NEED TO CALCULATE BSVALUE TO GET THE ND2 WHICH ALSO CALCS ND1. 
-
-            pips_spot_delta2 = bsDelta(S0, texp, K, rd, rf, v, self._optionType.value)
-            pips_fwd_delta2 = pips_spot_delta2 * np.exp(rf*tdel)
-
+            pips_spot_delta = bsDelta(S0, texp, K, rd, rf, v, self._optionType.value)
+            pips_fwd_delta = pips_spot_delta * np.exp(rf*tdel)
             vpctf = bsValue(S0, texp, K, rd, rf, v, self._optionType.value) / S0
+            pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+            pct_fwd_delta_prem_adj = np.exp(rf*tdel) * (pips_spot_delta - vpctf)
 
-            pct_spot_delta_prem_adj2 = pips_spot_delta2 - vpctf
-            pct_fwd_delta_prem_adj2 = np.exp(rf*tdel) * (pips_spot_delta2 - vpctf)
-
- #           print(pct_fwd_delta_prem_adj, pct_fwd_delta_prem_adj2, 
- #                 pct_fwd_delta_prem_adj / pct_fwd_delta_prem_adj2)
-
-        return {"pips_spot_delta": pips_spot_delta2,
-                "pips_fwd_delta": pips_fwd_delta2,
-                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj2,
-                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj2}
+        return {"pips_spot_delta": pips_spot_delta,
+                "pips_fwd_delta": pips_fwd_delta,
+                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
+                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
 
 ###############################################################################
 
     def fastDelta(self,
-                  valueDate,
-                  spotFXRate,
-                  domDF,
-                  forDF,
+                  t,
+                  s,
+                  rd,
+                  rf,
                   vol):
         ''' Calculation of the FX Option delta. Used in the determination of
-        the volatility surface. Avoids curve interpolation. '''
+        the volatility surface. Avoids discount curve interpolation so it 
+        should be slightly faster than the full calculation of delta. '''
 
-        spotDate = valueDate.addWeekDays(self._spotDays)
-        tdel = (self._deliveryDate - valueDate) / gDaysInYear
+#        spotDate = valueDate.addWeekDays(self._spotDays)
+#        tdel = (self._deliveryDate - valueDate) / gDaysInYear
+#        tdel = np.maximum(tdel, gSmall)
 
-        if np.any(spotFXRate <= 0.0):
-            raise FinError("Spot FX Rate must be greater than zero.")
+#        rd = -np.log(domDF)/tdel
+#        rf = -np.log(forDF)/tdel
+        k = self._strikeFXRate
 
-        if np.any(tdel < 0.0):
-            raise FinError("Time to expiry must be positive.")
+#        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
 
-        tdel = np.maximum(tdel, 1e-10)
-
-        rd = -np.log(domDF)/tdel
-        rf = -np.log(forDF)/tdel
-
-        S0 = spotFXRate
-        K = self._strikeFXRate
-
-        pips_spot_delta2 = bsDelta(S0, tdel, K, rd, rf, vol,
+        pips_spot_delta = bsDelta(s, t, k, rd, rf, vol,
                                    self._optionType.value)
-        pips_fwd_delta2 = pips_spot_delta2 * np.exp(rf*tdel)
+        pips_fwd_delta = pips_spot_delta * np.exp(rf*t)
 
-        vpctf = bsValue(S0, tdel, K, rd, rf, vol, self._optionType.value) / S0
+        vpctf = bsValue(s, t, k, rd, rf, vol, self._optionType.value) / s
 
-        pct_spot_delta_prem_adj2 = pips_spot_delta2 - vpctf
-        pct_fwd_delta_prem_adj2 = np.exp(rf*tdel) * (pips_spot_delta2 - vpctf)
+        pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+        pct_fwd_delta_prem_adj = np.exp(rf*t) * (pips_spot_delta - vpctf)
 
-        return {"pips_spot_delta": pips_spot_delta2,
-                "pips_fwd_delta": pips_fwd_delta2,
-                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj2,
-                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj2}
+        return {"pips_spot_delta": pips_spot_delta,
+                "pips_fwd_delta": pips_fwd_delta,
+                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
+                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
 
 ###############################################################################
 
@@ -743,5 +737,24 @@ class FinFXVanillaOption():
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
         v = payoff * np.exp(-rd * t) / 2.0
         return v
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("CURRENCY PAIR", self._currencyPair)
+        s += labelToString("PREMIUM CCY", self._premCurrency)
+        s += labelToString("STRIKE FX RATE", self._strikeFXRate)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("SPOT DAYS", self._spotDays)
+        s += labelToString("NOTIONAL", self._notional, "")
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################
