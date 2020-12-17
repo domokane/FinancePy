@@ -73,45 +73,31 @@ class FinModelSABR():
     def blackVol(self, f, k, t):
         ''' Black volatility from SABR model using Hagan et al. approx. '''
 
+        params = np.array([self._alpha, self._beta, self._rho, self._nu])
+
         # I wish to enable vectorisations
         if isinstance(f, np.ndarray):
             vols = []
             for x in f:
-                v = blackVolFromSABR(self._alpha,
-                                     self._beta,
-                                     self._rho,
-                                     self._nu,
-                                     x, k, t)
+                v = volFunctionSABR(params, x, k, t)
                 vols.append(v)
             return np.array(vols)
 
         elif isinstance(k, np.ndarray):
             vols = []
             for x in k:
-                v = blackVolFromSABR(self._alpha,
-                                     self._beta,
-                                     self._rho,
-                                     self._nu,
-                                     f, x, t)
+                v = volFunctionSABR(params, f, x, t)
                 vols.append(v)
             return np.array(vols)
 
         elif isinstance(t, np.ndarray):
             vols = []
             for x in t:
-                v = blackVolFromSABR(self._alpha,
-                                     self._beta,
-                                     self._rho,
-                                     self._nu,
-                                     f, k, x)
+                v = volFunctionSABR(params, f, k, x)
                 vols.append(v)
             return np.array(vols)
         else:
-            v = blackVolFromSABR(self._alpha,
-                                 self._beta,
-                                 self._rho,
-                                 self._nu,
-                                 f, k, t)
+            v = volFunctionSABR(params, f, k, t)
             return v
 
 ###############################################################################

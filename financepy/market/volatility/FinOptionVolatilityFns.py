@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, jit, float64
+from numba import njit, float64
 
 from ...finutils.FinMath import N
 
@@ -19,7 +19,7 @@ class FinVolFunctionTypes(Enum):
 # Parametric functions for option volatility to use in a Black-Scholes model
 ###############################################################################
 
-@jit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def volFunctionClarke(params, f, k, t):
     ''' Volatility Function in book by Iain Clarke generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 

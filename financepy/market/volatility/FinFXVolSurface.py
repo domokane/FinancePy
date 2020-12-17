@@ -3,13 +3,11 @@
 ##############################################################################
 
 import numpy as np
-from scipy.optimize import fmin_powell
 from scipy.optimize import newton
-from scipy.optimize import brentq
 from scipy.optimize import minimize
 
 import matplotlib.pyplot as plt
-from numba import jit, njit, float64, int64
+from numba import njit, float64, int64
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
@@ -31,46 +29,10 @@ from ...finutils.FinMath import norminvcdf
 
 from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
-
-import multiprocessing as mp
-
-result_list = []
-def log_result(result):
-    # This is called whenever foo_pool(i) returns a result.
-    # result_list is modified only by the main process, not the pool workers.
-    result_list.append(result)
-    
     
 ###############################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
 #       delta fit.
-###############################################################################
-
-# def g(K, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     option implied strike which is computed in the class below. '''
-
-#     self = args[0]
-#     valueDate = args[1]
-#     spotFXRate = args[2]
-#     domDF = args[3]
-#     forDF = args[4]
-#     delta = args[5]
-#     deltaType = args[6]
-#     volatility = args[7]
-
-#     self._strikeFXRate = K
-
-#     deltaDict = self.fastDelta(valueDate,
-#                                spotFXRate,
-#                                domDF,
-#                                forDF,
-#                                volatility)
-
-#     deltaOut = deltaDict[deltaType]
-#     objFn = delta - deltaOut    
-#     return objFn
-
 ###############################################################################
 
 def g(K, *args):
@@ -96,84 +58,86 @@ def g(K, *args):
 
 ###############################################################################
 
-def obj(cvec, *args):
-    ''' Return a function that is minimised when the ATM, MS and RR vols have
-    been best fitted using the parametric volatility curve represented by cvec
-    '''
-    self = args[0]
-    i = self._tenorIndex
-    self._parameters[i, :] = cvec
+# def obj(cvec, *args):
+#     ''' Return a function that is minimised when the ATM, MS and RR vols have
+#     been best fitted using the parametric volatility curve represented by cvec
+#     '''
+#     self = args[0]
+#     i = self._tenorIndex
+#     self._parameters[i, :] = cvec
 
-    # We first need to solve for the strikes at the 25 delta points using the
-    # new volatility curve
+#     # We first need to solve for the strikes at the 25 delta points using the
+#     # new volatility curve
 
-    # Match the at-the-money option volatility
-    atmCurveVol = self.volFunction(self._K_ATM[i], i)
-    targetATMVol = self._atmVols[i]
-    term1 = (targetATMVol - atmCurveVol)**2
+#     # Match the at-the-money option volatility
+#     atmCurveVol = self.volFunction(self._K_ATM[i], i)
+#     targetATMVol = self._atmVols[i]
+#     term1 = (targetATMVol - atmCurveVol)**2
 
-    # Match the market strangle value but this has to be at the MS strikes
-    # call._strikeFXRate = self._K_25D_C_MS[i]
-    sigma_K_25D_C_MS = self.volFunction(self._K_25D_C_MS[i], i)
-    # model = FinFXModelBlackScholes(sigma_K_25D_C_MS)
+#     # Match the market strangle value but this has to be at the MS strikes
+#     # call._strikeFXRate = self._K_25D_C_MS[i]
+#     sigma_K_25D_C_MS = self.volFunction(self._K_25D_C_MS[i], i)
+#     # model = FinFXModelBlackScholes(sigma_K_25D_C_MS)
 
-    # V_C_25_MS = call.value(self._valueDate,
-    #                        self._spotFXRate,
-    #                        self._domDiscountCurve,
-    #                        self._forDiscountCurve,
-    #                        model)['v']
+#     # V_C_25_MS = call.value(self._valueDate,
+#     #                        self._spotFXRate,
+#     #                        self._domDiscountCurve,
+#     #                        self._forDiscountCurve,
+#     #                        model)['v']
 
-    V_25D_C_MS = bsValue(self._spotFXRate,
-                          self._texp[i],
-                          self._K_25D_C_MS[i],
-                          self._rd[i],
-                          self._rf[i],
-                          sigma_K_25D_C_MS,
-                          FinOptionTypes.EUROPEAN_CALL.value)
+#     V_25D_C_MS = bsValue(self._spotFXRate,
+#                           self._texp[i],
+#                           self._K_25D_C_MS[i],
+#                           self._rd[i],
+#                           self._rf[i],
+#                           sigma_K_25D_C_MS,
+#                           FinOptionTypes.EUROPEAN_CALL.value)
 
-    # put._strikeFXRate = self._K_25D_P_MS[i]
-    sigma_K_25D_P_MS = self.volFunction(self._K_25D_P_MS[i], i)
-    # model = FinFXModelBlackScholes(sigma_K_25D_P_MS)
+#     # put._strikeFXRate = self._K_25D_P_MS[i]
+#     sigma_K_25D_P_MS = self.volFunction(self._K_25D_P_MS[i], i)
+#     # model = FinFXModelBlackScholes(sigma_K_25D_P_MS)
 
-    # V_25D_P_MS = put.value(self._valueDate,
-    #                       self._spotFXRate,
-    #                       self._domDiscountCurve,
-    #                       self._forDiscountCurve,
-    #                       model)['v']
+#     # V_25D_P_MS = put.value(self._valueDate,
+#     #                       self._spotFXRate,
+#     #                       self._domDiscountCurve,
+#     #                       self._forDiscountCurve,
+#     #                       model)['v']
 
-    V_25D_P_MS = bsValue(self._spotFXRate,
-                          self._texp[i],
-                          self._K_25D_P_MS[i],
-                          self._rd[i],
-                          self._rf[i],
-                          sigma_K_25D_P_MS,
-                          FinOptionTypes.EUROPEAN_PUT.value)
+#     V_25D_P_MS = bsValue(self._spotFXRate,
+#                           self._texp[i],
+#                           self._K_25D_P_MS[i],
+#                           self._rd[i],
+#                           self._rf[i],
+#                           sigma_K_25D_P_MS,
+#                           FinOptionTypes.EUROPEAN_PUT.value)
 
-    V_25D_MS = V_25D_C_MS + V_25D_P_MS
-    target25StrangleValue = self._V_25D_MS[i]
-    term2 = (V_25D_MS - target25StrangleValue)**2
+#     V_25D_MS = V_25D_C_MS + V_25D_P_MS
+#     target25StrangleValue = self._V_25D_MS[i]
+#     term2 = (V_25D_MS - target25StrangleValue)**2
 
-    # Match the risk reversal volatility
+#     # Match the risk reversal volatility
     
-    K0 = self._K_25D_C_MS[i]
-    K_25D_C = self.solveForSmileStrike(FinOptionTypes.EUROPEAN_CALL.value, +0.2500, i, K0)
-    sigma_K_25D_C = self.volFunction(K_25D_C, i)
+#     K0 = self._K_25D_C_MS[i]
+#     K_25D_C = self.solveForSmileStrike(FinOptionTypes.EUROPEAN_CALL.value, +0.2500, i, K0)
+#     sigma_K_25D_C = self.volFunction(K_25D_C, i)
 
-    K0 = self._K_25D_P_MS[i]
-    K_25D_P = self.solveForSmileStrike(FinOptionTypes.EUROPEAN_PUT.value, -0.2500, i, K0)
-    sigma_K_25D_P = self.volFunction(K_25D_P, i)
+#     K0 = self._K_25D_P_MS[i]
+#     K_25D_P = self.solveForSmileStrike(FinOptionTypes.EUROPEAN_PUT.value, -0.2500, i, K0)
+#     sigma_K_25D_P = self.volFunction(K_25D_P, i)
 
-    targetRRVol = self._riskReversal25DeltaVols[i]
-    sigma_25D_RR = (sigma_K_25D_C - sigma_K_25D_P)
-    term3 = (sigma_25D_RR - targetRRVol)**2
+#     targetRRVol = self._riskReversal25DeltaVols[i]
+#     sigma_25D_RR = (sigma_K_25D_C - sigma_K_25D_P)
+#     term3 = (sigma_25D_RR - targetRRVol)**2
 
-    self._K_25D_C[i] = K_25D_C
-    self._K_25D_P[i] = K_25D_P
+#     self._K_25D_C[i] = K_25D_C
+#     self._K_25D_P[i] = K_25D_P
 
-    tot = term1 + term2 + term3
+#     tot = term1 + term2 + term3
 
-#    print("TOT:", tot)
-    return tot
+#     print("OBJSLOW", cvec, tot)
+
+# #    print("TOT:", tot)
+#     return tot
 
 ###############################################################################
 
@@ -246,6 +210,7 @@ def objFAST(params, *args):
     ###########################################################################
 
     tot = term1 + term2 + term3
+
     return tot
 
 ###############################################################################
@@ -298,6 +263,7 @@ def solveToHorizonFAST(s, t, rd, rf, K_ATM,
     # The function is quadratic. So the quadratic value should be small
     if abs(v) > tol:
         print("Using an xtol:", tol, " maybe make this smaller")
+        print("Reported value of v:", v)
         raise FinError("Failed to fit volatility smile curve.")
 
     params = np.array(xopt)
@@ -325,17 +291,16 @@ def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
     interpolation following Section 3.9 of Iain Clark book. '''
 
     if volFunctionTypeValue == FinVolFunctionTypes.CLARKE.value:
-        vol = np.float64(volFunctionClarke(params, f, k, t))
+        vol = volFunctionClarke(params, f, k, t)
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
-        vol = np.float64(volFunctionSABR(params, f, k, t))
+        vol = volFunctionSABR(params, f, k, t)
         return vol
     else:
         raise FinError("Unknown Model Type")
 
 ###############################################################################
 
-#@jit
 def deltaFit(K, *args):
     ''' This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
@@ -354,39 +319,9 @@ def deltaFit(K, *args):
     params = args[8]
 
     f = s*np.exp((rd-rf)*t)
-
-#    volatility = self.volFunction(K, tenorIndex)
-
     v = volFunctionFAST(volTypeValue, params, f, K, t)
-
-#    model = FinFXModelBlackScholes(volatility)
-
-#    option._strikeFXRate = np.abs(K)
-
-    # TODO - MAKE THIS FAST DELTA TO AVOID CURVE INTERPOLATION
-    # deltaDict = option.delta(self._valueDate,
-    #                           self._spotFXRate,
-    #                           self._domDiscountCurve,
-    #                           self._forDiscountCurve,
-    #                           model)
-
-    # print("SLOW", deltaDict)
-    # TODO - MAKE THIS FAST DELTA TO AVOID CURVE INTERPOLATION
-
-    # if 1==0:
-    #     deltaDict = option.fastDelta(tdel,
-    #                                  self._spotFXRate,
-    #                                  rd,
-    #                                  rf,
-    #                                  volatility)
-    #     deltaOut = deltaDict[self._deltaMethodString]
-    #     # print("FAST", deltaDict)
-
     deltaOut = fastDelta(s, t, K, rd, rf, v, deltaTypeValue, optionTypeValue)
-
-#    print("DELTA FIT", deltaOut)
     inverseDeltaOut = norminvcdf(np.abs(deltaOut))   
-
     invObjFn = inverseDeltaTarget - inverseDeltaOut
 
     return invObjFn
@@ -410,7 +345,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
                 deltaMethodValue, inverseDeltaTarget, parameters)
 
     K = newton(deltaFit, x0=initialValue, args=argtuple,
-                   rtol=1e-7, maxiter=50, fprime2=None)
+               tol=1e-8, maxiter=50, fprime2=None)
 
     return K
     
@@ -575,26 +510,22 @@ class FinFXVolSurface():
 
 ###############################################################################
 
-    def volFunction(self, K, tenorIndex):
-        ''' Return the volatility for a strike using a given polynomial
-        interpolation following Section 3.9 of Iain Clark book. '''
+    # def volFunction(self, K, tenorIndex):
+    #     ''' Return the volatility for a strike using a given polynomial
+    #     interpolation following Section 3.9 of Iain Clark book. '''
 
-        params = self._parameters[tenorIndex]
-        F = self._F0T[tenorIndex]
-        texp = self._texp[tenorIndex]
+    #     params = self._parameters[tenorIndex]
+    #     F = self._F0T[tenorIndex]
+    #     texp = self._texp[tenorIndex]
 
-        if self._volatilityFunctionType == FinVolFunctionTypes.CLARKE:
-            vol = np.float64(volFunctionClarke(params, F, K, texp))
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-            vol = np.float64(volFunctionSABR(params, F, K, texp))
-        else:
-            raise FinError("Unknown Model Type")
+    #     if self._volatilityFunctionType == FinVolFunctionTypes.CLARKE:
+    #         vol = volFunctionClarke(params, F, K, texp)
+    #     elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+    #         vol = volFunctionSABR(params, F, K, texp)
+    #     else:
+    #         raise FinError("Unknown Model Type")
 
-#       THIS SEEMS TO BE QUITE EXPENSIVE !!!
-#        if vol.any() < 0.0:
-#            raise ValueError("Negative volatility. Not permitted.")
-
-        return vol
+    #     return vol
 
 ###############################################################################
 
@@ -677,160 +608,114 @@ class FinFXVolSurface():
 
             xinits.append(xinit)
 
-        if 1==0:
 
-            for i in range(0, numVolCurves):
-                self.solveToHorizon(i, xinits[i])
+        deltaMethodValue = self._deltaMethod.value
+        volTypeValue = self._volatilityFunctionType.value
 
-        elif 1==1:
+        for i in range(0, numVolCurves):
+            
+            t = self._texp[i]
+            rd = self._rd[i]
+            rf = self._rf[i]
+            K_ATM = self._K_ATM[i]
+            atmVol = self._atmVols[i]
+            ms25DVol = self._mktStrangle25DeltaVols[i]
+            rr25DVol = self._riskReversal25DeltaVols[i]
 
-            deltaMethodValue = self._deltaMethod.value
-            volTypeValue = self._volatilityFunctionType.value
+#            print(t, rd, rf, K_ATM, atmVol, ms25DVol, rr25DVol)
 
-            for i in range(0, numVolCurves):
-                
-                t = self._texp[i]
-                rd = self._rd[i]
-                rf = self._rf[i]
-                K_ATM = self._K_ATM[i]
-                atmVol = self._atmVols[i]
-                ms25DVol = self._mktStrangle25DeltaVols[i]
-                rr25DVol = self._riskReversal25DeltaVols[i]
+            res = solveToHorizonFAST(s, t, rd, rf, K_ATM, 
+                                   atmVol, ms25DVol, rr25DVol, 
+                                   deltaMethodValue, volTypeValue,
+                                   xinits[i])
 
-                res = solveToHorizonFAST(s, t, rd, rf, K_ATM, 
-                                       atmVol, ms25DVol, rr25DVol, 
-                                       deltaMethodValue, volTypeValue,
-                                       xinits[i])
-
-                (self._parameters[i,:], 
-                 self._K_25D_C_MS[i], self._K_25D_P_MS[i], 
-                 self._K_25D_C[i], self._K_25D_P[i]) = res
-
-        else:
-
-            deltaMethodValue = self._deltaMethod.value
-            volTypeValue = self._volatilityFunctionType.value
-
-            params = []
-
-            for i in range(0, numVolCurves):
-                
-                t = self._texp[i]
-                rd = self._rd[i]
-                rf = self._rf[i]
-                K_ATM = self._K_ATM[i]
-                ms25DVol = self._mktStrangle25DeltaVols[i]
-                rr25DVol = self._riskReversal25DeltaVols[i]
-
-                param = (s, t, rd, rf, K_ATM, 
-                         atmVol, ms25DVol, rr25DVol, 
-                         deltaMethodValue, volTypeValue,
-                         xinits[i])
-
-                params.append(param)
-
-            pool = mp.Pool(mp.cpu_count())
-
-#            for i in range(0, self._numVolCurves):
-#                pool.apply_async(solveToHorizonFAST, args = params[i], callback = log_result)
-
-            print(params)
-            result_list = pool.starmap(solveToHorizonFAST, params)
-#            pool.close()
-#            pool.join()
-
-            print(result_list)
-
-            for i in range(0, self._numVolCurves):
-                (self._parameters[i,:], 
-                 self._K_25D_C_MS[i],
-                 self._K_25D_P_MS[i],
-                 self._K_25D_C[i],
-                 self._K_25D_P[i]) = result_list[i]
+            (self._parameters[i,:], 
+             self._K_25D_C_MS[i], self._K_25D_P_MS[i], 
+             self._K_25D_C[i], self._K_25D_P[i]) = res
 
 ###############################################################################
 
-    def solveToHorizon(self, i, xopt):
+    # def solveToHorizon(self, i, xopt):
 
-        print("Starting solve To Horizon", i)
-        self._tenorIndex = i
+    #     print("Starting solve To Horizon", i)
+    #     self._tenorIndex = i
 
-        c0 = xopt
+    #     c0 = xopt
 
-        # Determine the price of a market strangle from market strangle
-        # Need to price a call and put that agree with market strangle
+    #     # Determine the price of a market strangle from market strangle
+    #     # Need to price a call and put that agree with market strangle
 
-        vol_25D_MS = self._atmVols[i] + self._mktStrangle25DeltaVols[i]
+    #     vol_25D_MS = self._atmVols[i] + self._mktStrangle25DeltaVols[i]
 
-        K_25D_C_MS = solveForStrike(self._spotFXRate,
-                                    self._texp[i],                                         
-                                    self._rd[i],
-                                    self._rf[i],
-                                    FinOptionTypes.EUROPEAN_CALL.value,
-                                    +0.2500,
-                                    self._deltaMethod.value,
-                                    vol_25D_MS)
+    #     K_25D_C_MS = solveForStrike(self._spotFXRate,
+    #                                 self._texp[i],                                         
+    #                                 self._rd[i],
+    #                                 self._rf[i],
+    #                                 FinOptionTypes.EUROPEAN_CALL.value,
+    #                                 +0.2500,
+    #                                 self._deltaMethod.value,
+    #                                 vol_25D_MS)
 
-        K_25D_P_MS = solveForStrike(self._spotFXRate,
-                                    self._texp[i],
-                                    self._rd[i],
-                                    self._rf[i],
-                                    FinOptionTypes.EUROPEAN_PUT.value,
-                                    -0.2500,
-                                    self._deltaMethod.value,
-                                    vol_25D_MS)
+    #     K_25D_P_MS = solveForStrike(self._spotFXRate,
+    #                                 self._texp[i],
+    #                                 self._rd[i],
+    #                                 self._rf[i],
+    #                                 FinOptionTypes.EUROPEAN_PUT.value,
+    #                                 -0.2500,
+    #                                 self._deltaMethod.value,
+    #                                 vol_25D_MS)
 
-        # Store the set of strikes in the class
-        self._K_25D_C_MS[i] = K_25D_C_MS
-        self._K_25D_P_MS[i] = K_25D_P_MS
+    #     # Store the set of strikes in the class
+    #     self._K_25D_C_MS[i] = K_25D_C_MS
+    #     self._K_25D_P_MS[i] = K_25D_P_MS
 
-        # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
+    #     # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
 
-        V_25D_C_MS = bsValue(self._spotFXRate,
-                             self._texp[i],
-                             K_25D_C_MS,
-                             self._rd[i],
-                             self._rf[i],
-                             vol_25D_MS,
-                             FinOptionTypes.EUROPEAN_CALL.value)
+    #     V_25D_C_MS = bsValue(self._spotFXRate,
+    #                          self._texp[i],
+    #                          K_25D_C_MS,
+    #                          self._rd[i],
+    #                          self._rf[i],
+    #                          vol_25D_MS,
+    #                          FinOptionTypes.EUROPEAN_CALL.value)
 
-        V_25D_P_MS = bsValue(self._spotFXRate,
-                             self._texp[i],
-                             K_25D_P_MS,
-                             self._rd[i],
-                             self._rf[i],
-                             vol_25D_MS,
-                             FinOptionTypes.EUROPEAN_PUT.value)
+    #     V_25D_P_MS = bsValue(self._spotFXRate,
+    #                          self._texp[i],
+    #                          K_25D_P_MS,
+    #                          self._rd[i],
+    #                          self._rf[i],
+    #                          vol_25D_MS,
+    #                          FinOptionTypes.EUROPEAN_PUT.value)
 
-        # Market price of strangle in the domestic currency
-        V_25D_MS = V_25D_C_MS + V_25D_P_MS
-        self._V_25D_MS[i] = V_25D_MS
+    #     # Market price of strangle in the domestic currency
+    #     V_25D_MS = V_25D_C_MS + V_25D_P_MS
+    #     self._V_25D_MS[i] = V_25D_MS
 
-        if 1 == 0:
-            print("Value Date:", self._valueDate)
-            print("Expiry Date:", self._expiryDates[i])
-            print("T:", self._texp[i])
-            print("S0:", self._spotFXRate)
-            print("F0T:", self._F0T[i])
-            print("ATM Method:", self._atmMethod)
-            print("DeltaATM:", self._deltaATM[i])
-            print("DeltaMethod:", self._deltaMethod)
+    #     if 1 == 0:
+    #         print("Value Date:", self._valueDate)
+    #         print("Expiry Date:", self._expiryDates[i])
+    #         print("T:", self._texp[i])
+    #         print("S0:", self._spotFXRate)
+    #         print("F0T:", self._F0T[i])
+    #         print("ATM Method:", self._atmMethod)
+    #         print("DeltaATM:", self._deltaATM[i])
+    #         print("DeltaMethod:", self._deltaMethod)
 
-        # Determine parameters of vol surface using minimisation
-        args = (self) #, call, put)
-        tol = 1e-8
+    #     # Determine parameters of vol surface using minimisation
+    #     args = (self) #, call, put)
+    #     tol = 1e-8
 
-        opt = minimize(obj, c0, args, method="CG", tol=tol)
-        xopt = opt.x
+    #     opt = minimize(obj, c0, args, method="CG", tol=tol)
+    #     xopt = opt.x
 
-        v = obj(xopt, args)
+    #     v = obj(xopt, args)
 
-        # The function is quadratic. So the quadratic value should be small
-        if abs(v) > tol:
-            print("Using an xtol:", tol, " maybe make this smaller")
-            raise FinError("Failed to fit volatility smile curve.")
+    #     # The function is quadratic. So the quadratic value should be small
+    #     if abs(v) > tol:
+    #         print("Using an xtol:", tol, " maybe make this smaller")
+    #         raise FinError("Failed to fit volatility smile curve.")
 
-        self._parameters[i, :] = np.array(xopt)
+    #     self._parameters[i, :] = np.array(xopt)
 
 ###############################################################################
 
@@ -853,28 +738,28 @@ class FinFXVolSurface():
                     inverseDeltaTarget, tenorIndex)
         
         volTypeValue = self._volatilityFunctionType.value
+
         argtuple = (volTypeValue, s0, tdel, rd, rf, optionTypeValue, 
                     self._deltaMethod.value, 
                     inverseDeltaTarget, self._parameters[tenorIndex])
 
-        sigma = newton(deltaFit, x0=initialValue, args=argtuple,
-                       rtol=1e-6, maxiter=50, fprime2=None)
+        K = newton(deltaFit, x0=initialValue, args=argtuple,
+                       tol=1e-5, maxiter=50, fprime2=None)
 
-        return sigma
+        return K
 
 ###############################################################################
 
-    def checkCalibration(self, checkCalibrationFlag: bool, tol: float = 1e-6):
+    def checkCalibration(self, verbose: bool, tol: float = 1e-6):
 
-        if checkCalibrationFlag is False:
-            return
+        if verbose:
 
-        print("==========================================================")
-        print("VALUE DATE:", self._valueDate)
-        print("SPOT FX RATE:", self._spotFXRate)
-        print("ATM METHOD:", self._atmMethod)
-        print("DELTA METHOD:", self._deltaMethod)
-        print("==========================================================")
+            print("==========================================================")
+            print("VALUE DATE:", self._valueDate)
+            print("SPOT FX RATE:", self._spotFXRate)
+            print("ATM METHOD:", self._atmMethod)
+            print("DELTA METHOD:", self._deltaMethod)
+            print("==========================================================")
         
         K_dummy = 999
 
@@ -882,11 +767,12 @@ class FinFXVolSurface():
 
             expiryDate = self._expiryDates[i]
 
-            print("TENOR:", self._tenors[i])
-            print("EXPIRY DATE:", expiryDate)
-            print("IN ATM VOL: %9.6f %%"% (100.0*self._atmVols[i]))
-            print("IN MKT STRANGLE 25D: %9.6f %%"% (100.0*self._mktStrangle25DeltaVols[i]))
-            print("IN RSK REVERSAL 25D: %9.6f %%"% (100.0*self._riskReversal25DeltaVols[i]))
+            if verbose:
+                print("TENOR:", self._tenors[i])
+                print("EXPIRY DATE:", expiryDate)
+                print("IN ATM VOL: %9.6f %%"% (100.0*self._atmVols[i]))
+                print("IN MKT STRANGLE 25D VOL: %9.6f %%"% (100.0*self._mktStrangle25DeltaVols[i]))
+                print("IN RSK REVERSAL 25D VOL: %9.6f %%"% (100.0*self._riskReversal25DeltaVols[i]))
 
             call = FinFXVanillaOption(expiryDate,
                                       K_dummy,
@@ -902,35 +788,39 @@ class FinFXVolSurface():
                                      1.0,
                                      self._notionalCurrency)
 
-            print("==========================================================")
 
             ###################################################################
             # AT THE MONEY
             ###################################################################
 
-            print("T_(YEARS): ", self._texp[i])
-            print("CNT_CPD_RD:%9.6f %%"% (self._rd[i]*100))
-            print("CNT_CPD_RF:%9.6f %%"% (self._rf[i]*100))
-            print("FWD_RATE:  %9.6f"% (self._F0T[i]))
-
-            print("==========================================================")
-
+            if verbose:
+                print("==========================================================")
+                print("T_(YEARS): ", self._texp[i])
+                print("CNT_CPD_RD:%9.6f %%"% (self._rd[i]*100))
+                print("CNT_CPD_RF:%9.6f %%"% (self._rf[i]*100))
+                print("FWD_RATE:  %9.6f"% (self._F0T[i]))
+ 
             sigma_ATM_out = volFunctionFAST(self._volatilityFunctionType.value,
                                         self._parameters[i],
                                         self._F0T[i],
                                         self._K_ATM[i],
                                         self._texp[i])
 
-            print("VOL FUNCTION", self._volatilityFunctionType)
-            print("VOL_PARAMETERS:", self._parameters[i])
+            if verbose:
+                print("==========================================================")
+                print("VOL FUNCTION", self._volatilityFunctionType)
+                print("VOL_PARAMETERS:", self._parameters[i])
+                print("==========================================================")
+                print("OUT_K_ATM:  %9.6f" % (self._K_ATM[i]))
+                print("OUT_ATM_VOL: %9.6f %%" 
+                      % (100.0*sigma_ATM_out))
 
-            print("==========================================================")
-            print("OUT_K_ATM:    %9.6f" % (self._K_ATM[i]))
-            print("OUT_ATM_VOL: %9.4f %% - VOL CURVE MUST RECOVER ATM VOL" 
-                  % (100.0*sigma_ATM_out))
+            diff = sigma_ATM_out - self._atmVols[i]
 
-            if np.abs(sigma_ATM_out - self._atmVols[i]) > tol:
-                raise FinError("Calibration does not match ATM Vol")
+            if np.abs(diff) > tol:
+                print("FAILED FIT TO ATM VOL IN: %9.6f  OUT: %9.6f  DIFF: %9.6f"% 
+                      (self._atmVols[i]*100.0, sigma_ATM_out*100.0, 
+                       diff * 100.0))
 
             call._strikeFXRate = self._K_ATM[i]
             put._strikeFXRate = self._K_ATM[i]
@@ -949,20 +839,23 @@ class FinFXVolSurface():
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
 
-            print("CALL_DELTA: % 9.6f  PUT_DELTA: % 9.6f  NET_DELTA: % 9.6f" 
-                  % (delta_call, delta_put, delta_call + delta_put))
+            if verbose:
+                print("CALL_DELTA: % 9.6f  PUT_DELTA: % 9.6f  NET_DELTA: % 9.6f" 
+                      % (delta_call, delta_put, delta_call + delta_put))
 
             ###################################################################
             # NOW WE ASSIGN THE SAME VOLATILITY TO THE MS STRIKES
             # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
             ###################################################################
 
-            print("==========================================================")
 
             msVol = self._atmVols[i] + self._mktStrangle25DeltaVols[i]
 
-            print("MKT STRANGLE VOL IN: %9.4f %%"
-                  % (100.0*self._mktStrangle25DeltaVols[i]))
+            if verbose:
+
+                print("==========================================================")
+                print("MKT STRANGLE VOL IN: %9.6f %%"
+                      % (100.0*self._mktStrangle25DeltaVols[i]))
 
             call._strikeFXRate = self._K_25D_C_MS[i]
             put._strikeFXRate = self._K_25D_P_MS[i]
@@ -981,11 +874,12 @@ class FinFXVolSurface():
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
 
-            print("K_25D_C_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                  % (self._K_25D_C_MS[i], 100.0*msVol, delta_call))
-
-            print("K_25D_P_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                  % (self._K_25D_P_MS[i], 100.0*msVol, delta_put))
+            if verbose:
+                print("K_25D_C_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
+                      % (self._K_25D_C_MS[i], 100.0*msVol, delta_call))
+    
+                print("K_25D_P_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
+                      % (self._K_25D_P_MS[i], 100.0*msVol, delta_put))
 
             call_value = call.value(self._valueDate,
                                     self._spotFXRate,
@@ -1000,8 +894,10 @@ class FinFXVolSurface():
                                   model)['v']
 
             mktStrangleValue = call_value + put_value
-            print("CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_VALUE: % 9.6f" 
-                  % (call_value, put_value, mktStrangleValue))
+
+            if verbose:
+                print("CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_VALUE: % 9.6f" 
+                      % (call_value, put_value, mktStrangleValue))
 
             ###################################################################
             # NOW WE ASSIGN A DIFFERENT VOLATILITY TO THE MS STRIKES
@@ -1053,19 +949,24 @@ class FinFXVolSurface():
 
             mktStrangleValueSkew = call_value + put_value
 
-            print("K_25D_C_MS: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
-                  % (self._K_25D_C_MS[i], 100.0*sigma_K_25D_C_MS, delta_call))
+            if verbose:
+                print("K_25D_C_MS: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
+                      % (self._K_25D_C_MS[i], 100.0*sigma_K_25D_C_MS, delta_call))
+    
+                print("K_25D_P_MS: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
+                      % (self._K_25D_P_MS[i], 100.0*sigma_K_25D_P_MS, delta_put))
+    
+                print("CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_SKEW_VALUE: % 9.6f" 
+                      % (call_value, put_value, mktStrangleValueSkew))
 
-            print("K_25D_P_MS: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
-                  % (self._K_25D_P_MS[i], 100.0*sigma_K_25D_P_MS, delta_put))
+            diff = mktStrangleValue - mktStrangleValueSkew
+            if np.abs(diff) > tol:
+                print("FAILED FIT TO 25D MS VAL: %9.6f  OUT: %9.6f  DIFF: % 9.6f"%
+                      (mktStrangleValue, mktStrangleValueSkew, diff))
 
-            print("CALL_VALUE: %9.6f  PUT_VALUE:  %9.6f MS_SKEW_VALUE: % 9.6f" 
-                  % (call_value, put_value, mktStrangleValueSkew))
-
-            if np.abs(mktStrangleValue - mktStrangleValueSkew) > tol:
-                raise FinError("Unable to match market strangle value")
-
-            print("==========================================================")
+            ###################################################################
+            # NOW WE SHIFT STRIKES SO THAT DELTAS NOW EQUAL 0.25, -0.25
+            ###################################################################
         
             call._strikeFXRate = self._K_25D_C[i]
             put._strikeFXRate = self._K_25D_P[i]
@@ -1077,11 +978,6 @@ class FinFXVolSurface():
                                             self._texp[i])
  
             model = FinFXModelBlackScholes(sigma_K_25D_C)
-            call_value = call.value(self._valueDate,
-                                    self._spotFXRate,
-                                    self._domDiscountCurve,
-                                    self._forDiscountCurve,
-                                    model)['v']
 
             # THIS DELTA SHOULD BE +0.25
             delta_call = call.delta(self._valueDate,
@@ -1098,42 +994,36 @@ class FinFXVolSurface():
 
             model = FinFXModelBlackScholes(sigma_K_25D_P)
 
-            put_value = put.value(self._valueDate,
-                                  self._spotFXRate,
-                                  self._domDiscountCurve,
-                                  self._forDiscountCurve,
-                                  model)['v']
-
             # THIS DELTA SHOULD BE -0.25
             delta_put = put.delta(self._valueDate,
                                   self._spotFXRate,
                                   self._domDiscountCurve,
                                   self._forDiscountCurve,
                                   model)[self._deltaMethodString]
+            
+            if verbose:
+                print("K_25D_C: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                      % (self._K_25D_C[i], 100.0*sigma_K_25D_C, delta_call))
+                
+                print("K_25D_P: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                      % (self._K_25D_P[i], 100.0*sigma_K_25D_P, delta_put))
 
-            mktStrangleValue2 = call_value + put_value
-
-            print("K_25D_C: %9.7f  VOL: %9.6f  VALUE: %9.6f  DELTA: % 9.6f"
-                  % (self._K_25D_C[i], 100.0*sigma_K_25D_C, call_value, delta_call))
-
-            print("K_25D_P: %9.7f  VOL: %9.6f  VALUE: %9.6f  DELTA: % 9.6f"
-                  % (self._K_25D_P[i], 100.0*sigma_K_25D_P, put_value, delta_put))
-
-            print("==========================================================")
 
             sigma_RR = sigma_K_25D_C - sigma_K_25D_P            
-            print("RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%" 
+
+            if verbose:
+                print("==========================================================")
+                print("RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%" 
                   % (100.0 * self._riskReversal25DeltaVols[i], 100.0*sigma_RR))
+                print("==========================================================")
 
-            if np.abs(sigma_RR - self._riskReversal25DeltaVols[i]) > tol:
-                raise FinError("Calibration does not match Risk Reversal Vol")
+            diff = sigma_RR - self._riskReversal25DeltaVols[i]
 
-            print("==========================================================")
-
-            sigma_SS = 0.5*(sigma_K_25D_C + sigma_K_25D_P) - sigma_ATM_out
-            print("SS: %9.5f %%" % (100.0*sigma_SS))
-
-            print("==========================================================")
+            if np.abs(diff) > tol:
+                print("FAILED FIT TO 25D RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f"% 
+                      (self._riskReversal25DeltaVols[i]*100.0,
+                       sigma_RR*100.0, 
+                       diff*100.0))
 
 ###############################################################################
 
@@ -1182,23 +1072,28 @@ class FinFXVolSurface():
 
         plt.figure()
 
+        volTypeVal = self._volatilityFunctionType.value
+
         for tenorIndex in range(0, self._numVolCurves):
 
             atmVol = self._atmVols[tenorIndex]*100
             msVol = self._mktStrangle25DeltaVols[tenorIndex]*100
             rrVol = self._riskReversal25DeltaVols[tenorIndex]*100
 
-            lowK = self._K_25_D_P[tenorIndex] * 0.95
-            highK = self._K_25_D_C[tenorIndex] * 1.05
+            lowK = self._K_25D_P[tenorIndex] * 0.95
+            highK = self._K_25D_C[tenorIndex] * 1.05
 
             strikes = []
             vols = []
-
             numIntervals = 30
             K = lowK
             dK = (highK - lowK)/numIntervals
+            params = self._parameters[tenorIndex]
+            t = self._texp[tenorIndex]
+            f = self._F0T[tenorIndex]
+
             for i in range(0, numIntervals):
-                sigma = self.volFunction(K, tenorIndex) * 100.0
+                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
                 strikes.append(K)
                 vols.append(sigma)
                 K = K + dK
@@ -1215,16 +1110,16 @@ class FinFXVolSurface():
             title = self._currencyPair
 
             keyStrikes = []
-            keyStrikes.append(self._K_25_D_P[tenorIndex])
-            keyStrikes.append(self._K_25_D_P_MS[tenorIndex])
+            keyStrikes.append(self._K_25D_P[tenorIndex])
+            keyStrikes.append(self._K_25D_P_MS[tenorIndex])
             keyStrikes.append(self._K_ATM[tenorIndex])
-            keyStrikes.append(self._K_25_D_C[tenorIndex])
-            keyStrikes.append(self._K_25_D_C_MS[tenorIndex])
+            keyStrikes.append(self._K_25D_C[tenorIndex])
+            keyStrikes.append(self._K_25D_C_MS[tenorIndex])
 
             keyVols = []
 
             for K in keyStrikes:
-                sigma = self.volFunction(K, tenorIndex) * 100.0
+                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
             plt.plot(keyStrikes, keyVols, 'ro')

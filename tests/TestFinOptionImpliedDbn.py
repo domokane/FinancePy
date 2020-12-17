@@ -69,7 +69,7 @@ def test_FinOptionImpliedDbn():
                                    atmMethod,
                                    deltaMethod)
 
-        fxMarket.checkCalibration(True)
+#        fxMarket.checkCalibration(True)
 
         PLOT_GRAPHS= True
         if PLOT_GRAPHS:
@@ -106,7 +106,7 @@ def test_FinOptionImpliedDbn():
             strikes = np.array(strikes)
             vols = np.array(vols)
 
-            dbn = optionImpliedDbn(spotFXRate, texp, rd, rf, strikes, vols)            
+            dbn = optionImpliedDbn(spotFXRate, texp, rd, rf, strikes, vols)
             
 #            print("SUM:", dbn.sum())
 #            plt.figure()
