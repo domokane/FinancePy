@@ -71,7 +71,7 @@ def test_FinOptionImpliedDbn():
 
 #        fxMarket.checkCalibration(True)
 
-        PLOT_GRAPHS= True
+        PLOT_GRAPHS = False
         if PLOT_GRAPHS:
             fxMarket.plotVolCurves()
  
