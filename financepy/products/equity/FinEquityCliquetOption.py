@@ -113,10 +113,10 @@ class FinEquityCliquetOption(FinEquityOption):
                     dq = np.exp(-q * tprev)
 
                     if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, 1.0)
+                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, FinOptionTypes.EUROPEAN_CALL.value)
                         v_cliquet += v
                     elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, 1.0)
+                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, FinOptionTypes.EUROPEAN_PUT.value)
                         v_cliquet += v
                     else:
                         raise FinError("Unknown option type")

@@ -4,18 +4,23 @@
 
 import numpy as np
 from scipy import optimize
+from numba import njit
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXModelTypes import FinFXModel
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from ...products.fx.FinFXModelTypes import FinFXModelSABR
+from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
+
 from ...models.FinModelCRRTree import crrTreeValAvg
-from ...models.FinModelSABR import blackVolFromSABR
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...models.FinModelSABR import volFunctionSABR
+from ...models.FinModelBlackScholesAnalytical import bsValue, bsDelta
+
+from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 
 from ...finutils.FinMath import N
 
@@ -73,56 +78,88 @@ def fvega(volatility, *args):
 
 ###############################################################################
 
+@njit(fastmath=True, cache=True)
+def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
+    ''' Calculation of the FX Option delta. Used in the determination of
+    the volatility surface. Avoids discount curve interpolation so it 
+    should be slightly faster than the full calculation of delta. '''
 
-def g(K, *args):
-    ''' This is the objective function used in the determination of the FX
-    Option implied strike which is computed in the class below. '''
+    pips_spot_delta = bsDelta(s, t, k, rd, rf, vol, optionTypeValue)
 
-    self = args[0]
-    valueDate = args[1]
-    stockPrice = args[2]
-    domDiscountCurve = args[3]
-    forDiscountCurve = args[4]
-    delta = args[5]
-    deltaType = args[6]
-    volatility = args[7]
-
-    model = FinFXModelBlackScholes(volatility)
-
-    self._strikeFXRate = K
-
-    deltaDict = self.delta(valueDate,
-                           stockPrice,
-                           domDiscountCurve,
-                           forDiscountCurve,
-                           model)
-
-    deltaOut = deltaDict[deltaType]
-    objFn = delta - deltaOut
-    return objFn
+    if deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA.value:
+        return pips_spot_delta
+    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA.value:
+        pips_fwd_delta = pips_spot_delta * np.exp(rf*t)
+        return pips_fwd_delta
+    elif deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+        vpctf = bsValue(s, t, k, rd, rf, vol, optionTypeValue) / s
+        pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+        return pct_spot_delta_prem_adj
+    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+        vpctf = bsValue(s, t, k, rd, rf, vol, optionTypeValue) / s
+        pct_fwd_delta_prem_adj = np.exp(rf*t) * (pips_spot_delta - vpctf)
+        return pct_fwd_delta_prem_adj
+    else:
+        raise FinError("Unknown FinFXDeltaMethod")
 
 ###############################################################################
+    
+# def g(K, *args):
+#     ''' This is the objective function used in the determination of the FX
+#     Option implied strike which is computed in the class below. '''
+
+#     self = args[0]
+#     valueDate = args[1]
+#     stockPrice = args[2]
+#     domDiscountCurve = args[3]
+#     forDiscountCurve = args[4]
+#     delta = args[5]
+#     deltaType = args[6]
+#     volatility = args[7]
+
+#     model = FinFXModelBlackScholes(volatility)
+
+#     self._strikeFXRate = K
+
+#     deltaDict = self.delta(valueDate,
+#                            stockPrice,
+#                            domDiscountCurve,
+#                            forDiscountCurve,
+#                            model)
+
+#     deltaOut = deltaDict[deltaType]
+#     objFn = delta - deltaOut
+#     return objFn
+
+# ## THIS IS A HOPEFULLY FASTER VERSION WHICH AVOIDS CALLING DF
+
+# def g2(K, *args):
+#     ''' This is the objective function used in the determination of the FX
+#     Option implied strike which is computed in the class below. '''
+
+#     self = args[0]
+#     valueDate = args[1]
+#     stockPrice = args[2]
+#     domDF = args[3]
+#     forDF = args[4]
+#     delta = args[5]
+#     deltaType = args[6]
+#     volatility = args[7]
+
+#     self._strikeFXRate = K
+
+#     deltaDict = self.fastDelta(valueDate,
+#                                stockPrice,
+#                                domDF,
+#                                forDF,
+#                                volatility)
+
+#     deltaOut = deltaDict[deltaType]
+#     objFn = delta - deltaOut
+#     return objFn
 
 
-def solveForStrike(valueDate,
-                   vanillaOption,
-                   spotFXRate,
-                   domDiscountCurve,
-                   forDiscountCurve,
-                   delta,
-                   deltaType,
-                   volatility):
-    ''' This function determines the implied strike of an FX option
-    given a delta and the other option details. It uses a one-dimensional
-    Newton root search algorith to determine the strike that matches an
-    input volatility. '''
-
-    argtuple = (vanillaOption, valueDate, spotFXRate, domDiscountCurve,
-                forDiscountCurve, delta, deltaType, volatility)
-
-    sigma = optimize.newton(g, x0=spotFXRate, args=argtuple,
-                            tol=1e-5, maxiter=100, fprime2=None)
-    return sigma
+###############################################################################
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -220,22 +257,20 @@ class FinFXVanillaOption():
         if spotFXRate <= 0.0:
             raise FinError("spotFXRate must be greater than zero.")
 
-#        if np.any(spotFXRate <= 0.0):
-#            raise FinError("spotFXRate must be greater than zero.")
-
         if model._parentType != FinFXModel:
             raise FinError("Model is not inherited off type FinFXModel.")
-
-#        if np.any(tdel < 0.0):
-#            raise FinError("Time to expiry must be positive.")
     
         if tdel < 0.0:
             raise FinError("Time to expiry must be positive.")
 
         tdel = np.maximum(tdel, 1e-10)
-
-        rd = domDiscountCurve.zeroRate(self._deliveryDate)
-        rf = forDiscountCurve.zeroRate(self._deliveryDate)
+        
+        # TODO RESOLVE TDEL versus TEXP 
+        domDF = domDiscountCurve._df(tdel)
+        forDF = forDiscountCurve._df(tdel)
+            
+        rd = -np.log(domDF) / tdel
+        rf = -np.log(forDF) / tdel
 
         S0 = spotFXRate
         K = self._strikeFXRate
@@ -247,33 +282,27 @@ class FinFXVanillaOption():
             if type(model) == FinFXModelBlackScholes:
                 volatility = model._volatility
             elif type(model) == FinFXModelSABR:
-                volatility = blackVolFromSABR(model.alpha,
-                                              model.beta,
-                                              model.rho,
-                                              model.nu,
-                                              F0T, K, tdel)
-
-#            if np.any(volatility) < 0.0:
-#                raise FinError("Volatility should not be negative.")
+                volatility = volFunctionSABR(model.alpha,
+                                             model.beta,
+                                             model.rho,
+                                             model.nu,
+                                             F0T, K, tdel)
 
             if volatility < 0.0:
                 raise FinError("Volatility should not be negative.")
 
-            volatility = np.maximum(volatility, 1e-10)
-
-            lnS0k = np.log(S0/K)
-            sqrtT = np.sqrt(texp)
-            den = volatility * sqrtT
-            mu = rd - rf
-            v2 = volatility * volatility
-
-            d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
-            d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
+            v = np.maximum(volatility, 1e-10)
 
             if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                vdf = np.exp(-rd*tdel) * (F0T*N(d1) - K*N(d2))
+
+                vdf = bsValue(S0, texp, K, rd, rf, v,
+                              FinOptionTypes.EUROPEAN_CALL.value)
+
             elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                vdf = -np.exp(-rd*tdel) * (F0T*N(-d1) - K*N(-d2))
+
+                vdf = bsValue(S0, texp, K, rd, rf, v,
+                              FinOptionTypes.EUROPEAN_PUT.value)
+
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
                 numStepsPerYear = 100
                 vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
@@ -395,40 +424,57 @@ class FinFXVanillaOption():
 
         S0 = spotFXRate
         K = self._strikeFXRate
-        F = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == FinFXModelBlackScholes:
 
-            volatility = model._volatility
+            v = model._volatility
 
-            if np.any(volatility < 0.0):
+            if np.any(v < 0.0):
                 raise FinError("Volatility should not be negative.")
 
-            volatility = np.maximum(volatility, 1e-10)
+            v = np.maximum(v, gSmall)
 
-            lnS0k = np.log(S0/K)
-            sqrtT = np.sqrt(texp)
-            den = volatility * sqrtT
-            mu = rd - rf
-            v2 = volatility * volatility
+            pips_spot_delta = bsDelta(S0, texp, K, rd, rf, v, self._optionType.value)
+            pips_fwd_delta = pips_spot_delta * np.exp(rf*tdel)
+            vpctf = bsValue(S0, texp, K, rd, rf, v, self._optionType.value) / S0
+            pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+            pct_fwd_delta_prem_adj = np.exp(rf*tdel) * (pips_spot_delta - vpctf)
 
-            d1 = (lnS0k + mu * tdel + v2 * texp / 2.0) / den
-            d2 = (lnS0k + mu * tdel - v2 * texp / 2.0) / den
+        return {"pips_spot_delta": pips_spot_delta,
+                "pips_fwd_delta": pips_fwd_delta,
+                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
+                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
 
-            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                w = 1
-            elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                w = -1
-            else:
-                raise FinError("Unknown option type")
+###############################################################################
 
-            n1 = N(w*d1)
-            n2 = N(w*d2)
+    def fastDelta(self,
+                  t,
+                  s,
+                  rd,
+                  rf,
+                  vol):
+        ''' Calculation of the FX Option delta. Used in the determination of
+        the volatility surface. Avoids discount curve interpolation so it 
+        should be slightly faster than the full calculation of delta. '''
 
-            pips_spot_delta = w*np.exp(-rf*tdel)*n1
-            pips_fwd_delta = w*n1
-            pct_spot_delta_prem_adj = w*np.exp(-rd*tdel)*n2*K/S0
-            pct_fwd_delta_prem_adj = w*K*n2/F
+#        spotDate = valueDate.addWeekDays(self._spotDays)
+#        tdel = (self._deliveryDate - valueDate) / gDaysInYear
+#        tdel = np.maximum(tdel, gSmall)
+
+#        rd = -np.log(domDF)/tdel
+#        rf = -np.log(forDF)/tdel
+        k = self._strikeFXRate
+
+#        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
+
+        pips_spot_delta = bsDelta(s, t, k, rd, rf, vol,
+                                   self._optionType.value)
+        pips_fwd_delta = pips_spot_delta * np.exp(rf*t)
+
+        vpctf = bsValue(s, t, k, rd, rf, vol, self._optionType.value) / s
+
+        pct_spot_delta_prem_adj = pips_spot_delta - vpctf
+        pct_fwd_delta_prem_adj = np.exp(rf*t) * (pips_spot_delta - vpctf)
 
         return {"pips_spot_delta": pips_spot_delta,
                 "pips_fwd_delta": pips_fwd_delta,
@@ -691,5 +737,24 @@ class FinFXVanillaOption():
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
         v = payoff * np.exp(-rd * t) / 2.0
         return v
+
+###############################################################################
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("CURRENCY PAIR", self._currencyPair)
+        s += labelToString("PREMIUM CCY", self._premCurrency)
+        s += labelToString("STRIKE FX RATE", self._strikeFXRate)
+        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("SPOT DAYS", self._spotDays)
+        s += labelToString("NOTIONAL", self._notional, "")
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
 
 ###############################################################################

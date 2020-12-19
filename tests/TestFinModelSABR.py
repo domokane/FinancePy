@@ -5,7 +5,8 @@
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelSABR import blackVolFromSABR
+import numpy as np
+from financepy.models.FinModelSABR import volFunctionSABR
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -31,7 +32,8 @@ def test_SABR():
     for alpha in [0.1, 0.2, 0.3]:
         for beta in [0.5, 1.0, 2.0]:
             for rho in [-0.8, 0.0, 0.8]:
-                vol = blackVolFromSABR(alpha, beta, rho, nu, f, k, t)
+                params = np.array([alpha, beta, rho, nu])
+                vol = volFunctionSABR(params, f, k, t)
                 testCases.print(alpha, beta, rho, vol)
 
 ###############################################################################

@@ -8,6 +8,7 @@ from scipy import optimize
 
 from ...finutils.FinMath import M
 from ...finutils.FinGlobalVariables import gDaysInYear
+from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
@@ -110,12 +111,12 @@ class FinEquityChooserOption(FinEquityOption):
         rtc = -np.log(dftc) / tc
         rtp = -np.log(dftp) / tp
 
-        t = max(t, 1e-6)
-        tc = max(tc, 1e-6)
-        tp = max(tp, 1e-6)
+        t = max(t, gSmall)
+        tc = max(tc, gSmall)
+        tp = max(tp, gSmall)
 
         v = model._volatility
-        v = max(v, 1e-6)
+        v = max(v, gSmall)
 
         s0 = stockPrice
         q = dividendYield
@@ -208,11 +209,11 @@ class FinEquityChooserOption(FinEquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bsValue(s_1, tc-t, kc, rtc, q, v, +1.0)
-        v_put_1 = bsValue(s_1, tp-t, kp, rtp, q, v, -1.0)
+        v_call_1 = bsValue(s_1, tc-t, kc, rtc, q, v, FinOptionTypes.EUROPEAN_CALL.value)
+        v_put_1 = bsValue(s_1, tp-t, kp, rtp, q, v, FinOptionTypes.EUROPEAN_PUT.value)
 
-        v_call_2 = bsValue(s_2, tc-t, kc, rtc, q, v, +1.0)
-        v_put_2 = bsValue(s_2, tp-t, kp, rtp, q, v, -1.0)
+        v_call_2 = bsValue(s_2, tc-t, kc, rtc, q, v, FinOptionTypes.EUROPEAN_CALL.value)
+        v_put_2 = bsValue(s_2, tp-t, kp, rtp, q, v, FinOptionTypes.EUROPEAN_PUT.value)
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)
