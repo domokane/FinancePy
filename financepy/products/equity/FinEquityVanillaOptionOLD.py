@@ -75,7 +75,7 @@ def _fvega(volatility, *args):
 ###############################################################################
 
 
-class FinEquityVanillaOption_OLD():
+class FinEquityVanillaOptionOLD():
     ''' Class for managing plain vanilla European calls and puts on equities.
     For American calls and puts see the FinEquityAmericanOption class. '''
 

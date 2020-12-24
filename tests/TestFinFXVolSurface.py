@@ -31,7 +31,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
     if 1 == 1:
 
         # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
-        # print("EURUSD EXAMPLE CLARKE")
+        # print("EURUSD EXAMPLE CLARK")
 
         valueDate = FinDate(10, 4, 2020)
 
@@ -55,36 +55,54 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+        volFunctionType = FinVolFunctionTypes.CLARK
+
+        fxMarket = FinFXVolSurface(valueDate,
+                                   spotFXRate,
+                                   currencyPair,
+                                   notionalCurrency,
+                                   domDiscountCurve,
+                                   forDiscountCurve,
+                                   tenors,
+                                   atmVols,
+                                   marketStrangle25DeltaVols,
+                                   riskReversal25DeltaVols,
+                                   atmMethod,
+                                   deltaMethod, 
+                                   volFunctionType)
+
+        fxMarket.checkCalibration(verboseCalibration)
 
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
-        for atmMethod in FinFXATMMethod:
-            for deltaMethod in FinFXDeltaMethod:
-                for volFunctionType in FinVolFunctionTypes:
+        # for atmMethod in FinFXATMMethod:
+        #     for deltaMethod in FinFXDeltaMethod:
+        #         for volFunctionType in FinVolFunctionTypes:
     
-                    fxMarket = FinFXVolSurface(valueDate,
-                                               spotFXRate,
-                                               currencyPair,
-                                               notionalCurrency,
-                                               domDiscountCurve,
-                                               forDiscountCurve,
-                                               tenors,
-                                               atmVols,
-                                               marketStrangle25DeltaVols,
-                                               riskReversal25DeltaVols,
-                                               atmMethod,
-                                               deltaMethod, 
-                                               volFunctionType)
+        #             fxMarket = FinFXVolSurface(valueDate,
+        #                                        spotFXRate,
+        #                                        currencyPair,
+        #                                        notionalCurrency,
+        #                                        domDiscountCurve,
+        #                                        forDiscountCurve,
+        #                                        tenors,
+        #                                        atmVols,
+        #                                        marketStrangle25DeltaVols,
+        #                                        riskReversal25DeltaVols,
+        #                                        atmMethod,
+        #                                        deltaMethod, 
+        #                                        volFunctionType)
         
-                    fxMarket.checkCalibration(verboseCalibration)
+        #             fxMarket.checkCalibration(verboseCalibration)
 
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
+        if True: #PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
-#        dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
+        dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
 
-#        for i in range(0, len(dbns)):
-#            plt.plot(dbns[i]._x, dbns[i]._densitydx)
-#            print("SUM:", dbns[i].sum())
+        for i in range(0, len(dbns)):
+            plt.plot(dbns[i]._x, dbns[i]._densitydx)
+            plt.title(volFunctionType)
+            print("SUM:", dbns[i].sum())
 
     ###########################################################################
 
@@ -92,8 +110,8 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
         #print("==============================================================")
 
-        # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
-        # print("EURJPY EXAMPLE CLARKE")
+        # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
+        # print("EURJPY EXAMPLE CLARK")
 
         valueDate = FinDate(10, 4, 2020)
 

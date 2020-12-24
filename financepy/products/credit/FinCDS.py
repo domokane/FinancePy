@@ -504,7 +504,7 @@ class FinCDS(object):
 
 ###############################################################################
 
-    def riskyPV01_OLD(self,
+    def riskyPV01OLD(self,
                       valuationDate,
                       issuerCurve,
                       pv01Method=0):

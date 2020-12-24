@@ -21,15 +21,17 @@ from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from ...market.volatility.FinOptionVolatilityFns import volFunctionClarke
+from ...market.volatility.FinOptionVolatilityFns import volFunctionClark
 from ...market.volatility.FinOptionVolatilityFns import volFunctionSABR
+from ...market.volatility.FinOptionVolatilityFns import volFunctionBloomberg
 from ...market.volatility.FinOptionVolatilityFns import FinVolFunctionTypes
 
 from ...finutils.FinMath import norminvcdf
 
 from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
-    
+from ...finutils.FinDistribution import FinDistribution
+
 ###############################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
 #       delta fit.
@@ -215,8 +217,10 @@ def objFAST(params, *args):
 
 ###############################################################################
 
-def solveToHorizonFAST(s, t, rd, rf, K_ATM,
-                       atmVol, ms25DVol, rr25DVol, 
+def solveToHorizonFAST(s, t, 
+                       rd, rf, 
+                       K_ATM, atmVol, 
+                       ms25DVol, rr25DVol, 
                        deltaMethodValue, volTypeValue, 
                        xopt):
 
@@ -289,12 +293,15 @@ def solveToHorizonFAST(s, t, rd, rf, K_ATM,
 def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
     ''' Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. '''
-
-    if volFunctionTypeValue == FinVolFunctionTypes.CLARKE.value:
-        vol = volFunctionClarke(params, f, k, t)
+    
+    if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
+        vol = volFunctionClark(params, f, k, t)
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
         vol = volFunctionSABR(params, f, k, t)
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
+        vol = volFunctionBloomberg(params, f, k, t)
         return vol
     else:
         raise FinError("Unknown Model Type")
@@ -351,7 +358,8 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
     
 ###############################################################################
 
-def solveForStrike(spotFXRate, tdel, rd, rf,
+def solveForStrike(spotFXRate, 
+                   tdel, rd, rf,
                    optionTypeValue,
                    deltaTarget,
                    deltaMethodValue, 
@@ -383,7 +391,7 @@ def solveForStrike(spotFXRate, tdel, rd, rf,
 
         F0T = spotFXRate * forDF / domDF
         vsqrtt = volatility * np.sqrt(tdel)
-        arg = np.abs(deltaTarget*phi/forDF)  # CHECK THIS !!!
+        arg = deltaTarget*phi/forDF  # CHECK THIS !!!
         norminvdelta = norminvcdf(arg)
         K = F0T * np.exp(-vsqrtt *(phi*norminvdelta - vsqrtt/2.0))
         return K
@@ -400,7 +408,7 @@ def solveForStrike(spotFXRate, tdel, rd, rf,
 
         F0T = spotFXRate * forDF / domDF
         vsqrtt = volatility * np.sqrt(tdel)
-        arg = np.abs(deltaTarget*phi)   # CHECK THIS!!!!!!!!      
+        arg = deltaTarget*phi   # CHECK THIS!!!!!!!!      
         norminvdelta = norminvcdf(arg) 
         K = F0T * np.exp(-vsqrtt *(phi*norminvdelta - vsqrtt/2.0))
         return K
@@ -452,7 +460,7 @@ class FinFXVolSurface():
                  riskReversal25DeltaVols,
                  atmMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod=FinFXDeltaMethod.SPOT_DELTA, 
-                 volatilityFunctionType=FinVolFunctionTypes.CLARKE):
+                 volatilityFunctionType=FinVolFunctionTypes.CLARK):
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -522,7 +530,7 @@ class FinFXVolSurface():
     #     F = self._F0T[tenorIndex]
     #     texp = self._texp[tenorIndex]
 
-    #     if self._volatilityFunctionType == FinVolFunctionTypes.CLARKE:
+    #     if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
     #         vol = volFunctionClarke(params, F, K, texp)
     #     elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
     #         vol = volFunctionSABR(params, F, K, texp)
@@ -538,9 +546,11 @@ class FinFXVolSurface():
         s = self._spotFXRate
         numVolCurves = self._numVolCurves
 
-        if self._volatilityFunctionType == FinVolFunctionTypes.CLARKE:
+        if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
         elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            numParameters = 3
+        elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
             numParameters = 3
         else:
             raise FinError("Unknown Model Type")
@@ -602,16 +612,28 @@ class FinFXVolSurface():
 
             atmVol = self._atmVols[i]
 
-            if self._volatilityFunctionType == FinVolFunctionTypes.CLARKE:
+            if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
                 xinit = [np.log(atmVol), 0.050, 0.800]
             elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
                 # SABR parameters are alpha, nu, rho
-                xinit = [0.18, 0.82, -0.12]
+                xinit = [0.174, 0.817, -0.112]
+            elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+                # BBG Params
+                atm = self._atmVols[i]
+                ms25 = self._mktStrangle25DeltaVols[i]
+                rr25 = self._riskReversal25DeltaVols[i]
+                s25 = atm + ms25 + rr25/2.0
+                s50 = atm
+                s75 = atm + ms25 - rr25/2.0
+                a = 8.0*s75-16.0*s50+8.0*s25
+                b = -6.0*s75+16.0*s50-10.0*s25
+                c = s75-3.0*s50+3.0*s25
+                xinit = [a, b, c]
             else:
                 raise FinError("Unknown Model Type")
 
+            print("xinit:", i, xinit)
             xinits.append(xinit)
-
 
         deltaMethodValue = self._deltaMethod.value
         volTypeValue = self._volatilityFunctionType.value
@@ -1059,15 +1081,22 @@ class FinFXVolSurface():
 
             for iK in range(0, numIntervals):
                 strike = lowFX + iK*dFX                
-                vol = volFunctionClarke(params, F, strike, texp)
+
+                if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+                    vol = volFunctionClark(params, F, strike, texp)
+                elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+                    vol = volFunctionSABR(params, F, strike, texp)
+                if self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+                    vol = volFunctionBloomberg(params, F, strike, texp)
+
                 strikes.append(strike) 
                 vols.append(vol)
             
             strikes = np.array(strikes)
             vols = np.array(vols)
 
-            dbn = optionImpliedDbn(self._spotFXRate, texp, rd, rf, strikes, vols)            
-
+            density = optionImpliedDbn(self._spotFXRate, texp, rd, rf, strikes, vols)
+            dbn = FinDistribution(strikes, density)
             dbns.append(dbn)
 
         return dbns
@@ -1086,8 +1115,8 @@ class FinFXVolSurface():
             msVol = self._mktStrangle25DeltaVols[tenorIndex]*100
             rrVol = self._riskReversal25DeltaVols[tenorIndex]*100
 
-            lowK = self._K_25D_P[tenorIndex] * 0.95
-            highK = self._K_25D_C[tenorIndex] * 1.05
+            lowK = self._K_25D_P[tenorIndex] * 0.75
+            highK = self._K_25D_C[tenorIndex] * 1.25
 
             strikes = []
             vols = []
@@ -1113,12 +1142,21 @@ class FinFXVolSurface():
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = self._currencyPair
+            title = "BASIC FIT:" + self._currencyPair + " " + str(self._volatilityFunctionType)
+
+            keyStrikes = []
+            keyStrikes.append(self._K_ATM[tenorIndex])
+
+            keyVols = []
+            for K in keyStrikes:
+                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
+                keyVols.append(sigma)
+
+            plt.plot(keyStrikes, keyVols, 'bo', markersize=4)
 
             keyStrikes = []
             keyStrikes.append(self._K_25D_P[tenorIndex])
             keyStrikes.append(self._K_25D_P_MS[tenorIndex])
-            keyStrikes.append(self._K_ATM[tenorIndex])
             keyStrikes.append(self._K_25D_C[tenorIndex])
             keyStrikes.append(self._K_25D_C_MS[tenorIndex])
 
@@ -1131,7 +1169,7 @@ class FinFXVolSurface():
             plt.plot(keyStrikes, keyVols, 'ro')
 
         plt.title(title)
-        plt.legend(loc='upper right')
+#        plt.legend(loc="lower left", bbox_to_anchor=(1,0))
 
 ###############################################################################
 
@@ -1182,3 +1220,13 @@ class FinFXVolSurface():
 
 if __name__ == '__main__':
     pass
+
+###############################################################################
+
+# linsolve([a*(0.25) + b*(0.5)+c=s50
+# ,a *(0.25)*(0.25) + b*(0.25)+c=s25,
+# a *(0.75)*(0.75) + b*(0.75)+c=s75],[a,b,c]);
+# gives
+# [a=8*s75-16*s50+8*s25,b=-6*s75+16*s50-10*s25,c=s75-3*s50+3*s25]
+
+###############################################################################

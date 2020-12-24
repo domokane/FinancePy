@@ -30,8 +30,8 @@ def test_FinOptionImpliedDbn():
 
     if 1 == 1:
 
-        # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
-        # print("EURUSD EXAMPLE CLARKE")
+        # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
+        # print("EURUSD EXAMPLE CLARK")
 
         valueDate = FinDate(10, 4, 2020)
 

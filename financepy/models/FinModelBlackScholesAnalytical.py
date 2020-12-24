@@ -48,7 +48,7 @@ def bsDelta(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-        phi = 1.0
+        phi = +1.0
     elif optionTypeValue == FinOptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
@@ -63,6 +63,7 @@ def bsDelta(s, t, k, r, q, v, optionTypeValue):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     delta = phi * np.exp(-q*t) * NVect(phi*d1)
+#    print("TRUE DELTA:", s,t,k,r,q,v,delta)
     return delta
 
 ###############################################################################

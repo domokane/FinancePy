@@ -7,21 +7,22 @@ from numba import njit, float64
 
 from ...finutils.FinMath import N
 
+###############################################################################
 
 from enum import Enum
 
 class FinVolFunctionTypes(Enum):
-    CLARKE = 0
+    CLARK = 0
     SABR = 1
-
+    BBG = 2
 
 ###############################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
 ###############################################################################
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
-def volFunctionClarke(params, f, k, t):
-    ''' Volatility Function in book by Iain Clarke generalised to allow for 
+def volFunctionClark(params, f, k, t):
+    ''' Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
     The exact reference is Clarke Page 59. '''
 
@@ -38,8 +39,39 @@ def volFunctionClarke(params, f, k, t):
 ###############################################################################
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+def volFunctionBloomberg(params, f, k, t):
+    ''' Volatility Function similar to the one used by Bloomberg. It is 
+    a quadratic function in the spot delta of the option. It can therefore 
+    go negative so it requires a good initial guess when performing the 
+    fitting to avoid this happening. The first parameter is the quadratic 
+    coefficient i.e. sigma(K) = a * D * D + b * D + c where a = params[0], 
+    b = params[1], c = params[2] and D is the spot delta.'''
+ 
+    numParams = len(params)
+
+    sigma = 0.0
+    for i in range(0, len(params)):
+        pwr = numParams - i - 1
+        sigma += params[i] * ((0.50) ** pwr)
+
+    vsqrtt = sigma * np.sqrt(t)
+    
+    d1 = np.log(f/k)/ vsqrtt + vsqrtt/2.0
+    delta = N(d1)
+
+    v = 0.0
+    for i in range(0, len(params)):
+        pwr = numParams - i - 1
+        v += params[i] * (delta ** pwr)
+
+    return v
+
+###############################################################################
+
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def volFunctionSABR(params, f, k, t):
-    ''' This is SABR but when beta = 1 '''
+    ''' This is the SABR function with the exponent beta set equal to 1. The 
+    first parameter is alpha, then nu and the third parameter is rho. '''
     
     alpha = params[0]
     nu = params[1]
