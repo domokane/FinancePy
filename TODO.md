@@ -26,8 +26,10 @@ Equities - Payoff language
 Equities - Power options
 Equities - Variance swaps using given skew curve
 
+FX - Volatility surface fitting to a range of volatility functions as described in Clark
+FX - Fast fitting to 10 delta MS and RR
 FX - Barrier bending
-FX - Breedon-Litzenburger implied distribution of terminal stock price
+FX - Breedon-Litzenburger implied distribution of terminal stock price DONE
 FX - Heston model
 
 Ibor - Implement G2++ rate model

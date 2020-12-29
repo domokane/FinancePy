@@ -5,7 +5,6 @@ from .FinFXFixedLookbackOption import *
 from .FinFXFloatLookbackOption import *
 from .FinFXForward import *
 from .FinFXMktConventions import *
-from .FinFXModelTypes import *
 from .FinFXOption import *
 from .FinFXRainbowOption import *
 from .FinFXVanillaOption import *

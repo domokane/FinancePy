@@ -94,15 +94,16 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         
         #             fxMarket.checkCalibration(verboseCalibration)
 
-        if True: #PLOT_GRAPHS:
+        if PLOT_GRAPHS:
+
             fxMarket.plotVolCurves()
 
-        dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
+            dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
 
-        for i in range(0, len(dbns)):
-            plt.plot(dbns[i]._x, dbns[i]._densitydx)
-            plt.title(volFunctionType)
-            print("SUM:", dbns[i].sum())
+            for i in range(0, len(dbns)):
+                plt.plot(dbns[i]._x, dbns[i]._densitydx)
+                plt.title(volFunctionType)
+                print("SUM:", dbns[i].sum())
 
     ###########################################################################
 
@@ -151,12 +152,12 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
         fxMarket.checkCalibration(verboseCalibration)
 
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
-#    print("==================================================================")
+#   print("==================================================================")
 
-#    ###########################################################################
+#   ###########################################################################
 
 def test_FinFXMktVolSurface3(verboseCalibration):
 
@@ -201,8 +202,8 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         fxMarket.checkCalibration(verboseCalibration)
 
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
     ###########################################################################
 
@@ -249,8 +250,8 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         fxMarket.checkCalibration(verboseCalibration)
 
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
+        if PLOT_GRAPHS:
+            fxMarket.plotVolCurves()
 
     #    testCases.header("value", "delta")
     #    testCases.print(value, delta)

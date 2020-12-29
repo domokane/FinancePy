@@ -11,8 +11,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 # from ...products.equity.FinEquityOption import FinOption
 from ...finutils.FinDate import FinDate
-from ...products.fx.FinFXModelTypes import FinFXModel
-from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
+#from ...products.fx.FinFXModelTypes import FinFXModel
+from ...models.FinModelBlackScholes import FinModelBlackScholes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...finutils.FinGlobalTypes import FinOptionTypes
 
@@ -75,9 +75,6 @@ class FinFXDigitalOption():
         if np.any(spotFXRate <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinFXModel.")
-
         if np.any(tdel < 0.0):
             raise FinError("Option time to maturity is less than zero.")
 
@@ -92,7 +89,7 @@ class FinFXDigitalOption():
         S0 = spotFXRate
         K = self._strikeFXRate
 
-        if type(model) == FinFXModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             volatility = model._volatility
             lnS0k = log(S0 / K)

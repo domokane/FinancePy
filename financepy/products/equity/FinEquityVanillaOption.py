@@ -18,7 +18,12 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...models.FinModel import FinModel
 from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...models.FinModelBlackScholesAnalytical import *
+from ...models.FinModelBlackScholesAnalytical import bsValue
+from ...models.FinModelBlackScholesAnalytical import bsDelta
+from ...models.FinModelBlackScholesAnalytical import bsVega
+from ...models.FinModelBlackScholesAnalytical import bsGamma
+from ...models.FinModelBlackScholesAnalytical import bsRho
+from ...models.FinModelBlackScholesAnalytical import bsTheta
 
 from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA_NONUMPY
 from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_NUMBA
@@ -340,10 +345,19 @@ class FinEquityVanillaOption():
         k = self._strikePrice
         s0 = stockPrice
 
+        if np.abs(k-s0)/ (k+s0) < 0.05:
+            sigma0 = price / 0.4 / stockPrice / np.sqrt(texp)
+        else:
+            sigma0 = 0.10
+            
+        # NEED TO MAP THE OPTION TO AN OTM option!!!
+        # TODO !!
+        
         argtuple = (self, texp, s0, r, q, k, price)
 
-        sigma = optimize.newton(_f, x0=0.2, fprime=_fvega, args=argtuple,
+        sigma = optimize.newton(_f, x0=sigma0, fprime=_fvega, args=argtuple,
                                 tol=1e-5, maxiter=50, fprime2=None)
+
         return sigma
 
 ###############################################################################

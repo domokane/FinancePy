@@ -9,8 +9,8 @@ from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinGlobalTypes import FinOptionTypes
-from .FinFXModelTypes import FinFXModelBlackScholes
 from .FinFXVanillaOption import FinFXVanillaOption
+from ...models.FinModelBlackScholes import FinModelBlackScholes
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes
 

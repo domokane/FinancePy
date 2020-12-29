@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-from .FinFXModelTypes import FinFXModelBlackScholes
+from ...models.FinModelBlackScholes import FinModelBlackScholes
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinHelperFunctions import labelToString
 
@@ -44,24 +44,14 @@ class FinFXOption(object):
         ''' Calculate the option gamma (delta sensitivity) by adding on a
         small bump and calculating the change in the option delta. '''
 
-        v = self.delta(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
+        v = self.delta(valueDate, stockPrice, discountCurve, dividendYield,
             model)
-        vBumpedDn = self.delta(
-            valueDate,
-            stockPrice + bump,
-            discountCurve,
-            dividendYield,
-            model)
-        vBumpedUp = self.delta(
-            valueDate,
-            stockPrice + bump,
-            discountCurve,
-            dividendYield,
-            model)
+
+        vBumpedDn = self.delta(valueDate, stockPrice + bump, discountCurve,
+            dividendYield, model)
+
+        vBumpedUp = self.delta(valueDate, stockPrice + bump, discountCurve,
+            dividendYield, model)
 
         if type(v) is dict:
             num = (vBumpedUp['value'] - 2.0 * v['value'] + vBumpedDn['value'])
@@ -81,7 +71,7 @@ class FinFXOption(object):
                        model)
 
         vp = self.value(valueDate, stockPrice, discountCurve, dividendYield,
-                        FinFXModelBlackScholes(model._volatility + bump))
+                        FinModelBlackScholes(model._volatility + bump))
 
         if type(v) is dict:
             vega = (vp['value'] - v['value']) / bump

@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 ###############################################################################
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
 
 ###############################################################################
 
@@ -58,7 +58,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.SABR
+        volFunctionType = FinVolFunctionTypes.BBG
 
         fxMarket = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
@@ -244,105 +244,6 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
 #    print("==================================================================")
 
-#    ###########################################################################
-
-def test_FinFXMktVolSurface3(verboseCalibration):
-
-        # EURUSD Example from Paper by Uwe Wystup using Tables 4
-#        print("EURUSD EXAMPLE WYSTUP")
-
-        valueDate = FinDate(20, 1, 2009)
-
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.020113  # EUR
-        domCCRate = 0.003525  # USD
-
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
-
-        currencyPair = forName + domName
-        spotFXRate = 1.3088
-
-        tenors = ['1M']
-        atmVols = [21.6215]
-        marketStrangle25DeltaVols = [0.7375]
-        riskReversal25DeltaVols = [-0.50]
-
-        notionalCurrency = forName
-
-        atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-
-        fxMarket = FinFXVolSurfacePlus(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
-
-        fxMarket.checkCalibration(verboseCalibration)
-
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
-
-    ###########################################################################
-
-def test_FinFXMktVolSurface4(verboseCalibration):
-
-        # USDJPY Example from Paper by Uwe Wystup using Tables 4
-#        print("USDJPY EXAMPLE WYSTUP")
-
-        valueDate = FinDate(20, 1, 2009)
-
-        forName = "USD"
-        domName = "JPY"
-        forCCRate = 0.003525  # USD
-        domCCRate = 0.0042875  # JPY
-
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
-
-        currencyPair = forName + domName
-        spotFXRate = 90.68
-
-        tenors = ['1M']
-        atmVols = [21.00]
-        marketStrangle25DeltaVols = [0.184]
-        riskReversal25DeltaVols = [-5.30]
-
-        notionalCurrency = forName
-
-        atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-
-        fxMarket = FinFXVolSurfacePlus(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
-
-        fxMarket.checkCalibration(verboseCalibration)
-
-#        if PLOT_GRAPHS:
-#            fxMarket.plotVolCurves()
-
-    #    testCases.header("value", "delta")
-    #    testCases.print(value, delta)
-
 ###############################################################################
 
 import time
@@ -354,9 +255,7 @@ if __name__ == '__main__':
     verboseCalibration = False
 
     test_FinFXMktVolSurface1(verboseCalibration)
-#    test_FinFXMktVolSurface2(verboseCalibration)
-#    test_FinFXMktVolSurface3(verboseCalibration)
-#    test_FinFXMktVolSurface4(verboseCalibration)
+    test_FinFXMktVolSurface2(verboseCalibration)
     
     end = time.time()
     

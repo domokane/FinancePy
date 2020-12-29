@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64, int64, vectorize
+from numba import float64, int64, vectorize
 from scipy import optimize
 
 from ..finutils.FinGlobalTypes import FinOptionTypes

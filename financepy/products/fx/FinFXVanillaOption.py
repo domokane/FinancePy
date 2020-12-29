@@ -11,13 +11,16 @@ from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...products.fx.FinFXModelTypes import FinFXModel
-from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-from ...products.fx.FinFXModelTypes import FinFXModelSABR
+#from ...products.fx.FinFXModelTypes import FinFXModel
+#from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
+#from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 
 from ...models.FinModelCRRTree import crrTreeValAvg
 from ...models.FinModelSABR import volFunctionSABR
+from ...models.FinModelSABR import FinModelSABR
+from ...models.FinModelBlackScholes import FinModelBlackScholes
+
 from ...models.FinModelBlackScholesAnalytical import bsValue, bsDelta
 
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
@@ -40,7 +43,7 @@ def f(volatility, *args):
     forDiscountCurve = args[4]
     price = args[5]
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     vdf = self.value(valueDate,
                      spotFXRate,
@@ -66,7 +69,7 @@ def fvega(volatility, *args):
     domDiscountCurve = args[3]
     forDiscountCurve = args[4]
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     fprime = self.vega(valueDate,
                        spotFXRate,
@@ -177,9 +180,9 @@ class FinFXVanillaOption():
 
     def __init__(self,
                  expiryDate: FinDate,
-                 strikeFXRate: float,  # 1 unit of foreign in domestic
+                 strikeFXRate: (float, np.ndarray),  # 1 unit of foreign in domestic
                  currencyPair: str,  # FORDOM
-                 optionType: FinOptionTypes,
+                 optionType: (FinOptionTypes, list),
                  notional: float,
                  premCurrency: str,
                  spotDays: int = 0):
@@ -208,7 +211,7 @@ class FinFXVanillaOption():
         self._expiryDate = expiryDate
         self._deliveryDate = deliveryDate
 
-        if strikeFXRate < 0.0:
+        if np.any(strikeFXRate < 0.0):
             raise FinError("Negative strike.")
 
         self._strikeFXRate = strikeFXRate
@@ -254,12 +257,9 @@ class FinFXVanillaOption():
             tdel = valueDate
             texp = tdel
 
-        if spotFXRate <= 0.0:
+        if np.any(spotFXRate <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinFXModel.")
-    
         if tdel < 0.0:
             raise FinError("Time to expiry must be positive.")
 
@@ -276,19 +276,19 @@ class FinFXVanillaOption():
         K = self._strikeFXRate
         F0T = S0 * np.exp((rd-rf)*tdel)
 
-        if type(model) == FinFXModelBlackScholes or \
-           type(model) == FinFXModelSABR:
+        if type(model) == FinModelBlackScholes or \
+           type(model) == FinModelSABR:
 
-            if type(model) == FinFXModelBlackScholes:
+            if type(model) == FinModelBlackScholes:
                 volatility = model._volatility
-            elif type(model) == FinFXModelSABR:
+            elif type(model) == FinModelSABR:
                 volatility = volFunctionSABR(model.alpha,
                                              model.beta,
                                              model.rho,
                                              model.nu,
                                              F0T, K, tdel)
 
-            if volatility < 0.0:
+            if np.any(volatility < 0.0):
                 raise FinError("Volatility should not be negative.")
 
             v = np.maximum(volatility, 1e-10)
@@ -408,9 +408,6 @@ class FinFXVanillaOption():
         if np.any(spotFXRate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinFXModel.")
-
         if np.any(tdel < 0.0):
             raise FinError("Time to expiry must be positive.")
 
@@ -425,7 +422,7 @@ class FinFXVanillaOption():
         S0 = spotFXRate
         K = self._strikeFXRate
 
-        if type(model) == FinFXModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             v = model._volatility
 
@@ -500,9 +497,6 @@ class FinFXVanillaOption():
         if np.any(spotFXRate <= 0.0):
             raise FinError("FX Rate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinFXModel.")
-
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
 
@@ -517,7 +511,7 @@ class FinFXVanillaOption():
         K = self._strikeFXRate
         S0 = spotFXRate
 
-        if type(model) == FinFXModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             volatility = model._volatility
 
@@ -558,9 +552,6 @@ class FinFXVanillaOption():
         if np.any(spotFXRate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
-
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
 
@@ -575,7 +566,7 @@ class FinFXVanillaOption():
         K = self._strikeFXRate
         S0 = spotFXRate
 
-        if type(model) == FinFXModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             volatility = model._volatility
 
@@ -614,9 +605,6 @@ class FinFXVanillaOption():
         if np.any(spotFXRate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
 
-        if model._parentType != FinFXModel:
-            raise FinError("Model is not inherited off type FinEquityModel.")
-
         if np.any(t < 0.0):
             raise FinError("Time to expiry must be positive.")
 
@@ -631,7 +619,7 @@ class FinFXVanillaOption():
         K = self._strikeFXRate
         S0 = spotFXRate
 
-        if type(model) == FinFXModelBlackScholes:
+        if type(model) == FinModelBlackScholes:
 
             vol = model._volatility
 
@@ -699,7 +687,7 @@ class FinFXVanillaOption():
         cannot be priced analytically. This function uses Numpy vectorisation
         for speed of execution.'''
 
-        if model._parentType == FinFXModel:
+        if model._parentType == FinModelBlackScholes:
             volatility = model._volatility
         else:
             raise FinError("Model Type invalid")
