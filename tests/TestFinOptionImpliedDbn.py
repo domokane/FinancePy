@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-from financepy.market.volatility.FinOptionVolatilityFns import volFunctionClarke
+from financepy.market.volatility.FinOptionVolatilityFns import volFunctionClark
 
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
@@ -99,7 +99,7 @@ def test_FinOptionImpliedDbn():
 
             for iK in range(0, numSteps):
                 strike = startFX + iK*dFX                
-                vol = volFunctionClarke(params, F, strike, texp)
+                vol = volFunctionClark(params, F, strike, texp)
                 strikes.append(strike) 
                 vols.append(vol)
             
