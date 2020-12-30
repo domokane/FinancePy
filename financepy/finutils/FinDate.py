@@ -569,15 +569,14 @@ class FinDate():
         # so earliest and latest dates are 15th and 21st
 
         d_start = 15
-        d_end = 21
+        startDate = FinDate(d_start, m, y)
 
-        for d in range(d_start, d_end+1):
-            immDate = FinDate(d, m, y)
-            if immDate._weekday == self.WED:
-                return d
-
-        # Should never reach this line but just to be defensive
-        raise FinError("Third Wednesday not found")
+        if (startDate._weekday <= FinDate.WED):
+            # Wednesday is in the first week
+            return d_start + (FinDate.WED     - startDate._weekday)
+        else:
+            # Wednesday is in the second week
+            return d_start + (FinDate.WED + 7 - startDate._weekday)
 
     ##########################################################################
 
