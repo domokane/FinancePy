@@ -1028,7 +1028,7 @@ class FinFXVolSurface():
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = "BASIC FIT:" + self._currencyPair + " " + str(self._volatilityFunctionType)
+            title = "25D FIT:" + self._currencyPair + " " + str(self._volatilityFunctionType)
 
             keyStrikes = []
             keyStrikes.append(self._K_ATM[tenorIndex])
@@ -1038,7 +1038,7 @@ class FinFXVolSurface():
                 sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
-            plt.plot(keyStrikes, keyVols, 'bo', markersize=4)
+            plt.plot(keyStrikes, keyVols, 'ko', markersize=4)
 
             keyStrikes = []
             keyStrikes.append(self._K_25D_P[tenorIndex])
@@ -1052,7 +1052,7 @@ class FinFXVolSurface():
                 sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
-            plt.plot(keyStrikes, keyVols, 'ro')
+            plt.plot(keyStrikes, keyVols, 'bo', markersize=4)
 
         plt.title(title)
 #        plt.legend(loc="lower left", bbox_to_anchor=(1,0))
@@ -1104,15 +1104,3 @@ class FinFXVolSurface():
 
 ###############################################################################
 
-if __name__ == '__main__':
-    pass
-
-###############################################################################
-
-# linsolve([a*(0.25) + b*(0.5)+c=s50
-# ,a *(0.25)*(0.25) + b*(0.25)+c=s25,
-# a *(0.75)*(0.75) + b*(0.75)+c=s75],[a,b,c]);
-# gives
-# [a=8*s75-16*s50+8*s25,b=-6*s75+16*s50-10*s25,c=s75-3*s50+3*s25]
-
-###############################################################################

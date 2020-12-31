@@ -225,6 +225,7 @@ def test_IntraDay():
 
 ###############################################################################
 
+start = time.time()
 
 test_FinDate()
 test_FinDateTenors()
@@ -234,6 +235,10 @@ test_FinDateAddYears()
 test_FinDateSpeed()
 test_FinDateFormat()
 test_IntraDay()
+
+end = time.time()
+elapsed = end - start
+# print("Elapsed time:", elapsed)
 
 testCases.compareTestCases()
 

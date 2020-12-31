@@ -20,7 +20,9 @@ class FinVolFunctionTypes(Enum):
 # Parametric functions for option volatility to use in a Black-Scholes model
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+
+@njit(float64(float64[:], float64, float64, float64),
+      fastmath=True, cache=True)
 def volFunctionClark(params, f, k, t):
     ''' Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
@@ -38,7 +40,9 @@ def volFunctionClark(params, f, k, t):
 
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+
+@njit(float64(float64[:], float64, float64, float64), 
+      fastmath=True, cache=True)
 def volFunctionBloomberg(params, f, k, t):
     ''' Volatility Function similar to the one used by Bloomberg. It is 
     a quadratic function in the spot delta of the option. It can therefore 
@@ -49,6 +53,7 @@ def volFunctionBloomberg(params, f, k, t):
  
     numParams = len(params)
 
+    # Rather than pass in the ATM vol, I imply it from the delta=0.50 curve
     sigma = 0.0
     for i in range(0, len(params)):
         pwr = numParams - i - 1
@@ -68,7 +73,9 @@ def volFunctionBloomberg(params, f, k, t):
 
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+
+@njit(float64(float64[:], float64, float64, float64), 
+      fastmath=True, cache=True)
 def volFunctionSABR(params, f, k, t):
     ''' This is the SABR function with the exponent beta set equal to 1. The 
     first parameter is alpha, then nu and the third parameter is rho. '''

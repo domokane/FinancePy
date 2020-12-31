@@ -67,7 +67,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
             iterations - Number of iterations needed to find the root.
             converged - True if the routine converged
     """
-
+    
     if tol <= 0:
         raise ValueError("tol is too small <= 0")
     if maxiter < 1:

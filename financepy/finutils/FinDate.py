@@ -6,7 +6,7 @@ import datetime
 from .FinError import FinError
 from numba import njit, boolean, int64
 import numpy as np
-
+from numba import njit, int64
 
 ###############################################################################    
 
@@ -102,7 +102,6 @@ def parse_date(dateStr, dateFormat):
 gDateCounterList = None
 gStartYear = 1900
 gEndYear = 2100
-
 
 def calculateList():
     ''' Calculate list of dates so that we can do quick lookup to get the
@@ -624,7 +623,7 @@ class FinDate():
     ###########################################################################
 
     def addTenor(self,
-                 tenor: str):
+                 tenor: (list,str)):
         ''' Return the date following the FinDate by a period given by the
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
@@ -632,55 +631,73 @@ class FinDate():
         years. The date is NOT weekend or holiday calendar adjusted. This must
         be done AFTERWARDS. '''
 
-        if isinstance(tenor, str) is False:
-            raise FinError("Tenor must be a string e.g. '5Y'")
+        listFlag = False
 
-        tenor = tenor.upper()
-        DAYS = 1
-        WEEKS = 2
-        MONTHS = 3
-        YEARS = 4
-
-        periodType = 0
-        numPeriods = 0
-
-        if tenor == "ON":   # overnight - should be used only if spot days = 0
-            periodType = DAYS
-            numPeriods = 1
-        elif tenor == "TN":  # overnight - should be used when spot days > 0
-            periodType = DAYS
-            numPeriods = 1
-        elif tenor[-1] == "D":
-            periodType = DAYS
-            numPeriods = int(tenor[0:-1])
-        elif tenor[-1] == "W":
-            periodType = WEEKS
-            numPeriods = int(tenor[0:-1])
-        elif tenor[-1] == "M":
-            periodType = MONTHS
-            numPeriods = int(tenor[0:-1])
-        elif tenor[-1] == "Y":
-            periodType = YEARS
-            numPeriods = int(tenor[0:-1])
+        if isinstance(tenor, list) is True:
+            listFlag = True
+            for ten in tenor:
+                if isinstance(ten, str) is False:
+                    raise FinError("Tenor must be a string e.g. '5Y'")
         else:
-            raise FinError("Unknown tenor type in " + tenor)
+            if isinstance(tenor, str) is True:
+                tenor = [tenor]
+            else:
+                raise FinError("Tenor must be a string e.g. '5Y'")
 
-        newDate = FinDate(self._d, self._m, self._y)
+        newDates = []
 
-        if periodType == DAYS:
-            for _ in range(0, numPeriods):
-                newDate = newDate.addDays(1)
-        elif periodType == WEEKS:
-            for _ in range(0, numPeriods):
-                newDate = newDate.addDays(7)
-        elif periodType == MONTHS:
-            for _ in range(0, numPeriods):
-                newDate = newDate.addMonths(1)
-        elif periodType == YEARS:
-            for _ in range(0, numPeriods):
-                newDate = newDate.addMonths(12)
+        for tenStr in tenor:            
+            tenStr = tenStr.upper()
+            DAYS = 1
+            WEEKS = 2
+            MONTHS = 3
+            YEARS = 4
+    
+            periodType = 0
+            numPeriods = 0
+    
+            if tenStr == "ON":   # overnight - should be used only if spot days = 0
+                periodType = DAYS
+                numPeriods = 1
+            elif tenStr == "TN":  # overnight - should be used when spot days > 0
+                periodType = DAYS
+                numPeriods = 1
+            elif tenStr[-1] == "D":
+                periodType = DAYS
+                numPeriods = int(tenStr[0:-1])
+            elif tenStr[-1] == "W":
+                periodType = WEEKS
+                numPeriods = int(tenStr[0:-1])
+            elif tenStr[-1] == "M":
+                periodType = MONTHS
+                numPeriods = int(tenStr[0:-1])
+            elif tenStr[-1] == "Y":
+                periodType = YEARS
+                numPeriods = int(tenStr[0:-1])
+            else:
+                raise FinError("Unknown tenor type in " + tenor)
+    
+            newDate = FinDate(self._d, self._m, self._y)
+    
+            if periodType == DAYS:
+                for _ in range(0, numPeriods):
+                    newDate = newDate.addDays(1)
+            elif periodType == WEEKS:
+                for _ in range(0, numPeriods):
+                    newDate = newDate.addDays(7)
+            elif periodType == MONTHS:
+                for _ in range(0, numPeriods):
+                    newDate = newDate.addMonths(1)
+            elif periodType == YEARS:
+                for _ in range(0, numPeriods):
+                    newDate = newDate.addMonths(12)
 
-        return newDate
+            newDates.append(newDate)
+
+        if listFlag is True:
+            return newDates
+        else:
+            return newDates[0]
 
     ###########################################################################
 
