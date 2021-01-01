@@ -10,9 +10,10 @@ from ..finutils.FinMath import N
 from ..finutils.FinError import FinError
 
 ###############################################################################
+###############################################################################
 
-
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(float64(float64[:], float64, float64, float64),
+      fastmath=True, cache=True)
 def volFunctionSABR(params, f, k, t):
 
     alpha = params[0]
@@ -57,6 +58,50 @@ def volFunctionSABR(params, f, k, t):
 
 ###############################################################################
 
+@njit(float64(float64[:], float64, float64, float64), 
+      fastmath=True, cache=True)
+def volFunctionSABR3(params, f, k, t):
+    ''' This is the SABR function with the exponent beta set equal to 1 so only
+    3 parameters are free. The first parameter is alpha, then nu and the third 
+    parameter is rho. Check the order as it is not the same as main SABR fn'''
+    
+    alpha = params[0]
+    nu = params[1]
+    rho = params[2]
+
+    if rho > 1.0:
+        rho = 0.99
+    
+    if rho < -1.0:
+        rho = -0.99
+
+    m = f / k
+
+    if abs(m - 1.0) > 1e-6:
+
+        sigma = 1.0
+        numTerm1 = 0.0
+        numTerm2 = rho * nu * alpha / 4.0
+        numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
+        num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
+        logM = np.log(m)
+        z = nu / alpha * logM
+        denom = 1.0
+        x = np.log((np.sqrt(1.0 - 2.0*rho*z + z**2.0) + z - rho)/(1.0 - rho))
+        sigma = num*z/(denom*x)
+
+    else:
+        # when the option is at the money
+        numTerm1 = 0.0
+        numTerm2 = rho * nu * alpha / 4.0
+        numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
+        num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
+        denom = 1.0
+        sigma = num / denom
+
+    return sigma
+
+###############################################################################
 
 class FinModelSABR():
     ''' SABR - Stochastic alpha beta rho model by Hagan et al. '''

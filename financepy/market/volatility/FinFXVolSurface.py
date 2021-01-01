@@ -21,10 +21,11 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...models.FinModelBlackScholes import FinModelBlackScholes
 
-from ...market.volatility.FinOptionVolatilityFns import volFunctionClark
-from ...market.volatility.FinOptionVolatilityFns import volFunctionSABR
-from ...market.volatility.FinOptionVolatilityFns import volFunctionBloomberg
-from ...market.volatility.FinOptionVolatilityFns import FinVolFunctionTypes
+from ...models.FinModelVolatilityFns import volFunctionClark
+from ...models.FinModelVolatilityFns import volFunctionBloomberg
+from ...models.FinModelVolatilityFns import FinVolFunctionTypes
+from ...models.FinModelSABR import volFunctionSABR
+from ...models.FinModelSABR import volFunctionSABR3
 
 from ...finutils.FinMath import norminvcdf
 
@@ -223,8 +224,8 @@ def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
     if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
         vol = volFunctionClark(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
-        vol = volFunctionSABR(params, f, k, t)
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR3.value:
+        vol = volFunctionSABR3(params, f, k, t)
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
         vol = volFunctionBloomberg(params, f, k, t)
@@ -943,46 +944,43 @@ class FinFXVolSurface():
         ''' Calculate the pdf for each tenor horizon. Returns a list of 
         FinDistribution objects, one for each tenor horizon. '''
 
-#        plt.figure()
-
         dbns = []
 
         for iTenor in range(0, len(self._tenors)):
             
             F = self._F0T[iTenor]
-            texp = self._texp[iTenor]
+            t = self._texp[iTenor]
 
             dFX = (highFX - lowFX)/ numIntervals
 
-            domDF = self._domDiscountCurve._df(texp)
-            forDF = self._forDiscountCurve._df(texp)
+            domDF = self._domDiscountCurve._df(t)
+            forDF = self._forDiscountCurve._df(t)
 
-            rd = -np.log(domDF) / texp
-            rf = -np.log(forDF) / texp
+            rd = -np.log(domDF) / t
+            rf = -np.log(forDF) / t
 
-            params = self._parameters[iTenor]
-
-            strikes = []
+            Ks = []
             vols = []
 
             for iK in range(0, numIntervals):
-                strike = lowFX + iK*dFX                
 
-                if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
-                    vol = volFunctionClark(params, F, strike, texp)
-                elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-                    vol = volFunctionSABR(params, F, strike, texp)
-                if self._volatilityFunctionType == FinVolFunctionTypes.BBG:
-                    vol = volFunctionBloomberg(params, F, strike, texp)
+                k = lowFX + iK*dFX                
 
-                strikes.append(strike) 
+                vol = volFunctionFAST(self._volatilityFunctionType.value, 
+                                      self._parameters[iTenor], 
+                                      self._strikes[iTenor], 
+                                      self._gaps[iTenor], 
+                                      f, k, t)
+
+                Ks.append(k) 
                 vols.append(vol)
             
-            strikes = np.array(strikes)
+            Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._spotFXRate, texp, rd, rf, strikes, vols)
-            dbn = FinDistribution(strikes, density)
+            density = optionImpliedDbn(self._spotFXRate, t, rd, rf, Ks, vols)
+
+            dbn = FinDistribution(Ks, density)
             dbns.append(dbn)
 
         return dbns
@@ -1013,7 +1011,7 @@ class FinFXVolSurface():
             t = self._texp[tenorIndex]
             f = self._F0T[tenorIndex]
 
-            for i in range(0, numIntervals):
+            for _ in range(0, numIntervals):
                 sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
                 strikes.append(K)
                 vols.append(sigma)

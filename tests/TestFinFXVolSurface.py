@@ -10,7 +10,7 @@ from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
 from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
 from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
 from financepy.finutils.FinDate import FinDate
-from financepy.market.volatility.FinOptionVolatilityFns import FinVolFunctionTypes
+from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

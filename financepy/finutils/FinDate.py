@@ -113,6 +113,7 @@ def calculateList():
 
     dayCounter = 0
     maxDays = 0
+    
     global gDateCounterList
     global gStartYear
     global gEndYear
@@ -409,6 +410,8 @@ class FinDate():
             numDays = -1 * numDays
             s = -1
 
+        # TODO: Fix this.
+        # This is very inefficient as it creates a FinDate for each date
         while numDays > 0:
             dt = dt + s * datetime.timedelta(days=1)
             d = dt.day

@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
-from financepy.market.volatility.FinOptionVolatilityFns import volFunctionClark
+
+from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
+from financepy.models.FinModelVolatilityFns import volFunctionClark
 
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
