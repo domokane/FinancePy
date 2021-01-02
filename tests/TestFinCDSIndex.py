@@ -7,8 +7,8 @@ sys.path.append("..")
 
 from financepy.products.credit.FinCDS import FinCDS
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborSwap import FinIborSwap
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.credit.FinCDSCurve import FinCDSCurve
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes

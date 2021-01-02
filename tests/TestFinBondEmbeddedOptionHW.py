@@ -14,8 +14,8 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.models.FinModelRatesHW import FinModelRatesHW
 
-from financepy.products.funding.FinIborSwap import FinIborSwap
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborSwap import FinIborSwap
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption

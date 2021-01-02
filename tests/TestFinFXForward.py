@@ -8,8 +8,8 @@ sys.path.append("..")
 from financepy.products.fx.FinFXForward import FinFXForward
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode

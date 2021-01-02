@@ -13,19 +13,19 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.funding.FinIborFRA import FinIborFRA
-from financepy.products.funding.FinIborFuture import FinIborFuture
-from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.rates.FinIborFRA import FinIborFRA
+from financepy.products.rates.FinIborFuture import FinIborFuture
+from financepy.products.rates.FinIborDeposit import FinIborDeposit
+from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.funding.FinIborDualCurve import FinIborDualCurve
-from financepy.products.funding.FinOISCurve import FinOISCurve
-from financepy.products.funding.FinOIS import FinOIS
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborDualCurve import FinIborDualCurve
+from financepy.products.rates.FinOISCurve import FinOISCurve
+from financepy.products.rates.FinOIS import FinOIS
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

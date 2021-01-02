@@ -15,7 +15,7 @@ from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinDate import FinDate
 
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...products.funding.FinIborFRA import FinIborFRA
+from ...products.rates.FinIborFRA import FinIborFRA
 
 ###############################################################################
 

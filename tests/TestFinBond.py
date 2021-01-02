@@ -11,9 +11,9 @@ sys.path.append("..")
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.products.bonds.FinBond import FinYTMCalcType
 from financepy.products.bonds.FinBond import FinBond
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.funding.FinIborDeposit import FinIborDeposit
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborDeposit import FinIborDeposit
+from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.finutils.FinMath import ONE_MILLION
 from financepy.finutils.FinDate import FinDate, fromDatetime
 from financepy.finutils.FinDayCount import FinDayCountTypes

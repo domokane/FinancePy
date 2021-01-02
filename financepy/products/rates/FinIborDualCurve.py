@@ -13,9 +13,9 @@ from ...finutils.FinHelperFunctions import checkArgumentTypes, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolator import FinInterpTypes, FinInterpolator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...products.funding.FinIborDeposit import FinIborDeposit
-from ...products.funding.FinIborFRA import FinIborFRA
-from ...products.funding.FinIborSwap import FinIborSwap
+from ...products.rates.FinIborDeposit import FinIborDeposit
+from ...products.rates.FinIborFRA import FinIborFRA
+from ...products.rates.FinIborSwap import FinIborSwap
 
 swaptol = 1e-10
 

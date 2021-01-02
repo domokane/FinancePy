@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.funding.FinOIS import FinOIS
+from financepy.products.rates.FinOIS import FinOIS
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
