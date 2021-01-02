@@ -96,7 +96,6 @@ class FinIborCapVolCurve():
             t = (dt - self._curveDate) / gDaysInYear
             self._times.append(t)
             tau = dayCounter.yearFrac(prevDt, dt)[0]
-#            tau = (dt - prevDt)/gDaysInYear
             self._taus.append(tau)
             prevDt = dt
 

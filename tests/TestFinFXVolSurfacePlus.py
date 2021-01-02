@@ -20,10 +20,11 @@ import matplotlib.pyplot as plt
 
 ###############################################################################
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
 
 ###############################################################################
-
+# TODO: ADD LOGGING TO TEST CASES
+###############################################################################
 
 def test_FinFXMktVolSurface1(verboseCalibration):
 
@@ -58,7 +59,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK5
+        volFunctionType = FinVolFunctionTypes.CLARK
         alpha = 0.50 # FIT WINGS AT 10D
 
         fxMarketPlus = FinFXVolSurfacePlus(valueDate,
@@ -78,7 +79,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                        deltaMethod, 
                                        volFunctionType)
 
-        fxMarketPlus.checkCalibration(True)
+#        fxMarketPlus.checkCalibration(True)
 
         if PLOT_GRAPHS:
 
@@ -92,7 +93,6 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
                 plt.title(volFunctionType)
                 print("SUM:", dbns[i].sum())
-
 
 ###############################################################################
 
@@ -123,13 +123,13 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         riskReversal25DeltaVols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
         marketStrangle10DeltaVols = [3.704, 4.047, 4.396, 4.932, 5.726, 5.709]
         riskReversal10DeltaVols = [-15.855, -16.467, -17.114, -17.882, -18.855, -18.217]
-        alpha = 0.50 
+        alpha = 0.50 # Equally fit 10 and 25 Delta
 
         notionalCurrency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-        volFunctionType = FinVolFunctionTypes.CLARK5
+        volFunctionType = FinVolFunctionTypes.CLARK
 
         fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                            spotFXRate,
@@ -148,7 +148,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                                            deltaMethod,
                                            volFunctionType)
 
-        fxMarketPlus.checkCalibration(True)
+#        fxMarketPlus.checkCalibration(True)
 
         if PLOT_GRAPHS:
             fxMarketPlus.plotVolCurves()
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
     verboseCalibration = False
 
-#    test_FinFXMktVolSurface1(verboseCalibration)
+    test_FinFXMktVolSurface1(verboseCalibration)
     test_FinFXMktVolSurface2(verboseCalibration)
     
     end = time.time()
