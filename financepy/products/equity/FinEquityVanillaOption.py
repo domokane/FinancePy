@@ -6,6 +6,7 @@
 import numpy as np
 
 from scipy import optimize
+from copy import deepcopy
 
 
 from ...finutils.FinDate import FinDate
@@ -347,13 +348,39 @@ class FinEquityVanillaOption():
 
         if np.abs(k-s0)/ (k+s0) < 0.05:
             sigma0 = price / 0.4 / stockPrice / np.sqrt(texp)
+            isAtm = True
         else:
-            sigma0 = 0.10
-            
-        # NEED TO MAP THE OPTION TO AN OTM option!!!
-        # TODO !!
-        
-        argtuple = (self, texp, s0, r, q, k, price)
+            sigma0 = 0.20
+            isAtm = False
+
+        intrinsicVal = max(s0 - k, 0.0) if \
+            self._optionType==FinOptionTypes.EUROPEAN_CALL \
+            else max(k - s0, 0.0)
+
+        if not isAtm and intrinsicVal > 0:
+            optionObj = deepcopy(self)
+            divAdjStockPrice = stockPrice * np.exp(-dividendYield * texp)
+
+            if self._optionType == FinOptionTypes.EUROPEAN_CALL:
+                price = price - (divAdjStockPrice - k * df)
+                optionObj._optionType = FinOptionTypes.EUROPEAN_PUT
+            else:
+                price = price + (divAdjStockPrice - k * df)
+                optionObj._optionType = FinOptionTypes.EUROPEAN_CALL
+
+            intrinsicVal = max(s0 - k, 0.0) if \
+                optionObj._optionType==FinOptionTypes.EUROPEAN_CALL \
+                else max(k - s0, 0.0)
+        else:
+            optionObj = self
+
+        if price < intrinsicVal:
+            raise FinError(
+                "Price ({:.2f}) is too low compared to intrinsic ({:.2f})"
+                .format(price, intrinsicVal)
+            )
+
+        argtuple = (optionObj, texp, s0, r, q, k, price)
 
         sigma = optimize.newton(_f, x0=sigma0, fprime=_fvega, args=argtuple,
                                 tol=1e-5, maxiter=50, fprime2=None)
