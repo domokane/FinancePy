@@ -7,6 +7,8 @@ import time
 import sys
 sys.path.append("..")
 
+import numpy as np
+
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -155,25 +157,68 @@ def test_FinEquityVanillaOption():
 
 ###############################################################################
 
-    testCases.header("STOCK PRICE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
+def testImpliedVolatility():
 
-    stockPrices = range(60, 150, 10)
 
-    for stockPrice in stockPrices:
-        callOption = FinEquityVanillaOption(
-            expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
-        value = callOption.value(
-            valueDate,
-            stockPrice,
-            discountCurve,
-            dividendYield,
-            model)
-        impliedVol = callOption.impliedVolatility(
-            valueDate, stockPrice, discountCurve, dividendYield, value)
-        testCases.print(stockPrice, value, volatility, impliedVol)
+    valueDate = FinDate(1, 1, 2015)
+    stockPrice = 100
+    interestRate = 0.05
+    dividendYield = 0.01
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+
+    strikes = [10, 20, 50, 100, 150, 200]
+    timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]    
+    expiryDates = valueDate.addYears(timesToExpiry)
+    sigmas = [0.01, 0.10, 0.50, 1.0]
+    optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
+
+    testCases.header("OPT_TYPE", "EXP_DATE", "STRIKE", "STOCK_PRICE",
+                     "VALUE", "INPUT_VOL", "IMPLIED_VOL")
+    
+    tol = 1e-6
+    numTests = 0
+    numFails = 0
+    
+    for vol in sigmas:
+
+        model = FinModelBlackScholes(vol)
+
+        for expiryDate in expiryDates:     
+
+            for strike in strikes:
+
+                for optionType in optionTypes:
+
+                    option = FinEquityVanillaOption(expiryDate, 100.0, 
+                                                    optionType)
+                
+                    value = option.value(valueDate, stockPrice, discountCurve, 
+                                         dividendYield, model)
+
+                    impliedVol = option.impliedVolatility(valueDate, stockPrice, 
+                                                      discountCurve, 
+                                                      dividendYield, value)
+
+                    numTests += 1    
+                    if np.abs(impliedVol - vol) > tol:
+                        numFails += 1
+
+                    print(optionType, expiryDate, strike, 
+                          stockPrice, value, vol, impliedVol)
+            
+                    testCases.print(optionType, expiryDate, strike, stockPrice, 
+                                    value, vol, impliedVol)
+
+    print("Num Tests", numTests, "numFails", numFails)
 
 ###############################################################################
 
 
 test_FinEquityVanillaOption()
+start = time.time()
+testImpliedVolatility()
+end = time.time()
+elapsed = end - start
+print("Elapsed:", elapsed)
+
 testCases.compareTestCases()

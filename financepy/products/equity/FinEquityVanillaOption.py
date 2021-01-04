@@ -4,9 +4,10 @@
 
 
 import numpy as np
+from numba import njit
 
-from scipy import optimize
-
+# from scipy import optimize
+from ...finutils.FinSolvers import newton_secant, bisection, newton
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -33,13 +34,12 @@ from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_PARALLEL
 
 from ...finutils.FinMath import N
 
-
 ###############################################################################
 
+@njit(fastmath=True, cache=True)
+def _f(v, args):
 
-def _f(v, *args):
-
-    self = args[0]
+    optionTypeValue = int(args[0])
     texp = args[1]
     s0 = args[2]
     r = args[3]
@@ -47,9 +47,8 @@ def _f(v, *args):
     k = args[5]
     price = args[6]
 
-    objFn = bsValue(s0, texp, k, r, q, v, self._optionType.value)
+    objFn = bsValue(s0, texp, k, r, q, v, optionTypeValue)
     objFn = objFn - price
-
     return objFn
 
 ###############################################################################
@@ -338,7 +337,15 @@ class FinEquityVanillaOption():
         ''' Calculate the implied volatility of a European vanilla option. '''
 
         texp = (self._expiryDate - valueDate) / gDaysInYear
-        texp = np.maximum(texp, 1e-10)
+
+        if texp < 1.0 / 365.0:
+            print("Expiry time is too close to zero.")
+            return -999
+
+        if price < 1e-10:
+            print("Option value is effectively zero.")
+            return -999.0
+
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/texp
         q = dividendYield
@@ -348,15 +355,17 @@ class FinEquityVanillaOption():
         if np.abs(k-s0)/ (k+s0) < 0.05:
             sigma0 = price / 0.4 / stockPrice / np.sqrt(texp)
         else:
-            sigma0 = 0.10
-            
-        # NEED TO MAP THE OPTION TO AN OTM option!!!
-        # TODO !!
-        
-        argtuple = (self, texp, s0, r, q, k, price)
+            sigma0 = 0.20
 
-        sigma = optimize.newton(_f, x0=sigma0, fprime=_fvega, args=argtuple,
-                                tol=1e-5, maxiter=50, fprime2=None)
+        # NEED TO MAP THE OPTION TO AN OTM option!!!
+
+        optionTypeValue = self._optionType.value
+
+        argsv = np.array([optionTypeValue, texp, s0, r, q, k, price])
+
+#        sigma = newton(_f, x0=sigma0, args=argsv, tol=1e-6, maxiter=100)
+
+        sigma = bisection(_f, 0.0, 10.0, args=argsv, xtol=1e-6, maxIter=100)
 
         return sigma
 
