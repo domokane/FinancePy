@@ -1,5 +1,6 @@
 ##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# Greeks added thanks to Guillaume Lefieux
 ##############################################################################
 
 # TODO Fix this
@@ -32,7 +33,8 @@ def calculateD1D2(f, t, k, v):
         raise FinError("Strike is zero.")
 
     d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrtT)
-    d2 = d1 - vol*sqrtT
+    d2 = d1 - vol * sqrtT
+
     return np.array([d1, d2])
 
 ###############################################################################
@@ -70,13 +72,13 @@ class FinModelBlack():
         [d1, d2] = calculateD1D2(f, t, k, v)
         
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
-            v = df * (f * NVect(d1) - k * NVect(d2))
+            value = df * (f * NVect(d1) - k * NVect(d2))
         elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
-            v = df * (k * NVect(-d2) - f * NVect(-d1))
+            value = df * (k * NVect(-d2) - f * NVect(-d1))
         else:
             raise FinError("Option type must be a European Call or Put")
 
-        return v
+        return value
 
 ###############################################################################
 
@@ -95,7 +97,7 @@ class FinModelBlack():
         k = strikeRate
         v = self._volatility
 
-        d1, d2 = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculateD1D2(f, t, k, v)
 
         if callOrPut == FinOptionTypes.EUROPEAN_CALL:
             delta = df * NVect(d1)
@@ -123,7 +125,7 @@ class FinModelBlack():
         k = strikeRate
         v = self._volatility
 
-        d1, d2 = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculateD1D2(f, t, k, v)
 
         sqrtT = np.sqrt(t)
         gamma = df * NPrimeVect(d1) / (f * v * sqrtT)
@@ -147,7 +149,7 @@ class FinModelBlack():
         v = self._volatility
         r = -np.log(df)/t
 
-        d1, d2 = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculateD1D2(f, t, k, v)
 
         sqrtT = np.sqrt(t)
 
