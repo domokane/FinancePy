@@ -203,8 +203,8 @@ def testImpliedVolatility():
                     if np.abs(impliedVol - vol) > tol:
                         numFails += 1
 
-                    print(optionType, expiryDate, strike, 
-                          stockPrice, value, vol, impliedVol)
+#                    print(optionType, expiryDate, strike, 
+#                          stockPrice, value, vol, impliedVol)
             
                     testCases.print(optionType, expiryDate, strike, stockPrice, 
                                     value, vol, impliedVol)
@@ -219,6 +219,6 @@ start = time.time()
 testImpliedVolatility()
 end = time.time()
 elapsed = end - start
-print("Elapsed:", elapsed)
+# print("Elapsed:", elapsed)
 
 testCases.compareTestCases()

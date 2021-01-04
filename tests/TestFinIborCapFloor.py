@@ -298,7 +298,7 @@ def test_FinIborCapletHull():
                                            model)
 
     # Cannot match Hull due to dates being adjusted
-    testCases.header("CORRECT PRICE", "MODEL PRICE")
+    testCases.header("CORRECT PRICE", "MODEL_PRICE")
     testCases.print(517.29, vCaplet)
 
 ###############################################################################
