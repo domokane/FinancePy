@@ -2,8 +2,12 @@
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
 ###############################################################################
 
-from numba import njit, boolean, int64, float64, vectorize
+from numba import jit, njit, boolean, int64, float64, vectorize
 import numpy as np
+
+import operator
+
+from .FinError import FinError
 
 ###############################################################################
 ## from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/root_finding.html #####################
@@ -27,6 +31,8 @@ def _results(r):
     x, funcalls, iterations, flag = r
     return x# results(x, funcalls, iterations, flag == 0)
 
+###############################################################################
+# DO NOT TOUCH THIS FUNCTION AS IT IS USED IN FX VOL CALIBRATION !!!!!!!!!
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
@@ -67,47 +73,307 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
             iterations - Number of iterations needed to find the root.
             converged - True if the routine converged
     """
-    
-    if tol <= 0:
-        raise ValueError("tol is too small <= 0")
+
+    if tol <= 0.0:
+        raise FinError("Tolerance should be positive.")
+
     if maxiter < 1:
-        raise ValueError("maxiter must be greater than 0")
+        raise FinError("maxiter must be greater than 0")
 
     # Convert to float (don't use float(x0); this works also for complex x0)
+    eps = 1e-4
     p0 = 1.0 * x0
     funcalls = 0
     status = _ECONVERR
 
-    # Secant method
-    if x0 >= 0:
-        p1 = x0 * (1 + 1e-4) + 1e-4
+    p1 = x0 * (1.0 + eps)
+    
+    if p1 > 0.0:
+        p1 = p1 + eps
     else:
-        p1 = x0 * (1 + 1e-4) - 1e-4
-        q0 = func(p0, *args)
+        p1 = p1 - eps
+
+    q0 = func(p0, *args)
     funcalls += 1
     q1 = func(p1, *args)
     funcalls += 1
+
+    if np.abs(q1) < np.abs(q0):
+        p0, p1, q0, q1 = p1, p0, q1, q0
+
     for itr in range(maxiter):
+        
         if q1 == q0:
+            if p1 != p0:
+                raise FinError("Tolerance reached")
+
             p = (p1 + p0) / 2.0
             status = _ECONVERGED
             break
         else:
-            p = p1 - q1 * (p1 - p0) / (q1 - q0)
+            if np.abs(q1) > np.abs(q0):
+                p = (-q0 / q1 * p1 + p0) / (1.0 - q0 / q1)
+            else:
+                p = (-q1 / q0 * p0 + p1) / (1.0 - q1 / q0)
+
         if np.abs(p - p1) < tol:
             status = _ECONVERGED
-            break
-        p0 = p1
-        q0 = q1
+            return p
+
+        p0, q0 = p1, q1
         p1 = p
         q1 = func(p1, *args)
         funcalls += 1
 
     if disp and status == _ECONVERR:
         msg = "Failed to converge"
-        raise RuntimeError(msg)
+        raise FinError(msg)
 
-    return p#_results((p, funcalls, itr + 1, status))
+    return p
+
+###############################################################################
+
+# @jit
+def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
+           fprime2=None, x1=None, rtol=0.0,
+           full_output=False, disp=True):
+    """
+    
+    TAKEN FROM SCIPY
+    
+    Find a zero of a real or complex function using the Newton-Raphson
+    (or secant or Halley's) method.
+    Find a zero of the function `func` given a nearby starting point `x0`.
+    The Newton-Raphson method is used if the derivative `fprime` of `func`
+    is provided, otherwise the secant method is used. If the second order
+    derivative `fprime2` of `func` is also provided, then Halley's method is
+    used.
+    If `x0` is a sequence with more than one item, then `newton` returns an
+    array, and `func` must be vectorized and return a sequence or array of the
+    same shape as its first argument. If `fprime` or `fprime2` is given, then
+    its return must also have the same shape.
+    Parameters
+    ----------
+    func : callable
+        The function whose zero is wanted. It must be a function of a
+        single variable of the form ``f(x,a,b,c...)``, where ``a,b,c...``
+        are extra arguments that can be passed in the `args` parameter.
+    x0 : float, sequence, or ndarray
+        An initial estimate of the zero that should be somewhere near the
+        actual zero. If not scalar, then `func` must be vectorized and return
+        a sequence or array of the same shape as its first argument.
+    fprime : callable, optional
+        The derivative of the function when available and convenient. If it
+        is None (default), then the secant method is used.
+    args : tuple, optional
+        Extra arguments to be used in the function call.
+    tol : float, optional
+        The allowable error of the zero value. If `func` is complex-valued,
+        a larger `tol` is recommended as both the real and imaginary parts
+        of `x` contribute to ``|x - x0|``.
+    maxiter : int, optional
+        Maximum number of iterations.
+    fprime2 : callable, optional
+        The second order derivative of the function when available and
+        convenient. If it is None (default), then the normal Newton-Raphson
+        or the secant method is used. If it is not None, then Halley's method
+        is used.
+    x1 : float, optional
+        Another estimate of the zero that should be somewhere near the
+        actual zero. Used if `fprime` is not provided.
+    rtol : float, optional
+        Tolerance (relative) for termination.
+    full_output : bool, optional
+        If `full_output` is False (default), the root is returned.
+        If True and `x0` is scalar, the return value is ``(x, r)``, where ``x``
+        is the root and ``r`` is a `RootResults` object.
+        If True and `x0` is non-scalar, the return value is ``(x, converged,
+        zero_der)`` (see Returns section for details).
+    disp : bool, optional
+        If True, raise a RuntimeError if the algorithm didn't converge, with
+        the error message containing the number of iterations and current
+        function value. Otherwise, the convergence status is recorded in a
+        `RootResults` return object.
+        Ignored if `x0` is not scalar.
+        *Note: this has little to do with displaying, however,
+        the `disp` keyword cannot be renamed for backwards compatibility.*
+    Returns
+    -------
+    root : float, sequence, or ndarray
+        Estimated location where function is zero.
+    r : `RootResults`, optional
+        Present if ``full_output=True`` and `x0` is scalar.
+        Object containing information about the convergence. In particular,
+        ``r.converged`` is True if the routine converged.
+    converged : ndarray of bool, optional
+        Present if ``full_output=True`` and `x0` is non-scalar.
+        For vector functions, indicates which elements converged successfully.
+    zero_der : ndarray of bool, optional
+        Present if ``full_output=True`` and `x0` is non-scalar.
+        For vector functions, indicates which elements had a zero derivative.
+    See Also
+    --------
+    brentq, brenth, ridder, bisect
+    fsolve : find zeros in N dimensions.
+    Notes
+    -----
+    The convergence rate of the Newton-Raphson method is quadratic,
+    the Halley method is cubic, and the secant method is
+    sub-quadratic. This means that if the function is well-behaved
+    the actual error in the estimated zero after the nth iteration
+    is approximately the square (cube for Halley) of the error
+    after the (n-1)th step. However, the stopping criterion used
+    here is the step size and there is no guarantee that a zero
+    has been found. Consequently, the result should be verified.
+    Safer algorithms are brentq, brenth, ridder, and bisect,
+    but they all require that the root first be bracketed in an
+    interval where the function changes sign. The brentq algorithm
+    is recommended for general use in one dimensional problems
+    when such an interval has been found.
+    When `newton` is used with arrays, it is best suited for the following
+    types of problems:
+    * The initial guesses, `x0`, are all relatively the same distance from
+      the roots.
+    * Some or all of the extra arguments, `args`, are also arrays so that a
+      class of similar problems can be solved together.
+    * The size of the initial guesses, `x0`, is larger than O(100) elements.
+      Otherwise, a naive loop may perform as well or better than a vector.
+    Examples
+    --------
+    >>> from scipy import optimize
+    >>> import matplotlib.pyplot as plt
+    >>> def f(x):
+    ...     return (x**3 - 1)  # only one real root at x = 1
+    ``fprime`` is not provided, use the secant method:
+    >>> root = optimize.newton(f, 1.5)
+    >>> root
+    1.0000000000000016
+    >>> root = optimize.newton(f, 1.5, fprime2=lambda x: 6 * x)
+    >>> root
+    1.0000000000000016
+    Only ``fprime`` is provided, use the Newton-Raphson method:
+    >>> root = optimize.newton(f, 1.5, fprime=lambda x: 3 * x**2)
+    >>> root
+    1.0
+    Both ``fprime2`` and ``fprime`` are provided, use Halley's method:
+    >>> root = optimize.newton(f, 1.5, fprime=lambda x: 3 * x**2,
+    ...                        fprime2=lambda x: 6 * x)
+    >>> root
+    1.0
+    When we want to find zeros for a set of related starting values and/or
+    function parameters, we can provide both of those as an array of inputs:
+    >>> f = lambda x, a: x**3 - a
+    >>> fder = lambda x, a: 3 * x**2
+    >>> np.random.seed(4321)
+    >>> x = np.random.randn(100)
+    >>> a = np.arange(-50, 50)
+    >>> vec_res = optimize.newton(f, x, fprime=fder, args=(a, ))
+    The above is the equivalent of solving for each value in ``(x, a)``
+    separately in a for-loop, just faster:
+    >>> loop_res = [optimize.newton(f, x0, fprime=fder, args=(a0,))
+    ...             for x0, a0 in zip(x, a)]
+    >>> np.allclose(vec_res, loop_res)
+    True
+    Plot the results found for all values of ``a``:
+    >>> analytical_result = np.sign(a) * np.abs(a)**(1/3)
+    >>> fig = plt.figure()
+    >>> ax = fig.add_subplot(111)
+    >>> ax.plot(a, analytical_result, 'o')
+    >>> ax.plot(a, vec_res, '.')
+    >>> ax.set_xlabel('$a$')
+    >>> ax.set_ylabel('$x$ where $f(x, a)=0$')
+    >>> plt.show()
+    """
+    
+    if tol <= 0.0:
+        raise FinError("tol too small")
+
+    maxiter = operator.index(maxiter)
+    if maxiter < 1:
+        raise FinError("maxiter must be greater than 0")
+
+    # Convert to float (don't use float(x0); this works also for complex x0)
+    p0 = 1.0 * x0
+    funcalls = 0
+    if fprime is not None:
+        # Newton-Raphson method
+        for itr in range(maxiter):
+            # first evaluate fval
+            fval = func(p0, args)
+            funcalls += 1
+            # If fval is 0, a root has been found, then terminate
+            if fval == 0:
+                return p0
+            fder = fprime(p0, args)
+            funcalls += 1
+            if fder == 0:
+                msg = "Derivative was zero."
+                if disp:
+                    print("Failed to converge after ", str(itr+1),
+                          "iterations, value is ", p0)
+                    raise FinError(msg)
+                print(msg)
+                return p0
+            newton_step = fval / fder
+            if fprime2:
+                fder2 = fprime2(p0, args)
+                funcalls += 1
+                # Halley's method:
+                #   newton_step /= (1.0 - 0.5 * newton_step * fder2 / fder)
+                # Only do it if denominator stays close enough to 1
+                # Rationale: If 1-adj < 0, then Halley sends x in the
+                # opposite direction to Newton. Doesn't happen if x is close
+                # enough to root.
+                adj = newton_step * fder2 / fder / 2
+                if np.abs(adj) < 1:
+                    newton_step /= 1.0 - adj
+            p = p0 - newton_step
+            if np.isclose(p, p0, rtol=rtol, atol=tol):
+                return p
+            p0 = p
+    else:
+        # Secant method
+        if x1 is not None:
+            if x1 == x0:
+                raise ValueError("x1 and x0 must be different")
+            p1 = x1
+        else:
+            eps = 1e-4
+            p1 = x0 * (1 + eps)
+            p1 += (eps if p1 >= 0 else -eps)
+        q0 = func(p0, args)
+        funcalls += 1
+        q1 = func(p1, args)
+        funcalls += 1
+        if abs(q1) < abs(q0):
+            p0, p1, q0, q1 = p1, p0, q1, q0
+        for itr in range(maxiter):
+            if q1 == q0:
+                if p1 != p0:
+                    msg = "Tolerance of reached."
+                    if disp:
+                        print("Failed to converge after ", str(itr+1),
+                              "iterations, value is ", str(p1))
+                    return -999
+                p = (p1 + p0) / 2.0
+                return p
+            else:
+                if abs(q1) > abs(q0):
+                    p = (-q0 / q1 * p1 + p0) / (1 - q0 / q1)
+                else:
+                    p = (-q1 / q0 * p0 + p1) / (1 - q1 / q0)
+            if np.isclose(p, p1, rtol=rtol, atol=tol):
+                return p
+            p0, q0 = p1, q1
+            p1 = p
+            q1 = func(p1, args)
+            funcalls += 1
+
+    if disp:
+        print("Failed to converge after ", str(itr+1),
+              "iterations, value is ", str(p))
+
+    return p
 
 ###############################################################################
 
@@ -257,6 +523,42 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     info = status_flag, num
 
     return xf, fval, info
+
+###############################################################################
+
+#@njit(fastmath=True, cache=True)
+def bisection(func, x1, x2, args, xtol=1e-6, maxIter=500):
+
+    if np.abs(x1-x2) < 1e-10:
+        raise FinError("Brackets should not be equal")
+
+    if x1 > x2:
+        raise FinError("Bracket x2 should be greater than x1")
+
+    f1 = func(x1, args)
+    fmid = func(x2, args)
+
+#    print(x1, f1, "  ", x2, fmid)
+
+    if f1 * fmid >= 0:
+        print("Root not bracketed")
+        return -999.0
+
+    for i in range(0, maxIter):
+
+        xmid = (x1 + x2)/2.0
+        fmid = func(xmid, args)
+        
+        if f1 * fmid < 0:
+            x2 = xmid
+        else:
+            x1 = xmid
+        
+        if np.abs(fmid) < xtol:
+            return xmid
+
+    print("Unable to find root in maxIter")
+    return -999.0
 
 ###############################################################################
 ## https://github.com/linesd/minimize/blob/master/optimizer/minimize.py

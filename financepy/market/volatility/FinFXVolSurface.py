@@ -282,7 +282,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
                 deltaMethodValue, inverseDeltaTarget, parameters)
 
     K = newton_secant(deltaFit, x0=initialValue, args=argtuple,
-               tol=1e-8, maxiter=50)
+                      tol=1e-8, maxiter=50)
 
     return K
     

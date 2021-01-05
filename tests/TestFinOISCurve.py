@@ -13,11 +13,11 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.funding.FinIborFRA import FinIborFRA
-from financepy.products.funding.FinIborFuture import FinIborFuture
-from financepy.products.funding.FinOIS import FinOIS
-from financepy.products.funding.FinOISCurve import FinOISCurve
-from financepy.products.funding.FinIborDeposit import FinIborDeposit
+from financepy.products.rates.FinIborFRA import FinIborFRA
+from financepy.products.rates.FinIborFuture import FinIborFuture
+from financepy.products.rates.FinOIS import FinOIS
+from financepy.products.rates.FinOISCurve import FinOISCurve
+from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes

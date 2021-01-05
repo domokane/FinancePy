@@ -828,7 +828,7 @@ if 1 == 1:
     buildChapter("..//financepy//products//equity")
     buildChapter("..//financepy//products//credit")
     buildChapter("..//financepy//products//bonds")
-    buildChapter("..//financepy//products//funding")
+    buildChapter("..//financepy//products//rates")
     buildChapter("..//financepy//products//fx")
     buildChapter("..//financepy//models")
 #    buildChapter("..//financepy//portfolio")

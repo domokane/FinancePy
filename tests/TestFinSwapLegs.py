@@ -14,8 +14,8 @@ from financepy.finutils.FinAmount import FinAmount
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinDate import FinDate
-from financepy.products.funding.FinFixedLeg import FinFixedLeg
-from financepy.products.funding.FinFloatLeg import FinFloatLeg
+from financepy.products.rates.FinFixedLeg import FinFixedLeg
+from financepy.products.rates.FinFloatLeg import FinFloatLeg
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode

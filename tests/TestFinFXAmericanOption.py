@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -42,7 +42,7 @@ def test_FinFXAmericanOption():
     domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
     forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged

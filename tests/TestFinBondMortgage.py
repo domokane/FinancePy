@@ -8,7 +8,7 @@ sys.path.append("..")
 from financepy.finutils.FinDate import FinDate
 from financepy.products.bonds.FinBondMortgage import FinBondMortgage
 from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
-from financepy.products.funding.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -10,10 +10,10 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
 from financepy.finutils.FinGlobalTypes import FinExerciseTypes
-from financepy.products.funding.FinIborSwaption import FinIborSwaption
-from financepy.products.funding.FinIborSwap import FinIborSwap
+from financepy.products.rates.FinIborSwaption import FinIborSwaption
+from financepy.products.rates.FinIborSwap import FinIborSwap
 
-from financepy.products.funding.FinIborBermudanSwaption import FinIborBermudanSwaption
+from financepy.products.rates.FinIborBermudanSwaption import FinIborBermudanSwaption
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesHW import FinModelRatesHW
