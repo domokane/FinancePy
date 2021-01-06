@@ -6,14 +6,8 @@
 import numpy as np
 from numba import njit
 
-<<<<<<< HEAD
-from scipy import optimize
-from copy import deepcopy
-
-=======
 # from scipy import optimize
 from ...finutils.FinSolvers import newton_secant, bisection, newton
->>>>>>> upstream/master
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinMath import nprime
@@ -31,6 +25,8 @@ from ...models.FinModelBlackScholesAnalytical import bsVega
 from ...models.FinModelBlackScholesAnalytical import bsGamma
 from ...models.FinModelBlackScholesAnalytical import bsRho
 from ...models.FinModelBlackScholesAnalytical import bsTheta
+from ...models.FinModelBlackScholesAnalytical import bsImpliedVolatility
+
 
 from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA_NONUMPY
 from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_NUMBA
@@ -372,8 +368,42 @@ class FinEquityVanillaOption():
 
 #        sigma = newton(_f, x0=sigma0, args=argsv, tol=1e-6, maxiter=100)
 
-        sigma = bisection(_f, 0.0, 10.0, args=argsv, xtol=1e-6, maxIter=100)
+        sigma = bisection(_f, 0.0, 1.0, args=argsv, xtol=1e-6, maxIter=100)
 
+        return sigma
+
+###############################################################################
+
+    def impliedVolatility_v2(self,
+                          valueDate: FinDate,
+                          stockPrice: (float, list, np.ndarray),
+                          discountCurve: FinDiscountCurve,
+                          dividendYield: float,
+                          price):
+        ''' Calculate the Black-Scholes implied volatility of a European vanilla option. '''
+
+        texp = (self._expiryDate - valueDate) / gDaysInYear
+
+        if texp < 1.0 / 365.0:
+            print("Expiry time is too close to zero.")
+            return -999
+
+        if price < 1e-10:
+            print("Option value is effectively zero.")
+            return -999.0
+
+        df = discountCurve.df(self._expiryDate)
+        r = -np.log(df)/texp
+        q = dividendYield
+        k = self._strikePrice
+        s0 = stockPrice
+
+        try:
+            sigma = bsImpliedVolatility(s0, texp, k, r, q, price, self._optionType.value)
+        except FinError:
+            argsv = np.array([self._optionType.value, texp, s0, r, q, k, price])
+            sigma = bisection(_f, 0.0, 10.0, args=argsv, xtol=1e-6, maxIter=100)
+        
         return sigma
 
 ###############################################################################
