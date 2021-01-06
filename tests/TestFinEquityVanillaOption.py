@@ -214,8 +214,8 @@ def testImpliedVolatility():
 
 ###############################################################################
 
-    K = [10, 20, 50, 100, 150, 200, 250]
-    T = [0.001, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]
+    K = [10, 20, 50, 100, 150, 200]
+    T = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]
     sigma = [0.01, 0.10, 0.50, 1.0]
     optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
     stockPrice = 100
@@ -225,6 +225,7 @@ def testImpliedVolatility():
     noResult = 0
     successful = 0
     numberTests = 0
+    totalElapsedTime = 0.
     for t in T:
         expDate = valueDate.addHours(t * HOURS_PER_YEAR)
         for k in K:
@@ -239,9 +240,11 @@ def testImpliedVolatility():
                         discountCurve,
                         dividendYield,
                         bs_model)
-
+                    if value < 1e-10:
+                        continue
                     try:
-                        impliedVol = option.impliedVolatility(
+                        start_time = time.time()
+                        impliedVol = option.impliedVolatility_v2(
                             valueDate, stockPrice, discountCurve, dividendYield, value)
                         assert abs(impliedVol - vol) < 0.10
                     except FinError:
@@ -255,7 +258,8 @@ def testImpliedVolatility():
                             "Type:", type_.name,
                             "ttm:", t,
                             "strike:", k,
-                            "Expected IV:", vol
+                            "Expected IV:", vol,
+                            "BS Price:", value
                         )
                     except RuntimeError:
                         import traceback
@@ -274,13 +278,16 @@ def testImpliedVolatility():
                         noResult += 1
                     else:
                         successful += 1
+                        totalElapsedTime += time.time()-start_time
                     finally:
                         numberTests += 1
+
     print("\nSuccessful:", successful)
     print("Convergence failure:", convergenceFailure)
     print("Inaccurate result:", assertionFailure)
     print("No result (price too low)", noResult)
     print("TOTAL:", numberTests)
+    print("Mean time:", 1e6 * totalElapsedTime/successful, "us")
 
 ###############################################################################
 
