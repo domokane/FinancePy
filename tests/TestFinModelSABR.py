@@ -51,8 +51,7 @@ def test_SABR_Calibration():
     f = 0.043
     k = 0.050
     r = 0.03
-    texp = 1.0
-
+    texp = 2.0
 
     callOptionType = FinOptionTypes.EUROPEAN_CALL
     putOptionType = FinOptionTypes.EUROPEAN_PUT

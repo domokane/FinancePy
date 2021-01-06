@@ -22,7 +22,7 @@ def _x(rho, z):
     b = 1.0 - rho
     return np.log(a / b)
 
-def volFunctionSABR(params, k, f, t):
+def volFunctionSABR(params, f, k, t):
     ''' Black volatility implied by SABR model. '''
 
     alpha = params[0]
@@ -59,56 +59,6 @@ def volFunctionSABR(params, k, f, t):
     else:
         v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
         return v0
-
-###############################################################################
-
-#@njit(float64(float64[:], float64, float64, float64),
-#      fastmath=True, cache=True)
-# def volFunctionSABR2(params, f, k, t):
-
-#     # Shifted forward and strike
-#     # forward = forward + self._shift
-#     # strike = strike + self._shift
-
-#     alpha = params[0]
-#     beta = params[1]
-#     rho = params[2]
-#     nu = params[3]
-
-#     if abs(rho) >= 0.999999999:
-#         raise FinError("Rho is a correlation and must be less than 1.0")
-
-#     b = 1.0 - beta
-#     fk = f * k
-#     m = f / k
-
-#     if abs(m - 1.0) > 1e-6:
-#         sigma = 1.0
-#         numTerm1 = ((alpha * b)**2.0) / (fk**b) / 24.0
-#         numTerm2 = rho * beta * nu * alpha / (fk**(b/2.0)) / 4.0
-#         numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
-#         num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
-#         logM = np.log(m)
-#         z = nu / alpha * (fk**(b / 2.0)) * logM
-#         denom = (fk**(b/2)) * (1.0 + (b**2) / 24.0 *
-#                                  (logM**2) + (b**4) / 1920.0 * (logM**4))
-
-#         x = np.log((np.sqrt(1.0 - 2.0*rho*z + z**2.0) + z - rho)/(1.0 - rho))
-#         sigma = num*z/(denom*x)
-
-#     else:
-#         # when the option is at the money
-#         numTerm1 = ((alpha * b)**2.0) / (f**(2.0 * b)) / 24.0
-#         numTerm2 = rho * beta * nu * alpha / (f**b) / 4.0
-#         numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
-#         num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
-#         denom = f**b
-#         sigma = num / denom
-
-#     if sigma <= 0.0:
-#         raise FinError("SABR Volatility <= 0%.")
-
-#     return sigma
 
 ###############################################################################
 
@@ -158,7 +108,11 @@ def volFunctionSABR3(params, f, k, t):
 ###############################################################################
 
 class FinModelSABR():
-    ''' SABR - Stochastic alpha beta rho model by Hagan et al. '''
+    ''' SABR - Stochastic alpha beta rho model by Hagan et al. which is a 
+    stochastic volatility model where alpha controls the implied volatility,
+    beta is the exponent on the the underlying asset's process so beta = 0
+    is normal and beta = 1 is lognormal, rho is the correlation between the 
+    underlying and the volatility process. '''
 
     def __init__(self, alpha, beta, rho, nu):
         ''' Create FinModelSABR with all of the model parameters. We will 
@@ -169,7 +123,7 @@ class FinModelSABR():
         self._beta = beta
         self._rho = rho
         self._nu = nu
-        
+
 ###############################################################################
 
 
@@ -275,9 +229,6 @@ class FinModelSABR():
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
         chosen.''' 
-
-        # For shifted SABR
-        # atmStrike = atmStrike + self._shift
 
         beta = self._beta
         rho = self._rho
