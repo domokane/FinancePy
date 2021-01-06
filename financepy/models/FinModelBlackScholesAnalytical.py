@@ -3,13 +3,14 @@
 ##############################################################################
 
 import numpy as np
-from numba import float64, int64, vectorize
+from numba import float64, int64, vectorize, njit
 from scipy import optimize
 
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinGlobalVariables import gSmall
 from ..finutils.FinMath import NVect, NPrimeVect, N
 from ..finutils.FinError import FinError
+from ..finutils.FinSolvers import newton_secant
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -158,6 +159,60 @@ def bsRho(s, t, k, r, q, v, optionTypeValue):
     d2 = d1 - vsqrtT
     rho = phi * k * t * np.exp(-r*t) * NVect(phi*d2)
     return rho
+
+###############################################################################
+
+@njit(fastmath=True, cache=True)
+def _f(sigma, s, t, k, r, q, price, optionTypeValue):
+    bsPrice = bsValue(s, t, k, r, q, sigma, optionTypeValue)
+    return bsPrice - price
+
+
+@vectorize([float64(float64, float64, float64, float64, float64, float64, int64)],
+           fastmath=True, cache=True)
+def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
+    ''' Calculate the Black-Scholes implied volatility of a European vanilla option. '''
+
+    if np.abs(k-s)/ (k+s) < 0.05:
+        sigma0 = price / 0.4 / s / np.sqrt(t)
+        isAtm = True
+    else:
+        sigma0 = np.sqrt(np.log(s/k + r*t) * 2/t)
+        isAtm = False
+
+    intrinsicVal = max(s - k, 0.0) if \
+        optionTypeValue==FinOptionTypes.EUROPEAN_CALL.value \
+        else max(k - s, 0.0)
+
+    if not isAtm and intrinsicVal > 0:
+        divAdjStockPrice = s * np.exp(-q * t)
+        df = np.exp(-r * t)
+
+        if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+            price = price - (divAdjStockPrice - k * df)
+            optionTypeValue = FinOptionTypes.EUROPEAN_PUT.value
+        else:
+            price = price + (divAdjStockPrice - k * df)
+            optionTypeValue = FinOptionTypes.EUROPEAN_CALL.value
+
+        intrinsicVal = max(s - k, 0.0) if \
+            optionTypeValue==FinOptionTypes.EUROPEAN_CALL.value \
+            else max(k - s, 0.0)
+
+    if price < intrinsicVal:
+        raise FinError(
+            "Price ({:.2f}) is too low compared to intrinsic ({:.2f})"
+            .format(price, intrinsicVal)
+        )
+
+    argtuple = (s, t, k, r, q, price, optionTypeValue)
+
+    sigma = newton_secant(_f, sigma0, args=argtuple, tol=1e-6)
+
+    if np.isnan(sigma):
+        raise FinError("NaN result.")
+
+    return sigma
 
 ###############################################################################
 ###############################################################################
