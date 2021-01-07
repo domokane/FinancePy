@@ -12,16 +12,17 @@ from ..finutils.FinMath import N
 from ..finutils.FinError import FinError
 from ..finutils.FinHelperFunctions import labelToString
 
-
 ###############################################################################
 ###############################################################################
 
+@njit
 def _x(rho, z):
-    """Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
+    ''' Return function x used in Hagan's 2002 SABR lognormal vol expansion.'''
     a = (1.0 - 2.0*rho*z + z**2)**.5 + z - rho
     b = 1.0 - rho
     return np.log(a / b)
 
+@njit
 def volFunctionSABR(params, f, k, t):
     ''' Black volatility implied by SABR model. '''
 

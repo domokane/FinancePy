@@ -188,14 +188,6 @@ def solveToHorizonFAST(s, t,
     opt = minimize(objFAST, c0, fargs, method="CG", tol=tol)
     xopt = opt.x
 
-    v = objFAST(xopt, *fargs)
-
-    # The function is quadratic. So the quadratic value should be small
-    if abs(v) > tol:
-        print("Using an xtol:", tol, " maybe make this smaller")
-        print("Reported value of v:", v)
-        raise FinError("Failed to fit volatility smile curve.")
-
     params = np.array(xopt)
 
     K_25D_C = solveForSmileStrikeFAST(s, t, rd, rf, 
@@ -227,8 +219,14 @@ def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
     elif volFunctionTypeValue == FinVolFunctionTypes.SABR3.value:
         vol = volFunctionSABR3(params, f, k, t)
         return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
+        vol = volFunctionSABR(params, f, k, t)
+        return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
         vol = volFunctionBloomberg(params, f, k, t)
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.CLARK5.value:
+        vol = volFunctionClark(params, f, k, t)
         return vol
     else:
         raise FinError("Unknown Model Type")
@@ -270,7 +268,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
                             volatilityTypeValue,
                             deltaTarget,
                             deltaMethodValue,
-                            initialValue,
+                            initialGuess,
                             parameters):
     ''' Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
@@ -281,7 +279,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
     argtuple = (volatilityTypeValue, s, t, rd, rf, optionTypeValue, 
                 deltaMethodValue, inverseDeltaTarget, parameters)
 
-    K = newton_secant(deltaFit, x0=initialValue, args=argtuple,
+    K = newton_secant(deltaFit, x0=initialGuess, args=argtuple,
                       tol=1e-8, maxiter=50)
 
     return K
@@ -383,16 +381,18 @@ class FinFXVolSurface():
                  valueDate: FinDate,
                  spotFXRate: float,
                  currencyPair: str,
-                 notionalCurrency,
+                 notionalCurrency: str,
                  domDiscountCurve: FinDiscountCurve,
                  forDiscountCurve: FinDiscountCurve,
-                 tenors,
-                 atmVols,
-                 mktStrangle25DeltaVols,
-                 riskReversal25DeltaVols,
-                 atmMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
-                 deltaMethod=FinFXDeltaMethod.SPOT_DELTA, 
-                 volatilityFunctionType=FinVolFunctionTypes.CLARK):
+                 tenors: (list),
+                 atmVols: (list, np.ndarray),
+                 mktStrangle25DeltaVols: (list, np.ndarray),
+                 riskReversal25DeltaVols: (list, np.ndarray),
+                 atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
+                 deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
+                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
+        ''' Create the FinFXVolSurface object by passing in market vol data
+        for ATM and 25 Delta Market Strangles and Risk Reversals. '''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -466,38 +466,51 @@ class FinFXVolSurface():
 
         t = (expiryDate - self._valueDate) / gDaysInYear
 
-        if self._numVolCurves == 1:
+        numCurves = self._numVolCurves
+
+        if numCurves == 1:
 
             # The volatility term structure is flat if there is only one expiry
-            fwd1 = self._F0T[0]
-            t0 = 0.0
-            t1 = self._texp[0]
-            vol1 = volFunctionFAST(volTypeValue, self._parameters[0], fwd1, K, t1)
-            return vol1
-                        
-        for i in range(1, self._numVolCurves):
-            
-            print(i, t, self._texp[i])
+            fwd = self._F0T[0]
+            texp = self._texp[0]
+            vol = volFunctionFAST(volTypeValue, self._parameters[0], 
+                                  fwd, K, texp)
+            return vol
+        
+        # If the time is below first time then assume a flat vol
+        if t <= self._texp[0]:
+
+            fwd = self._F0T[0]
+            texp = self._texp[0]
+            vol = volFunctionFAST(volTypeValue, self._parameters[0],
+                                  fwd, K, texp)
+            return vol
+
+        # If the time is beyond the last time then extrapolate with a flat vol
+        if t > self._texp[-1]:
+
+            fwd = self._F0T[-1]
+            texp = self._texp[-1]
+            vol = volFunctionFAST(volTypeValue, self._parameters[-1],
+                                  fwd, K, texp)
+            return vol
+
+        for i in range(1, numCurves):
  
             if t <= self._texp[i] and t > self._texp[i-1]:
-                index0 = self._texp[i-1]
-                index1 = self._texp[i]
+                index0 = i-1
+                index1 = i
                 break
         
-        if index1 == 0:
-            raise FinError("Time not bracketed - extrapolate")
-
-        print("index0", index0, "index1", index1)
-
         fwd0 = self._F0T[index0]
         t0 = self._texp[index0]
-        vol0 = volFunctionFAST(volTypeValue, self._parameters[index0], fwd0, K, t0)
-        
+        vol0 = volFunctionFAST(volTypeValue, self._parameters[index0],
+                               fwd0, K, t0)
+
         fwd1 = self._F0T[index1]
         t1 = self._texp[index1]
-        vol1 = volFunctionFAST(volTypeValue, self._parameters[index1], fwd1, K, t1)
-
-        print("vol0", vol0, "vol1", vol1)
+        vol1 = volFunctionFAST(volTypeValue, self._parameters[index1],
+                               fwd1, K, t1)
 
         vart0 = vol0*vol0*t0
         vart1 = vol1*vol1*t1
@@ -507,7 +520,7 @@ class FinFXVolSurface():
             raise FinError("Negative variance.")
 
         volt = np.sqrt(vart/t)
-        return volt 
+        return volt
         
 ###############################################################################
 
@@ -518,11 +531,16 @@ class FinFXVolSurface():
 
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
             numParameters = 3
         elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
             numParameters = 3
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            numParameters = 4
+        elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+            numParameters = 5
         else:
+            print(self._volatilityFunctionType)
             raise FinError("Unknown Model Type")
 
         self._parameters = np.zeros([numVolCurves, numParameters])
@@ -548,15 +566,15 @@ class FinFXVolSurface():
         for i in range(0, numVolCurves):
 
             expiryDate = self._expiryDates[i]
-            t = (expiryDate - spotDate) / gDaysInYear
+            texp = (expiryDate - spotDate) / gDaysInYear
 
-            domDF = self._domDiscountCurve._df(t)
-            forDF = self._forDiscountCurve._df(t)
+            domDF = self._domDiscountCurve._df(texp)
+            forDF = self._forDiscountCurve._df(texp)
             f = s * forDF/domDF
 
-            self._texp[i] = t
-            self._rd[i] = -np.log(domDF) / t
-            self._rf[i] = -np.log(forDF) / t
+            self._texp[i] = texp
+            self._rd[i] = -np.log(domDF) / texp
+            self._rf[i] = -np.log(forDF) / texp
             self._F0T[i] = f
 
             atmVol = self._atmVols[i]
@@ -567,9 +585,9 @@ class FinFXVolSurface():
             elif self._atmMethod == FinFXATMMethod.FWD:
                 self._K_ATM[i] = f
             elif self._atmMethod == FinFXATMMethod.FWD_DELTA_NEUTRAL:
-                self._K_ATM[i] = f * np.exp(atmVol*atmVol*t/2.0)
+                self._K_ATM[i] = f * np.exp(atmVol*atmVol*texp/2.0)
             elif self._atmMethod == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
-                self._K_ATM[i] = f * np.exp(-atmVol*atmVol*t/2.0)
+                self._K_ATM[i] = f * np.exp(-atmVol*atmVol*texp/2.0)
             else:
                 raise FinError("Unknown Delta Type")
 
@@ -588,21 +606,49 @@ class FinFXVolSurface():
             s75 = atmVol + ms25 - rr25/2.0
 
             if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+
+                # Fit to 25D
                 c0 = np.log(atmVol)
                 c1 = 2.0 * np.log(s75/s25)
                 c2 = 8.0 * np.log(s25*s75/atmVol/atmVol)
                 xinit = [c0, c1, c2]
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
                 # SABR parameters are alpha, nu, rho
-                xinit = [0.174, 0.817, -0.112]
+                alpha = 0.174
+                nu = 0.817
+                rho = -0.112
+                xinit = [alpha, nu, rho]
+
             elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
-                # BBG Params
+
+                # BBG Params if we fit to 25D
                 a = 8.0*s75-16.0*s50+8.0*s25
                 b = -6.0*s75+16.0*s50-10.0*s25
                 c = s75-3.0*s50+3.0*s25
+
                 xinit = [a, b, c]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+                # SABR parameters are alpha, nu, rho
+                # SABR parameters are alpha, nu, rho
+                alpha = 0.174
+                nu = 0.817
+                rho = -0.112
+                beta = 1.0
+                xinit = [alpha, beta, rho, nu]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+
+                # Fit to 25D
+                c0 = np.log(atmVol)
+                c1 = 2.0 * np.log(s75/s25)
+                c2 = 8.0 * np.log(s25*s75/atmVol/atmVol)
+                xinit = [c0, c1, c2, 0.0, 0.0]
+
             else:
                 raise FinError("Unknown Model Type")
+
 
             xinits.append(xinit)
 
@@ -948,16 +994,16 @@ class FinFXVolSurface():
 
         for iTenor in range(0, len(self._tenors)):
             
-            F = self._F0T[iTenor]
-            t = self._texp[iTenor]
+            f = self._F0T[iTenor]
+            texp = self._texp[iTenor]
 
             dFX = (highFX - lowFX)/ numIntervals
 
-            domDF = self._domDiscountCurve._df(t)
-            forDF = self._forDiscountCurve._df(t)
+            domDF = self._domDiscountCurve._df(texp)
+            forDF = self._forDiscountCurve._df(texp)
 
-            rd = -np.log(domDF) / t
-            rf = -np.log(forDF) / t
+            rd = -np.log(domDF) / texp
+            rf = -np.log(forDF) / texp
 
             Ks = []
             vols = []
@@ -968,9 +1014,7 @@ class FinFXVolSurface():
 
                 vol = volFunctionFAST(self._volatilityFunctionType.value, 
                                       self._parameters[iTenor], 
-                                      self._strikes[iTenor], 
-                                      self._gaps[iTenor], 
-                                      f, k, t)
+                                      f, k, texp)
 
                 Ks.append(k) 
                 vols.append(vol)
@@ -978,7 +1022,8 @@ class FinFXVolSurface():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._spotFXRate, t, rd, rf, Ks, vols)
+            density = optionImpliedDbn(self._spotFXRate, texp,
+                                       rd, rf, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)

@@ -392,7 +392,6 @@ def _objGAP(gaps, *args):
     print("SIGMA_K_10D_C", sigma_K_10D_C)
 
     print("INIT K_10D_P_MS", K_10D_P_MS)
-    print(t)
 
     K_10D_P = _solveForSmileStrike(s, t, rd, rf,
                                       FinOptionTypes.EUROPEAN_PUT.value,
@@ -572,6 +571,8 @@ def volFunction(volFunctionTypeValue, params, strikes, gaps, f, k, t):
     ''' Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. '''
 
+#    print("volFunction", volFunctionTypeValue)
+
     if len(strikes) == 1:
         gapK = 0.0
     else:
@@ -624,6 +625,8 @@ def _deltaFit(k, *args):
     inverseDeltaOut = norminvcdf(np.abs(deltaOut))
     invObjFn = inverseDeltaTarget - inverseDeltaOut
 
+#    print(k, f, v, deltaOut, invObjFn)
+
     return invObjFn
 
 ###############################################################################
@@ -639,7 +642,7 @@ def _solveForSmileStrike(s, t, rd, rf,
                             volatilityTypeValue,
                             deltaTarget,
                             deltaMethodValue,
-                            initialValue,
+                            initialGuess,
                             parameters,
                             strikes,
                             gaps):
@@ -654,7 +657,7 @@ def _solveForSmileStrike(s, t, rd, rf,
                 inverseDeltaTarget, 
                 parameters, strikes, gaps)
 
-    K = newton_secant(_deltaFit, x0=initialValue, args=argtuple,
+    K = newton_secant(_deltaFit, x0=initialGuess, args=argtuple,
                       tol=1e-8, maxiter=50)
 
     return K
@@ -764,7 +767,7 @@ class FinFXVolSurfacePlus():
                  valueDate: FinDate,
                  spotFXRate: float,
                  currencyPair: str,
-                 notionalCurrency,
+                 notionalCurrency: str,
                  domDiscountCurve: FinDiscountCurve,
                  forDiscountCurve: FinDiscountCurve,
                  tenors: (list),
@@ -774,9 +777,9 @@ class FinFXVolSurfacePlus():
                  mktStrangle10DeltaVols: (list, np.ndarray),
                  riskReversal10DeltaVols: (list, np.ndarray),
                  alpha: float,
-                 atmMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
-                 deltaMethod=FinFXDeltaMethod.SPOT_DELTA,
-                 volatilityFunctionType=FinVolFunctionTypes.CLARK):
+                 atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
+                 deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
+                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
         ''' Create the FinFXVolSurfacePlus object by passing in market vol data
         for ATM, 25 Delta and 10 Delta strikes. The alpha weight shifts the
         fitting between 25D and 10D. Alpha = 0.0 is 100% 25D while alpha = 1.0
@@ -855,79 +858,302 @@ class FinFXVolSurfacePlus():
 
 ###############################################################################
 
-    def volatility(self, K, expiryDate):
-        ''' Interpolate the Black-Scholes volatility from the volatility
-        surface given the option strike and expiry date. Linear interpolation
-        is done in variance x time. This can probably be numbaed later. '''
+    def volatilityFromStrikeDate(self, K, expiryDate):
+        ''' Interpolates the Black-Scholes volatility from the volatility
+        surface given call option strike and expiry date. Linear interpolation
+        is done in variance space. The smile strikes at bracketed dates are 
+        determined by determining the strike that reproduces the provided delta
+        value. This uses the calibration delta convention, but it can be 
+        overriden by a provided delta convention. The resulting volatilities 
+        are then determined for each bracketing expiry time and linear 
+        interpolation is done in variance space and then converted back to a 
+        lognormal volatility.'''
+
+        texp = (expiryDate - self._valueDate) / gDaysInYear
 
         volTypeValue = self._volatilityFunctionType.value
 
-        index0 = 0
-        index1 = 0
-
-        t = (expiryDate - self._valueDate) / gDaysInYear
+        index0 = 0 # lower index in bracket
+        index1 = 0 # upper index in bracket
 
         numCurves = self._numVolCurves
 
         if numCurves == 1:
 
-            # The volatility term structure is flat if there is only one expiry
-            fwd = self._F0T[0]
-            texp = self._texp[0]
-            vol = volFunction(volTypeValue, self._parameters[0],
-                                  self._strikes[0], self._gaps[0],
-                                  fwd, K, texp)
-            return vol
-
+            index0 = 0
+            index1 = 0
+            
         # If the time is below first time then assume a flat vol
-        if t <= self._texp[0]:
+        elif texp <= self._texp[0]:
 
-            fwd = self._F0T[0]
-            texp = self._texp[0]
-            vol = volFunction(volTypeValue, self._parameters[0],
-                                  self._strikes[0], self._gaps[0],
-                                  fwd, K, texp)
-            return vol
+            index0 = 0
+            index1 = 0
 
         # If the time is beyond the last time then extrapolate with a flat vol
-        if t > self._texp[-1]:
+        elif texp >= self._texp[-1]:
 
-            fwd = self._F0T[-1]
-            texp = self._texp[-1]
-            vol = volFunction(volTypeValue, self._parameters[-1],
-                                  self._strikes[-1], self._gaps[-1],
-                                  fwd, K, texp)
-            return vol
+            index0 = len(self._texp) - 1
+            index1 = len(self._texp) - 1
 
-        # Otherwise we look for bracketing times and interpolate
-        for i in range(1, numCurves):
+        else: # Otherwise we look for bracketing times and interpolate
 
-            if t <= self._texp[i] and t > self._texp[i-1]:
-                index0 = i-1
-                index1 = i
-                break
+            for i in range(1, numCurves):
+
+                if texp <= self._texp[i] and texp > self._texp[i-1]:
+                    index0 = i-1
+                    index1 = i
+                    break
 
         fwd0 = self._F0T[index0]
+        fwd1 = self._F0T[index1]
+                
         t0 = self._texp[index0]
+        t1 = self._texp[index1]
+
         vol0 = volFunction(volTypeValue, self._parameters[index0],
                                self._strikes[index0], self._gaps[index0],
                                fwd0, K, t0)
 
-        fwd1 = self._F0T[index1]
-        t1 = self._texp[index1]
-        vol1 = volFunction(volTypeValue, self._parameters[index1],
+        if index1 != index0:
+
+            vol1 = volFunction(volTypeValue, self._parameters[index1],
                                self._strikes[index1], self._gaps[index1],
                                fwd1, K, t1)
 
+        else:
+            
+            vol1 = vol0
+
+        # In the expiry time dimension, both volatilities are interpolated 
+        # at the same strikes but different deltas.
         vart0 = vol0*vol0*t0
         vart1 = vol1*vol1*t1
-        vart = ((t-t0) * vart1 + (t1-t) * vart0) / (t1 - t0)
 
-        if vart < 0.0:
-            raise FinError("Negative variance.")
+        if np.abs(t1-t0) > 1e-6:
+            vart = ((texp-t0) * vart1 + (t1-texp) * vart0) / (t1 - t0)
 
-        volt = np.sqrt(vart/t)
+            if vart < 0.0:
+                raise FinError("Negative variance.")
+
+            volt = np.sqrt(vart/texp)
+
+        else:
+            volt = vol1
+
         return volt
+
+###############################################################################
+
+    def deltaToStrike(self, callDelta, expiryDate, deltaMethod):
+        ''' Interpolates the strike at a delta and expiry date. Linear 
+        interpolation is used in strike.'''
+
+        texp = (expiryDate - self._valueDate) / gDaysInYear
+
+        volTypeValue = self._volatilityFunctionType.value
+
+        s = self._spotFXRate
+
+        if deltaMethod is None:
+            deltaMethodValue = self._deltaMethod.value
+        else:
+            deltaMethodValue = deltaMethod.value
+
+        index0 = 0 # lower index in bracket
+        index1 = 0 # upper index in bracket
+
+        numCurves = self._numVolCurves
+
+        # If there is only one time horizon then assume flat vol to this time
+        if numCurves == 1:
+
+            index0 = 0
+            index1 = 0
+
+        # If the time is below first time then assume a flat vol
+        elif texp <= self._texp[0]:
+
+            index0 = 0
+            index1 = 0
+
+        # If the time is beyond the last time then extrapolate with a flat vol
+        elif texp > self._texp[-1]:
+ 
+            index0 = len(self._texp) - 1
+            index1 = len(self._texp) - 1
+
+        else: # Otherwise we look for bracketing times and interpolate
+
+            for i in range(1, numCurves):
+
+                if texp <= self._texp[i] and texp > self._texp[i-1]:
+                    index0 = i-1
+                    index1 = i
+                    break
+
+        #######################################################################
+                
+        t0 = self._texp[index0]
+        t1 = self._texp[index1]
+
+        initialGuess = self._K_ATM[index0]
+
+        K0 = _solveForSmileStrike(s, texp, self._rd[index0], self._rf[index0],
+                                  FinOptionTypes.EUROPEAN_CALL.value,
+                                  volTypeValue, callDelta,
+                                  deltaMethodValue,
+                                  initialGuess,
+                                  self._parameters[index0], 
+                                  self._strikes[index0], 
+                                  self._gaps[index0])
+
+        if index1 != index0:
+
+            K1 = _solveForSmileStrike(s, texp, 
+                                      self._rd[index1], 
+                                      self._rf[index1],
+                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      volTypeValue, callDelta,
+                                      deltaMethodValue,
+                                      initialGuess,
+                                      self._parameters[index1], 
+                                      self._strikes[index1], 
+                                      self._gaps[index1])
+        else:
+
+            K1 = K0
+            
+        # In the expiry time dimension, both volatilities are interpolated 
+        # at the same strikes but different deltas.
+ 
+        if np.abs(t1-t0) > 1e-6:
+
+            K = ((texp-t0) * K1 + (t1-texp) * K1) / (K1 - K0)
+
+        else:
+
+            K = K1
+
+        return K
+
+###############################################################################
+        
+    def volatilityFromDeltaDate(self, callDelta, expiryDate, 
+                                deltaMethod = None):
+        ''' Interpolates the Black-Scholes volatility from the volatility
+        surface given a call option delta and expiry date. Linear interpolation
+        is done in variance space. The smile strikes at bracketed dates are 
+        determined by determining the strike that reproduces the provided delta
+        value. This uses the calibration delta convention, but it can be 
+        overriden by a provided delta convention. The resulting volatilities 
+        are then determined for each bracketing expiry time and linear 
+        interpolation is done in variance space and then converted back to a 
+        lognormal volatility.'''
+
+        texp = (expiryDate - self._valueDate) / gDaysInYear
+
+        volTypeValue = self._volatilityFunctionType.value
+
+        s = self._spotFXRate
+
+        if deltaMethod is None:
+            deltaMethodValue = self._deltaMethod.value
+        else:
+            deltaMethodValue = deltaMethod.value
+
+        index0 = 0 # lower index in bracket
+        index1 = 0 # upper index in bracket
+
+        numCurves = self._numVolCurves
+
+        # If there is only one time horizon then assume flat vol to this time
+        if numCurves == 1:
+
+            index0 = 0
+            index1 = 0
+
+        # If the time is below first time then assume a flat vol
+        elif texp <= self._texp[0]:
+
+            index0 = 0
+            index1 = 0
+
+        # If the time is beyond the last time then extrapolate with a flat vol
+        elif texp > self._texp[-1]:
+ 
+            index0 = len(self._texp) - 1
+            index1 = len(self._texp) - 1
+
+        else: # Otherwise we look for bracketing times and interpolate
+
+            for i in range(1, numCurves):
+
+                if texp <= self._texp[i] and texp > self._texp[i-1]:
+                    index0 = i-1
+                    index1 = i
+                    break
+        
+        fwd0 = self._F0T[index0]
+        fwd1 = self._F0T[index1]
+                
+        t0 = self._texp[index0]
+        t1 = self._texp[index1]
+
+        initialGuess = self._K_ATM[index0]
+
+        K0 = _solveForSmileStrike(s, texp, self._rd[index0], self._rf[index0],
+                                  FinOptionTypes.EUROPEAN_CALL.value,
+                                  volTypeValue, callDelta,
+                                  deltaMethodValue,
+                                  initialGuess,
+                                  self._parameters[index0], 
+                                  self._strikes[index0], 
+                                  self._gaps[index0])
+
+        vol0 = volFunction(volTypeValue, self._parameters[index0],
+                           self._strikes[index0], self._gaps[index0],
+                           fwd0, K0, t0)
+
+        if index1 != index0:
+
+            K1 = _solveForSmileStrike(s, texp, 
+                                      self._rd[index1], 
+                                      self._rf[index1],
+                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      volTypeValue, callDelta,
+                                      deltaMethodValue,
+                                      initialGuess,
+                                      self._parameters[index1], 
+                                      self._strikes[index1], 
+                                      self._gaps[index1])
+
+            vol1 = volFunction(volTypeValue, self._parameters[index1],
+                               self._strikes[index1], self._gaps[index1],
+                               fwd1, K1, t1)
+        else:
+            vol1 = vol0
+            
+        # In the expiry time dimension, both volatilities are interpolated 
+        # at the same strikes but different deltas.
+        vart0 = vol0*vol0*t0
+        vart1 = vol1*vol1*t1
+
+        if np.abs(t1-t0) > 1e-6:
+
+            vart = ((texp-t0) * vart1 + (t1-texp) * vart0) / (t1 - t0)
+            kt = ((texp-t0) * K1 + (t1-texp) * K0) / (t1 - t0)
+
+            if vart < 0.0:
+                raise FinError("Failed interpolation due to negative variance.")
+
+            volt = np.sqrt(vart/texp)
+
+        else:
+
+            volt = vol0
+            kt = K0
+
+        return volt, kt
 
 ###############################################################################
 
@@ -985,15 +1211,15 @@ class FinFXVolSurfacePlus():
         for i in range(0, numVolCurves):
 
             expiryDate = self._expiryDates[i]
-            t = (expiryDate - spotDate) / gDaysInYear
+            texp = (expiryDate - spotDate) / gDaysInYear
 
-            domDF = self._domDiscountCurve._df(t)
-            forDF = self._forDiscountCurve._df(t)
+            domDF = self._domDiscountCurve._df(texp)
+            forDF = self._forDiscountCurve._df(texp)
             f = s * forDF/domDF
 
-            self._texp[i] = t
-            self._rd[i] = -np.log(domDF) / t
-            self._rf[i] = -np.log(forDF) / t
+            self._texp[i] = texp
+            self._rd[i] = -np.log(domDF) / texp
+            self._rf[i] = -np.log(forDF) / texp
             self._F0T[i] = f
 
             atmVol = self._atmVols[i]
@@ -1004,9 +1230,9 @@ class FinFXVolSurfacePlus():
             elif self._atmMethod == FinFXATMMethod.FWD:
                 self._K_ATM[i] = f
             elif self._atmMethod == FinFXATMMethod.FWD_DELTA_NEUTRAL:
-                self._K_ATM[i] = f * np.exp(atmVol*atmVol*t/2.0)
+                self._K_ATM[i] = f * np.exp(atmVol*atmVol*texp/2.0)
             elif self._atmMethod == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
-                self._K_ATM[i] = f * np.exp(-atmVol*atmVol*t/2.0)
+                self._K_ATM[i] = f * np.exp(-atmVol*atmVol*texp/2.0)
             else:
                 raise FinError("Unknown Delta Type")
 
@@ -1130,32 +1356,32 @@ class FinFXVolSurfacePlus():
 
 ###############################################################################
 
-    def _solveForSmileStrike(self,
-                            optionTypeValue,
-                            deltaTarget,
-                            tenorIndex,
-                            initialValue):
-        ''' Solve for the strike that sets the delta of the option equal to the
-        target value of delta allowing the volatility to be a function of the
-        strike. '''
+    # def _solveForSmileStrike(self,
+    #                         optionTypeValue,
+    #                         deltaTarget,
+    #                         tenorIndex,
+    #                         initialValue):
+    #     ''' Solve for the strike that sets the delta of the option equal to the
+    #     target value of delta allowing the volatility to be a function of the
+    #     strike. '''
 
-        s0 = self._spotFXRate
-        tdel = self._texp[tenorIndex]
-        rd = self._rd[tenorIndex]
-        rf = self._rf[tenorIndex]
+    #     s0 = self._spotFXRate
+    #     tdel = self._texp[tenorIndex]
+    #     rd = self._rd[tenorIndex]
+    #     rf = self._rf[tenorIndex]
 
-        inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
+    #     inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
 
-        volTypeValue = self._volatilityFunctionType.value
+    #     volTypeValue = self._volatilityFunctionType.value
 
-        argtuple = (volTypeValue, s0, tdel, rd, rf, optionTypeValue,
-                    self._deltaMethod.value,
-                    inverseDeltaTarget, self._parameters[tenorIndex])
+    #     argtuple = (volTypeValue, s0, tdel, rd, rf, optionTypeValue,
+    #                 self._deltaMethod.value,
+    #                 inverseDeltaTarget, self._parameters[tenorIndex])
 
-        K = newton_secant(_deltaFit, x0=initialValue, args=argtuple,
-                          tol=1e-5, maxiter=50)
+    #     K = newton_secant(_deltaFit, x0=initialValue, args=argtuple,
+    #                       tol=1e-5, maxiter=50)
 
-        return K
+    #     return K
 
 ###############################################################################
 
@@ -1169,7 +1395,7 @@ class FinFXVolSurfacePlus():
             print("==========================================================")
             print("VALUE DATE:", self._valueDate)
             print("SPOT FX RATE:", self._spotFXRate)
-            print("ALPHA WEIGHT::", self._alpha)
+            print("ALPHA WEIGHT:", self._alpha)
             print("ATM METHOD:", self._atmMethod)
             print("DELTA METHOD:", self._deltaMethod)
             print("==========================================================")

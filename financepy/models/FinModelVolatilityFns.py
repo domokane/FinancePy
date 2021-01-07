@@ -6,6 +6,7 @@ import numpy as np
 from numba import njit, float64
 
 from ..finutils.FinMath import N
+from ..finutils.FinError import FinError
 
 ###############################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
@@ -29,6 +30,14 @@ def volFunctionClark(params, f, k, t):
     ''' Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
     The exact reference is Clarke Page 59. '''
+
+    if f < 0.0:
+        print("f:", f)
+        raise FinError("Forward is negative")
+
+    if k < 0.0:
+        print("k:", k)
+        raise FinError("Strike is negative")
 
     x = np.log(f/k)
     sigma0 = np.exp(params[0])
