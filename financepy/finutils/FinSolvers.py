@@ -538,7 +538,12 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=500):
     f1 = func(x1, args)
     fmid = func(x2, args)
 
-#    print(x1, f1, "  ", x2, fmid)
+    if np.abs(f1) < xtol:
+        return x1
+    elif np.abs(fmid) < xtol:
+        return x2
+
+    # print(x1, f1, "  ", x2, fmid)
 
     if f1 * fmid >= 0:
         print("Root not bracketed")
