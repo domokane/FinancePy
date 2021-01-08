@@ -35,7 +35,8 @@ from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
 from ...finutils.FinDistribution import FinDistribution
 
-from ...finutils.FinSolvers import newton_secant
+from ...finutils.FinSolvers import newton_secant, nelder_mead
+from ...finutils.FinSolvers import FinSolversTypes
 
 ###############################################################################
 # ISSUES
@@ -427,7 +428,8 @@ def _solveToHorizon(s, t, rd, rf,
                        deltaMethodValue, volTypeValue,
                        alpha,
                        xinits,
-                       ginits):
+                       ginits,
+                       finSolversTypes):
 
     ###########################################################################
     # Determine the price of a market strangle from market strangle
@@ -496,8 +498,27 @@ def _solveToHorizon(s, t, rd, rf,
             K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
             deltaMethodValue, volTypeValue, alpha)
 
-    opt = minimize(_obj, xinits, args, method="CG", tol=tol)
-    xopt = opt.x
+    # Nelmer-Mead (both SciPy & Numba)
+    # is quicker, but occasionally fails to converge, so for those cases try again with CG
+    # Numba version is quicker, but can be slightly away from CG output
+    try:
+        if finSolversTypes == FinSolversTypes.NELDER_MEAD_NUMBA:
+            xopt = nelder_mead(_obj, np.array(xinits), bounds=np.array([[], []]).T, args=args, tol_f=tol,
+                               tol_x=tol, max_iter=1000)
+        elif finSolversTypes == FinSolversTypes.NELDER_MEAD:
+            opt = minimize(_obj, xinits, args, method="Nelder-Mead", tol=tol)
+            xopt = opt.x
+        elif finSolversTypes == FinSolversTypes.CG:
+            opt = minimize(_obj, xinits, args, method="CG", tol=tol)
+            xopt = opt.x
+    except:
+        # If convergence fails try again with CG if necessary
+        if finSolversTypes != FinSolversTypes.CG:
+            print('Failed to converge, will try CG')
+            opt = minimize(_obj, xinits, args, method="CG", tol=tol)
+
+            xopt = opt.x
+
     params = np.array(xopt)
 
     strikes = [K_10D_P_MS, K_25D_P_MS, K_ATM, K_10D_C_MS, K_25D_C_MS]
@@ -779,7 +800,8 @@ class FinFXVolSurfacePlus():
                  alpha: float,
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
-                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
+                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
+                 finSolversTypes:FinSolversTypes=FinSolversTypes.NELDER_MEAD):
         ''' Create the FinFXVolSurfacePlus object by passing in market vol data
         for ATM, 25 Delta and 10 Delta strikes. The alpha weight shifts the
         fitting between 25D and 10D. Alpha = 0.0 is 100% 25D while alpha = 1.0
@@ -854,7 +876,7 @@ class FinFXVolSurfacePlus():
             expiryDate = valueDate.addTenor(tenors[i])
             self._expiryDates.append(expiryDate)
 
-        self._buildVolSurface()
+        self._buildVolSurface(finSolversTypes=finSolversTypes)
 
 ###############################################################################
 
@@ -1157,7 +1179,7 @@ class FinFXVolSurfacePlus():
 
 ###############################################################################
 
-    def _buildVolSurface(self):
+    def _buildVolSurface(self, finSolversTypes=FinSolversTypes.NELDER_MEAD):
         ''' Main function to construct the vol surface. '''
 
         s = self._spotFXRate
@@ -1345,7 +1367,8 @@ class FinFXVolSurfacePlus():
                                       deltaMethodValue, volTypeValue,
                                       self._alpha,
                                       xinits[i],
-                                      ginits[i])
+                                      ginits[i],
+                                      finSolversTypes)
 
             (self._parameters[i,:], self._strikes[i,:], self._gaps[i:],
              self._K_25D_C_MS[i], self._K_25D_P_MS[i],
