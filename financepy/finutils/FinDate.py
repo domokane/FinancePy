@@ -399,30 +399,25 @@ class FinDate():
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
-        dt = datetime.date(self._y, self._m, self._d)
-        d = dt.day
-        m = dt.month
-        y = dt.year
-        newDt = FinDate(d, m, y)
+        positiveNumDays = (numDays > 0)
+        numDays = abs(numDays)
+        
+        # 5 week days make up a week
+        numWeeks = int(numDays / 5)
+        remainingDays = numDays % 5
 
-        s = +1
-        if numDays < 0:
-            numDays = -1 * numDays
-            s = -1
+        if (positiveNumDays):
+            if (self._weekday + remainingDays > self.FRI):
+                # add weekend
+                remainingDays += 2
 
-        # TODO: Fix this.
-        # This is very inefficient as it creates a FinDate for each date
-        while numDays > 0:
-            dt = dt + s * datetime.timedelta(days=1)
-            d = dt.day
-            m = dt.month
-            y = dt.year
-            newDt = FinDate(d, m, y)
+            return self.addDays(numWeeks * 7 + remainingDays)
+        else:
+            if (self._weekday - remainingDays < self.MON):
+                # add weekend
+                remainingDays += 2
 
-            if newDt.isWeekend() is False:
-                numDays = numDays - 1
-
-        return newDt
+            return self.addDays(-(numWeeks * 7 + remainingDays))
 
     ###########################################################################
 

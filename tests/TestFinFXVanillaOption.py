@@ -9,7 +9,7 @@ sys.path.append("..")
 
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
@@ -51,7 +51,7 @@ def test_FinFXVanillaOptionWystupExample1():
     domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
     forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
@@ -123,7 +123,7 @@ def test_FinFXVanillaOptionWystupExample2():
     domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
     forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
@@ -198,7 +198,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depos.append(depo)
     forDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     callOption = FinFXVanillaOption(expiryDate,
                                     strikeFXRate,
@@ -236,7 +236,7 @@ def test_FinFXVanillaOptionHullExample():
     volatility = 0.1411
     domInterestRate = 0.08
     forInterestRate = 0.11
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
     domDiscountCurve = FinDiscountCurveFlat(valuationDate, domInterestRate)
     forDiscountCurve = FinDiscountCurveFlat(valuationDate, forInterestRate)
 

@@ -7,9 +7,9 @@ sys.path.append("..")
 
 from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierOption
-from financepy.products.fx.FinFXModelTypes import FinFXModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.finutils.FinDate import FinDate
 
@@ -36,7 +36,7 @@ def test_FinFXBarrierOption():
     processType = FinProcessTypes.GBM
     domDiscountCurve = FinDiscountCurveFlat(valueDate, domInterestRate)
     forDiscountCurve = FinDiscountCurveFlat(valueDate, forInterestRate)
-    model = FinFXModelBlackScholes(volatility)
+    model = FinModelBlackScholes(volatility)
 
     ###########################################################################
 

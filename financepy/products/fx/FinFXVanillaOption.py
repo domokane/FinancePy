@@ -687,7 +687,7 @@ class FinFXVanillaOption():
         cannot be priced analytically. This function uses Numpy vectorisation
         for speed of execution.'''
 
-        if model._parentType == FinModelBlackScholes:
+        if isinstance(model, FinModelBlackScholes):
             volatility = model._volatility
         else:
             raise FinError("Model Type invalid")
