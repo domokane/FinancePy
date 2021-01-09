@@ -156,27 +156,25 @@ def test_FinEquityVanillaOption():
                                  dividendYield, model)
         testCases.print(stockPrice, value, delta, vega, theta, rho)
 
-###############################################################################
 
-def testImpliedVolatility():
+def testImpliedVolatility_NEW():
 
 
     valueDate = FinDate(1, 1, 2015)
-    stockPrice = 100
+    stockPrice = 100.0
     interestRate = 0.05
     dividendYield = 0.01
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
-    strikes = [10, 20, 50, 100, 150, 200]
+    strikes = [50.0, 75.0, 100.0, 125.0, 150.0]
     timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]    
-    expiryDates = valueDate.addYears(timesToExpiry)
-    sigmas = [0.01, 0.10, 0.50, 1.0]
+    sigmas = [0.01, 0.10, 0.50, 1.0, 5.0]
     optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
 
     testCases.header("OPT_TYPE", "EXP_DATE", "STRIKE", "STOCK_PRICE",
                      "VALUE", "INPUT_VOL", "IMPLIED_VOL")
     
-    tol = 1e-6
+    tol = 1e-5
     numTests = 0
     numFails = 0
     
@@ -184,118 +182,66 @@ def testImpliedVolatility():
 
         model = FinModelBlackScholes(vol)
 
-        for expiryDate in expiryDates:     
+        for timeToExpiry in timesToExpiry:     
+
+            expiryDate = valueDate.addYears(timeToExpiry)
 
             for strike in strikes:
 
                 for optionType in optionTypes:
 
-                    option = FinEquityVanillaOption(expiryDate, 100.0, 
+                    option = FinEquityVanillaOption(expiryDate, strike, 
                                                     optionType)
                 
                     value = option.value(valueDate, stockPrice, discountCurve, 
                                          dividendYield, model)
 
-                    impliedVol = option.impliedVolatility(valueDate, stockPrice, 
-                                                      discountCurve, 
-                                                      dividendYield, value)
+                    intrinsic = option.intrinsic(valueDate, stockPrice,
+                                             discountCurve, dividendYield)
 
-                    numTests += 1    
-                    if np.abs(impliedVol - vol) > tol:
-                        numFails += 1
+                    # I remove the cases where the time value is zero
+                    # This is arbitrary but 1e-10 seems good enough to me
+                    if value - intrinsic > 1e-10:
 
-#                    print(optionType, expiryDate, strike, 
-#                          stockPrice, value, vol, impliedVol)
-            
-                    testCases.print(optionType, expiryDate, strike, stockPrice, 
-                                    value, vol, impliedVol)
+                        impliedVol = option.impliedVolatility(valueDate, 
+                                                              stockPrice, 
+                                                              discountCurve, 
+                                                              dividendYield, 
+                                                              value)
+    
+                        numTests += 1    
+                        
+                        errVol = np.abs(impliedVol - vol)
+    
+                        if errVol > tol:
+    
+                            print(optionType, 
+                                  "Years", timeToExpiry, 
+                                  "StockPrice", stockPrice,
+                                  "Strike:", strike, 
+                                  "Intrinsic:", intrinsic,
+                                  "Value:", value, 
+                                  "Volatility:", vol, 
+                                  "Implied Vol:", impliedVol)
+    
+                            numFails += 1
+                            
+                            testCases.print(optionType, expiryDate, strike,
+                                            stockPrice, value, vol, impliedVol)
+    
+                            print("===============================================")
 
     print("Num Tests", numTests, "numFails", numFails)
 
 ###############################################################################
 
-    K = [10, 20, 50, 100, 150, 200]
-    T = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]
-    sigma = [0.01, 0.10, 0.50, 1.0]
-    optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
-    stockPrice = 100
-    HOURS_PER_YEAR = 365.25 * 24
-    convergenceFailure = 0
-    assertionFailure = 0
-    noResult = 0
-    successful = 0
-    numberTests = 0
-    totalElapsedTime = 0.
-    for t in T:
-        expDate = valueDate.addHours(t * HOURS_PER_YEAR)
-        for k in K:
-            for vol in sigma:
-                bs_model = FinModelBlackScholes(vol)
-                for type_ in optionTypes:
-                    option = FinEquityVanillaOption(
-                        expDate, k, type_)
-                    value = option.value(
-                        valueDate,
-                        stockPrice,
-                        discountCurve,
-                        dividendYield,
-                        bs_model)
-                    if value < 1e-10:
-                        continue
-                    try:
-                        start_time = time.time()
-                        impliedVol = option.impliedVolatility_v2(
-                            valueDate, stockPrice, discountCurve, dividendYield, value)
-                        assert abs(impliedVol - vol) < 0.10
-                    except FinError:
-                        noResult += 1
-                    except AssertionError:
-                        assertionFailure += 1
-                        print("-----------------")
-                        print(f"Did not converge to expected value: {round(impliedVol, 2)} vs {vol}")
-                        print(
-                            "INPUTS\n",
-                            "Type:", type_.name,
-                            "ttm:", t,
-                            "strike:", k,
-                            "Expected IV:", vol,
-                            "BS Price:", value
-                        )
-                    except RuntimeError:
-                        import traceback
-                        traceback.print_exc()
-                        convergenceFailure += 1
-                        print(
-                            "INPUTS\n",
-                            "Type:", type_.name,
-                            "ttm:", t,
-                            "strike:", k,
-                            "Expected IV:", vol
-                        )
-                    except Exception:
-                        import traceback
-                        traceback.print_exc()
-                        noResult += 1
-                    else:
-                        successful += 1
-                        totalElapsedTime += time.time()-start_time
-                    finally:
-                        numberTests += 1
-
-    print("\nSuccessful:", successful)
-    print("Convergence failure:", convergenceFailure)
-    print("Inaccurate result:", assertionFailure)
-    print("No result (price too low)", noResult)
-    print("TOTAL:", numberTests)
-    print("Mean time:", 1e6 * totalElapsedTime/successful, "us")
-
-###############################################################################
-
 test_FinEquityVanillaOption()
+
 start = time.time()
-testImpliedVolatility()
+testImpliedVolatility_NEW()
 end = time.time()
 elapsed = end - start
-# print("Elapsed:", elapsed)
+
+print("Elapsed:", elapsed)
 
 testCases.compareTestCases()

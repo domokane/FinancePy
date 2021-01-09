@@ -33,6 +33,7 @@ def _results(r):
 
 ###############################################################################
 # DO NOT TOUCH THIS FUNCTION AS IT IS USED IN FX VOL CALIBRATION !!!!!!!!!
+# IT NEEDS TO PASS IN ARGS AS A TUPLE AS ONE OF THE ARGS IS AN NDARRAY
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
@@ -133,10 +134,9 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
 
 ###############################################################################
 
-# @jit
-def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
-           fprime2=None, x1=None, rtol=0.0,
-           full_output=False, disp=True):
+#@jit
+def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
+           fprime2=None, x1=None, rtol=0.0, full_output=False, disp=False):
     """
     
     TAKEN FROM SCIPY
@@ -306,14 +306,15 @@ def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
                 return p0
             fder = fprime(p0, args)
             funcalls += 1
+
+#            print("==>", itr, p0, fval, fder)
+
             if fder == 0:
-                msg = "Derivative was zero."
-                if disp:
-                    print("Failed to converge after ", str(itr+1),
-                          "iterations, value is ", p0)
-                    raise FinError(msg)
-                print(msg)
-                return p0
+                if disp is True:
+                    print("Derivative is zero. Newton Failed to converge " +
+                          "after ", str(itr+1), "iterations, value is ", p0)
+                return None
+
             newton_step = fval / fder
             if fprime2:
                 fder2 = fprime2(p0, args)
@@ -354,7 +355,7 @@ def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
                     if disp:
                         print("Failed to converge after ", str(itr+1),
                               "iterations, value is ", str(p1))
-                    return -999
+                    return None
                 p = (p1 + p0) / 2.0
                 return p
             else:
@@ -366,7 +367,7 @@ def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
                 return p
             p0, q0 = p1, q1
             p1 = p
-            q1 = func(p1, args)
+            q1 = func(p1, *args)
             funcalls += 1
 
     if disp:
@@ -378,7 +379,7 @@ def newton(func, x0, fprime=None, args=np.ndarray([]), tol=1.48e-8, maxiter=50,
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
-def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
+def brent_max(func, a, b, args, xtol=1e-5, maxiter=500):
     """
     Uses a jitted version of the maximization routine from SciPy's fminbound.
     The algorithm is identical except that it's been switched to maximization
@@ -526,8 +527,9 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
 
 ###############################################################################
 
-#@njit(fastmath=True, cache=True)
-def bisection(func, x1, x2, args, xtol=1e-6, maxIter=500):
+#@jit(fastmath=True, cache=True)
+def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
+    ''' Bisection algorithm. You need to supply root brackets x1 and x2. '''
 
     if np.abs(x1-x2) < 1e-10:
         raise FinError("Brackets should not be equal")
@@ -543,11 +545,9 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=500):
     elif np.abs(fmid) < xtol:
         return x2
 
-    # print(x1, f1, "  ", x2, fmid)
-
     if f1 * fmid >= 0:
         print("Root not bracketed")
-        return -999.0
+        return None
 
     for i in range(0, maxIter):
 
@@ -562,8 +562,8 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=500):
         if np.abs(fmid) < xtol:
             return xmid
 
-    print("Unable to find root in maxIter")
-    return -999.0
+    print("Bisection exceeded number of iterations", maxIter)
+    return None
 
 ###############################################################################
 ## https://github.com/linesd/minimize/blob/master/optimizer/minimize.py

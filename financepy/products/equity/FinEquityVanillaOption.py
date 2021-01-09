@@ -10,7 +10,6 @@ from numba import njit
 from ...finutils.FinSolvers import newton_secant, bisection, newton
 
 from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import nprime
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinError import FinError
 from ...finutils.FinGlobalTypes import FinOptionTypes
@@ -26,6 +25,7 @@ from ...models.FinModelBlackScholesAnalytical import bsGamma
 from ...models.FinModelBlackScholesAnalytical import bsRho
 from ...models.FinModelBlackScholesAnalytical import bsTheta
 from ...models.FinModelBlackScholesAnalytical import bsImpliedVolatility
+from ...models.FinModelBlackScholesAnalytical import bsIntrinsic
 
 
 from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA_NONUMPY
@@ -94,6 +94,35 @@ class FinEquityVanillaOption():
         self._optionType = optionType
         self._numOptions = numOptions
         self._texp = None
+
+###############################################################################
+
+    def intrinsic(self,
+                  valueDate: (FinDate, list),
+                  stockPrice: (np.ndarray, float),
+                  discountCurve: FinDiscountCurve,
+                  dividendYield: float):
+        ''' Equity Vanilla Option valuation using Black-Scholes model. '''
+
+        if type(valueDate) == FinDate:
+            texp = (self._expiryDate - valueDate) / gDaysInYear
+        else:
+            texp = valueDate
+
+        self._texp = texp
+
+        texp = np.maximum(texp, 1e-10)
+        df = discountCurve.df(self._expiryDate)
+        s0 = stockPrice
+        r = -np.log(df)/texp
+        q = dividendYield
+        k = self._strikePrice
+
+        intrinsicValue = bsIntrinsic(s0, texp, k, r, q,
+                                     self._optionType.value)
+
+        intrinsicValue = intrinsicValue * self._numOptions
+        return intrinsicValue
 
 ###############################################################################
 
@@ -336,7 +365,8 @@ class FinEquityVanillaOption():
                           discountCurve: FinDiscountCurve,
                           dividendYield: float,
                           price):
-        ''' Calculate the implied volatility of a European vanilla option. '''
+        ''' Calculate the Black-Scholes implied volatility of a European 
+        vanilla option. '''
 
         texp = (self._expiryDate - valueDate) / gDaysInYear
 
@@ -344,65 +374,14 @@ class FinEquityVanillaOption():
             print("Expiry time is too close to zero.")
             return -999
 
-        if price < 1e-10:
-            print("Option value is effectively zero.")
-            return -999.0
-
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/texp
         q = dividendYield
         k = self._strikePrice
         s0 = stockPrice
 
-        if np.abs(k-s0)/ (k+s0) < 0.05:
-            sigma0 = price / 0.4 / stockPrice / np.sqrt(texp)
-            isAtm = True
-        else:
-            sigma0 = 0.20
-
-        # NEED TO MAP THE OPTION TO AN OTM option!!!
-
-        optionTypeValue = self._optionType.value
-
-        argsv = np.array([optionTypeValue, texp, s0, r, q, k, price])
-
-#        sigma = newton(_f, x0=sigma0, args=argsv, tol=1e-6, maxiter=100)
-
-        sigma = bisection(_f, 0.0, 1.0, args=argsv, xtol=1e-6, maxIter=100)
-
-        return sigma
-
-###############################################################################
-
-    def impliedVolatility_v2(self,
-                          valueDate: FinDate,
-                          stockPrice: (float, list, np.ndarray),
-                          discountCurve: FinDiscountCurve,
-                          dividendYield: float,
-                          price):
-        ''' Calculate the Black-Scholes implied volatility of a European vanilla option. '''
-
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-
-        if texp < 1.0 / 365.0:
-            print("Expiry time is too close to zero.")
-            return -999
-
-        if price < 1e-10:
-            print("Option value is effectively zero.")
-            return -999.0
-
-        df = discountCurve.df(self._expiryDate)
-        r = -np.log(df)/texp
-        q = dividendYield
-        k = self._strikePrice
-        s0 = stockPrice
-
-        try:
-            sigma = bsImpliedVolatility(s0, texp, k, r, q, price, self._optionType.value)
-        except FinError:
-            argsv = np.array([self._optionType.value, texp, s0, r, q, k, price])
-            sigma = bisection(_f, 0.0, 10.0, args=argsv, xtol=1e-6, maxIter=100)
+        sigma = bsImpliedVolatility(s0, texp, k, r, q, price, 
+                                    self._optionType.value)
         
         return sigma
 
