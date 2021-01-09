@@ -274,7 +274,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         deltas = np.linspace(0.10, 0.90, 17)
 
-        if 1==1:
+        if 1==0:
             volSurface = []        
             for delta in deltas:
                 volSmile = []
@@ -310,8 +310,8 @@ if __name__ == '__main__':
 
     verboseCalibration = False
 
-#    test_FinFXMktVolSurface1(verboseCalibration)
-#    test_FinFXMktVolSurface2(verboseCalibration)
+    test_FinFXMktVolSurface1(verboseCalibration)
+    test_FinFXMktVolSurface2(verboseCalibration)
     test_FinFXMktVolSurface3(verboseCalibration)
     
     end = time.time()
