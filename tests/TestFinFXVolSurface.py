@@ -274,5 +274,5 @@ if __name__ == '__main__':
     end = time.time()
     
     elapsed = end - start
-    print("Elapsed Time:", elapsed)
+#    print("Elapsed Time:", elapsed)
     testCases.compareTestCases()

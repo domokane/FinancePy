@@ -102,7 +102,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
     if np.abs(q1) < np.abs(q0):
         p0, p1, q0, q1 = p1, p0, q1, q0
 
-    for itr in range(maxiter):
+    for _ in range(maxiter):
         
         if q1 == q0:
             if p1 != p0:
@@ -351,10 +351,9 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
         for itr in range(maxiter):
             if q1 == q0:
                 if p1 != p0:
-                    msg = "Tolerance of reached."
                     if disp:
-                        print("Failed to converge after ", str(itr+1),
-                              "iterations, value is ", str(p1))
+                        print("Tolerance reached. Failed to converge after ", 
+                              str(itr+1), "iterations, value is ", str(p1))
                     return None
                 p = (p1 + p0) / 2.0
                 return p

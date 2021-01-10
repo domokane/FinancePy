@@ -208,28 +208,24 @@ def bsIntrinsic(s, t, k, r, q, optionTypeValue):
 ###############################################################################
 
 
-@vectorize([float64(float64, float64, float64, float64, float64, float64, 
-                    int64)], fastmath=True, cache=True,  forceobj=True)
+#@vectorize([float64(float64, float64, float64, float64, float64, float64, 
+#                    int64)], fastmath=True, cache=True,  forceobj=True)
 def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
     ''' Calculate the Black-Scholes implied volatility of a European 
     vanilla option using Newton with a fallback to bisection. '''
 
-    # Close to the money we invert the approximation for the price
-    arg = np.abs(np.log(s/k + r*t) * 2.0/t)
-    sigma0 = np.sqrt(arg)
-
     fwd = s * np.exp((r-q)*t)
-
+                                
     if optionTypeValue==FinOptionTypes.EUROPEAN_CALL.value:
         intrinsicVal = np.exp(-r*t) * max(fwd - k, 0.0)
     else:
         intrinsicVal = np.exp(-r*t) * max(k - fwd, 0.0)
 
+    divAdjStockPrice = s * np.exp(-q * t)
+    df = np.exp(-r * t)
+
     # Flip ITM call option to be OTM put and vice-versa using put call parity
     if intrinsicVal > 0.0:
-
-        divAdjStockPrice = s * np.exp(-q * t)
-        df = np.exp(-r * t)
 
         if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
             price = price - (divAdjStockPrice - k * df)
@@ -251,14 +247,77 @@ def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
         print("Time value", timeValue)
         raise FinError("Option Price is below the intrinsic value")
 
+    ###########################################################################
+    # Some approximations which might be used later    
+    ###########################################################################
+
+    if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
+        C = price
+    else:
+        C = price + (divAdjStockPrice - k * df)
+
+    # Notation in SSRN-id567721.pdf
+    X = k * np.exp(-r*t)
+    S = s*np.exp(-q*t)
+    pi = np.pi
+
+    ###########################################################################
+    # Initial point of inflexion
+    ###########################################################################
+
+    # arg = np.abs(np.log(fwd/k))
+    # sigma0 = np.sqrt(2.0 * arg)
+
+    ###########################################################################
+    # Corrado Miller from Hallerbach equation (7)
+    ###########################################################################
+    
+    cmsigma = 0.0
+    # arg = (C - 0.5*(S-X))**2 - ((S-X)**2)/ pi
+
+    # if arg < 0.0:
+    #     arg = 0.0
+
+    # cmsigma = (C-0.5*(S-X) + np.sqrt(arg))
+    # cmsigma = cmsigma * np.sqrt(2.0*pi) / (S+X)
+    # cmsigma = cmsigma / np.sqrt(t)
+
+    ###########################################################################
+    # Hallerbach SSRN-id567721.pdf equation (22)
+    ###########################################################################
+
+    hsigma = 0.0
+    gamma = 2.0
+    arg = (2*C+X-S)**2 - gamma * (S+X)*(S-X)*(S-X)/ pi / S
+
+    if arg < 0.0:
+        arg = 0.0
+
+    hsigma = (2 * C + X - S + np.sqrt(arg))
+    hsigma = hsigma * np.sqrt(2.0*pi) / 2.0 / (S+X)
+    hsigma = hsigma / np.sqrt(t)
+
+    sigma0 = hsigma
+
+    ###########################################################################
+
     arglist = [s, t, k, r, q, price, optionTypeValue]
     argsv = np.array(arglist)
 
-    tol = 1e-8
+    tol = 1e-6
     sigma = newton(_f, sigma0, _fvega, argsv, tol=tol)
     
     if sigma is None:
         sigma = bisection(_f, 1e-4, 10.0, argsv, xtol=tol)
+        if sigma is None:
+            method = "Failed"
+        else:
+            method = "Bisection"
+    else:
+        method = "Newton"
+ 
+    if 1==0:
+        print("S: %7.2f K: %7.3f T:%5.3f V:%10.7f Sig0: %7.5f CM: %7.5f HL: %7.5f NW: %7.5f %10s"% (s, k, t, price, sigma0*100.0, cmsigma*100.0, hsigma*100.0, sigma*100.0, method))
 
     return sigma
 

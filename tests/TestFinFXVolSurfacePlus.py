@@ -81,7 +81,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                        deltaMethod, 
                                        volFunctionType)
 
-        fxMarketPlus.checkCalibration(True)
+        fxMarketPlus.checkCalibration(False)
 
         if 1==0: # PLOT_GRAPHS:
 
@@ -223,7 +223,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                                        deltaMethod, 
                                        volFunctionType)
 
-        fxMarketPlus.checkCalibration(True)
+        fxMarketPlus.checkCalibration(False)
 
         if 1==0: # PLOT_GRAPHS:
 
@@ -317,5 +317,5 @@ if __name__ == '__main__':
     end = time.time()
     
     elapsed = end - start
-    print("Elapsed Time:", elapsed)
+#    print("Elapsed Time:", elapsed)
     testCases.compareTestCases()

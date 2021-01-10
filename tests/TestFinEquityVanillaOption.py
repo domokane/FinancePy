@@ -163,15 +163,15 @@ def testImpliedVolatility_NEW():
     valueDate = FinDate(1, 1, 2015)
     stockPrice = 100.0
     interestRate = 0.05
-    dividendYield = 0.01
+    dividendYield = 0.03
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
-    strikes = [50.0, 75.0, 100.0, 125.0, 150.0]
+    strikes = np.linspace(50, 150, 11)
     timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]    
-    sigmas = [0.01, 0.10, 0.50, 1.0, 5.0]
+    sigmas = np.arange(1, 100, 5) / 100.0
     optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
 
-    testCases.header("OPT_TYPE", "EXP_DATE", "STRIKE", "STOCK_PRICE",
+    testCases.header("OPT_TYPE", "TEXP", "STOCK_PRICE", "STRIKE", "INTRINSIC",
                      "VALUE", "INPUT_VOL", "IMPLIED_VOL")
     
     tol = 1e-5
@@ -201,6 +201,9 @@ def testImpliedVolatility_NEW():
 
                     # I remove the cases where the time value is zero
                     # This is arbitrary but 1e-10 seems good enough to me
+                    
+                    impliedVol = -999
+
                     if value - intrinsic > 1e-10:
 
                         impliedVol = option.impliedVolatility(valueDate, 
@@ -209,29 +212,31 @@ def testImpliedVolatility_NEW():
                                                               dividendYield, 
                                                               value)
     
-                        numTests += 1    
+                    numTests += 1    
                         
-                        errVol = np.abs(impliedVol - vol)
+                    errVol = np.abs(impliedVol - vol)
     
-                        if errVol > tol:
+                    if errVol > tol:
     
-                            print(optionType, 
-                                  "Years", timeToExpiry, 
-                                  "StockPrice", stockPrice,
-                                  "Strike:", strike, 
-                                  "Intrinsic:", intrinsic,
-                                  "Value:", value, 
-                                  "Volatility:", vol, 
-                                  "Implied Vol:", impliedVol)
-    
-                            numFails += 1
-                            
-                            testCases.print(optionType, expiryDate, strike,
-                                            stockPrice, value, vol, impliedVol)
-    
-                            print("===============================================")
+                        testCases.print(optionType, 
+                                  timeToExpiry, 
+                                  stockPrice,
+                                  strike, 
+                                  intrinsic,
+                                  value, 
+                                  vol, 
+                                  impliedVol)
 
-    print("Num Tests", numTests, "numFails", numFails)
+                        # These fails include ones due to the zero time value    
+                        numFails += 1
+                            
+                        testCases.print(optionType, timeToExpiry, stockPrice,
+                                        strike,
+                                        stockPrice, value, vol, impliedVol)
+
+    assert numFails == 694, "Num Fails has changed."
+
+#    print("Num Tests", numTests, "numFails", numFails)
 
 ###############################################################################
 
@@ -242,6 +247,6 @@ testImpliedVolatility_NEW()
 end = time.time()
 elapsed = end - start
 
-print("Elapsed:", elapsed)
+#print("Elapsed:", elapsed)
 
 testCases.compareTestCases()
