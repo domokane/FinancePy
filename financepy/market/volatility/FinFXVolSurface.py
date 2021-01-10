@@ -33,7 +33,7 @@ from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
 from ...finutils.FinDistribution import FinDistribution
 
-from ...finutils.FinSolvers import newton_secant
+from ...finutils.FinSolvers1D import newton_secant
 
 ###############################################################################
 # TODO: Speed up search for strike by providing derivative function to go with

@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit
 
 # from scipy import optimize
-from ...finutils.FinSolvers import newton_secant, bisection, newton
+from ...finutils.FinSolvers1D import newton_secant, bisection, newton
 
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear

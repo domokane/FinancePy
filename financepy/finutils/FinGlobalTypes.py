@@ -40,3 +40,8 @@ class FinExerciseTypes(Enum):
     AMERICAN = 3
 
 ###############################################################################
+
+class FinSolverTypes(Enum):
+    CONJUGATE_GRADIENT = 0
+    NELDER_MEAD = 1
+    NELDER_MEAD_NUMBA = 2

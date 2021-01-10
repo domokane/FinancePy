@@ -35,8 +35,9 @@ from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
 from ...finutils.FinDistribution import FinDistribution
 
-from ...finutils.FinSolvers import newton_secant, nelder_mead
-from ...finutils.FinSolvers import FinSolversTypes
+from ...finutils.FinSolvers1D import newton_secant
+from ...finutils.FinSolversNM import nelder_mead
+from ...finutils.FinGlobalTypes import FinSolverTypes
 
 ###############################################################################
 # ISSUES
@@ -429,7 +430,7 @@ def _solveToHorizon(s, t, rd, rf,
                        alpha,
                        xinits,
                        ginits,
-                       finSolversTypes):
+                       finSolverType):
 
     ###########################################################################
     # Determine the price of a market strangle from market strangle
@@ -498,22 +499,23 @@ def _solveToHorizon(s, t, rd, rf,
             K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
             deltaMethodValue, volTypeValue, alpha)
 
-    # Nelmer-Mead (both SciPy & Numba)
-    # is quicker, but occasionally fails to converge, so for those cases try again with CG
+    # Nelmer-Mead (both SciPy & Numba) is quicker, but occasionally fails 
+    # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:
-        if finSolversTypes == FinSolversTypes.NELDER_MEAD_NUMBA:
-            xopt = nelder_mead(_obj, np.array(xinits), bounds=np.array([[], []]).T, args=args, tol_f=tol,
+        if finSolverType == FinSolverTypes.NELDER_MEAD_NUMBA:
+            xopt = nelder_mead(_obj, np.array(xinits), 
+                               bounds=np.array([[], []]).T, args=args, tol_f=tol,
                                tol_x=tol, max_iter=1000)
-        elif finSolversTypes == FinSolversTypes.NELDER_MEAD:
+        elif finSolverType == FinSolverTypes.NELDER_MEAD:
             opt = minimize(_obj, xinits, args, method="Nelder-Mead", tol=tol)
             xopt = opt.x
-        elif finSolversTypes == FinSolversTypes.CG:
+        elif finSolverType == FinSolverTypes.CG:
             opt = minimize(_obj, xinits, args, method="CG", tol=tol)
             xopt = opt.x
     except:
         # If convergence fails try again with CG if necessary
-        if finSolversTypes != FinSolversTypes.CG:
+        if finSolverType != FinSolverTypes.CG:
             print('Failed to converge, will try CG')
             opt = minimize(_obj, xinits, args, method="CG", tol=tol)
 
@@ -801,7 +803,7 @@ class FinFXVolSurfacePlus():
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
                  volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
-                 finSolversTypes:FinSolversTypes=FinSolversTypes.NELDER_MEAD):
+                 finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
         ''' Create the FinFXVolSurfacePlus object by passing in market vol data
         for ATM, 25 Delta and 10 Delta strikes. The alpha weight shifts the
         fitting between 25D and 10D. Alpha = 0.0 is 100% 25D while alpha = 1.0
@@ -876,7 +878,7 @@ class FinFXVolSurfacePlus():
             expiryDate = valueDate.addTenor(tenors[i])
             self._expiryDates.append(expiryDate)
 
-        self._buildVolSurface(finSolversTypes=finSolversTypes)
+        self._buildVolSurface(finSolverType=finSolverType)
 
 ###############################################################################
 
@@ -1179,7 +1181,7 @@ class FinFXVolSurfacePlus():
 
 ###############################################################################
 
-    def _buildVolSurface(self, finSolversTypes=FinSolversTypes.NELDER_MEAD):
+    def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         ''' Main function to construct the vol surface. '''
 
         s = self._spotFXRate
@@ -1368,7 +1370,7 @@ class FinFXVolSurfacePlus():
                                       self._alpha,
                                       xinits[i],
                                       ginits[i],
-                                      finSolversTypes)
+                                      finSolverType)
 
             (self._parameters[i,:], self._strikes[i,:], self._gaps[i:],
              self._K_25D_C_MS[i], self._K_25D_P_MS[i],
