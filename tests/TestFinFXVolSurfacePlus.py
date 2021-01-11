@@ -61,8 +61,8 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK
-        alpha = 0.0 # FIT WINGS AT 10D if ALPHA = 1.0
+        volFunctionType = FinVolFunctionTypes.CLARK5
+        alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
@@ -131,7 +131,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-        volFunctionType = FinVolFunctionTypes.CLARK
+        volFunctionType = FinVolFunctionTypes.CLARK5
 
         fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                            spotFXRate,
@@ -204,7 +204,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.FORWARD_DELTA # THIS IS DIFFERENT
         volFunctionType = FinVolFunctionTypes.CLARK5
-        alpha = 0.0 # FIT WINGS AT 10D if ALPHA = 1.0
+        alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
@@ -299,8 +299,134 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             
             plt.show()
 
+###############################################################################
+
+
+def test_FinFXMktVolSurface4(verboseCalibration):
+
+    ###########################################################################
+    # Here I remove the 25D Vols
+    ###########################################################################
+    
+    if 1 == 1:
+
+        # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
+        # print("EURUSD EXAMPLE CLARK")
+
+        valueDate = FinDate(10, 4, 2020)
+
+        forName = "EUR"
+        domName = "USD"
+        forCCRate = 0.03460  # EUR
+        domCCRate = 0.02940  # USD
+
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+
+        currencyPair = forName + domName
+        spotFXRate = 1.3465
+
+        tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
+        atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
+        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
+        riskReversal10DeltaVols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
+
+        marketStrangle25DeltaVols = None
+        riskReversal25DeltaVols = None
+        
+        notionalCurrency = forName
+
+        atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
+        deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+        volFunctionType = FinVolFunctionTypes.CLARK
+        alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
+
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
+                                       spotFXRate,
+                                       currencyPair,
+                                       notionalCurrency,
+                                       domDiscountCurve,
+                                       forDiscountCurve,
+                                       tenors,
+                                       atmVols,
+                                       marketStrangle25DeltaVols,
+                                       riskReversal25DeltaVols,
+                                       marketStrangle10DeltaVols,
+                                       riskReversal10DeltaVols,
+                                       alpha,
+                                       atmMethod,
+                                       deltaMethod, 
+                                       volFunctionType)
+
+        fxMarketPlus.checkCalibration(False)
 
 ###############################################################################
+
+
+def test_FinFXMktVolSurface5(verboseCalibration):
+
+    ###########################################################################
+    # Here I remove the 10D Vols
+    ###########################################################################
+    
+    if 1 == 1:
+
+        # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
+        # print("EURUSD EXAMPLE CLARK")
+
+        valueDate = FinDate(10, 4, 2020)
+
+        forName = "EUR"
+        domName = "USD"
+        forCCRate = 0.03460  # EUR
+        domCCRate = 0.02940  # USD
+
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+
+        currencyPair = forName + domName
+        spotFXRate = 1.3465
+
+        tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
+        atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
+        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
+        riskReversal10DeltaVols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
+
+        marketStrangle10DeltaVols = None
+        riskReversal10DeltaVols = None
+        
+        notionalCurrency = forName
+
+        atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
+        deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+        volFunctionType = FinVolFunctionTypes.CLARK
+        alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
+
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
+                                       spotFXRate,
+                                       currencyPair,
+                                       notionalCurrency,
+                                       domDiscountCurve,
+                                       forDiscountCurve,
+                                       tenors,
+                                       atmVols,
+                                       marketStrangle25DeltaVols,
+                                       riskReversal25DeltaVols,
+                                       marketStrangle10DeltaVols,
+                                       riskReversal10DeltaVols,
+                                       alpha,
+                                       atmMethod,
+                                       deltaMethod, 
+                                       volFunctionType)
+
+        fxMarketPlus.checkCalibration(False)
+
+###############################################################################
+
 
 import time
 
@@ -313,6 +439,8 @@ if __name__ == '__main__':
     test_FinFXMktVolSurface1(verboseCalibration)
     test_FinFXMktVolSurface2(verboseCalibration)
     test_FinFXMktVolSurface3(verboseCalibration)
+    test_FinFXMktVolSurface4(verboseCalibration)
+    test_FinFXMktVolSurface5(verboseCalibration)
     
     end = time.time()
     

@@ -2,7 +2,6 @@
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
 ###############################################################################
 
-
 import numpy as np
 from numba import njit
 
