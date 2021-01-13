@@ -6,7 +6,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 import matplotlib.pyplot as plt
-from numba import njit, float64, int64
+from numba import jit, njit, float64, int64
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
@@ -110,7 +110,7 @@ def _interpolateGap(k, strikes, gaps):
 
 ###############################################################################
 # Do not cache this function
-# @njit(fastmath=True) #, cache=True)
+@njit(fastmath=True) #, cache=True)
 def _obj(params, *args):
     ''' Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
@@ -198,8 +198,8 @@ def _solveToHorizon(s, t, r, q,
 ###############################################################################
 
 
-#@njit(float64(int64, float64[:], float64[:], float64[:], 
-#              float64, float64, float64), cache=True, fastmath=True)
+@jit(float64(int64, float64[:], float64, float64, float64), 
+      cache=True, fastmath=True)
 def volFunction(volFunctionTypeValue, params, f, k, t):
     ''' Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. '''
@@ -765,6 +765,7 @@ class FinEquityVolSurface():
         #######################################################################
         # TODO: ADD SPOT DAYS
         #######################################################################
+
         spotDate = self._valueDate
 
         for i in range(0, numExpiryDates):
@@ -784,6 +785,7 @@ class FinEquityVolSurface():
         #######################################################################
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
+
         volTypeValue = self._volatilityFunctionType.value
 
         xinits = []
@@ -825,7 +827,7 @@ class FinEquityVolSurface():
 
         K_dummy = 999
 
-        for i in range(0, 1): # self._numExpiryDates):
+        for i in range(0, self._numExpiryDates):
 
             expiryDate = self._expiryDates[i]
             print("==========================================================")

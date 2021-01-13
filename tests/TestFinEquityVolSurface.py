@@ -75,9 +75,9 @@ def test_FinEquityVolSurface1(verboseCalibration):
                                             volFunctionType)
 
         tol = 1e-4
-#        equitySurface.checkCalibration(False, tol)
+        equitySurface.checkCalibration(False, tol)
 
-        if 1==1: # PLOT_GRAPHS:
+        if 1==0: # PLOT_GRAPHS:
 
             equitySurface.plotVolCurves()
 
@@ -110,5 +110,5 @@ if __name__ == '__main__':
     end = time.time()
     
     elapsed = end - start
-#    print("Elapsed Time:", elapsed)
+    print("Elapsed Time:", elapsed)
     testCases.compareTestCases()
