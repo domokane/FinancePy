@@ -10,7 +10,7 @@ from ..finutils.FinMath import N
 from ..finutils.FinMath import norminvcdf
 from ..models.FinSobol import getUniformSobol
 
-# TO DO: SHITED LOGNORMAL
+# TO DO: SHIFTED LOGNORMAL
 # TO DO: TERMINAL MEASURE
 # TO DO:: CALIBRATION
 

@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64
+from numba import njit, float64, vectorize
 
 from ..finutils.FinMath import N
 from ..finutils.FinError import FinError
@@ -20,6 +20,9 @@ class FinVolFunctionTypes(Enum):
     BBG = 2
     SABR = 3
     CLARK5= 4
+    SVI = 5
+    SSVI = 6
+
 
 ###############################################################################
 
@@ -84,4 +87,129 @@ def volFunctionBloomberg(params, f, k, t):
 
 ###############################################################################
 
+@njit(float64(float64[:], float64, float64, float64), 
+           fastmath=True, cache=True)
+def volFunctionSVI(params, f, k, t):
+    ''' Volatility Function proposed by Gatheral in 2004. Increasing a results 
+    in a vertical translation of the smile in the positive direction. 
+    Increasing b decreases the angle between the put and call wing, i.e. 
+    tightens the smile. Increasing rho results in a counter-clockwise rotation
+    of the smile. Increasing m results in a horizontal translation of the smile 
+    in the positive direction. Increasing sigma reduces the at-the-money 
+    curvature of the smile. '''
 
+    x = np.log(f/k)
+
+    a = params[0]
+    b = params[1]
+    rho = params[2]
+    m = params[3]
+    sigma = params[4]
+
+    vart = a + b*(rho*(x-m)+np.sqrt((x-m)**2 + sigma*sigma))   
+    v = np.sqrt(vart/t)
+    return v
+
+###############################################################################
+###############################################################################
+# Gatheral SSVI surface SVI and equivalent local volatility
+# Code from https://wwwf.imperial.ac.uk/~ajacquie/IC_AMDP/IC_AMDP_Docs/Code/SSVI.pdf
+###############################################################################
+###############################################################################
+
+#@njit(float64(float64, float64), fastmath=True, cache=True)
+def phiSSVI(theta, gamma): 
+    phi = (1.0/gamma/theta) * (1.0 - (1.0 - np.exp(-gamma*theta))/gamma/theta)
+    return phi
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def SSVI(x, gamma, sigma, rho, t):
+    theta = sigma * sigma * t
+    p = phiSSVI(theta, gamma)
+    px = p * x
+    g = px + rho
+    v = 0.5 * theta * (1. + rho * px + np.sqrt(g**2  + 1. - rho * rho))
+    return v
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def SSVI1(x, gamma, sigma, rho, t):
+    # First derivative with respect to x
+    theta = sigma * sigma * t
+    p = phiSSVI(theta, gamma)
+    px = p * x
+    v = 0.5 * theta * p * (px + rho * np.sqrt(px**2 + 2. * px * rho + 1.) + rho)
+    v = v / np.sqrt(px**2 + 2. * px * rho + 1.)
+    return v
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def SSVI2(x, gamma, sigma, rho, t):
+    # Second derivative with respect to x
+    theta = sigma * sigma * t
+    p = phiSSVI(theta, gamma)
+    px = p * x
+    v = 0.5 * theta * p * p * (1. - rho * rho) 
+    v =v / ((px**2 + 2. * px * rho + 1.) * np.sqrt(px**2 + 2. * px * rho + 1.))
+    return v
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def SSVIt(x, gamma, sigma, rho, t):
+    # First derivative with respect to t, by central difference
+    eps = 0.0001
+    ssvitplus = SSVI(x, gamma, sigma, rho, t + eps)
+    ssvitminus = SSVI(x, gamma, sigma, rho, t - eps)
+    deriv = (ssvitplus - ssvitminus) / 2.0/ eps
+    return deriv  
+                   
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def g(x, gamma, sigma, rho, t):
+    w = SSVI(x, gamma, sigma, rho, t)
+    w1 = SSVI1(x, gamma, sigma, rho, t)
+    w2 = SSVI2(x, gamma, sigma, rho, t)
+    xwv = x * w1 / w
+    v = (1. - 0.5 * xwv) **2 - 0.25 * w1 * w1 * (0.25 + 1. / w) + 0.5 * w2
+    return v
+    
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def dminus(x, gamma, sigma, rho, t):
+    vsqrt = np.sqrt(SSVI(x, gamma, sigma, rho, t))
+    v = -x / vsqrt - 0.5 * vsqrt
+    return v
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def densitySSVI(x, gamma, sigma, rho, t):
+    dm = dminus(x, gamma, sigma, rho, t)
+    v = g(x, gamma, sigma, rho, t) * np.exp(-0.5 * dm * dm)
+    v = v / np.sqrt(2. * np.pi * SSVI(x, gamma, sigma, rho, t))
+    return v
+
+#@njit(float64(float64, float64, float64, float64, float64), 
+#      fastmath=True, cache=True)
+def SSVI_LocalVarg(x, gamma, sigma, rho, t):
+    # Compute the equivalent SSVI local variance
+    num = SSVIt(x, gamma, sigma, rho, t) 
+    den = g(x, gamma, sigma, rho, t)
+    var = num/den
+    return var
+
+#@njit(float64(float64[:], float64, float64, float64), 
+#      fastmath=True, cache=True)
+def volFunctionSSVI(params, f, k, t):
+    ''' Volatility Function proposed by Gatheral in 2004.'''
+ 
+    gamma = params[0]
+    sigma = params[1]
+    rho = params[2]
+    x = np.log(f/k)
+
+    vart = SSVI_LocalVarg(x, gamma, sigma, rho, t)    
+    sigma = np.sqrt(vart/t)
+    return sigma
+
+###############################################################################

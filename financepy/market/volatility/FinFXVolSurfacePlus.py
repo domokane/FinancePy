@@ -108,7 +108,7 @@ def _interpolateGap(k, strikes, gaps):
 
 ###############################################################################
 # Do not cache this function
-# SHIT @njit(fastmath=True) #, cache=True)
+# @njit(fastmath=True) #, cache=True)
 def _obj(params, *args):
     ''' Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
