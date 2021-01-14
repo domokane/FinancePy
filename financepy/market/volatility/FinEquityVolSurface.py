@@ -137,8 +137,7 @@ def _obj(params, *args):
 
         for j in range(0, numStrikes):
             
-            fittedVol = volFunction(volTypeValue, params, 
-                                    f, strikes[j], t)
+            fittedVol = volFunction(volTypeValue, params, f, strikes[j], t)
 
             mktVol = volatilityGrid[index][j]
             
@@ -166,7 +165,7 @@ def _solveToHorizon(s, t, r, q,
     # Determine parameters of vol surface using minimisation
     ###########################################################################
 
-    tol = 1e-8
+    tol = 1e-6
 
     args = (s, t, r, q, strikes, timeIndex, volatilityGrid, volTypeValue)
 
@@ -198,7 +197,7 @@ def _solveToHorizon(s, t, r, q,
 ###############################################################################
 
 
-@jit(float64(int64, float64[:], float64, float64, float64), 
+@njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
 def volFunction(volFunctionTypeValue, params, f, k, t):
     ''' Return the volatility for a strike using a given polynomial

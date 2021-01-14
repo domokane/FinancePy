@@ -86,6 +86,9 @@ def volFunctionBloomberg(params, f, k, t):
     return v
 
 ###############################################################################
+# I do not jit this so it can be called from a notebook with a vector of strike
+# Also, if I vectorise it it fails as it cannot handle a numpy array as input
+###############################################################################
 
 @njit(float64(float64[:], float64, float64, float64), 
            fastmath=True, cache=True)
@@ -125,6 +128,8 @@ def phiSSVI(theta, gamma):
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def SSVI(x, gamma, sigma, rho, t):
+    ''' This is the total variance w = sigma(t)^2 (0,t) x t ''' 
+    
     theta = sigma * sigma * t
     p = phiSSVI(theta, gamma)
     px = p * x
@@ -192,7 +197,7 @@ def densitySSVI(x, gamma, sigma, rho, t):
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def SSVI_LocalVarg(x, gamma, sigma, rho, t):
-    # Compute the equivalent SSVI local variance
+    # Compute the equivalent SSVI local variance 
     num = SSVIt(x, gamma, sigma, rho, t) 
     den = g(x, gamma, sigma, rho, t)
     var = num/den
@@ -209,7 +214,7 @@ def volFunctionSSVI(params, f, k, t):
     x = np.log(f/k)
 
     vart = SSVI_LocalVarg(x, gamma, sigma, rho, t)    
-    sigma = np.sqrt(vart/t)
+    sigma = np.sqrt(vart)
     return sigma
 
 ###############################################################################
