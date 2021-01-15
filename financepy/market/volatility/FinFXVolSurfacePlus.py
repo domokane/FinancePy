@@ -25,7 +25,8 @@ from ...models.FinModelVolatilityFns import volFunctionClark
 from ...models.FinModelVolatilityFns import volFunctionBloomberg
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR3
+from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
+from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
 
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 
@@ -667,14 +668,17 @@ def volFunction(volFunctionTypeValue, params, strikes, gaps, f, k, t):
     if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
         vol = volFunctionClark(params, f, k, t) + gapK
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR3.value:
-        vol = volFunctionSABR3(params, f, k, t)  + gapK
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
+        vol = volFunctionSABR(params, f, k, t)  + gapK
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_HALF.value:
+        vol = volFunctionSABR_BETA_HALF(params, f, k, t)  + gapK
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_ONE.value:
+        vol = volFunctionSABR_BETA_ONE(params, f, k, t)  + gapK
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
         vol = volFunctionBloomberg(params, f, k, t)  + gapK
-        return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
-        vol = volFunctionSABR(params, f, k, t)  + gapK
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.CLARK5.value:
         vol = volFunctionClark(params, f, k, t)  + gapK
@@ -1298,12 +1302,14 @@ class FinFXVolSurfacePlus():
 
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            numParameters = 4
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+            numParameters = 3
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
             numParameters = 3
         elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
             numParameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-            numParameters = 4
         elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
             numParameters = 5
         else:
@@ -1425,12 +1431,33 @@ class FinFXVolSurfacePlus():
                     c2 = np.log(s10*s90/atmVol/atmVol) / 0.32
                     xinit = [c0, c1, c2]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+                # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
-                nu = 0.817
+                beta = 1.0
                 rho = -0.112
-                xinit = [alpha, nu, rho]
+                nu = 0.817
+
+                xinit = [alpha, beta, rho, nu]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+                # SABR parameters are alpha, nu, rho
+                alpha = 0.174
+                beta = 1.0 # FIXED
+                rho = -0.112
+                nu = 0.817
+
+                xinit = [alpha, rho, nu]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+                # SABR parameters are alpha, nu, rho
+                alpha = 0.174
+                beta = 0.50 # FIXED
+                rho = -0.112
+                nu = 0.817
+ 
+                xinit = [alpha, rho, nu]
 
             elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
 
@@ -1447,15 +1474,6 @@ class FinFXVolSurfacePlus():
                     c = (5.0*s90 - 18.0*s50 + 45.0*s10) / 32.0
 
                 xinit = [a, b, c]
-
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-                # SABR parameters are alpha, nu, rho
-                # SABR parameters are alpha, nu, rho
-                alpha = 0.174
-                nu = 0.817
-                rho = -0.112
-                beta = 1.0
-                xinit = [alpha, beta, rho, nu]
 
             elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
 

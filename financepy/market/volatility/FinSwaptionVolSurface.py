@@ -27,8 +27,8 @@ from ...models.FinModelVolatilityFns import volFunctionBloomberg
 from ...models.FinModelVolatilityFns import volFunctionSVI
 from ...models.FinModelVolatilityFns import volFunctionSSVI
 from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
 from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
+from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
 
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 
@@ -110,38 +110,34 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 #     return v
 
 ###############################################################################
-# Do not cache this function - WRONG. IT WORKS BUT WHY WHEN IN FX IT FAILS ??
-###############################################################################
 
 @njit(fastmath=True, cache=True)
 def _obj(params, *args):
     ''' Return a value that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
-    params and specified by the volTypeValue. We fit at one time slice only.
+    params and specified by the volTypeValue at a single time slice only.
     '''
 
-    s = args[0]
-    t = args[1]
-    r = args[2]
-    q = args[3]
-    strikes = args[4]
-    index = args[5]
-    volatilityGrid = args[6]
-    volTypeValue = args[7]
+    t = args[0]
+    f = args[1]
+    strikesGrid = args[2]
+    index = args[3]
+    volatilityGrid = args[4]
+    volTypeValue = args[5]
 
-    f = s * np.exp((r-q)*t)
-
-    numExpiryDates = len(volatilityGrid)
-    numStrikes = len(volatilityGrid[0])
- 
     tot = 0.0
 
+    numStrikes = len(volatilityGrid)
+    numExpiryDates = len(volatilityGrid[0])
+ 
     for i in range(0, numStrikes):
-            
-        fittedVol = volFunction(volTypeValue, params, f, strikes[i], t)
 
-        mktVol = volatilityGrid[index][i]
-            
+        k = strikesGrid[i][index]
+
+        fittedVol = volFunction(volTypeValue, params, f, k, t)
+
+        mktVol = volatilityGrid[i][index]
+
         diff = fittedVol - mktVol
             
         tot += diff**2
@@ -152,8 +148,8 @@ def _obj(params, *args):
 # Do not cache this function as it leads to complaints
 ###############################################################################
 
-def _solveToHorizon(s, t, r, q,
-                    strikes,
+def _solveToHorizon(t, f,
+                    strikesGrid,
                     timeIndex,
                     volatilityGrid,
                     volTypeValue,
@@ -166,7 +162,7 @@ def _solveToHorizon(s, t, r, q,
 
     tol = 1e-6
 
-    args = (s, t, r, q, strikes, timeIndex, volatilityGrid, volTypeValue)
+    args = (t, f, strikesGrid, timeIndex, volatilityGrid, volTypeValue)
 
     # Nelmer-Mead (both SciPy & Numba) is quicker, but occasionally fails 
     # to converge, so for those cases try again with CG
@@ -189,6 +185,9 @@ def _solveToHorizon(s, t, r, q,
             print('Failed to converge, will try CG')
             opt = minimize(_obj, xinits, args, method="CG", tol=tol)
             xopt = opt.x
+
+    print("t: %9.5f alpha:%9.5f beta: %9.5f rho: %9.5f nu: %9.5f"%
+          (t, xopt[0], 0.5, xopt[1], xopt[2]))
 
     params = np.array(xopt)    
     return params
@@ -382,53 +381,53 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 ###############################################################################
 
 
-class FinEquityVolSurface():
+class FinSwaptionVolSurface():
     ''' Class to perform a calibration of a chosen parametrised surface to the
-    prices of equity options at different strikes and expiry tenors. There is a 
+    prices of swaptions at different expiry dates and swap tenors. There is a 
     choice of volatility function from cubic in delta to full SABR and SSVI. 
     Check out FinVolFunctionTypes. Visualising the volatility curve is useful. 
     Also, there is no guarantee that the implied pdf will be positive.'''
 
     def __init__(self,
                  valueDate: FinDate,
-                 stockPrice: float,
-                 discountCurve: FinDiscountCurve,
-                 dividendCurve: FinDiscountCurve,
                  expiryDates: (list),
-                 strikes: (list, np.ndarray),
-                 volatilityGrid: (list, np.ndarray),
-                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
+                 fwdSwapRates: (list, np.ndarray),
+                 strikeGrid: (np.ndarray),
+                 volatilityGrid: (np.ndarray),
+                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.SABR,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
-        ''' Create the FinEquitySurface object by passing in market vol data
-        for a list of strikes and expiry dates. '''
+        ''' Create the FinSwaptionVolSurface object by passing in market vol 
+        data for a list of strikes and expiry dates. '''
 
         checkArgumentTypes(self.__init__, locals())
 
         self._valueDate = valueDate
-        self._stockPrice = stockPrice
 
-        self._discountCurve = discountCurve
-        self._dividendCurve = dividendCurve
+        if len(strikeGrid.shape) != 2:
+            raise FinError("Strike grid must be a 2D grid of values")
 
-        nExpiryDates = len(expiryDates)
-        nStrikes = len(strikes)
-        n = len(volatilityGrid)
-        m = len(volatilityGrid[0])
-        
-        if n != nExpiryDates:
-            raise FinError("1st dimension of vol grid is not nExpiryDates")
+        if len(volatilityGrid.shape) != 2:
+            raise FinError("Volatility grid must be a 2D grid of values")
+            
+        if len(strikeGrid) != len(volatilityGrid):
+            raise FinError("Strike grid and volatility grid must have same size")
 
-        if m != nStrikes:
-            raise FinError("2nd dimension of the vol matrix is not nStrikes")
+        if len(strikeGrid[0]) != len(volatilityGrid[0]):
+            raise FinError("Strike grid and volatility grid must have same size")
 
-        self._strikes = strikes
-        self._numStrikes = len(strikes)
+        if len(expiryDates) != len(volatilityGrid[0]):
+            raise FinError("Expiry dates not same size as volatility grid")
+
+        self._numExpiryDates = len(volatilityGrid[0])
+        self._numStrikes = len(volatilityGrid)
+
+        self._strikeGrid = strikeGrid
+        self._volatilityGrid = volatilityGrid
 
         self._expiryDates = expiryDates
-        self._numExpiryDates = len(expiryDates)
-
-        self._volatilityGrid = volatilityGrid    
         self._volatilityFunctionType = volatilityFunctionType
+
+        self._fwdSwapRates = fwdSwapRates
 
         self._buildVolSurface(finSolverType=finSolverType)
 
@@ -480,8 +479,8 @@ class FinEquityVolSurface():
                     index1 = i
                     break
 
-        fwd0 = self._F0T[index0]
-        fwd1 = self._F0T[index1]
+        fwd0 = self._fwdSwapRates[index0]
+        fwd1 = self._fwdSwapRates[index1]
                 
         t0 = self._texp[index0]
         t1 = self._texp[index1]
@@ -734,8 +733,6 @@ class FinEquityVolSurface():
     def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         ''' Main function to construct the vol surface. '''
 
-        s = self._stockPrice
-
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
         elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
@@ -761,29 +758,15 @@ class FinEquityVolSurface():
         self._parameters = np.zeros([numExpiryDates, numParameters])        
         self._texp = np.zeros(numExpiryDates)
 
-        self._F0T = np.zeros(numExpiryDates)
-        self._r = np.zeros(numExpiryDates)
-        self._q = np.zeros(numExpiryDates)
-
         #######################################################################
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spotDate = self._valueDate
-
         for i in range(0, numExpiryDates):
 
             expiryDate = self._expiryDates[i]
-            texp = (expiryDate - spotDate) / gDaysInYear
-
-            disDF = self._discountCurve._df(texp)
-            divDF = self._dividendCurve._df(texp)
-            f = s * divDF/disDF
-
+            texp = (expiryDate - self._valueDate) / gDaysInYear
             self._texp[i] = texp
-            self._r[i] = -np.log(disDF) / texp
-            self._q[i] = -np.log(divDF) / texp
-            self._F0T[i] = f
 
         #######################################################################
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
@@ -798,11 +781,10 @@ class FinEquityVolSurface():
         for i in range(0, numExpiryDates):
 
             t = self._texp[i]
-            r = self._r[i]
-            q = self._q[i]
+            f = self._fwdSwapRates[i]
 
-            res = _solveToHorizon(s, t, r, q,
-                                  self._strikes,
+            res = _solveToHorizon(t, f,
+                                  self._strikeGrid,
                                   i,
                                   self._volatilityGrid, 
                                   volTypeValue,
@@ -837,11 +819,11 @@ class FinEquityVolSurface():
 
             for j in range(0, self._numStrikes):
                 
-                strike = self._strikes[j]
+                strike = self._strikeGrid[j][i]
 
                 fittedVol = self.volatilityFromStrikeDate(strike, expiryDate)
 
-                mktVol = self._volatilityGrid[i][j]
+                mktVol = self._volatilityGrid[j][i]
                 
                 diff = fittedVol - mktVol
                 
@@ -853,48 +835,48 @@ class FinEquityVolSurface():
         
 ###############################################################################
 
-    def impliedDbns(self, lowS, highS, numIntervals):
-        ''' Calculate the pdf for each tenor horizon. Returns a list of
-        FinDistribution objects, one for each tenor horizon. '''
+    # def impliedDbns(self, lowS, highS, numIntervals):
+    #     ''' Calculate the pdf for each tenor horizon. Returns a list of
+    #     FinDistribution objects, one for each tenor horizon. '''
 
-        dbns = []
+    #     dbns = []
 
-        for iTenor in range(0, self._numExpiryDates):
+    #     for iTenor in range(0, self._numExpiryDates):
 
-            f = self._F0T[iTenor]
-            t = self._texp[iTenor]
+    #         f = self._fwdSwapRates[iTenor]
+    #         t = self._texp[iTenor]
 
-            dS = (highS - lowS)/ numIntervals
+    #         dS = (highS - lowS)/ numIntervals
 
-            disDF = self._discountCurve._df(t)
-            divDF = self._dividendCurve._df(t)
+    #         disDF = self._discountCurve._df(t)
+    #         divDF = self._dividendCurve._df(t)
 
-            r = -np.log(disDF) / t
-            q = -np.log(divDF) / t
+    #         r = -np.log(disDF) / t
+    #         q = -np.log(divDF) / t
 
-            Ks = []
-            vols = []
+    #         Ks = []
+    #         vols = []
 
-            for iK in range(0, numIntervals):
+    #         for iK in range(0, numIntervals):
 
-                k = lowS + iK*dS
+    #             k = lowS + iK*dS
 
-                vol = volFunction(self._volatilityFunctionType.value, 
-                                  self._parameters[iTenor], 
-                                  f, k, t)
+    #             vol = volFunction(self._volatilityFunctionType.value, 
+    #                               self._parameters[iTenor], 
+    #                               f, k, t)
 
-                Ks.append(k)
-                vols.append(vol)
+    #             Ks.append(k)
+    #             vols.append(vol)
 
-            Ks = np.array(Ks)
-            vols = np.array(vols)
+    #         Ks = np.array(Ks)
+    #         vols = np.array(vols)
 
-            density = optionImpliedDbn(self._stockPrice, t, r, q, Ks, vols)
+    #         density = optionImpliedDbn(self._stockPrice, t, r, q, Ks, vols)
 
-            dbn = FinDistribution(Ks, density)
-            dbns.append(dbn)
+    #         dbn = FinDistribution(Ks, density)
+    #         dbns.append(dbn)
 
-        return dbns
+    #     return dbns
 
 ###############################################################################
 
@@ -904,10 +886,10 @@ class FinEquityVolSurface():
         
         volTypeVal = self._volatilityFunctionType.value
 
-        lowK = self._strikes[0] * 0.9
-        highK = self._strikes[-1] * 1.1
-
         for tenorIndex in range(0, self._numExpiryDates):
+
+            lowK = self._strikeGrid[0][tenorIndex] * 0.9
+            highK = self._strikeGrid[-1][tenorIndex] * 1.1
 
             expiryDate = self._expiryDates[tenorIndex]
             plt.figure()
@@ -920,7 +902,7 @@ class FinEquityVolSurface():
             dK = (highK - lowK)/numIntervals
             params = self._parameters[tenorIndex]
             t = self._texp[tenorIndex]
-            f = self._F0T[tenorIndex]
+            f = self._fwdSwapRates[tenorIndex]
             
             for i in range(0, numIntervals):
 
@@ -933,8 +915,8 @@ class FinEquityVolSurface():
             plt.plot(ks, fittedVols, label=labelStr)
 
             labelStr = "MARKET AT " + str(self._expiryDates[tenorIndex])
-            mktVols = self._volatilityGrid[tenorIndex] * 100.0
-            plt.plot(self._strikes, mktVols, 'o', label=labelStr)
+            mktVols = self._volatilityGrid[:, tenorIndex] * 100.0
+            plt.plot(self._strikeGrid[:, tenorIndex], mktVols, 'o', label=labelStr)
 
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
@@ -949,16 +931,26 @@ class FinEquityVolSurface():
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUE DATE", self._valueDate)
         s += labelToString("STOCK PRICE", self._stockPrice)
+        s += labelToString("ATM METHOD", self._atmMethod)
+        s += labelToString("DELTA METHOD", self._deltaMethod)
         s += labelToString("VOL FUNCTION", self._volatilityFunctionType)
 
         for i in range(0, self._numExpiryDates):
+
+            s += "\n"
+
             s += labelToString("EXPIRY DATE", self._expiryDates[i])
+            s += labelToString("TIME (YRS)", self._texp[i])
+            s += labelToString("FWD FX", self._F0T[i])
 
-        for i in range(0, self._numStrikes):
-            s += labelToString("STRIKE", self._strikes[i])
+            s += labelToString("ATM VOLS", self._atmVols[i]*100.0)
 
-        s += labelToString("EQUITY VOL GRID", self._volatilityGrid)
- 
+            for j in range(0, self._numStrikes):
+                
+                k = self._strikes[j]
+                vol = self._volGrid[i][j]
+                print(expiryDate, k, vol)
+
         return s
 
 ###############################################################################

@@ -9,13 +9,14 @@ from ...finutils.FinMath import testMonotonicity
 from ...finutils.FinHelperFunctions import labelToString
 
 ###############################################################################
-# TODO: This is unfinished
+# TODO: This should be deleted and replaced with FinEquityVolSurface
 
 
 class FinEquityVolCurve():
     ''' Class to manage a smile or skew in volatility at a single maturity
     horizon. It fits the volatility using a polynomial. Includes analytics to
-    extract the implied pdf of the underyling at maturity. '''
+    extract the implied pdf of the underyling at maturity. THIS NEEDS TO BE
+    SUBSTITUTED WITH FINEQUITYVOLSURFACE. '''
 
 ###############################################################################
 

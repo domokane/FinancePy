@@ -25,7 +25,8 @@ from ...models.FinModelVolatilityFns import volFunctionClark
 from ...models.FinModelVolatilityFns import volFunctionBloomberg
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR3
+from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
+from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
 
 from ...finutils.FinMath import norminvcdf
 
@@ -216,11 +217,14 @@ def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
     if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
         vol = volFunctionClark(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR3.value:
-        vol = volFunctionSABR3(params, f, k, t)
-        return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
         vol = volFunctionSABR(params, f, k, t)
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_ONE.value:
+        vol = volFunctionSABR_BETA_ONE(params, f, k, t)
+        return vol
+    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_HALF.value:
+        vol = volFunctionSABR_BETA_HALF(params, f, k, t)
         return vol
     elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
         vol = volFunctionBloomberg(params, f, k, t)
@@ -349,7 +353,7 @@ def solveForStrike(spotFXRate,
                     deltaMethodValue, optionTypeValue, deltaTarget)
     
         K = newton_secant(g, x0=spotFXRate, args=argtuple,
-                   tol=1e-7, maxiter=50)
+                          tol=1e-7, maxiter=50)
 
         return K
 
@@ -531,12 +535,14 @@ class FinFXVolSurface():
 
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            numParameters = 4
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+            numParameters = 3
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
             numParameters = 3
         elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
             numParameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-            numParameters = 4
         elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
             numParameters = 5
         else:
@@ -613,12 +619,29 @@ class FinFXVolSurface():
                 c2 = 8.0 * np.log(s25*s75/atmVol/atmVol)
                 xinit = [c0, c1, c2]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR3:
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+                # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
-                nu = 0.817
+                beta = 1.0
                 rho = -0.112
+                nu = 0.817
+
+                xinit = [alpha, beta, rho, nu]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+                # SABR parameters are alpha, nu, rho
+                alpha = 0.174
+                rho = -0.112
+                nu = 0.817
                 xinit = [alpha, nu, rho]
+
+            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+                # SABR parameters are alpha, nu, rho
+                alpha = 0.174
+                rho = -0.112
+                nu = 0.817
+                xinit = [alpha, rho, nu]
 
             elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
 
@@ -628,15 +651,6 @@ class FinFXVolSurface():
                 c = s75-3.0*s50+3.0*s25
 
                 xinit = [a, b, c]
-
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
-                # SABR parameters are alpha, nu, rho
-                # SABR parameters are alpha, nu, rho
-                alpha = 0.174
-                nu = 0.817
-                rho = -0.112
-                beta = 1.0
-                xinit = [alpha, beta, rho, nu]
 
             elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
 

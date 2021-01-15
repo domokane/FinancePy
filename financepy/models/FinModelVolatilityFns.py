@@ -16,12 +16,13 @@ from enum import Enum
 
 class FinVolFunctionTypes(Enum):
     CLARK = 0
-    SABR3 = 1
-    BBG = 2
-    SABR = 3
-    CLARK5= 4
-    SVI = 5
-    SSVI = 6
+    SABR = 1
+    SABR_BETA_ONE = 2
+    SABR_BETA_HALF = 3
+    BBG = 4
+    CLARK5= 5
+    SVI = 6
+    SSVI = 7
 
 
 ###############################################################################

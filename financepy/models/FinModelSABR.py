@@ -22,7 +22,8 @@ def _x(rho, z):
     b = 1.0 - rho
     return np.log(a / b)
 
-@njit
+@njit(float64(float64[:], float64, float64, float64), 
+      fastmath=True, cache=True)
 def volFunctionSABR(params, f, k, t):
     ''' Black volatility implied by SABR model. '''
 
@@ -65,14 +66,14 @@ def volFunctionSABR(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSABR3(params, f, k, t):
+def volFunctionSABR_BETA_ONE(params, f, k, t):
     ''' This is the SABR function with the exponent beta set equal to 1 so only
     3 parameters are free. The first parameter is alpha, then nu and the third 
     parameter is rho. Check the order as it is not the same as main SABR fn'''
     
     alpha = params[0]
-    nu = params[1]
-    rho = params[2]
+    rho = params[1]
+    nu = params[2]
 
     if rho > 1.0:
         rho = 0.99
@@ -105,6 +106,49 @@ def volFunctionSABR3(params, f, k, t):
         sigma = num / denom
 
     return sigma
+
+###############################################################################
+
+@njit(float64(float64[:], float64, float64, float64), 
+      fastmath=True, cache=True)
+def volFunctionSABR_BETA_HALF(params, f, k, t):
+    ''' Black volatility implied by SABR model. '''
+
+    alpha = params[0]
+    rho = params[1]
+    nu = params[2]
+
+    beta = 0.50
+
+    if alpha < 1e-10:
+        alpha = 1e-10
+
+    # Negative strikes or forwards
+    if k <= 0:
+        raise FinError("Strike must be positive")
+
+    if f <= 0:
+        raise FinError("Forward must be positive")
+
+    logfk = np.log(f / k)
+    b = 1.0 - beta
+    fkb = (f*k)**b
+    a = b**2 * alpha**2 / (24.0 * fkb)
+    b = 0.25 * rho * beta * nu * alpha / fkb**0.5
+    c = (2.0 - 3.0*rho**2.0) * nu**2.0 / 24
+    d = fkb**0.5
+    v = b**2 * logfk**2 / 24.0
+    w = b**4 * logfk**4 / 1920.0
+    z = nu * fkb**0.5 * logfk / alpha
+
+    eps = 1e-07
+
+    if abs(z) > eps:
+        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        return vz
+    else:
+        v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
+        return v0
 
 ###############################################################################
 
