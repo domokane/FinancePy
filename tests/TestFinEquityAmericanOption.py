@@ -29,6 +29,7 @@ def testFinEquityAmericanOption():
     strikePrice = 50.0
 
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
@@ -38,10 +39,10 @@ def testFinEquityAmericanOption():
                                  FinModelBlackScholesTypes.CRR_TREE,
                                  {'numStepsPerYear': 100})
 
-    value = putOption.value(valueDate, stockPrice, discountCurve, dividendYield, model)
-    delta = putOption.delta(valueDate, stockPrice, discountCurve, dividendYield, model)
-    gamma = putOption.gamma(valueDate, stockPrice, discountCurve, dividendYield, model)
-    theta = putOption.theta(valueDate, stockPrice, discountCurve, dividendYield, model)
+    value = putOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    delta = putOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    gamma = putOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    theta = putOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
@@ -59,7 +60,7 @@ def testFinEquityAmericanOption():
                                      {'numStepsPerYear': numSteps})
 
         start = time.time()
-        results = option.value(valueDate, stockPrice, discountCurve, dividendYield, model)
+        results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
         end = time.time()
         duration = end - start
         testCases.print("EUROPEAN_PUT_TREE", numSteps, results, duration)
@@ -84,7 +85,7 @@ def testFinEquityAmericanOption():
                                      {'numStepsPerYear': numSteps})
 
         start = time.time()
-        results = option.value(valueDate, stockPrice, discountCurve, dividendYield, model)
+        results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
         end = time.time()
         duration = end - start
         testCases.print("AMERICAN_PUT", numSteps, results, duration)
@@ -96,10 +97,10 @@ def testFinEquityAmericanOption():
         expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valueDate, stockPrice, discountCurve, dividendYield, model)
-    delta = callOption.delta(valueDate, stockPrice, discountCurve, dividendYield, model)
-    gamma = callOption.gamma(valueDate, stockPrice, discountCurve, dividendYield, model)
-    theta = callOption.theta(valueDate, stockPrice, discountCurve, dividendYield, model)
+    value = callOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    delta = callOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    gamma = callOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    theta = callOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
@@ -122,7 +123,7 @@ def testFinEquityAmericanOption():
                                      {'numStepsPerYear': numSteps})
         start = time.time()
         results = option.value(valueDate, stockPrice, discountCurve, 
-                               dividendYield, model)
+                               dividendCurve, model)
         end = time.time()
         duration = end - start
         testCases.print("EUROPEAN_CALL_TREE", numSteps, results, duration)
@@ -147,7 +148,7 @@ def testFinEquityAmericanOption():
         start = time.time()
 
         results = option.value(valueDate, stockPrice, discountCurve, 
-                               dividendYield, model)
+                               dividendCurve, model)
 
         end = time.time()
         duration = end - start

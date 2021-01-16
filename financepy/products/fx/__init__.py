@@ -1,5 +1,4 @@
 from .FinFXBarrierOption import *
-from .FinFXBasketOption import *
 from .FinFXDigitalOption import *
 from .FinFXFixedLookbackOption import *
 from .FinFXFloatLookbackOption import *

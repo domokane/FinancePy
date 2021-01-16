@@ -20,15 +20,15 @@ class FinFXOption(object):
 ###############################################################################
 
     def delta(self, valueDate, stockPrice, discountCurve,
-              dividendYield, model):
+              dividendCurve, model):
         ''' Calculate the option delta (FX rate sensitivity) by adding on a
         small bump and calculating the change in the option price. '''
 
-        v = self.value(valueDate, stockPrice, discountCurve, dividendYield,
+        v = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
                        model)
 
         vBumped = self.value(valueDate, stockPrice + bump, discountCurve,
-                             dividendYield, model)
+                             dividendCurve, model)
 
         if type(vBumped) is dict:
             delta = (vBumped['value'] - v['value']) / bump
@@ -39,19 +39,19 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def gamma(self, valueDate, stockPrice, discountCurve, dividendYield,
+    def gamma(self, valueDate, stockPrice, discountCurve, dividendCurve,
               model):
         ''' Calculate the option gamma (delta sensitivity) by adding on a
         small bump and calculating the change in the option delta. '''
 
-        v = self.delta(valueDate, stockPrice, discountCurve, dividendYield,
+        v = self.delta(valueDate, stockPrice, discountCurve, dividendCurve,
             model)
 
         vBumpedDn = self.delta(valueDate, stockPrice + bump, discountCurve,
-            dividendYield, model)
+            dividendCurve, model)
 
         vBumpedUp = self.delta(valueDate, stockPrice + bump, discountCurve,
-            dividendYield, model)
+            dividendCurve, model)
 
         if type(v) is dict:
             num = (vBumpedUp['value'] - 2.0 * v['value'] + vBumpedDn['value'])
@@ -63,14 +63,14 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def vega(self, valueDate, stockPrice, discountCurve, dividendYield, model):
+    def vega(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
         ''' Calculate the option vega (volatility sensitivity) by adding on a
         small bump and calculating the change in the option price. '''
 
-        v = self.value(valueDate, stockPrice, discountCurve, dividendYield,
+        v = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
                        model)
 
-        vp = self.value(valueDate, stockPrice, discountCurve, dividendYield,
+        vp = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
                         FinModelBlackScholes(model._volatility + bump))
 
         if type(v) is dict:
@@ -82,18 +82,18 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def theta(self, valueDate, stockPrice, discountCurve, dividendYield, model):
+    def theta(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
         ''' Calculate the option theta (calendar time sensitivity) by moving
         forward one day and calculating the change in the option price. '''
 
         v = self.value(valueDate, stockPrice, discountCurve,
-                       dividendYield, model)
+                       dividendCurve, model)
 
         nextDate = valueDate.addDays(1)
         bump = 1.0 / gDaysInYear
 
         vBumped = self.value(nextDate, stockPrice, discountCurve,
-                             dividendYield, model)
+                             dividendCurve, model)
 
         if type(v) is dict:
             theta = (vBumped['value'] - v['value']) / bump
@@ -102,7 +102,7 @@ class FinFXOption(object):
 
         return theta
 
-    def rho(self, valueDate, stockPrice, discountCurve, dividendYield, model):
+    def rho(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
         ''' Calculate the option rho (interest rate sensitivity) by perturbing
         the discount curve and revaluing. '''
 
@@ -110,13 +110,13 @@ class FinFXOption(object):
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         vBumped = self.value(
             valueDate,
             stockPrice,
             discountCurve.bump(bump),
-            dividendYield,
+            dividendCurve,
             model)
 
         if type(v) is dict:

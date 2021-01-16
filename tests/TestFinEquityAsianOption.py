@@ -42,6 +42,7 @@ def testConvergence():
 
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     asianOption = FinEquityAsianOption(startAveragingDate,
                                        expiryDate,
@@ -72,7 +73,7 @@ def testConvergence():
         valueMC_fast = asianOption._valueMC_fast(valueDate,
                                                  stockPrice,
                                                  discountCurve,
-                                                 dividendYield,
+                                                 dividendCurve,
                                                  model,
                                                  numPaths,
                                                  seed,
@@ -81,7 +82,7 @@ def testConvergence():
         valueMC_CV = asianOption.valueMC(valueDate,
                                          stockPrice,
                                          discountCurve,
-                                         dividendYield,
+                                         dividendCurve,
                                          model,
                                          numPaths,
                                          seed,
@@ -90,7 +91,7 @@ def testConvergence():
         valueGeometric = asianOption.value(valueDate,
                                            stockPrice,
                                            discountCurve,
-                                           dividendYield,
+                                           dividendCurve,
                                            model,
                                            FinAsianOptionValuationMethods.GEOMETRIC,
                                            accruedAverage)
@@ -98,7 +99,7 @@ def testConvergence():
         valueTurnbullWakeman = asianOption.value(valueDate,
                                                  stockPrice,
                                                  discountCurve,
-                                                 dividendYield,
+                                                 dividendCurve,
                                                  model,
                                                  FinAsianOptionValuationMethods.TURNBULL_WAKEMAN,
                                                  accruedAverage)
@@ -106,7 +107,7 @@ def testConvergence():
         valueCurran = asianOption.value(valueDate,
                                         stockPrice,
                                         discountCurve,
-                                        dividendYield,
+                                        dividendCurve,
                                         model,
                                         FinAsianOptionValuationMethods.CURRAN,
                                         accruedAverage)
@@ -191,11 +192,12 @@ def testTimeEvolution():
         accruedAverage = stockPrice * 0.9
 
         discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+        dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
         valueMC_fast = asianOption._valueMC_fast(valueDate,
                                                  stockPrice,
                                                  discountCurve,
-                                                 dividendYield,
+                                                 dividendCurve,
                                                  model,
                                                  numPaths,
                                                  seed,
@@ -204,7 +206,7 @@ def testTimeEvolution():
         valueMC_CV = asianOption.valueMC(valueDate,
                                          stockPrice,
                                          discountCurve,
-                                         dividendYield,
+                                         dividendCurve,
                                          model,
                                          numPaths,
                                          seed,
@@ -213,7 +215,7 @@ def testTimeEvolution():
         valueGeometric = asianOption.value(valueDate,
                                            stockPrice,
                                            discountCurve,
-                                           dividendYield,
+                                           dividendCurve,
                                            model,
                                            FinAsianOptionValuationMethods.GEOMETRIC,
                                            accruedAverage)
@@ -221,7 +223,7 @@ def testTimeEvolution():
         valueTurnbullWakeman = asianOption.value(valueDate,
                                                  stockPrice,
                                                  discountCurve,
-                                                 dividendYield,
+                                                 dividendCurve,
                                                  model,
                                                  FinAsianOptionValuationMethods.TURNBULL_WAKEMAN,
                                                  accruedAverage)
@@ -229,7 +231,7 @@ def testTimeEvolution():
         valueCurran = asianOption.value(valueDate,
                                         stockPrice,
                                         discountCurve,
-                                        dividendYield,
+                                        dividendCurve,
                                         model,
                                         FinAsianOptionValuationMethods.CURRAN,
                                         accruedAverage)
@@ -280,6 +282,7 @@ def testMCTimings():
 
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     asianOption = FinEquityAsianOption(startAveragingDate,
                                        expiryDate,
@@ -314,7 +317,7 @@ def testMCTimings():
         valueMC = asianOption.valueMC(valueDate,
                                       stockPrice,
                                       discountCurve,
-                                      dividendYield,
+                                      dividendCurve,
                                       model,
                                       numPaths,
                                       seed,
@@ -327,7 +330,7 @@ def testMCTimings():
         valueMC_fast = asianOption._valueMC_fast(valueDate,
                                                  stockPrice,
                                                  discountCurve,
-                                                 dividendYield,
+                                                 dividendCurve,
                                                  model,
                                                  numPaths,
                                                  seed,
@@ -340,7 +343,7 @@ def testMCTimings():
         valueMC_fast_CV = asianOption.valueMC(valueDate,
                                               stockPrice,
                                               discountCurve,
-                                              dividendYield,
+                                              dividendCurve,
                                               model,
                                               numPaths,
                                               seed,

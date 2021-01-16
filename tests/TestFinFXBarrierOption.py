@@ -154,6 +154,7 @@ def test_FinFXBarrierOption():
                             vega,
                             theta)
 
+###############################################################################
 
 test_FinFXBarrierOption()
 testCases.compareTestCases()

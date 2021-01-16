@@ -16,6 +16,7 @@ from ...finutils.FinDate import FinDate
 
 from ...finutils.FinMath import N
 
+# TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 
 ###############################################################################
 
@@ -68,7 +69,7 @@ class FinEquityBarrierOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: (float, np.ndarray),
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model):
         ''' This prices an Equity Barrier option using the formulae given in
         the paper by Clewlow, Llanos and Strickland December 1994 which can be
@@ -88,7 +89,7 @@ class FinEquityBarrierOption(FinEquityOption):
         values = []
         for s in stockPrices:
             v = self._valueOne(valueDate, s, discountCurve,
-                               dividendYield, model)
+                               dividendCurve, model)
             values.append(v)
 
         if isinstance(stockPrice, float):
@@ -102,22 +103,23 @@ class FinEquityBarrierOption(FinEquityOption):
                   valueDate: FinDate,
                   stockPrice: (float, np.ndarray),
                   discountCurve: FinDiscountCurve,
-                  dividendYield: float,
+                  dividendCurve: FinDiscountCurve,
                   model):
         ''' This values a single option. Because of its structure it cannot
         easily be vectorised which is why it has been wrapped. '''
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
 
-        if t < 0:
+        if texp < 0:
             raise FinError("Option expires before value date.")
 
-        t = max(t, 1e-6)
+        texp = max(texp, 1e-6)
 
         lnS0k = np.log(stockPrice / self._strikePrice)
-        sqrtT = np.sqrt(t)
+        sqrtT = np.sqrt(texp)
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)
+        q = dividendCurve.ccRate(self._expiryDate)
 
         k = self._strikePrice
         s = stockPrice
@@ -126,11 +128,11 @@ class FinEquityBarrierOption(FinEquityOption):
         volatility = model._volatility
         sigmaRootT = volatility * sqrtT
         v2 = volatility * volatility
-        mu = r - dividendYield
-        d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigmaRootT
-        d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigmaRootT
-        df = np.exp(-r * t)
-        dq = np.exp(-dividendYield * t)
+        mu = r - q
+        d1 = (lnS0k + (mu + v2 / 2.0) * texp) / sigmaRootT
+        d2 = (lnS0k + (mu - v2 / 2.0) * texp) / sigmaRootT
+        df = np.exp(-r * texp)
+        dq = np.exp(-q * texp)
 
         c = s * dq * N(d1) - k * df * N(d2)
         p = k * df * N(-d2) - s * dq * N(-d1)
@@ -153,27 +155,29 @@ class FinEquityBarrierOption(FinEquityOption):
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT and s <= h:
             return p
 
-        numObservations = 1 + t * self._numObservationsPerYear
+        numObservations = 1 + texp * self._numObservationsPerYear
 
         # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
         # Adjusts the barrier for discrete and not continuous observations
         h_adj = h
+        t = texp / numObservations
+
         if self._optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL:
-            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL:
-            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_IN_CALL:
-            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_OUT_CALL:
-            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_IN_PUT:
-            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT:
-            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT:
-            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
         elif self._optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT:
-            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t / numObservations))
+            h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
         else:
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))
@@ -279,6 +283,7 @@ class FinEquityBarrierOption(FinEquityOption):
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
+                dividendCurve: FinDiscountCurve,
                 processType,
                 modelParams,
                 numAnnObs: int = 252,
@@ -290,8 +295,8 @@ class FinEquityBarrierOption(FinEquityOption):
         crossed and the corresponding value of the final payoff, if any. It
         assumes a GBM model for the stock price. '''
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
-        numTimeSteps = int(t * numAnnObs)
+        texp = (self._expiryDate - valueDate) / gDaysInYear
+        numTimeSteps = int(texp * numAnnObs)
         K = self._strikePrice
         B = self._barrierLevel
         optionType = self._optionType
@@ -299,7 +304,12 @@ class FinEquityBarrierOption(FinEquityOption):
         process = FinProcessSimulator()
 
         r = discountCurve.zeroRate(self._expiryDate)
+        
+        # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
 
+        r = discountCurve.ccRate(self._expiryDate)
+        q = dividendCurve.ccRate(self._expiryDate)
+        
         #######################################################################
 
         if optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL and stockPrice <= B:
@@ -327,20 +337,20 @@ class FinEquityBarrierOption(FinEquityOption):
 
         if simplePut or simpleCall:
             Sall = process.getProcess(
-                processType, t, modelParams, 1, numPaths, seed)
+                processType, texp, modelParams, 1, numPaths, seed)
 
         if simpleCall:
             c = (np.maximum(Sall[:, -1] - K, 0.0)).mean()
-            c = c * np.exp(-r * t)
+            c = c * np.exp(-r * texp)
             return c
 
         if simplePut:
             p = (np.maximum(K - Sall[:, -1], 0.0)).mean()
-            p = p * np.exp(-r * t)
+            p = p * np.exp(-r * texp)
             return p
 
         # Get full set of paths
-        Sall = process.getProcess(processType, t, modelParams, numTimeSteps,
+        Sall = process.getProcess(processType, texp, modelParams, numTimeSteps,
                                   numPaths, seed)
 
         (numPaths, numTimeSteps) = Sall.shape
@@ -391,7 +401,7 @@ class FinEquityBarrierOption(FinEquityOption):
             raise FinError("Unknown barrier option type." +
                            str(self._optionType))
 
-        v = payoff.mean() * np.exp(- r * t)
+        v = payoff.mean() * np.exp(- r * texp)
 
         return v * self._notional
 

@@ -24,13 +24,15 @@ def test_FinEquityOneTouchOption():
     valueDate = FinDate(1, 1, 2016)
     expiryDate = FinDate(2, 7, 2016)
     interestRate = 0.10
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     volatility = 0.20
     barrierLevel = 100.0  # H
     model = FinModelBlackScholes(volatility)
     dividendYield = 0.03
     numPaths = 10000
     numStepsPerYear = 252
+
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     stockPrice = 105.0
     paymentSize = 15.0
@@ -53,13 +55,13 @@ def test_FinEquityOneTouchOption():
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendYield,
+                         dividendCurve,
                          model)
 
         v_mc = option.valueMC(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendYield,
+                              dividendCurve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -87,13 +89,13 @@ def test_FinEquityOneTouchOption():
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendYield,
+                         dividendCurve,
                          model)
 
         v_mc = option.valueMC(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendYield,
+                              dividendCurve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -122,13 +124,13 @@ def test_FinEquityOneTouchOption():
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendYield,
+                         dividendCurve,
                          model)
 
         v_mc = option.valueMC(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendYield,
+                              dividendCurve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -152,13 +154,13 @@ def test_FinEquityOneTouchOption():
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendYield,
+                         dividendCurve,
                          model)
 
         v_mc = option.valueMC(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendYield,
+                              dividendCurve,
                               model,
                               numStepsPerYear,
                               numPaths)

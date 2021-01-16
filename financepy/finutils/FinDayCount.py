@@ -6,6 +6,7 @@ from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
 from .FinDate import isLeapYear
 from .FinError import FinError
 from .FinFrequency import FinFrequencyTypes, FinFrequency
+from .FinGlobalVariables import gDaysInYear
 
 from enum import Enum
 
@@ -52,7 +53,8 @@ class FinDayCountTypes(Enum):
     ACT_ACT_ICMA = 6  
     ACT_365F = 7  
     ACT_360 = 8
-    ACT_365L = 9 
+    ACT_365L = 9
+    SIMPLE = 10 # actual divided by gDaysInYear
 
 ###############################################################################
 
@@ -268,6 +270,13 @@ class FinDayCount(object):
                 if isLeapYear(y3) is True:
                     den = 366
 
+            accFactor = num / den
+            return (accFactor, num, den)
+
+        elif self._type == FinDayCountTypes.SIMPLE:
+            
+            num = dt2 - dt1
+            den = gDaysInYear
             accFactor = num / den
             return (accFactor, num, den)
 

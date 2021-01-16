@@ -36,6 +36,8 @@ def test_FinEquityVarianceSwap():
     valuationDate = FinDate(2018, 3, 20)
     stockPrice = 100.0
     dividendYield = 0.0
+    dividendCurve = FinDiscountCurveFlat(valuationDate, dividendYield)
+
     maturityDate = startDate.addMonths(3)
 
     atmVol = 0.20
@@ -49,13 +51,14 @@ def test_FinEquityVarianceSwap():
     numCallOptions = 10
     numPutOptions = 10
     r = 0.05
+
     discountCurve = FinDiscountCurveFlat(valuationDate, r)
 
     useForward = False
 
     testCases.header("LABEL", "VALUE")
 
-    k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendYield,
+    k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendCurve,
                             volCurve, numCallOptions, numPutOptions,
                             strikeSpacing, discountCurve, useForward)
 

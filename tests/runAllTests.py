@@ -11,7 +11,7 @@ from os.path import dirname, basename, join
 
 from financepy.finutils.FinError import FinError
 from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(FinDateFormatTypes.UK_LONG)
 
 # I put this here to get the library loaded and header printed before loop
 from FinTestCases import FinTestCases

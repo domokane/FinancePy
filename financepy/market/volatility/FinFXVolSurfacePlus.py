@@ -605,7 +605,7 @@ def _solveToHorizon(s, t, rd, rf,
 
 # Removed this as it causes discontinuity
 #    f = s * np.exp((rd-rf)*t)
-#    interpATMVol = volFunctionFAST(volTypeValue, params,
+#    interpATMVol = volFunction(volTypeValue, params,
 #                                   strikes, gaps, f, K_ATM, t)
 
 #    diff = atmVol - interpATMVol

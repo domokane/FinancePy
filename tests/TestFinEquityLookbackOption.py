@@ -28,7 +28,9 @@ def test_FinEquityLookBackOption():
     numPathsRange = [10000]
     stockPriceRange = range(90, 110, 10)
     numStepsPerYear = 252
+
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
 ###############################################################################
 
@@ -51,7 +53,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin)
             start = time.time()
@@ -59,7 +61,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -96,7 +98,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin)
             start = time.time()
@@ -104,7 +106,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -141,7 +143,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax)
             start = time.time()
@@ -149,7 +151,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -186,7 +188,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax)
             start = time.time()
@@ -194,7 +196,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -239,7 +241,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax)
             start = time.time()
@@ -247,7 +249,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -287,7 +289,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax)
             start = time.time()
@@ -295,7 +297,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -335,7 +337,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax)
             start = time.time()
@@ -343,7 +345,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMax,
                 numPaths,
@@ -383,7 +385,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin)
             start = time.time()
@@ -391,7 +393,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -431,7 +433,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin)
             start = time.time()
@@ -439,7 +441,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -479,7 +481,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin)
             start = time.time()
@@ -487,7 +489,7 @@ def test_FinEquityLookBackOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 volatility,
                 stockMin,
                 numPaths,
@@ -519,16 +521,18 @@ def test_example():
 
     valueDate = FinDate(1, 1, 2020)
     interestRate = 0.10
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     stockPrice = 100.0
     dividendYield = 0.0
     stockMinMax = 100.0
+
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     volatilities = [0.30]
 
     testCases.header("VALUE")
     for vol in volatilities:
-        v = lookbackCall.value(valueDate, stockPrice, discountCurve, dividendYield, vol, stockMinMax)
+        v = lookbackCall.value(valueDate, stockPrice, discountCurve, dividendCurve, vol, stockMinMax)
         testCases.print(v)
 
 ###############################################################################

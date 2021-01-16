@@ -107,7 +107,7 @@ class FinEquityVarianceSwap(object):
     def fairStrike(self,
                    valuationDate,
                    stockPrice,
-                   dividendYield,
+                   dividendCurve,
                    volatilityCurve,
                    numCallOptions,
                    numPutOptions,
@@ -129,6 +129,9 @@ class FinEquityVarianceSwap(object):
 
         df = discountCurve._df(tmat)
         r = - log(df)/tmat
+
+        dq = dividendCurve._df(tmat)
+        q = - log(dq)/tmat
 
         s0 = stockPrice
         g = exp(r*tmat)
@@ -198,7 +201,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, putType)
             model = FinModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)
+                          dividendCurve, model)
             piPut += v * self._putWts[n]
 
         piCall = 0.0
@@ -208,7 +211,7 @@ class FinEquityVarianceSwap(object):
             opt = FinEquityVanillaOption(self._maturityDate, k, callType)
             model = FinModelBlackScholes(vol)
             v = opt.value(valuationDate, s0, discountCurve,
-                          dividendYield, model)
+                          dividendCurve, model)
             piCall += v * self._callWts[n]
 
         pi = piCall + piPut

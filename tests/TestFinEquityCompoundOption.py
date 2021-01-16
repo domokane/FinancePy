@@ -31,6 +31,7 @@ def test_FinEquityCompoundOption():
 
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     numStepsList = [100, 200, 500, 1000, 2000, 5000]
 
@@ -53,10 +54,10 @@ def test_FinEquityCompoundOption():
             for numSteps in numStepsList:
         
                 value = cmpdOption.value(valueDate, stockPrice, discountCurve,
-                                         dividendYield, model)
+                                         dividendCurve, model)
 
                 values = cmpdOption._valueTree(valueDate, stockPrice, discountCurve,
-                                               dividendYield, model, numSteps)
+                                               dividendCurve, model, numSteps)
         
                 testCases.print(optionType1, optionType2, k1, k2, stockPrice,
                                 numSteps, value, values[0])
@@ -80,10 +81,10 @@ def test_FinEquityCompoundOption():
             for numSteps in numStepsList:
         
                 value = cmpdOption.value(valueDate, stockPrice, discountCurve,
-                                         dividendYield, model, numSteps)
+                                         dividendCurve, model, numSteps)
 
                 values = cmpdOption._valueTree(valueDate, stockPrice, discountCurve,
-                                               dividendYield, model, numSteps)
+                                               dividendCurve, model, numSteps)
         
                 testCases.print(optionType1, optionType2, k1, k2, stockPrice,
                                 numSteps, value, values[0])
@@ -110,29 +111,29 @@ def test_FinEquityCompoundOption():
                     valueDate,
                     stockPrice,
                     discountCurve,
-                    dividendYield,
+                    dividendCurve,
                     model)
                 delta = cmpdOption.delta(
                     valueDate,
                     stockPrice,
                     discountCurve,
-                    dividendYield,
+                    dividendCurve,
                     model)
                 vega = cmpdOption.vega(
                     valueDate,
                     stockPrice,
                     discountCurve,
-                    dividendYield,
+                    dividendCurve,
                     model)
                 theta = cmpdOption.theta(
                     valueDate,
                     stockPrice,
                     discountCurve,
-                    dividendYield,
+                    dividendCurve,
                     model)
 
                 values = cmpdOption._valueTree(valueDate, stockPrice,
-                                               discountCurve, dividendYield,
+                                               discountCurve, dividendCurve,
                                                model)
 
                 diff = value - values[0]

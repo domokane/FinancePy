@@ -98,7 +98,7 @@ def _payoffValue(s, payoffType, payoffParams):
 @njit(fastmath=True, cache=True)
 def _valueOnce(stockPrice,
                r,
-               dividendYield,
+               q,
                volatility,
                numSteps,
                timeToExpiry,
@@ -115,7 +115,6 @@ def _valueOnce(stockPrice,
 
     # this is the size of the step
     dt = timeToExpiry / numSteps
-    q = dividendYield
 
     # the number of nodes on the tree
     numNodes = int(0.5 * (numSteps + 1) * (numSteps + 2))
@@ -206,7 +205,7 @@ class FinEquityBinomialTree():
     def value(self,
               stockPrice,
               discountCurve,
-              dividendYield,
+              dividendCurve,
               volatility,
               numSteps,
               valueDate,
@@ -217,15 +216,18 @@ class FinEquityBinomialTree():
               payoffParams):
 
         # do some validation
-        timeToExpiry = (expiryDate - valueDate) / gDaysInYear
+        texp = (expiryDate - valueDate) / gDaysInYear
         r = discountCurve.zeroRate(expiryDate)
+
+        dq = dividendCurve.df(expiryDate)
+        q = -np.log(dq)/texp
 
         price1 = _valueOnce(stockPrice,
                             r,
-                            dividendYield,
+                            q,
                             volatility,
                             numSteps,
-                            timeToExpiry,
+                            texp,
                             payoffType,
                             exerciseType,
                             payoffParams)
@@ -233,10 +235,10 @@ class FinEquityBinomialTree():
         # Can I reuse the same tree ?
         price2 = _valueOnce(stockPrice,
                             r,
-                            dividendYield,
+                            q,
                             volatility,
                             numSteps + 1,
-                            timeToExpiry,
+                            texp,
                             payoffType,
                             exerciseType,
                             payoffParams)

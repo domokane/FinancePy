@@ -28,6 +28,8 @@ def test_FinEquityDigitalOption():
     interestRate = 0.05
     dividendYield = 0.01
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    
     model = FinModelBlackScholes(volatility)
     import time
 
@@ -54,14 +56,14 @@ def test_FinEquityDigitalOption():
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         start = time.time()
         valueMC = callOption.valueMC(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model,
             numPaths)
         end = time.time()
@@ -92,25 +94,25 @@ def test_FinEquityDigitalOption():
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         delta = callOption.delta(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         vega = callOption.vega(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         theta = callOption.theta(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         callOptionValues.append(value)
         callOptionDeltas.append(delta)
@@ -129,25 +131,25 @@ def test_FinEquityDigitalOption():
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         delta = putOption.delta(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         vega = putOption.vega(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         theta = putOption.theta(
             valueDate,
             stockPrice,
             discountCurve,
-            dividendYield,
+            dividendCurve,
             model)
         putOptionValues.append(value)
         putOptionDeltas.append(delta)

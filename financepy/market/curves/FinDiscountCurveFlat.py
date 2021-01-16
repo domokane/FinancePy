@@ -58,7 +58,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)
-        self._times = timesFromDates(dates, self._valuationDate)
+        self._times = timesFromDates(dates, self._valuationDate, dayCountType)
 
 ###############################################################################
 

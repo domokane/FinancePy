@@ -12,7 +12,7 @@ from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, setDateFormatType, FinDateFormatTypes
 from financepy.products.bonds.FinBondAnnuity import FinBondAnnuity
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -20,6 +20,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
+setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
 def test_FinBondAnnuity():
 

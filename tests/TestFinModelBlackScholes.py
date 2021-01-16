@@ -51,6 +51,10 @@ def testFinModelBlackScholes():
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate,
                                          FinFrequencyTypes.CONTINUOUS, 
                                          FinDayCountTypes.ACT_365F)
+
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield,
+                                         FinFrequencyTypes.CONTINUOUS, 
+                                         FinDayCountTypes.ACT_365F)
     
     numStepsPerYear = 400
     
@@ -59,7 +63,7 @@ def testFinModelBlackScholes():
                                      {'numStepsPerYear':numStepsPerYear} )
     
     v = amOption.value(valueDate, stockPrice, discountCurve, 
-                           dividendYield, modelTree)
+                           dividendCurve, modelTree)
 #    print(v)
 
     modelApprox = FinModelBlackScholes(volatility, 
@@ -67,17 +71,17 @@ def testFinModelBlackScholes():
                                        None)
 
     v = amOption.value(valueDate, stockPrice, discountCurve, 
-                       dividendYield, modelApprox)
+                       dividendCurve, modelApprox)
 
 #    print(v)
 
     v = ameuOption.value(valueDate, stockPrice, discountCurve, 
-                           dividendYield, modelTree)
+                           dividendCurve, modelTree)
 
 #    print(v)
 
     v = euOption.value(valueDate, stockPrice, discountCurve, 
-                         dividendYield, modelTree)
+                         dividendCurve, modelTree)
 
 #    print(v)
 

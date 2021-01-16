@@ -166,7 +166,7 @@ class FinEquityOneTouchOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: (float, np.ndarray),
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model):
         ''' Equity One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -187,8 +187,8 @@ class FinEquityOneTouchOption(FinEquityOption):
         sqrtT = np.sqrt(t)
 
         df = discountCurve.df(self._expiryDate)
-        r = -np.log(df)/t
-        q = dividendYield
+        r = discountCurve.ccRate(self._expiryDate)
+        q = dividendCurve.ccRate(self._expiryDate)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -201,7 +201,6 @@ class FinEquityOneTouchOption(FinEquityOption):
         if DEBUG_MODE:
             print("t:", t)
             print("vol", v)
-            print("df", df)
             print("b", b)
             print("mu", mu)
             print("lam", lam)
@@ -400,7 +399,7 @@ class FinEquityOneTouchOption(FinEquityOption):
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
-                dividendYield: float,
+                dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
                 numStepsPerYear: int = 252,
@@ -411,13 +410,17 @@ class FinEquityOneTouchOption(FinEquityOption):
         convergence is slow. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
+
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
+
+        dq = dividendCurve.df(self._expiryDate)
+        q = -np.log(dq)/t
+
         numTimeSteps = int(t * numStepsPerYear) + 1
         dt = t / numTimeSteps
 
         v = model._volatility
-        q = dividendYield
         s0 = stockPrice
         mu = r - q
 

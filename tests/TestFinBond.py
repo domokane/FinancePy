@@ -26,7 +26,6 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
-
 def buildIborCurve(valuationDate):
 
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA

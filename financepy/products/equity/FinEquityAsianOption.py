@@ -374,7 +374,7 @@ class FinEquityAsianOption():
               valueDate: FinDate,
               stockPrice: float,
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model,
               method: FinAsianOptionValuationMethods,
               accruedAverage: float = None):
@@ -399,7 +399,7 @@ class FinEquityAsianOption():
             v = self._valueGeometric(valueDate,
                                      stockPrice,
                                      discountCurve,
-                                     dividendYield,
+                                     dividendCurve,
                                      model,
                                      accruedAverage)
 
@@ -407,7 +407,7 @@ class FinEquityAsianOption():
             v = self._valueTurnbullWakeman(valueDate,
                                            stockPrice,
                                            discountCurve,
-                                           dividendYield,
+                                           dividendCurve,
                                            model,
                                            accruedAverage)
 
@@ -415,7 +415,7 @@ class FinEquityAsianOption():
             v = self._valueCurran(valueDate,
                                   stockPrice,
                                   discountCurve,
-                                  dividendYield,
+                                  dividendCurve,
                                   model,
                                   accruedAverage)
         else:
@@ -426,7 +426,7 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def _valueGeometric(self, valueDate, stockPrice, discountCurve,
-                        dividendYield, model, accruedAverage):
+                        dividendCurve, model, accruedAverage):
         ''' This option valuation is based on paper by Kemna and Vorst 1990. It
         calculates the Geometric Asian option price which is a lower bound on
         the Arithmetic option price. This should not be used as a valuation
@@ -438,15 +438,18 @@ class FinEquityAsianOption():
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
+
+#        print("r:", r, "q:", q)
+        
         volatility = model._volatility
 
         K = self._strikePrice
         n = self._numObservations
-        q = dividendYield
         S0 = stockPrice
 
         multiplier = 1.0
@@ -457,29 +460,29 @@ class FinEquityAsianOption():
                 raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
-            K = (K * tau + accruedAverage * t0) / t
+            K = (K * tau + accruedAverage * t0) / texp
             # the number of options is rescaled also
-            multiplier = t / tau
+            multiplier = texp / tau
             # there is no pre-averaging time
             t0 = 0.0
             # the number of observations is scaled
-            n = n * t / tau
+            n = n * texp / tau
 
         sigSq = volatility ** 2
-        meanGeo = (r - q - sigSq / 2.0) * (t0 + (t - t0) / 2.0)
-        varGeo = sigSq * (t0 + (t - t0) * (2 * n - 1) / (6 * n))
+        meanGeo = (r - q - sigSq / 2.0) * (t0 + (texp - t0) / 2.0)
+        varGeo = sigSq * (t0 + (texp - t0) * (2 * n - 1) / (6 * n))
         EG = S0 * np.exp(meanGeo + varGeo / 2.0)
 
         d1 = (meanGeo + np.log(S0 / K) + varGeo) / np.sqrt(varGeo)
         d2 = d1 - np.sqrt(varGeo)
 
         # the Geometric price is the lower bound
-        call_g = np.exp(-r * t) * (EG * N(d1) - K * N(d2))
+        call_g = np.exp(-r * texp) * (EG * N(d1) - K * N(d2))
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             v = call_g
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            put_g = call_g - (EG - K) * np.exp(-r * t)
+            put_g = call_g - (EG - K) * np.exp(-r * texp)
             v = put_g
         else:
             raise FinError("Unknown option type " + str(self._optionType))
@@ -490,7 +493,7 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def _valueCurran(self, valueDate, stockPrice, discountCurve,
-                     dividendYield, model, accruedAverage):
+                     dividendCurve, model, accruedAverage):
         ''' Valuation of an Asian option using the result by Vorst. '''
 
         if valueDate > self._expiryDate:
@@ -498,16 +501,18 @@ class FinEquityAsianOption():
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         multiplier = 1.0
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
+
         volatility = model._volatility
 
         S0 = stockPrice
-        b = r - dividendYield
+        b = r - q
         sigma2 = volatility**2
         K = self._strikePrice
 
@@ -519,15 +524,15 @@ class FinEquityAsianOption():
                 raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
-            K = (K * tau + accruedAverage * t0) / t
+            K = (K * tau + accruedAverage * t0) / texp
             # the number of options is rescaled also
-            multiplier = t / tau
+            multiplier = texp / tau
             # there is no pre-averaging time
             t0 = 0.0
             # the number of observations is scaled and floored at 1
-            n = int(n * t / tau + 0.5) + 1
+            n = int(n * texp / tau + 0.5) + 1
 
-        h = (t - t0) / (n - 1)
+        h = (texp - t0) / (n - 1)
         u = (1.0 - np.exp(b * h * n)) / (1.0 - np.exp(b * h))
         w = (1.0 - np.exp((2 * b + sigma2) * h * n)) / \
             (1.0 - np.exp((2 * b + sigma2) * h))
@@ -535,15 +540,15 @@ class FinEquityAsianOption():
         FA = (S0 / n) * np.exp(b * t0) * u
         EA2 = (S0 * S0 / n / n) * np.exp((2.0 * b + sigma2) * t0)
         EA2 = EA2 * (w + 2.0 / (1.0 - np.exp((b + sigma2) * h)) * (u - w))
-        sigmaA = np.sqrt((np.log(EA2) - 2.0 * np.log(FA)) / t)
+        sigmaA = np.sqrt((np.log(EA2) - 2.0 * np.log(FA)) / texp)
 
-        d1 = (np.log(FA / K) + sigmaA * sigmaA * t / 2.0) / (sigmaA*np.sqrt(t))
-        d2 = d1 - sigmaA * np.sqrt(t)
+        d1 = (np.log(FA / K) + sigmaA * sigmaA * texp / 2.0) / (sigmaA*np.sqrt(texp))
+        d2 = d1 - sigmaA * np.sqrt(texp)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            v = np.exp(-r * t) * (FA * N(d1) - K * N(d2))
+            v = np.exp(-r * texp) * (FA * N(d1) - K * N(d2))
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            v = np.exp(-r * t) * (K * N(-d2) - FA * N(-d1))
+            v = np.exp(-r * texp) * (K * N(-d2) - FA * N(-d1))
         else:
             return None
 
@@ -553,7 +558,7 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def _valueTurnbullWakeman(self, valueDate, stockPrice, discountCurve,
-                              dividendYield, model, accruedAverage):
+                              dividendCurve, model, accruedAverage):
         ''' Asian option valuation based on paper by Turnbull and Wakeman 1991
         which uses the edgeworth expansion to find the first two moments of the
         arithmetic average. '''
@@ -562,14 +567,15 @@ class FinEquityAsianOption():
             raise FinError("Value date after option expiry date.")
 
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         multiplier = 1.0
         n = self._numObservations
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
 
         volatility = model._volatility
 
@@ -579,46 +585,46 @@ class FinEquityAsianOption():
                 raise FinError(errorStr)
 
             # we adjust the strike to account for the accrued coupon
-            K = (K * tau + accruedAverage * t0) / t
+            K = (K * tau + accruedAverage * t0) / texp
             # the number of options is rescaled also
-            multiplier = t / tau
+            multiplier = texp / tau
             # there is no pre-averaging time
             t0 = 0.0
             # the number of observations is scaled and floored at 1
-            n = int(n * t / tau + 0.5) + 1
+            n = int(n * texp / tau + 0.5) + 1
 
         # need to handle this
-        b = r - dividendYield
+        b = r - q
         sigma2 = volatility**2
         a1 = b + sigma2
         a2 = 2 * b + sigma2
         S0 = stockPrice
 
-        dt = t - t0
+        dt = texp - t0
 
         if b == 0:
             M1 = 1.0
-            M2 = 2.0 * np.exp(sigma2 * t) - 2.0 * \
+            M2 = 2.0 * np.exp(sigma2 * texp) - 2.0 * \
                 np.exp(sigma2 * t0) * (1.0 + sigma2 * dt)
             M2 = M2 / sigma2 / sigma2 / dt / dt
         else:
-            M1 = S0 * (np.exp(b * t) - np.exp(b * t0)) / (b * dt)
-            M2 = np.exp(a2 * t) / a1 / a2 / dt / dt + \
+            M1 = S0 * (np.exp(b * texp) - np.exp(b * t0)) / (b * dt)
+            M2 = np.exp(a2 * texp) / a1 / a2 / dt / dt + \
                 (np.exp(a2 * t0) / b / dt / dt) * (1.0/a2 - np.exp(b*dt) / a1)
             M2 = 2.0 * M2 * S0 * S0
 
         F0 = M1
-        sigma2 = 1.0 / t * np.log(M2 / M1 / M1)
+        sigma2 = (1.0 / texp) * np.log(M2 / M1 / M1)
         sigma = np.sqrt(sigma2)
 
-        d1 = (np.log(F0 / K) + sigma2 * t / 2) / sigma / np.sqrt(t)
-        d2 = d1 - sigma * np.sqrt(t)
+        d1 = (np.log(F0 / K) + sigma2 * texp / 2) / sigma / np.sqrt(texp)
+        d2 = d1 - sigma * np.sqrt(texp)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-            call = np.exp(-r * t) * (F0 * N(d1) - K * N(d2))
+            call = np.exp(-r * texp) * (F0 * N(d1) - K * N(d2))
             v = call
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-            put = np.exp(-r * t) * (K * N(-d2) - F0 * N(-d1))
+            put = np.exp(-r * texp) * (K * N(-d2) - F0 * N(-d1))
             v = put
         else:
             return None
@@ -632,7 +638,7 @@ class FinEquityAsianOption():
                  valueDate: FinDate,
                  stockPrice: float,
                  discountCurve: FinDiscountCurve,
-                 dividendYield: float,
+                 dividendCurve: FinDiscountCurve,
                  model,
                  numPaths: int,
                  seed: int,
@@ -650,20 +656,21 @@ class FinEquityAsianOption():
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
 
         volatility = model._volatility
 
         K = self._strikePrice
         n = self._numObservations
 
-        v = _valueMC_NUMBA(t0, t, tau, K, n, self._optionType,
+        v = _valueMC_NUMBA(t0, texp, tau, K, n, self._optionType,
                            stockPrice,
                            r,
-                           dividendYield,
+                           q,
                            volatility,
                            numPaths,
                            seed,
@@ -677,7 +684,7 @@ class FinEquityAsianOption():
                       valueDate,
                       stockPrice,
                       discountCurve,
-                      dividendYield,  # Yield
+                      dividendCurve,  # Yield
                       model,          # Model
                       numPaths,       # Numpaths integer
                       seed,
@@ -687,21 +694,22 @@ class FinEquityAsianOption():
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
 
         volatility = model._volatility
 
-        v = _valueMC_fast_NUMBA(t0, t, tau,
+        v = _valueMC_fast_NUMBA(t0, texp, tau,
                                 K, n, self._optionType,
                                 stockPrice,
                                 r,
-                                dividendYield,
+                                q,
                                 volatility,
                                 numPaths,
                                 seed,
@@ -715,7 +723,7 @@ class FinEquityAsianOption():
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
-                dividendYield: float,
+                dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int,
                 seed: int,
@@ -726,32 +734,34 @@ class FinEquityAsianOption():
 
         # the years to the start of the averaging period
         t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiryDate - valueDate) / gDaysInYear
         tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
+
         volatility = model._volatility
 
         # For control variate we price a Geometric average option exactly
         v_g_exact = self._valueGeometric(valueDate,
                                          stockPrice,
                                          discountCurve,
-                                         dividendYield,
+                                         dividendCurve,
                                          model,
                                          accruedAverage)
 
         v = _valueMC_fast_CV_NUMBA(t0,
-                                   t,
+                                   texp,
                                    tau,
                                    K,
                                    n,
                                    self._optionType,
                                    stockPrice,
                                    r,
-                                   dividendYield,
+                                   q,
                                    volatility,
                                    numPaths,
                                    seed,

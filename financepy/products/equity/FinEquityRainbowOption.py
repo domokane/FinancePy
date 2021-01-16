@@ -67,7 +67,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 def valueMCFast(t,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 betas,
                 numAssets,
@@ -77,9 +77,19 @@ def valueMCFast(t,
                 seed=4242):
 
     np.random.seed(seed)
+
     df = discountCurve._df(t)
     r = -log(df)/t
-    mus = r - dividendYields
+
+    qs = []
+    for curve in dividendCurves:
+        dq = curve._df(t)
+        q = -np.log(dq)/t
+        qs.append(q)
+
+    qs = np.array(qs)
+    
+    mus = r - qs
 
     model = FinGBMProcess()
 
@@ -116,7 +126,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
     def _validate(self,
                   stockPrices,
-                  dividendYields,
+                  dividendCurves,
                   volatilities,
                   betas):
 
@@ -125,9 +135,9 @@ class FinEquityRainbowOption(FinEquityOption):
                 "Stock prices must be a vector of length "
                 + str(self._numAssets))
 
-        if len(dividendYields) != self._numAssets:
+        if len(dividendCurves) != self._numAssets:
             raise FinError(
-                "Dividend yields must be a vector of length "
+                "Dividend curves must be a vector of length "
                 + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:
@@ -179,7 +189,7 @@ class FinEquityRainbowOption(FinEquityOption):
               valueDate: FinDate,
               stockPrices: np.ndarray,
               discountCurve: FinDiscountCurve,
-              dividendYields: np.ndarray,
+              dividendCurves: (list),
               volatilities: np.ndarray,
               corrMatrix: np.ndarray):
 
@@ -198,17 +208,24 @@ class FinEquityRainbowOption(FinEquityOption):
         if valueDate > self._expiryDate:
             raise FinError("Value date after expiry date.")
 
-        self._validate(stockPrices,
-                       dividendYields,
-                       volatilities,
-                       corrMatrix)
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiryDate - valueDate) / gDaysInYear
         r = discountCurve.zeroRate(self._expiryDate)
 
-        q1 = dividendYields[0]
-        q2 = dividendYields[1]
+        q1 = dividendCurves[0].zeroRate(self._expiryDate)
+        q2 = dividendCurves[1].zeroRate(self._expiryDate)
+
+        dividendYields = [q1, q2]
+
+        self._validate(stockPrices,
+                       dividendYields,
+                       volatilities,
+                       corrMatrix)
+
+#        q1 = dividendYields[0]
+#        q2 = dividendYields[1]
+
         rho = corrMatrix[0][1]
         s1 = stockPrices[0]
         s2 = stockPrices[1]
@@ -255,14 +272,14 @@ class FinEquityRainbowOption(FinEquityOption):
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths=10000,
                 seed=4242):
 
         self._validate(stockPrices,
-                       dividendYields,
+                       dividendCurves,
                        volatilities,
                        corrMatrix)
 
@@ -274,7 +291,7 @@ class FinEquityRainbowOption(FinEquityOption):
         v = valueMCFast(t,
                         stockPrices,
                         discountCurve,
-                        dividendYields,
+                        dividendCurves,
                         volatilities,
                         corrMatrix,
                         self._numAssets,

@@ -28,11 +28,19 @@ def test_FinEquityRainbowOption():
     valueDate = FinDate(2015, 1, 1)
     expiryDate = FinDate(2016, 1, 1)
     interestRate = 0.05
+
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     numAssets = 2
     volatilities = np.ones(numAssets) * 0.3
+
     dividendYields = np.ones(numAssets) * 0.01
+
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
+
     stockPrices = np.ones(numAssets) * 100
     numPathsList = [10000]
     corrList = np.linspace(0.0, 0.999999, 6)
@@ -66,7 +74,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -74,7 +82,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -122,7 +130,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -130,7 +138,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -179,7 +187,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -187,7 +195,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -234,14 +242,14 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
             v_MC = rainbowOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -301,7 +309,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -309,7 +317,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -361,7 +369,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -369,7 +377,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -400,6 +408,11 @@ def test_FinEquityRainbowOption():
     volatilities = np.ones(numAssets) * 0.3
     dividendYields = np.ones(numAssets) * 0.01
     stockPrices = np.ones(numAssets) * 100
+
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
 
 #    plt.figure(figsize=(10,8))
 
@@ -432,7 +445,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -492,7 +505,7 @@ def test_FinEquityRainbowOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)

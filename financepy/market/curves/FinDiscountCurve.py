@@ -192,6 +192,18 @@ class FinDiscountCurve():
 
 ###############################################################################
 
+    def ccRate(self,
+               dts: (list, FinDate), 
+               dayCountType: FinDayCountTypes = FinDayCountTypes.SIMPLE):
+        ''' Calculation of zero rates with continuous compounding. This
+        function can return a vector of cc rates given a vector of
+        dates so must use Numpy functions. '''
+
+        ccRates = self.zeroRate(dts, FinFrequencyTypes.CONTINUOUS, dayCountType)
+        return ccRates
+
+###############################################################################
+
     def swapRate(self,
                  startDate: FinDate,
                  maturityDate: (list, FinDate),

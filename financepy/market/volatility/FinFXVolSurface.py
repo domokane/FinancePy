@@ -89,19 +89,19 @@ def objFAST(params, *args):
     # new volatility curve
 
     # Match the at-the-money option volatility
-    atmCurveVol = volFunctionFAST(volTypeValue, params, f, K_ATM, t)
+    atmCurveVol = volFunction(volTypeValue, params, f, K_ATM, t)
     term1 = (atmVol - atmCurveVol)**2
 
     ###########################################################################
     # Match the market strangle value but this has to be at the MS strikes
     ###########################################################################
 
-    sigma_K_25D_C_MS = volFunctionFAST(volTypeValue, params, f, K_25D_C_MS, t)
+    sigma_K_25D_C_MS = volFunction(volTypeValue, params, f, K_25D_C_MS, t)
 
     V_25D_C_MS = bsValue(s, t, K_25D_C_MS, rd, rf, sigma_K_25D_C_MS,
                          FinOptionTypes.EUROPEAN_CALL.value)
 
-    sigma_K_25D_P_MS = volFunctionFAST(volTypeValue, params, f, K_25D_P_MS, t)
+    sigma_K_25D_P_MS = volFunction(volTypeValue, params, f, K_25D_P_MS, t)
 
     V_25D_P_MS = bsValue(s, t, K_25D_P_MS, rd, rf, sigma_K_25D_P_MS,
                          FinOptionTypes.EUROPEAN_PUT.value)
@@ -119,7 +119,7 @@ def objFAST(params, *args):
                                       deltaMethodValue, K_25D_C_MS, 
                                       params)
  
-    sigma_K_25D_C = volFunctionFAST(volTypeValue, params, f, K_25D_C, t)
+    sigma_K_25D_C = volFunction(volTypeValue, params, f, K_25D_C, t)
 
     K_25D_P = solveForSmileStrikeFAST(s, t, rd, rf, 
                                       FinOptionTypes.EUROPEAN_PUT.value,
@@ -127,7 +127,7 @@ def objFAST(params, *args):
                                       deltaMethodValue, K_25D_P_MS,
                                       params)
 
-    sigma_K_25D_P = volFunctionFAST(volTypeValue, params, f, K_25D_P, t)
+    sigma_K_25D_P = volFunction(volTypeValue, params, f, K_25D_P, t)
 
     sigma_25D_RR = (sigma_K_25D_C - sigma_K_25D_P)
     term3 = (sigma_25D_RR - targetRRVol)**2
@@ -210,7 +210,7 @@ def solveToHorizonFAST(s, t,
 
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
-def volFunctionFAST(volFunctionTypeValue, params, f, k, t):
+def volFunction(volFunctionTypeValue, params, f, k, t):
     ''' Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. '''
     
@@ -256,7 +256,7 @@ def deltaFit(K, *args):
     params = args[8]
 
     f = s*np.exp((rd-rf)*t)
-    v = volFunctionFAST(volTypeValue, params, f, K, t)
+    v = volFunction(volTypeValue, params, f, K, t)
     deltaOut = fastDelta(s, t, K, rd, rf, v, deltaTypeValue, optionTypeValue)
     inverseDeltaOut = norminvcdf(np.abs(deltaOut))   
     invObjFn = inverseDeltaTarget - inverseDeltaOut
@@ -477,7 +477,7 @@ class FinFXVolSurface():
             # The volatility term structure is flat if there is only one expiry
             fwd = self._F0T[0]
             texp = self._texp[0]
-            vol = volFunctionFAST(volTypeValue, self._parameters[0], 
+            vol = volFunction(volTypeValue, self._parameters[0], 
                                   fwd, K, texp)
             return vol
         
@@ -486,7 +486,7 @@ class FinFXVolSurface():
 
             fwd = self._F0T[0]
             texp = self._texp[0]
-            vol = volFunctionFAST(volTypeValue, self._parameters[0],
+            vol = volFunction(volTypeValue, self._parameters[0],
                                   fwd, K, texp)
             return vol
 
@@ -495,7 +495,7 @@ class FinFXVolSurface():
 
             fwd = self._F0T[-1]
             texp = self._texp[-1]
-            vol = volFunctionFAST(volTypeValue, self._parameters[-1],
+            vol = volFunction(volTypeValue, self._parameters[-1],
                                   fwd, K, texp)
             return vol
 
@@ -508,12 +508,12 @@ class FinFXVolSurface():
         
         fwd0 = self._F0T[index0]
         t0 = self._texp[index0]
-        vol0 = volFunctionFAST(volTypeValue, self._parameters[index0],
+        vol0 = volFunction(volTypeValue, self._parameters[index0],
                                fwd0, K, t0)
 
         fwd1 = self._F0T[index1]
         t1 = self._texp[index1]
-        vol1 = volFunctionFAST(volTypeValue, self._parameters[index1],
+        vol1 = volFunction(volTypeValue, self._parameters[index1],
                                fwd1, K, t1)
 
         vart0 = vol0*vol0*t0
@@ -773,7 +773,7 @@ class FinFXVolSurface():
                 print("CNT_CPD_RF:%9.6f %%"% (self._rf[i]*100))
                 print("FWD_RATE:  %9.6f"% (self._F0T[i]))
  
-            sigma_ATM_out = volFunctionFAST(self._volatilityFunctionType.value,
+            sigma_ATM_out = volFunction(self._volatilityFunctionType.value,
                                         self._parameters[i],
                                         self._F0T[i],
                                         self._K_ATM[i],
@@ -878,7 +878,7 @@ class FinFXVolSurface():
             ###################################################################
 
             # CALL
-            sigma_K_25D_C_MS = volFunctionFAST(self._volatilityFunctionType.value,
+            sigma_K_25D_C_MS = volFunction(self._volatilityFunctionType.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C_MS[i],
@@ -899,7 +899,7 @@ class FinFXVolSurface():
                                     model)[self._deltaMethodString]
 
             # PUT
-            sigma_K_25D_P_MS = volFunctionFAST(self._volatilityFunctionType.value,
+            sigma_K_25D_P_MS = volFunction(self._volatilityFunctionType.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P_MS[i],
@@ -944,7 +944,7 @@ class FinFXVolSurface():
             call._strikeFXRate = self._K_25D_C[i]
             put._strikeFXRate = self._K_25D_P[i]
 
-            sigma_K_25D_C = volFunctionFAST(self._volatilityFunctionType.value,
+            sigma_K_25D_C = volFunction(self._volatilityFunctionType.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C[i],
@@ -959,7 +959,7 @@ class FinFXVolSurface():
                                     self._forDiscountCurve,
                                     model)[self._deltaMethodString]
 
-            sigma_K_25D_P = volFunctionFAST(self._volatilityFunctionType.value,
+            sigma_K_25D_P = volFunction(self._volatilityFunctionType.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P[i],
@@ -1026,7 +1026,7 @@ class FinFXVolSurface():
 
                 k = lowFX + iK*dFX                
 
-                vol = volFunctionFAST(self._volatilityFunctionType.value, 
+                vol = volFunction(self._volatilityFunctionType.value, 
                                       self._parameters[iTenor], 
                                       f, k, texp)
 
@@ -1071,7 +1071,7 @@ class FinFXVolSurface():
             f = self._F0T[tenorIndex]
 
             for _ in range(0, numIntervals):
-                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
+                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
                 strikes.append(K)
                 vols.append(sigma)
                 K = K + dK
@@ -1092,7 +1092,7 @@ class FinFXVolSurface():
 
             keyVols = []
             for K in keyStrikes:
-                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
+                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
             plt.plot(keyStrikes, keyVols, 'ko', markersize=4)
@@ -1106,7 +1106,7 @@ class FinFXVolSurface():
             keyVols = []
 
             for K in keyStrikes:
-                sigma = volFunctionFAST(volTypeVal, params, f, K, t) * 100.0
+                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
             plt.plot(keyStrikes, keyVols, 'bo', markersize=4)

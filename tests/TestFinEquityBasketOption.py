@@ -38,6 +38,11 @@ def test_FinEquityBasketOption():
     dividendYields = np.ones(numAssets) * 0.01
     stockPrices = np.ones(numAssets) * 100
 
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
+
     betaList = np.linspace(0.0, 0.999999, 11)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
@@ -54,7 +59,7 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
 
@@ -62,7 +67,7 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -79,6 +84,11 @@ def test_FinEquityBasketOption():
     dividendYields = np.array([0.01, 0.02, 0.04, 0.01, 0.02])
     stockPrices = np.array([100, 105, 120, 100, 90])
 
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
+
     betaList = np.linspace(0.0, 0.999999, 11)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
@@ -98,7 +108,7 @@ def test_FinEquityBasketOption():
                     valueDate,
                     stockPrices,
                     discountCurve,
-                    dividendYields,
+                    dividendCurves,
                     volatilities,
                     corrMatrix)
 
@@ -106,7 +116,7 @@ def test_FinEquityBasketOption():
                     valueDate,
                     stockPrices,
                     discountCurve,
-                    dividendYields,
+                    dividendCurves,
                     volatilities,
                     corrMatrix,
                     numPaths)
@@ -125,6 +135,11 @@ def test_FinEquityBasketOption():
     stockPrices = np.ones(numAssets) * 100
     betaList = np.linspace(0.0, 0.999999, 11)
 
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
+
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
 
     for beta in betaList:
@@ -139,14 +154,14 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -164,6 +179,11 @@ def test_FinEquityBasketOption():
     stockPrices = np.array([100, 105, 120, 100, 90])
     betaList = np.linspace(0.0, 0.999999, 11)
 
+    dividendCurves = []
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
+        dividendCurves.append(dividendCurve)
+
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
 
     for beta in betaList:
@@ -180,14 +200,14 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix)
             vMC = callOption.valueMC(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendYields,
+                dividendCurves,
                 volatilities,
                 corrMatrix,
                 numPaths)

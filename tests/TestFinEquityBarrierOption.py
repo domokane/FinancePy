@@ -31,7 +31,10 @@ def test_FinEquityBarrierOption():
     drift = interestRate - dividendYield
     scheme = FinGBMNumericalScheme.NORMAL
     processType = FinProcessTypes.GBM
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)    
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+
     model = FinModelBlackScholes(volatility)
 
     #######################################################################
@@ -62,16 +65,16 @@ def test_FinEquityBarrierOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
             start = time.time()
             modelParams = (stockPrice, drift, volatility, scheme)
-            valueMC = option.valueMC(
-                valueDate,
-                stockPrice,
-                discountCurve,
-                processType,
-                modelParams)
+            valueMC = option.valueMC(valueDate,
+                                     stockPrice,
+                                     discountCurve,
+                                     dividendCurve,
+                                     processType,
+                                     modelParams)
 
             end = time.time()
             timeElapsed = round(end - start, 3)
@@ -98,7 +101,7 @@ def test_FinEquityBarrierOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
             start = time.time()
             modelParams = (stockPrice, drift, volatility, scheme)
@@ -106,6 +109,7 @@ def test_FinEquityBarrierOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
+                dividendCurve,
                 processType,
                 modelParams)
             end = time.time()
@@ -142,25 +146,25 @@ def test_FinEquityBarrierOption():
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
             delta = barrierOption.delta(
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
             vega = barrierOption.vega(
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
             theta = barrierOption.theta(
                 valueDate,
                 stockPrice,
                 discountCurve,
-                dividendYield,
+                dividendCurve,
                 model)
 
             testCases.print(
@@ -173,6 +177,7 @@ def test_FinEquityBarrierOption():
                 vega,
                 theta)
 
+###############################################################################
 
 test_FinEquityBarrierOption()
 testCases.compareTestCases()

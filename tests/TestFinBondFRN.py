@@ -10,6 +10,7 @@ from financepy.products.bonds.FinBondFRN import FinBondFRN
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import FinDate, setDateFormatType, FinDateFormatTypes
 from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinGlobalTypes import FinSwapTypes
@@ -19,6 +20,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
+setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
 def buildIborCurve(valuationDate):
 

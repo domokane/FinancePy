@@ -38,11 +38,12 @@ def test_FinEquityCliquetOptionHaug():
     dividendYield = 0.05
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     v = cliquetOption.value(valueDate,
                             stockPrice,
                             discountCurve,
-                            dividendYield,
+                            dividendCurve,
                             model)
 
     testCases.header("LABEL", "VALUE")

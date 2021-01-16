@@ -744,7 +744,6 @@ class FinDate():
         shortYearStr = str(self._y)[2:]
         longYearStr = str(self._y)
 
-        
         if gDateFormatType == FinDateFormatTypes.UK_LONGEST:
 
             sep = " "

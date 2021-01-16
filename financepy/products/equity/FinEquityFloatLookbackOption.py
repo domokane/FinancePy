@@ -60,7 +60,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: float,
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               volatility: float,
               stockMinMax: float):
         ''' Valuation of the Floating Lookback option using Black-Scholes using
@@ -68,11 +68,13 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
         t = (self._expiryDate - valueDate) / gDaysInYear
         df = discountCurve.df(self._expiryDate)
-        r = -np.log(df)/t
+
+
+        r = discountCurve.ccRate(self._expiryDate)
+        q = dividendCurve.ccRate(self._expiryDate)
 
         v = volatility
         s0 = stockPrice
-        q = dividendYield
         smin = 0.0
         smax = 0.0
 
@@ -140,7 +142,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
-                dividendYield: float,
+                dividendCurve: FinDiscountCurve,
                 volatility: float,
                 stockMinMax: float,
                 numPaths: int = 10000,
@@ -150,11 +152,12 @@ class FinEquityFloatLookbackOption(FinEquityOption):
         Black-Scholes model that assumes the stock follows a GBM process. '''
 
         t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(self._expiryDate)
-        r = -np.log(df)/t
-
         numTimeSteps = int(t * numStepsPerYear)
-        mu = r - dividendYield
+
+        df = discountCurve.df(self._expiryDate)
+        r = discountCurve.ccRate(self._expiryDate)
+        q = dividendCurve.ccRate(self._expiryDate)
+        mu = r - q
 
         optionType = self._optionType
         smin = 0.0

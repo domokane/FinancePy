@@ -89,7 +89,7 @@ class FinEquityChooserOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: float,
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model):
         ''' Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options. '''
@@ -103,13 +103,11 @@ class FinEquityChooserOption(FinEquityOption):
         tc = (self._callExpiryDate - valueDate) / gDaysInYear
         tp = (self._putExpiryDate - valueDate) / gDaysInYear
 
-        dft = discountCurve.df(self._chooseDate)
-        dftc = discountCurve.df(self._callExpiryDate)
-        dftp = discountCurve.df(self._putExpiryDate)
+        rt = discountCurve.ccRate(self._chooseDate)
+        rtc = discountCurve.ccRate(self._callExpiryDate)
+        rtp = discountCurve.ccRate(self._putExpiryDate)
 
-        rt = -np.log(dft) / t
-        rtc = -np.log(dftc) / tc
-        rtp = -np.log(dftp) / tp
+        q = dividendCurve.ccRate(self._chooseDate)
 
         t = max(t, gSmall)
         tc = max(tc, gSmall)
@@ -119,7 +117,6 @@ class FinEquityChooserOption(FinEquityOption):
         v = max(v, gSmall)
 
         s0 = stockPrice
-        q = dividendYield
         xc = self._callStrike
         xp = self._putStrike
         bt = rt - q
@@ -169,7 +166,7 @@ class FinEquityChooserOption(FinEquityOption):
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
-                dividendYield: float,
+                dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
                 seed: int = 4242):
@@ -194,7 +191,11 @@ class FinEquityChooserOption(FinEquityOption):
         v = model._volatility
         v = max(v, 1e-6)
 
-        q = dividendYield
+        # SHOULD THIS CARE ABOUT TERM STRUCTURE OF Q
+        dq = dividendCurve.df(self._chooseDate)
+        q = -np.log(dq) / t
+
+#        q = dividendYield
         kc = self._callStrike
         kp = self._putStrike
 

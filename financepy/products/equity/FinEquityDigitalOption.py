@@ -62,7 +62,7 @@ class FinEquityDigitalOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: (float, np.ndarray),
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model):
         ''' Digital Option valuation using the Black-Scholes model assuming a
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
@@ -79,10 +79,12 @@ class FinEquityDigitalOption(FinEquityOption):
         lnS0k = np.log(S0 / X)
 
         sqrtT = np.sqrt(t)
-        q = dividendYield
 
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
+
+        dq = dividendCurve.df(self._expiryDate)
+        q = -np.log(dq)/t
 
         volatility = model._volatility
 
@@ -114,7 +116,7 @@ class FinEquityDigitalOption(FinEquityOption):
                 valueDate: FinDate,
                 stockPrice: float,
                 discountCurve: FinDiscountCurve,
-                dividendYield: float,
+                dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
                 seed: int = 4242):
@@ -127,8 +129,10 @@ class FinEquityDigitalOption(FinEquityOption):
         df = discountCurve.df(self._expiryDate)
         r = -np.log(df)/t
 
+        dq = dividendCurve.df(self._expiryDate)
+        q = -np.log(dq)/t
+
         volatility = model._volatility
-        q = dividendYield
         K = self._barrierPrice
         sqrtdt = np.sqrt(t)
 

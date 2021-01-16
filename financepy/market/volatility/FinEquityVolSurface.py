@@ -44,7 +44,7 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 
 ###############################################################################
 # ISSUES
-# sabr does not fit inverted skew curves like eurjpy 
+# Factor out vol stuff
 # problem with initial values ? optimiser can drive vol negative
 #
 # tried adding a function called gap but it screws up the pdf. Need it to 

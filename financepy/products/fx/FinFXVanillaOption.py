@@ -658,14 +658,14 @@ class FinFXVanillaOption():
                           valueDate,
                           stockPrice,
                           discountCurve,
-                          dividendYield,
+                          dividendCurve,
                           price):
         ''' This function determines the implied volatility of an FX option
         given a price and the other option details. It uses a one-dimensional
         Newton root search algorith to determine the implied volatility. '''
 
         argtuple = (self, valueDate, stockPrice,
-                    discountCurve, dividendYield, price)
+                    discountCurve, dividendCurve, price)
 
         sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
                                 tol=1e-6, maxiter=50, fprime2=None)

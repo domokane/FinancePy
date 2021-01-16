@@ -81,16 +81,16 @@ class FinEquityCliquetOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: float,
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model:FinModel):
         ''' Value the cliquet option as a sequence of options using the Black-
         Scholes model. '''
 
+        print("FIX DIVIDEND ISSUE")
         if valueDate > self._finalExpiryDate:
             raise FinError("Value date after final expiry date.")
 
         s0 = stockPrice
-        q = dividendYield
         v_cliquet = 0.0
 
         self._v_options = []
@@ -102,15 +102,24 @@ class FinEquityCliquetOption(FinEquityOption):
             vol = model._volatility
             vol = max(vol, 1e-6)
             tprev = 0.0
+            dqprev = 1.0
 
             for dt in self._expiryDates:
 
                 if dt > valueDate:
+
                     df = discountCurve.df(dt)
                     t = (dt - valueDate) / gDaysInYear
                     r = -np.log(df) / t
+
                     texp = t - tprev
-                    dq = np.exp(-q * tprev)
+
+                    qOLD = 0.05
+                    dqOLD = np.exp(-qOLD * tprev)
+  
+                    dqnow = discountCurve.df(dt)
+                    dq = dqnow / dqprev
+                    q = -np.log(dq)/texp
 
                     if self._optionType == FinOptionTypes.EUROPEAN_CALL:
                         v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, FinOptionTypes.EUROPEAN_CALL.value)
@@ -125,7 +134,7 @@ class FinEquityCliquetOption(FinEquityOption):
                     self._v_options.append(v)
                     self._actualDates.append(dt)
                     tprev = t
-
+                    dqprev = dqnow
         else:
             raise FinError("Unknown Model Type")
 

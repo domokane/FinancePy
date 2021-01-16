@@ -54,7 +54,7 @@ class FinEquityAmericanOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: (np.ndarray, float),
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model: FinModel):
         ''' Valuation of an American option using a CRR tree to take into
         account the value of early exercise. '''
@@ -75,9 +75,8 @@ class FinEquityAmericanOption(FinEquityOption):
 
         texp = np.maximum(texp, 1e-10)
 
-        df = discountCurve.df(self._expiryDate)
-        r = -np.log(df)/texp
-        q = dividendYield
+        r = discountCurve.ccRate(self._expiryDate)        
+        q = dividendCurve.ccRate(self._expiryDate)
 
         S0 = stockPrice
         K = self._strikePrice

@@ -33,7 +33,7 @@ def _f(s0, *args):
     self = args[0]
     valueDate = args[1]
     discountCurve = args[2]
-    dividendYield = args[3]
+    dividendCurve = args[3]
     model = args[4]
     value = args[5]
 
@@ -43,7 +43,7 @@ def _f(s0, *args):
     objFn = self.value(valueDate,
                        s0,
                        discountCurve,
-                       dividendYield,
+                       dividendCurve,
                        model) - value
 
     return objFn
@@ -53,8 +53,8 @@ def _f(s0, *args):
 
 @njit(fastmath=True, cache=True, nogil=True)
 def _valueOnce(stockPrice,
-               riskFreeRate,
-               dividendYield,
+               r,
+               q,
                volatility,
                t1, t2,
                optionType1, optionType2,
@@ -73,8 +73,7 @@ def _valueOnce(stockPrice,
     numSteps2 = numSteps - numSteps1
     dt1 = dt
     dt2 = dt
-    r = riskFreeRate
-    q = dividendYield
+
     # print("T1:",t1,"T2:",t2,"dt:",dt,"N1*dt",numSteps1*dt,"N*dt",numSteps*dt)
 
     # the number of nodes on the tree
@@ -273,7 +272,7 @@ class FinEquityCompoundOption(FinEquityOption):
               valueDate: FinDate,
               stockPrice: float,
               discountCurve: FinDiscountCurve,
-              dividendYield: float,
+              dividendCurve: FinDiscountCurve,
               model,
               numSteps: int = 200):
         ''' Value the compound option using an analytical approach if it is
@@ -290,7 +289,7 @@ class FinEquityCompoundOption(FinEquityOption):
             v = self._valueTree(valueDate,
                                 stockPrice,
                                 discountCurve,
-                                dividendYield,
+                                dividendCurve,
                                 model,
                                 numSteps)
 
@@ -299,14 +298,20 @@ class FinEquityCompoundOption(FinEquityOption):
         tc = (self._cExpiryDate - valueDate) / gDaysInYear
         tu = (self._uExpiryDate - valueDate) / gDaysInYear
 
-        r = discountCurve.zeroRate(self._uExpiryDate)
+        s0 = stockPrice
 
+        df = discountCurve.df(self._uExpiryDate)
+        ru = -np.log(df)/tu
+
+        # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
         tc = np.maximum(tc, gSmall)
         tu = np.maximum(tc, tu)
+
+        dq = dividendCurve.df(self._uExpiryDate)
+        q = -np.log(dq)/tu
+
         v = np.maximum(model._volatility, gSmall)
 
-        s0 = stockPrice
-        q = dividendYield
         kc = self._cStrikePrice
         ku = self._uStrikePrice
 
@@ -316,16 +321,16 @@ class FinEquityCompoundOption(FinEquityOption):
                                         kc,
                                         ku,
                                         self._uOptionType,
-                                        r, q, model)
+                                        ru, q, model)
 
-        a1 = (log(s0 / sstar) + (r - q + (v**2) / 2.0) * tc) / v / sqrt(tc)
+        a1 = (log(s0 / sstar) + (ru - q + (v**2) / 2.0) * tc) / v / sqrt(tc)
         a2 = a1 - v * sqrt(tc)
-        b1 = (log(s0 / ku) + (r - q + (v**2) / 2.0) * tu) / v / sqrt(tu)
+        b1 = (log(s0 / ku) + (ru - q + (v**2) / 2.0) * tu) / v / sqrt(tu)
         b2 = b1 - v * sqrt(tu)
 
         dqu = exp(-q * tu)
-        dfc = exp(-r * tc)
-        dfu = exp(-r * tu)
+        dfc = exp(-ru * tc)
+        dfu = exp(-ru * tu)
         c = sqrt(tc / tu)
 
         # Taken from Hull Page 532 (6th edition)
@@ -356,7 +361,7 @@ class FinEquityCompoundOption(FinEquityOption):
                    valueDate,
                    stockPrice,
                    discountCurve,
-                   dividendYield,
+                   dividendCurve,
                    model,
                    numSteps=200):
         ''' This function is called if the option has American features. '''
@@ -367,13 +372,19 @@ class FinEquityCompoundOption(FinEquityOption):
         tc = (self._cExpiryDate - valueDate) / gDaysInYear
         tu = (self._uExpiryDate - valueDate) / gDaysInYear
 
-        riskFreeRate = discountCurve.zeroRate(self._uExpiryDate)
+        df = discountCurve.df(self._uExpiryDate)
+        r = -np.log(df)/tu
+
+        dq = dividendCurve.df(self._uExpiryDate)
+        q = -np.log(dq)/tu
+
+        r = discountCurve.zeroRate(self._uExpiryDate)
 
         volatility = model._volatility
 
         v1 = _valueOnce(stockPrice,
-                        riskFreeRate,
-                        dividendYield,
+                        r,
+                        q,
                         volatility,
                         tc, tu,
                         self._cOptionType,
@@ -400,8 +411,9 @@ class FinEquityCompoundOption(FinEquityOption):
         option = FinEquityVanillaOption(expiryDate2, strikePrice2, optionType2)
 
         discountCurve = FinDiscountCurveFlat(expiryDate1, interestRate)
+        dividendCurve = FinDiscountCurveFlat(expiryDate1, dividendYield)
 
-        argtuple = (option, expiryDate1, discountCurve, dividendYield,
+        argtuple = (option, expiryDate1, discountCurve, dividendCurve,
                     model, strikePrice1)
 
         sigma = optimize.newton(_f, x0=stockPrice, args=argtuple, tol=1e-8,
