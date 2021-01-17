@@ -14,3 +14,7 @@ from .FinEquityOption import *
 from .FinEquityRainbowOption import *
 from .FinEquityVanillaOption import *
 from .FinEquityVarianceSwap import *
+from .FinEquityOneTouchOption import *
+
+
+# dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)

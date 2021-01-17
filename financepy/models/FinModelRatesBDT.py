@@ -643,7 +643,9 @@ def buildTreeFast(sigma, treeTimes, numTimeSteps, discountFactors):
 
 class FinModelRatesBDT():
 
-    def __init__(self, sigma, numTimeSteps=100):
+    def __init__(self, 
+                 sigma: float, 
+                 numTimeSteps:int=100):
         ''' Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
         and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh '''
@@ -664,8 +666,6 @@ class FinModelRatesBDT():
         self._pu = 0.50
         self._pd = 0.50
         self._discountCurve = None
-
-        return
 
 ###############################################################################
 

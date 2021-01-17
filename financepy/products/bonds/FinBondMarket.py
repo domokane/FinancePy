@@ -49,7 +49,7 @@ class FinBondMarkets(Enum):
     UNITED_KINGDOM = 32,
     UNITED_STATES = 33,
     AUSTRALIA = 34
-    NEW_ZEALAND = 35,
+#    NEW_ZEALAND = 35,
     NORWAY = 36,
     SOUTH_AFRICA = 37
 
@@ -74,7 +74,7 @@ def getTreasuryBondMarketConventions(country):
     # NUM EX DIVIDEND DAYS AND CALENDAR TO USE
 
     if country == FinBondMarkets.AUSTRIA:
-        return (act_act, annual, 2, 0)
+        return (act_act, annual, 2, 0, None)
     elif country == FinBondMarkets.AUSTRALIA:
         return (act_act, annual, 2, 7, FinCalendarTypes.NONE)
     elif country == FinBondMarkets.BELGIUM:
@@ -144,4 +144,5 @@ def getTreasuryBondMarketConventions(country):
     elif country == FinBondMarkets.UNITED_KINGDOM:
         return (act_act, semi_annual, 1, 6, FinCalendarTypes.UK)  # OR 7 DAYS ?
     else:
-        raise FinError("Unknown country.")
+        print("Unknown Country:", country)
+        return (None, None, None, None, None)
