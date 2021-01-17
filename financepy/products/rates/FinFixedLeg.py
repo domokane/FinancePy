@@ -163,7 +163,7 @@ class FinFixedLeg(object):
 
             else:
 
-                self._paymentDfs.apppend(0.0)            
+                self._paymentDfs.append(0.0)            
                 self._paymentPVs.append(0.0)
                 self._cumulativePVs.append(0.0)
 

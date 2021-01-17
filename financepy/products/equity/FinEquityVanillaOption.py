@@ -583,7 +583,7 @@ class FinEquityVanillaOption():
         vol = model._volatility
 
         v = _valueMC_NONUMBA_NONUMPY(stockPrice, 
-                           t, 
+                           texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 

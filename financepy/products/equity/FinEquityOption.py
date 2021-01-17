@@ -46,7 +46,7 @@ class FinEquityOption(object):
               discountCurve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model):
-        ''' Calculation of option delta by perturbation of stock proce and
+        ''' Calculation of option delta by perturbation of stock price and
         revaluation. '''
         v = self.value(valueDate, stockPrice, discountCurve,
                        dividendCurve, model)

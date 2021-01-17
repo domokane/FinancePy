@@ -44,7 +44,7 @@ class FinEquityBarrierOption(FinEquityOption):
                  strikePrice: float,
                  optionType: FinEquityBarrierTypes,
                  barrierLevel: float,
-                 numObservationsPerYear: int = 252,
+                 numObservationsPerYear: (int, float) = 252,
                  notional: float = 1.0):
         ''' Create the FinEquityBarrierOption by specifying the expiry date,
         strike price, option type, barrier level, the number of observations

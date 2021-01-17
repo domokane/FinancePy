@@ -17,7 +17,7 @@ from ...models.FinGBMProcess import getPaths
 
 from numba import njit
 
-from ...finutils.FinMath import N
+from ...finutils.FinMath import NVect
 
 ###############################################################################
 # TODO: Implement Sobol random numbers
@@ -213,8 +213,8 @@ class FinEquityOneTouchOption(FinEquityOption):
 
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * N(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * N(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -226,8 +226,8 @@ class FinEquityOneTouchOption(FinEquityOption):
 
             eta = -1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * N(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * N(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -240,8 +240,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             eta = 1.0
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * N(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * N(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -254,8 +254,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             eta = -1.0
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * N(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * N(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -269,8 +269,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             phi = -1.0
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * N(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * N(eta*y2-eta*v*sqrtT)
+            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
             v = (B2 + B4)
             return v
 
@@ -285,8 +285,8 @@ class FinEquityOneTouchOption(FinEquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * N(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * N(eta*y2-eta*v*sqrtT)
+            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
             v = (B2 + B4)
             return v
 
@@ -301,8 +301,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-q*t)
-            A2 = s0 * dq * N(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * N(eta*y2)
+            A2 = s0 * dq * NVect(phi*x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
             v = (A2 + A4)
             return v
 
@@ -317,8 +317,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-q*t)
-            A2 = s0 * dq * N(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * N(eta*y2)
+            A2 = s0 * dq * NVect(phi*x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
             v = (A2 + A4)
             return v
 
@@ -333,8 +333,8 @@ class FinEquityOneTouchOption(FinEquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * N(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * N(eta*y2-eta*v*sqrtT)
+            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
             v = (B2 - B4)
             return v
 
@@ -349,8 +349,8 @@ class FinEquityOneTouchOption(FinEquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * N(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * N(eta*y2-eta*v*sqrtT)
+            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
             v = (B2 - B4)
             return v
 
@@ -366,8 +366,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-q*t)
-            A2 = s0 * dq * N(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * N(eta*y2)
+            A2 = s0 * dq * NVect(phi*x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
             v = (A2 - A4)
             return v
 
@@ -383,8 +383,8 @@ class FinEquityOneTouchOption(FinEquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-q*t)
-            A2 = s0 * dq * N(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * N(eta*y2)
+            A2 = s0 * dq * NVect(phi*x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
             v = (A2 - A4)
             return v
 
