@@ -80,13 +80,13 @@ def crrTreeVal(stockPrice,
         s = stockValues[index + iNode]
 
         if optionType == FinOptionTypes.EUROPEAN_CALL.value:
-            optionValues[index + iNode] = max(s - strikePrice, 0.0)
+            optionValues[index + iNode] = np.maximum(s - strikePrice, 0.0)
         elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
-            optionValues[index + iNode] = max(strikePrice - s, 0.0)
+            optionValues[index + iNode] = np.maximum(strikePrice - s, 0.0)
         elif optionType == FinOptionTypes.AMERICAN_CALL.value:
-            optionValues[index + iNode] = max(s - strikePrice, 0.0)
+            optionValues[index + iNode] = np.maximum(s - strikePrice, 0.0)
         elif optionType == FinOptionTypes.AMERICAN_PUT.value:
-            optionValues[index + iNode] = max(strikePrice - s, 0.0)
+            optionValues[index + iNode] = np.maximum(strikePrice - s, 0.0)
 
     # begin backward steps from expiry to value date
     for iTime in range(numSteps - 1, -1, -1):
@@ -104,9 +104,9 @@ def crrTreeVal(stockPrice,
             elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
                 exerciseValue = 0.0
             elif optionType == FinOptionTypes.AMERICAN_CALL.value:
-                exerciseValue = max(s - strikePrice, 0.0)
+                exerciseValue = np.maximum(s - strikePrice, 0.0)
             elif optionType == FinOptionTypes.AMERICAN_PUT.value:
-                exerciseValue = max(strikePrice - s, 0.0)
+                exerciseValue = np.maximum(strikePrice - s, 0.0)
 
             nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
 
@@ -124,9 +124,9 @@ def crrTreeVal(stockPrice,
             elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
                 optionValues[index + iNode] = holdValue
             elif optionType == FinOptionTypes.AMERICAN_CALL.value:
-                optionValues[index + iNode] = max(exerciseValue, holdValue)
+                optionValues[index + iNode] = np.maximum(exerciseValue, holdValue)
             elif optionType == FinOptionTypes.AMERICAN_PUT.value:
-                optionValues[index + iNode] = max(exerciseValue, holdValue)
+                optionValues[index + iNode] = np.maximum(exerciseValue, holdValue)
 
     # We calculate all of the important Greeks in one go
     price = optionValues[0]

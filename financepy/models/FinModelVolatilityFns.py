@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64, vectorize
+from numba import njit, float64
 
 from ..finutils.FinMath import N
 from ..finutils.FinError import FinError

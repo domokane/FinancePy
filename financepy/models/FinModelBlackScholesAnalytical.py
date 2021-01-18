@@ -8,9 +8,9 @@ from scipy import optimize
 
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinGlobalVariables import gSmall
-from ..finutils.FinMath import NVect, NPrimeVect, N
+from ..finutils.FinMath import NVect, NPrimeVect
 from ..finutils.FinError import FinError
-from ..finutils.FinSolvers1D import bisection, newton
+from ..finutils.FinSolvers1D import bisection, newton, newton_secant
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -86,8 +86,8 @@ def bsGamma(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
-#@vectorize([float64(float64, float64, float64, float64, 
-#                    float64, float64, int64)], fastmath=True, cache=True)
+@vectorize([float64(float64, float64, float64, float64, 
+                    float64, float64, int64)], fastmath=True, cache=True)
 def bsVega(s, t, k, r, q, v, optionTypeValue):
     ''' Price a derivative using Black-Scholes model. ''' 
 
@@ -329,6 +329,7 @@ def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
 ###############################################################################
 ###############################################################################
 
+@njit(fastmath=True, cache=True)
 def _fcall(si, *args):
     ''' Function to determine ststar for pricing American call options. '''
 
@@ -350,11 +351,12 @@ def _fcall(si, *args):
 
     objFn = si - k
     objFn = objFn - bsValue(si, t, k, r, q, v, +1) 
-    objFn = objFn - (1.0 - np.exp(-q*t) * N(d1)) * si / q2
+    objFn = objFn - (1.0 - np.exp(-q*t) * NVect(d1)) * si / q2
     return objFn
 
 ###############################################################################
 
+@njit(fastmath=True, cache=True)
 def _fput(si, *args):
     ''' Function to determine sstar for pricing American put options. '''
 
@@ -374,28 +376,19 @@ def _fput(si, *args):
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     objFn = si - k
     objFn = objFn - bsValue(si, t, k, r, q, v, -1)
-    objFn = objFn - (1.0 - np.exp(-q*t) * N(-d1)) * si / q1
+    objFn = objFn - (1.0 - np.exp(-q*t) * NVect(-d1)) * si / q1
     return objFn
 
 ###############################################################################
+# TODO: NUMBA SPEED UP
+###############################################################################
 
-def bawValue(stockPrice: float, 
-             timeToExpiry: float, 
-             strikePrice: float, 
-             riskFreeRate: float, 
-             dividendRate: float, 
-             volatility: float, 
-             phi:int):
+@njit(fastmath=True)
+def bawValue(s, t, k, r, q, v, phi):
     ''' American Option Pricing Approximation using the Barone-Adesi-Whaley
     approximation for the Black Scholes Model '''
 
-    s = stockPrice
-    k = strikePrice
-    t = timeToExpiry
-    r = riskFreeRate
-    q = dividendRate
-    v = volatility
-    b = riskFreeRate - dividendRate
+    b = r - q
 
     if phi == 1:
 
@@ -404,15 +397,18 @@ def bawValue(stockPrice: float,
 
         argtuple = (t, k, r, q, v)
 
-        sstar = optimize.newton(_fcall, x0=s, fprime=None, args=argtuple,
-                                tol=1e-7, maxiter=50, fprime2=None)
+#        sstar = optimize.newton(_fcall, x0=s, fprime=None, args=argtuple,
+#                                tol=1e-7, maxiter=50, fprime2=None)
+
+        sstar = newton_secant(_fcall, x0=s, args=argtuple,
+                              tol=1e-7, maxiter=50)
                     
         M = 2.0 * r / (v*v)
         W = 2.0 * b / (v*v) 
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar/k) + (b + v*v/ 2.0) * t) / (v * np.sqrt(t))
         q2 = (-1.0 * (W - 1.0) + np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
-        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * N(d1))
+        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * NVect(d1))
 
         if s < sstar:
             return bsValue(s, t, k, r, q, v, +1) + A2 * ((s/sstar)**q2)
@@ -422,8 +418,13 @@ def bawValue(stockPrice: float,
     elif phi == -1:
 
         argtuple = (t, k, r, q, v)
-        sstar = optimize.newton(_fput, x0=s, fprime=None, args=argtuple,
-                                tol=1e-7, maxiter=50, fprime2=None)
+
+#        sstar = optimize.newton(_fput, x0=s, fprime=None, args=argtuple,
+#                                tol=1e-7, maxiter=50, fprime2=None)
+
+        sstar = newton_secant(_fput, x0=s, args=argtuple,
+                              tol=1e-7, maxiter=50)
+
         v2 = v * v
         
         M = 2.0 * r / v2
@@ -431,7 +432,7 @@ def bawValue(stockPrice: float,
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
         q1 = (-1.0 * (W - 1.0) - np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
-        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * N(-d1))
+        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * NVect(-d1))
 
         if s > sstar:
             return bsValue(s, t, k, r, q, v, -1) + a1 * ((s/sstar)**q1)

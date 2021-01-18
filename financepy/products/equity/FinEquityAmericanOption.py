@@ -78,14 +78,14 @@ class FinEquityAmericanOption(FinEquityOption):
         r = discountCurve.ccRate(self._expiryDate)        
         q = dividendCurve.ccRate(self._expiryDate)
 
-        S0 = stockPrice
-        K = self._strikePrice
+        s = stockPrice
+        k = self._strikePrice
 
-        v = model.value(S0, texp, K, r, q, self._optionType)
+        v = model.value(s, texp, k, r, q, self._optionType)
                     
         v = v * self._numOptions
 
-        if isinstance(S0, float):
+        if isinstance(s, float):
             return v
         else:
             return v[0]
