@@ -60,15 +60,14 @@ def testFinModelBlackScholes():
     
     modelTree = FinModelBlackScholes(volatility, 
                                      FinModelBlackScholesTypes.CRR_TREE, 
-                                     {'numStepsPerYear':numStepsPerYear} )
+                                     numStepsPerYear)
     
     v = amOption.value(valueDate, stockPrice, discountCurve, 
                            dividendCurve, modelTree)
 #    print(v)
 
     modelApprox = FinModelBlackScholes(volatility, 
-                                       FinModelBlackScholesTypes.BARONE_ADESI, 
-                                       None)
+                                       FinModelBlackScholesTypes.BARONE_ADESI)
 
     v = amOption.value(valueDate, stockPrice, discountCurve, 
                        dividendCurve, modelApprox)

@@ -21,7 +21,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinEquityCliquetOptionHaug():
     ''' Following example in Haug Page 130 '''
 
-    startDate = FinDate(1, 1, 2015)
+    startDate = FinDate(1, 1, 2014)
     finalExpiryDate = FinDate(1, 1, 2017)
     freqType = FinFrequencyTypes.QUARTERLY
     optionType = FinOptionTypes.EUROPEAN_CALL
@@ -31,11 +31,11 @@ def test_FinEquityCliquetOptionHaug():
                                            optionType,
                                            freqType)
 
-    valueDate = FinDate(1, 8, 2016)
-    stockPrice = 50.0
-    volatility = 0.35
-    interestRate = 0.10
-    dividendYield = 0.05
+    valueDate = FinDate(1, 1, 2015)
+    stockPrice = 100.0
+    volatility = 0.20
+    interestRate = 0.05
+    dividendYield = 0.02
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)

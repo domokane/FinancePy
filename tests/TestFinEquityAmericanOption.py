@@ -37,7 +37,7 @@ def testFinEquityAmericanOption():
 
     model = FinModelBlackScholes(volatility, 
                                  FinModelBlackScholesTypes.CRR_TREE,
-                                 {'numStepsPerYear': 100})
+                                 100)
 
     value = putOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
     delta = putOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
@@ -57,7 +57,7 @@ def testFinEquityAmericanOption():
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     {'numStepsPerYear': numSteps})
+                                     numSteps)
 
         start = time.time()
         results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
@@ -82,7 +82,7 @@ def testFinEquityAmericanOption():
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     {'numStepsPerYear': numSteps})
+                                     numSteps)
 
         start = time.time()
         results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
@@ -120,7 +120,7 @@ def testFinEquityAmericanOption():
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     {'numStepsPerYear': numSteps})
+                                     numSteps)
         start = time.time()
         results = option.value(valueDate, stockPrice, discountCurve, 
                                dividendCurve, model)
@@ -143,7 +143,7 @@ def testFinEquityAmericanOption():
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     {'numStepsPerYear': numSteps})
+                                     numSteps)
 
         start = time.time()
 

@@ -78,10 +78,11 @@ class FinIborSwaption():
         self._maturityDate = maturityDate
         self._fixedLegType = fixedLegType
 
+        self._notional = notional
+
         self._fixedCoupon = fixedCoupon
         self._fixedFrequencyType = fixedFrequencyType
         self._fixedDayCountType = fixedDayCountType
-        self._notional = notional
         self._floatFrequencyType = floatFrequencyType
         self._floatDayCountType = floatDayCountType
 
@@ -108,19 +109,20 @@ class FinIborSwaption():
 
         floatSpread = 0.0
 
+        # We create a swap that starts on the exercise date.
         swap = FinIborSwap(self._exerciseDate,
-                            self._maturityDate,
-                            self._fixedLegType,
-                            self._fixedCoupon,
-                            self._fixedFrequencyType,
-                            self._fixedDayCountType,
-                            self._notional,
-                            floatSpread,
-                            self._floatFrequencyType,
-                            self._floatDayCountType,
-                            self._calendarType,
-                            self._busDayAdjustType,
-                            self._dateGenRuleType)
+                           self._maturityDate,
+                           self._fixedLegType,
+                           self._fixedCoupon,
+                           self._fixedFrequencyType,
+                           self._fixedDayCountType,
+                           self._notional,
+                           floatSpread,
+                           self._floatFrequencyType,
+                           self._floatDayCountType,
+                           self._calendarType,
+                           self._busDayAdjustType,
+                           self._dateGenRuleType)
 
         k = self._fixedCoupon
 
@@ -144,17 +146,20 @@ class FinIborSwaption():
         cpnTimes = [texp]
         cpnFlows = [0.0]
 
-        # The first flow is always the previous coupon date
+        # The first flow is on the day after the expiry date
         numFlows = len(swap._fixedLeg._paymentDates)
 
-        for iFlow in range(1, numFlows):
-
+        for iFlow in range(0, numFlows):
+            
             flowDate = swap._fixedLeg._paymentDates[iFlow]
 
-            cpnTime = (flowDate - valuationDate) / gDaysInYear
-            cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
-            cpnTimes.append(cpnTime)
-            cpnFlows.append(cpnFlow)
+            # Only flows occurring after option expiry are counted. 
+            # Flows on the expiry date are not included
+            if flowDate > self._exerciseDate:
+                cpnTime = (flowDate - valuationDate) / gDaysInYear
+                cpnFlow = swap._fixedLeg._payments[iFlow] / self._notional
+                cpnTimes.append(cpnTime)
+                cpnFlows.append(cpnFlow)
 
         cpnTimes = np.array(cpnTimes)
         cpnFlows = np.array(cpnFlows)
@@ -208,7 +213,6 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesHW):
 
-            print("Warning: Prices changed. Please test.")
             swaptionPx = model.europeanBondOptionJamshidian(texp,
                                                   strikePrice,
                                                   faceAmount, 
@@ -230,7 +234,6 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBK):
 
-            print("Warning: Prices changed. Please test.")
             model.buildTree(tmat, dfTimes, dfValues)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,

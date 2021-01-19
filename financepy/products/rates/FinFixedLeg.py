@@ -83,6 +83,9 @@ class FinFixedLeg(object):
         # life of the swap. Given a valuation date we can determine
         # which cash flows are in the future and value the swap
         # The schedule allows for a specified lag in the payment date
+        # Nothing is paid on the swap effective date and so the first payment
+        # date is the first actual payment date
+
         scheduleDates = FinSchedule(self._effectiveDate,
                                     self._terminationDate,
                                     self._freqType,

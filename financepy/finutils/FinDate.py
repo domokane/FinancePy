@@ -6,7 +6,6 @@ import datetime
 from .FinError import FinError
 from numba import njit, boolean, int64
 import numpy as np
-from numba import njit, int64
 
 ###############################################################################    
 

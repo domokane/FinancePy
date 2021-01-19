@@ -130,7 +130,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
         df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
         df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         fixedLegFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
-        floatLegValues[n] = strikePrice * df_flow / df_tree
+        floatLegValues[n] = strikePrice # * df_flow / df_tree
 
     ###########################################################################
     # Mapped times stores the mapped times and flows and is used to calculate
@@ -175,8 +175,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
     # Start with the value of the fixed leg at maturity
     for k in range(0, numNodes):
-        fixedLegValues[maturityStep, k] = (1.0 + fixedLegFlows[maturityStep]) \
-            * faceAmount
+        flow = 1.0 + fixedLegFlows[maturityStep]
+        fixedLegValues[maturityStep, k] = flow * faceAmount
 
     # Now step back to today considering early exercise on coupon dates
     for m in range(maturityStep-1, -1, -1):

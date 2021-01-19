@@ -86,55 +86,59 @@ class FinEquityCliquetOption(FinEquityOption):
         ''' Value the cliquet option as a sequence of options using the Black-
         Scholes model. '''
 
-        print("FIX DIVIDEND ISSUE")
         if valueDate > self._finalExpiryDate:
             raise FinError("Value date after final expiry date.")
 
-        s0 = stockPrice
+        s = stockPrice
         v_cliquet = 0.0
 
         self._v_options = []
         self._dfs = []
         self._actualDates = []
 
+        CALL = FinOptionTypes.EUROPEAN_CALL
+        PUT = FinOptionTypes.EUROPEAN_PUT
+
         if isinstance(model, FinModelBlackScholes):
 
-            vol = model._volatility
-            vol = max(vol, 1e-6)
+            v = model._volatility
+            v = max(v, 1e-6)
             tprev = 0.0
-            dqprev = 1.0
 
             for dt in self._expiryDates:
 
                 if dt > valueDate:
 
                     df = discountCurve.df(dt)
-                    t = (dt - valueDate) / gDaysInYear
-                    r = -np.log(df) / t
+                    texp = (dt - valueDate) / gDaysInYear
+                    r = -np.log(df) / texp
 
-                    texp = t - tprev
+                    # option life
+                    tau = texp - tprev
 
-                    qOLD = 0.05
-                    dqOLD = np.exp(-qOLD * tprev)
-  
-                    dqnow = discountCurve.df(dt)
-                    dq = dqnow / dqprev
-                    q = -np.log(dq)/texp
+                    # The deflator is out to the option reset time
+                    dq = dividendCurve._df(tprev)
 
-                    if self._optionType == FinOptionTypes.EUROPEAN_CALL:
-                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, FinOptionTypes.EUROPEAN_CALL.value)
-                        v_cliquet += v
-                    elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
-                        v = s0 * dq * bsValue(1.0, texp, 1.0, r, q, vol, FinOptionTypes.EUROPEAN_PUT.value)
-                        v_cliquet += v
+                    # The option dividend is over the option life
+                    dqMat = dividendCurve._df(texp)
+
+                    q = -np.log(dqMat/dq)/tau
+
+                    if self._optionType == CALL:
+                        v_fwd_opt = s * dq * bsValue(1.0, tau, 1.0, r, q, v, CALL.value)
+                        v_cliquet += v_fwd_opt
+                    elif self._optionType == PUT:
+                        v_fwd_opt = s * dq * bsValue(1.0, tau, 1.0, r, q, v, PUT.value)
+                        v_cliquet += v_fwd_opt
                     else:
                         raise FinError("Unknown option type")
+
+#                    print(dt, r, df, q, v_fwd_opt, v_cliquet)
 
                     self._dfs.append(df)
                     self._v_options.append(v)
                     self._actualDates.append(dt)
-                    tprev = t
-                    dqprev = dqnow
+                    tprev = texp
         else:
             raise FinError("Unknown Model Type")
 

@@ -41,7 +41,8 @@ def test_FinIborBermudanSwaptionBKModel():
 
     liborCurve = FinDiscountCurveFlat(valuationDate,
                                       0.0625,
-                                      FinFrequencyTypes.SEMI_ANNUAL)
+                                      FinFrequencyTypes.SEMI_ANNUAL, 
+                                      FinDayCountTypes.ACT_365F)
 
     fwdPAYSwap = FinIborSwap(exerciseDate,
                                 swapMaturityDate,
@@ -128,17 +129,17 @@ def test_FinIborBermudanSwaptionBKModel():
     testCases.banner("======= 0% VOLATILITY EUROPEAN SWAPTION BK MODEL ======")
 
     # Used BK with constant short-rate volatility
-    sigma = 0.00001
+    sigma = 0.000000001
     a = 0.01
-    numTimeSteps = 200
+    numTimeSteps = 100
     model = FinModelRatesBK(sigma, a, numTimeSteps)
 
     valuePay = europeanSwaptionPay.value(valuationDate, liborCurve, model)
     testCases.print("EUROPEAN BK PAY VALUE:", valuePay)
-
+    
     valueRec = europeanSwaptionRec.value(valuationDate, liborCurve, model)
     testCases.print("EUROPEAN BK REC VALUE:", valueRec)
-
+    
     payRec = valuePay - valueRec
     testCases.print("PAY MINUS RECEIVER :", payRec)
 

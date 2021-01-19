@@ -165,7 +165,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
     ###########################################################################
 
     fixedLegFlows = np.zeros(numTimeSteps)
-    floatLegValues = np.zeros(numTimeSteps)
+    floatLegValues = np.ones(numTimeSteps) # Initialise it with ones CHANGE
     numCoupons = len(couponTimes)
 
     # swap fixed leg flows go all the way out to the swap maturity date
@@ -176,8 +176,41 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
         df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
         df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
         fixedLegFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
-        floatLegValues[n] = strikePrice * df_flow / df_tree
+        floatLegValues[n] = strikePrice # * df_flow / df_tree
+
+    ############################## REMOVE START ###############################
+
+    if 1==0:
+        fixedpv = 0.0
+        for n in range(0, numTimeSteps-1):
+            ttree = _treeTimes[n]
+            df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
+            flow = fixedLegFlows[n]
+            pvflow = flow * df_tree
+            fixedpv += pvflow
+            print(">>", n, ttree, df_tree, flow, fixedpv)
+        fixedpv += df_tree
+        df_tree = _uinterpolate(texp, _dfTimes, _dfValues, interp)
+        floatpv = df_tree
+        swaptionpv = (fixedpv/df_tree - 1.0) * df_tree
+        print("PV:", fixedpv, floatpv, swaptionpv)
     
+        fixedpv = 0.0
+        for n in range(0, numCoupons):
+            tcpn = couponTimes[n]
+            df = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
+            flow = couponFlows[n]
+            pvflow = flow * df
+            fixedpv += pvflow
+            print("++", n, tcpn, df, flow, fixedpv)
+        fixedpv += df
+        df_tree = _uinterpolate(texp, _dfTimes, _dfValues, interp)
+        floatpv = df_tree
+        swaptionpv = (fixedpv/df_tree - 1.0) * df_tree
+        print("PV:", fixedpv, floatpv, swaptionpv)
+        
+    ########################### REMOVE END ####################################
+
     ###########################################################################
     # Mapped times stores the mapped times and flows and is used to calculate
     # accrued interest in a consistent manner as using actual flows will
@@ -221,8 +254,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
     # Start with the value of the fixed leg at maturity
     for k in range(0, numNodes):
-        fixedLegValues[maturityStep, k] = (1.0 + fixedLegFlows[maturityStep]) \
-            * faceAmount
+        flow = 1.0 + fixedLegFlows[maturityStep]
+        fixedLegValues[maturityStep, k] = flow * faceAmount
 
     N = jmax
     
@@ -245,7 +278,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
                 vd = fixedLegValues[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 fixedLegValues[m, kN] = v
-            elif k == jmax:
+            elif k == -jmax:
                 vu = fixedLegValues[m+1, kN+2]
                 vm = fixedLegValues[m+1, kN+1]
                 vd = fixedLegValues[m+1, kN]
@@ -267,7 +300,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
                 vm = payValues[m+1, kN-1]
                 vd = payValues[m+1, kN-2]
                 vpay = (pu*vu + pm*vm + pd*vd) * df
-            elif k == jmax:
+            elif k == -jmax:
                 vu = payValues[m+1, kN+2]
                 vm = payValues[m+1, kN+1]
                 vd = payValues[m+1, kN]
@@ -285,7 +318,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
                 vm = recValues[m+1, kN-1]
                 vd = recValues[m+1, kN-2]
                 vrec = (pu*vu + pm*vm + pd*vd) * df
-            elif k == jmax:
+            elif k == -jmax:
                 vu = recValues[m+1, kN+2]
                 vm = recValues[m+1, kN+1]
                 vd = recValues[m+1, kN]
@@ -320,13 +353,13 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
             elif exerciseTypeInt == 3 and m > expiryStep:
 
-                raise FinError("American optionality not allows.")
+                raise FinError("American optionality not allowed.")
 
                 ## Need to define floating value on all grid dates
 
                 payValues[m, kN] = max(payExercise, holdPay)
                 recValues[m, kN] = max(recExercise, holdRec)
-        
+
     return payValues[0, jmax], recValues[0, jmax]
 
 ###############################################################################
@@ -475,7 +508,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
                 vd = bondValues[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 bondValues[m, kN] = v
-            elif k == jmax:
+            elif k == -jmax:
                 vu = bondValues[m+1, kN+2]
                 vm = bondValues[m+1, kN+1]
                 vd = bondValues[m+1, kN]
@@ -498,7 +531,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
                 vm = callOptionValues[m+1, kN-1]
                 vd = callOptionValues[m+1, kN-2]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
-            elif k == jmax:
+            elif k == -jmax:
                 vu = callOptionValues[m+1, kN+2]
                 vm = callOptionValues[m+1, kN+1]
                 vd = callOptionValues[m+1, kN]
@@ -516,7 +549,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
                 vm = putOptionValues[m+1, kN-1]
                 vd = putOptionValues[m+1, kN-2]
                 vput = (pu*vu + pm*vm + pd*vd) * df
-            elif k == jmax:
+            elif k == -jmax:
                 vu = putOptionValues[m+1, kN+2]
                 vm = putOptionValues[m+1, kN+1]
                 vd = putOptionValues[m+1, kN]
@@ -705,7 +738,7 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
                 vu = callPutBondValues[m+1, kN]
                 vm = callPutBondValues[m+1, kN-1]
                 vd = callPutBondValues[m+1, kN-2]
-            elif k == jmax:
+            elif k == -jmax:
                 vu = callPutBondValues[m+1, kN+2]
                 vm = callPutBondValues[m+1, kN+1]
                 vd = callPutBondValues[m+1, kN]
@@ -728,12 +761,12 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
 
 @njit(fastmath=True)
 def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
+    ''' Calibrate the tree to a term structure of interest rates. '''
 
     treeMaturity = treeTimes[-1]
     dt = treeMaturity / (numTimeSteps+1)
     dX = sigma * np.sqrt(3.0 * dt)
     jmax = ceil(0.1835/(a * dt))
-    jmin = - jmax
 
     if jmax > 1000:
         raise FinError("Jmax > 1000. Increase a or dt.")
@@ -753,20 +786,22 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
     # and two upper nodes respectively. The probabilities only depend on j
 
     for j in range(-jmax, jmax+1):
+
         ajdt = a*j*dt
         jN = j + jmax
+
         if j == jmax:
-            pu[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt - 3.0*ajdt)
-            pm[jN] = -1.0/3.0 - ajdt*ajdt + 2.0*ajdt
-            pd[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt - ajdt)
+            pu[jN] = 7.0/6.0 + 0.50 * (ajdt*ajdt - 3.0*ajdt)
+            pm[jN] = -1.0/3.0 - ajdt * ajdt + 2.0 * ajdt
+            pd[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt - ajdt)
         elif j == -jmax:
-            pu[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt + ajdt)
-            pm[jN] = -1.0/3.0 - ajdt*ajdt - 2.0*ajdt
-            pd[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt + 3.0*ajdt)
+            pu[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt + ajdt)
+            pm[jN] = -1.0/3.0 - ajdt * ajdt - 2.0 * ajdt
+            pd[jN] = 7.0/6.0 + 0.50 * (ajdt * ajdt + 3.0 * ajdt)
         else:
-            pu[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt - ajdt)
-            pm[jN] = 2.0/3.0 - ajdt*ajdt
-            pd[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt + ajdt)
+            pu[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt - ajdt)
+            pm[jN] = 2.0/3.0 - ajdt * ajdt
+            pd[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt + ajdt)
 
     # Arrow-Debreu array
     Q = np.zeros(shape=(numTimeSteps+2, 2*jmax+1))
@@ -803,6 +838,7 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
 
         # Loop over all nodes at time m to calculate next values of Q
         for j in range(-nm, nm+1):
+
             jN = j + jmax
             rdt = np.exp(X[m, jN]) * dt
             z = np.exp(-rdt)
@@ -811,7 +847,7 @@ def buildTreeFast(a, sigma, treeTimes, numTimeSteps, discountFactors):
                 Q[m+1, jN] += Q[m, jN] * pu[jN] * z
                 Q[m+1, jN-1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN-2] += Q[m, jN] * pd[jN] * z
-            elif j == jmin:
+            elif j == -jmax:
                 Q[m+1, jN] += Q[m, jN] * pd[jN] * z
                 Q[m+1, jN+1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN+2] += Q[m, jN] * pu[jN] * z

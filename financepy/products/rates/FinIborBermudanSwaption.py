@@ -19,10 +19,9 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 from ...products.rates.FinIborSwap import FinIborSwap
 
-from ...models.FinModelBlack import FinModelBlack
-from ...models.FinModelBlackShifted import FinModelBlackShifted
-from ...models.FinModelSABR import FinModelSABR
-from ...models.FinModelSABRShifted import FinModelSABRShifted
+from ...models.FinModelRatesBDT import FinModelRatesBDT
+from ...models.FinModelRatesBK import FinModelRatesBK
+from ...models.FinModelRatesHW import FinModelRatesHW
 
 ###############################################################################
 
@@ -85,7 +84,9 @@ class FinIborBermudanSwaption(object):
         self._fwdSwapRate = None
         self._forwardDf = None
         self._underlyingSwap = None
-
+        self._cpnTimes = None
+        self._cpnFlows = None
+        
 ###############################################################################
 
     def value(self,
@@ -99,47 +100,44 @@ class FinIborBermudanSwaption(object):
         floatSpread = 0.0
 
         # The underlying is a swap in which we pay the fixed amount
-        swap = FinIborSwap(self._exerciseDate,
-                            self._maturityDate,
-                            self._fixedLegType,
-                            self._fixedCoupon,
-                            self._fixedFrequencyType,
-                            self._fixedDayCountType,
-                            self._notional,
-                            floatSpread,
-                            self._floatFrequencyType,
-                            self._floatDayCountType,
-                            self._calendarType,
-                            self._busDayAdjustType,
-                            self._dateGenRuleType)
+        self._underlyingSwap = FinIborSwap(self._exerciseDate,
+                                           self._maturityDate,
+                                           self._fixedLegType,
+                                           self._fixedCoupon,
+                                           self._fixedFrequencyType,
+                                           self._fixedDayCountType,
+                                           self._notional,
+                                           floatSpread,
+                                           self._floatFrequencyType,
+                                           self._floatDayCountType,
+                                           self._calendarType,
+                                           self._busDayAdjustType,
+                                           self._dateGenRuleType)
 
         #  I need to do this to generate the fixed leg flows
-        swap.pv01(valuationDate, discountCurve)
+        self._pv01 = self._underlyingSwap.pv01(valuationDate, discountCurve)
 
         texp = (self._exerciseDate - valuationDate) / gDaysInYear
         tmat = (self._maturityDate - valuationDate) / gDaysInYear
 
+        #######################################################################
+        # For the tree models we need to generate a vector of the coupons
+        #######################################################################
+
         cpnTimes = [texp]
         cpnFlows = [0.0]
 
-        numFlows = len(swap._fixedLeg._paymentDates)
+        # The first flow is the expiry date
+        numFlows = len(self._underlyingSwap._fixedLeg._paymentDates)
 
-        # The first flow is always the PCD
+        swap = self._underlyingSwap
 
-        for iFlow in range(1, numFlows):
+        for iFlow in range(0, numFlows):
 
-            pcd = swap._fixedLeg._paymentDates[iFlow-1]
-            ncd = swap._fixedLeg._paymentDates[iFlow]
+            flowDate = self._underlyingSwap._fixedLeg._paymentDates[iFlow]
 
-            if ncd > valuationDate:
-
-                if len(cpnTimes) == 0:
-                    cpnTime = (pcd - valuationDate) / gDaysInYear
-                    cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
-                    cpnTimes.append(cpnTime)
-                    cpnFlows.append(cpnFlow)
-                    
-                cpnTime = (ncd - valuationDate) / gDaysInYear
+            if flowDate > self._exerciseDate:
+                cpnTime = (flowDate - valuationDate) / gDaysInYear
                 cpnFlow = swap._fixedLeg._payments[iFlow-1] / self._notional
                 cpnTimes.append(cpnTime)
                 cpnFlows.append(cpnFlow)
@@ -147,46 +145,63 @@ class FinIborBermudanSwaption(object):
         cpnTimes = np.array(cpnTimes)
         cpnFlows = np.array(cpnFlows)
 
-        callTimes = []
-        for cpnTime in cpnTimes:
-            if cpnTime >= texp:
-                callTimes.append(cpnTime)
+        self._cpnTimes = cpnTimes
+        self._cpnFlows = cpnFlows
+
+        # Allow exercise on coupon dates but control this later for europeans
+        self._callTimes = cpnTimes
 
         dfTimes = discountCurve._times
         dfValues = discountCurve._dfs
 
         faceAmount = 1.0
-        strikePrice = 1.0
+        strikePrice = 1.0 # Floating leg is assumed to price at par
 
         #######################################################################
         # For both models, the tree needs to extend out to maturity because of
         # the multi-callable nature of the Bermudan Swaption
         #######################################################################
 
-        if isinstance(model, FinModelBlack) or \
-           isinstance(model, FinModelBlackShifted) or \
-             isinstance(model, FinModelSABR) or \
-               isinstance(model, FinModelSABRShifted):
-                  raise FinError("Model is not valid for Bermudan Swaptions")
+        if isinstance(model, FinModelRatesBDT) or isinstance(model, FinModelRatesBK) or isinstance(model, FinModelRatesHW):
 
-        model.buildTree(tmat, dfTimes, dfValues)
-        v = model.bermudanSwaption(texp,
-                                   tmat,
-                                   strikePrice,
-                                   faceAmount,
-                                   cpnTimes,
-                                   cpnFlows,
-                                   self._exerciseType)
+            model.buildTree(tmat, dfTimes, dfValues)
+
+            v = model.bermudanSwaption(texp,
+                                       tmat,
+                                       strikePrice,
+                                       faceAmount,
+                                       cpnTimes,
+                                       cpnFlows,
+                                       self._exerciseType)
+        else:
+
+            raise FinError("Invalid model choice for Bermudan Swaption")
 
         if self._fixedLegType == FinSwapTypes.RECEIVE:
             v = self._notional * v['rec']
-            return v
         elif self._fixedLegType == FinSwapTypes.PAY:
             v = self._notional * v['pay']
-            return v
+
+        return v
 
 ###############################################################################
 
+    def printSwaptionValue(self):
+
+        print("SWAP PV01:", self._pv01)
+        
+        n = len(self._cpnTimes)
+        
+        for i in range(0,n):
+            print("CPN TIME: ", self._cpnTimes[i], "FLOW", self._cpnFlows[i])
+
+        n = len(self._callTimes)
+
+        for i in range(0,n):
+            print("CALL TIME: ", self._callTimes[i])
+
+###############################################################################
+        
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXERCISE DATE", self._exerciseDate)
