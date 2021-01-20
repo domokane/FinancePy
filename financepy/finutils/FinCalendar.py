@@ -54,12 +54,18 @@ class FinBusDayAdjustTypes(Enum):
 
 
 class FinCalendarTypes(Enum):
-    TARGET = 1
-    US = 2
-    UK = 3
-    WEEKEND = 4
-    JAPAN = 5
-    NONE = 6
+    NONE = 1
+    WEEKEND = 2
+    US = 3
+    UK = 4
+    TARGET = 5
+    JAPAN = 6
+    FRANCE = 7
+    GERMANY = 8
+    SWITZERLAND = 9
+    ITALY = 10
+    SWEDEN = 11
+    CANADA = 12
 
 
 class FinDateGenRuleTypes(Enum):
@@ -212,213 +218,662 @@ class FinCalendar(object):
         d = dt._d
 
         startDate = FinDate(1, 1, y)
-        dd = dt._excelDate - startDate._excelDate + 1
+        dayInYear = dt._excelDate - startDate._excelDate + 1
         weekday = dt._weekday
+
+        self._y = y
+        self._m = m
+        self._d = d
+        self._dayInYear = dayInYear
+        self._weekday = weekday
+        self._dt = dt
+
+        if self._type == FinCalendarTypes.NONE:
+            return True
+
+        if dt.isWeekend() is True:
+            return False
+
+        if self.isHoliday(dt):
+            return False
+        else:
+            return True
+
+###############################################################################
+
+    def isHoliday(self,
+                      dt: FinDate):
+        ''' Determines if a date is a Holiday according to the specified
+        calendar. A holiday does not fall on a weekend. '''
+
+        if dt.isWeekend():
+            return False
+
+        y = dt._y
+        m = dt._m
+        d = dt._d
+
+        startDate = FinDate(1, 1, y)
+        dayInYear = dt._excelDate - startDate._excelDate + 1
+        weekday = dt._weekday
+
+        self._y = y
+        self._m = m
+        self._d = d
+        self._dayInYear = dayInYear
+        self._weekday = weekday
+        self._dt = dt
+
+        if self._type == FinCalendarTypes.WEEKEND:
+            return self.HOLIDAY_WEEKEND()
+        elif self._type == FinCalendarTypes.UK:
+            return self.HOLIDAY_UNITED_KINGDOM()
+        elif self._type == FinCalendarTypes.JAPAN:
+            return self.HOLIDAY_JAPAN()
+        elif self._type == FinCalendarTypes.US:
+            return self.HOLIDAY_UNITED_STATES()
+        elif self._type == FinCalendarTypes.TARGET:
+            return self.HOLIDAY_TARGET()
+        elif self._type == FinCalendarTypes.FRANCE:
+            return self.HOLIDAY_FRANCE()
+        elif self._type == FinCalendarTypes.GERMANY:
+            return self.HOLIDAY_GERMANY()
+        elif self._type == FinCalendarTypes.SWITZERLAND:
+            return self.HOLIDAY_SWITZERLAND()
+        elif self._type == FinCalendarTypes.CANADA:
+            return self.HOLIDAY_CANADA()
+        elif self._type == FinCalendarTypes.ITALY:
+            return self.HOLIDAY_ITALY()
+        elif self._type == FinCalendarTypes.SWEDEN:
+            return self.HOLIDAY_SWEDEN()
+        elif self._type == FinCalendarTypes.NONE:
+            return self.HOLIDAY_NONE()
+        else:
+            raise FinError("Unknown calendar")
+
+###############################################################################
+
+    def HOLIDAY_WEEKEND(self):
+
+        if self._dt.isWeekend():
+            return True
+        else:
+            return False
+
+###############################################################################
+
+    def HOLIDAY_UNITED_KINGDOM(self):
+
+        ''' Only holidays in England and Wales. Does not count weekends. '''
+
+        m = self._m; d = self._d; y = self._y
+        weekday = self._weekday ; dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 2 and weekday == FinDate.MON:  # new years day
+            return True
+
+        if m == 1 and d == 3 and weekday == FinDate.MON:  # new years day
+            return True
 
         em = easterMondayDay[y - 1901]
 
-        if self._type == FinCalendarTypes.NONE:
-            # Every day is a business day when there are no holidays
+        if dayInYear == em:  # Easter Monday
             return True
 
-        if dt.isWeekend():
-            # If calendar is not NONE, every weekend is not a business date
-            return False
-
-        if self._type == FinCalendarTypes.WEEKEND:
-            # it is not a weekend and no other hols then it is a business day
+        if dayInYear == em - 3:  # good friday
             return True
 
-        if self._type == FinCalendarTypes.UK:
-            ''' Only holidays in England and Wales '''
-
-            if m == 1 and d == 1:  # new years day
-                return False
-
-            if dd == em:  # Easter Monday
-                return False
-
-            if dd == em - 3:  # good friday
-                return False
-
-            if m == 5 and d <= 7 and weekday == FinDate.MON:
-                return False
-
-            if m == 5 and d >= 25 and weekday == FinDate.MON:
-                return False
-
-#            if m == 8 and d <= 7 and weekday == FinDate.MON: # Summer Bank
-#                return False
-
-            if m == 8 and d > 24 and weekday == FinDate.MON:  # Late Summer
-                return False
-
-            if m == 12 and d == 25:  # Xmas
-                return False
-
-            if m == 12 and d == 26:  # Boxing day
-                return False
-
-            if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
-                return False
-
-            if m == 12 and d == 27 and weekday == FinDate.TUE:  # Xmas
-                return False
-
-            if m == 12 and d == 28 and weekday == FinDate.MON:  # Xmas
-                return False
-
-            if m == 12 and d == 28 and weekday == FinDate.TUE:  # Xmas
-                return False
-
+        if m == 5 and d <= 7 and weekday == FinDate.MON:
             return True
 
-        if self._type == FinCalendarTypes.JAPAN:
-            ''' This is not exact NEEDS DEBUGGING '''
-
-            print("Do not use this calendar as it has not been tested.")
-
-            if m == 1 and d == 1:  # new years day
-                return False
-
-            if m == 1 and d == 2:  # bank holiday
-                return False
-
-            if m == 1 and d == 3:  # bank holiday
-                return False
-
-            if m == 1 and d > 7 and d < 15 and weekday == FinDate.MON:  # coa
-                return False
-
-            if m == 2 and d == 11:  # nfd
-                return False
-
-            if m == 2 and d == 23:  # emperor's birthday
-                return False
-
-            if m == 3 and d == 20:  # vernal equinox - NOT EXACT
-                return False
-
-            if m == 4 and d == 29:  # SHOWA greenery
-                return False
-
-            if m == 5 and d == 3:  # Memorial Day
-                return False
-
-            if m == 5 and d == 4:  # nation
-                return False
-
-            if m == 5 and d == 5:  # children
-                return False
-
-            # Marine
-            if m == 7 and d > 14 and d < 22 and weekday == FinDate.MON:
-                return False
-
-            # Mountain day
-            md = FinDate(11, 8, y)
-            if md._weekday == FinDate.SUN:
-                md = md.addDays(1)
-
-            if dt == md:  # Mountain Day
-                return False
-
-            # Respect for aged
-            if m == 8 and d > 14 and d < 22 and weekday == FinDate.MON:
-                return False
-
-            # Equinox - APPROXIMATE
-            if m == 9 and d == 23:
-                return False
-
-            if m == 10 and d >= 7 and d <= 14 and weekday == FinDate.MON:  # HS
-                return False
-
-            if m == 11 and d == 3:  # Culture
-                return False
-
-            if m == 11 and d == 23:  # Thanksgiving
-                return False
-
-            if m == 12 and d == 31:  # Xmas
-                return False
-
+        if m == 5 and d >= 25 and weekday == FinDate.MON:
             return True
 
-        elif self._type == FinCalendarTypes.US:
-
-            ''' This is a generic US calendar that contains the superset of
-            holidays for bond markets, NYSE, and public holidays. For each of
-            these and other categories there will be some variations. '''
-
-            if m == 1 and d == 1:  # NYD
-                return False
-
-            if m == 1 and d >= 15 and d < 22 and weekday == FinDate.MON:  # MLK
-                return False
-
-            if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # GW
-                return False
-
-            if m == 5 and d >= 25 and d <= 31 and weekday == FinDate.MON:  # MD
-                return False
-
-            if m == 7 and d == 4:  # Indep day
-                return False
-
-            if m == 7 and d == 5 and weekday == FinDate.MON:  # Indep day
-                return False
-
-            if m == 7 and d == 3 and weekday == FinDate.FRI:  # Indep day
-                return False
-
-            if m == 9 and d >= 1 and d < 8 and weekday == FinDate.MON:  # Lab
-                return False
-
-            if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # CD
-                return False
-
-            if m == 11 and d == 11:  # Veterans day
-                return False
-
-            if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
-                return False
-
-            if m == 11 and d == 10 and weekday == FinDate.FRI:  # Vets
-                return False
-
-            if m == 11 and d >= 22 and d < 29 and weekday == FinDate.THU:  # TG
-                return False
-
-            if m == 12 and d == 25:  # Xmas holiday
-                return False
-
+        if m == 6 and d == 2 and y == 2022: # SPRING BANK HOLIDAY
             return True
 
-        elif self._type == FinCalendarTypes.TARGET:
-
-            if m == 1 and d == 1:  # new year's day
-                return False
-
-            if m == 5 and d == 1:  # May day
-                return False
-
-            if dd == em - 3:  # Easter Friday holiday
-                return False
-
-            if dd == em:  # Easter monday holiday
-                return False
-
-            if m == 12 and d == 25:  # Xmas bank holiday
-                return False
-
-            if m == 12 and d == 26:  # Xmas bank holiday
-                return False
-
-#            if m == 12 and d == 31:  # NYD bank holiday
-#                return False
-
+        if m == 6 and d == 3 and y == 2022: # QUEEN PLAT JUB
             return True
+
+        if m == 8 and d > 24 and weekday == FinDate.MON:  # Late Summer
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.TUE:  # Xmas
+            return True
+
+        if m == 12 and d == 28 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 28 and weekday == FinDate.TUE:  # Xmas
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_FRANCE(self):
+
+        ''' Only holidays in France. Does not count weekends. '''
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if m == 5 and d == 1: # LABOUR DAY
+            return True
+
+        if m == 5 and d == 8: # VICTORY DAY
+            return True
+
+        if dayInYear == em + 39 - 1:  # Ascension
+            return True
+
+        if dayInYear == em + 50 - 1:  # pentecost
+            return True
+
+        if m == 7 and d == 14: # BASTILLE DAY
+            return True
+
+        if m == 8 and d  == 15:  # ASSUMPTION
+            return True
+
+        if m == 11 and d == 1:  # ALL SAINTS
+            return True
+
+        if m == 11 and d == 11:  # ARMISTICE
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_SWEDEN(self):
+
+        ''' Only holidays in France. Does not count weekends. '''
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+        weekday = self._weekday
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 6:  # epiphany day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em + 39 - 1:  # Ascension
+            return True
+
+        if m == 5 and d == 1:  # labour day
+            return True
+
+        if m == 6 and d == 6: # June
+            return True
+
+        if m == 6 and d > 18 and d < 26 and weekday == FinDate.FRI: # Midsummer
+            return True
+
+        if m == 12 and d == 24:  # Xmas eve
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        if m == 12 and d == 31:  # NYE
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_GERMANY(self):
+
+        ''' Only holidays in Germany. Does not count weekends. '''
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if m == 5 and d == 1: # LABOUR DAY
+            return True
+
+        if dayInYear == em + 39 - 1:  # Ascension
+            return True
+
+        if dayInYear == em + 50 - 1:  # pentecost
+            return True
+
+        if m == 10 and d == 3:  # GERMAN UNITY DAY
+            return True
+
+        if m == 12 and d == 24:  # Xmas eve
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_SWITZERLAND(self):
+
+        ''' Only holidays in Switzerland. Does not count weekends. '''
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 2:  # berchtoldstag
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if dayInYear == em + 39 - 1:  # Ascension
+            return True
+
+        if dayInYear == em + 50 - 1:  # pentecost / whit
+            return True
+
+        if m == 5 and d == 1:  # Labour day
+            return True
+
+        if m == 8 and d == 1:  # National day
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_JAPAN(self):
+
+        m = self._m; d = self._d; y = self._y;
+        weekday = self._weekday
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 2 and weekday == FinDate.MON:  # bank holiday
+            return True
+
+        if m == 1 and d == 3 and weekday == FinDate.MON:  # bank holiday
+            return True
+
+        if m == 1 and d > 7 and d < 15 and weekday == FinDate.MON:  # coa
+            return True
+
+        if m == 2 and d == 11:  # nfd
+            return True
+
+        if m == 2 and d == 12 and weekday == FinDate.MON:  # nfd
+            return True
+
+        if m == 2 and d == 23:  # emperor's birthday
+            return True
+
+        if m == 2 and d == 24 and weekday == FinDate.MON:  # emperor's birthday
+            return True
+
+        if m == 3 and d == 20:  # vernal equinox - NOT EXACT
+            return True
+
+        if m == 3 and d == 21 and weekday == FinDate.MON:  
+            return True
+
+        if m == 4 and d == 29:  # SHOWA greenery
+            return True
+
+        if m == 4 and d == 30 and weekday == FinDate.MON:  # SHOWA greenery
+            return True
+
+        if m == 5 and d == 3:  # Memorial Day
+            return True
+
+        if m == 5 and d == 4:  # nation
+            return True
+
+        if m == 5 and d == 5:  # children
+            return True
+
+        if m == 5 and d == 6 and weekday == FinDate.MON:  # children
+            return True
+
+        if m == 7 and d > 14 and d < 22 and y != 2021 and weekday == FinDate.MON:
+            return True
+
+        if m == 7 and d == 22 and y == 2021: # OLYMPICS
+            return True
+
+        if m == 7 and d == 23 and y == 2021: # OLYMPICS HEALTH AND SPORTS HERE
+            return True
+
+        # Mountain day
+        if m == 8 and d == 11 and y != 2021:
+            return True
+
+        if m == 8 and d == 12 and y != 2021 and weekday == FinDate.MON:
+            return True
+
+        if m == 8 and d == 9 and y == 2021 and weekday == FinDate.MON:
+            return True
+
+        # Respect for aged
+        if m == 9 and d > 14 and d < 22 and weekday == FinDate.MON:
+            return True
+
+        # Equinox - APPROXIMATE
+        if m == 9 and d == 23:
+            return True
+
+        if m == 9 and d == 24 and weekday == FinDate.MON:
+            return True
+
+        if m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == FinDate.MON:  # HS
+            return True
+
+        if m == 11 and d == 3:  # Culture
+            return True
+
+        if m == 11 and d == 4 and weekday == FinDate.MON:  # Culture
+            return True
+
+        if m == 11 and d == 23:  # Thanksgiving
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_UNITED_STATES(self):
+
+        ''' This is a generic US calendar that contains the superset of
+        holidays for bond markets, NYSE, and public holidays. For each of
+        these and other categories there will be some variations. '''
+
+        m = self._m; d = self._d; 
+        weekday = self._weekday
+
+        if m == 1 and d == 1:  # NYD
+            return True
+
+        if m == 1 and d == 2 and weekday == FinDate.MON:  # NYD
+            return True
+
+        if m == 1 and d == 3 and weekday == FinDate.MON:  # NYD
+            return True
+
+        if m == 1 and d >= 15 and d < 22 and weekday == FinDate.MON:  # MLK
+            return True
+
+        if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # GW
+            return True
+
+        if m == 5 and d >= 25 and d <= 31 and weekday == FinDate.MON:  # MD
+            return True
+
+        if m == 7 and d == 4:  # Indep day
+            return True
+
+        if m == 7 and d == 5 and weekday == FinDate.MON:  # Indep day
+            return True
+
+        if m == 7 and d == 3 and weekday == FinDate.FRI:  # Indep day
+            return True
+
+        if m == 9 and d >= 1 and d < 8 and weekday == FinDate.MON:  # Lab
+            return True
+
+        if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # CD
+            return True
+
+        if m == 11 and d == 11:  # Veterans day
+            return True
+
+        if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
+            return True
+
+        if m == 11 and d == 10 and weekday == FinDate.FRI:  # Vets
+            return True
+
+        if m == 11 and d >= 22 and d < 29 and weekday == FinDate.THU:  # TG
+            return True
+
+        if m == 12 and d == 24 and weekday == FinDate.FRI:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 25:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 31 and weekday == FinDate.FRI:
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_CANADA(self):
+
+        m = self._m; d = self._d; y = self._y
+        weekday = self._weekday
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # NYD
+            return True
+
+        if m == 1 and d == 2 and weekday == FinDate.MON:  # NYD
+            return True
+
+        if m == 1 and d == 3 and weekday == FinDate.MON:  # NYD
+            return True
+
+        if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # FAMILY
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if m == 5 and d >= 18 and d < 25 and weekday == FinDate.MON:  # VICTORIA
+            return True
+
+        if m == 7 and d == 1:  # Canada day
+            return True
+
+        if m == 7 and d == 2 and weekday == FinDate.MON:  # Canada day
+            return True
+
+        if m == 7 and d == 3 and weekday == FinDate.MON:  # Canada day
+            return True
+
+        if m == 8 and d < 8 and weekday == FinDate.MON:  # Provincial
+            return True
+
+        if m == 9 and d < 8 and weekday == FinDate.MON:  # Labor
+            return True
+
+        if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # THANKS
+            return True
+
+        if m == 11 and d == 11:  # Veterans day
+            return True
+
+        if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
+            return True
+
+        if m == 11 and d == 13 and weekday == FinDate.MON:  # Vets
+            return True
+
+        if m == 12 and d == 25:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 26:  # Boxing holiday
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing holiday
+            return True
+
+        if m == 12 and d == 28 and weekday == FinDate.TUE:  # Boxing holiday
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_ITALY(self):
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 6:  # epiphany
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if m == 4 and d == 25: # LIBERATION DAY
+            return True
+
+        if m == 5 and d == 1: # LABOUR DAY
+            return True
+
+        if m == 6 and d == 2 and y > 1999: # REPUBLIC DAY
+            return True
+
+        if m == 8 and d  == 15:  # ASSUMPTION
+            return True
+
+        if m == 11 and d == 1:  # ALL SAINTS
+            return True
+
+        if m == 12 and d == 8:  # IMMAC CONC
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_TARGET(self):
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new year's day
+            return True
+
+        if m == 5 and d == 1:  # May day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 3:  # Easter Friday holiday
+            return True
+
+        if dayInYear == em:  # Easter monday holiday
+            return True
+
+        if m == 12 and d == 25:  # Xmas bank holiday
+            return True
+
+        if m == 12 and d == 26:  # Xmas bank holiday
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_NONE(self):
+
+        return False
 
 ###############################################################################
 
@@ -453,6 +908,12 @@ class FinCalendar(object):
         startDate = FinDate(1, 1, year)
         em = startDate.addDays(emDays-1)
         return em
+
+###############################################################################
+
+    def __str__(self):
+        s = self._type.name
+        return s
 
 ###############################################################################
 

@@ -17,6 +17,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
+setDateFormatType(FinDateFormatTypes.UK_LONGEST)
 
 def test_FinDate():
 
