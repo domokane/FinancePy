@@ -36,10 +36,12 @@ def test_FinCalendar():
             
             if nextDate._d == 1 and nextDate._m == 1:
                 testCases.banner("================================")
+#                print("=========================")
 
             isHolidayDay = cal.isHoliday(nextDate)
             if isHolidayDay is True:
                 testCases.print(cal, nextDate)
+#                print(cal, nextDate)
 
 ###############################################################################
 

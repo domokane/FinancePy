@@ -56,16 +56,19 @@ class FinBusDayAdjustTypes(Enum):
 class FinCalendarTypes(Enum):
     NONE = 1
     WEEKEND = 2
-    US = 3
-    UK = 4
-    TARGET = 5
-    JAPAN = 6
-    FRANCE = 7
-    GERMANY = 8
-    SWITZERLAND = 9
-    ITALY = 10
+    AUSTRALIA = 3
+    CANADA = 4
+    FRANCE = 5
+    GERMANY = 6
+    ITALY = 7
+    JAPAN = 8
+    NEW_ZEALAND = 9
+    NORWAY = 10
     SWEDEN = 11
-    CANADA = 12
+    SWITZERLAND = 12
+    TARGET = 13
+    UNITED_STATES = 14
+    UNITED_KINGDOM = 15
 
 
 class FinDateGenRuleTypes(Enum):
@@ -201,7 +204,6 @@ class FinCalendar(object):
             newDt = FinDate(d, m, y)
 
             if self.isBusinessDay(newDt) is True:
-#                print("BUS DAY: ", newDt, numDays)
                 numDays -= 1
 
         return newDt
@@ -213,28 +215,12 @@ class FinCalendar(object):
         ''' Determines if a date is a business day according to the specified
         calendar. If it is it returns True, otherwise False. '''
 
-        y = dt._y
-        m = dt._m
-        d = dt._d
-
-        startDate = FinDate(1, 1, y)
-        dayInYear = dt._excelDate - startDate._excelDate + 1
-        weekday = dt._weekday
-
-        self._y = y
-        self._m = m
-        self._d = d
-        self._dayInYear = dayInYear
-        self._weekday = weekday
-        self._dt = dt
-
-        if self._type == FinCalendarTypes.NONE:
-            return True
-
-        if dt.isWeekend() is True:
+        # For all calendars so far, SAT and SUN are not business days
+        # If this ever changes I will need to add a filter here.
+        if self._dt.isWeekend():
             return False
 
-        if self.isHoliday(dt):
+        if self.isHoliday(dt) is True:
             return False
         else:
             return True
@@ -244,56 +230,58 @@ class FinCalendar(object):
     def isHoliday(self,
                       dt: FinDate):
         ''' Determines if a date is a Holiday according to the specified
-        calendar. A holiday does not fall on a weekend. '''
+        calendar. Weekends are not holidays unless the holiday falls on a 
+        weekend date. '''
 
-        if dt.isWeekend():
-            return False
-
-        y = dt._y
-        m = dt._m
-        d = dt._d
-
-        startDate = FinDate(1, 1, y)
+        startDate = FinDate(1, 1, dt._y)
         dayInYear = dt._excelDate - startDate._excelDate + 1
         weekday = dt._weekday
 
-        self._y = y
-        self._m = m
-        self._d = d
+        self._y = dt._y
+        self._m = dt._m
+        self._d = dt._d
         self._dayInYear = dayInYear
         self._weekday = weekday
         self._dt = dt
 
-        if self._type == FinCalendarTypes.WEEKEND:
+        if self._type == FinCalendarTypes.NONE:
+            return self.HOLIDAY_NONE()
+        elif self._type == FinCalendarTypes.WEEKEND:
             return self.HOLIDAY_WEEKEND()
-        elif self._type == FinCalendarTypes.UK:
-            return self.HOLIDAY_UNITED_KINGDOM()
-        elif self._type == FinCalendarTypes.JAPAN:
-            return self.HOLIDAY_JAPAN()
-        elif self._type == FinCalendarTypes.US:
-            return self.HOLIDAY_UNITED_STATES()
-        elif self._type == FinCalendarTypes.TARGET:
-            return self.HOLIDAY_TARGET()
+        elif self._type == FinCalendarTypes.AUSTRALIA:
+            return self.HOLIDAY_AUSTRALIA()
+        elif self._type == FinCalendarTypes.CANADA:
+            return self.HOLIDAY_CANADA()
         elif self._type == FinCalendarTypes.FRANCE:
             return self.HOLIDAY_FRANCE()
         elif self._type == FinCalendarTypes.GERMANY:
             return self.HOLIDAY_GERMANY()
-        elif self._type == FinCalendarTypes.SWITZERLAND:
-            return self.HOLIDAY_SWITZERLAND()
-        elif self._type == FinCalendarTypes.CANADA:
-            return self.HOLIDAY_CANADA()
         elif self._type == FinCalendarTypes.ITALY:
             return self.HOLIDAY_ITALY()
+        elif self._type == FinCalendarTypes.JAPAN:
+            return self.HOLIDAY_JAPAN()
+        elif self._type == FinCalendarTypes.NEW_ZEALAND:
+            return self.HOLIDAY_NEW_ZEALAND()
+        elif self._type == FinCalendarTypes.NORWAY:
+            return self.HOLIDAY_NORWAY()
         elif self._type == FinCalendarTypes.SWEDEN:
             return self.HOLIDAY_SWEDEN()
-        elif self._type == FinCalendarTypes.NONE:
-            return self.HOLIDAY_NONE()
+        elif self._type == FinCalendarTypes.SWITZERLAND:
+            return self.HOLIDAY_SWITZERLAND()
+        elif self._type == FinCalendarTypes.TARGET:
+            return self.HOLIDAY_TARGET()
+        elif self._type == FinCalendarTypes.UNITED_KINGDOM:
+            return self.HOLIDAY_UNITED_KINGDOM()
+        elif self._type == FinCalendarTypes.UNITED_STATES:
+            return self.HOLIDAY_UNITED_STATES()
         else:
+            print(self._type)
             raise FinError("Unknown calendar")
 
 ###############################################################################
 
     def HOLIDAY_WEEKEND(self):
+        ''' Weekends by themselves are a holiday. '''
 
         if self._dt.isWeekend():
             return True
@@ -302,9 +290,72 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def HOLIDAY_UNITED_KINGDOM(self):
+    def HOLIDAY_AUSTRALIA(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
-        ''' Only holidays in England and Wales. Does not count weekends. '''
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+        weekday = self._weekday
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 26:  # Australia day
+            return True
+
+        if m == 1 and d == 27 and weekday == FinDate.MON:  # Australia day
+            return True
+
+        if m == 1 and d == 28 and weekday == FinDate.MON:  # Australia day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if m == 4 and d == 25:  # Australia day
+            return True
+
+        if m == 4 and d == 26 and weekday == FinDate.MON:  # Australia day
+            return True
+
+        if m == 6 and d > 7 and d < 15 and weekday == FinDate.MON:  # Queen 
+            return True
+
+        if m == 8 and d < 8 and weekday == FinDate.MON:  # BANK holiday 
+            return True
+
+        if m == 10 and d < 8 and weekday == FinDate.MON:  # BANK holiday 
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing
+            return True
+
+        if m == 12 and d == 28 and weekday == FinDate.MON:  # Boxing
+            return True
+
+        return False
+   
+###############################################################################
+
+    def HOLIDAY_UNITED_KINGDOM(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         weekday = self._weekday ; dayInYear = self._dayInYear
@@ -364,8 +415,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_FRANCE(self):
-
-        ''' Only holidays in France. Does not count weekends. '''
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -416,8 +466,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_SWEDEN(self):
-
-        ''' Only holidays in France. Does not count weekends. '''
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -466,8 +515,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_GERMANY(self):
-
-        ''' Only holidays in Germany. Does not count weekends. '''
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -509,8 +557,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_SWITZERLAND(self):
-
-        ''' Only holidays in Switzerland. Does not count weekends. '''
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -552,6 +599,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_JAPAN(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y;
         weekday = self._weekday
@@ -650,9 +698,112 @@ class FinCalendar(object):
 
 ###############################################################################
 
-    def HOLIDAY_UNITED_STATES(self):
+    def HOLIDAY_NEW_ZEALAND(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
-        ''' This is a generic US calendar that contains the superset of
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+        weekday = self._weekday
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        if m == 1 and d == 2 and weekday == FinDate.MON:  # new years day
+            return True
+
+        if m == 1 and d == 3 and weekday == FinDate.MON:  # new years day
+            return True
+
+        if m == 1 and d > 18 and d < 26 and weekday == FinDate.MON:  # Anniversary 
+            return True
+
+        if m == 2 and d == 6:  # Waitanga day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if m == 4 and d == 25:  # ANZAC day
+            return True
+
+        if m == 6 and d < 8 and weekday == FinDate.MON:  # Queen 
+            return True
+
+        if m == 10 and d > 21 and d < 29 and weekday == FinDate.MON:  # LABOR DAY 
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing
+            return True
+
+        if m == 12 and d == 28 and weekday == FinDate.MON:  # Boxing
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_NORWAY(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+
+        m = self._m; d = self._d; y = self._y
+        dayInYear = self._dayInYear
+
+        if m == 1 and d == 1:  # new years day
+            return True
+
+        em = easterMondayDay[y - 1901]
+
+        if dayInYear == em - 4:  # holy thursday
+            return True
+
+        if dayInYear == em - 3:  # good friday
+            return True
+
+        if dayInYear == em:  # Easter Monday
+            return True
+
+        if dayInYear == em + 38:  # Ascension
+            return True
+
+        if dayInYear == em + 49:  # Pentecost
+            return True
+
+        if m == 5 and d == 1:  # May day
+            return True
+
+        if m == 5 and d == 17:  # Independence day
+            return True
+
+        if m == 12 and d == 25:  # Xmas
+            return True
+
+        if m == 12 and d == 26:  # Boxing day
+            return True
+
+        return False
+
+###############################################################################
+
+    def HOLIDAY_UNITED_STATES(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday.
+        This is a generic US calendar that contains the superset of
         holidays for bond markets, NYSE, and public holidays. For each of
         these and other categories there will be some variations. '''
 
@@ -721,10 +872,10 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_CANADA(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
-        weekday = self._weekday
-        dayInYear = self._dayInYear
+        weekday = self._weekday; dayInYear = self._dayInYear
 
         if m == 1 and d == 1:  # NYD
             return True
@@ -796,6 +947,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_ITALY(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -843,6 +995,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_TARGET(self):
+        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -872,7 +1025,7 @@ class FinCalendar(object):
 ###############################################################################
 
     def HOLIDAY_NONE(self):
-
+        ''' No day is a holiday. '''
         return False
 
 ###############################################################################
