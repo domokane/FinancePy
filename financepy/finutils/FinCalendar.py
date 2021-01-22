@@ -11,7 +11,8 @@ import datetime
 from enum import Enum
 from .FinDate import FinDate
 from .FinError import FinError
-from numba import njit, jit, int64, boolean
+
+# from numba import njit, jit, int64, boolean
 
 easterMondayDay = [98, 90, 103, 95, 114, 106, 91, 111, 102, 87,
                    107, 99, 83, 103, 95, 115, 99, 91, 111, 96, 87,
@@ -217,7 +218,7 @@ class FinCalendar(object):
 
         # For all calendars so far, SAT and SUN are not business days
         # If this ever changes I will need to add a filter here.
-        if self._dt.isWeekend():
+        if dt.isWeekend():
             return False
 
         if self.isHoliday(dt) is True:
