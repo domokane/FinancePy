@@ -6,20 +6,15 @@ import numpy as np
 from scipy.optimize import minimize
 
 import matplotlib.pyplot as plt
-from numba import jit, njit, float64, int64
+from numba import njit, float64, int64
 
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
-from ...products.fx.FinFXMktConventions import FinFXATMMethod
-from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-
-from ...models.FinModelBlackScholes import FinModelBlackScholes
 
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 from ...models.FinModelVolatilityFns import volFunctionClark
@@ -30,12 +25,10 @@ from ...models.FinModelSABR import volFunctionSABR
 from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
 from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
 
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
-
 from ...finutils.FinMath import norminvcdf
 
-from ...models.FinModelBlackScholesAnalytical import bsValue
-from ...products.fx.FinFXVanillaOption import fastDelta
+from ...models.FinModelBlackScholesAnalytical import bsDelta
+
 from ...finutils.FinDistribution import FinDistribution
 
 from ...finutils.FinSolvers1D import newton_secant
@@ -44,15 +37,6 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 
 ###############################################################################
 # ISSUES
-# Factor out vol stuff
-# problem with initial values ? optimiser can drive vol negative
-#
-# tried adding a function called gap but it screws up the pdf. Need it to 
-# be smooth c3. abandoned for moment. Advise use quintic CLARK5 for best fit
-#
-# examine other functions for vol
-#
-# find python version of cg minimiser to apply numba to
 ###############################################################################
  
 ###############################################################################
@@ -60,54 +44,6 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 #       delta fit.
 ###############################################################################
 
-# @njit(fastmath=True, cache=True)
-# def _g(K, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     option implied strike which is computed in the class below. '''
-
-#     s = args[0]
-#     t = args[1]
-#     rd = args[2]
-#     rf = args[3]
-#     volatility = args[4]
-#     deltaMethodValue = args[5]
-#     optionTypeValue = args[6]
-#     deltaTarget = args[7]
-
-#     deltaOut = fastDelta(s, t, K, rd, rf,
-#                          volatility,
-#                          deltaMethodValue,
-#                          optionTypeValue)
-
-#     objFn = deltaTarget - deltaOut
-#     return objFn
-
-###############################################################################
-
-# @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-# def _interpolateGap(k, strikes, gaps):
-
-#     if k <= strikes[0]:
-#         return 0.0
-
-#     if k >= strikes[-1]:
-#         return 0.0
-
-#     index = 0
-#     for i in range(1, len(strikes)):
-#         if k > strikes[i-1]and k <= strikes[i]:
-#             index = i
-#             break
-
-#     if index == 0:
-#         raise FinError("Value not bracketed")
-
-#     k0 = strikes[index-1]
-#     k1 = strikes[index]
-#     v0 = gaps[index-1]
-#     v1 = gaps[index]
-#     v = ((k-k0) * v1 + (k1-k) * v0) / (k1-k0)
-#     return v
 
 ###############################################################################
 # Do not cache this function - WRONG. IT WORKS BUT WHY WHEN IN FX IT FAILS ??
@@ -231,153 +167,62 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 ###############################################################################
 
 
-#@njit(cache=True, fastmath=True)
-# def _deltaFit(k, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     Option implied strike which is computed in the class below. I map it into
-#     inverse normcdf space to avoid the flat slope of this function at low vol
-#     and high K. It speeds up the code as it allows initial values close to
-#     the solution to be used. '''
+@njit(cache=True, fastmath=True)
+def _deltaFit(k, *args):
+    ''' This is the objective function used in the determination of the 
+    option implied strike which is computed in the class below. I map it into
+    inverse normcdf space to avoid the flat slope of this function at low vol
+    and high K. It speeds up the code as it allows initial values close to
+    the solution to be used. '''
 
-#     volTypeValue = args[0]
-#     s = args[1]
-#     t = args[2]
-#     rd = args[3]
-#     rf = args[4]
-#     optionTypeValue = args[5]
-#     deltaTypeValue = args[6]
-#     inverseDeltaTarget = args[7]
-#     params = args[8]
-#     strikes = args[9]
-#     gaps = args[10]
+    volTypeValue = args[0]
+    s = args[1]
+    t = args[2]
+    r = args[3]
+    q = args[4]
+    optionTypeValue = args[5]
+    inverseDeltaTarget = args[6]
+    params = args[7]
 
-#     f = s * np.exp((rd-rf)*t)
-#     v = volFunction(volTypeValue, params, strikes, gaps, f, k, t)
-#     deltaOut = fastDelta(s, t, k, rd, rf, v, deltaTypeValue, optionTypeValue)
-#     inverseDeltaOut = norminvcdf(np.abs(deltaOut))
-#     invObjFn = inverseDeltaTarget - inverseDeltaOut
+    f = s * np.exp((r-q)*t)
+    v = volFunction(volTypeValue, params, f, k, t)
+    deltaOut = bsDelta(s, t, k, r, q, v, optionTypeValue)
+    inverseDeltaOut = norminvcdf(np.abs(deltaOut))
+    invObjFn = inverseDeltaTarget - inverseDeltaOut
 
-#     return invObjFn
+    return invObjFn
 
 ###############################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
 ###############################################################################
 
 
-#@njit(float64(float64, float64, float64, float64, int64, int64, float64,
-#              int64, float64, float64[:], float64[:], float64[:]), 
-#      fastmath=True)
-# def _solveForSmileStrike(s, t, rd, rf,
-#                             optionTypeValue,
-#                             volatilityTypeValue,
-#                             deltaTarget,
-#                             deltaMethodValue,
-#                             initialGuess,
-#                             parameters,
-#                             strikes,
-#                             gaps):
-#     ''' Solve for the strike that sets the delta of the option equal to the
-#     target value of delta allowing the volatility to be a function of the
-#     strike. '''
+@njit(float64(float64, float64, float64, float64, int64, int64, float64,
+              float64, float64[:]), fastmath=True)
+def _solveForSmileStrike(s, t, r, q,
+                         optionTypeValue,
+                         volatilityTypeValue,
+                         deltaTarget,
+                         initialGuess,
+                         parameters):
+     ''' Solve for the strike that sets the delta of the option equal to the
+     target value of delta allowing the volatility to be a function of the
+     strike. '''
 
-#     inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
+     inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
 
-#     argtuple = (volatilityTypeValue, s, t, rd, rf, 
-#                 optionTypeValue, deltaMethodValue, 
-#                 inverseDeltaTarget, 
-#                 parameters, strikes, gaps)
+     argtuple = (volatilityTypeValue, s, t, r, q, 
+                 optionTypeValue, 
+                 inverseDeltaTarget, 
+                 parameters)
 
-#     K = newton_secant(_deltaFit, x0=initialGuess, args=argtuple,
-#                       tol=1e-8, maxiter=50)
+     K = newton_secant(_deltaFit, x0=initialGuess, args=argtuple,
+                       tol=1e-8, maxiter=50)
 
-#     return K
+     return K
 
 ###############################################################################
 # Unable to cache function and if I remove njit it complains about pickle
-###############################################################################
-
-
-# @njit(float64(float64, float64, float64, float64, int64, float64,
-#               int64, float64), fastmath=True)
-# def solveForStrike(spotFXRate,
-#                    tdel, rd, rf,
-#                    optionTypeValue,
-#                    deltaTarget,
-#                    deltaMethodValue,
-#                    volatility):
-#     ''' This function determines the implied strike of an FX option
-#     given a delta and the other option details. It uses a one-dimensional
-#     Newton root search algorith to determine the strike that matches an
-#     input volatility. '''
-
-#     # =========================================================================
-#     # IMPORTANT NOTE:
-#     # =========================================================================
-#     # For some delta quotation conventions I can solve for K explicitly.
-#     # Note that as I am using the function norminvdelta to calculate the
-#     # inverse value of delta, this may not, on a round trip using N(x), give
-#     # back the value x as it is calculated to a different number of decimal
-#     # places. It should however agree to 6-7 decimal places. Which is OK.
-#     # =========================================================================
-
-#     if deltaMethodValue == FinFXDeltaMethod.SPOT_DELTA.value:
-
-#         domDF = np.exp(-rd*tdel)
-#         forDF = np.exp(-rf*tdel)
-
-#         if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-#             phi = +1.0
-#         else:
-#             phi = -1.0
-
-#         F0T = spotFXRate * forDF / domDF
-#         vsqrtt = volatility * np.sqrt(tdel)
-#         arg = deltaTarget*phi/forDF  # CHECK THIS !!!
-#         norminvdelta = norminvcdf(arg)
-#         K = F0T * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt/2.0))
-#         return K
-
-#     elif deltaMethodValue == FinFXDeltaMethod.FORWARD_DELTA.value:
-
-#         domDF = np.exp(-rd*tdel)
-#         forDF = np.exp(-rf*tdel)
-
-#         if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
-#             phi = +1.0
-#         else:
-#             phi = -1.0
-
-#         F0T = spotFXRate * forDF / domDF
-#         vsqrtt = volatility * np.sqrt(tdel)
-#         arg = deltaTarget*phi
-#         norminvdelta = norminvcdf(arg)
-#         K = F0T * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt/2.0))
-#         return K
-
-#     elif deltaMethodValue == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
-
-#         argtuple = (spotFXRate, tdel, rd, rf, volatility,
-#                     deltaMethodValue, optionTypeValue, deltaTarget)
-
-#         K = newton_secant(_g, x0=spotFXRate, args=argtuple,
-#                           tol=1e-7, maxiter=50)
-
-#         return K
-
-#     elif deltaMethodValue == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
-
-#         argtuple = (spotFXRate, tdel, rd, rf, volatility,
-#                     deltaMethodValue, optionTypeValue, deltaTarget)
-
-#         K = newton_secant(_g, x0=spotFXRate, args=argtuple,
-#                           tol=1e-7, maxiter=50)
-
-#         return K
-
-#     else:
-
-#         raise FinError("Unknown FinFXDeltaMethod")
-
 ###############################################################################
 
 
@@ -627,17 +472,12 @@ class FinEquityVolSurface():
 
         volTypeValue = self._volatilityFunctionType.value
 
-        s = self._spotFXRate
-
-        if deltaMethod is None:
-            deltaMethodValue = self._deltaMethod.value
-        else:
-            deltaMethodValue = deltaMethod.value
+        s = self._stockPrice
 
         index0 = 0 # lower index in bracket
         index1 = 0 # upper index in bracket
 
-        numCurves = self._numVolCurves
+        numCurves = self._numExpiryDates
 
         # If there is only one time horizon then assume flat vol to this time
         if numCurves == 1:
@@ -672,40 +512,32 @@ class FinEquityVolSurface():
         t0 = self._texp[index0]
         t1 = self._texp[index1]
 
-        initialGuess = self._K_ATM[index0]
+        initialGuess = self._stockPrice
 
         K0 = _solveForSmileStrike(s,
                                   texp,
-                                  self._rd[index0],
-                                  self._rf[index0],
+                                  self._r[index0],
+                                  self._q[index0],
                                   FinOptionTypes.EUROPEAN_CALL.value,
                                   volTypeValue, callDelta,
-                                  deltaMethodValue,
                                   initialGuess,
-                                  self._parameters[index0], 
-                                  self._strikes[index0], 
-                                  self._gaps[index0])
+                                  self._parameters[index0])
 
         vol0 = volFunction(volTypeValue, self._parameters[index0],
-                            self._strikes[index0], self._gaps[index0],
-                            fwd0, K0, t0)
+                           fwd0, K0, t0)
 
         if index1 != index0:
 
             K1 = _solveForSmileStrike(s, texp, 
-                                      self._rd[index1], 
-                                      self._rf[index1],
+                                      self._r[index1], 
+                                      self._q[index1],
                                       FinOptionTypes.EUROPEAN_CALL.value,
                                       volTypeValue, callDelta,
-                                      deltaMethodValue,
                                       initialGuess,
-                                      self._parameters[index1], 
-                                      self._strikes[index1], 
-                                      self._gaps[index1])
+                                      self._parameters[index1])
 
-            vol1 = volFunction(volTypeValue, self._parameters[index1],
-                                self._strikes[index1], self._gaps[index1],
-                                fwd1, K1, t1)
+            vol1 = volFunction(volTypeValue, self._parameters[index1], 
+                               fwd1, K1, t1)
         else:
             vol1 = vol0
             
@@ -904,8 +736,6 @@ class FinEquityVolSurface():
         ''' Generates a plot of each of the vol curves implied by the market 
         and fitted. '''
         
-        volTypeVal = self._volatilityFunctionType.value
-
         lowK = self._strikes[0] * 0.9
         highK = self._strikes[-1] * 1.1
 
@@ -920,9 +750,6 @@ class FinEquityVolSurface():
             numIntervals = 30
             K = lowK
             dK = (highK - lowK)/numIntervals
-            params = self._parameters[tenorIndex]
-            t = self._texp[tenorIndex]
-            f = self._F0T[tenorIndex]
             
             for i in range(0, numIntervals):
 
