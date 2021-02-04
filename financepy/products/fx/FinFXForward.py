@@ -147,3 +147,21 @@ class FinFXForward():
         return fwdFXRate
 
 ###############################################################################
+
+    def __repr__(self):
+        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("STRIKE FX RATE", self._strikeFXRate)
+        s += labelToString("CURRENCY PAIR", self._currencyPair)
+        s += labelToString("NOTIONAL", self._notional)
+        s += labelToString("NOTIONAL CCY", self._notionalCurrency)
+        s += labelToString("SPOT DAYS", self._spotDays, "")
+        return s
+
+###############################################################################
+
+    def _print(self):
+        ''' Simple print function for backward compatibility. '''
+        print(self)
+
+###############################################################################

@@ -17,7 +17,8 @@ with open("../version.py", "r") as fh:
     VERSION = str(version_number[start+1:start+end+1])
     VERSION = VERSION.replace('\n', '')
 
-fileName = "FinancePyManualV_" + str(VERSION)
+# fileName = "FinancePyManualV_" + str(VERSION)
+fileName = "FinancePyManual"
 userGuideFileName = "./" + fileName + ".tex"
 headFile = "./head.tex"
 tailFile = "./tail.tex"
@@ -206,7 +207,7 @@ def buildChapter(folderName):
     print("Building chapter in folder:", folderName)
 
     readMeFile = folderName + "//" + "README.md"
-    f = open(readMeFile, 'r')
+    f = open(readMeFile, 'r', encoding="utf8")
     readMeLines = f.readlines()
     f.close()
 
@@ -284,7 +285,7 @@ def parseModule(moduleName):
     ''' Parse a module looking for classes, functions and classes for
     enumerated types. Functions inside classes are parsed inside the class. '''
     print(moduleName)
-    f = open(moduleName, 'r')
+    f = open(moduleName, 'r', encoding="utf8")
     lines = f.readlines()
     f.close()
 
@@ -859,8 +860,10 @@ if 1 == 1:
     os.remove(fileName + ".toc")
     os.remove(fileName + ".aux")
     os.remove(fileName + ".log")
+    os.remove(newHeadFile)
+    os.remove(newHeadFile + ".bak")
 
-    print("Moving ", pdfFileName1, " to ", pdfFileName2)
-    shutil.move(pdfFileName1, pdfFileName2)
-    print(pdfFileName2)
-    open_file(pdfFileName2)
+#    print("Moving ", pdfFileName1, " to ", pdfFileName2)
+#    shutil.move(pdfFileName1, pdfFileName2)
+#    print(pdfFileName2)
+#    open_file(pdfFileName2)

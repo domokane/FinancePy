@@ -48,8 +48,8 @@ class FinBondMarkets(Enum):
     SWITZERLAND = 31,
     UNITED_KINGDOM = 32,
     UNITED_STATES = 33,
-    AUSTRALIA = 34
-#    NEW_ZEALAND = 35,
+    AUSTRALIA = 34,
+    NEW_ZEALAND = 35,
     NORWAY = 36,
     SOUTH_AFRICA = 37
 

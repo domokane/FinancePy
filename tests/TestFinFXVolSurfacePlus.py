@@ -245,7 +245,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         strikes = np.linspace(1.0, 2.0, 20)
 
-        if 1==0:
+        if 1==1:
             volSurface = []        
             for k in strikes:
                 volSmile = []
@@ -274,7 +274,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         deltas = np.linspace(0.10, 0.90, 17)
 
-        if 1==0:
+        if 1==1:
             volSurface = []        
             for delta in deltas:
                 volSmile = []
@@ -296,7 +296,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             ax.set_xlabel('Years')
             ax.set_ylabel('Delta')
             ax.set_zlabel('Volatility')
-            
+            plt.title("EURUSD Volatility Surface")
             plt.show()
 
 ###############################################################################
@@ -362,6 +362,36 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         fxMarketPlus.checkCalibration(False)
 
+        years = [1.0/12.0, 2./12., 0.25, 0.5, 1.0, 2.0]
+
+        dates = valueDate.addYears(years)
+
+        deltas = np.linspace(0.10, 0.90, 17)
+
+        if 1==1:
+            volSurface = []        
+            for delta in deltas:
+                volSmile = []
+                for dt in dates:
+                    (vol, k) = fxMarketPlus.volatilityFromDeltaDate(delta, dt)
+                    volSmile.append(vol*100.0)
+                    print(delta, k, dt, vol*100.0)
+
+                volSurface.append(volSmile)
+    
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            X, Y = np.meshgrid(years, deltas)
+            zs = np.array(volSurface)
+            Z = zs.reshape(X.shape)
+            
+            ax.plot_surface(X, Y, Z)
+            
+            ax.set_xlabel('Years')
+            ax.set_ylabel('Delta')
+            ax.set_zlabel('Volatility')
+            plt.title("EURUSD Volatility Surface")
+            plt.show()
 ###############################################################################
 
 

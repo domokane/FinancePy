@@ -8,6 +8,12 @@ from enum import Enum
 
 ###############################################################################
 
+class FinLongShort(Enum):
+    LONG = 1
+    SHORT = 2
+
+###############################################################################
+
 class FinOptionTypes(Enum):
     EUROPEAN_CALL = 1
     EUROPEAN_PUT = 2

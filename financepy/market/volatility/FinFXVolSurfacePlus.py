@@ -1407,13 +1407,14 @@ class FinFXVolSurfacePlus():
             else:
                 rr10 = 0.0
 
-            s25 = atmVol + ms25 + rr25/2.0
-            s50 = atmVol
-            s75 = atmVol + ms25 - rr25/2.0
+            # https://quantpie.co.uk/fx/fx_rr_str.php
+            s25 = atmVol + ms25 + rr25/2.0 # 25D Call
+            s50 = atmVol                   # ATM
+            s75 = atmVol + ms25 - rr25/2.0 # 25D Put (75D Call)
 
-            s10 = atmVol + ms10 + rr10/2.0
-            s50 = atmVol
-            s90 = atmVol + ms10 - rr10/2.0
+            s10 = atmVol + ms10 + rr10/2.0 # 10D Call
+            s50 = atmVol                   # ATM
+            s90 = atmVol + ms10 - rr10/2.0 # 10D Put (90D Call)
 
             if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
 

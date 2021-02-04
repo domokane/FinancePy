@@ -33,7 +33,7 @@ class FinVolFunctionTypes(Enum):
 def volFunctionClark(params, f, k, t):
     ''' Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
-    The exact reference is Clarke Page 59. '''
+    The exact reference is Clark Page 59. '''
 
     if f < 0.0:
         print("f:", f)
@@ -129,7 +129,7 @@ def phiSSVI(theta, gamma):
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def SSVI(x, gamma, sigma, rho, t):
-    ''' This is the total variance w = sigma(t)^2 (0,t) x t ''' 
+    ''' This is the total variance w = sigma(t) x sigma(t) (0,t) x t ''' 
     
     theta = sigma * sigma * t
     p = phiSSVI(theta, gamma)
