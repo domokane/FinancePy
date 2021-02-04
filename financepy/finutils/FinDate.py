@@ -344,6 +344,45 @@ class FinDate():
 
     ###########################################################################
 
+    def isEOM(self):
+        ''' returns True if this date falls on a month end. '''
+        
+        y = self._y
+        m = self._m
+        d = self._d
+
+        leapYear = isLeapYear(y)
+
+        if leapYear:
+            if d == monthDaysLeapYear[m - 1]:
+                return True
+        else:
+            if d == monthDaysNotLeapYear[m - 1]:
+                return True
+                    
+        return False
+
+    ###########################################################################
+
+    def EOM(self):
+        ''' returns True if this date falls on a month end. '''
+
+        y = self._y
+        m = self._m
+
+        leapYear = isLeapYear(y)
+
+        if leapYear:
+            lastDay = monthDaysLeapYear[m - 1]
+            return FinDate(lastDay, m, y)
+        else:
+            lastDay = monthDaysNotLeapYear[m - 1]
+            return FinDate(lastDay, m, y)
+
+        return False
+
+    ###########################################################################
+
     def addHours(self, hours):
         ''' Returns a new date that is h hours after the FinDate. '''
 

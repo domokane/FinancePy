@@ -12,11 +12,12 @@ from ...finutils.FinError import FinError
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
+# ADD START DATE TO CLASS ?
 ###############################################################################
 
 
 class FinEquityForward():
-    ''' Contract to buy a stock at a price agreed today. '''
+    ''' Contract to buy or sell a stock in future at a price agreed today. '''
 
     def __init__(self,
                  expiryDate: FinDate,
@@ -24,7 +25,7 @@ class FinEquityForward():
                  notional: float,
                  longShort: FinLongShort = FinLongShort.LONG):
         ''' Creates a FinEquityForward which allows the owner to buy the stock
-        at a price agreed today. Assumes the forward is long the stock.'''
+        at a price agreed today. Need to specify if LONG or SHORT.'''
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -40,8 +41,8 @@ class FinEquityForward():
               stockPrice,  # Current stock price
               discountCurve,
               dividendCurve):
-        ''' Calculate the value of an FX forward contract where the current
-        FX rate is the spotFXRate. '''
+        ''' Calculate the value of an equity forward contract from the stock 
+        price and discound and dividend curves. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear
@@ -78,7 +79,7 @@ class FinEquityForward():
                 stockPrice,  # Current stock price
                 discountCurve,
                 dividendCurve):
-        ''' Calculate the forward price. '''
+        ''' Calculate the forward price of the equity forward contract. '''
 
         if type(valueDate) == FinDate:
             t = (self._expiryDate - valueDate) / gDaysInYear

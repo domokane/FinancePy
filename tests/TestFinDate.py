@@ -226,6 +226,58 @@ def test_IntraDay():
 
 ###############################################################################
 
+def test_FinDateEOM():
+
+    dt = FinDate(29, 2, 2000)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(28, 2, 2001)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(29, 2, 2004)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(28, 2, 2005)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(31, 3, 2003)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(30, 4, 2004)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(31, 5, 2004)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(31, 12, 2010)    
+    assert(dt.isEOM() == True)
+
+    dt = FinDate(2, 2, 2000)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(24, 2, 2001)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(22, 2, 2004)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(1, 2, 2005)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(1, 3, 2003)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(3, 4, 2004)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(5, 5, 2004)    
+    assert(dt.EOM().isEOM() == True)
+
+    dt = FinDate(7, 12, 2010)    
+    assert(dt.EOM().isEOM() == True)
+
+###############################################################################
+    
 start = time.time()
 
 test_FinDate()
@@ -236,6 +288,7 @@ test_FinDateAddYears()
 test_FinDateSpeed()
 test_FinDateFormat()
 test_IntraDay()
+test_FinDateEOM()
 
 end = time.time()
 elapsed = end - start
