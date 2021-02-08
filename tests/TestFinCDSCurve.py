@@ -24,7 +24,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinCDSCurve():
 
-    curveDate = FinDate(2018, 12, 20)
+    curveDate = FinDate(20, 12, 2018)
 
     swaps = []
     depos = []
@@ -37,13 +37,12 @@ def test_FinCDSCurve():
     for i in range(1, 11):
 
         maturityDate = curveDate.addMonths(12 * i)
-        swap = FinIborSwap(
-            curveDate,
-            maturityDate,
-            FinSwapTypes.PAY,
-            fixedCoupon,
-            fixedFreq,
-            fixedDCC)
+        swap = FinIborSwap(curveDate,
+                           maturityDate,
+                           FinSwapTypes.PAY,
+                           fixedCoupon,
+                           fixedFreq,
+                           fixedDCC)
         swaps.append(swap)
 
     libor_curve = FinIborSingleCurve(curveDate, depos, fras, swaps)

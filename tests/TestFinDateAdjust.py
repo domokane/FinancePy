@@ -77,7 +77,7 @@ def test_FinDateAdjust():
     testCases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
                      "DATE")
     freqType = FinFrequencyTypes.SEMI_ANNUAL
-    calendarType = FinCalendarTypes.US
+    calendarType = FinCalendarTypes.UNITED_STATES
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
     dateGenRuleType = FinDateGenRuleTypes.BACKWARD
 

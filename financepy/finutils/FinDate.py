@@ -365,7 +365,7 @@ class FinDate():
     ###########################################################################
 
     def EOM(self):
-        ''' returns True if this date falls on a month end. '''
+        ''' returns last date of month of this date. '''
 
         y = self._y
         m = self._m

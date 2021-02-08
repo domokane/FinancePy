@@ -37,7 +37,7 @@ def test_FinDiscountCurve():
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
-    plotYears = np.linspace(0, 12, 12*12+1)
+    plotYears = np.linspace(0, 12, 12*12+1)[1:]
     plotDates = startDate.addYears(plotYears)
 
     # Examine dependency of curve on compounding rate

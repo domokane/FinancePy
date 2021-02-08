@@ -8,7 +8,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDate import *
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -22,6 +22,8 @@ from financepy.finutils.FinGlobalVariables import gDaysInYear
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
+setDateFormatType(FinDateFormatTypes.UK_LONG)
 
 PLOT_GRAPHS = False
 

@@ -24,6 +24,8 @@ from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
+
+
 ##########################################################################
 
 def buildIborCurve(valuationDate):
@@ -97,6 +99,9 @@ def buildIborCurve(valuationDate):
         swapRate,
         fixedFreqType,
         fixedDCCType)
+    
+#    print(swap1._fixedLeg._paymentDates)
+
     swaps.append(swap1)
 
     maturityDate = settlementDate.addMonths(36)
@@ -109,6 +114,9 @@ def buildIborCurve(valuationDate):
         fixedDCCType)
     swaps.append(swap2)
 
+#    print(swap2._fixedLeg._paymentDates)
+
+    
     maturityDate = settlementDate.addMonths(48)
     swap3 = FinIborSwap(
         settlementDate,
@@ -118,6 +126,8 @@ def buildIborCurve(valuationDate):
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap3)
+
+#    print(swap3._fixedLeg._paymentDates)
 
     maturityDate = settlementDate.addMonths(60)
     swap4 = FinIborSwap(
@@ -129,6 +139,8 @@ def buildIborCurve(valuationDate):
         fixedDCCType)
     swaps.append(swap4)
 
+#    print(swap4._fixedLeg._paymentDates)
+
     maturityDate = settlementDate.addMonths(72)
     swap5 = FinIborSwap(
         settlementDate,
@@ -138,6 +150,8 @@ def buildIborCurve(valuationDate):
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap5)
+
+#    print(swap5._fixedLeg._paymentDates)
 
     maturityDate = settlementDate.addMonths(84)
     swap6 = FinIborSwap(
@@ -149,6 +163,8 @@ def buildIborCurve(valuationDate):
         fixedDCCType)
     swaps.append(swap6)
 
+#    print(swap6._fixedLeg._paymentDates)
+
     maturityDate = settlementDate.addMonths(96)
     swap7 = FinIborSwap(
         settlementDate,
@@ -158,6 +174,8 @@ def buildIborCurve(valuationDate):
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap7)
+
+#    print(swap7._fixedLeg._paymentDates)
 
     maturityDate = settlementDate.addMonths(108)
     swap8 = FinIborSwap(
@@ -169,6 +187,8 @@ def buildIborCurve(valuationDate):
         fixedDCCType)
     swaps.append(swap8)
 
+#    print(swap8._fixedLeg._paymentDates)
+
     maturityDate = settlementDate.addMonths(120)
     swap9 = FinIborSwap(
         settlementDate,
@@ -178,6 +198,8 @@ def buildIborCurve(valuationDate):
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap9)
+
+#    print(swap9._fixedLeg._paymentDates)
 
     liborCurve = FinIborSingleCurve(valuationDate,
                                     depos,
@@ -238,6 +260,7 @@ def test_FinBond():
                             "%10.4f" % cleanPrice, "%6.0f" % accd_days,
                             "%10.4f" % accd, "%8.4f" % ytm)
 
+    ###########################################################################
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
 
     accrualConvention = FinDayCountTypes.ACT_ACT_ICMA
@@ -458,7 +481,7 @@ def test_FinBondExDividend():
     exDivDays = 7
     testCases.header("LABEL", "VALUE")
 
-    calendarType = FinCalendarTypes.UK
+    calendarType = FinCalendarTypes.UNITED_KINGDOM
     bond = FinBond(issueDate, maturityDate, coupon,
                    freqType, accrualType, face)
     settlementDate = FinDate(7, 9, 2003)
@@ -478,7 +501,7 @@ def test_FinBondExDividend():
     face = 100.0
     exDivDays = 7
 
-    calendarType = FinCalendarTypes.UK
+    calendarType = FinCalendarTypes.UNITED_KINGDOM
     bond = FinBond(issueDate, maturityDate, coupon,
                    freqType, accrualType, face)
 

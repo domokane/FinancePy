@@ -1,0 +1,18 @@
+File Created on:20210208_134537
+HEADER,================================= CASH ONLY,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,           FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_HIT ,  1.01538,  1.00647,
+RESULTS,        FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  0.97722,  0.96822,
+RESULTS,      FinTouchOptionPayoffTypes.DOWN_AND_OUT_CASH_OR_NOTHING ,  0.44963,  0.45863,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,             FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT ,  1.12853,  1.12350,
+RESULTS,          FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_EXPIRY ,  1.08667,  1.08146,
+RESULTS,        FinTouchOptionPayoffTypes.UP_AND_OUT_CASH_OR_NOTHING ,  0.34018,  0.34539,
+BANNER,================= ASSET ONLY
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,          FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_HIT ,  0.67692,  0.67098,
+RESULTS,       FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_EXPIRY ,  0.66918,  0.67857,
+RESULTS,     FinTouchOptionPayoffTypes.DOWN_AND_OUT_ASSET_OR_NOTHING ,  0.36519,  0.37207,
+RESULTS,            FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_HIT ,  0.75235,  0.74900,
+RESULTS,         FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_EXPIRY ,  0.74386,  0.75794,
+RESULTS,       FinTouchOptionPayoffTypes.UP_AND_OUT_ASSET_OR_NOTHING ,  0.19200,  0.19560,

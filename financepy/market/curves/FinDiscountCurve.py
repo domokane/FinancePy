@@ -205,7 +205,7 @@ class FinDiscountCurve():
 ###############################################################################
 
     def swapRate(self,
-                 startDate: FinDate,
+                 effectiveDate: FinDate,
                  maturityDate: (list, FinDate),
                  freqType=FinFrequencyTypes.ANNUAL,
                  dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360):
@@ -217,7 +217,7 @@ class FinDiscountCurve():
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
-        if startDate < self._valuationDate:
+        if effectiveDate < self._valuationDate:
             raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(freqType, FinFrequencyTypes) is False:
@@ -240,12 +240,15 @@ class FinDiscountCurve():
 
         for maturityDt in maturityDates:
 
-            schedule = FinSchedule(startDate,
+            if maturityDt <= effectiveDate:
+                raise FinError("Maturity date is before the swap start date.")
+
+            schedule = FinSchedule(effectiveDate,
                                    maturityDt,
                                    freqType)
 
             flowDates = schedule._generate()
-            flowDates[0] = startDate
+            flowDates[0] = effectiveDate
             
             dayCounter = FinDayCount(dayCountType)
             prevDt = flowDates[0]
@@ -261,7 +264,7 @@ class FinDiscountCurve():
             if abs(pv01) < gSmall:
                 parRate = 0.0
             else:
-                dfStart = self.df(startDate)
+                dfStart = self.df(effectiveDate)
                 parRate = (dfStart - df) / pv01
 
             parRates.append(parRate)

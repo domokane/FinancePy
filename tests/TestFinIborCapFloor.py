@@ -330,7 +330,7 @@ def test_FinIborCapFloorQLExample():
 
     startDate = FinDate(14, 6, 2016)
     endDate = FinDate(14, 6, 2026)
-    calendarType = FinCalendarTypes.US
+    calendarType = FinCalendarTypes.UNITED_STATES
     busDayAdjustType = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
     freqType = FinFrequencyTypes.QUARTERLY
     dateGenRuleType = FinDateGenRuleTypes.FORWARD

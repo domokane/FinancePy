@@ -51,7 +51,7 @@ def test_FinEquityForward():
                                    discountCurve, 
                                    dividendCurve)
 
-    print(stockPrice, fwdPrice, fwdValue)
+#    print(stockPrice, fwdPrice, fwdValue)
     testCases.print(stockPrice, fwdPrice, fwdValue)
 
 ###############################################################################

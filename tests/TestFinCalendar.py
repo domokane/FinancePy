@@ -43,6 +43,8 @@ def test_FinCalendar():
                 testCases.print(cal, nextDate)
 #                print(cal, nextDate)
 
+    setDateFormatType(FinDateFormatTypes.US_LONG)
+
 ###############################################################################
 
 

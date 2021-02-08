@@ -102,12 +102,14 @@ class FinIborCapFloor():
 
     def _generateDates(self):
 
-        self._capFloorLetDates = FinSchedule(self._startDate,
-                                             self._maturityDate,
-                                             self._freqType,
-                                             self._calendarType,
-                                             self._busDayAdjustType,
-                                             self._dateGenRuleType)._generate()
+        schedule = FinSchedule(self._startDate,
+                               self._maturityDate,
+                               self._freqType,
+                               self._calendarType,
+                               self._busDayAdjustType,
+                               self._dateGenRuleType)
+
+        self._capFloorLetDates = schedule._adjustedDates
 
 ##########################################################################
 

@@ -46,6 +46,7 @@ class FinFixedLeg(object):
             self._terminationDate = effectiveDate.addTenor(endDate)
 
         calendar = FinCalendar(calendarType)
+
         self._maturityDate = calendar.adjust(self._terminationDate,
                                              busDayAdjustType)
 
@@ -86,12 +87,14 @@ class FinFixedLeg(object):
         # Nothing is paid on the swap effective date and so the first payment
         # date is the first actual payment date
 
-        scheduleDates = FinSchedule(self._effectiveDate,
-                                    self._terminationDate,
-                                    self._freqType,
-                                    self._calendarType,
-                                    self._busDayAdjustType,
-                                    self._dateGenRuleType)._generate()
+        schedule = FinSchedule(self._effectiveDate,
+                               self._terminationDate,
+                               self._freqType,
+                               self._calendarType,
+                               self._busDayAdjustType,
+                               self._dateGenRuleType)
+
+        scheduleDates = schedule._adjustedDates
 
         if len(scheduleDates) < 2:
             raise FinError("Schedule has none or only one date")
@@ -148,7 +151,9 @@ class FinFixedLeg(object):
         dfValue = discountCurve.df(valuationDate)
         legPV = 0.0
         numPayments = len(self._paymentDates)
- 
+
+        dfPmnt = 0.0
+
         for iPmnt in range(0, numPayments):
  
             pmntDate = self._paymentDates[iPmnt]

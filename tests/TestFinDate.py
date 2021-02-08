@@ -296,4 +296,4 @@ elapsed = end - start
 
 testCases.compareTestCases()
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(FinDateFormatTypes.UK_LONG)

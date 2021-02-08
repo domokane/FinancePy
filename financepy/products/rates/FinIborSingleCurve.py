@@ -293,7 +293,7 @@ class FinIborSingleCurve(FinDiscountCurve):
             for swap in iborSwaps[0:-1]:
 
                 swapCpnDates = swap._fixedLeg._paymentDates
-
+                
                 numFlows = len(swapCpnDates)
                 for iFlow in range(0, numFlows):
                     if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:

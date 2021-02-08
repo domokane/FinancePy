@@ -409,7 +409,7 @@ def test_FinIborDepositsFuturesSwaps():
     principal = 0.0
     floatSpread = 0.0
     floatDCCType = FinDayCountTypes.ACT_360
-    calendarType = FinCalendarTypes.US
+    calendarType = FinCalendarTypes.UNITED_STATES
     busDayAdjustRule = FinBusDayAdjustTypes.PRECEDING
 
     swapRate = 0.02776305

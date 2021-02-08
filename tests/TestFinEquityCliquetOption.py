@@ -18,8 +18,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityCliquetOptionHaug():
-    ''' Following example in Haug Page 130 '''
+def test_FinEquityCliquetOption():
 
     startDate = FinDate(1, 1, 2014)
     finalExpiryDate = FinDate(1, 1, 2017)
@@ -52,5 +51,5 @@ def test_FinEquityCliquetOptionHaug():
 ###############################################################################
 
 
-test_FinEquityCliquetOptionHaug()
+test_FinEquityCliquetOption()
 testCases.compareTestCases()

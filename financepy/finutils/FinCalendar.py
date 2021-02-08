@@ -131,7 +131,7 @@ class FinCalendar(object):
 
             # if the business day is in a different month look back
             # for previous first business day one day at a time
-            # I could speed this up by starting it at initial date
+            # TODO: I could speed this up by starting it at initial date
             if dt._m != m_start:
                 dt = FinDate(d_start, m_start, y_start)
                 while self.isBusinessDay(dt) is False:
@@ -167,7 +167,9 @@ class FinCalendar(object):
                     dt = dt.addDays(+1)
 
             return dt
+
         else:
+
             raise FinError("Unknown adjustment convention" +
                            str(busDayConventionType))
 
@@ -181,7 +183,7 @@ class FinCalendar(object):
         ''' Returns a new date that is numDays business days after FinDate. 
         All holidays in the chosen calendar are assumed not business days. '''
 
-        # TODO: REMOVE DATETIME DEPENDENCE HERE
+        # TODO: REMOVE DATETIME DEPENDENCE HERE ???
 
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
