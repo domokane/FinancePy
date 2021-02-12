@@ -13,6 +13,7 @@ from .FinHelperFunctions import checkArgumentTypes
 
 ###############################################################################
 # TODO: Start and end date to allow for long stubs
+###############################################################################
 
 class FinSchedule(object):
     ''' A schedule is a set of dates generated according to ISDA standard
@@ -22,25 +23,28 @@ class FinSchedule(object):
     Next Coupon Date (NCD). We reference ISDA 2006.'''
 
     def __init__(self,
-                 effectiveDate: FinDate,   # Also known as the start date
-                 terminationDate: FinDate,  # This is UNADJUSTED (set flag to adjust it)
+                 effectiveDate: FinDate, # Also known as the start date
+                 terminationDate: FinDate, # This is UNADJUSTED (set flag to adjust it)
                  freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
                  adjustTerminationDate:bool = True, # Default is to adjust
-                 endOfMonthFlag:bool = False, # All dates are EOM if True
+                 endOfMonthFlag:bool = False, # All flow dates are EOM if True
                  firstDate = None,  # First coupon date
                  nextToLastDate = None): # Penultimate coupon date
         ''' Create FinSchedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps. 
-        The effective date is never adjusted as it is not a payment date.
-        The termination date is not automatically business day adjusted in a 
-        swap - assuming it is a holiday date. This must be explicitly states in
-        the trade confirm. It is adjusted in a CDS contract as standard. 
-        First we get the unadjusted dates by either stepping forward from the 
-        effective date or stepping back from the termination date in steps 
-        determined by the period - i.e. the number of months between payments.
+
+        If the date gen rule type is FORWARD we get the unadjusted dates by stepping 
+        forward from the effective date in steps of months determined by the period
+        tenor - i.e. the number of months between payments. We stop before we go past the
+        termination date. 
+
+        If the date gen rule type is BACKWARD we get the unadjusted dates by 
+        stepping backward from the termination date in steps of months determined by 
+        the period tenor - i.e. the number of months between payments. We stop 
+        before we go past the effective date. 
 
         - If the EOM flag is false, and the start date is on the 31st then the
         the unadjusted dates will fall on the 30 if a 30 is a previous date. 
@@ -49,11 +53,17 @@ class FinSchedule(object):
         - If the EOM flag is false and the start date is 28 Feb then all 
         unadjusted dates will fall on their respective EOM.
 
-        We then adjust all of these dates if they fall on a weekend or holiday 
-        according to the calendar specified. These dates are then adjusted in 
-        accordance with the business date adjustment.         
+        We then adjust all of the flow dates if they fall on a weekend or holiday 
+        according to the calendar specified. These dates are adjusted in 
+        accordance with the business date adjustment.
+
+        The effective date is never adjusted as it is not a payment date.
+        The termination date is not automatically business day adjusted in a 
+        swap - assuming it is a holiday date. This must be explicitly stated in
+        the trade confirm. However, it is adjusted in a CDS contract as standard. 
+
         Inputs firstDate and nextToLastDate are for managing long payment stubs
-        at the start and end of the swap but have not yet been implemented. All
+        at the start and end of the swap but *have not yet been implemented*. All
         stubs are currently short, either at the start or end of swap. '''
 
         checkArgumentTypes(self.__init__, locals())

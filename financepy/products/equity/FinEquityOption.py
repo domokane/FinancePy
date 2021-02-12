@@ -14,6 +14,7 @@ from ...finutils.FinDate import FinDate
 
 bump = 1e-4
 
+###############################################################################
 
 class FinEquityOptionModelTypes(Enum):
     BLACKSCHOLES = 1

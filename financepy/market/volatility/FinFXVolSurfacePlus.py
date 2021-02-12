@@ -1165,7 +1165,7 @@ class FinFXVolSurfacePlus():
  
         if np.abs(t1-t0) > 1e-6:
 
-            K = ((texp-t0) * K1 + (t1-texp) * K1) / (K1 - K0)
+            K = ((texp-t0) * K1 + (t1-texp) * K0) / (K1 - K0)
 
         else:
 

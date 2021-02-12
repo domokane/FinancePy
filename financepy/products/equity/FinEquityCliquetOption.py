@@ -22,15 +22,10 @@ from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...models.FinModelBlackScholes import bsValue, FinModelBlackScholes
 from ...models.FinModel import FinModel
 
-
 ###############################################################################
 # TODO: Do we need to day count adjust option payoffs ?
 # TODO: Monte Carlo pricer
 ###############################################################################
-
-
-###############################################################################
-
 
 class FinEquityCliquetOption(FinEquityOption):
     ''' A FinEquityCliquetOption is a series of options which start and stop at
