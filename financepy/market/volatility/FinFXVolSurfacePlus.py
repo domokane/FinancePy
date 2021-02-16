@@ -109,7 +109,7 @@ def _interpolateGap(k, strikes, gaps):
 
 ###############################################################################
 # Do not cache this function
-# @njit(fastmath=True) #, cache=True)
+@njit(fastmath=True) #, cache=True)
 def _obj(params, *args):
     ''' Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
@@ -455,7 +455,8 @@ def _solveToHorizon(s, t, rd, rf,
                        alpha,
                        xinits,
                        ginits,
-                       finSolverType):
+                       finSolverType,
+                       tol):
 
     ###########################################################################
     # Determine the price of a market strangle from market strangle
@@ -547,7 +548,7 @@ def _solveToHorizon(s, t, rd, rf,
     # Determine parameters of vol surface using minimisation
     ###########################################################################
 
-    tol = 1e-8
+    # tol = 1e-8
 
     args = (s, t, rd, rf,
             K_ATM, atmVol,
@@ -570,12 +571,12 @@ def _solveToHorizon(s, t, rd, rf,
             opt = minimize(_obj, xinits, args, method="CG", tol=tol)
             xopt = opt.x
     except:
-        # If convergence fails try again with CG if necessary
-        if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
-            print('Failed to converge, will try CG')
-            opt = minimize(_obj, xinits, args, method="CG", tol=tol)
+         # If convergence fails try again with CG if necessary
+         if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
+             print('Failed to converge, will try CG')
+             opt = minimize(_obj, xinits, args, method="CG", tol=tol)
 
-            xopt = opt.x
+             xopt = opt.x
 
     params = np.array(xopt)
 
@@ -870,7 +871,8 @@ class FinFXVolSurfacePlus():
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
                  volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
-                 finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
+                 finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD,
+                 tol:float=1e-8):
         ''' Create the FinFXVolSurfacePlus object by passing in market vol data
         for ATM, 25 Delta and 10 Delta strikes. The alpha weight shifts the
         fitting between 25D and 10D. Alpha = 0.0 is 100% 25D while alpha = 1.0
@@ -991,7 +993,7 @@ class FinFXVolSurfacePlus():
             expiryDate = valueDate.addTenor(tenors[i])
             self._expiryDates.append(expiryDate)
 
-        self._buildVolSurface(finSolverType=finSolverType)
+        self._buildVolSurface(finSolverType=finSolverType, tol=tol)
 
 ###############################################################################
 
@@ -1294,7 +1296,7 @@ class FinFXVolSurfacePlus():
 
 ###############################################################################
 
-    def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
+    def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD, tol=1e-8):
         ''' Main function to construct the vol surface. '''
 
         s = self._spotFXRate
@@ -1533,7 +1535,8 @@ class FinFXVolSurfacePlus():
                                       self._alpha,
                                       xinits[i],
                                       ginits[i],
-                                      finSolverType)
+                                      finSolverType,
+                                      tol)
 
             (self._parameters[i,:], self._strikes[i,:], self._gaps[i:],
              self._K_25D_C_MS[i], self._K_25D_P_MS[i],

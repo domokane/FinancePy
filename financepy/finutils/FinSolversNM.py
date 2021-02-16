@@ -25,7 +25,7 @@ results = namedtuple('results', 'root function_calls iterations converged')
 # An alternative optimizer when calibrating FX vol surface, which is faster than CG (although converges less often)
 
 # Numba has issues caching this
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True)#, cache=True)
 def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                 tol_x=1e-10, max_iter=1000, roh=1., chi=2., v=0.5, sigma=0.5):
     """
@@ -133,7 +133,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     .. [8] SciPy's Nelder-Mead implementation
 
     """
-    
+
     vertices = _initialize_simplex(x0, bounds)
 
     #results = _nelder_mead_algorithm(fun, vertices, bounds, args=args,
