@@ -461,12 +461,16 @@ def checkArgumentTypes(func, values):
         usableType = toUsableType(annotationType)
         if(not isinstance(value, usableType)):
 
-            print("==>", value, type(value), usableType,
-                  isinstance(value, usableType))
-            s = f"In {func.__module__}.{func.__name__}:\n"
-            s += f"Mismatched Types: expected a "
-            s += f"{valueName} of type '{usableType.__name__}', however"
-            s += f" a value of type '{type(value).__name__}' was given."
-            raise FinError(s)
+            print("ERROR with function arguments for", func.__name__)
+            print("This is in module", func.__module__)
+            print("Please check inputs for argument >>", valueName, "<<")
+            print("You have input an argument", value, "of type", type(value))
+            print("The allowed types are", usableType)
+            print("It is none of these so FAILS. Please amend.")
+#            s = f"In {func.__module__}.{func.__name__}:\n"
+#            s += f"Mismatched Types: expected a "
+#            s += f"{valueName} of type '{usableType.__name__}', however"
+#            s += f" a value of type '{type(value).__name__}' was given."
+            raise FinError("Argument Type Error")
 
 ###############################################################################

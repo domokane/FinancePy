@@ -4,6 +4,8 @@
 
 # TODO Fix this
 
+import numpy as np
+
 from ..finutils.FinGlobalTypes import FinOptionTypes
 from ..finutils.FinError import FinError
 
@@ -16,7 +18,6 @@ from .FinModelBlackScholesAnalytical import bsValue
 
 from enum import Enum
 
-
 class FinModelBlackScholesTypes(Enum):
         DEFAULT = 0
         ANALYTICAL = 1
@@ -28,7 +29,7 @@ class FinModelBlackScholesTypes(Enum):
 class FinModelBlackScholes(FinModel):
     
     def __init__(self,
-                 volatility: float, 
+                 volatility: (float, np.ndarray), 
                  implementationType: FinModelBlackScholesTypes = FinModelBlackScholesTypes.DEFAULT,
                  numStepsPerYear: int = 100):
 
