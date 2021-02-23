@@ -7,19 +7,10 @@
 import numpy as np
 
 from ...finutils.FinDate import FinDate
-from ...finutils.FinError import FinError
-from ...finutils.FinFrequency import FinFrequency, FinFrequencyTypes
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinCalendar import FinCalendar
 from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
-from ...finutils.FinCalendar import FinDateGenRuleTypes
 from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-
-from scipy import optimize
+from .FinBond import FinYTMCalcType
 
 ###############################################################################
 
