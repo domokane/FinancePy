@@ -88,10 +88,10 @@ See the changelog for a detailed history of changes.
 
 Contributions are very welcome. There are a number of requirements:
 
-* You should use CamelCase i.e. variables of the form optionPrice.
-* Comments are required for every class and function and they should be clear.
+* You can use either camel case or snail case. At some point I will try to make the code Pep8 compliant. But not yet.
+* Comments are required for every class and function and they should be a clear description.
 * At least one test case must be provided for every function.
-* Follow the style of the code as currently written. This may change over time but please use the current style as your guide.
+* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability is the priority.
 
 ## License
 
