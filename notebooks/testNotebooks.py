@@ -17,7 +17,7 @@ from os.path import dirname, join
 
 print("Looking in folder:", dirname(__file__))
 
-notebooks = sorted(glob.glob(join(dirname(__file__), "./products/equity/EQUITY*.ipynb"), recursive=True))
+notebooks = sorted(glob.glob(join(dirname(__file__), "./products/*/*.ipynb"), recursive=True))
 
 ###############################################################################
 

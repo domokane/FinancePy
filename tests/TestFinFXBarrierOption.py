@@ -20,8 +20,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFXBarrierOption():
 
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2016, 1, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
     spotFXRate = 100.0
     currencyPair = "USDJPY"
     volatility = 0.20

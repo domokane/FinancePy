@@ -57,22 +57,22 @@ def test_FinBondConvertible():
                               face)
 #    print(bond)
 
-    dividendDates = [FinDate(2007, 3, 20),
-                     FinDate(2008, 3, 15),
-                     FinDate(2009, 3, 15),
-                     FinDate(2010, 3, 15),
-                     FinDate(2011, 3, 15),
-                     FinDate(2012, 3, 15),
-                     FinDate(2013, 3, 15),
-                     FinDate(2014, 3, 15),
-                     FinDate(2015, 3, 15),
-                     FinDate(2016, 3, 15),
-                     FinDate(2017, 3, 15),
-                     FinDate(2018, 3, 15),
-                     FinDate(2019, 3, 15),
-                     FinDate(2020, 3, 15),
-                     FinDate(2021, 3, 15),
-                     FinDate(2022, 3, 15)]
+    dividendDates = [FinDate(20, 3, 2007),
+                     FinDate(15, 3, 2008),
+                     FinDate(15, 3, 2009),
+                     FinDate(15, 3, 2010),
+                     FinDate(15, 3, 2011),
+                     FinDate(15, 3, 2012),
+                     FinDate(15, 3, 2013),
+                     FinDate(15, 3, 2014),
+                     FinDate(15, 3, 2015),
+                     FinDate(15, 3, 2016),
+                     FinDate(15, 3, 2017),
+                     FinDate(15, 3, 2018),
+                     FinDate(15, 3, 2019),
+                     FinDate(15, 3, 2020),
+                     FinDate(15, 3, 2021),
+                     FinDate(15, 3, 2022)]
 
     dividendYields = [0.00] * 16
     stockPrice = 28.5

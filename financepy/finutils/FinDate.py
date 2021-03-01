@@ -79,8 +79,8 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 ###############################################################################
 
-
-@njit(boolean(int64), fastmath=True, cache=True)
+# TODO: Fix this - it has stopped working
+# @njit(boolean(int64), fastmath=True, cache=True)
 def isLeapYear(y: int):
     ''' Test whether year y is a leap year - if so return True, else False '''
     leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
@@ -213,9 +213,7 @@ class FinDate():
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
-            tmp = y
-            y = d
-            d = tmp
+            raise FinError("Dates must be in the format FinDate(dd, mm, yyyy")
 
         if gDateCounterList is None:
             calculateList()

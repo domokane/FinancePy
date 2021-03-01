@@ -25,6 +25,7 @@ financepy.egg-info
 financepy-0.*
 .ipynb_checkpoints
 *.out
+ERROR_*.ipynb
 
 # SPYDER
 .spyproject

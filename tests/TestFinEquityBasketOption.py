@@ -23,8 +23,8 @@ def test_FinEquityBasketOption():
 
     import time
 
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2016, 1, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
     volatility = 0.30
     interestRate = 0.05
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)

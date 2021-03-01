@@ -19,8 +19,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 def test_FinEquityLookBackOption():
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2016, 1, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
     stockPrice = 100.0
     volatility = 0.3
     interestRate = 0.05

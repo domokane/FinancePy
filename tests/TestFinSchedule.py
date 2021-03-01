@@ -208,8 +208,8 @@ def test_FinSchedule():
     # FORWARD SHORT STUB AT END
     ###########################################################################
 
-    d1 = FinDate(2018, 8, 20)
-    d2 = FinDate(2020, 6, 20)
+    d1 = FinDate(20, 8, 2018)
+    d2 = FinDate(20, 6, 2020)
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     calendarType = FinCalendarTypes.WEEKEND
     busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING

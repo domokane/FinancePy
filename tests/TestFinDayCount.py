@@ -22,7 +22,7 @@ def test_FinDayCount():
 
     for dayCountMethod in FinDayCountTypes:
 
-        startDate = FinDate(2019, 1, 1)
+        startDate = FinDate(1, 1, 2019)
         nextDate = startDate
         numDays = 20
         dayCount = FinDayCount(dayCountMethod)

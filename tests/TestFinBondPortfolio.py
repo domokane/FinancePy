@@ -28,7 +28,7 @@ def test_FinBondPortfolio():
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
 
-    settlement = FinDate(2012, 9, 19)
+    settlement = FinDate(19, 9, 2012)
 
     testCases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
 

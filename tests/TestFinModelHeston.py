@@ -22,8 +22,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def testAnalyticalModels():
 
     # Reference see table 4.1 of Rouah book
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2015, 4, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 4, 2015)
     v0 = 0.05  # initial variance of volatility
     theta = 0.05  # long term variance
     kappa = 2.0  # speed of variance reversion
@@ -95,8 +95,8 @@ def testMonteCarlo():
     import time
 
     # Reference see table 4.1 of Rouah book
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2016, 1, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
     v0 = 0.04  # initial variance of volatility
     theta = 0.04  # long term variance
     kappa = 2.0  # speed of variance reversion

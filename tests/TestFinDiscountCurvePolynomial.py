@@ -25,7 +25,7 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurvePolynomial():
 
     times = np.linspace(0.00, 10.0, 21)
-    curveDate = FinDate(2019, 2, 2)
+    curveDate = FinDate(2, 2, 2019)
     dates = curveDate.addYears(times)
     coeffs = [0.0004, -0.0001, 0.00000010]
     curve1 = FinDiscountCurvePoly(curveDate, coeffs)

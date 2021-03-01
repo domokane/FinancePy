@@ -81,11 +81,11 @@ def testFinIborSwaptionModels():
     # COMPARISON OF MODELS
     ##########################################################################
 
-    valuationDate = FinDate(2011, 1, 1)
+    valuationDate = FinDate(1, 1, 2011)
     liborCurve = test_FinIborDepositsAndSwaps(valuationDate)
 
-    exerciseDate = FinDate(2012, 1, 1)
-    swapMaturityDate = FinDate(2017, 1, 1)
+    exerciseDate = FinDate(1, 1, 2012)
+    swapMaturityDate = FinDate(1, 1, 2017)
 
     swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = FinDayCountTypes.ACT_365F

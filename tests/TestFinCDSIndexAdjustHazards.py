@@ -102,7 +102,7 @@ def buildIssuerCurve(tradeDate, liborCurve):
     cdsMarketContracts = []
 
     cdsCoupon = 0.0048375
-    maturityDate = FinDate(2010, 6, 29)
+    maturityDate = FinDate(29, 6, 2010)
     cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
     cdsMarketContracts.append(cds)
 
@@ -120,7 +120,7 @@ def buildIssuerCurve(tradeDate, liborCurve):
 
 def test_performCDSIndexHazardRateAdjustment():
 
-    tradeDate = FinDate(2007, 8, 1)
+    tradeDate = FinDate(1, 8, 2007)
     stepInDate = tradeDate.addDays(1)
     valuationDate = stepInDate
 
@@ -238,10 +238,12 @@ def test_performCDSIndexHazardRateAdjustment():
 
     indexCoupons = [0.002, 0.0037, 0.0050, 0.0063]
     indexUpfronts = [0.0, 0.0, 0.0, 0.0]
-    indexMaturityDates = [FinDate(2009, 12, 20),
-                          FinDate(2011, 12, 20),
-                          FinDate(2013, 12, 20),
-                          FinDate(2016, 12, 20)]
+
+    indexMaturityDates = [FinDate(20, 12, 2009),
+                          FinDate(20, 12, 2011),
+                          FinDate(20, 12, 2013),
+                          FinDate(20, 12, 2016)]
+
     indexRecoveryRate = 0.40
 
     tolerance = 1e-6

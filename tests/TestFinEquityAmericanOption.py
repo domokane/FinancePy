@@ -20,8 +20,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def testFinEquityAmericanOption():
 
-    valueDate = FinDate(2016, 1, 1)
-    expiryDate = FinDate(2017, 1, 1)
+    valueDate = FinDate(1, 1, 2016)
+    expiryDate = FinDate(1, 1, 2017)
     stockPrice = 50.0
     interestRate = 0.06
     dividendYield = 0.04

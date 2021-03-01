@@ -33,7 +33,7 @@ PLOT_GRAPHS = False
 def test_FinOISFRAsOnly():
 
     # TO DO FIX THIS
-    valuationDate = FinDate(2018, 2, 23)
+    valuationDate = FinDate(23, 2, 2018)
 
     spotDays = 0
     settleDt = valuationDate.addWeekDays(spotDays)
@@ -80,7 +80,7 @@ def test_FinOISFRAsOnly():
 
 def test_FinOISDepositsFRAsSwaps():
 
-    valuationDate = FinDate(2019, 9, 18)
+    valuationDate = FinDate(18, 9, 2019)
 
     dccType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []

@@ -36,7 +36,7 @@ def test_FinIborDepositsOnly():
     # I have used the following useful blog post by Ioannis Rigopoulos for this
     # https://blog.deriscope.com/index.php/en/yield-curve-excel-quantlib-deposit
 
-    valuationDate = FinDate(2018, 2, 23)
+    valuationDate = FinDate(23, 2, 2018)
 
     spotDays = 0
     settlementDate = valuationDate.addWeekDays(spotDays)
@@ -95,7 +95,7 @@ def test_FinIborDepositsOnly():
 def test_FinIborFRAsOnly():
 
     # TO DO FIX THIS
-    valuationDate = FinDate(2018, 2, 23)
+    valuationDate = FinDate(23, 2, 2018)
 
     spotDays = 0
     settlementDate = valuationDate.addWeekDays(spotDays)
@@ -144,7 +144,7 @@ def test_FinIborFRAsOnly():
 
 def test_FinIborDepositsFRAsSwaps():
 
-    valuationDate = FinDate(2019, 9, 18)
+    valuationDate = FinDate(18, 9, 2019)
 
     dccType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []

@@ -24,8 +24,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityVanillaOption():
 
-    valueDate = FinDate(2015, 1, 1)
-    expiryDate = FinDate(2015, 7, 1)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 7, 2015)
     stockPrice = 100
     volatility = 0.30
     interestRate = 0.05

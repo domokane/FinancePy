@@ -35,7 +35,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_CDSFastApproximation():
 
-    valueDate = FinDate(2018, 6, 20)
+    valueDate = FinDate(20, 6, 2018)
     # I build a discount curve that requires no bootstrap
     times = np.linspace(0, 10.0, 11)
     r = 0.05
@@ -87,7 +87,7 @@ def test_CDSFastApproximation():
 
 def test_CDSCurveRepricing():
 
-    valuationDate = FinDate(2018, 6, 20)
+    valuationDate = FinDate(20, 6, 2018)
     recoveryRate = 0.40
 
     cdsContracts, issuerCurve = test_IssuerCurveBuild()
@@ -179,7 +179,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
 
-    tradeDate = FinDate(2019, 8, 9)
+    tradeDate = FinDate(9, 8, 2019)
     valuationDate = tradeDate.addDays(1)
 
     m = 1.0  # 0.00000000000
@@ -675,11 +675,11 @@ def test_fullPriceCDSConvergence():
     _, issuerCurve = buildFullIssuerCurve1(0.0, 0.0)
 
     # This is the 10 year contract at an off market coupon
-    maturityDate = FinDate(2029, 6, 20)
+    maturityDate = FinDate(20, 6, 2029)
     cdsCoupon = 0.0150
     notional = ONE_MILLION
     longProtection = False
-    tradeDate = FinDate(2019, 8, 9)
+    tradeDate = FinDate(9, 8, 2019)
     valuationDate = tradeDate.addDays(1)
 
     cdsContract = FinCDS(valuationDate,
@@ -705,7 +705,7 @@ def test_CDSDateGeneration():
     maturityDate = FinDate(20, 6, 2029)
     cdsCoupon = 0.0100
 
-    tradeDate = FinDate(2019, 8, 9)
+    tradeDate = FinDate(9, 8, 2019)
     valuationDate = tradeDate.addDays(1)
 
     cdsContract = FinCDS(valuationDate,

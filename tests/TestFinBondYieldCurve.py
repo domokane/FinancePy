@@ -33,7 +33,7 @@ def test_FinBondYieldCurve():
 
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    settlement = FinDate(2012, 9, 19)
+    settlement = FinDate(19, 9, 2012)
 
     bonds = []
     ylds = []
@@ -91,7 +91,7 @@ def test_FinBondYieldCurve():
 
 ###############################################################################
 
-    maturityDate = FinDate(2030, 9, 19)
+    maturityDate = FinDate(19, 9, 2030)
     interpolatedYield = fittedCurve5.interpolatedYield(maturityDate)
     testCases.print(maturityDate, interpolatedYield)
 

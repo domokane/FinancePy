@@ -73,7 +73,7 @@ class FinBondFRN(object):
         self._flowDates = []
         self._flowAmounts = []
 
-        self._settlementDate = FinDate(1900, 1, 1)
+        self._settlementDate = FinDate(1, 1, 1900)
         self._accruedInterest = None
         self._accruedDays = 0.0
 

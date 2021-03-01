@@ -29,8 +29,8 @@ def test_FinBinomialTree():
     dividendYield = 0.04
     volatility = 0.40
 
-    valueDate = FinDate(2016, 1, 1)
-    expiryDate = FinDate(2017, 1, 1)
+    valueDate = FinDate(1, 1, 2016)
+    expiryDate = FinDate(1, 1, 2017)
 
     model = FinModelBlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, riskFreeRate)

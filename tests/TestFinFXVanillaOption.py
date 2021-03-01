@@ -230,7 +230,7 @@ def test_FinFXVanillaOptionBloombergExample():
 def test_FinFXVanillaOptionHullExample():
 
     #   Example from Hull 4th edition page 284
-    valuationDate = FinDate(2015, 1, 1)
+    valuationDate = FinDate(1, 1, 2015)
     expiryDate = valuationDate.addMonths(4)
     spotFXRate = 1.60
     volatility = 0.1411
