@@ -199,7 +199,7 @@ def printTree(array: np.ndarray,
 ###############################################################################
 
 
-def inputTime(dt: Date,
+def input_time(dt: Date,
               curve):
     """ Validates a time input in relation to a curve. If it is a float then
     it returns a float as long as it is positive. If it is a FinDate then it
@@ -423,8 +423,8 @@ def accruedTree(gridTimes: np.ndarray,
 
     # When the grid time is before the first coupon we have to extrapolate back
 
-    couponTimes = np.zeros(0)
-    couponFlows = np.zeros(0)
+    coupon_times = np.zeros(0)
+    coupon_flows = np.zeros(0)
 
     for iGrid in range(1, numGridTimes):
 
@@ -432,19 +432,19 @@ def accruedTree(gridTimes: np.ndarray,
         cpnFlow = gridFlows[iGrid]
 
         if gridFlows[iGrid] > gSmall:
-            couponTimes = np.append(couponTimes, cpnTime)
-            couponFlows = np.append(couponFlows, cpnFlow)
+            coupon_times = np.append(coupon_times, cpnTime)
+            coupon_flows = np.append(coupon_flows, cpnFlow)
 
-    numCoupons = len(couponTimes)
+    numCoupons = len(coupon_times)
 
     # interpolate between coupons
     for iGrid in range(0, numGridTimes):
         t = gridTimes[iGrid]            
         for i in range(0, numCoupons):
-            if t > couponTimes[i-1] and t <= couponTimes[i]:
-                den = couponTimes[i] - couponTimes[i-1]
-                num = (t - couponTimes[i-1])
-                accrued[iGrid] = face * num * couponFlows[i] / den
+            if t > coupon_times[i-1] and t <= coupon_times[i]:
+                den = coupon_times[i] - coupon_times[i-1]
+                num = (t - coupon_times[i-1])
+                accrued[iGrid] = face * num * coupon_flows[i] / den
                 break
      
     return accrued
@@ -452,7 +452,7 @@ def accruedTree(gridTimes: np.ndarray,
 ###############################################################################
 
 
-def checkArgumentTypes(func, values):
+def check_argument_types(func, values):
     """ Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
     will not be checked. """

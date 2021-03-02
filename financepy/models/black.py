@@ -47,7 +47,7 @@ class FinModelBlack():
         """ Create FinModel black using parameters. """
         self._volatility = volatility
         self._implementation = 0
-        self._numSteps = 0
+        self._num_steps = 0
         self._seed = 0
         self._param1 = 0
         self._param2 = 0
@@ -198,7 +198,7 @@ class FinModelBlack():
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VOLATILITY", self._volatility)
         s += labelToString("IMPLEMENTATION", self._implementation)
-        s += labelToString("NUMSTEPS", self._numSteps)
+        s += labelToString("NUMSTEPS", self._num_steps)
         return s
 
 ###############################################################################

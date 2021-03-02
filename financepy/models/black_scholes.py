@@ -9,7 +9,7 @@ import numpy as np
 from ..utils.FinGlobalTypes import FinOptionTypes
 from ..utils.FinError import FinError
 
-from ..utils.FinHelperFunctions import checkArgumentTypes
+from ..utils.FinHelperFunctions import check_argument_types
 
 from .FinModel import FinModel
 from .FinModelCRRTree import crrTreeValAvg
@@ -33,7 +33,7 @@ class FinModelBlackScholes(FinModel):
                  implementationType: FinModelBlackScholesTypes = FinModelBlackScholesTypes.DEFAULT,
                  num_steps_per_year: int = 100):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._volatility = volatility
         self._implementationType = implementationType

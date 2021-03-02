@@ -14,7 +14,7 @@ bump = 1e-4
 
 @njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
                  float64, int64), fastmath=True, cache=True)
-def crrTreeVal(stockPrice,
+def crrTreeVal(stock_price,
                ccInterestRate,  # continuously compounded
                ccDividendRate,  # continuously compounded
                volatility,  # Black scholes volatility
@@ -25,46 +25,46 @@ def crrTreeVal(stockPrice,
                isEven):
     """ Value an American option using a Binomial Treee """
 
-    numSteps = int(num_steps_per_year * timeToExpiry)
+    num_steps = int(num_steps_per_year * timeToExpiry)
 
-    if numSteps < 30:
-        numSteps = 30
+    if num_steps < 30:
+        num_steps = 30
 
     ## OVERRIDE JUST TO SEE
-    numSteps = num_steps_per_year
+    num_steps = num_steps_per_year
 
     # if the number of steps is even but we want odd then make it odd
-    if numSteps % 2 == 0 and isEven == 0:
-        numSteps += 1
-    elif numSteps % 2 == 1 and isEven == 1:
-        numSteps += 1
+    if num_steps % 2 == 0 and isEven == 0:
+        num_steps += 1
+    elif num_steps % 2 == 1 and isEven == 1:
+        num_steps += 1
 
-#    print(numSteps)
+#    print(num_steps)
     # this is the size of the step
-    dt = timeToExpiry / numSteps
+    dt = timeToExpiry / num_steps
     r = ccInterestRate
     q = ccDividendRate
 
     # the number of nodes on the tree
-    numNodes = int(0.5 * (numSteps + 1) * (numSteps + 2))
+    numNodes = int(0.5 * (num_steps + 1) * (num_steps + 2))
     stockValues = np.zeros(numNodes)
-    stockValues[0] = stockPrice
+    stockValues[0] = stock_price
 
     optionValues = np.zeros(numNodes)
     u = np.exp(volatility * np.sqrt(dt))
     d = 1.0 / u
-    sLow = stockPrice
+    sLow = stock_price
 
-    probs = np.zeros(numSteps)
-    periodDiscountFactors = np.zeros(numSteps)
+    probs = np.zeros(num_steps)
+    periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, numSteps):
+    for iTime in range(0, num_steps):
         a = np.exp((r - q) * dt)
         probs[iTime] = (a - d) / (u - d)
         periodDiscountFactors[iTime] = np.exp(-r * dt)
 
-    for iTime in range(1, numSteps + 1):
+    for iTime in range(1, num_steps + 1):
         sLow *= d
         s = sLow
         for iNode in range(0, iTime + 1):
@@ -73,7 +73,7 @@ def crrTreeVal(stockPrice,
             s = s * (u * u)
 
     # work backwards by first setting values at expiry date
-    index = int(0.5 * numSteps * (numSteps + 1))
+    index = int(0.5 * num_steps * (num_steps + 1))
 
     for iNode in range(0, iTime + 1):
 
@@ -89,7 +89,7 @@ def crrTreeVal(stockPrice,
             optionValues[index + iNode] = np.maximum(strikePrice - s, 0.0)
 
     # begin backward steps from expiry to value date
-    for iTime in range(numSteps - 1, -1, -1):
+    for iTime in range(num_steps - 1, -1, -1):
 
         index = int(0.5 * iTime * (iTime + 1))
 
@@ -144,7 +144,7 @@ def crrTreeVal(stockPrice,
 ###############################################################################
 
 
-def crrTreeValAvg(stockPrice,
+def crrTreeValAvg(stock_price,
                   ccInterestRate,  # continuously compounded
                   ccDividendRate,  # continuously compounded
                   volatility,  # Black scholes volatility
@@ -155,7 +155,7 @@ def crrTreeValAvg(stockPrice,
     """ Calculate the average values off the tree using an even and an odd
     number of time steps. """
 
-    value1 = crrTreeVal(stockPrice,
+    value1 = crrTreeVal(stock_price,
                         ccInterestRate,
                         ccDividendRate,
                         volatility,
@@ -165,7 +165,7 @@ def crrTreeValAvg(stockPrice,
                         strikePrice,
                         1)  # even
 
-    value2 = crrTreeVal(stockPrice,
+    value2 = crrTreeVal(stock_price,
                         ccInterestRate,
                         ccDividendRate,
                         volatility,

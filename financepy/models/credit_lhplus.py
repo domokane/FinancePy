@@ -68,14 +68,14 @@ class LHPlusModel():
     def expMinLKIntegral(self, K, dK):
 
         k0 = 0.0
-        numSteps = int(K / dK)
-        dK = K / numSteps
+        num_steps = int(K / dK)
+        dK = K / num_steps
         cdf0 = 1.0
         cdf1 = 0.0
         expMinLK = 0.0
         checkSum = 0.0
 
-        for _ in range(0, numSteps):
+        for _ in range(0, num_steps):
             k0 += dK
             cdf1 = self.probLossGreaterThanK(k0)
             pdf = cdf0 - cdf1

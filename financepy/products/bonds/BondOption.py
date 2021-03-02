@@ -71,8 +71,8 @@ class FinBondOption():
         flow_dates = self._bond._flow_dates
         flow_amounts = self._bond._flow_amounts
 
-        couponTimes = []
-        couponFlows = []
+        coupon_times = []
+        coupon_flows = []
 
         numFlows = len(self._bond._flow_dates)
 
@@ -82,28 +82,28 @@ class FinBondOption():
             pcd = flow_dates[i-1]
             ncd = flow_dates[i]
             if pcd < valuation_date and ncd > valuation_date:
-                flowTime = (pcd - valuation_date) / gDaysInYear
-                couponTimes.append(flowTime)
-                couponFlows.append(flow_amounts[i])
+                flow_time = (pcd - valuation_date) / gDaysInYear
+                coupon_times.append(flow_time)
+                coupon_flows.append(flow_amounts[i])
                 break
 
         for i in range(1, numFlows):
             if flow_dates[i] == valuation_date:
-                couponTimes.append(0.0)
-                couponFlows.append(flow_amounts[i])
+                coupon_times.append(0.0)
+                coupon_flows.append(flow_amounts[i])
                 
         # Now calculate the remaining coupons
         for i in range(1, numFlows):
             ncd = flow_dates[i]
             if ncd > valuation_date:
-                flowTime = (ncd - valuation_date) / gDaysInYear
-                couponTimes.append(flowTime)
-                couponFlows.append(flow_amounts[i])
+                flow_time = (ncd - valuation_date) / gDaysInYear
+                coupon_times.append(flow_time)
+                coupon_flows.append(flow_amounts[i])
 
         ##################################################################
 
-        couponTimes = np.array(couponTimes)
-        couponFlows = np.array(couponFlows)
+        coupon_times = np.array(coupon_times)
+        coupon_flows = np.array(coupon_flows)
 
         exerciseType = FinExerciseTypes.AMERICAN
 
@@ -115,7 +115,7 @@ class FinBondOption():
         model.buildTree(tmat, dfTimes, dfValues)
 
         v = model.bondOption(texp, self._strikePrice, self._face_amount,
-                             couponTimes, couponFlows, exerciseType)
+                             coupon_times, coupon_flows, exerciseType)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL \
             or self._optionType == FinOptionTypes.AMERICAN_CALL:

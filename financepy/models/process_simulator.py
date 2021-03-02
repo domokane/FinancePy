@@ -37,22 +37,22 @@ class FinProcessSimulator():
             t,
             modelParams,
             numAnnSteps,
-            numPaths,
+            num_paths,
             seed):
 
         if processType == FinProcessTypes.GBM:
-            (stockPrice, drift, volatility, scheme) = modelParams
-            paths = getGBMPaths(numPaths, numAnnSteps, t, drift,
-                                stockPrice, volatility, scheme.value, seed)
+            (stock_price, drift, volatility, scheme) = modelParams
+            paths = getGBMPaths(num_paths, numAnnSteps, t, drift,
+                                stock_price, volatility, scheme.value, seed)
             return paths
 
         elif processType == FinProcessTypes.HESTON:
-            (stockPrice, drift, v0, kappa, theta, sigma, rho, scheme) = modelParams
-            paths = getHestonPaths(numPaths,
+            (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = modelParams
+            paths = getHestonPaths(num_paths,
                                    numAnnSteps,
                                    t,
                                    drift,
-                                   stockPrice,
+                                   stock_price,
                                    v0,
                                    kappa,
                                    theta,
@@ -65,7 +65,7 @@ class FinProcessSimulator():
         elif processType == FinProcessTypes.VASICEK:
             (r0, kappa, theta, sigma, scheme) = modelParams
             paths = getVasicekPaths(
-                numPaths,
+                num_paths,
                 numAnnSteps,
                 t,
                 r0,
@@ -78,7 +78,7 @@ class FinProcessSimulator():
 
         elif processType == FinProcessTypes.CIR:
             (r0, kappa, theta, sigma, scheme) = modelParams
-            paths = getCIRPaths(numPaths, numAnnSteps, t,
+            paths = getCIRPaths(num_paths, numAnnSteps, t,
                                 r0, kappa, theta, sigma, scheme.value, seed)
             return paths
 
@@ -99,7 +99,7 @@ class FinHestonNumericalScheme(Enum):
 @njit(float64[:, :](int64, int64, float64, float64, float64, float64, float64,
                     float64, float64, float64, int64, int64),
       cache=True, fastmath=True)
-def getHestonPaths(numPaths,
+def getHestonPaths(num_paths,
                    numAnnSteps,
                    t,
                    drift,
@@ -114,8 +114,8 @@ def getHestonPaths(numPaths,
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
-    numSteps = int(t / dt)
-    sPaths = np.empty(shape=(numPaths, numSteps + 1))
+    num_steps = int(t / dt)
+    sPaths = np.empty(shape=(num_paths, num_steps + 1))
     sPaths[:, 0] = s0
     sdt = sqrt(dt)
     rhohat = sqrt(1.0 - rho * rho)
@@ -123,10 +123,10 @@ def getHestonPaths(numPaths,
 
     if scheme == FinHestonNumericalScheme.EULER.value:
         # Basic scheme to first order with truncation on variance
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             s = s0
             v = v0
-            for iStep in range(1, numSteps + 1):
+            for iStep in range(1, num_steps + 1):
                 z1 = np.random.normal(0.0, 1.0) * sdt
                 z2 = np.random.normal(0.0, 1.0) * sdt
                 zV = z1
@@ -141,10 +141,10 @@ def getHestonPaths(numPaths,
 
     elif scheme == FinHestonNumericalScheme.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             x = log(s0)
             v = v0
-            for iStep in range(1, numSteps + 1):
+            for iStep in range(1, num_steps + 1):
                 zV = np.random.normal(0.0, 1.0) * sdt
                 zS = rho * zV + rhohat * np.random.normal(0.0, 1.0) * sdt
                 vplus = max(v, 0.0)
@@ -170,10 +170,10 @@ def getHestonPaths(numPaths,
         c1 = sigma2 * Q * (1.0 - Q) / kappa
         c2 = theta * sigma2 * ((1.0 - Q)**2) / 2.0 / kappa
 
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             x = log(s0)
             vn = v0
-            for iStep in range(1, numSteps + 1):
+            for iStep in range(1, num_steps + 1):
                 zV = np.random.normal(0, 1)
                 zS = rho * zV + rhohat * np.random.normal(0, 1)
                 m = theta + (vn - theta) * Q
@@ -224,34 +224,34 @@ class FinGBMNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, int64, int64), cache=True, fastmath=True)
-def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
+def getGBMPaths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
     numTimeSteps = int(t / dt + 0.50)
-    vsqrtdt = sigma * sqrt(dt)
+    vsqrt_dt = sigma * sqrt(dt)
     m = exp((mu - sigma * sigma / 2.0) * dt)
 
     if scheme == FinGBMNumericalScheme.NORMAL.value:
 
-        Sall = np.empty((numPaths, numTimeSteps + 1))
-        Sall[:, 0] = stockPrice
+        Sall = np.empty((num_paths, numTimeSteps + 1))
+        Sall[:, 0] = stock_price
         for it in range(1, numTimeSteps + 1):
-            g1D = np.random.standard_normal((numPaths))
-            for ip in range(0, numPaths):
-                w = np.exp(g1D[ip] * vsqrtdt)
+            g1D = np.random.standard_normal((num_paths))
+            for ip in range(0, num_paths):
+                w = np.exp(g1D[ip] * vsqrt_dt)
                 Sall[ip, it] = Sall[ip, it - 1] * m * w
 
     elif scheme == FinGBMNumericalScheme.ANTITHETIC.value:
 
-        Sall = np.empty((2 * numPaths, numTimeSteps + 1))
-        Sall[:, 0] = stockPrice
+        Sall = np.empty((2 * num_paths, numTimeSteps + 1))
+        Sall[:, 0] = stock_price
         for it in range(1, numTimeSteps + 1):
-            g1D = np.random.standard_normal((numPaths))
-            for ip in range(0, numPaths):
-                w = np.exp(g1D[ip] * vsqrtdt)
+            g1D = np.random.standard_normal((num_paths))
+            for ip in range(0, num_paths):
+                w = np.exp(g1D[ip] * vsqrt_dt)
                 Sall[ip, it] = Sall[ip, it - 1] * m * w
-                Sall[ip + numPaths, it] = Sall[ip + numPaths, it - 1] * m / w
+                Sall[ip + num_paths, it] = Sall[ip + num_paths, it - 1] * m / w
 
     else:
 
@@ -259,7 +259,7 @@ def getGBMPaths(numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, seed):
 
 #    m = np.mean(Sall[:, -1])
 #    v = np.var(Sall[:, -1]/Sall[:, 0])
-#    print("GBM", numPaths, numAnnSteps, t, mu, stockPrice, sigma, scheme, m,v)
+#    print("GBM", num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, m,v)
 
     return Sall
 
@@ -274,7 +274,7 @@ class FinVasicekNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
-def getVasicekPaths(numPaths,
+def getVasicekPaths(num_paths,
                     numAnnSteps,
                     t,
                     r0,
@@ -286,33 +286,33 @@ def getVasicekPaths(numPaths,
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
-    numSteps = int(t / dt)
-    sigmasqrtdt = sigma * sqrt(dt)
+    num_steps = int(t / dt)
+    sigmasqrt_dt = sigma * sqrt(dt)
 
     if scheme == FinVasicekNumericalScheme.NORMAL.value:
-        ratePath = np.empty((numPaths, numSteps + 1))
-        ratePath[:, 0] = r0
-        for iPath in range(0, numPaths):
+        rate_path = np.empty((num_paths, num_steps + 1))
+        rate_path[:, 0] = r0
+        for iPath in range(0, num_paths):
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
-                r += kappa * (theta - r) * dt + z[iStep - 1] * sigmasqrtdt
-                ratePath[iPath, iStep] = r
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
+                r += kappa * (theta - r) * dt + z[iStep - 1] * sigmasqrt_dt
+                rate_path[iPath, iStep] = r
     elif scheme == FinVasicekNumericalScheme.ANTITHETIC.value:
-        ratePath = np.empty((2 * numPaths, numSteps + 1))
-        ratePath[:, 0] = r0
-        for iPath in range(0, numPaths):
+        rate_path = np.empty((2 * num_paths, num_steps + 1))
+        rate_path[:, 0] = r0
+        for iPath in range(0, num_paths):
             r1 = r0
             r2 = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
                 r1 = r1 + kappa * (theta - r1) * dt + \
-                    z[iStep - 1] * sigmasqrtdt
+                    z[iStep - 1] * sigmasqrt_dt
                 r2 = r2 + kappa * (theta - r2) * dt - \
-                    z[iStep - 1] * sigmasqrtdt
-                ratePath[iPath, iStep] = r1
-                ratePath[iPath + numPaths, iStep] = r2
-    return ratePath
+                    z[iStep - 1] * sigmasqrt_dt
+                rate_path[iPath, iStep] = r1
+                rate_path[iPath + num_paths, iStep] = r2
+    return rate_path
 
 ###############################################################################
 
@@ -328,7 +328,7 @@ class FinCIRNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
-def getCIRPaths(numPaths,
+def getCIRPaths(num_paths,
                 numAnnSteps,
                 t,
                 r0,
@@ -340,63 +340,63 @@ def getCIRPaths(numPaths,
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
-    numSteps = int(t / dt)
-    ratePath = np.empty(shape=(numPaths, numSteps + 1))
-    ratePath[:, 0] = r0
+    num_steps = int(t / dt)
+    rate_path = np.empty(shape=(num_paths, num_steps + 1))
+    rate_path[:, 0] = r0
 
     if scheme == FinCIRNumericalScheme.EULER.value:
-        sigmasqrtdt = sigma * sqrt(dt)
-        for iPath in range(0, numPaths):
+        sigmasqrt_dt = sigma * sqrt(dt)
+        for iPath in range(0, num_paths):
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
                 rplus = max(r, 0.0)
                 sqrtrplus = sqrt(rplus)
                 r = r + kappa * (theta - rplus) * dt + \
-                    sigmasqrtdt * z[iStep - 1] * sqrtrplus
-                ratePath[iPath, iStep] = r
+                    sigmasqrt_dt * z[iStep - 1] * sqrtrplus
+                rate_path[iPath, iStep] = r
 
     elif scheme == FinCIRNumericalScheme.LOGNORMAL.value:
         x = exp(-kappa * dt)
         y = 1.0 - x
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
                 mean = x * r + theta * y
                 var = sigma * sigma * y * (x * r + 0.50 * theta * y) / kappa
                 sig = sqrt(log(1.0 + var / (mean * mean)))
                 r = mean * exp(-0.5 * sig * sig + sig * z[iStep - 1])
-                ratePath[iPath, iStep] = r
+                rate_path[iPath, iStep] = r
 
     elif scheme == FinCIRNumericalScheme.MILSTEIN.value:
-        sigmasqrtdt = sigma * sqrt(dt)
+        sigmasqrt_dt = sigma * sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
                 sqrtrplus = sqrt(max(r, 0.0))
                 r = r + kappa * (theta - r) * dt + \
-                    z[iStep - 1] * sigmasqrtdt * sqrtrplus
+                    z[iStep - 1] * sigmasqrt_dt * sqrtrplus
                 r = r + sigma2dt * (z[iStep - 1]**2 - 1.0)
-                ratePath[iPath, iStep] = r
+                rate_path[iPath, iStep] = r
 
     elif scheme == FinCIRNumericalScheme.KAHLJACKEL.value:
         bhat = theta - sigma * sigma / 4.0 / kappa
-        sqrtdt = sqrt(dt)
-        for iPath in range(0, numPaths):
+        sqrt_dt = sqrt(dt)
+        for iPath in range(0, num_paths):
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(numSteps))
-            for iStep in range(1, numSteps + 1):
-                beta = z[iStep - 1] / sqrtdt
+            z = np.random.normal(0.0, 1.0, size=(num_steps))
+            for iStep in range(1, num_steps + 1):
+                beta = z[iStep - 1] / sqrt_dt
                 sqrtrplus = sqrt(max(r, 0.0))
                 c = 1.0 + (sigma * beta - 2.0 * kappa *
                            sqrtrplus) * dt / 4.0 / sqrtrplus
                 r = r + (kappa * (bhat - r) + sigma *
                          beta * sqrtrplus) * c * dt
-                ratePath[iPath, iStep] = r
+                rate_path[iPath, iStep] = r
 
-    return ratePath
+    return rate_path
 
 ###############################################################################

@@ -25,7 +25,7 @@ from scipy.interpolate import splrep
 ###############################################################################
 
 
-class FinBondYieldCurve():
+class BondYieldCurve():
     """ Class to do fitting of the yield curve and to enable interpolation of
     yields. Because yields assume a flat term structure for each bond, this
     class does not allow discounting to be done and so does not inherit from

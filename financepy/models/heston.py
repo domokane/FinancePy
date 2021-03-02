@@ -40,12 +40,12 @@ class FinHestonNumericalScheme(Enum):
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
                     float64, float64, float64, float64, int64, int64, int64),
       cache=True, fastmath=True)
-def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
+def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
              seed, scheme):
 
     np.random.seed(seed)
-    numSteps = int(t / dt)
-    sPaths = np.zeros(shape=(numPaths, numSteps))
+    num_steps = int(t / dt)
+    sPaths = np.zeros(shape=(num_paths, num_steps))
     sPaths[:, 0] = s0
     sdt = np.sqrt(dt)
     rhohat = np.sqrt(1.0 - rho * rho)
@@ -53,10 +53,10 @@ def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
 
     if scheme == FinHestonNumericalScheme.EULER.value:
         # Basic scheme to first order with truncation on variance
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             s = s0
             v = v0
-            for iStep in range(1, numSteps):
+            for iStep in range(1, num_steps):
                 z1 = np.random.normal(0.0, 1.0) * sdt
                 z2 = np.random.normal(0.0, 1.0) * sdt
                 zV = z1
@@ -71,10 +71,10 @@ def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
 
     elif scheme == FinHestonNumericalScheme.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             x = log(s0)
             v = v0
-            for iStep in range(1, numSteps):
+            for iStep in range(1, num_steps):
                 zV = np.random.normal(0.0, 1.0) * sdt
                 zS = rho * zV + rhohat * np.random.normal(0.0, 1.0) * sdt
                 vplus = max(v, 0.0)
@@ -100,10 +100,10 @@ def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, numPaths,
         c1 = sigma2 * Q * (1.0 - Q) / kappa
         c2 = theta * sigma2 * ((1.0 - Q)**2) / 2.0 / kappa
 
-        for iPath in range(0, numPaths):
+        for iPath in range(0, num_paths):
             x = log(s0)
             vn = v0
-            for iStep in range(1, numSteps):
+            for iStep in range(1, num_steps):
                 zV = np.random.normal(0, 1)
                 zS = rho * zV + rhohat * np.random.normal(0, 1)
                 m = theta + (vn - theta) * Q
@@ -166,10 +166,10 @@ class FinModelHeston():
     def value_MC(self,
                  valuation_date,
                  option,
-                 stockPrice,
+                 stock_price,
                  interestRate,
                  dividendYield,
-                 numPaths,
+                 num_paths,
                  num_steps_per_year,
                  seed,
                  scheme=FinHestonNumericalScheme.EULERLOG):
@@ -180,7 +180,7 @@ class FinModelHeston():
         dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
-        sPaths = getPaths(stockPrice,
+        sPaths = getPaths(stock_price,
                           interestRate,
                           dividendYield,
                           self._v0,
@@ -190,7 +190,7 @@ class FinModelHeston():
                           self._rho,
                           tau,
                           dt,
-                          numPaths,
+                          num_paths,
                           seed,
                           schemeValue)
 
@@ -210,7 +210,7 @@ class FinModelHeston():
     def value_Lewis(self,
                     valuation_date,
                     option,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield):
 
@@ -224,7 +224,7 @@ class FinModelHeston():
 
         r = interestRate
         q = dividendYield
-        S0 = stockPrice
+        S0 = stock_price
         K = option._strikePrice
         F = S0 * exp((r - q) * tau)
         V = sigma * sigma
@@ -258,7 +258,7 @@ class FinModelHeston():
     def value_Lewis_Rouah(self,
                           valuation_date,
                           option,
-                          stockPrice,
+                          stock_price,
                           interestRate,
                           dividendYield):
 
@@ -287,7 +287,7 @@ class FinModelHeston():
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
             return integrand.real
 
-        S0 = stockPrice
+        S0 = stock_price
         F = S0 * exp((r - q) * tau)
         K = option._strikePrice
         X = log(F / K)
@@ -302,7 +302,7 @@ class FinModelHeston():
     def value_Weber(self,
                     valuation_date,
                     option,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield):
 
@@ -316,7 +316,7 @@ class FinModelHeston():
 
         q = dividendYield
         r = interestRate
-        S0 = stockPrice
+        S0 = stock_price
         K = option._strikePrice
         V = sigma**2
 
@@ -348,7 +348,7 @@ class FinModelHeston():
     def value_Gatheral(self,
                        valuation_date,
                        option,
-                       stockPrice,
+                       stock_price,
                        interestRate,
                        dividendYield):
 
@@ -362,7 +362,7 @@ class FinModelHeston():
 
         q = dividendYield
         r = interestRate
-        S0 = stockPrice
+        S0 = stock_price
         K = option._strikePrice
         F = S0 * exp((r - q) * tau)
         x0 = log(F / K)

@@ -5,15 +5,15 @@
 import numpy as np
 import scipy.optimize as optimize
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.global_variables import gDaysInYear
 from ...market.curves.FinInterpolator import _uinterpolate, FinInterpTypes
-from ...utils.FinHelperFunctions import inputTime, tableToString
-from ...utils.DayCount import DayCount
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.FinHelperFunctions import checkArgumentTypes, _funcName
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.helper_functions import input_time, tableToString
+from ...utils.day_count import DayCount
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.helper_functions import check_argument_types, _funcName
+from ...utils.helper_functions import labelToString
 
 
 ###############################################################################
@@ -52,7 +52,7 @@ class FinCDSCurve():
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method. """
 
-        checkArgumentTypes(getattr(self, _funcName(), None), locals())
+        check_argument_types(getattr(self, _funcName(), None), locals())
 
         if valuation_date != libor_curve._valuation_date:
             raise FinError("Ibor curve does not have same valuation date as Issuer curve.")
@@ -171,7 +171,7 @@ class FinCDSCurve():
         """ Calculate the instantaneous forward rate at the forward date dt
         using the numerical derivative. """
 
-        t = inputTime(dt, self)
+        t = input_time(dt, self)
         epsilon = 1e-8
         df1 = self.df(t) * self.survProb(t)
         df2 = self.df(t+epsilon) * self.survProb(t+epsilon)
@@ -180,7 +180,7 @@ class FinCDSCurve():
 
 ###############################################################################
 
-    def fwdRate(self, date1, date2, day_count_type):
+    def fwd_rate(self, date1, date2, day_count_type):
         """ Calculate the forward rate according between dates date1 and date2
         according to the specified day count convention. """
 
@@ -201,11 +201,11 @@ class FinCDSCurve():
 
     def zeroRate(self,
                  dt,
-                 freq_type=FinFrequencyTypes.CONTINUOUS):
+                 freq_type=FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to date dt in the chosen compounding
         frequency where -1 is continuous is the default. """
 
-        t = inputTime(dt, self)
+        t = input_time(dt, self)
         f = Frequency(freq_type)
         df = self.df(t)
         q = self.survProb(t)

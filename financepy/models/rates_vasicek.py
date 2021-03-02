@@ -62,47 +62,47 @@ def zeroPrice(r0, a, b, sigma, t):
 
 
 @njit(float64[:](float64, float64, float64, float64, float64, float64, int64))
-def ratePath_MC(r0, a, b, sigma, t, dt, seed):
+def rate_path_MC(r0, a, b, sigma, t, dt, seed):
 
     np.random.seed(seed)
-    numSteps = int(t / dt)
-    ratePath = np.zeros(numSteps)
-    ratePath[0] = r0
-    numPaths = 1
+    num_steps = int(t / dt)
+    rate_path = np.zeros(num_steps)
+    rate_path[0] = r0
+    num_paths = 1
 
-    sigmasqrtdt = sigma * sqrt(dt)
+    sigmasqrt_dt = sigma * sqrt(dt)
 
-    for iPath in range(0, numPaths):
+    for iPath in range(0, num_paths):
 
         r = r0
-        z = np.random.normal(0.0, 1.0, size=(numSteps - 1))
+        z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-        for iStep in range(1, numSteps):
-            r = r + a * (b - r) * dt + z[iStep - 1] * sigmasqrtdt
-            ratePath[iStep] = r
+        for iStep in range(1, num_steps):
+            r = r + a * (b - r) * dt + z[iStep - 1] * sigmasqrt_dt
+            rate_path[iStep] = r
 
-    return ratePath
+    return rate_path
 
 ###############################################################################
 
 
 @njit(float64(float64, float64, float64, float64, float64,
       float64, int64, int64), fastmath=True, cache=True)
-def zeroPrice_MC(r0, a, b, sigma, t, dt, numPaths, seed):
+def zeroPrice_MC(r0, a, b, sigma, t, dt, num_paths, seed):
 
     np.random.seed(seed)
-    numSteps = int(t / dt)
-    sigmasqrtdt = sigma * sqrt(dt)
+    num_steps = int(t / dt)
+    sigmasqrt_dt = sigma * sqrt(dt)
     zcb = 0.0
-    for iPath in range(0, numPaths):
-        z = np.random.normal(0.0, 1.0, size=(numSteps))
+    for iPath in range(0, num_paths):
+        z = np.random.normal(0.0, 1.0, size=(num_steps))
         rsum = 0.0
         r = r0
-        for iStep in range(0, numSteps):
-            r += a * (b - r) * dt + z[iStep] * sigmasqrtdt
+        for iStep in range(0, num_steps):
+            r += a * (b - r) * dt + z[iStep] * sigmasqrt_dt
             rsum += r * dt
         zcb += exp(-rsum)
-    zcb /= numPaths
+    zcb /= num_paths
     return zcb
 
 ###############################################################################

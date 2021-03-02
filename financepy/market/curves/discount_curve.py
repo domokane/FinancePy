@@ -7,16 +7,16 @@ import numpy as np
 
 from .FinInterpolator import FinInterpolator, FinInterpTypes, interpolate
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gDaysInYear, gSmall
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.DayCount import DayCount, FinDayCountTypes
+from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.frequency import Frequency, FinFrequencyTypes
+from ...utils.day_count import DayCount, FinDayCountTypes
 from ...utils.Math import testMonotonicity
-from ...utils.Schedule import Schedule
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.FinHelperFunctions import timesFromDates
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.schedule import Schedule
+from ...utils.helper_functions import check_argument_types
+from ...utils.helper_functions import timesFromDates
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 
@@ -40,7 +40,7 @@ class FinDiscountCurve():
         discount factors are pure prices. We do however need to specify a
         convention for interpolating the discount factors in time."""
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         # Validate curve
         if len(dfDates) < 1:

@@ -28,7 +28,7 @@ class FinModelBlackShifted():
         self._volatility = volatility
         self._shift = shift
         self._implementation = 0
-        self._numSteps = 0
+        self._num_steps = 0
         self._seed = 0
         self._param1 = 0
         self._param2 = 0
@@ -70,7 +70,7 @@ class FinModelBlackShifted():
         s += labelToString("VOLATILITY", self._volatility)
         s += labelToString("SHIFT", self._shift)
         s += labelToString("IMPLEMENTATION", self._implementation)
-        s += labelToString("NUMSTEPS", self._numSteps)
+        s += labelToString("NUMSTEPS", self._num_steps)
         return s
 
 ###############################################################################

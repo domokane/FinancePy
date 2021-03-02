@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import norm
 N = norm.cdf
 
-from ..utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ..utils.FinHelperFunctions import labelToString, check_argument_types
 
 # TODO: Redesign this class
 
@@ -30,7 +30,7 @@ class FinModelMertonCredit():
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._A = np.array(assetValue)
         self._L = np.array(bondFace)
@@ -107,7 +107,7 @@ class FinModelMertonCredit():
 
 ###############################################################################
 
-    def creditSpread(self):
+    def credit_spread(self):
         """ Calculate the credit spread from the debt value. """
 
         dvalue = self.debtValue()

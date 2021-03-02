@@ -8,18 +8,18 @@ from numba import njit, float64, int64
 from math import exp, log
 from copy import deepcopy
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.Calendar import Calendar, FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.calendar import Calendar, CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.global_variables import gDaysInYear
 from ...utils.Math import ONE_MILLION
-from ...utils.FinHelperFunctions import labelToString, tableToString
+from ...utils.helper_functions import labelToString, tableToString
 from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 
-from ...utils.FinHelperFunctions import checkArgumentTypes
+from ...utils.helper_functions import check_argument_types
 
 useFlatHazardRateIntegral = True
 standardRecovery = 0.40
@@ -193,14 +193,14 @@ class FinCDS(object):
                  running_coupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a CDS from the step-in date, maturity date and coupon """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
@@ -237,12 +237,12 @@ class FinCDS(object):
         start_date = self._step_in_date
         end_date = self._maturity_date
 
-        self._adjustedDates = []
+        self._adjusted_dates = []
         numMonths = int(12.0 / frequency)
 
         unadjustedScheduleDates = []
 
-        if self._date_gen_rule_type == FinDateGenRuleTypes.BACKWARD:
+        if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
             nextDate = end_date
             flowNum = 0
@@ -259,22 +259,22 @@ class FinCDS(object):
             # reverse order
             for i in range(0, flowNum):
                 dt = unadjustedScheduleDates[flowNum - i - 1]
-                self._adjustedDates.append(dt)
+                self._adjusted_dates.append(dt)
 
             # holiday adjust dates except last one
             for i in range(0, flowNum - 1):
 
-                dt = calendar.adjust(self._adjustedDates[i],
+                dt = calendar.adjust(self._adjusted_dates[i],
                                      self._bus_day_adjust_type)
 
-                self._adjustedDates[i] = dt
+                self._adjusted_dates[i] = dt
 
-            finalDate = self._adjustedDates[flowNum - 1]
+            finalDate = self._adjusted_dates[flowNum - 1]
 
             # Final date is moved forward by one day
-            self._adjustedDates[flowNum - 1] = finalDate.addDays(1)
+            self._adjusted_dates[flowNum - 1] = finalDate.addDays(1)
 
-        elif self._date_gen_rule_type == FinDateGenRuleTypes.FORWARD:
+        elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             nextDate = start_date
             flowNum = 0
@@ -292,10 +292,10 @@ class FinCDS(object):
                 dt = calendar.adjust(unadjustedScheduleDates[i],
                                      self._bus_day_adjust_type)
 
-                self._adjustedDates.append(dt)
+                self._adjusted_dates.append(dt)
 
             finalDate = end_date.addDays(1)
-            self._adjustedDates.append(finalDate)
+            self._adjusted_dates.append(finalDate)
 
         else:
             raise FinError("Unknown FinDateGenRuleType:" +
@@ -305,7 +305,7 @@ class FinCDS(object):
 
     def _calcFlows(self):
         """ Calculate cash flow amounts on premium leg. """
-        payment_dates = self._adjustedDates
+        payment_dates = self._adjusted_dates
         dayCount = DayCount(self._day_count_type)
 
         self._accrualFactors = []
@@ -314,9 +314,9 @@ class FinCDS(object):
         self._accrualFactors.append(0.0)
         self._flows.append(0.0)
 
-        numFlows = len(payment_dates)
+        num_flows = len(payment_dates)
 
-        for it in range(1, numFlows):
+        for it in range(1, num_flows):
             t0 = payment_dates[it - 1]
             t1 = payment_dates[it]
             accrualFactor = dayCount.year_frac(t0, t1)[0]
@@ -429,7 +429,7 @@ class FinCDS(object):
         bump = 0.0001  # 1 basis point
 
         for depo in new_issuer_curve._libor_curve._usedDeposits:
-            depo._depositRate += bump
+            depo._deposit_rate += bump
         for fra in new_issuer_curve._libor_curve._usedFRAs:
             fra._fraRate += bump
         for swap in new_issuer_curve._libor_curve._usedSwaps:
@@ -476,7 +476,7 @@ class FinCDS(object):
 
 ###############################################################################
 
-    def cleanPrice(self,
+    def clean_price(self,
                    valuation_date,
                    issuer_curve,
                    contract_recovery=standardRecovery,
@@ -499,8 +499,8 @@ class FinCDS(object):
 
         cleanPV = fwdDf * (protPV - self._running_coupon * cleanRPV01
                            * self._notional)
-        cleanPrice = (self._notional - cleanPV) / self._notional * 100.0
-        return cleanPrice
+        clean_price = (self._notional - cleanPV) / self._notional * 100.0
+        return clean_price
 
 ###############################################################################
 
@@ -510,7 +510,7 @@ class FinCDS(object):
                       pv01_method=0):
         """ RiskyPV01 of the contract using the OLD method. """
 
-        payment_dates = self._adjustedDates
+        payment_dates = self._adjusted_dates
         dayCount = DayCount(self._day_count_type)
 
         couponAccruedIndicator = 1
@@ -599,7 +599,7 @@ class FinCDS(object):
         in date. """
 
         # I assume accrued runs to the effective date
-        payment_dates = self._adjustedDates
+        payment_dates = self._adjusted_dates
         pcd = payment_dates[0]
         accrued_days = (self._step_in_date - pcd)
         return accrued_days
@@ -611,7 +611,7 @@ class FinCDS(object):
         previous coupon date (PCD) to the step_in_date of the CDS contract. """
 
         dayCount = DayCount(self._day_count_type)
-        payment_dates = self._adjustedDates
+        payment_dates = self._adjusted_dates
         pcd = payment_dates[0]
         accrualFactor = dayCount.year_frac(pcd, self._step_in_date)[0]
         accruedInterest = accrualFactor * self._notional * self._running_coupon
@@ -661,13 +661,13 @@ class FinCDS(object):
         libor_curve = issuer_curve._libor_curve
 
         paymentTimes = []
-        for it in range(0, len(self._adjustedDates)):
-            t = (self._adjustedDates[it] - valuation_date) / gDaysInYear
+        for it in range(0, len(self._adjusted_dates)):
+            t = (self._adjusted_dates[it] - valuation_date) / gDaysInYear
             paymentTimes.append(t)
 
         # this is the part of the coupon accrued from the previous coupon date
         # to now
-        pcd = self._adjustedDates[0]
+        pcd = self._adjusted_dates[0]
         eff = self._step_in_date
         dayCount = DayCount(self._day_count_type)
 
@@ -754,7 +754,7 @@ class FinCDS(object):
         h = flatCDSCurveSpread / (1.0 - curveRecovery)
         r = flatContinuousInterestRate
         fwdDf = 1.0
-        bumpSize = 0.0001
+        bump_size = 0.0001
 
         if self._long_protection:
             long_protection = +1
@@ -780,7 +780,7 @@ class FinCDS(object):
         # bump CDS spread and calculate
         #######################################################################
 
-        h = (flatCDSCurveSpread + bumpSize) / (1.0 - contract_recovery)
+        h = (flatCDSCurveSpread + bump_size) / (1.0 - contract_recovery)
         r = flatContinuousInterestRate
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
@@ -797,7 +797,7 @@ class FinCDS(object):
         #######################################################################
 
         h = flatCDSCurveSpread / (1.0 - contract_recovery)
-        r = flatContinuousInterestRate + bumpSize
+        r = flatContinuousInterestRate + bump_size
 
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
@@ -814,12 +814,12 @@ class FinCDS(object):
 
     def printFlows(self, issuer_curve):
 
-        numFlows = len(self._adjustedDates)
+        num_flows = len(self._adjusted_dates)
 
         print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
 
-        for it in range(1, numFlows):
-            dt = self._adjustedDates[it]
+        for it in range(1, num_flows):
+            dt = self._adjusted_dates[it]
             acc_factor = self._accrualFactors[it]
             flow = self._flows[it]
             z = issuer_curve.df(dt)
@@ -831,7 +831,7 @@ class FinCDS(object):
 
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
-        cashflows """
+        cash flows """
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("STEP-IN DATE", self._step_in_date)
         s += labelToString("MATURITY", self._maturity_date)
@@ -845,7 +845,7 @@ class FinCDS(object):
         s += labelToString("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+        valueTable = [self._adjusted_dates, self._accrualFactors, self._flows]
         precision = "12.6f"
 
         s += tableToString(header, valueTable, precision)

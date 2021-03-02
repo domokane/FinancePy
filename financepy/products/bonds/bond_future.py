@@ -2,10 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...products.bonds.FinBond import FinBond
-from ...utils.Date import Date
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.global_variables import gDaysInYear
+from ...products.bonds.Bond import Bond
+from ...utils.date import Date
+from ...utils.helper_functions import labelToString, check_argument_types
 
 
 # TODO: Examine other exchange conventions.
@@ -13,7 +13,7 @@ from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 ###############################################################################
 
 
-class FinBondFuture(object):
+class BondFuture(object):
     """ Class for managing futures contracts on government bonds that follows
     CME conventions and related analytics. """
 
@@ -24,7 +24,7 @@ class FinBondFuture(object):
                  contractSize: int,
                  coupon: float):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._tickerName = tickerName
         self._firstDeliveryDate = firstDeliveryDate  # This is the IMM date
@@ -35,7 +35,7 @@ class FinBondFuture(object):
 ###############################################################################
 
     def conversionFactor(self,
-                         bond: FinBond):
+                         bond: Bond):
         """ Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
         must round the bond maturity (starting its life on the first delivery
@@ -53,14 +53,14 @@ class FinBondFuture(object):
 
         issue_date = Date(newMat._d, newMat._m, 2000)
 
-        newBond = FinBond(issue_date,
+        newBond = Bond(issue_date,
                           newMat,
                           bond._coupon,
                           bond._freq_type,
                           bond._accrual_type,
                           face)
 
-        p = newBond.cleanPriceFromYTM(self._firstDeliveryDate,
+        p = newBond.clean_price_from_ytm(self._firstDeliveryDate,
                                       self._coupon)
 
         # Convention is to round the conversion factor to 4dp
@@ -70,7 +70,7 @@ class FinBondFuture(object):
 ###############################################################################
 
     def principalInvoicePrice(self,
-                              bond: FinBond,
+                              bond: Bond,
                               futures_price: float):
         """ The principal invoice price as defined by the CME."""
         cf = self.conversionFactor(bond)
@@ -82,12 +82,12 @@ class FinBondFuture(object):
 
     def totalInvoiceAmount(self,
                            settlement_date: Date,
-                           bond: FinBond,
+                           bond: Bond,
                            futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accruedInterest is None:
-            bond.calculateFlowDates(settlement_date)
+            bond.calculate_flow_dates(settlement_date)
 
         accd = bond._accruedInterest
 
@@ -120,7 +120,7 @@ class FinBondFuture(object):
 ###############################################################################
 
     def deliveryGainLoss(self,
-                         bond: FinBond,
+                         bond: Bond,
                          bondCleanPrice: float,
                          futures_price: float):
         """ Determination of what is received when the bond is delivered. """

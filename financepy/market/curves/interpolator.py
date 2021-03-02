@@ -5,7 +5,7 @@
 from numba import njit, float64, int64
 import numpy as np
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gSmall
+from ...utils.global_variables import gSmall
 
 
 from scipy.interpolate import PchipInterpolator
@@ -194,7 +194,7 @@ class FinInterpolator():
     def __init__(self,
                  interpolatorType: FinInterpTypes):
         
-        self._interpType = interpolatorType
+        self._interp_type = interpolatorType
         self._interpFn = None
         self._times = None
         self._dfs = None
@@ -212,12 +212,12 @@ class FinInterpolator():
         if len(times) == 1:
             return
 
-        if self._interpType == FinInterpTypes.PCHIP_LOG_DISCOUNT:
+        if self._interp_type == FinInterpTypes.PCHIP_LOG_DISCOUNT:
 
              logDfs = np.log(self._dfs)
              self._interpFn = PchipInterpolator(self._times, logDfs)
 
-        elif self._interpType  == FinInterpTypes.PCHIP_ZERO_RATES:
+        elif self._interp_type  == FinInterpTypes.PCHIP_ZERO_RATES:
 
              gSmallVector = np.ones(len(self._times)) * gSmall
              zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
@@ -227,7 +227,7 @@ class FinInterpolator():
 
              self._interpFn = PchipInterpolator(self._times, zeroRates)
 
-        # if self._interpType == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+        # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
 
         #     """ Second derivatives at left is zero and first derivative at
         #     right is clamped to zero. """
@@ -235,7 +235,7 @@ class FinInterpolator():
         #     self._interpFn = CubicSpline(self._times, logDfs,
         #                                  bc_type=((2, 0.0), (1, 0.0)))
 
-        elif self._interpType == FinInterpTypes.FINCUBIC_ZERO_RATES:
+        elif self._interp_type == FinInterpTypes.FINCUBIC_ZERO_RATES:
 
             """ Second derivatives at left is zero and first derivative at
             right is clamped to zero. """
@@ -248,14 +248,14 @@ class FinInterpolator():
             self._interpFn = CubicSpline(self._times, zeroRates,
                                          bc_type=((2, 0.0), (1, 0.0)))
 
-        elif self._interpType == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
+        elif self._interp_type == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
 
             """ Second derivatives are clamped to zero at end points """
             logDfs = np.log(self._dfs)
             self._interpFn = CubicSpline(self._times, logDfs,
                                          bc_type = 'natural')
     
-        elif self._interpType == FinInterpTypes.NATCUBIC_ZERO_RATES:
+        elif self._interp_type == FinInterpTypes.NATCUBIC_ZERO_RATES:
 
             """ Second derivatives are clamped to zero at end points """
             gSmallVector = np.ones(len(self._times)) * gSmall
@@ -267,7 +267,7 @@ class FinInterpolator():
             self._interpFn = CubicSpline(self._times, zeroRates,
                                          bc_type = 'natural')
 
-#        elif self._interpType  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+#        elif self._interp_type  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
 #
 #            logDfs = np.log(self._dfs)
 #            self._interpFn = interp1d(self._times, logDfs, 
@@ -307,38 +307,38 @@ class FinInterpolator():
         else:
             raise FinError("t is not a recognized type")
         
-        if self._interpType == FinInterpTypes.PCHIP_LOG_DISCOUNT:
+        if self._interp_type == FinInterpTypes.PCHIP_LOG_DISCOUNT:
         
             out = np.exp(self._interpFn(tvec))
 
-        elif self._interpType == FinInterpTypes.PCHIP_ZERO_RATES:
+        elif self._interp_type == FinInterpTypes.PCHIP_ZERO_RATES:
     
             out = np.exp(-tvec * self._interpFn(tvec))
 
-        # if self._interpType == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+        # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
         
         #     out = np.exp(self._interpFn(tvec))
 
-        elif self._interpType == FinInterpTypes.FINCUBIC_ZERO_RATES:
+        elif self._interp_type == FinInterpTypes.FINCUBIC_ZERO_RATES:
         
             out = np.exp(-tvec * self._interpFn(tvec))
 
-        elif self._interpType == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
+        elif self._interp_type == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
         
             out = np.exp(self._interpFn(tvec))
 
-        elif self._interpType == FinInterpTypes.NATCUBIC_ZERO_RATES:
+        elif self._interp_type == FinInterpTypes.NATCUBIC_ZERO_RATES:
         
             out = np.exp(-tvec * self._interpFn(tvec))
     
-#        elif self._interpType == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+#        elif self._interp_type == FinInterpTypes.LINEAR_LOG_DISCOUNT:
 #    
 #            out = np.exp(self._interpFn(tvec))
 
         else:
 
             out = _vinterpolate(tvec, self._times, self._dfs,
-                                self._interpType.value)
+                                self._interp_type.value)
 
         if type(t) is float or type(t) is np.float64:
             return out[0]

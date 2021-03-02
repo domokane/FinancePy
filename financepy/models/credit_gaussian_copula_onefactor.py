@@ -9,9 +9,9 @@ import numpy as np
 
 from ..utils.Math import norminvcdf, N, INVROOT2PI
 from ..utils.FinError import FinError
-from .FinModelLossDbnBuilder import indepLossDbnRecursionGCD
-from .FinModelLossDbnBuilder import indepLossDbnHeterogeneousAdjBinomial
-from .FinModelLossDbnBuilder import portfolioGCD
+from .credit_loss_dbn_builder import indepLossDbnRecursionGCD
+from .credit_loss_dbn_builder import indepLossDbnHeterogeneousAdjBinomial
+from .credit_loss_dbn_builder import portfolioGCD
 
 ###############################################################################
 

@@ -22,17 +22,17 @@ ONE_BILLION = 1000000000
 
 @njit(fastmath=True, cache=True)
 def accruedInterpolator(tset: float,  # Settlement time in years
-                        couponTimes: np.ndarray,
+                        coupon_times: np.ndarray,
                         couponAmounts: np.ndarray):
     """ Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
-    numCoupons = len(couponTimes)
+    numCoupons = len(coupon_times)
 
     for i in range(1, numCoupons):
 
-        pct = couponTimes[i - 1]
-        nct = couponTimes[i]
+        pct = coupon_times[i - 1]
+        nct = coupon_times[i]
         denom = (nct-pct)
        
         if tset >= pct and tset < nct:
@@ -43,7 +43,7 @@ def accruedInterpolator(tset: float,  # Settlement time in years
     # TODO: NEED TO REVISIT THIS TODO
     return 0.0
     print("t", tset)
-    print("CPN TIMES", couponTimes)
+    print("CPN TIMES", coupon_times)
     print("CPN AMNTS", couponAmounts)
  
     raise FinError("Failed to calculate accrued")
@@ -320,15 +320,15 @@ def normcdf_integrate(x: float):
     since the number of integration steps is currently hardcoded to 10,000."""
     lower = -6.0
     upper = x
-    numSteps = 10000
-    dx = (upper - lower) / numSteps
+    num_steps = 10000
+    dx = (upper - lower) / num_steps
     InvRoot2Pi = 0.3989422804014327
 
     x = lower
     fx = exp(-x * x / 2.0)
     integral = fx / 2.0
 
-    for _ in range(0, numSteps - 1):
+    for _ in range(0, num_steps - 1):
         x = x + dx
         fx = exp(-x * x / 2.0)
         integral += fx
