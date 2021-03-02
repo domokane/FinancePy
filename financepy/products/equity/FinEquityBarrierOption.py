@@ -5,16 +5,16 @@
 import numpy as np
 from enum import Enum
 
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.FinGlobalVariables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.FinProcessSimulator import FinProcessSimulator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 
 
-from ...finutils.FinMath import N
+from ...utils.Math import N
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 
@@ -35,24 +35,24 @@ class FinEquityBarrierTypes(Enum):
 
 
 class FinEquityBarrierOption(FinEquityOption):
-    ''' Class to hold details of an Equity Barrier Option. It also
+    """ Class to hold details of an Equity Barrier Option. It also
     calculates the option price using Black Scholes for 8 different
-    variants on the Barrier structure in enum FinEquityBarrierTypes. '''
+    variants on the Barrier structure in enum FinEquityBarrierTypes. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikePrice: float,
                  optionType: FinEquityBarrierTypes,
                  barrierLevel: float,
                  numObservationsPerYear: (int, float) = 252,
                  notional: float = 1.0):
-        ''' Create the FinEquityBarrierOption by specifying the expiry date,
+        """ Create the FinEquityBarrierOption by specifying the expiry date,
         strike price, option type, barrier level, the number of observations
-        per year and the notional. '''
+        per year and the notional. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
         self._barrierLevel = float(barrierLevel)
         self._numObservationsPerYear = int(numObservationsPerYear)
@@ -66,17 +66,17 @@ class FinEquityBarrierOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: (float, np.ndarray),
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model):
-        ''' This prices an Equity Barrier option using the formulae given in
+        """ This prices an Equity Barrier option using the formulae given in
         the paper by Clewlow, Llanos and Strickland December 1994 which can be
         found at
 
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
-        '''
+        """
 
         if isinstance(stockPrice, int):
             stockPrice = float(stockPrice)
@@ -88,7 +88,7 @@ class FinEquityBarrierOption(FinEquityOption):
 
         values = []
         for s in stockPrices:
-            v = self._valueOne(valueDate, s, discountCurve,
+            v = self._valueOne(valuation_date, s, discount_curve,
                                dividendCurve, model)
             values.append(v)
 
@@ -100,15 +100,15 @@ class FinEquityBarrierOption(FinEquityOption):
 ###############################################################################
 
     def _valueOne(self,
-                  valueDate: FinDate,
+                  valuation_date: Date,
                   stockPrice: (float, np.ndarray),
-                  discountCurve: FinDiscountCurve,
+                  discount_curve: FinDiscountCurve,
                   dividendCurve: FinDiscountCurve,
                   model):
-        ''' This values a single option. Because of its structure it cannot
-        easily be vectorised which is why it has been wrapped. '''
+        """ This values a single option. Because of its structure it cannot
+        easily be vectorised which is why it has been wrapped. """
 
-        texp = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
 
         if texp < 0:
             raise FinError("Option expires before value date.")
@@ -118,8 +118,8 @@ class FinEquityBarrierOption(FinEquityOption):
         lnS0k = np.log(stockPrice / self._strikePrice)
         sqrtT = np.sqrt(texp)
 
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
 
         k = self._strikePrice
         s = stockPrice
@@ -280,22 +280,22 @@ class FinEquityBarrierOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
+                valuation_date: Date,
                 stockPrice: float,
-                discountCurve: FinDiscountCurve,
+                discount_curve: FinDiscountCurve,
                 dividendCurve: FinDiscountCurve,
                 processType,
                 modelParams,
                 numAnnObs: int = 252,
                 numPaths: int = 10000,
                 seed: int = 4242):
-        ''' A Monte-Carlo based valuation of the barrier option which simulates
+        """ A Monte-Carlo based valuation of the barrier option which simulates
         the evolution of the stock price of at a specified number of annual
         observation times until expiry to examine if the barrier has been
         crossed and the corresponding value of the final payoff, if any. It
-        assumes a GBM model for the stock price. '''
+        assumes a GBM model for the stock price. """
 
-        texp = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
         numTimeSteps = int(texp * numAnnObs)
         K = self._strikePrice
         B = self._barrierLevel
@@ -303,12 +303,12 @@ class FinEquityBarrierOption(FinEquityOption):
 
         process = FinProcessSimulator()
 
-        r = discountCurve.zeroRate(self._expiryDate)
+        r = discount_curve.zeroRate(self._expiry_date)
         
         # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
 
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
         
         #######################################################################
 
@@ -409,7 +409,7 @@ class FinEquityBarrierOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("BARRIER LEVEL", self._barrierLevel)
@@ -420,7 +420,7 @@ class FinEquityBarrierOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

@@ -8,11 +8,11 @@
 import numpy as np
 from numba import njit, float64, float64
 
-from ..finutils.FinMath import NVect, NPrimeVect
-from ..finutils.FinGlobalVariables import gSmall
-from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinError import FinError
+from ..utils.Math import NVect, NPrimeVect
+from ..utils.FinGlobalVariables import gSmall
+from ..utils.FinHelperFunctions import labelToString
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinError import FinError
 
 ###############################################################################
 # TODO: Use Numba ?
@@ -40,11 +40,11 @@ def calculateD1D2(f, t, k, v):
 ###############################################################################
 
 class FinModelBlack():
-    ''' Black's Model which prices call and put options in the forward
-    measure according to the Black-Scholes equation. '''
+    """ Black's Model which prices call and put options in the forward
+    measure according to the Black-Scholes equation. """
 
     def __init__(self, volatility, implementation=0):
-        ''' Create FinModel black using parameters. '''
+        """ Create FinModel black using parameters. """
         self._volatility = volatility
         self._implementation = 0
         self._numSteps = 0
@@ -61,8 +61,8 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
               callOrPut):    # Call or put
-        ''' Price a derivative using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Price a derivative using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry
@@ -89,8 +89,8 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
               callOrPut):    # Call or put
-        ''' Calculate delta using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Calculate delta using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry
@@ -117,8 +117,8 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
               callOrPut):    # Call or put
-        ''' Calculate gamma using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Calculate gamma using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry
@@ -140,8 +140,8 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,  # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Calculate theta using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Calculate theta using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry
@@ -172,8 +172,8 @@ class FinModelBlack():
               timeToExpiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
               callOrPut):    # Call or put
-        ''' Price a derivative using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Price a derivative using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry

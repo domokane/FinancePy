@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from financepy.products.bonds.FinBondMortgage import FinBondMortgage
 from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
@@ -21,9 +21,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinBondMortgage():
 
     principal = 130000
-    startDate = FinDate(23, 2, 2018)
-    endDate = startDate.addTenor("10Y")
-    mortgage = FinBondMortgage(startDate, endDate, principal)
+    start_date = Date(23, 2, 2018)
+    end_date = start_date.addTenor("10Y")
+    mortgage = FinBondMortgage(start_date, end_date, principal)
 
     rate = 0.035
     mortgage.generateFlows(rate, FinBondMortgageTypes.REPAYMENT)

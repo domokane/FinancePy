@@ -6,10 +6,10 @@
 
 import numpy as np
 
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinError import FinError
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinError import FinError
 
-from ..finutils.FinHelperFunctions import checkArgumentTypes
+from ..utils.FinHelperFunctions import checkArgumentTypes
 
 from .FinModel import FinModel
 from .FinModelCRRTree import crrTreeValAvg
@@ -31,13 +31,13 @@ class FinModelBlackScholes(FinModel):
     def __init__(self,
                  volatility: (float, np.ndarray), 
                  implementationType: FinModelBlackScholesTypes = FinModelBlackScholesTypes.DEFAULT,
-                 numStepsPerYear: int = 100):
+                 num_steps_per_year: int = 100):
 
         checkArgumentTypes(self.__init__, locals())
 
         self._volatility = volatility
         self._implementationType = implementationType
-        self._numStepsPerYear = numStepsPerYear
+        self._num_steps_per_year = num_steps_per_year
 
     def value(self, 
               spotPrice: float, 
@@ -64,7 +64,7 @@ class FinModelBlackScholes(FinModel):
             elif self._implementationType == FinModelBlackScholesTypes.CRR_TREE:
                 
                 v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate, 
-                                  self._volatility, self._numStepsPerYear,
+                                  self._volatility, self._num_steps_per_year,
                                   timeToExpiry, optionType.value, 
                                   strikePrice)['value']
 
@@ -96,7 +96,7 @@ class FinModelBlackScholes(FinModel):
             elif self._implementationType == FinModelBlackScholesTypes.CRR_TREE:
 
                 v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate, 
-                                  self._volatility, self._numStepsPerYear,
+                                  self._volatility, self._num_steps_per_year,
                                   timeToExpiry, optionType.value, 
                                   strikePrice)['value']
 

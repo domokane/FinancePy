@@ -7,8 +7,8 @@
 import numpy as np
 from numba import njit, float64
 
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinError import FinError
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinError import FinError
 
 from .FinModelBlackScholesAnalytical import bsValue
 
@@ -19,8 +19,8 @@ from .FinModelBlackScholesAnalytical import bsValue
 @njit(float64[:](float64, float64, float64, float64, float64[:], 
                  float64[:]), cache=True)
 def optionImpliedDbn(s, t, r, q, strikes, sigmas):
-    ''' This function calculates the option smile/skew-implied probability
-    density function times the interval width. '''
+    """ This function calculates the option smile/skew-implied probability
+    density function times the interval width. """
 
     if len(strikes) != len(sigmas):
         raise FinError("Strike and Sigma vector do not have same length.")

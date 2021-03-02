@@ -5,17 +5,17 @@
 
 import numpy as np
 
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
 
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
-from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinSchedule import FinSchedule
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.DayCount import FinDayCountTypes
+from ...utils.Calendar import FinBusDayAdjustTypes
+from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...utils.Schedule import Schedule
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 
@@ -28,22 +28,22 @@ from ...models.FinModel import FinModel
 ###############################################################################
 
 class FinEquityCliquetOption(FinEquityOption):
-    ''' A FinEquityCliquetOption is a series of options which start and stop at
+    """ A FinEquityCliquetOption is a series of options which start and stop at
     successive times with each subsequent option resetting its strike to be ATM
-    at the start of its life. This is also known as a reset option.'''
+    at the start of its life. This is also known as a reset option."""
 
     def __init__(self,
-                 startDate: FinDate,
-                 finalExpiryDate: FinDate,
+                 start_date: Date,
+                 finalExpiryDate: Date,
                  optionType: FinOptionTypes,
-                 freqType: FinFrequencyTypes,
-                 dayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create the FinEquityCliquetOption by passing in the start date
+                 freq_type: FinFrequencyTypes,
+                 day_count_type: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        """ Create the FinEquityCliquetOption by passing in the start date
         and the end date and whether it is a call or a put. Some additional
-        data is needed in order to calculate the individual payments. '''
+        data is needed in order to calculate the individual payments. """
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -51,37 +51,37 @@ class FinEquityCliquetOption(FinEquityOption):
            optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(optionType))
 
-        if finalExpiryDate < startDate:
+        if finalExpiryDate < start_date:
             raise FinError("Expiry date precedes start date")
 
-        self._startDate = startDate
+        self._start_date = start_date
         self._finalExpiryDate = finalExpiryDate
         self._optionType = optionType
-        self._freqType = freqType
-        self._dayCountType = dayCountType
-        self._calendarType = calendarType
-        self._busDayAdjustType = busDayAdjustType
-        self._dateGenRuleType = dateGenRuleType
+        self._freq_type = freq_type
+        self._day_count_type = day_count_type
+        self._calendar_type = calendar_type
+        self._bus_day_adjust_type = bus_day_adjust_type
+        self._date_gen_rule_type = date_gen_rule_type
 
-        self._expiryDates = FinSchedule(self._startDate,
-                                        self._finalExpiryDate,
-                                        self._freqType,
-                                        self._calendarType,
-                                        self._busDayAdjustType,
-                                        self._dateGenRuleType)._generate()
+        self._expiry_dates = Schedule(self._start_date,
+                                     self._finalExpiryDate,
+                                     self._freq_type,
+                                     self._calendar_type,
+                                     self._bus_day_adjust_type,
+                                     self._date_gen_rule_type)._generate()
 
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: float,
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model:FinModel):
-        ''' Value the cliquet option as a sequence of options using the Black-
-        Scholes model. '''
+        """ Value the cliquet option as a sequence of options using the Black-
+        Scholes model. """
 
-        if valueDate > self._finalExpiryDate:
+        if valuation_date > self._finalExpiryDate:
             raise FinError("Value date after final expiry date.")
 
         s = stockPrice
@@ -100,12 +100,12 @@ class FinEquityCliquetOption(FinEquityOption):
             v = max(v, 1e-6)
             tprev = 0.0
 
-            for dt in self._expiryDates:
+            for dt in self._expiry_dates:
 
-                if dt > valueDate:
+                if dt > valuation_date:
 
-                    df = discountCurve.df(dt)
-                    texp = (dt - valueDate) / gDaysInYear
+                    df = discount_curve.df(dt)
+                    texp = (dt - valuation_date) / gDaysInYear
                     r = -np.log(df) / texp
 
                     # option life
@@ -150,20 +150,20 @@ class FinEquityCliquetOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._startDate)
+        s += labelToString("START DATE", self._start_date)
         s += labelToString("FINAL EXPIRY DATE", self._finalExpiryDate)
         s += labelToString("OPTION TYPE", self._optionType)
-        s += labelToString("FREQUENCY TYPE", self._freqType)
-        s += labelToString("DAY COUNT TYPE", self._dayCountType)
-        s += labelToString("CALENDAR TYPE", self._calendarType)
-        s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)
-        s += labelToString("DATE GEN RULE TYPE", self._dateGenRuleType, "")
+        s += labelToString("FREQUENCY TYPE", self._freq_type)
+        s += labelToString("DAY COUNT TYPE", self._day_count_type)
+        s += labelToString("CALENDAR TYPE", self._calendar_type)
+        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
+        s += labelToString("DATE GEN RULE TYPE", self._date_gen_rule_type, "")
         return s
 
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

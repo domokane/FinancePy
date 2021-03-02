@@ -4,8 +4,8 @@
 
 from numba import njit, float64, int64
 import numpy as np
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalVariables import gSmall
+from ...utils.FinError import FinError
+from ...utils.FinGlobalVariables import gSmall
 
 
 from scipy.interpolate import PchipInterpolator
@@ -37,9 +37,9 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
                 times: np.ndarray,  # Vector of times on grid
                 dfs: np.ndarray,  # Vector of discount factors
                 method: int):  # Interpolation method which is value of enum
-    ''' Fast interpolation of discount factors at time x given discount factors
+    """ Fast interpolation of discount factors at time x given discount factors
     at times provided using one of the methods in the enum FinInterpTypes. The
-    value of x can be an array so that the function is vectorised. '''
+    value of x can be an array so that the function is vectorised. """
 
     if type(t) is float or type(t) is np.float64:
         
@@ -67,23 +67,23 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)
 def _uinterpolate(t, times, dfs, method):
-    ''' Return the interpolated value of y given x and a vector of x and y.
+    """ Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
-    piecewise flat in the continuously compounded forward y rate. '''
+    piecewise flat in the continuously compounded forward y rate. """
     
     small = 1e-10
-    numPoints = times.size
+    num_points = times.size
 
     if t == times[0]:
         return dfs[0]
 
     i = 0
-    while times[i] < t and i < numPoints - 1:
+    while times[i] < t and i < num_points - 1:
         i = i + 1
 
     if t > times[i]:
-        i = numPoints
+        i = num_points
 
     yvalue = 0.0
 
@@ -99,7 +99,7 @@ def _uinterpolate(t, times, dfs, method):
             dt = times[i] - times[i-1]
             rvalue = ((times[i]-t)*r1 + (t-times[i-1])*r2)/dt
             yvalue = np.exp(-rvalue*t)
-        elif i < numPoints:
+        elif i < num_points:
             r1 = -np.log(dfs[i-1])/times[i-1]
             r2 = -np.log(dfs[i])/times[i]
             dt = times[i] - times[i-1]
@@ -128,7 +128,7 @@ def _uinterpolate(t, times, dfs, method):
             dt = times[i] - times[i-1]
             rtvalue = ((times[i]-t)*rt1 + (t-times[i-1])*rt2)/dt
             yvalue = np.exp(-rtvalue)
-        elif i < numPoints:
+        elif i < num_points:
             rt1 = -np.log(dfs[i - 1])
             rt2 = -np.log(dfs[i])
             dt = times[i] - times[i-1]
@@ -149,7 +149,7 @@ def _uinterpolate(t, times, dfs, method):
             y2 = -np.log(dfs[i] + small)
             yvalue = t * y2 / (times[i] + small)
             yvalue = np.exp(-yvalue)
-        elif i < numPoints:
+        elif i < num_points:
             # If you get a math domain error it is because you need negativ
             fwd1 = -np.log(dfs[i-1]/dfs[i-2])/(times[i-1]-times[i-2])
             fwd2 = -np.log(dfs[i]/dfs[i-1])/(times[i]-times[i-1])
@@ -174,10 +174,10 @@ def _vinterpolate(xValues,
                   xvector,
                   dfs,
                   method):
-    ''' Return the interpolated values of y given x and a vector of x and y.
+    """ Return the interpolated values of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
-    piecewise flat in the continuously compounded forward y rate. '''
+    piecewise flat in the continuously compounded forward y rate. """
 
     n = xValues.size
     yvalues = np.empty(n)
@@ -229,16 +229,16 @@ class FinInterpolator():
 
         # if self._interpType == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
 
-        #     ''' Second derivatives at left is zero and first derivative at
-        #     right is clamped to zero. '''
+        #     """ Second derivatives at left is zero and first derivative at
+        #     right is clamped to zero. """
         #     logDfs = np.log(self._dfs)
         #     self._interpFn = CubicSpline(self._times, logDfs,
         #                                  bc_type=((2, 0.0), (1, 0.0)))
 
         elif self._interpType == FinInterpTypes.FINCUBIC_ZERO_RATES:
 
-            ''' Second derivatives at left is zero and first derivative at
-            right is clamped to zero. '''
+            """ Second derivatives at left is zero and first derivative at
+            right is clamped to zero. """
             gSmallVector = np.ones(len(self._times)) * gSmall
             zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
 
@@ -250,14 +250,14 @@ class FinInterpolator():
 
         elif self._interpType == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
 
-            ''' Second derivatives are clamped to zero at end points '''
+            """ Second derivatives are clamped to zero at end points """
             logDfs = np.log(self._dfs)
             self._interpFn = CubicSpline(self._times, logDfs,
                                          bc_type = 'natural')
     
         elif self._interpType == FinInterpTypes.NATCUBIC_ZERO_RATES:
 
-            ''' Second derivatives are clamped to zero at end points '''
+            """ Second derivatives are clamped to zero at end points """
             gSmallVector = np.ones(len(self._times)) * gSmall
             zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
 
@@ -278,9 +278,9 @@ class FinInterpolator():
 
     def interpolate(self,
                     t: float):
-        ''' Interpolation of discount factors at time x given discount factors
+        """ Interpolation of discount factors at time x given discount factors
         at times provided using one of the methods in the enum FinInterpTypes.
-        The value of x can be an array so that the function is vectorised. '''
+        The value of x can be an array so that the function is vectorised. """
 
         if self._dfs is None:
             raise FinError("Dfs have not been set.")

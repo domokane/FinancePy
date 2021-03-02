@@ -4,7 +4,7 @@
 
 from numba import njit, float64, int64
 import numpy as np
-from ..finutils.FinHelperFunctions import labelToString
+from ..utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # CIR Process
@@ -39,7 +39,7 @@ class FinModelRatesCIR():
         self._sigma = sigma
 
     def __repr__(self):
-        ''' Return string with class details. '''
+        """ Return string with class details. """
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("Sigma", self._sigma)
@@ -54,7 +54,7 @@ class FinModelRatesCIR():
 
 @njit(fastmath=True, cache=True)
 def meanr(r0, a, b, t):
-    ''' Mean value of a CIR process after time t '''
+    """ Mean value of a CIR process after time t """
     mr = r0 * np.exp(-a * t) + b * (1.0 - np.exp(-a * t))
     return mr
 
@@ -63,7 +63,7 @@ def meanr(r0, a, b, t):
 
 @njit(fastmath=True, cache=True)
 def variancer(r0, a, b, sigma, t):
-    ''' Variance of a CIR process after time t '''
+    """ Variance of a CIR process after time t """
     vr = r0 * sigma * sigma * (np.exp(-a * t) - np.exp(-2.0 * a * t)) / a
     vr += b * sigma * sigma * ((1.0 - np.exp(-a * t))**2) / 2.0 / a
     return vr
@@ -81,7 +81,7 @@ def variancer(r0, a, b, sigma, t):
     fastmath=True,
     cache=True)
 def zeroPrice(r0, a, b, sigma, t):
-    ''' Price of a zero coupon bond in CIR model. '''
+    """ Price of a zero coupon bond in CIR model. """
     h = np.sqrt(a * a + 2.0 * sigma * sigma)
     denom = 2.0 * h + (a + h) * (np.exp(h * t) - 1.0)
     A = (2.0 * h * np.exp((a + h) * t / 2.0) /
@@ -103,7 +103,7 @@ def zeroPrice(r0, a, b, sigma, t):
     fastmath=True,
     cache=True)
 def draw(rt, a, b, sigma, dt):
-    ''' Draw a next rate from the CIR model in Monte Carlo. '''
+    """ Draw a next rate from the CIR model in Monte Carlo. """
     sigma2 = sigma * sigma
     d = 4.0 * a * b / sigma2
     ll = 4.0 * a * np.exp(-a * dt) / sigma2 / (1.0 - np.exp(-a * dt)) * rt
@@ -134,7 +134,7 @@ def draw(rt, a, b, sigma, dt):
         int64,
         int64))
 def ratePath_MC(r0, a, b, sigma, t, dt, seed, scheme):
-    ''' Generate a path of CIR rates using a number of numerical schemes. '''
+    """ Generate a path of CIR rates using a number of numerical schemes. """
 
     np.random.seed(seed)
     numSteps = int(t / dt)
@@ -233,7 +233,7 @@ def ratePath_MC(r0, a, b, sigma, t, dt, seed, scheme):
         int64,
         int64))
 def zeroPrice_MC(r0, a, b, sigma, t, dt, numPaths, seed, scheme):
-    ' Determine the CIR zero price using Monte Carlo. '''
+    ' Determine the CIR zero price using Monte Carlo. """
 
     if t == 0.0:
         return 1.0

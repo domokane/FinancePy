@@ -6,11 +6,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import scale
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.Math import scale
+from ...utils.FinHelperFunctions import labelToString
 
 from .FinBondYieldCurveModel import FinCurveFitPolynomial
 from .FinBondYieldCurveModel import FinCurveFitNelsonSiegel
@@ -26,22 +26,22 @@ from scipy.interpolate import splrep
 
 
 class FinBondYieldCurve():
-    ''' Class to do fitting of the yield curve and to enable interpolation of
+    """ Class to do fitting of the yield curve and to enable interpolation of
     yields. Because yields assume a flat term structure for each bond, this
     class does not allow discounting to be done and so does not inherit from
     FinDiscountCurve. It should only be used for visualisation and simple
-    interpolation but not for full term-structure-consistent pricing. '''
+    interpolation but not for full term-structure-consistent pricing. """
 
     def __init__(self,
-                 settlementDate: FinDate,
+                 settlement_date: Date,
                  bonds: list,
                  ylds: (np.ndarray, list),
                  curveFit):
-        ''' Fit the curve to a set of bond yields using the type of curve
+        """ Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
-        upper limits on the respective model parameters. '''
+        upper limits on the respective model parameters. """
 
-        self._settlementDate = settlementDate
+        self._settlement_date = settlement_date
         self._bonds = bonds
         self._ylds = np.array(ylds)
         self._curveFit = curveFit
@@ -51,7 +51,7 @@ class FinBondYieldCurve():
 
         yearsToMaturities = []
         for bond in bonds:
-            maturityYears = (bond._maturityDate-settlementDate)/gDaysInYear
+            maturityYears = (bond._maturity_date-settlement_date)/gDaysInYear
             yearsToMaturities.append(maturityYears)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
@@ -94,7 +94,7 @@ class FinBondYieldCurve():
             xdata = self._yearsToMaturity
             ydata = self._ylds
 
-            ''' Cubic splines as k=3 '''
+            """ Cubic splines as k=3 """
             spline = splrep(xdata, ydata, k=fit._power, t=fit._knots)
             fit._spline = spline
 
@@ -104,16 +104,16 @@ class FinBondYieldCurve():
 ###############################################################################
 
     def interpolatedYield(self,
-                          maturityDate: FinDate):
+                          maturity_date: Date):
 
-        if type(maturityDate) is FinDate:
-            t = (maturityDate - self._settlementDate) / gDaysInYear
-        elif type(maturityDate) is list:
-            t = maturityDate
-        elif type(maturityDate) is np.ndarray:
-            t = maturityDate
-        elif type(maturityDate) is float or type(maturityDate) is np.float64:
-            t = maturityDate
+        if type(maturity_date) is Date:
+            t = (maturity_date - self._settlement_date) / gDaysInYear
+        elif type(maturity_date) is list:
+            t = maturity_date
+        elif type(maturity_date) is np.ndarray:
+            t = maturity_date
+        elif type(maturity_date) is float or type(maturity_date) is np.float64:
+            t = maturity_date
         else:
             raise FinError("Unknown date type.")
 
@@ -146,7 +146,7 @@ class FinBondYieldCurve():
 
     def plot(self,
              title):
-        ''' Display yield curve. '''
+        """ Display yield curve. """
 
         plt.figure(figsize=(12, 6))
         plt.title(title)
@@ -169,7 +169,7 @@ class FinBondYieldCurve():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("SETTLEMENT DATE", self._settlementDate)
+        s += labelToString("SETTLEMENT DATE", self._settlement_date)
         s += labelToString("BOND", self._bonds)
         s += labelToString("YIELDS", self._ylds)
         s += labelToString("CURVE FIT", self._curveFit)
@@ -178,7 +178,7 @@ class FinBondYieldCurve():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ##############################################################################

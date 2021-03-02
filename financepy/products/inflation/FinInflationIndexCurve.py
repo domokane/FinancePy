@@ -4,25 +4,25 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import testMonotonicity
-from ...finutils.FinHelperFunctions import labelToString
-from ...finutils.FinHelperFunctions import timesFromDates
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import daysInMonth
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.Math import testMonotonicity
+from ...utils.FinHelperFunctions import labelToString
+from ...utils.FinHelperFunctions import timesFromDates
+from ...utils.FinHelperFunctions import checkArgumentTypes
+from ...utils.Date import daysInMonth
+from ...utils.FinGlobalVariables import gDaysInYear
 
 ###############################################################################
 
 class FinInflationIndexCurve():
-    ''' This is a curve calculated from a set of dates and CPI-like numbers. It
+    """ This is a curve calculated from a set of dates and CPI-like numbers. It
     should start at the issue date of the bond (or index). It also requires a
     lag in months. Here is a reference to the CPI curve used for TIPS.
     
     https://www.treasury.gov/about/organizational-structure/offices/Domestic-Finance/Documents/tips-presentation.pdf
     
-    '''
+    """
 
 ###############################################################################
 
@@ -55,12 +55,12 @@ class FinInflationIndexCurve():
 
 ###############################################################################
 
-    def indexValue(self, dt: FinDate):
-        ''' Calculate index value by interpolating the CPI curve '''
+    def indexValue(self, dt: Date):
+        """ Calculate index value by interpolating the CPI curve """
 
         lagMonthsAgoDt = dt.addMonths(-self._lagInMonths)
         
-        cpiFirstDate = FinDate(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y) 
+        cpiFirstDate = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
         cpiSecondDate = cpiFirstDate.addMonths(1)
         
         cpiFirstTime = (cpiFirstDate - self._baseDate) / gDaysInYear
@@ -83,8 +83,8 @@ class FinInflationIndexCurve():
 
 ###############################################################################
 
-    def indexRatio(self, dt: FinDate):
-        ''' Calculate index value by interpolating the CPI curve '''
+    def indexRatio(self, dt: Date):
+        """ Calculate index value by interpolating the CPI curve """
 
         vt = self.indexValue(dt)
         v0 = self.indexValue(self._baseDate)
@@ -100,8 +100,8 @@ class FinInflationIndexCurve():
         s += labelToString("INDEX LAG", self._lagInMonths)
 
         s += labelToString("DATES", "ZERO RATES")
-        numPoints = len(self._indexValues)
-        for i in range(0, numPoints):
+        num_points = len(self._indexValues)
+        for i in range(0, num_points):
             s += labelToString("%12s" % self._indexDates[i],
                                "%10.7f" % self._indexValues[i])
 
@@ -110,7 +110,7 @@ class FinInflationIndexCurve():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

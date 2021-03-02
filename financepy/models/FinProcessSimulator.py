@@ -8,9 +8,9 @@ from enum import Enum
 from numba import njit, float64, int64
 import numpy as np
 
-from ..finutils.FinError import FinError
-from ..finutils.FinMath import norminvcdf
-from ..finutils.FinHelperFunctions import labelToString
+from ..utils.FinError import FinError
+from ..utils.Math import norminvcdf
+from ..utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 

@@ -5,11 +5,11 @@
 import numpy as np
 
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinGlobalTypes import FinLongShort
-from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinGlobalTypes import FinLongShort
+from ...utils.FinError import FinError
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 # ADD START DATE TO CLASS ?
@@ -17,19 +17,19 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 class FinEquityForward():
-    ''' Contract to buy or sell a stock in future at a price agreed today. '''
+    """ Contract to buy or sell a stock in future at a price agreed today. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  forwardPrice: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
                  notional: float,
                  longShort: FinLongShort = FinLongShort.LONG):
-        ''' Creates a FinEquityForward which allows the owner to buy the stock
-        at a price agreed today. Need to specify if LONG or SHORT.'''
+        """ Creates a FinEquityForward which allows the owner to buy the stock
+        at a price agreed today. Need to specify if LONG or SHORT."""
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._forwardPrice = forwardPrice
         self._notional = notional
         self._longShort = longShort
@@ -37,17 +37,17 @@ class FinEquityForward():
 ###############################################################################
 
     def value(self,
-              valueDate,
+              valuation_date,
               stockPrice,  # Current stock price
-              discountCurve,
+              discount_curve,
               dividendCurve):
-        ''' Calculate the value of an equity forward contract from the stock 
-        price and discound and dividend curves. '''
+        """ Calculate the value of an equity forward contract from the stock
+        price and discound and dividend curves. """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(stockPrice <= 0.0):
             raise FinError("Stock price must be greater than zero.")
@@ -57,12 +57,12 @@ class FinEquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        fwdStockPrice = self.forward(valueDate,
+        fwdStockPrice = self.forward(valuation_date,
                                      stockPrice,
-                                     discountCurve,
+                                     discount_curve,
                                      dividendCurve)
 
-        discountDF = discountCurve._df(t)
+        discountDF = discount_curve._df(t)
 
         v = (fwdStockPrice - self._forwardPrice)
         v = v * self._notional * discountDF
@@ -75,16 +75,16 @@ class FinEquityForward():
 ###############################################################################
 
     def forward(self,
-                valueDate,
+                valuation_date,
                 stockPrice,  # Current stock price
-                discountCurve,
+                discount_curve,
                 dividendCurve):
-        ''' Calculate the forward price of the equity forward contract. '''
+        """ Calculate the forward price of the equity forward contract. """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(stockPrice <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
@@ -94,7 +94,7 @@ class FinEquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        discountDF = discountCurve._df(t)
+        discountDF = discount_curve._df(t)
         dividendDF = dividendCurve._df(t)
 
         fwdStockPrice = stockPrice * dividendDF / discountDF
@@ -104,7 +104,7 @@ class FinEquityForward():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("FORWARD PRICE", self._forwardPrice)
         s += labelToString("LONG OR SHORT", self._longShort)
         s += labelToString("NOTIONAL", self._notional, "")
@@ -113,7 +113,7 @@ class FinEquityForward():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

@@ -2,12 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinGlobalTypes import FinOptionTypes, FinExerciseTypes
+from ...utils.FinGlobalTypes import FinOptionTypes, FinExerciseTypes
 from ...products.bonds.FinBond import FinBond
 
 from enum import Enum
@@ -29,76 +29,76 @@ class FinBondModelTypes(Enum):
 
 
 class FinBondOption():
-    ''' Class for options on fixed coupon bonds. These are options to either
+    """ Class for options on fixed coupon bonds. These are options to either
     buy or sell a bond on or before a specific future expiry date at a strike
     price that is set on trade date. A European option only allows the bond to
     be exercised into on a specific expiry date. An American option allows the
     option holder to exercise early, potentially allowing earlier coupons to
-    be received. '''
+    be received. """
 
     def __init__(self,
                  bond: FinBond,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikePrice: float,
-                 faceAmount: float,
+                 face_amount: float,
                  optionType: FinOptionTypes):
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = strikePrice
         self._bond = bond
         self._optionType = optionType
-        self._faceAmount = faceAmount
+        self._face_amount = face_amount
 
 ###############################################################################
 
     def value(self,
-              valuationDate: FinDate,
-              discountCurve: FinDiscountCurve,
+              valuation_date: Date,
+              discount_curve: FinDiscountCurve,
               model):
-        ''' Value a bond option (option on a bond) using a specified model
+        """ Value a bond option (option on a bond) using a specified model
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
-        model which are all implemented as short rate tree models. '''
+        model which are all implemented as short rate tree models. """
 
-        texp = (self._expiryDate - valuationDate) / gDaysInYear
-        tmat = (self._bond._maturityDate - valuationDate) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tmat = (self._bond._maturity_date - valuation_date) / gDaysInYear
 
-        dfTimes = discountCurve._times
-        dfValues = discountCurve._dfs
+        dfTimes = discount_curve._times
+        dfValues = discount_curve._dfs
 
         # We need all of the flows in case the option is American and some occur before expiry
-        flowDates = self._bond._flowDates
-        flowAmounts = self._bond._flowAmounts
+        flow_dates = self._bond._flow_dates
+        flow_amounts = self._bond._flow_amounts
 
         couponTimes = []
         couponFlows = []
 
-        numFlows = len(self._bond._flowDates)
+        numFlows = len(self._bond._flow_dates)
 
         # Want the first flow to be the previous coupon date
         # This is needed to calculate accrued correctly        
         for i in range(1, numFlows):
-            pcd = flowDates[i-1]
-            ncd = flowDates[i]
-            if pcd < valuationDate and ncd > valuationDate:            
-                flowTime = (pcd - valuationDate) / gDaysInYear
+            pcd = flow_dates[i-1]
+            ncd = flow_dates[i]
+            if pcd < valuation_date and ncd > valuation_date:
+                flowTime = (pcd - valuation_date) / gDaysInYear
                 couponTimes.append(flowTime)
-                couponFlows.append(flowAmounts[i])
+                couponFlows.append(flow_amounts[i])
                 break
 
         for i in range(1, numFlows):
-            if flowDates[i] == valuationDate:
+            if flow_dates[i] == valuation_date:
                 couponTimes.append(0.0)
-                couponFlows.append(flowAmounts[i])
+                couponFlows.append(flow_amounts[i])
                 
         # Now calculate the remaining coupons
         for i in range(1, numFlows):
-            ncd = flowDates[i]
-            if ncd > valuationDate:            
-                flowTime = (ncd - valuationDate) / gDaysInYear
+            ncd = flow_dates[i]
+            if ncd > valuation_date:
+                flowTime = (ncd - valuation_date) / gDaysInYear
                 couponTimes.append(flowTime)
-                couponFlows.append(flowAmounts[i])
+                couponFlows.append(flow_amounts[i])
 
         ##################################################################
 
@@ -114,7 +114,7 @@ class FinBondOption():
         # This is wasteful if the model is Jamshidian but how to do neat design ?
         model.buildTree(tmat, dfTimes, dfValues)
 
-        v = model.bondOption(texp, self._strikePrice, self._faceAmount,
+        v = model.bondOption(texp, self._strikePrice, self._face_amount,
                              couponTimes, couponFlows, exerciseType)
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL \
@@ -131,10 +131,10 @@ class FinBondOption():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
-        s += labelToString("FACE AMOUNT", self._faceAmount, "")
+        s += labelToString("FACE AMOUNT", self._face_amount, "")
         s += "Underlying Bond\n"
         s += str(self._bond)
         return s
@@ -142,7 +142,7 @@ class FinBondOption():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

@@ -6,18 +6,18 @@
 from math import exp, log, sqrt
 
 
-from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import ONE_MILLION, INVROOT2PI, N
-from ...finutils.FinError import FinError
+from ...utils.Calendar import FinCalendarTypes
+from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
+from ...utils.DayCount import DayCount, FinDayCountTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.Math import ONE_MILLION, INVROOT2PI, N
+from ...utils.FinError import FinError
 from ...products.credit.FinCDSCurve import FinCDSCurve
 from ...products.credit.FinCDS import FinCDS
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinHelperFunctions import checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.FinHelperFunctions import labelToString
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -26,27 +26,27 @@ RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
 class FinCDSIndexOption(object):
 
-    ''' Class to manage the pricing and risk management of an option to enter
-    into a CDS index. Different pricing algorithms are presented.'''
+    """ Class to manage the pricing and risk management of an option to enter
+    into a CDS index. Different pricing algorithms are presented."""
 
     def __init__(self,
-                 expiryDate: FinDate,
-                 maturityDate: FinDate,
+                 expiry_date: Date,
+                 maturity_date: Date,
                  indexCoupon: float,
                  strikeCoupon: float,
                  notional: float = ONE_MILLION,
-                 longProtection: bool = True,
-                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Initialisation of the class object. Note that a large number of the
-        inputs are set to default values in line with the standard contract.'''
+                 long_protection: bool = True,
+                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        """ Initialisation of the class object. Note that a large number of the
+        inputs are set to default values in line with the standard contract."""
 
         checkArgumentTypes(self.__init__, locals())
 
-        if expiryDate > maturityDate:
+        if expiry_date > maturity_date:
             raise FinError("Expiry date after end date")
 
         if indexCoupon < 0.0:
@@ -55,58 +55,58 @@ class FinCDSIndexOption(object):
         if strikeCoupon < 0.0:
             raise FinError("Index Option strike coupon is negative")
 
-        self._expiryDate = expiryDate
-        self._maturityDate = maturityDate
+        self._expiry_date = expiry_date
+        self._maturity_date = maturity_date
         self._indexCoupon = indexCoupon
         self._strikeCoupon = strikeCoupon
         self._notional = notional
-        self._longProtection = longProtection
+        self._long_protection = long_protection
 
-        self._dayCountType = dayCountType
-        self._dateGenRuleType = dateGenRuleType
-        self._calendarType = calendarType
-        self._freqType = freqType
-        self._busDayAdjustType = busDayAdjustType
+        self._day_count_type = day_count_type
+        self._date_gen_rule_type = date_gen_rule_type
+        self._calendar_type = calendar_type
+        self._freq_type = freq_type
+        self._bus_day_adjust_type = bus_day_adjust_type
 
-        self._cdsContract = FinCDS(self._expiryDate,
-                                   self._maturityDate,
+        self._cdsContract = FinCDS(self._expiry_date,
+                                   self._maturity_date,
                                    self._indexCoupon,
                                    1.0,
-                                   self._longProtection,
-                                   self._freqType,
-                                   self._dayCountType,
-                                   self._calendarType,
-                                   self._busDayAdjustType,
-                                   self._dateGenRuleType)
+                                   self._long_protection,
+                                   self._freq_type,
+                                   self._day_count_type,
+                                   self._calendar_type,
+                                   self._bus_day_adjust_type,
+                                   self._date_gen_rule_type)
 
 ###############################################################################
 
     def valueAdjustedBlack(self,
-                           valuationDate,
-                           indexCurve,
+                           valuation_date,
+                           index_curve,
                            indexRecovery,
-                           liborCurve,
+                           libor_curve,
                            sigma):
-        ''' This approach uses two adjustments to Black's option pricing
-        model to value an option on a CDS index. '''
+        """ This approach uses two adjustments to Black's option pricing
+        model to value an option on a CDS index. """
 
         k = self._strikeCoupon
         c = self._indexCoupon
-        timeToExpiry = (self._expiryDate - valuationDate) / gDaysInYear
-        df = liborCurve.df(self._expiryDate)
-        qExpiryIndex = indexCurve.survProb(timeToExpiry)
+        timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
+        df = libor_curve.df(self._expiry_date)
+        qExpiryIndex = index_curve.survProb(timeToExpiry)
 
-        cds = FinCDS(valuationDate, self._maturityDate, k)
+        cds = FinCDS(valuation_date, self._maturity_date, k)
         strikeCurve = FinCDSCurve(
-            valuationDate, [cds], liborCurve, indexRecovery)
+            valuation_date, [cds], libor_curve, indexRecovery)
 #        qExpiryStrike = strikeCurve.survivalProbability(timeToExpiry)
 
         strikeRPV01 = self._cdsContract.riskyPV01(
-            valuationDate, strikeCurve)['clean_rpv01']
+            valuation_date, strikeCurve)['clean_rpv01']
         indexRPV01 = self._cdsContract.riskyPV01(
-            valuationDate, indexCurve)['clean_rpv01']
+            valuation_date, index_curve)['clean_rpv01']
 
-        s = self._cdsContract.parSpread(valuationDate, indexCurve)
+        s = self._cdsContract.parSpread(valuation_date, index_curve)
 
         fep = df * (1.0 - qExpiryIndex) * (1.0 - indexRecovery)
         adjFwd = s + fep / indexRPV01
@@ -129,32 +129,32 @@ class FinCDSIndexOption(object):
 ###############################################################################
 
     def valueAnderson(self,
-                      valuationDate,
-                      issuerCurves,
+                      valuation_date,
+                      issuer_curves,
                       indexRecovery,
                       sigma):
-        ''' This function values a CDS index option following approach by
+        """ This function values a CDS index option following approach by
         Anderson (2006). This ensures that a no-arbitrage relationship between
         the consituent CDS contract and the CDS index is enforced. It models
         the forward spread as a log-normally distributed quantity and uses the
-        credit triangle to compute the forward RPV01. '''
+        credit triangle to compute the forward RPV01. """
 
-        numCredits = len(issuerCurves)
-        timeToExpiry = (self._expiryDate - valuationDate) / gDaysInYear
-#        timeToMaturity = (self._maturityDate - valuationDate) / gDaysInYear
-        dfToExpiry = issuerCurves[0].df(timeToExpiry)
-        liborCurve = issuerCurves[0]._liborCurve
+        numCredits = len(issuer_curves)
+        timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
+#        timeToMaturity = (self._maturity_date - valuation_date) / gDaysInYear
+        dfToExpiry = issuer_curves[0].df(timeToExpiry)
+        libor_curve = issuer_curves[0]._libor_curve
 
         k = self._strikeCoupon
         c = self._indexCoupon
 
         strikeCDS = FinCDS(
-            self._expiryDate,
-            self._maturityDate,
+            self._expiry_date,
+            self._maturity_date,
             self._strikeCoupon,
             1.0)
-        strikeCurve = FinCDSCurve(valuationDate, [strikeCDS], liborCurve)
-        strikeRPV01s = strikeCDS.riskyPV01(valuationDate, strikeCurve)
+        strikeCurve = FinCDSCurve(valuation_date, [strikeCDS], libor_curve)
+        strikeRPV01s = strikeCDS.riskyPV01(valuation_date, strikeCurve)
         qToExpiry = strikeCurve.survProb(timeToExpiry)
         strikeValue = (k - c) * strikeRPV01s['clean_rpv01']
         strikeValue /= (dfToExpiry * qToExpiry)
@@ -165,12 +165,12 @@ class FinCDSIndexOption(object):
 
         for iCredit in range(0, numCredits):
 
-            issuerCurve = issuerCurves[iCredit]
-            q = issuerCurve.survProb(timeToExpiry)
-            dh1 = (1.0 - issuerCurve._recoveryRate) * (1.0 - q)
+            issuer_curve = issuer_curves[iCredit]
+            q = issuer_curve.survProb(timeToExpiry)
+            dh1 = (1.0 - issuer_curve._recovery_rate) * (1.0 - q)
 
-            s = self._cdsContract.parSpread(valuationDate, issuerCurve)
-            rpv01 = self._cdsContract.riskyPV01(valuationDate, issuerCurve)
+            s = self._cdsContract.parSpread(valuation_date, issuer_curve)
+            rpv01 = self._cdsContract.riskyPV01(valuation_date, issuer_curve)
             dh2 = (s - c) * rpv01['clean_rpv01'] / (dfToExpiry * qToExpiry)
 
             h1 = h1 + dh1
@@ -178,19 +178,19 @@ class FinCDSIndexOption(object):
 
         expH = (h1 + h2) / numCredits
 
-        x = self._solveForX(valuationDate,
+        x = self._solveForX(valuation_date,
                             sigma,
                             c,
                             indexRecovery,
-                            liborCurve,
+                            libor_curve,
                             expH)
 
-        v = self._calcIndexPayerOptionPrice(valuationDate,
+        v = self._calcIndexPayerOptionPrice(valuation_date,
                                             x,
                                             sigma,
                                             c,
                                             strikeValue,
-                                            liborCurve,
+                                            libor_curve,
                                             indexRecovery)
 
         v = v[1]
@@ -204,13 +204,13 @@ class FinCDSIndexOption(object):
 ###############################################################################
 
     def _solveForX(self,
-                   valuationDate,
+                   valuation_date,
                    sigma,
                    indexCoupon,
                    indexRecovery,
-                   liborCurve,
+                   libor_curve,
                    expH):
-        ''' Function to solve for the arbitrage free '''
+        """ Function to solve for the arbitrage free """
         x1 = 0.0
         x2 = 0.9999
         ftol = 1e-8
@@ -218,11 +218,11 @@ class FinCDSIndexOption(object):
         xacc = 0.000000001
         rtb = 999999
 
-        f = self._calcObjFunc(x1, valuationDate, sigma, indexCoupon,
-                              indexRecovery, liborCurve) - expH
+        f = self._calcObjFunc(x1, valuation_date, sigma, indexCoupon,
+                              indexRecovery, libor_curve) - expH
 
-        fmid = self._calcObjFunc(x2, valuationDate, sigma, indexCoupon,
-                                 indexRecovery, liborCurve) - expH
+        fmid = self._calcObjFunc(x2, valuation_date, sigma, indexCoupon,
+                                 indexRecovery, libor_curve) - expH
 
         if f * fmid >= 0.0:
             raise FinError("Solution not bracketed.")
@@ -237,8 +237,8 @@ class FinCDSIndexOption(object):
         for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self._calcObjFunc(xmid, valuationDate, sigma, indexCoupon,
-                                     indexRecovery, liborCurve) - expH
+            fmid = self._calcObjFunc(xmid, valuation_date, sigma, indexCoupon,
+                                     indexRecovery, libor_curve) - expH
             if fmid <= 0.0:
                 rtb = xmid
             if abs(dx) < xacc or abs(fmid) < ftol:
@@ -250,23 +250,23 @@ class FinCDSIndexOption(object):
 
     def _calcObjFunc(self,
                      x,
-                     valuationDate,
+                     valuation_date,
                      sigma,
                      indexCoupon,
                      indexRecovery,
-                     liborCurve):
-        ''' An internal function used in the Anderson valuation. '''
+                     libor_curve):
+        """ An internal function used in the Anderson valuation. """
 
         # The strike value is not relevant here as we want the zeroth element
         # of the return value
         strikeValue = 0.0
 
-        values = self._calcIndexPayerOptionPrice(valuationDate,
+        values = self._calcIndexPayerOptionPrice(valuation_date,
                                                  x,
                                                  sigma,
                                                  self._indexCoupon,
                                                  strikeValue,
-                                                 liborCurve,
+                                                 libor_curve,
                                                  indexRecovery)
 
         return values[0]
@@ -274,25 +274,25 @@ class FinCDSIndexOption(object):
 ###############################################################################
 
     def _calcIndexPayerOptionPrice(self,
-                                   valuationDate,
+                                   valuation_date,
                                    x,
                                    sigma,
                                    indexCoupon,
                                    strikeValue,
-                                   liborCurve,
+                                   libor_curve,
                                    indexRecovery):
-        ''' Calculates the intrinsic value of the index payer swap and the
+        """ Calculates the intrinsic value of the index payer swap and the
         value of the index payer option which are both returned in an array.
-        '''
+        """
 
         z = -6.0
         dz = 0.2
         numZSteps = int(2.0 * abs(z) / dz)
 
-        flowDates = self._cdsContract._adjustedDates
-        numFlows = len(flowDates)
-        texp = (self._expiryDate - valuationDate) / gDaysInYear
-        dfToExpiry = liborCurve.df(self._expiryDate)
+        flow_dates = self._cdsContract._adjustedDates
+        numFlows = len(flow_dates)
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        dfToExpiry = libor_curve.df(self._expiry_date)
         lgd = 1.0 - indexRecovery
 
         fwdDfs = [1.0] * (numFlows)
@@ -300,16 +300,16 @@ class FinCDSIndexOption(object):
 
         for iFlow in range(1, numFlows):
             expiryToFlowTimes[iFlow] = (
-                flowDates[iFlow] - self._expiryDate) / gDaysInYear
-            fwdDfs[iFlow] = liborCurve.df(flowDates[iFlow]) / dfToExpiry
+                flow_dates[iFlow] - self._expiry_date) / gDaysInYear
+            fwdDfs[iFlow] = libor_curve.df(flow_dates[iFlow]) / dfToExpiry
 
         intH = 0.0
         intMaxH = 0.0
 
-        dayCount = FinDayCount(self._dayCountType)
-        pcd = flowDates[0]  # PCD
-        eff = self._expiryDate
-        accrualFactorPCDToExpiry = dayCount.yearFrac(pcd, eff)[0]
+        dayCount = DayCount(self._day_count_type)
+        pcd = flow_dates[0]  # PCD
+        eff = self._expiry_date
+        accrualFactorPCDToExpiry = dayCount.year_frac(pcd, eff)[0]
 
         s0 = exp(-0.5 * sigma * sigma * texp)
 
@@ -320,9 +320,9 @@ class FinCDSIndexOption(object):
 
             fwdRPV01 = 0.0
             for iFlow in range(1, numFlows):
-                accFactor = self._cdsContract._accrualFactors[iFlow]
+                acc_factor = self._cdsContract._accrualFactors[iFlow]
                 survivalProbability = exp(-s * expiryToFlowTimes[iFlow] / lgd)
-                fwdRPV01 += accFactor * survivalProbability * fwdDfs[iFlow]
+                fwdRPV01 += acc_factor * survivalProbability * fwdDfs[iFlow]
 
             fwdRPV01 += -accrualFactorPCDToExpiry
             h = (s - indexCoupon) * fwdRPV01
@@ -338,25 +338,25 @@ class FinCDSIndexOption(object):
 ###############################################################################
 
     def __repr__(self):
-        ''' print out details of the CDS contract and all of the calculated
-        cashflows '''
+        """ print out details of the CDS contract and all of the calculated
+        cashflows """
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
-        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
+        s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("INDEX COUPON", self._indexCoupon*10000, "bp\n")
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("LONG PROTECTION", self._longProtection)
-        s += labelToString("FREQUENCY", self._freqType)
-        s += labelToString("DAYCOUNT", self._dayCountType)
-        s += labelToString("CALENDAR", self._calendarType)
-        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
-        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("LONG PROTECTION", self._long_protection)
+        s += labelToString("FREQUENCY", self._freq_type)
+        s += labelToString("DAYCOUNT", self._day_count_type)
+        s += labelToString("CALENDAR", self._calendar_type)
+        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
+        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
         return s
 
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

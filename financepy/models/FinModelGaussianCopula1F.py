@@ -7,8 +7,8 @@ import numpy as np
 
 ##########################################################################
 
-from ..finutils.FinMath import norminvcdf, N, INVROOT2PI
-from ..finutils.FinError import FinError
+from ..utils.Math import norminvcdf, N, INVROOT2PI
+from ..utils.FinError import FinError
 from .FinModelLossDbnBuilder import indepLossDbnRecursionGCD
 from .FinModelLossDbnBuilder import indepLossDbnHeterogeneousAdjBinomial
 from .FinModelLossDbnBuilder import portfolioGCD
@@ -29,8 +29,8 @@ def lossDbnRecursionGCD(numCredits,
                         lossUnits,
                         betaVector,
                         numIntegrationSteps):
-    ''' Full construction of the loss distribution of a portfolio of credits
-    where losses have been calculate as number of units based on the GCD. '''
+    """ Full construction of the loss distribution of a portfolio of credits
+    where losses have been calculate as number of units based on the GCD. """
 
     if len(defaultProbs) != numCredits:
         raise FinError("Default probability length must equal num credits.")
@@ -84,12 +84,12 @@ def lossDbnRecursionGCD(numCredits,
 @njit(float64[:](float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
 def homogeneousBasketLossDbn(survivalProbabilities,
-                             recoveryRates,
+                             recovery_rates,
                              betaVector,
                              numIntegrationSteps):
-    ''' Calculate the loss distribution of a CDS default basket where the
+    """ Calculate the loss distribution of a CDS default basket where the
     portfolio is equally weighted and the losses in the portfolio are homo-
-    geneous i.e. the credits have the same recovery rates. '''
+    geneous i.e. the credits have the same recovery rates. """
 
     numCredits = len(survivalProbabilities)
 
@@ -97,7 +97,7 @@ def homogeneousBasketLossDbn(survivalProbabilities,
         raise FinError("Number of credits equals zero")
 
     for iCredit in range(1, numCredits):
-        if recoveryRates[iCredit] != recoveryRates[0]:
+        if recovery_rates[iCredit] != recovery_rates[0]:
             raise FinError("Losses are not homogeneous")
 
     m = 0.0
@@ -135,12 +135,12 @@ def trSurvProbRecursion(k1,
                         k2,
                         numCredits,
                         survivalProbabilities,
-                        recoveryRates,
+                        recovery_rates,
                         betaVector,
                         numIntegrationSteps):
-    ''' Get the tranche survival probability of a portfolio of credits in the
+    """ Get the tranche survival probability of a portfolio of credits in the
     one-factor GC model using a full recursion calculation of the loss
-    distribution and survival probabilities to some time horizon. '''
+    distribution and survival probabilities to some time horizon. """
 
     if k1 == 0.0 and k2 == 0.0:
         return 0.0
@@ -152,7 +152,7 @@ def trSurvProbRecursion(k1,
 
     lossAmounts = np.zeros(numCredits)
     for iCredit in range(0, numCredits):
-        lossAmounts[iCredit] = (1.0 - recoveryRates[iCredit]) / numCredits
+        lossAmounts[iCredit] = (1.0 - recovery_rates[iCredit]) / numCredits
         if lossAmounts[iCredit] != lossAmounts[0]:
             commonRecoveryFlag = 0
 
@@ -230,13 +230,13 @@ def trSurvProbGaussian(k1,
                        k2,
                        numCredits,
                        survivalProbabilities,
-                       recoveryRates,
+                       recovery_rates,
                        betaVector,
                        numIntegrationSteps):
-    ''' Get the approximated tranche survival probability of a portfolio
+    """ Get the approximated tranche survival probability of a portfolio
     of credits in the one-factor GC model using a Gaussian fit of the
     conditional loss distribution and survival probabilities to some time
-    horizon. Note that the losses in this fit are allowed to be negative. '''
+    horizon. Note that the losses in this fit are allowed to be negative. """
 
     if k1 == 0.0 and k2 == 0.0:
         return 0.0
@@ -257,7 +257,7 @@ def trSurvProbGaussian(k1,
     for iCredit in range(0, numCredits):
         pd = 1.0 - survivalProbabilities[iCredit]
         thresholds[iCredit] = norminvcdf(pd)
-        losses[iCredit] = (1.0 - recoveryRates[iCredit]) / numCredits
+        losses[iCredit] = (1.0 - recovery_rates[iCredit]) / numCredits
 
     v = 0.0
     for _ in range(0, numIntegrationSteps):
@@ -294,8 +294,8 @@ def lossDbnHeterogeneousAdjBinomial(numCredits,
                                     lossRatio,
                                     betaVector,
                                     numIntegrationSteps):
-    ''' Get the portfolio loss distribution using the adjusted binomial
-    approximation to the conditional loss distribution. '''
+    """ Get the portfolio loss distribution using the adjusted binomial
+    approximation to the conditional loss distribution. """
 
     numLossUnits = numCredits + 1
     condDefaultProbs = np.zeros(numCredits)
@@ -342,13 +342,13 @@ def trSurvProbAdjBinomial(k1,
                           k2,
                           numCredits,
                           survivalProbabilities,
-                          recoveryRates,
+                          recovery_rates,
                           betaVector,
                           numIntegrationSteps):
-    ''' Get the approximated tranche survival probability of a portfolio of
+    """ Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the adjusted binomial fit of the
     conditional loss distribution and survival probabilities to some time
-    horizon. This approach is both fast and highly accurate. '''
+    horizon. This approach is both fast and highly accurate. """
 
     if k1 == 0.0 and k2 == 0.0:
         return 0.0
@@ -362,7 +362,7 @@ def trSurvProbAdjBinomial(k1,
 
     totalLoss = 0.0
     for iCredit in range(0, numCredits):
-        totalLoss += (1.0 - recoveryRates[iCredit])
+        totalLoss += (1.0 - recovery_rates[iCredit])
     totalLoss /= numCredits
 
     avgLoss = totalLoss / numCredits
@@ -370,7 +370,7 @@ def trSurvProbAdjBinomial(k1,
     lossRatio = np.zeros(numCredits)
     for iCredit in range(0, numCredits):
         lossRatio[iCredit] = (
-            1.0 - recoveryRates[iCredit]) / numCredits / avgLoss
+            1.0 - recovery_rates[iCredit]) / numCredits / avgLoss
 
     lossDbn = lossDbnHeterogeneousAdjBinomial(numCredits,
                                               defaultProbs,

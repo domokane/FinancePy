@@ -4,7 +4,7 @@
 
 import numpy as np
 from numba import jit, njit, float64, int64
-from ..finutils.FinMath import cholesky
+from ..utils.Math import cholesky
 
 ###############################################################################
 

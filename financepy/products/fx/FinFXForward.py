@@ -5,10 +5,10 @@
 import numpy as np
 
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -18,34 +18,34 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 class FinFXForward():
-    ''' Contract to buy or sell currency at a forward rate decided today. '''
+    """ Contract to buy or sell currency at a forward rate decided today. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikeFXRate: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
                  currencyPair: str,  # FORDOM
                  notional: float,
                  notionalCurrency: str,  # must be FOR or DOM
                  spotDays: int = 0):
-        ''' Creates a FinFXForward which allows the owner to buy the FOR
+        """ Creates a FinFXForward which allows the owner to buy the FOR
         against the DOM currency at the strikeFXRate and to pay it in the
-        notional currency. '''
+        notional currency. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        deliveryDate = expiryDate.addWeekDays(spotDays)
+        deliveryDate = expiry_date.addWeekDays(spotDays)
 
-        ''' The FX rate is the price in domestic currency ccy2 of a single unit
+        """ The FX rate is the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
-        price in USD (CCY2) of 1 unit of EUR (CCY1) '''
+        price in USD (CCY2) of 1 unit of EUR (CCY1) """
 
-        if deliveryDate < expiryDate:
+        if deliveryDate < expiry_date:
             raise FinError("Delivery date must be on or after expiry date.")
 
         if len(currencyPair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._deliveryDate = deliveryDate
         self._strikeFXRate = strikeFXRate
 
@@ -63,17 +63,17 @@ class FinFXForward():
 ###############################################################################
 
     def value(self,
-              valueDate,
+              valuation_date,
               spotFXRate,  # 1 unit of foreign in domestic
               domDiscountCurve,
               forDiscountCurve):
-        ''' Calculate the value of an FX forward contract where the current
-        FX rate is the spotFXRate. '''
+        """ Calculate the value of an FX forward contract where the current
+        FX rate is the spotFXRate. """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(spotFXRate <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
@@ -83,7 +83,7 @@ class FinFXForward():
 
         t = np.maximum(t, 1e-10)
 
-        newFwdFXRate = self.forward(valueDate,
+        newFwdFXRate = self.forward(valuation_date,
                                     spotFXRate,
                                     domDiscountCurve,
                                     forDiscountCurve)
@@ -120,17 +120,17 @@ class FinFXForward():
 ###############################################################################
 
     def forward(self,
-                valueDate,
+                valuation_date,
                 spotFXRate,  # 1 unit of foreign in domestic
                 domDiscountCurve,
                 forDiscountCurve):
-        ''' Calculate the FX Forward rate that makes the value of the FX
-        contract equal to zero. '''
+        """ Calculate the FX Forward rate that makes the value of the FX
+        contract equal to zero. """
 
-        if type(valueDate) == FinDate:
-            t = (self._deliveryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._deliveryDate - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(spotFXRate <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
@@ -150,7 +150,7 @@ class FinFXForward():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE FX RATE", self._strikeFXRate)
         s += labelToString("CURRENCY PAIR", self._currencyPair)
         s += labelToString("NOTIONAL", self._notional)
@@ -161,7 +161,7 @@ class FinFXForward():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

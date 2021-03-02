@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -23,8 +23,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinNumbaNumpySpeed(useSobol):
 
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 7, 2015)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 7, 2015)
     stockPrice = 100
     volatility = 0.30
     interestRate = 0.05
@@ -32,26 +32,26 @@ def test_FinNumbaNumpySpeed(useSobol):
     seed = 1999
 
     model = FinModelBlackScholes(volatility)
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)
 
     useSobolInt = int(useSobol)
     
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+    callOption = FinEquityVanillaOption(expiry_date, 100.0, 
                                         FinOptionTypes.EUROPEAN_CALL)
 
-    value = callOption.value(valueDate, stockPrice, discountCurve,
+    value = callOption.value(valuation_date, stockPrice, discount_curve,
                              dividendYield,model)
 
-    numPoints = 20
-    v_exact = [value] * numPoints
+    num_points = 20
+    v_exact = [value] * num_points
 
     ###########################################################################
     # DO UP TO 100K AS IT IS SLOW
     ###########################################################################
 
-    numPathsList = np.arange(1,numPoints+1,1) * 100000
+    numPathsList = np.arange(1,num_points+1,1) * 100000
 
     NONUMBA_NONUMPY_v = []
     NONUMBA_NONUMPY_t = []
@@ -60,7 +60,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NONUMBA_NONUMPY(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NONUMBA_NONUMPY(valuation_date, stockPrice, discount_curve,
                                       dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -77,7 +77,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_ONLY(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMPY_ONLY(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -119,7 +119,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     # DO UP TO 10 MILLION NOW THAT WE HAVE NUMPY
     ###########################################################################
     
-    numPathsList = np.arange(1,numPoints+1,1) * 1000000
+    numPathsList = np.arange(1,num_points+1,1) * 1000000
 
     NUMPY_ONLY_v = []
     NUMPY_ONLY_t = []
@@ -128,7 +128,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_ONLY(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMPY_ONLY(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -145,7 +145,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_NUMBA(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMPY_NUMBA(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -162,7 +162,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_ONLY(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMBA_ONLY(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -179,7 +179,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_PARALLEL(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMBA_PARALLEL(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -253,8 +253,8 @@ def test_FinNumbaNumpySpeed(useSobol):
 
 def test_FinNumbaNumbaParallel(useSobol):
 
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 7, 2015)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 7, 2015)
     stockPrice = 100
     volatility = 0.30
     interestRate = 0.05
@@ -262,22 +262,22 @@ def test_FinNumbaNumbaParallel(useSobol):
     seed = 2021
 
     model = FinModelBlackScholes(volatility)
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)
 
     useSobolInt = int(useSobol)
     
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+    callOption = FinEquityVanillaOption(expiry_date, 100.0, 
                                         FinOptionTypes.EUROPEAN_CALL)
 
-    value = callOption.value(valueDate, stockPrice, discountCurve,
+    value = callOption.value(valuation_date, stockPrice, discount_curve,
                              dividendYield,model)
 
-    numPoints = 20
-    v_exact = [value] * numPoints
+    num_points = 20
+    v_exact = [value] * num_points
 
-    numPathsList = np.arange(1,numPoints+1,1) * 1000000
+    numPathsList = np.arange(1,num_points+1,1) * 1000000
 
     NUMBA_ONLY_v = []
     NUMBA_ONLY_t = []
@@ -286,7 +286,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_ONLY(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMBA_ONLY(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -303,7 +303,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     for numPaths in numPathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_PARALLEL(valueDate, stockPrice, discountCurve,
+        valueMC = callOption.valueMC_NUMBA_PARALLEL(valuation_date, stockPrice, discount_curve,
                                      dividendYield, model, numPaths, seed, useSobolInt)
         end = time.time()
         duration = end - start

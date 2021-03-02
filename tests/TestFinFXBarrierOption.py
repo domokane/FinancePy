@@ -11,7 +11,7 @@ from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,8 +20,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFXBarrierOption():
 
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 1, 2016)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 1, 2016)
     spotFXRate = 100.0
     currencyPair = "USDJPY"
     volatility = 0.20
@@ -34,8 +34,8 @@ def test_FinFXBarrierOption():
     drift = domInterestRate - forInterestRate
     scheme = FinGBMNumericalScheme.ANTITHETIC
     processType = FinProcessTypes.GBM
-    domDiscountCurve = FinDiscountCurveFlat(valueDate, domInterestRate)
-    forDiscountCurve = FinDiscountCurveFlat(valueDate, forInterestRate)
+    domDiscountCurve = FinDiscountCurveFlat(valuation_date, domInterestRate)
+    forDiscountCurve = FinDiscountCurveFlat(valuation_date, forInterestRate)
     model = FinModelBlackScholes(volatility)
 
     ###########################################################################
@@ -53,17 +53,17 @@ def test_FinFXBarrierOption():
             B = 110.0
             K = 100.0
 
-            option = FinFXBarrierOption(expiryDate, K, currencyPair,
+            option = FinFXBarrierOption(expiry_date, K, currencyPair,
                                         optionType, B,
                                         numObservationsPerYear,
                                         notional, notionalCurrency)
 
-            value = option.value(valueDate, spotFXRate,
+            value = option.value(valuation_date, spotFXRate,
                                  domDiscountCurve, forDiscountCurve, model)
 
             start = time.time()
             modelParams = (spotFXRate, drift, volatility, scheme)
-            valueMC = option.valueMC(valueDate, spotFXRate,
+            valueMC = option.valueMC(valuation_date, spotFXRate,
                                      domInterestRate, processType,
                                      modelParams)
 
@@ -78,17 +78,17 @@ def test_FinFXBarrierOption():
             B = 100.0
             K = 110.0
 
-            option = FinFXBarrierOption(expiryDate, K, currencyPair,
+            option = FinFXBarrierOption(expiry_date, K, currencyPair,
                                         optionType, B,
                                         numObservationsPerYear,
                                         notional, notionalCurrency)
 
-            value = option.value(valueDate, spotFXRate,
+            value = option.value(valuation_date, spotFXRate,
                                  domDiscountCurve, forDiscountCurve, model)
 
             start = time.time()
             modelParams = (spotFXRate, drift, volatility, scheme)
-            valueMC = option.valueMC(valueDate,
+            valueMC = option.valueMC(valuation_date,
                                      spotFXRate,
                                      domInterestRate,
                                      processType,
@@ -112,7 +112,7 @@ def test_FinFXBarrierOption():
 
     for optionType in FinFXBarrierTypes:
         for spotFXRate in spotFXRates:
-            barrierOption = FinFXBarrierOption(expiryDate,
+            barrierOption = FinFXBarrierOption(expiry_date,
                                                100.0,
                                                currencyPair,
                                                optionType,
@@ -121,25 +121,25 @@ def test_FinFXBarrierOption():
                                                notional,
                                                notionalCurrency)
 
-            value = barrierOption.value(valueDate,
+            value = barrierOption.value(valuation_date,
                                         spotFXRate,
                                         domDiscountCurve,
                                         forDiscountCurve,
                                         model)
 
-            delta = barrierOption.delta(valueDate,
+            delta = barrierOption.delta(valuation_date,
                                         spotFXRate,
                                         domDiscountCurve,
                                         forDiscountCurve,
                                         model)
 
-            vega = barrierOption.vega(valueDate,
+            vega = barrierOption.vega(valuation_date,
                                       spotFXRate,
                                       domDiscountCurve,
                                       forDiscountCurve,
                                       model)
 
-            theta = barrierOption.theta(valueDate,
+            theta = barrierOption.theta(valuation_date,
                                         spotFXRate,
                                         domDiscountCurve,
                                         forDiscountCurve,

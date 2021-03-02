@@ -8,9 +8,9 @@ import os
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate, fromDatetime
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.Date import Date, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondYieldCurve import FinBondYieldCurve
 from financepy.products.bonds.FinBondYieldCurveModel import *
@@ -31,9 +31,9 @@ def test_FinBondYieldCurve():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    settlement = FinDate(19, 9, 2012)
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    settlement = Date(19, 9, 2012)
 
     bonds = []
     ylds = []
@@ -43,10 +43,10 @@ def test_FinBondYieldCurve():
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = fromDatetime(matDatetime)
-        issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
+        issueDt = Date(maturityDt._d, maturityDt._m, 2000)
         coupon = bond['coupon']/100.0
         cleanPrice = bond['mid']
-        bond = FinBond(issueDt, maturityDt, coupon, freqType, accrualType)
+        bond = FinBond(issueDt, maturityDt, coupon, freq_type, accrual_type)
         yld = bond.yieldToMaturity(settlement, cleanPrice)
         bonds.append(bond)
         ylds.append(yld)
@@ -91,9 +91,9 @@ def test_FinBondYieldCurve():
 
 ###############################################################################
 
-    maturityDate = FinDate(19, 9, 2030)
-    interpolatedYield = fittedCurve5.interpolatedYield(maturityDate)
-    testCases.print(maturityDate, interpolatedYield)
+    maturity_date = Date(19, 9, 2030)
+    interpolatedYield = fittedCurve5.interpolatedYield(maturity_date)
+    testCases.print(maturity_date, interpolatedYield)
 
 ###############################################################################
 

@@ -5,16 +5,16 @@
 import numpy as np
 from typing import List
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import N, M
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.Math import N, M
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from enum import Enum
 
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...utils.FinHelperFunctions import checkArgumentTypes
 
 ###############################################################################
 
@@ -66,7 +66,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
 def valueMCFast(t,
                 stockPrices,
-                discountCurve,
+                discount_curve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -77,7 +77,7 @@ def valueMCFast(t,
                 seed=4242):
 
     np.random.seed(seed)
-    df = discountCurve._df(t)
+    df = discount_curve._df(t)
     r = -np.log(df)/t
     mus = r - dividendYields
 
@@ -98,7 +98,7 @@ def valueMCFast(t,
 class FinRainbowOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  payoffType: FinFXRainbowOptionTypes,
                  payoffParams: List[float],
                  numAssets: int):
@@ -107,7 +107,7 @@ class FinRainbowOption(FinEquityOption):
 
         self.validatePayoff(payoffType, payoffParams, numAssets)
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._payoffType = payoffType
         self._payoffParams = payoffParams
         self._numAssets = numAssets
@@ -177,10 +177,10 @@ class FinRainbowOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate,
-              expiryDate,
+              valuation_date,
+              expiry_date,
               stockPrices,
-              discountCurve,
+              discount_curve,
               dividendYields,
               volatilities,
               betas):
@@ -188,7 +188,7 @@ class FinRainbowOption(FinEquityOption):
         if self._numAssets != 2:
             raise FinError("Analytical results for two assets only.")
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         self.validate(stockPrices,
@@ -197,9 +197,9 @@ class FinRainbowOption(FinEquityOption):
                       betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discountCurve._df(t)
+        df = discount_curve._df(t)
         r = -np.log(df)/t
 
         q1 = dividendYields[0]
@@ -249,10 +249,10 @@ class FinRainbowOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
-                expiryDate,
+                valuation_date,
+                expiry_date,
                 stockPrices,
-                discountCurve,
+                discount_curve,
                 dividendYields,
                 volatilities,
                 betas,
@@ -264,14 +264,14 @@ class FinRainbowOption(FinEquityOption):
                       volatilities,
                       betas)
 
-        if valueDate > expiryDate:
+        if valuation_date > expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
         v = valueMCFast(t,
                         stockPrices,
-                        discountCurve,
+                        discount_curve,
                         dividendYields,
                         volatilities,
                         betas,

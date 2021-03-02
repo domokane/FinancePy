@@ -9,7 +9,7 @@
 
 import datetime
 from enum import Enum
-from .FinDate import FinDate
+from .Date import Date
 from .FinError import FinError
 
 # from numba import njit, jit, int64, boolean
@@ -79,31 +79,31 @@ class FinDateGenRuleTypes(Enum):
 ###############################################################################
 
 
-class calendar(object):
-    ''' Class to manage designation of payment dates as holidays according to
+class Calendar(object):
+    """ Class to manage designation of payment dates as holidays according to
     a regional or country-specific calendar convention specified by the user.
     It also supplies an adjustment method which takes in an adjustment
     convention and then applies that to any date that falls on a holiday in the
-    specified calendar. '''
+    specified calendar. """
 
     def __init__(self,
-                 calendarType: FinCalendarTypes):
-        ''' Create a calendar based on a specified calendar type. '''
+                 calendar_type: FinCalendarTypes):
+        """ Create a calendar based on a specified calendar type. """
 
-        if calendarType not in FinCalendarTypes:
+        if calendar_type not in FinCalendarTypes:
             raise FinError(
                 "Need to pass FinCalendarType and not " +
-                str(calendarType))
+                str(calendar_type))
 
-        self._type = calendarType
+        self._type = calendar_type
 
     ###########################################################################
 
     def adjust(self,
-               dt: FinDate,
+               dt: Date,
                busDayConventionType: FinBusDayAdjustTypes):
-        ''' Adjust a payment date if it falls on a holiday according to the
-        specified business day convention. '''
+        """ Adjust a payment date if it falls on a holiday according to the
+        specified business day convention. """
 
         if type(busDayConventionType) != FinBusDayAdjustTypes:
             raise FinError("Invalid type passed. Need FinBusDayConventionType")
@@ -133,7 +133,7 @@ class calendar(object):
             # for previous first business day one day at a time
             # TODO: I could speed this up by starting it at initial date
             if dt._m != m_start:
-                dt = FinDate(d_start, m_start, y_start)
+                dt = Date(d_start, m_start, y_start)
                 while self.isBusinessDay(dt) is False:
                     dt = dt.addDays(-1)
 
@@ -162,7 +162,7 @@ class calendar(object):
             # for previous first business day one day at a time
             # I could speed this up by starting it at initial date
             if dt._m != m_start:
-                dt = FinDate(d_start, m_start, y_start)
+                dt = Date(d_start, m_start, y_start)
                 while self.isBusinessDay(dt) is False:
                     dt = dt.addDays(+1)
 
@@ -178,21 +178,21 @@ class calendar(object):
 ###############################################################################
 
     def addBusinessDays(self,
-                        startDate: FinDate,
+                        start_date: Date,
                         numDays: int):
-        ''' Returns a new date that is numDays business days after FinDate. 
-        All holidays in the chosen calendar are assumed not business days. '''
+        """ Returns a new date that is numDays business days after FinDate. 
+        All holidays in the chosen calendar are assumed not business days. """
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE ???
 
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
-        dt = datetime.date(startDate._y, startDate._m, startDate._d)
+        dt = datetime.date(start_date._y, start_date._m, start_date._d)
         d = dt.day
         m = dt.month
         y = dt.year
-        newDt = FinDate(d, m, y)
+        newDt = Date(d, m, y)
 
         s = +1
         if numDays < 0:
@@ -204,7 +204,7 @@ class calendar(object):
             d = dt.day
             m = dt.month
             y = dt.year
-            newDt = FinDate(d, m, y)
+            newDt = Date(d, m, y)
 
             if self.isBusinessDay(newDt) is True:
                 numDays -= 1
@@ -214,9 +214,9 @@ class calendar(object):
 ###############################################################################
 
     def isBusinessDay(self,
-                      dt: FinDate):
-        ''' Determines if a date is a business day according to the specified
-        calendar. If it is it returns True, otherwise False. '''
+                      dt: Date):
+        """ Determines if a date is a business day according to the specified
+        calendar. If it is it returns True, otherwise False. """
 
         # For all calendars so far, SAT and SUN are not business days
         # If this ever changes I will need to add a filter here.
@@ -231,13 +231,13 @@ class calendar(object):
 ###############################################################################
 
     def isHoliday(self,
-                      dt: FinDate):
-        ''' Determines if a date is a Holiday according to the specified
+                  dt: Date):
+        """ Determines if a date is a Holiday according to the specified
         calendar. Weekends are not holidays unless the holiday falls on a 
-        weekend date. '''
+        weekend date. """
 
-        startDate = FinDate(1, 1, dt._y)
-        dayInYear = dt._excelDate - startDate._excelDate + 1
+        start_date = Date(1, 1, dt._y)
+        dayInYear = dt._excelDate - start_date._excelDate + 1
         weekday = dt._weekday
 
         self._y = dt._y
@@ -284,7 +284,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_WEEKEND(self):
-        ''' Weekends by themselves are a holiday. '''
+        """ Weekends by themselves are a holiday. """
 
         if self._dt.isWeekend():
             return True
@@ -294,7 +294,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_AUSTRALIA(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -306,10 +306,10 @@ class calendar(object):
         if m == 1 and d == 26:  # Australia day
             return True
 
-        if m == 1 and d == 27 and weekday == FinDate.MON:  # Australia day
+        if m == 1 and d == 27 and weekday == Date.MON:  # Australia day
             return True
 
-        if m == 1 and d == 28 and weekday == FinDate.MON:  # Australia day
+        if m == 1 and d == 28 and weekday == Date.MON:  # Australia day
             return True
 
         em = easterMondayDay[y - 1901]
@@ -323,34 +323,34 @@ class calendar(object):
         if m == 4 and d == 25:  # Australia day
             return True
 
-        if m == 4 and d == 26 and weekday == FinDate.MON:  # Australia day
+        if m == 4 and d == 26 and weekday == Date.MON:  # Australia day
             return True
 
-        if m == 6 and d > 7 and d < 15 and weekday == FinDate.MON:  # Queen 
+        if m == 6 and d > 7 and d < 15 and weekday == Date.MON:  # Queen
             return True
 
-        if m == 8 and d < 8 and weekday == FinDate.MON:  # BANK holiday 
+        if m == 8 and d < 8 and weekday == Date.MON:  # BANK holiday
             return True
 
-        if m == 10 and d < 8 and weekday == FinDate.MON:  # BANK holiday 
+        if m == 10 and d < 8 and weekday == Date.MON:  # BANK holiday
             return True
 
         if m == 12 and d == 25:  # Xmas
             return True
 
-        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 26 and weekday == Date.MON:  # Xmas
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
             return True
 
         if m == 12 and d == 26:  # Boxing day
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing
+        if m == 12 and d == 27 and weekday == Date.MON:  # Boxing
             return True
 
-        if m == 12 and d == 28 and weekday == FinDate.MON:  # Boxing
+        if m == 12 and d == 28 and weekday == Date.MON:  # Boxing
             return True
 
         return False
@@ -358,7 +358,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_UNITED_KINGDOM(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         weekday = self._weekday ; dayInYear = self._dayInYear
@@ -366,10 +366,10 @@ class calendar(object):
         if m == 1 and d == 1:  # new years day
             return True
 
-        if m == 1 and d == 2 and weekday == FinDate.MON:  # new years day
+        if m == 1 and d == 2 and weekday == Date.MON:  # new years day
             return True
 
-        if m == 1 and d == 3 and weekday == FinDate.MON:  # new years day
+        if m == 1 and d == 3 and weekday == Date.MON:  # new years day
             return True
 
         em = easterMondayDay[y - 1901]
@@ -380,10 +380,10 @@ class calendar(object):
         if dayInYear == em - 3:  # good friday
             return True
 
-        if m == 5 and d <= 7 and weekday == FinDate.MON:
+        if m == 5 and d <= 7 and weekday == Date.MON:
             return True
 
-        if m == 5 and d >= 25 and weekday == FinDate.MON:
+        if m == 5 and d >= 25 and weekday == Date.MON:
             return True
 
         if m == 6 and d == 2 and y == 2022: # SPRING BANK HOLIDAY
@@ -392,7 +392,7 @@ class calendar(object):
         if m == 6 and d == 3 and y == 2022: # QUEEN PLAT JUB
             return True
 
-        if m == 8 and d > 24 and weekday == FinDate.MON:  # Late Summer
+        if m == 8 and d > 24 and weekday == Date.MON:  # Late Summer
             return True
 
         if m == 12 and d == 25:  # Xmas
@@ -401,16 +401,16 @@ class calendar(object):
         if m == 12 and d == 26:  # Boxing day
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.TUE:  # Xmas
+        if m == 12 and d == 27 and weekday == Date.TUE:  # Xmas
             return True
 
-        if m == 12 and d == 28 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 28 and weekday == Date.MON:  # Xmas
             return True
 
-        if m == 12 and d == 28 and weekday == FinDate.TUE:  # Xmas
+        if m == 12 and d == 28 and weekday == Date.TUE:  # Xmas
             return True
 
         return False
@@ -418,7 +418,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_FRANCE(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -469,7 +469,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_SWEDEN(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -498,7 +498,7 @@ class calendar(object):
         if m == 6 and d == 6: # June
             return True
 
-        if m == 6 and d > 18 and d < 26 and weekday == FinDate.FRI: # Midsummer
+        if m == 6 and d > 18 and d < 26 and weekday == Date.FRI: # Midsummer
             return True
 
         if m == 12 and d == 24:  # Xmas eve
@@ -518,7 +518,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_GERMANY(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -560,7 +560,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_SWITZERLAND(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -602,7 +602,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_JAPAN(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y;
         weekday = self._weekday
@@ -610,37 +610,37 @@ class calendar(object):
         if m == 1 and d == 1:  # new years day
             return True
 
-        if m == 1 and d == 2 and weekday == FinDate.MON:  # bank holiday
+        if m == 1 and d == 2 and weekday == Date.MON:  # bank holiday
             return True
 
-        if m == 1 and d == 3 and weekday == FinDate.MON:  # bank holiday
+        if m == 1 and d == 3 and weekday == Date.MON:  # bank holiday
             return True
 
-        if m == 1 and d > 7 and d < 15 and weekday == FinDate.MON:  # coa
+        if m == 1 and d > 7 and d < 15 and weekday == Date.MON:  # coa
             return True
 
         if m == 2 and d == 11:  # nfd
             return True
 
-        if m == 2 and d == 12 and weekday == FinDate.MON:  # nfd
+        if m == 2 and d == 12 and weekday == Date.MON:  # nfd
             return True
 
         if m == 2 and d == 23:  # emperor's birthday
             return True
 
-        if m == 2 and d == 24 and weekday == FinDate.MON:  # emperor's birthday
+        if m == 2 and d == 24 and weekday == Date.MON:  # emperor's birthday
             return True
 
         if m == 3 and d == 20:  # vernal equinox - NOT EXACT
             return True
 
-        if m == 3 and d == 21 and weekday == FinDate.MON:  
+        if m == 3 and d == 21 and weekday == Date.MON:
             return True
 
         if m == 4 and d == 29:  # SHOWA greenery
             return True
 
-        if m == 4 and d == 30 and weekday == FinDate.MON:  # SHOWA greenery
+        if m == 4 and d == 30 and weekday == Date.MON:  # SHOWA greenery
             return True
 
         if m == 5 and d == 3:  # Memorial Day
@@ -652,10 +652,10 @@ class calendar(object):
         if m == 5 and d == 5:  # children
             return True
 
-        if m == 5 and d == 6 and weekday == FinDate.MON:  # children
+        if m == 5 and d == 6 and weekday == Date.MON:  # children
             return True
 
-        if m == 7 and d > 14 and d < 22 and y != 2021 and weekday == FinDate.MON:
+        if m == 7 and d > 14 and d < 22 and y != 2021 and weekday == Date.MON:
             return True
 
         if m == 7 and d == 22 and y == 2021: # OLYMPICS
@@ -668,30 +668,30 @@ class calendar(object):
         if m == 8 and d == 11 and y != 2021:
             return True
 
-        if m == 8 and d == 12 and y != 2021 and weekday == FinDate.MON:
+        if m == 8 and d == 12 and y != 2021 and weekday == Date.MON:
             return True
 
-        if m == 8 and d == 9 and y == 2021 and weekday == FinDate.MON:
+        if m == 8 and d == 9 and y == 2021 and weekday == Date.MON:
             return True
 
         # Respect for aged
-        if m == 9 and d > 14 and d < 22 and weekday == FinDate.MON:
+        if m == 9 and d > 14 and d < 22 and weekday == Date.MON:
             return True
 
         # Equinox - APPROXIMATE
         if m == 9 and d == 23:
             return True
 
-        if m == 9 and d == 24 and weekday == FinDate.MON:
+        if m == 9 and d == 24 and weekday == Date.MON:
             return True
 
-        if m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == FinDate.MON:  # HS
+        if m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == Date.MON:  # HS
             return True
 
         if m == 11 and d == 3:  # Culture
             return True
 
-        if m == 11 and d == 4 and weekday == FinDate.MON:  # Culture
+        if m == 11 and d == 4 and weekday == Date.MON:  # Culture
             return True
 
         if m == 11 and d == 23:  # Thanksgiving
@@ -702,7 +702,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_NEW_ZEALAND(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -711,13 +711,13 @@ class calendar(object):
         if m == 1 and d == 1:  # new years day
             return True
 
-        if m == 1 and d == 2 and weekday == FinDate.MON:  # new years day
+        if m == 1 and d == 2 and weekday == Date.MON:  # new years day
             return True
 
-        if m == 1 and d == 3 and weekday == FinDate.MON:  # new years day
+        if m == 1 and d == 3 and weekday == Date.MON:  # new years day
             return True
 
-        if m == 1 and d > 18 and d < 26 and weekday == FinDate.MON:  # Anniversary 
+        if m == 1 and d > 18 and d < 26 and weekday == Date.MON:  # Anniversary
             return True
 
         if m == 2 and d == 6:  # Waitanga day
@@ -734,28 +734,28 @@ class calendar(object):
         if m == 4 and d == 25:  # ANZAC day
             return True
 
-        if m == 6 and d < 8 and weekday == FinDate.MON:  # Queen 
+        if m == 6 and d < 8 and weekday == Date.MON:  # Queen
             return True
 
-        if m == 10 and d > 21 and d < 29 and weekday == FinDate.MON:  # LABOR DAY 
+        if m == 10 and d > 21 and d < 29 and weekday == Date.MON:  # LABOR DAY
             return True
 
         if m == 12 and d == 25:  # Xmas
             return True
 
-        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 26 and weekday == Date.MON:  # Xmas
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas
+        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
             return True
 
         if m == 12 and d == 26:  # Boxing day
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing
+        if m == 12 and d == 27 and weekday == Date.MON:  # Boxing
             return True
 
-        if m == 12 and d == 28 and weekday == FinDate.MON:  # Boxing
+        if m == 12 and d == 28 and weekday == Date.MON:  # Boxing
             return True
 
         return False
@@ -763,7 +763,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_NORWAY(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -805,10 +805,10 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_UNITED_STATES(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday.
+        """ Only bank holidays. Weekends by themselves are not a holiday.
         This is a generic US calendar that contains the superset of
         holidays for bond markets, NYSE, and public holidays. For each of
-        these and other categories there will be some variations. '''
+        these and other categories there will be some variations. """
 
         m = self._m; d = self._d; 
         weekday = self._weekday
@@ -816,58 +816,58 @@ class calendar(object):
         if m == 1 and d == 1:  # NYD
             return True
 
-        if m == 1 and d == 2 and weekday == FinDate.MON:  # NYD
+        if m == 1 and d == 2 and weekday == Date.MON:  # NYD
             return True
 
-        if m == 1 and d == 3 and weekday == FinDate.MON:  # NYD
+        if m == 1 and d == 3 and weekday == Date.MON:  # NYD
             return True
 
-        if m == 1 and d >= 15 and d < 22 and weekday == FinDate.MON:  # MLK
+        if m == 1 and d >= 15 and d < 22 and weekday == Date.MON:  # MLK
             return True
 
-        if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # GW
+        if m == 2 and d >= 15 and d < 22 and weekday == Date.MON:  # GW
             return True
 
-        if m == 5 and d >= 25 and d <= 31 and weekday == FinDate.MON:  # MD
+        if m == 5 and d >= 25 and d <= 31 and weekday == Date.MON:  # MD
             return True
 
         if m == 7 and d == 4:  # Indep day
             return True
 
-        if m == 7 and d == 5 and weekday == FinDate.MON:  # Indep day
+        if m == 7 and d == 5 and weekday == Date.MON:  # Indep day
             return True
 
-        if m == 7 and d == 3 and weekday == FinDate.FRI:  # Indep day
+        if m == 7 and d == 3 and weekday == Date.FRI:  # Indep day
             return True
 
-        if m == 9 and d >= 1 and d < 8 and weekday == FinDate.MON:  # Lab
+        if m == 9 and d >= 1 and d < 8 and weekday == Date.MON:  # Lab
             return True
 
-        if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # CD
+        if m == 10 and d >= 8 and d < 15 and weekday == Date.MON:  # CD
             return True
 
         if m == 11 and d == 11:  # Veterans day
             return True
 
-        if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
+        if m == 11 and d == 12 and weekday == Date.MON:  # Vets
             return True
 
-        if m == 11 and d == 10 and weekday == FinDate.FRI:  # Vets
+        if m == 11 and d == 10 and weekday == Date.FRI:  # Vets
             return True
 
-        if m == 11 and d >= 22 and d < 29 and weekday == FinDate.THU:  # TG
+        if m == 11 and d >= 22 and d < 29 and weekday == Date.THU:  # TG
             return True
 
-        if m == 12 and d == 24 and weekday == FinDate.FRI:  # Xmas holiday
+        if m == 12 and d == 24 and weekday == Date.FRI:  # Xmas holiday
             return True
 
         if m == 12 and d == 25:  # Xmas holiday
             return True
 
-        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas holiday
+        if m == 12 and d == 26 and weekday == Date.MON:  # Xmas holiday
             return True
 
-        if m == 12 and d == 31 and weekday == FinDate.FRI:
+        if m == 12 and d == 31 and weekday == Date.FRI:
             return True
 
         return False
@@ -875,7 +875,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_CANADA(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         weekday = self._weekday; dayInYear = self._dayInYear
@@ -883,13 +883,13 @@ class calendar(object):
         if m == 1 and d == 1:  # NYD
             return True
 
-        if m == 1 and d == 2 and weekday == FinDate.MON:  # NYD
+        if m == 1 and d == 2 and weekday == Date.MON:  # NYD
             return True
 
-        if m == 1 and d == 3 and weekday == FinDate.MON:  # NYD
+        if m == 1 and d == 3 and weekday == Date.MON:  # NYD
             return True
 
-        if m == 2 and d >= 15 and d < 22 and weekday == FinDate.MON:  # FAMILY
+        if m == 2 and d >= 15 and d < 22 and weekday == Date.MON:  # FAMILY
             return True
 
         em = easterMondayDay[y - 1901]
@@ -897,52 +897,52 @@ class calendar(object):
         if dayInYear == em - 3:  # good friday
             return True
 
-        if m == 5 and d >= 18 and d < 25 and weekday == FinDate.MON:  # VICTORIA
+        if m == 5 and d >= 18 and d < 25 and weekday == Date.MON:  # VICTORIA
             return True
 
         if m == 7 and d == 1:  # Canada day
             return True
 
-        if m == 7 and d == 2 and weekday == FinDate.MON:  # Canada day
+        if m == 7 and d == 2 and weekday == Date.MON:  # Canada day
             return True
 
-        if m == 7 and d == 3 and weekday == FinDate.MON:  # Canada day
+        if m == 7 and d == 3 and weekday == Date.MON:  # Canada day
             return True
 
-        if m == 8 and d < 8 and weekday == FinDate.MON:  # Provincial
+        if m == 8 and d < 8 and weekday == Date.MON:  # Provincial
             return True
 
-        if m == 9 and d < 8 and weekday == FinDate.MON:  # Labor
+        if m == 9 and d < 8 and weekday == Date.MON:  # Labor
             return True
 
-        if m == 10 and d >= 8 and d < 15 and weekday == FinDate.MON:  # THANKS
+        if m == 10 and d >= 8 and d < 15 and weekday == Date.MON:  # THANKS
             return True
 
         if m == 11 and d == 11:  # Veterans day
             return True
 
-        if m == 11 and d == 12 and weekday == FinDate.MON:  # Vets
+        if m == 11 and d == 12 and weekday == Date.MON:  # Vets
             return True
 
-        if m == 11 and d == 13 and weekday == FinDate.MON:  # Vets
+        if m == 11 and d == 13 and weekday == Date.MON:  # Vets
             return True
 
         if m == 12 and d == 25:  # Xmas holiday
             return True
 
-        if m == 12 and d == 26 and weekday == FinDate.MON:  # Xmas holiday
+        if m == 12 and d == 26 and weekday == Date.MON:  # Xmas holiday
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Xmas holiday
+        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas holiday
             return True
 
         if m == 12 and d == 26:  # Boxing holiday
             return True
 
-        if m == 12 and d == 27 and weekday == FinDate.MON:  # Boxing holiday
+        if m == 12 and d == 27 and weekday == Date.MON:  # Boxing holiday
             return True
 
-        if m == 12 and d == 28 and weekday == FinDate.TUE:  # Boxing holiday
+        if m == 12 and d == 28 and weekday == Date.TUE:  # Boxing holiday
             return True
 
         return False
@@ -950,7 +950,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_ITALY(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -998,7 +998,7 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_TARGET(self):
-        ''' Only bank holidays. Weekends by themselves are not a holiday. '''
+        """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
         dayInYear = self._dayInYear
@@ -1028,24 +1028,24 @@ class calendar(object):
 ###############################################################################
 
     def HOLIDAY_NONE(self):
-        ''' No day is a holiday. '''
+        """ No day is a holiday. """
         return False
 
 ###############################################################################
 
     def getHolidayList(self,
                        year: float):
-        ''' generates a list of holidays in a specific year for the specified
-        calendar. Useful for diagnostics. '''
-        startDate = FinDate(1, 1, year)
-        endDate = FinDate(1, 1, year+1)
+        """ generates a list of holidays in a specific year for the specified
+        calendar. Useful for diagnostics. """
+        start_date = Date(1, 1, year)
+        end_date = Date(1, 1, year + 1)
         holidayList = []
-        while startDate < endDate:
-            if self.isBusinessDay(startDate) is False and \
-              startDate.isWeekend() is False:
-                holidayList.append(startDate.__str__())
+        while start_date < end_date:
+            if self.isBusinessDay(start_date) is False and \
+              start_date.isWeekend() is False:
+                holidayList.append(start_date.__str__())
 
-            startDate = startDate.addDays(1)
+            start_date = start_date.addDays(1)
 
         return holidayList
 
@@ -1053,16 +1053,16 @@ class calendar(object):
 
     def easterMonday(self,
                      year: float):
-        ''' Get the day in a given year that is Easter Monday. This is not
-        easy to compute so we rely on a pre-calculated array. '''
+        """ Get the day in a given year that is Easter Monday. This is not
+        easy to compute so we rely on a pre-calculated array. """
 
         if year > 2100:
             raise FinError(
                 "Unable to determine Easter monday in year " + str(year))
 
         emDays = easterMondayDay[year - 1901]
-        startDate = FinDate(1, 1, year)
-        em = startDate.addDays(emDays-1)
+        start_date = Date(1, 1, year)
+        em = start_date.addDays(emDays-1)
         return em
 
 ###############################################################################

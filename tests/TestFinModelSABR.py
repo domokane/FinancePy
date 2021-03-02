@@ -8,7 +8,7 @@ sys.path.append("..")
 import numpy as np
 from financepy.models.FinModelSABR import volFunctionSABR
 from financepy.models.FinModelSABR import FinModelSABR
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.FinGlobalTypes import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

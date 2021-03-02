@@ -7,9 +7,9 @@ import numpy as np
 
 ###############################################################################
 
-from ..finutils.FinMath import N
-from ..finutils.FinMath import normpdf, norminvcdf, M
-from ..finutils.FinError import FinError
+from ..utils.Math import N
+from ..utils.Math import normpdf, norminvcdf, M
+from ..utils.FinError import FinError
 
 ###############################################################################
 
@@ -19,12 +19,12 @@ def trSurvProbLHP(k1,
                   k2,
                   numCredits,
                   survivalProbabilities,
-                  recoveryRates,
+                  recovery_rates,
                   beta):
-    ''' Get the approximated tranche survival probability of a portfolio of
+    """ Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the large portfolio limit which
     assumes a homogenous portfolio with an infinite number of credits. This
-    approach is very fast but not so as accurate as the adjusted binomial. '''
+    approach is very fast but not so as accurate as the adjusted binomial. """
 
     if k1 == 0.0 and k2 == 0.0:
         return 0.0
@@ -37,7 +37,7 @@ def trSurvProbLHP(k1,
     for iCredit in range(0, numCredits):
         pd = (1.0 - survivalProbabilities[iCredit])
         p += pd
-        portfolioEL += pd * (1.0 - recoveryRates[iCredit])
+        portfolioEL += pd * (1.0 - recovery_rates[iCredit])
 
     if p == 0.0:
         return 1.0
@@ -55,14 +55,14 @@ def trSurvProbLHP(k1,
 
 
 @njit(fastmath=True, cache=True)
-def portfolioCDF_LHP(k, numCredits, qvector, recoveryRates, beta, numPoints):
+def portfolioCDF_LHP(k, numCredits, qvector, recovery_rates, beta, num_points):
 
     p = 0.0
     portfolioEL = 0.0
 
     for j in range(0, numCredits):
         p += (1.0 - qvector[j])
-        portfolioEL += (1.0 - recoveryRates[j]) * (1 - qvector[j])
+        portfolioEL += (1.0 - recovery_rates[j]) * (1 - qvector[j])
 
     p = p / numCredits
     portfolioEL /= numCredits

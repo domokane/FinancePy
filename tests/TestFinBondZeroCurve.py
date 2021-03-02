@@ -8,9 +8,9 @@ sys.path.append("..")
 import os
 import datetime as dt
 
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate, fromDatetime
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.Date import Date, fromDatetime
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondZeroCurve import FinBondZeroCurve
 
@@ -29,9 +29,9 @@ def test_FinBondZeroCurve():
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    settlement = FinDate(19, 9, 2012)
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    settlement = Date(19, 9, 2012)
 
     bonds = []
     cleanPrices = []
@@ -40,10 +40,10 @@ def test_FinBondZeroCurve():
         dateString = bondRow['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = fromDatetime(matDatetime)
-        issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
+        issueDt = Date(maturityDt._d, maturityDt._m, 2000)
         coupon = bondRow['coupon']/100.0
         cleanPrice = bondRow['mid']
-        bond = FinBond(issueDt, maturityDt, coupon, freqType, accrualType)
+        bond = FinBond(issueDt, maturityDt, coupon, freq_type, accrual_type)
         bonds.append(bond)
         cleanPrices.append(cleanPrice)
 

@@ -4,9 +4,9 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gDaysInYear
 
 ##########################################################################
 # TODO: Market calibration (fitting)
@@ -14,8 +14,8 @@ from ...finutils.FinGlobalVariables import gDaysInYear
 
 
 class FinIborCapVolCurveFn():
-    ''' Class to manage a term structure of caplet volatilities using the
-    parametric form suggested by Rebonato (1999). '''
+    """ Class to manage a term structure of caplet volatilities using the
+    parametric form suggested by Rebonato (1999). """
 
     def __init__(self,
                  curveDate,
@@ -33,9 +33,9 @@ class FinIborCapVolCurveFn():
 ###############################################################################
 
     def capFloorletVol(self, dt):
-        ''' Return the caplet volatility. '''
+        """ Return the caplet volatility. """
 
-        if isinstance(dt, FinDate):
+        if isinstance(dt, Date):
             t = (dt - self._curveDate) / gDaysInYear
             vol = (self._a + self._b*t) * np.exp(-self._c*t) + self._d
 

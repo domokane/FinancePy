@@ -8,20 +8,20 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 from financepy.models.FinModelBlack import FinModelBlack
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinGlobalVariables import gDaysInYear
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.FinGlobalVariables import gDaysInYear
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
-from financepy.finutils.FinHelperFunctions import printTree
-from financepy.finutils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.FinHelperFunctions import printTree
+from financepy.utils.FinGlobalTypes import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -36,13 +36,13 @@ def testBlackModelCheck():
     # Used to check swaption price below - we have Ts = 1 and Te = 4
     # Expect a price around 122 cents which is what I find.
 
-    valuationDate = FinDate(1, 1, 2020)
-    liborCurve = FinDiscountCurveFlat(valuationDate, 0.06,
+    valuation_date = Date(1, 1, 2020)
+    libor_curve = FinDiscountCurveFlat(valuation_date, 0.06,
                                       FinFrequencyTypes.SEMI_ANNUAL)
 
-    settlementDate = FinDate(1, 1, 2020)
-    exerciseDate = FinDate(1, 1, 2021)
-    maturityDate = FinDate(1, 1, 2024)
+    settlement_date = Date(1, 1, 2020)
+    exerciseDate = Date(1, 1, 2021)
+    maturity_date = Date(1, 1, 2024)
 
     fixedCoupon = 0.06
     fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
@@ -51,9 +51,9 @@ def testBlackModelCheck():
 
     # Pricing a PAY
     swaptionType = FinSwapTypes.PAY
-    swaption = FinIborSwaption(settlementDate,
+    swaption = FinIborSwaption(settlement_date,
                                 exerciseDate,
-                                maturityDate,
+                                maturity_date,
                                 swaptionType,
                                 fixedCoupon,
                                 fixedFrequencyType,
@@ -61,7 +61,7 @@ def testBlackModelCheck():
                                 notional)
 
     model = FinModelBlack(0.20)
-    v = swaption.value(valuationDate, liborCurve, model)
+    v = swaption.value(valuation_date, libor_curve, model)
     testCases.header("LABEL", "VALUE")
     testCases.print("BLACK'S MODEL PRICE:", v*100)
 
@@ -72,9 +72,9 @@ def test_BDTExampleOne():
     # HULL BOOK NOTES
     # http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote23.pdf
 
-    valuationDate = FinDate(1, 1, 2020)
+    valuation_date = Date(1, 1, 2020)
     years = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-    zeroDates = valuationDate.addYears(years)
+    zeroDates = valuation_date.addYears(years)
     zeroRates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
 
     testCases.header("DATES")
@@ -83,7 +83,7 @@ def test_BDTExampleOne():
     testCases.header("RATES")
     testCases.print(zeroRates)
 
-    curve = FinDiscountCurveZeros(valuationDate,
+    curve = FinDiscountCurveZeros(valuation_date,
                                   zeroDates,
                                   zeroRates,
                                   FinFrequencyTypes.ANNUAL)
@@ -113,31 +113,31 @@ def test_BDTExampleTwo():
 
     testCases.banner("===================== FIG 28.11 HULL BOOK =============")
 
-    settlementDate = FinDate(1, 12, 2019)
-    issueDate = FinDate(1, 12, 2015)
-    expiryDate = settlementDate.addTenor("18m")
-    maturityDate = settlementDate.addTenor("10Y")
+    settlement_date = Date(1, 12, 2019)
+    issue_date = Date(1, 12, 2015)
+    expiry_date = settlement_date.addTenor("18m")
+    maturity_date = settlement_date.addTenor("10Y")
     coupon = 0.05
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
-    numFlows = len(bond._flowDates)
+    numFlows = len(bond._flow_dates)
 
     for i in range(1, numFlows):
-        pcd = bond._flowDates[i-1]
-        ncd = bond._flowDates[i]
-        if pcd < settlementDate and ncd > settlementDate:
-            flowTime = (pcd - settlementDate) / gDaysInYear
+        pcd = bond._flow_dates[i-1]
+        ncd = bond._flow_dates[i]
+        if pcd < settlement_date and ncd > settlement_date:
+            flowTime = (pcd - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
-    for flowDate in bond._flowDates:
-        if flowDate > settlementDate:
-            flowTime = (flowDate - settlementDate) / gDaysInYear
+    for flowDate in bond._flow_dates:
+        if flowDate > settlement_date:
+            flowTime = (flowDate - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
@@ -147,18 +147,18 @@ def test_BDTExampleTwo():
     strikePrice = 105.0
     face = 100.0
 
-    tmat = (maturityDate - settlementDate) / gDaysInYear
-    texp = (expiryDate - settlementDate) / gDaysInYear
+    tmat = (maturity_date - settlement_date) / gDaysInYear
+    texp = (expiry_date - settlement_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settlementDate.addYears(times)
+    dates = settlement_date.addYears(times)
     dfs = np.exp(-0.05*times)
 
     testCases.header("LABEL", "VALUES")
     testCases.print("TIMES:", times)
 
-    curve = FinDiscountCurve(settlementDate, dates, dfs)
+    curve = FinDiscountCurve(settlement_date, dates, dfs)
 
-    price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
+    price = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
     testCases.print("Fixed Income Price:", price)
 
     sigma = 0.20
@@ -201,16 +201,16 @@ def test_BDTExampleThree():
     # This is a sanity check
     testBlackModelCheck()
 
-    settlementDate = FinDate(1, 1, 2020)
+    settlement_date = Date(1, 1, 2020)
     times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-    dates = settlementDate.addYears(times)
+    dates = settlement_date.addYears(times)
     rate = 0.06
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
-    curve = FinDiscountCurve(settlementDate, dates, dfs)
+    curve = FinDiscountCurve(settlement_date, dates, dfs)
 
     coupon = 0.06
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
     strikePrice = 100.0
     face = 100.0
     # Andersen paper
@@ -224,8 +224,8 @@ def test_BDTExampleThree():
 
         for maturityYears in [4.0, 5.0, 10.0, 20.0]:
 
-            maturityDate = settlementDate.addYears(maturityYears)
-            issueDate = FinDate(maturityDate._d, maturityDate._m, 2000)
+            maturity_date = settlement_date.addYears(maturityYears)
+            issue_date = Date(maturity_date._d, maturity_date._m, 2000)
 
             if maturityYears == 4.0 or maturityYears == 5.0:
                 sigma = 0.2012
@@ -236,26 +236,26 @@ def test_BDTExampleThree():
 
             for expiryYears in range(int(maturityYears/2)-1, int(maturityYears)):
 
-                expiryDate = settlementDate.addYears(expiryYears)
+                expiry_date = settlement_date.addYears(expiryYears)
 
-                tmat = (maturityDate - settlementDate) / gDaysInYear
-                texp = (expiryDate - settlementDate) / gDaysInYear
+                tmat = (maturity_date - settlement_date) / gDaysInYear
+                texp = (expiry_date - settlement_date) / gDaysInYear
 
-                bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+                bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
                 couponTimes = []
                 couponFlows = []
                 cpn = bond._coupon/bond._frequency
-                for flowDate in bond._flowDates:
-                    if flowDate > expiryDate:
-                        flowTime = (flowDate - settlementDate) / gDaysInYear
+                for flowDate in bond._flow_dates:
+                    if flowDate > expiry_date:
+                        flowTime = (flowDate - settlement_date) / gDaysInYear
                         couponTimes.append(flowTime)
                         couponFlows.append(cpn)
 
                 couponTimes = np.array(couponTimes)
                 couponFlows = np.array(couponFlows)
 
-                price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
+                price = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
 
                 model = FinModelRatesBDT(sigma, numTimeSteps)
                 model.buildTree(tmat, times, dfs)

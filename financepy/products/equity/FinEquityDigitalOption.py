@@ -7,15 +7,15 @@ import numpy as np
 from enum import Enum
 
 
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
-from ...finutils.FinMath import NVect
+from ...utils.Math import NVect
 
 
 ###############################################################################
@@ -29,29 +29,29 @@ class FinDigitalOptionTypes(Enum):
 
 
 class FinEquityDigitalOption(FinEquityOption):
-    ''' A FinEquityDigitalOption is an option in which the buyer receives some
+    """ A FinEquityDigitalOption is an option in which the buyer receives some
     payment if the stock price has crossed a barrier ONLY at expiry and zero
     otherwise. There are two types: cash-or-nothing and the asset-or-nothing
     option. We do not care whether the stock price has crossed the barrier
     today, we only care about the barrier at option expiry. For a continuously-
-    monitored barrier, use the FinEquityOneTouchOption class. '''
+    monitored barrier, use the FinEquityOneTouchOption class. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  barrierPrice: float,
                  optionType: FinOptionTypes,
                  underlyingType: FinDigitalOptionTypes):
-        ''' Create the digital option by specifying the expiry date, the
+        """ Create the digital option by specifying the expiry date, the
         barrier price and the type of option which is either a EUROPEAN_CALL
         or a EUROPEAN_PUT or an AMERICAN_CALL or AMERICAN_PUT. There are two
-        types of underlying - cash or nothing and asset or nothing. '''
+        types of underlying - cash or nothing and asset or nothing. """
 
         checkArgumentTypes(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN CALL or EUROPEAN PUT")
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._barrierPrice = float(barrierPrice)
         self._optionType = optionType
         self._underlyingType = underlyingType
@@ -59,19 +59,19 @@ class FinEquityDigitalOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: (float, np.ndarray),
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model):
-        ''' Digital Option valuation using the Black-Scholes model assuming a
+        """ Digital Option valuation using the Black-Scholes model assuming a
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
-        options.'''
+        options."""
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
         t = max(t, 1e-6)
 
         S0 = stockPrice
@@ -80,10 +80,10 @@ class FinEquityDigitalOption(FinEquityOption):
 
         sqrtT = np.sqrt(t)
 
-        df = discountCurve.df(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/t
 
-        dq = dividendCurve.df(self._expiryDate)
+        dq = dividendCurve.df(self._expiry_date)
         q = -np.log(dq)/t
 
         volatility = model._volatility
@@ -113,23 +113,23 @@ class FinEquityDigitalOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
+                valuation_date: Date,
                 stockPrice: float,
-                discountCurve: FinDiscountCurve,
+                discount_curve: FinDiscountCurve,
                 dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
                 seed: int = 4242):
-        ''' Digital Option valuation using the Black-Scholes model and Monte
+        """ Digital Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
-        handles both a cash-or-nothing and an asset-or-nothing option.'''
+        handles both a cash-or-nothing and an asset-or-nothing option."""
 
         np.random.seed(seed)
-        t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(self._expiryDate)
+        t = (self._expiry_date - valuation_date) / gDaysInYear
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/t
 
-        dq = dividendCurve.df(self._expiryDate)
+        dq = dividendCurve.df(self._expiry_date)
         q = -np.log(dq)/t
 
         volatility = model._volatility
@@ -167,7 +167,7 @@ class FinEquityDigitalOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("BARRIER LEVEL", self._barrierPrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("UNDERLYING TYPE", self._underlyingType, "")
@@ -176,7 +176,7 @@ class FinEquityDigitalOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

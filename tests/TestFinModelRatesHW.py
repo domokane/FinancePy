@@ -9,15 +9,15 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 from financepy.models.FinModelRatesHW import FinModelRatesHW, FinHWEuropeanCalcType
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinHelperFunctions import printTree
-from financepy.finutils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.FinGlobalVariables import gDaysInYear
+from financepy.utils.FinHelperFunctions import printTree
+from financepy.utils.FinGlobalTypes import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -34,13 +34,13 @@ def test_HullWhiteExampleOne():
     zeros = np.array(zeros)
     dfs = np.exp(-zeros*times)
 
-    startDate = FinDate(1, 12, 2019)
-    endDate = FinDate(1, 12, 2022)
+    start_date = Date(1, 12, 2019)
+    end_date = Date(1, 12, 2022)
     sigma = 0.01
     a = 0.1
     numTimeSteps = 3
     model = FinModelRatesHW(sigma, a, numTimeSteps)
-    treeMat = (endDate - startDate)/gDaysInYear
+    treeMat = (end_date - start_date)/gDaysInYear
     model.buildTree(treeMat, times, dfs)
 #   printTree(model._Q)
 #   print("")
@@ -65,17 +65,17 @@ def test_HullWhiteExampleTwo():
     zeros = np.array(zeroRates) / 100.0
     dfs = np.exp(-zeros*times)
 
-    startDate = FinDate(1, 12, 2019)
+    start_date = Date(1, 12, 2019)
     sigma = 0.01
     a = 0.1
     strike = 63.0
     face = 100.0
 
-    expiryDate = startDate.addTenor("3Y")
-    maturityDate = startDate.addTenor("9Y")
+    expiry_date = start_date.addTenor("3Y")
+    maturity_date = start_date.addTenor("9Y")
 
-    texp = (expiryDate - startDate)/gDaysInYear
-    tmat = (maturityDate - startDate)/gDaysInYear
+    texp = (expiry_date - start_date)/gDaysInYear
+    tmat = (maturity_date - start_date)/gDaysInYear
 
     numTimeSteps = None
     model = FinModelRatesHW(sigma, a, numTimeSteps)
@@ -124,33 +124,33 @@ def test_HullWhiteExampleTwo():
 def test_HullWhiteBondOption():
     # Valuation of a European option on a coupon bearing bond
 
-    settlementDate = FinDate(1, 12, 2019)
-    issueDate = FinDate(1, 12, 2018)
-    expiryDate = settlementDate.addTenor("18m")
-    maturityDate = settlementDate.addTenor("10Y")
+    settlement_date = Date(1, 12, 2019)
+    issue_date = Date(1, 12, 2018)
+    expiry_date = settlement_date.addTenor("18m")
+    maturity_date = settlement_date.addTenor("10Y")
     coupon = 0.05
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
 
-    numFlows = len(bond._flowDates)
+    numFlows = len(bond._flow_dates)
     for i in range(1, numFlows):
 
-        pcd = bond._flowDates[i-1]
-        ncd = bond._flowDates[i]
+        pcd = bond._flow_dates[i-1]
+        ncd = bond._flow_dates[i]
 
-        if ncd > settlementDate:
+        if ncd > settlement_date:
             
             if len(couponTimes) == 0:
-                flowTime = (pcd - settlementDate) / gDaysInYear
+                flowTime = (pcd - settlement_date) / gDaysInYear
                 couponTimes.append(flowTime)
                 couponFlows.append(cpn)
                 
-            flowTime = (ncd - settlementDate) / gDaysInYear
+            flowTime = (ncd - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
@@ -169,7 +169,7 @@ def test_HullWhiteBondOption():
 
     #  Test convergence
     numStepsList = range(50, 500, 50)
-    texp = (expiryDate - settlementDate)/gDaysInYear
+    texp = (expiry_date - settlement_date)/gDaysInYear
 
     vJam = model.europeanBondOptionJamshidian(texp, strikePrice, face,
                                               couponTimes, couponFlows,
@@ -218,22 +218,22 @@ def test_HullWhiteBondOption():
 def test_HullWhiteCallableBond():
     # Valuation of a European option on a coupon bearing bond
 
-    settlementDate = FinDate(1, 12, 2019)
-    issueDate = FinDate(1, 12, 2018)
-    maturityDate = settlementDate.addTenor("10Y")
+    settlement_date = Date(1, 12, 2019)
+    issue_date = Date(1, 12, 2018)
+    maturity_date = settlement_date.addTenor("10Y")
     coupon = 0.05
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+    freq_type = FinFrequencyTypes.SEMI_ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     couponTimes = []
     couponFlows = []
     cpn = bond._coupon/bond._frequency
 
-    for flowDate in bond._flowDates[1:]:
+    for flowDate in bond._flow_dates[1:]:
         
-        if flowDate > settlementDate:
-            flowTime = (flowDate - settlementDate) / gDaysInYear
+        if flowDate > settlement_date:
+            flowTime = (flowDate - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
@@ -247,46 +247,46 @@ def test_HullWhiteCallableBond():
     callDates = []
     callPrices = []
     callPx = 120.0
-    callDates.append(settlementDate.addTenor("2Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("3Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("4Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("5Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("6Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("7Y")); callPrices.append(callPx)
-    callDates.append(settlementDate.addTenor("8Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("2Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("3Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("4Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("5Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("6Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("7Y")); callPrices.append(callPx)
+    callDates.append(settlement_date.addTenor("8Y")); callPrices.append(callPx)
 
     callTimes = []
     for dt in callDates:
-        t = (dt - settlementDate) / gDaysInYear
+        t = (dt - settlement_date) / gDaysInYear
         callTimes.append(t)
 
     putDates = []
     putPrices = []
     putPx = 98.0
-    putDates.append(settlementDate.addTenor("2Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("3Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("4Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("5Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("6Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("7Y")); putPrices.append(putPx)
-    putDates.append(settlementDate.addTenor("8Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("2Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("3Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("4Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("5Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("6Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("7Y")); putPrices.append(putPx)
+    putDates.append(settlement_date.addTenor("8Y")); putPrices.append(putPx)
 
     putTimes = []
     for dt in putDates:
-        t = (dt - settlementDate) / gDaysInYear
+        t = (dt - settlement_date) / gDaysInYear
         putTimes.append(t)
 
     ###########################################################################
 
-    tmat = (maturityDate - settlementDate) / gDaysInYear
-    curve = FinDiscountCurveFlat(settlementDate, 0.05, FinFrequencyTypes.CONTINUOUS)
+    tmat = (maturity_date - settlement_date) / gDaysInYear
+    curve = FinDiscountCurveFlat(settlement_date, 0.05, FinFrequencyTypes.CONTINUOUS)
 
     dfs = []
     times = []
 
-    for dt in bond._flowDates:
-        if dt > settlementDate:
-            t = (dt - settlementDate) / gDaysInYear
+    for dt in bond._flow_dates:
+        if dt > settlement_date:
+            t = (dt - settlement_date) / gDaysInYear
             df = curve.df(dt)
             times.append(t)
             dfs.append(df) 
@@ -296,14 +296,14 @@ def test_HullWhiteCallableBond():
 
     ###########################################################################
 
-    v1 = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
+    v1 = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
 
     sigma = 0.02  # basis point volatility
     a = 0.01
 
     # Test convergence
     numStepsList = [100, 200, 500, 1000]
-    tmat = (maturityDate - settlementDate)/gDaysInYear
+    tmat = (maturity_date - settlement_date)/gDaysInYear
 
     testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 

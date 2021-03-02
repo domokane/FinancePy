@@ -7,17 +7,17 @@ import numpy as np
 from enum import Enum
 
 
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 from ...models.FinGBMProcess import getPaths
 
 from numba import njit
 
-from ...finutils.FinMath import NVect
+from ...utils.Math import NVect
 
 ###############################################################################
 # TODO: Implement Sobol random numbers
@@ -44,7 +44,7 @@ class FinTouchOptionPayoffTypes(Enum):
 
 @njit(fastmath=True, cache=True)
 def _barrierPayOneAtHitPVDown(s, H, r, dt):
-    ''' Pay $1 if the stock crosses the barrier H from above. PV payment. '''
+    """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
     numPaths, numTimeSteps = s.shape
     pv = 0.0
 
@@ -68,7 +68,7 @@ def _barrierPayOneAtHitPVDown(s, H, r, dt):
 
 @njit(fastmath=True, cache=True)
 def _barrierPayOneAtHitPVUp(s, H, r, dt):
-    ''' Pay $1 if the stock crosses the barrier H from below. PV payment. '''
+    """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
     numPaths, numTimeSteps = s.shape
     pv = 0.0
@@ -93,7 +93,7 @@ def _barrierPayOneAtHitPVUp(s, H, r, dt):
 
 @njit(fastmath=True, cache=True)
 def _barrierPayAssetAtExpiryDownOut(s, H):
-    ''' Pay $1 if the stock crosses the barrier H from above. PV payment. '''
+    """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
     numPaths, numTimeSteps = s.shape
     pv = 0.0
 
@@ -115,7 +115,7 @@ def _barrierPayAssetAtExpiryDownOut(s, H):
 
 @njit(fastmath=True, cache=True)
 def _barrierPayAssetAtExpiryUpOut(s, H):
-    ''' Pay $1 if the stock crosses the barrier H from below. PV payment. '''
+    """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
     numPaths, numTimeSteps = s.shape
     pv = 0.0
@@ -137,25 +137,25 @@ def _barrierPayAssetAtExpiryUpOut(s, H):
 
 
 class FinEquityOneTouchOption(FinEquityOption):
-    ''' A FinEquityOneTouchOption is an option in which the buyer receives one
+    """ A FinEquityOneTouchOption is an option in which the buyer receives one
     unit of cash OR stock if the stock price touches a barrier at any time
     before the option expiry date and zero otherwise. The choice of cash or
     stock is made at trade initiation. The single barrier payoff must define
     whether the option pays or cancels if the barrier is touched and also when
     the payment is made (at hit time or option expiry). All of these variants
-    are all members of the FinTouchOptionTypes enumerated type. '''
+    are all members of the FinTouchOptionTypes enumerated type. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  optionType: FinTouchOptionPayoffTypes,
                  barrierPrice: float,
                  paymentSize: float = 1.0):
-        ''' Create the one touch option by defining its expiry date and the
-        barrier level and a payment size if it is a cash . '''
+        """ Create the one touch option by defining its expiry date and the
+        barrier level and a payment size if it is a cash . """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._optionType = optionType
         self._barrierPrice = float(barrierPrice)
         self._paymentSize = paymentSize
@@ -163,21 +163,21 @@ class FinEquityOneTouchOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: (float, np.ndarray),
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model):
-        ''' Equity One-Touch Option valuation using the Black-Scholes model
+        """ Equity One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
-        Handles both cash-or-nothing and asset-or-nothing options.'''
+        Handles both cash-or-nothing and asset-or-nothing options."""
 
         DEBUG_MODE = False
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = stockPrice
@@ -186,9 +186,9 @@ class FinEquityOneTouchOption(FinEquityOption):
 
         sqrtT = np.sqrt(t)
 
-        df = discountCurve.df(self._expiryDate)
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -396,28 +396,28 @@ class FinEquityOneTouchOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
+                valuation_date: Date,
                 stockPrice: float,
-                discountCurve: FinDiscountCurve,
+                discount_curve: FinDiscountCurve,
                 dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
-                numStepsPerYear: int = 252,
+                num_steps_per_year: int = 252,
                 seed: int = 4242):
-        ''' Touch Option valuation using the Black-Scholes model and Monte
+        """ Touch Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Accuracy is not great when compared to the analytical
         result as we only observe the barrier a finite number of times. The
-        convergence is slow. '''
+        convergence is slow. """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discountCurve.df(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/t
 
-        dq = dividendCurve.df(self._expiryDate)
+        dq = dividendCurve.df(self._expiry_date)
         q = -np.log(dq)/t
 
-        numTimeSteps = int(t * numStepsPerYear) + 1
+        numTimeSteps = int(t * num_steps_per_year) + 1
         dt = t / numTimeSteps
 
         v = model._volatility
@@ -555,7 +555,7 @@ class FinEquityOneTouchOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("BARRIER LEVEL", self._barrierPrice)
         s += labelToString("PAYMENT SIZE", self._paymentSize, "")
@@ -564,7 +564,7 @@ class FinEquityOneTouchOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

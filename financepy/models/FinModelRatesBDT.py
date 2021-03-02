@@ -5,12 +5,12 @@
 import numpy as np
 from numba import njit, float64, int64
 
-from ..finutils.FinError import FinError
-from ..finutils.FinMath import accruedInterpolator
+from ..utils.FinError import FinError
+from ..utils.Math import accruedInterpolator
 from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
-from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinGlobalTypes import FinExerciseTypes
-from ..finutils.FinGlobalVariables import gSmall
+from ..utils.FinHelperFunctions import labelToString
+from ..utils.FinGlobalTypes import FinExerciseTypes
+from ..utils.FinGlobalVariables import gSmall
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 
@@ -96,16 +96,16 @@ def searchRoot(x0, m, Q, rt, dfEnd, dt, sigma):
 
 @njit(fastmath=True, cache=True)
 def bermudanSwaption_Tree_Fast(texp, tmat,
-                               strikePrice, faceAmount,
+                               strikePrice, face_amount,
                                couponTimes, couponFlows,
                                exerciseTypeInt,
                                _dfTimes, _dfValues,
                                _treeTimes,
                                _Q, _rt, _dt):
-    ''' Option to enter into a swap that can be exercised on coupon payment
+    """ Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to non-analytical bond
     price we need to extend tree out to bond maturity and take into account
-    cash flows through time. '''
+    cash flows through time. """
 
     pu = 0.50
     pd = 0.50
@@ -118,7 +118,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
     ###########################################################################
 
-    fixedLegFlows = np.zeros(numTimeSteps)
+    fixed_legFlows = np.zeros(numTimeSteps)
     floatLegValues = np.zeros(numTimeSteps)
     numCoupons = len(couponTimes)
 
@@ -129,7 +129,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
         ttree = _treeTimes[n]
         df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
         df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
-        fixedLegFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
+        fixed_legFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
         floatLegValues[n] = strikePrice # * df_flow / df_tree
 
     ###########################################################################
@@ -147,9 +147,9 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
             mappedTimes = np.append(mappedTimes, texp)
             mappedAmounts = np.append(mappedAmounts, accdAtExpiry)
 
-        if fixedLegFlows[n] > 0.0:
+        if fixed_legFlows[n] > 0.0:
             mappedTimes = np.append(mappedTimes, _treeTimes[n])
-            mappedAmounts = np.append(mappedAmounts, fixedLegFlows[n])
+            mappedAmounts = np.append(mappedAmounts, fixed_legFlows[n])
 
     ###########################################################################
 
@@ -157,17 +157,17 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
     for m in range(0, maturityStep+1):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, mappedTimes, mappedAmounts)
-        accrued[m] *= faceAmount
+        accrued[m] *= face_amount
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
-        if fixedLegFlows[m] > gSmall:
-            accrued[m] = fixedLegFlows[m] * faceAmount
+        if fixed_legFlows[m] > gSmall:
+            accrued[m] = fixed_legFlows[m] * face_amount
 
     #######################################################################
 
     # The value of the swap at each time and node. Principal is exchanged.
-    fixedLegValues = np.zeros(shape=(numTimeSteps, numNodes))
+    fixed_legValues = np.zeros(shape=(numTimeSteps, numNodes))
     # The value of the option to enter into a payer swap
     payValues = np.zeros(shape=(numTimeSteps, numNodes))
     # The value of the option to enter into a receiver swap
@@ -175,24 +175,24 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
     # Start with the value of the fixed leg at maturity
     for k in range(0, numNodes):
-        flow = 1.0 + fixedLegFlows[maturityStep]
-        fixedLegValues[maturityStep, k] = flow * faceAmount
+        flow = 1.0 + fixed_legFlows[maturityStep]
+        fixed_legValues[maturityStep, k] = flow * face_amount
 
     # Now step back to today considering early exercise on coupon dates
     for m in range(maturityStep-1, -1, -1):
         nm = m
-        flow = fixedLegFlows[m] * faceAmount
+        flow = fixed_legFlows[m] * face_amount
 
         for k in range(0, nm+1):
             rt = _rt[m, k]
             df = np.exp(- rt * _dt)
 
-            vu = fixedLegValues[m+1, k+1]
-            vd = fixedLegValues[m+1, k]
+            vu = fixed_legValues[m+1, k+1]
+            vd = fixed_legValues[m+1, k]
             v = (pu*vu + pd*vd) * df
 
-            fixedLegValues[m, k] = v
-            fixedLegValues[m, k] += flow
+            fixed_legValues[m, k] = v
+            fixed_legValues[m, k] += flow
 
             vpay = 0.0
             vrec = 0.0
@@ -211,11 +211,11 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
             holdRec = recValues[m, k]
 
             # The floating value is clean and so must be the fixed value
-            fixedLegValue = fixedLegValues[m, k] - accrued[m]          
+            fixed_legValue = fixed_legValues[m, k] - accrued[m]
             floatLegValue = floatLegValues[m]               
 
-            payExercise = max(floatLegValue - fixedLegValue, 0.0)
-            recExercise = max(fixedLegValue - floatLegValue, 0.0)
+            payExercise = max(floatLegValue - fixed_legValue, 0.0)
+            recExercise = max(fixed_legValue - floatLegValue, 0.0)
 
             if m == expiryStep:
 
@@ -243,16 +243,16 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 
 @njit(fastmath=True, cache=True)
 def americanBondOption_Tree_Fast(texp, tmat,
-                                 strikePrice, faceAmount,
+                                 strikePrice, face_amount,
                                  couponTimes, couponFlows,
                                  exerciseTypeInt,
                                  _dfTimes, _dfValues,
                                  _treeTimes, _Q,
                                  _rt, _dt):
-    ''' Option to buy or sell bond at a specified strike price that can be
+    """ Option to buy or sell bond at a specified strike price that can be
     exercised over the exercise period depending on choice of exercise type.
     Due to non-analytical bond price we need to extend tree out to bond
-    maturity and take into account cash flows through time. '''
+    maturity and take into account cash flows through time. """
 
     DEBUG = False
 
@@ -315,12 +315,12 @@ def americanBondOption_Tree_Fast(texp, tmat,
     for m in range(0, maturityStep+1):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, couponTimes, couponFlows)
-        accrued[m] *= faceAmount
+        accrued[m] *= face_amount
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
         if treeFlows[m] > gSmall:
-            accrued[m] = treeFlows[m] * faceAmount
+            accrued[m] = treeFlows[m] * face_amount
 
     if DEBUG:
         for i in range(0, expiryStep+1):
@@ -335,7 +335,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
     # Start with the value of the bond at maturity
     for k in range(0, numNodes):
         bondValues[maturityStep, k] = (1.0 + treeFlows[maturityStep]) \
-            * faceAmount
+            * face_amount
 
     if DEBUG:
         fullPrice = bondValues[maturityStep, 0]
@@ -346,7 +346,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
     for m in range(maturityStep-1, expiryStep, -1):
 
         nm = m
-        flow = treeFlows[m] * faceAmount
+        flow = treeFlows[m] * face_amount
 
         for k in range(0, nm+1):
 
@@ -368,7 +368,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
     # Now step back to today from the expiry date considering early exercise
     for m in range(expiryStep, -1, -1):
         nm = m
-        flow = treeFlows[m] * faceAmount
+        flow = treeFlows[m] * face_amount
 
         for k in range(0, nm+1):
 
@@ -427,14 +427,14 @@ def americanBondOption_Tree_Fast(texp, tmat,
 @njit(fastmath=True, cache=True)
 def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
                                    callTimes, callPrices,
-                                   putTimes, putPrices, faceAmount,
+                                   putTimes, putPrices, face_amount,
                                    _sigma, _a, _Q,  # IS SIGMA USED ?
                                    _pu, _pm, _pd, _rt, _dt, _treeTimes,
                                    _dfTimes, _dfValues):
-    ''' Value a bond with embedded put and call options that can be exercised
+    """ Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
-    maturity and take into account cash flows through time. '''
+    maturity and take into account cash flows through time. """
 
     pu = 0.50
     pd = 0.50
@@ -479,18 +479,18 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
     for m in range(0, numTimeSteps):
         ttree = _treeTimes[m]
         accrued[m] = accruedInterpolator(ttree, mappedTimes, mappedAmounts)
-        accrued[m] *= faceAmount
+        accrued[m] *= face_amount
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
         if treeFlows[m] > 0.0:
-            accrued[m] = treeFlows[m] * faceAmount
+            accrued[m] = treeFlows[m] * face_amount
 
     ###########################################################################
     # map call onto tree - must have no calls at high value
     ###########################################################################
 
-    treeCallValue = np.ones(numTimeSteps) * faceAmount * 1000.0
+    treeCallValue = np.ones(numTimeSteps) * face_amount * 1000.0
     numCalls = len(callTimes)
     for i in range(0, numCalls):
         callTime = callTimes[i]
@@ -531,17 +531,17 @@ def callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
     nm = maturityStep
     vcall = treeCallValue[m]
     vput = treePutValue[m]
-    vhold = (1.0 + treeFlows[m]) * faceAmount
+    vhold = (1.0 + treeFlows[m]) * face_amount
     vclean = vhold - accrued[m]
     value = min(max(vclean, vput), vcall) + accrued[m]
 
     for k in range(0, nm+1):
-        bondValues[m, k] = (1.0 + treeFlows[m]) * faceAmount
+        bondValues[m, k] = (1.0 + treeFlows[m]) * face_amount
         callPutBondValues[m, k] = value
 
     for m in range(maturityStep-1, -1, -1):
         nm = m
-        flow = treeFlows[m] * faceAmount
+        flow = treeFlows[m] * face_amount
         vcall = treeCallValue[m]
         vput = treePutValue[m]
 
@@ -646,9 +646,9 @@ class FinModelRatesBDT():
     def __init__(self, 
                  sigma: float, 
                  numTimeSteps:int=100):
-        ''' Constructs the Black-Derman-Toy rate model in the case when the
+        """ Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
-        and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh '''
+        and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh """
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
@@ -665,7 +665,7 @@ class FinModelRatesBDT():
         self._treeTimes = None
         self._pu = 0.50
         self._pd = 0.50
-        self._discountCurve = None
+        self._discount_curve = None
 
 ###############################################################################
 
@@ -701,10 +701,10 @@ class FinModelRatesBDT():
 
 ###############################################################################
 
-    def bondOption(self, texp, strikePrice, faceAmount,
+    def bondOption(self, texp, strikePrice, face_amount,
                    couponTimes, couponFlows, exerciseType):
-        ''' Value a bond option that can have European or American exercise
-        using the Black-Derman-Toy model. The model uses a binomial tree. '''
+        """ Value a bond option that can have European or American exercise
+        using the Black-Derman-Toy model. The model uses a binomial tree. """
 
         exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
 
@@ -720,7 +720,7 @@ class FinModelRatesBDT():
 
         callValue, putValue \
             = americanBondOption_Tree_Fast(texp, tmat, 
-                                           strikePrice, faceAmount,
+                                           strikePrice, face_amount,
                                            couponTimes, couponFlows,
                                            exerciseTypeInt,
                                            self._dfTimes, self._dfs,
@@ -732,11 +732,11 @@ class FinModelRatesBDT():
 
 ###############################################################################
 
-    def bermudanSwaption(self, texp, tmat, strike, faceAmount,
+    def bermudanSwaption(self, texp, tmat, strike, face_amount,
                          couponTimes, couponFlows, exerciseType):
-        ''' Swaption that can be exercised on specific dates over the exercise
+        """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
-        bond maturity and take into account cash flows through time. '''
+        bond maturity and take into account cash flows through time. """
 
         exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
 
@@ -752,7 +752,7 @@ class FinModelRatesBDT():
 
         payValue, recValue \
             = bermudanSwaption_Tree_Fast(texp, tmat,
-                                         strike, faceAmount,
+                                         strike, face_amount,
                                          couponTimes, couponFlows,
                                          exerciseTypeInt,
                                          self._dfTimes, self._dfs,
@@ -768,10 +768,10 @@ class FinModelRatesBDT():
                                   couponTimes, couponFlows,
                                   callTimes, callPrices,
                                   putTimes, putPrices,
-                                  faceAmount):
-        ''' Option that can be exercised at any time over the exercise period.
+                                  face_amount):
+        """ Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
-        maturity and take into account cash flows through time. '''
+        maturity and take into account cash flows through time. """
 
         callTimes = np.array(callTimes)
         putTimes = np.array(putTimes)
@@ -781,7 +781,7 @@ class FinModelRatesBDT():
 
         v = callablePuttableBond_Tree_Fast(couponTimes, couponFlows,
                                            callTimes, callPrices,
-                                           putTimes, putPrices, faceAmount,
+                                           putTimes, putPrices, face_amount,
                                            self._sigma,
                                            self._Q,
                                            self._rt, self._dt,
@@ -794,7 +794,7 @@ class FinModelRatesBDT():
 ###############################################################################
 
     def __repr__(self):
-        ''' Return string with class details. '''
+        """ Return string with class details. """
 
         s = "Black-Derman-Toy Model\n"
         s += labelToString("Sigma", self._sigma)

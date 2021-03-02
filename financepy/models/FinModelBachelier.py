@@ -7,8 +7,8 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinHelperFunctions import labelToString
+from ..utils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.
@@ -17,11 +17,11 @@ from ..finutils.FinGlobalTypes import FinOptionTypes
 
 
 class FinModelBachelier():
-    ''' Bachelier's Model which prices call and put options in the forward
-    measure assuming the underlying rate follows a normal process. '''
+    """ Bachelier's Model which prices call and put options in the forward
+    measure assuming the underlying rate follows a normal process. """
 
     def __init__(self, volatility):
-        ''' Create FinModel black using parameters. '''
+        """ Create FinModel black using parameters. """
         self._volatility = volatility
 
 ###############################################################################
@@ -32,7 +32,7 @@ class FinModelBachelier():
               timeToExpiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Price a call or put option using Bachelier's model. '''
+        """ Price a call or put option using Bachelier's model. """
 
         f = forwardRate
         t = timeToExpiry

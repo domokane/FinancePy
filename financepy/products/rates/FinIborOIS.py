@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinCalendar import FinCalendarTypes, FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinGlobalTypes import FinSwapTypes
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.DayCount import FinDayCountTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.Calendar import FinCalendarTypes, FinDateGenRuleTypes
+from ...utils.Calendar import Calendar, FinBusDayAdjustTypes
+from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...utils.Math import ONE_MILLION
+from ...utils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from .FinFloatLeg import FinFloatLeg
@@ -19,7 +19,7 @@ from .FinFloatLeg import FinFloatLeg
 
 
 class FinIborOIS(object):
-    ''' Class for managing an Ibor-OIS basis swap contract. This is a
+    """ Class for managing an Ibor-OIS basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment of an overnight index swap. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
@@ -27,11 +27,11 @@ class FinIborOIS(object):
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curves from
-    which the implied index rates are extracted. '''
+    which the implied index rates are extracted. """
     
     def __init__(self,
-                 effectiveDate: FinDate,  # Date interest starts to accrue
-                 terminationDateOrTenor: (FinDate, str),  # Date contract ends
+                 effective_date: Date,  # Date interest starts to accrue
+                 termination_dateOrTenor: (Date, str),  # Date contract ends
                  iborType: FinSwapTypes,
                  iborFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  iborDayCountType: FinDayCountTypes  = FinDayCountTypes.THIRTY_E_360,
@@ -41,30 +41,30 @@ class FinIborOIS(object):
                  oisSpread: float = 0.0,
                  oisPaymentLag: int = 0,
                  notional: float = ONE_MILLION,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create a Ibor basis swap contract giving the contract start
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        """ Create a Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating 
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
         on which interest starts to accrue. The end of the contract is the
         termination date. This is not adjusted for business days. The adjusted
-        termination date is called the maturity date. This is calculated. '''
+        termination date is called the maturity date. This is calculated. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(terminationDateOrTenor) == FinDate:
-            self._terminationDate = terminationDateOrTenor
+        if type(termination_dateOrTenor) == Date:
+            self._termination_date = termination_dateOrTenor
         else:
-            self._terminationDate = effectiveDate.addTenor(terminationDateOrTenor)
+            self._termination_date = effective_date.addTenor(termination_dateOrTenor)
 
-        calendar = FinCalendar(calendarType)
-        self._maturityDate = calendar.adjust(self._terminationDate,
-                                             busDayAdjustType)
+        calendar = Calendar(calendar_type)
+        self._maturity_date = calendar.adjust(self._termination_date,
+                                             bus_day_adjust_type)
 
-        if effectiveDate > self._maturityDate:
+        if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
 
         oisType = FinSwapTypes.PAY
@@ -73,8 +73,8 @@ class FinIborOIS(object):
         
         principal = 0.0
 
-        self._floatIborLeg = FinFloatLeg(effectiveDate,
-                                         self._terminationDate,
+        self._floatIborLeg = FinFloatLeg(effective_date,
+                                         self._termination_date,
                                          iborType,
                                          iborSpread,
                                          iborFreqType,
@@ -82,12 +82,12 @@ class FinIborOIS(object):
                                          notional,
                                          principal,
                                          0,
-                                         calendarType,
-                                         busDayAdjustType,
-                                         dateGenRuleType)
+                                         calendar_type,
+                                         bus_day_adjust_type,
+                                         date_gen_rule_type)
 
-        self._floatOISLeg = FinFloatLeg(effectiveDate,
-                                        self._terminationDate,
+        self._floatOISLeg = FinFloatLeg(effective_date,
+                                        self._termination_date,
                                         oisType,
                                         oisSpread,
                                         oisFreqType,
@@ -95,35 +95,35 @@ class FinIborOIS(object):
                                         notional,
                                         principal,
                                         oisPaymentLag,
-                                        calendarType,
-                                        busDayAdjustType,
-                                        dateGenRuleType)
+                                        calendar_type,
+                                        bus_day_adjust_type,
+                                        date_gen_rule_type)
 
 ###############################################################################
 
     def value(self,
-              valuationDate: FinDate,
-              discountCurve: FinDiscountCurve,
+              valuation_date: Date,
+              discount_curve: FinDiscountCurve,
               indexIborCurve: FinDiscountCurve = None,
               indexOISCurve: FinDiscountCurve = None,
               firstFixingRateLeg1=None,
               firstFixingRateLeg2=None):
-        ''' Value the interest rate swap on a value date given a single Ibor
-        discount curve and an index curve for the Ibors on each swap leg. '''
+        """ Value the interest rate swap on a value date given a single Ibor
+        discount curve and an index curve for the Ibors on each swap leg. """
 
         if indexIborCurve is None:
-            indexIborCurve = discountCurve
+            indexIborCurve = discount_curve
 
         if indexOISCurve is None:
-            indexOISCurve = discountCurve
+            indexOISCurve = discount_curve
 
-        floatIborLegValue = self._floatIborLeg.value(valuationDate,
-                                                     discountCurve, 
+        floatIborLegValue = self._floatIborLeg.value(valuation_date,
+                                                     discount_curve, 
                                                      indexIborCurve, 
                                                      firstFixingRateLeg1)
 
-        floatOISLegValue = self._floatOISLeg.value(valuationDate,
-                                                   discountCurve,
+        floatOISLegValue = self._floatOISLeg.value(valuation_date,
+                                                   discount_curve,
                                                    indexOISCurve,
                                                    firstFixingRateLeg2)
 
@@ -133,8 +133,8 @@ class FinIborOIS(object):
 ###############################################################################
 
     def printFlows(self):
-        ''' Prints the fixed leg amounts without any valuation details. Shows
-        the dates and sizes of the promised fixed leg flows. '''
+        """ Prints the fixed leg amounts without any valuation details. Shows
+        the dates and sizes of the promised fixed leg flows. """
 
         self._floatIborLeg.printPayments()
         self._floatOISLeg.printPayments()
@@ -151,8 +151,8 @@ class FinIborOIS(object):
 ###############################################################################
 
     def _print(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
+        """ Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. """
         print(self)
 
 ###############################################################################

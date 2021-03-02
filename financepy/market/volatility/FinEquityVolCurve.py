@@ -4,30 +4,30 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinMath import testMonotonicity
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinError import FinError
+from ...utils.Math import testMonotonicity
+from ...utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # TODO: This should be deleted and replaced with FinEquityVolSurface
 
 
 class FinEquityVolCurve():
-    ''' Class to manage a smile or skew in volatility at a single maturity
+    """ Class to manage a smile or skew in volatility at a single maturity
     horizon. It fits the volatility using a polynomial. Includes analytics to
     extract the implied pdf of the underyling at maturity. THIS NEEDS TO BE
-    SUBSTITUTED WITH FINEQUITYVOLSURFACE. '''
+    SUBSTITUTED WITH FINEQUITYVOLSURFACE. """
 
 ###############################################################################
 
     def __init__(self,
                  curveDate,
-                 expiryDate,
+                 expiry_date,
                  strikes,
                  volatilities,
                  polynomial=3):
 
-        if expiryDate <= curveDate:
+        if expiry_date <= curveDate:
             raise FinError("Expiry date before curve date.")
 
         if len(strikes) < 1:
@@ -56,8 +56,8 @@ class FinEquityVolCurve():
 ###############################################################################
 
     def volatility(self, strike):
-        ''' Return the volatility for a strike using a given polynomial
-        interpolation. '''
+        """ Return the volatility for a strike using a given polynomial
+        interpolation. """
 
         vol = self._f(strike)
 
@@ -69,9 +69,9 @@ class FinEquityVolCurve():
 ###############################################################################
 
     def calculatePDF():
-        ''' calculate the probability density function of the underlying using
+        """ calculate the probability density function of the underlying using
         the volatility smile or skew curve following the approach set out in
-        Breedon and Litzenberger. '''
+        Breedon and Litzenberger. """
         pass
 
 ###############################################################################

@@ -7,10 +7,10 @@ from scipy import integrate
 from math import exp, log, pi
 import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
 
-from ..finutils.FinGlobalVariables import gDaysInYear
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinMath import norminvcdf
-from ..finutils.FinError import FinError
+from ..utils.FinGlobalVariables import gDaysInYear
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.Math import norminvcdf
+from ..utils.FinError import FinError
 
 ##########################################################################
 # Heston Process
@@ -164,20 +164,20 @@ class FinModelHeston():
 ###############################################################################
 
     def value_MC(self,
-                 valueDate,
+                 valuation_date,
                  option,
                  stockPrice,
                  interestRate,
                  dividendYield,
                  numPaths,
-                 numStepsPerYear,
+                 num_steps_per_year,
                  seed,
                  scheme=FinHestonNumericalScheme.EULERLOG):
 
-        tau = (option._expiryDate - valueDate) / gDaysInYear
+        tau = (option._expiry_date - valuation_date) / gDaysInYear
 
         K = option._strikePrice
-        dt = 1.0 / numStepsPerYear
+        dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
         sPaths = getPaths(stockPrice,
@@ -208,13 +208,13 @@ class FinModelHeston():
 ###############################################################################
 
     def value_Lewis(self,
-                    valueDate,
+                    valuation_date,
                     option,
                     stockPrice,
                     interestRate,
                     dividendYield):
 
-        tau = (option._expiryDate - valueDate) / gDaysInYear
+        tau = (option._expiry_date - valuation_date) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -256,13 +256,13 @@ class FinModelHeston():
 ###############################################################################
 
     def value_Lewis_Rouah(self,
-                          valueDate,
+                          valuation_date,
                           option,
                           stockPrice,
                           interestRate,
                           dividendYield):
 
-        tau = (option._expiryDate - valueDate) / gDaysInYear
+        tau = (option._expiry_date - valuation_date) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -300,13 +300,13 @@ class FinModelHeston():
 ###############################################################################
 
     def value_Weber(self,
-                    valueDate,
+                    valuation_date,
                     option,
                     stockPrice,
                     interestRate,
                     dividendYield):
 
-        tau = (option._expiryDate - valueDate) / gDaysInYear
+        tau = (option._expiry_date - valuation_date) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -346,13 +346,13 @@ class FinModelHeston():
 ###############################################################################
 
     def value_Gatheral(self,
-                       valueDate,
+                       valuation_date,
                        option,
                        stockPrice,
                        interestRate,
                        dividendYield):
 
-        tau = (option._expiryDate - valueDate) / gDaysInYear
+        tau = (option._expiry_date - valuation_date) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma

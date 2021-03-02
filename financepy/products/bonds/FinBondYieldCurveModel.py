@@ -5,7 +5,7 @@
 
 import numpy as np
 from scipy.interpolate import splev
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -37,7 +37,7 @@ class FinCurveFitPolynomial():
         return s
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################
@@ -51,7 +51,7 @@ class FinCurveFitNelsonSiegel():
         self._beta2 = None
         self._beta3 = None
         self._tau = tau
-        ''' Fairly permissive bounds. Only tau1 is 1-100 '''
+        """ Fairly permissive bounds. Only tau1 is 1-100 """
         self._bounds = bounds
 
     def _interpolatedYield(self, t, beta1=None, beta2=None,
@@ -87,7 +87,7 @@ class FinCurveFitNelsonSiegel():
         return s
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################
@@ -97,8 +97,8 @@ class FinCurveFitNelsonSiegelSvensson():
 
     def __init__(self, tau1=None, tau2=None,
                  bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
-        ''' Create object to store calibration and functional form of NSS
-        parametric fit. '''
+        """ Create object to store calibration and functional form of NSS
+        parametric fit. """
 
         self._parentType = FinCurveFitMethod
         self._beta1 = None
@@ -108,8 +108,8 @@ class FinCurveFitNelsonSiegelSvensson():
         self._tau1 = tau1
         self._tau2 = tau2
 
-        ''' I impose some bounds to help ensure a sensible result if
-        the user does not provide any bounds. Especially for tau2. '''
+        """ I impose some bounds to help ensure a sensible result if
+        the user does not provide any bounds. Especially for tau2. """
         self._bounds = bounds
 
     def _interpolatedYield(self, t, beta1=None, beta2=None, beta3=None,
@@ -157,7 +157,7 @@ class FinCurveFitNelsonSiegelSvensson():
         return s
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################
@@ -184,7 +184,7 @@ class FinCurveFitBSpline():
         return s
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

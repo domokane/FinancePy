@@ -9,14 +9,14 @@ import sys
 sys.path.append("..")
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.utils.Date import Date
+from financepy.utils.DayCount import FinDayCountTypes
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.utils.Frequency import FinFrequencyTypes
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.finutils.FinHelperFunctions import checkVectorDifferences
+from financepy.utils.FinHelperFunctions import checkVectorDifferences
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsNF
 from financepy.models.FinModelRatesLMM import LMMSimulateFwds1F
 from financepy.models.FinModelRatesLMM import LMMSimulateFwdsMF
@@ -51,14 +51,14 @@ def getCorrelationMatrix(numFwds, beta, dt):
 
 """ def getVolCurve(numFwds, dt, flatVol=None):
 
-    valuationDate = FinDate(1, 1, 2020)
+    valuation_date = FinDate(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     numPeriods = 10
-    capletDt = valuationDate
+    capletDt = valuation_date
 
-    capVolDates.append(valuationDate)
+    capVolDates.append(valuation_date)
     for _ in range(0, numPeriods):
         capletDt = capletDt.addTenor(capletVolTenor)
         capVolDates.append(capletDt)
@@ -72,11 +72,11 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities = np.array(capVolatilities)
         capVolatilities[0] = 0.0
 
-    dayCountType = FinDayCountTypes.ACT_ACT_ISDA
-    volCurve = FinIborCapVolCurve(valuationDate,
+    day_count_type = FinDayCountTypes.ACT_ACT_ISDA
+    volCurve = FinIborCapVolCurve(valuation_date,
                                    capVolDates,
                                    capVolatilities,
-                                   dayCountType)
+                                   day_count_type)
 
     zetas = np.zeros(numFwds)
     t = 0.0
@@ -148,13 +148,13 @@ def getForwardCurve(numFwds, r):
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         valuationDate = FinDate(1, 1, 2010)
-#         liborCurve = FinDiscountCurveFlat(valuationDate, r,
+#         valuation_date = FinDate(1, 1, 2010)
+#         libor_curve = FinDiscountCurveFlat(valuation_date, r,
 #                                           FinFrequencyTypes.QUARTERLY)
 
-#         settlementDate = valuationDate
-#         exerciseDate = settlementDate.addMonths(a*3)
-#         maturityDate = settlementDate.addMonths(b*3)
+#         settlement_date = valuation_date
+#         exerciseDate = settlement_date.addMonths(a*3)
+#         maturity_date = settlement_date.addMonths(b*3)
 
 #         fixedCoupon = strike
 #         fixedFrequencyType = FinFrequencyTypes.QUARTERLY
@@ -165,9 +165,9 @@ def getForwardCurve(numFwds, r):
 
 #         # Pricing a PAY
 #         swaptionType = FinIborSwaptionTypes.PAY
-#         swaption = FinIborSwaption(settlementDate,
+#         swaption = FinIborSwaption(settlement_date,
 #                                     exerciseDate,
-#                                     maturityDate,
+#                                     maturity_date,
 #                                     swaptionType,
 #                                     fixedCoupon,
 #                                     fixedFrequencyType,
@@ -177,7 +177,7 @@ def getForwardCurve(numFwds, r):
 #                                     floatDayCountType)
 
 #         model = FinModelBlack(swaptionVol)
-#         blackSwaptionPrice = swaption.value(valuationDate, liborCurve, model)
+#         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
 #         print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
 #               % (strike, texp, fwdRateVol, swapVolSim1F, swapVolSimNF, swaptionVol,
@@ -243,10 +243,10 @@ def getForwardCurve(numFwds, r):
 
 
 def test_HullBookExamples():
-    ''' Examining examples on page 770 of Hull OFODS
+    """ Examining examples on page 770 of Hull OFODS
         Last cap product has caplet starting in 10 years so we have to model
         the forward curve from time 0 out to 11 forwards, not 10 forwards.
-        We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11 '''
+        We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11 """
 
     verbose = True
 

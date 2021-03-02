@@ -7,14 +7,14 @@ from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
-from ...finutils.FinMath import N, M
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
+from ...utils.Math import N, M
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 
 from enum import Enum
 
@@ -66,7 +66,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
 def valueMCFast(t,
                 stockPrices,
-                discountCurve,
+                discount_curve,
                 dividendCurves,
                 volatilities,
                 betas,
@@ -78,7 +78,7 @@ def valueMCFast(t,
 
     np.random.seed(seed)
 
-    df = discountCurve._df(t)
+    df = discount_curve._df(t)
     r = -log(df)/t
 
     qs = []
@@ -108,7 +108,7 @@ def valueMCFast(t,
 class FinEquityRainbowOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  payoffType: FinEquityRainbowOptionTypes,
                  payoffParams: List[float],
                  numAssets: int):
@@ -117,7 +117,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
         self._validatePayoff(payoffType, payoffParams, numAssets)
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._payoffType = payoffType
         self._payoffParams = payoffParams
         self._numAssets = numAssets
@@ -186,9 +186,9 @@ class FinEquityRainbowOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrices: np.ndarray,
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurves: (list),
               volatilities: np.ndarray,
               corrMatrix: np.ndarray):
@@ -205,16 +205,16 @@ class FinEquityRainbowOption(FinEquityOption):
         if corrMatrix.shape[1] != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiryDate - valueDate) / gDaysInYear
-        r = discountCurve.zeroRate(self._expiryDate)
+        t = (self._expiry_date - valuation_date) / gDaysInYear
+        r = discount_curve.zeroRate(self._expiry_date)
 
-        q1 = dividendCurves[0].zeroRate(self._expiryDate)
-        q2 = dividendCurves[1].zeroRate(self._expiryDate)
+        q1 = dividendCurves[0].zeroRate(self._expiry_date)
+        q2 = dividendCurves[1].zeroRate(self._expiry_date)
 
         dividendYields = [q1, q2]
 
@@ -269,9 +269,9 @@ class FinEquityRainbowOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
+                valuation_date,
                 stockPrices,
-                discountCurve,
+                discount_curve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
@@ -283,14 +283,14 @@ class FinEquityRainbowOption(FinEquityOption):
                        volatilities,
                        corrMatrix)
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
         v = valueMCFast(t,
                         stockPrices,
-                        discountCurve,
+                        discount_curve,
                         dividendCurves,
                         volatilities,
                         corrMatrix,
@@ -307,7 +307,7 @@ class FinEquityRainbowOption(FinEquityOption):
     def __repr__(self):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("PAYOFF TYPE", self._payoffType)
         s += labelToString("PAYOFF PARAMS", self._payoffParams)
         s += labelToString("NUM ASSETS TYPE", self._numAssets, "")
@@ -316,7 +316,7 @@ class FinEquityRainbowOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

@@ -8,18 +8,18 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.utils.Date import Date
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.DayCount import FinDayCountTypes
 
-from financepy.products.rates.FinIborSwap import FinIborSwap
+from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 
 from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.products.bonds.FinBond import FinBond
 from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 
@@ -37,49 +37,49 @@ def test_FinBondEmbeddedOptionMATLAB():
     # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
     # WHICH MIGHT BE A BETTER MATCH - ALSO THEY DO NOT USE A REALISTIC VOL
 
-    valuationDate = FinDate(1, 1, 2007)
-    settlementDate = valuationDate
+    valuation_date = Date(1, 1, 2007)
+    settlement_date = valuation_date
 
     ###########################################################################
 
-    fixedLegType = FinSwapTypes.PAY
+    fixed_legType = FinSwapTypes.PAY
     dcType = FinDayCountTypes.THIRTY_E_360
     fixedFreq = FinFrequencyTypes.ANNUAL
-    swap1 = FinIborSwap(settlementDate, "1Y", fixedLegType, 0.0350, fixedFreq, dcType)
-    swap2 = FinIborSwap(settlementDate, "2Y", fixedLegType, 0.0400, fixedFreq, dcType)
-    swap3 = FinIborSwap(settlementDate, "3Y", fixedLegType, 0.0450, fixedFreq, dcType)
+    swap1 = FinIborSwap(settlement_date, "1Y", fixed_legType, 0.0350, fixedFreq, dcType)
+    swap2 = FinIborSwap(settlement_date, "2Y", fixed_legType, 0.0400, fixedFreq, dcType)
+    swap3 = FinIborSwap(settlement_date, "3Y", fixed_legType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discountCurve = FinIborSingleCurve(valuationDate, [], [], swaps)
+    discount_curve = FinIborSingleCurve(valuation_date, [], [], swaps)
 
     ###########################################################################
 
-    issueDate = FinDate(1, 1, 2005)
-    maturityDate = FinDate(1, 1, 2010)
+    issue_date = Date(1, 1, 2005)
+    maturity_date = Date(1, 1, 2010)
     coupon = 0.0525
-    freqType = FinFrequencyTypes.ANNUAL
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+    freq_type = FinFrequencyTypes.ANNUAL
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     callDates = []
     callPrices = []
     putDates = []
     putPrices = []
 
-    putDate = FinDate(1, 1, 2008)
+    putDate = Date(1, 1, 2008)
     for _ in range(0, 24):
         putDates.append(putDate)
         putPrices.append(100)
         putDate = putDate.addMonths(1)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
+    v = bond.cleanPriceFromDiscountCurve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     sigma = 0.01  # This volatility is very small for a BK process
     a = 0.1
 
-    puttableBond = FinBondEmbeddedOption(issueDate, maturityDate, coupon,
-                                         freqType, accrualType,
+    puttableBond = FinBondEmbeddedOption(issue_date, maturity_date, coupon,
+                                         freq_type, accrual_type,
                                          callDates, callPrices,
                                          putDates, putPrices)
 
@@ -90,7 +90,7 @@ def test_FinBondEmbeddedOptionMATLAB():
     for numTimeSteps in timeSteps:
         model = FinModelRatesBK(sigma, a, numTimeSteps)
         start = time.time()
-        v = puttableBond.value(settlementDate, discountCurve, model)
+        v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()
         period = end - start
         testCases.print(period, numTimeSteps, v['bondwithoption'],
@@ -113,28 +113,28 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     # 68.38 found in blog article. But this is for 40 grid points.
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
-    valuationDate = FinDate(16, 8, 2016)
-    settlementDate = valuationDate.addWeekDays(3)
+    valuation_date = Date(16, 8, 2016)
+    settlement_date = valuation_date.addWeekDays(3)
 
     ###########################################################################
 
-    discountCurve = FinDiscountCurveFlat(valuationDate, 0.035,
+    discount_curve = FinDiscountCurveFlat(valuation_date, 0.035,
                                          FinFrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 
-    issueDate = FinDate(15, 9, 2010)
-    maturityDate = FinDate(15, 9, 2022)
+    issue_date = Date(15, 9, 2010)
+    maturity_date = Date(15, 9, 2022)
     coupon = 0.025
-    freqType = FinFrequencyTypes.QUARTERLY
-    accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issueDate, maturityDate, coupon, freqType, accrualType)
+    freq_type = FinFrequencyTypes.QUARTERLY
+    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     ###########################################################################
     # Set up the call and put times and prices
     ###########################################################################
 
-    nextCallDate = FinDate(15, 9, 2016)
+    nextCallDate = Date(15, 9, 2016)
     callDates = [nextCallDate]
     callPrices = [100.0]
 
@@ -150,13 +150,13 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     sigma = 0.12/0.035  # basis point volatility
     a = 0.03
 
-    puttableBond = FinBondEmbeddedOption(issueDate, maturityDate, coupon,
-                                         freqType, accrualType,
+    puttableBond = FinBondEmbeddedOption(issue_date, maturity_date, coupon,
+                                         freq_type, accrual_type,
                                          callDates, callPrices,
                                          putDates, putPrices)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.cleanPriceFromDiscountCurve(settlementDate, discountCurve)
+    v = bond.cleanPriceFromDiscountCurve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
@@ -165,7 +165,7 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     for numTimeSteps in timeSteps:
         model = FinModelRatesBK(sigma, a, numTimeSteps)
         start = time.time()
-        v = puttableBond.value(settlementDate, discountCurve, model)
+        v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()
         period = end - start
         testCases.print(period, numTimeSteps, v['bondwithoption'],

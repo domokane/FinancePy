@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import norm
 N = norm.cdf
 
-from ..finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ..utils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 # TODO: Redesign this class
 
@@ -15,10 +15,10 @@ from ..finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 class FinModelMertonCredit():
-    ''' Implementation of the Merton Credit Model according to the original
+    """ Implementation of the Merton Credit Model according to the original
     formulation by Merton with the inputs being the asset value of the firm, 
     the liabilities (bond face), the time to maturity in years, the risk-free 
-    rate, the asset growth rate and the asset value volatility. '''
+    rate, the asset growth rate and the asset value volatility. """
 
     def __init__(self,
                  assetValue: (float, list, np.ndarray),
@@ -27,8 +27,8 @@ class FinModelMertonCredit():
                  riskFreeRate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
                  assetVolatility: (float, list, np.ndarray)):
-        ''' Create an object that holds all of the model parameters. These
-        parameters may be vectorised. '''
+        """ Create an object that holds all of the model parameters. These
+        parameters may be vectorised. """
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -45,7 +45,7 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def leverage(self):
-        ''' Calculate the leverage. '''
+        """ Calculate the leverage. """
 
         lvg = self._A / self._L
         return lvg
@@ -53,21 +53,21 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def assetValue(self):
-        ''' Calculate the asset value. '''
+        """ Calculate the asset value. """
 
         return self._A
 
 ###############################################################################
 
     def debtFacevalue(self):
-        ''' Calculate the asset value. '''
+        """ Calculate the asset value. """
 
         return self._L
 
 ###############################################################################
 
     def equityVol(self):
-        ''' Calculate the equity volatility. '''
+        """ Calculate the equity volatility. """
 
         E = self.equityValue()
 
@@ -82,7 +82,7 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def equityValue(self):
-        ''' Calculate the equity value. '''
+        """ Calculate the equity value. """
 
         lvg = self._A / self._L
         sigmaRootT = self._vA * np.sqrt(self._t)
@@ -95,7 +95,7 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def debtValue(self):
-        ''' Calculate the debt value '''
+        """ Calculate the debt value """
 
         lvg = self._A / self._L
         sigmaRootT = self._vA * np.sqrt(self._t)
@@ -108,7 +108,7 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def creditSpread(self):
-        ''' Calculate the credit spread from the debt value. '''
+        """ Calculate the credit spread from the debt value. """
 
         dvalue = self.debtValue()
         spd = -(1.0 / self._t) * np.log(dvalue / self._L) - self._r
@@ -117,8 +117,8 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def probDefault(self):
-        ''' Calculate the default probability. This is not risk-neutral so it
-        uses the real world drift rather than the risk-free rate. '''
+        """ Calculate the default probability. This is not risk-neutral so it
+        uses the real world drift rather than the risk-free rate. """
         
         lvg = self._A / self._L
         dd = np.log(lvg) + (self._mu - (self._vA**2)/2.0) * self._t
@@ -129,8 +129,8 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def distDefault(self):
-        ''' Calculate the distance to default. This is not risk-neutral so it
-        uses the real world drift rather than the risk-free rate. '''
+        """ Calculate the distance to default. This is not risk-neutral so it
+        uses the real world drift rather than the risk-free rate. """
         
         lvg = self._A / self._L
         dd = np.log(lvg) + (self._mu - (self._vA**2)/2.0) * self._t

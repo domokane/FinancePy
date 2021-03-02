@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.products.rates.FinIborFuture import FinIborFuture
-from financepy.finutils.FinDate import *
+from financepy.utils.Date import *
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -18,7 +18,7 @@ setDateFormatType(FinDateFormatTypes.UK_LONG)
 
 def test_FinIborFuture():
 
-    todayDate = FinDate(5, 5, 2020)
+    todayDate = Date(5, 5, 2020)
 
     testCases.header("VALUES")
 

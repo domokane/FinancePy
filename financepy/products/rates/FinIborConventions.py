@@ -8,10 +8,10 @@
 
 from enum import Enum
 
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
+from ...utils.DayCount import DayCount, FinDayCountTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...utils.Calendar import FinBusDayAdjustTypes
 
 ##########################################################################
 
@@ -24,12 +24,12 @@ class FinIborConventions():
 
         if currencyName == "USD" and indexName == "LIBOR":
             self._spotLag = 2
-            self._dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
-            self._calendarType=FinCalendarTypes.TARGET
+            self._day_count_type=FinDayCountTypes.THIRTY_E_360_ISDA
+            self._calendar_type=FinCalendarTypes.TARGET
         elif currencyName == "EUR"and indexName == "EURIBOR":
             self._spotLag = 2
-            self._dayCountType=FinDayCountTypes.THIRTY_E_360_ISDA
-            self._calendarType=FinCalendarTypes.TARGET
+            self._day_count_type=FinDayCountTypes.THIRTY_E_360_ISDA
+            self._calendar_type=FinCalendarTypes.TARGET
         else:
             pass
 

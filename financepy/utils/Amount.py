@@ -4,19 +4,19 @@
 
 
 from .FinHelperFunctions import checkArgumentTypes
-from .FinCurrency import FinCurrencyTypes
+from .Currency import FinCurrencyTypes
 from .Math import ONE_MILLION
 
 ###############################################################################
 
 
 class FinAmount(object):
-    ''' A FinAmount is a holder for an amount in a specific currency. '''
+    """ A FinAmount is a holder for an amount in a specific currency. """
 
     def __init__(self,
                  notional: float = ONE_MILLION,
                  currencyType: FinCurrencyTypes = FinCurrencyTypes.NONE):
-        ''' Create FinAmount object. '''
+        """ Create FinAmount object. """
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -25,8 +25,8 @@ class FinAmount(object):
 
 
     def __repr__(self):
-        ''' Print out the details of the schedule and the actual dates. This
-        can be used for providing transparency on schedule calculations. '''
+        """ Print out the details of the schedule and the actual dates. This
+        can be used for providing transparency on schedule calculations. """
 
         s = ""
         if self._currencyType != FinCurrencyTypes.NONE:
@@ -41,8 +41,8 @@ class FinAmount(object):
         return self._notional
 
     def _print(self):
-        ''' Print out the details of the schedule and the actual dates. This
-        can be used for providing transparency on schedule calculations. '''
+        """ Print out the details of the schedule and the actual dates. This
+        can be used for providing transparency on schedule calculations. """
         print(self)
 
 ###############################################################################

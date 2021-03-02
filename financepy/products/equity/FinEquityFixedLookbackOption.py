@@ -5,16 +5,16 @@
 import numpy as np
 
 
-from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...utils.Math import N
+from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.Date import Date
 
 from ...models.FinGBMProcess import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.FinGlobalTypes import FinOptionTypes
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -31,46 +31,46 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 
 
 class FinEquityFixedLookbackOption(FinEquityOption):
-    ''' This is an equity option in which the strike of the option is fixed but
+    """ This is an equity option in which the strike of the option is fixed but
     the value of the stock price used to determine the payoff is the maximum
-    in the case of a call option, and a minimum in the case of a put option.'''
+    in the case of a call option, and a minimum in the case of a put option."""
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  optionType: FinOptionTypes,
                  strikePrice: float):
-        ''' Create the FixedLookbackOption by specifying the expiry date, the
-        option type and the option strike. '''
+        """ Create the FixedLookbackOption by specifying the expiry date, the
+        option type and the option strike. """
 
         checkArgumentTypes(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._optionType = optionType
         self._strikePrice = strikePrice
 
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: float,
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               volatility: float,
               stockMinMax: float):
-        ''' Valuation of the Fixed Lookback option using Black-Scholes using
+        """ Valuation of the Fixed Lookback option using Black-Scholes using
         the formulae derived by Conze and Viswanathan (1991). One of the inputs
         is the minimum of maximum of the stock price since the start of the
-        option depending on whether the option is a call or a put. '''
+        option depending on whether the option is a call or a put. """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discountCurve.df(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/t
 
-        dq = dividendCurve.df(self._expiryDate)
+        dq = dividendCurve.df(self._expiry_date)
         q = -np.log(dq)/t
 
         v = volatility
@@ -174,26 +174,26 @@ class FinEquityFixedLookbackOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
+                valuation_date: Date,
                 stockPrice: float,
-                discountCurve: FinDiscountCurve,
+                discount_curve: FinDiscountCurve,
                 dividendCurve: FinDiscountCurve,
                 volatility: float,
                 stockMinMax: float,
                 numPaths: int = 10000,
-                numStepsPerYear: int = 252,
+                num_steps_per_year: int = 252,
                 seed: int = 4242):
-        ''' Monte Carlo valuation of a fixed strike lookback option using a
-        Black-Scholes model that assumes the stock follows a GBM process. '''
+        """ Monte Carlo valuation of a fixed strike lookback option using a
+        Black-Scholes model that assumes the stock follows a GBM process. """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discountCurve.df(self._expiryDate)
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
 
         mu = r - q
-        numTimeSteps = int(t * numStepsPerYear)
+        numTimeSteps = int(t * num_steps_per_year)
 
         optionType = self._optionType
         k = self._strikePrice
@@ -240,7 +240,7 @@ class FinEquityFixedLookbackOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType, "")
         return s
@@ -248,7 +248,7 @@ class FinEquityFixedLookbackOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

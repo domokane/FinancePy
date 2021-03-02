@@ -34,7 +34,7 @@ import os
 import numpy as np
 from numba import njit
 
-from financepy.finutils.FinMath import norminvcdf
+from financepy.utils.Math import norminvcdf
 
 ###############################################################################
 # This code loads sobol coefficients from binary numpy file and allocates
@@ -53,12 +53,12 @@ with np.load(path, mmap_mode='r') as f:
 
 
 @njit(cache=True)
-def getGaussianSobol(numPoints, dimension):
-    ''' Sobol Gaussian quasi random points generator based on graycode order.
-    The generated points follow a normal distribution. '''
-    points = getUniformSobol(numPoints, dimension)
+def getGaussianSobol(num_points, dimension):
+    """ Sobol Gaussian quasi random points generator based on graycode order.
+    The generated points follow a normal distribution. """
+    points = getUniformSobol(num_points, dimension)
 
-    for i in range(numPoints):
+    for i in range(num_points):
         for j in range(dimension):
             points[i, j] = norminvcdf(points[i, j])
     return points
@@ -67,25 +67,25 @@ def getGaussianSobol(numPoints, dimension):
 
 
 @njit(cache=True)
-def getUniformSobol(numPoints, dimension):
-    ''' Sobol uniform quasi random points generator based on graycode order. 
+def getUniformSobol(num_points, dimension):
+    """ Sobol uniform quasi random points generator based on graycode order. 
     This function returns a 2D Numpy array of values where the number of rows
     is the number of draws and the number of columns is the number of 
     dimensions of the random values. Each dimension has the same number of 
     random draws. Each column of random numbers is ordered so as not to
-    correlate, i.e be independent from any other column.'''
+    correlate, i.e be independent from any other column."""
     
     global sArr
     global aArr
     global m_i
 
     # ll = number of bits needed
-    ll = int(np.ceil(np.log(numPoints+1)/np.log(2.0)))
+    ll = int(np.ceil(np.log(num_points+1)/np.log(2.0)))
 
     # c[i] = index from the right of the first zero bit of i
-    c = np.zeros(numPoints, dtype=np.int64)
+    c = np.zeros(num_points, dtype=np.int64)
     c[0] = 1
-    for i in range(1, numPoints):
+    for i in range(1, num_points):
         c[i] = 1
         value = i
         while value & 1:
@@ -93,7 +93,7 @@ def getUniformSobol(numPoints, dimension):
             c[i] += 1
 
     # points initialization
-    points = np.zeros((numPoints, dimension))
+    points = np.zeros((num_points, dimension))
 
     # ----- Compute the first dimension -----
     # Compute direction numbers v[1] to v[L], scaled by 2**32
@@ -103,8 +103,8 @@ def getUniformSobol(numPoints, dimension):
         v[i] = int(v[i])
 
     #  Evalulate x[0] to x[N-1], scaled by 2**32
-    x = np.zeros(numPoints+1)
-    for i in range(1, numPoints+1):
+    x = np.zeros(num_points+1)
+    for i in range(1, num_points+1):
         x[i] = int(x[i-1]) ^ int(v[c[i-1]])
         points[i-1, 0] = x[i]/(2**32)
 
@@ -133,8 +133,8 @@ def getUniformSobol(numPoints, dimension):
                                         * int(v[i-k]))
 
         # Evalulate X[0] to X[N-1], scaled by pow(2,32)
-        x = np.zeros(numPoints+1)
-        for i in range(1, numPoints+1):
+        x = np.zeros(num_points+1)
+        for i in range(1, num_points+1):
             x[i] = int(x[i-1]) ^ int(v[c[i-1]])
             points[i-1, j] = x[i]/(2**32)
 

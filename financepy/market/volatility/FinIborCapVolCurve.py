@@ -4,11 +4,11 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinHelperFunctions import labelToString
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.DayCount import DayCount, FinDayCountTypes
 
 ##########################################################################
 # TODO: Calibration
@@ -18,25 +18,25 @@ from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
 
 
 class FinIborCapVolCurve():
-    ''' Class to manage a term structure of cap (flat) volatilities and to
+    """ Class to manage a term structure of cap (flat) volatilities and to
     do the conversion to caplet (spot) volatilities. This does not manage a
     strike dependency, only a term structure. The cap and caplet volatilies
     are keyed off the cap and caplet maturity dates. However this volatility
     only applies to the evolution of the Ibor rate out to the caplet start
-    dates. Note also that this class also handles floor vols.'''
+    dates. Note also that this class also handles floor vols."""
 
     def __init__(self,
                  curveDate,  # Valuation date for cap volatility
                  capMaturityDates,  # curve date + maturity dates for caps
                  capSigmas,  # Flat cap volatility for cap maturity dates
-                 dayCountType):
-        ''' Create a cap/floor volatility curve given a curve date, a list of
+                 day_count_type):
+        """ Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
         first date of the capDates must be equal to the curve date and first
         cap volatility for this date must equal zero. The internal times are
         calculated according to the provided day count convention. Note cap and
         floor volatilities are the same for the same strike and tenor, I just
-        refer to cap volatilities in the code for code simplicity. '''
+        refer to cap volatilities in the code for code simplicity. """
 
         numTimes = len(capMaturityDates)
         numVols = len(capSigmas)
@@ -71,31 +71,31 @@ class FinIborCapVolCurve():
 
         self._capMaturityDates = capMaturityDates
 
-        if isinstance(dayCountType, FinDayCountTypes) is False:
+        if isinstance(day_count_type, FinDayCountTypes) is False:
             raise FinError("DayCountType must be of type FinDayCountTypes.")
 
-        self._dayCountType = dayCountType
+        self._day_count_type = day_count_type
 
         self.generateCapletVols()
 
 ###############################################################################
 
     def generateCapletVols(self):
-        ''' Bootstrap caplet volatilities from cap volatilities using similar
+        """ Bootstrap caplet volatilities from cap volatilities using similar
         notation to Hull's book (page 32.11). The first volatility in the
-        vector of caplet vols is zero. '''
+        vector of caplet vols is zero. """
 
         self._times = []
         self._taus = []
 
-        dayCounter = FinDayCount(self._dayCountType)
+        day_counter = DayCount(self._day_count_type)
         prevDt = self._curveDate
         numCaps = len(self._capMaturityDates)
 
         for dt in self._capMaturityDates:
             t = (dt - self._curveDate) / gDaysInYear
             self._times.append(t)
-            tau = dayCounter.yearFrac(prevDt, dt)[0]
+            tau = day_counter.year_frac(prevDt, dt)[0]
             self._taus.append(tau)
             prevDt = dt
 
@@ -122,12 +122,12 @@ class FinIborCapVolCurve():
 ###############################################################################
 
     def capletVol(self, dt):
-        ''' Return the forward rate caplet/floorlet volatility for a specific
+        """ Return the forward rate caplet/floorlet volatility for a specific
         forward caplet expiry date. The period of the volatility is the
         the intercaplet spacing period used when creating the class object.
-        The volatility interpolation is piecewise flat. '''
+        The volatility interpolation is piecewise flat. """
 
-        if isinstance(dt, FinDate):
+        if isinstance(dt, Date):
             t = (dt - self._curveDate) / gDaysInYear
         else:
             t = dt
@@ -153,11 +153,11 @@ class FinIborCapVolCurve():
 ###############################################################################
 
     def capVol(self, dt):
-        ''' Return the cap flat volatility for a specific cap maturity date for
+        """ Return the cap flat volatility for a specific cap maturity date for
         the last caplet/floorlet in the cap/floor. The volatility interpolation
-        is piecewise flat. '''
+        is piecewise flat. """
 
-        if isinstance(dt, FinDate):
+        if isinstance(dt, Date):
             t = (dt - self._curveDate) / gDaysInYear
         else:
             t = dt
@@ -180,7 +180,7 @@ class FinIborCapVolCurve():
 ###############################################################################
 
     def __repr__(self):
-        ''' Output the contents of the FinCapVolCurve class object. '''
+        """ Output the contents of the FinCapVolCurve class object. """
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         numTimes = len(self._times)

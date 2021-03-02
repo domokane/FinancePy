@@ -11,7 +11,7 @@ from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierTyp
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierOption
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,8 +20,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityBarrierOption():
 
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 1, 2016)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 1, 2016)
     stockPrice = 100.0
     volatility = 0.20
     interestRate = 0.05
@@ -32,8 +32,8 @@ def test_FinEquityBarrierOption():
     scheme = FinGBMNumericalScheme.NORMAL
     processType = FinProcessTypes.GBM
 
-    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)    
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)    
+    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
 
     model = FinModelBlackScholes(volatility)
 
@@ -60,18 +60,18 @@ def test_FinEquityBarrierOption():
             K = 100.0
 
             option = FinEquityBarrierOption(
-                expiryDate, K, optionType, B, numObservationsPerYear)
+                expiry_date, K, optionType, B, numObservationsPerYear)
             value = option.value(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
             start = time.time()
             modelParams = (stockPrice, drift, volatility, scheme)
-            valueMC = option.valueMC(valueDate,
+            valueMC = option.valueMC(valuation_date,
                                      stockPrice,
-                                     discountCurve,
+                                     discount_curve,
                                      dividendCurve,
                                      processType,
                                      modelParams)
@@ -96,19 +96,19 @@ def test_FinEquityBarrierOption():
             K = 110.0
 
             option = FinEquityBarrierOption(
-                expiryDate, K, optionType, B, numObservationsPerYear)
+                expiry_date, K, optionType, B, numObservationsPerYear)
             value = option.value(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
             start = time.time()
             modelParams = (stockPrice, drift, volatility, scheme)
             valueMC = option.valueMC(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 processType,
                 modelParams)
@@ -140,30 +140,30 @@ def test_FinEquityBarrierOption():
         for stockPrice in stockPrices:
 
             barrierOption = FinEquityBarrierOption(
-                expiryDate, 100.0, optionType, B, numObservationsPerYear)
+                expiry_date, 100.0, optionType, B, numObservationsPerYear)
 
             value = barrierOption.value(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
             delta = barrierOption.delta(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
             vega = barrierOption.vega(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
             theta = barrierOption.theta(
-                valueDate,
+                valuation_date,
                 stockPrice,
-                discountCurve,
+                discount_curve,
                 dividendCurve,
                 model)
 

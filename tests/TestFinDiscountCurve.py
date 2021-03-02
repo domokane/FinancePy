@@ -8,11 +8,11 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.utils.Date import Date
+from financepy.utils.Frequency import FinFrequencyTypes
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.finutils.FinMath import scale
+from financepy.utils.Math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -27,18 +27,18 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurve():
 
     # Create a curve from times and discount factors
-    startDate = FinDate(1, 1, 2018)
+    start_date = Date(1, 1, 2018)
     years = np.linspace(0, 10, 6)
     rate = 0.05 + 0.005*years - 0.0003*years*years
     dfs = np.exp(-rate * years)
-    dates = startDate.addYears(years)
+    dates = start_date.addYears(years)
 
-    curve = FinDiscountCurve(startDate, dates, dfs, FinInterpTypes.FLAT_FWD_RATES)
+    curve = FinDiscountCurve(start_date, dates, dfs, FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
     plotYears = np.linspace(0, 12, 12*12+1)[1:]
-    plotDates = startDate.addYears(plotYears)
+    plotDates = start_date.addYears(plotYears)
 
     # Examine dependency of curve on compounding rate
     zeroRates_A = curve.zeroRate(plotDates, FinFrequencyTypes.ANNUAL)
@@ -65,10 +65,10 @@ def test_FinDiscountCurve():
 
     for interp in FinInterpTypes:
 
-        curve = FinDiscountCurve(startDate, dates, dfs, interp)
+        curve = FinDiscountCurve(start_date, dates, dfs, interp)
         fwdRates = curve.fwd(plotDates)
         zeroRates = curve.zeroRate(plotDates, FinFrequencyTypes.ANNUAL)
-        parRates = curve.swapRate(startDate, plotDates, FinFrequencyTypes.ANNUAL)
+        parRates = curve.swapRate(start_date, plotDates, FinFrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))

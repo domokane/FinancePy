@@ -8,15 +8,15 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from numba import jit, njit, float64, int64
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from ...models.FinModelBlackScholes import FinModelBlackScholes
@@ -32,15 +32,15 @@ from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
 
 from ...models.FinModelVolatilityFns import FinVolFunctionTypes
 
-from ...finutils.FinMath import norminvcdf
+from ...utils.Math import norminvcdf
 
 from ...models.FinModelBlackScholesAnalytical import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
-from ...finutils.FinDistribution import FinDistribution
+from ...utils.FinDistribution import FinDistribution
 
-from ...finutils.FinSolvers1D import newton_secant
-from ...finutils.FinSolversNM import nelder_mead
-from ...finutils.FinGlobalTypes import FinSolverTypes
+from ...utils.FinSolvers1D import newton_secant
+from ...utils.FinSolversNM import nelder_mead
+from ...utils.FinGlobalTypes import FinSolverTypes
 
 ###############################################################################
 # ISSUES
@@ -62,8 +62,8 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 
 # @njit(fastmath=True, cache=True)
 # def _g(K, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     option implied strike which is computed in the class below. '''
+#     """ This is the objective function used in the determination of the FX
+#     option implied strike which is computed in the class below. """
 
 #     s = args[0]
 #     t = args[1]
@@ -113,10 +113,10 @@ from ...finutils.FinGlobalTypes import FinSolverTypes
 
 @njit(fastmath=True, cache=True)
 def _obj(params, *args):
-    ''' Return a value that is minimised when the ATM, MS and RR vols have
+    """ Return a value that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the volTypeValue at a single time slice only.
-    '''
+    """
 
     t = args[0]
     f = args[1]
@@ -198,8 +198,8 @@ def _solveToHorizon(t, f,
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
 def volFunction(volFunctionTypeValue, params, f, k, t):
-    ''' Return the volatility for a strike using a given polynomial
-    interpolation following Section 3.9 of Iain Clark book. '''
+    """ Return the volatility for a strike using a given polynomial
+    interpolation following Section 3.9 of Iain Clark book. """
 
     if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
         vol = volFunctionClark(params, f, k, t)
@@ -233,11 +233,11 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 
 #@njit(cache=True, fastmath=True)
 # def _deltaFit(k, *args):
-#     ''' This is the objective function used in the determination of the FX
+#     """ This is the objective function used in the determination of the FX
 #     Option implied strike which is computed in the class below. I map it into
 #     inverse normcdf space to avoid the flat slope of this function at low vol
 #     and high K. It speeds up the code as it allows initial values close to
-#     the solution to be used. '''
+#     the solution to be used. """
 
 #     volTypeValue = args[0]
 #     s = args[1]
@@ -276,9 +276,9 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 #                             parameters,
 #                             strikes,
 #                             gaps):
-#     ''' Solve for the strike that sets the delta of the option equal to the
+#     """ Solve for the strike that sets the delta of the option equal to the
 #     target value of delta allowing the volatility to be a function of the
-#     strike. '''
+#     strike. """
 
 #     inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
 
@@ -305,10 +305,10 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 #                    deltaTarget,
 #                    deltaMethodValue,
 #                    volatility):
-#     ''' This function determines the implied strike of an FX option
+#     """ This function determines the implied strike of an FX option
 #     given a delta and the other option details. It uses a one-dimensional
 #     Newton root search algorith to determine the strike that matches an
-#     input volatility. '''
+#     input volatility. """
 
 #     # =========================================================================
 #     # IMPORTANT NOTE:
@@ -382,26 +382,26 @@ def volFunction(volFunctionTypeValue, params, f, k, t):
 
 
 class FinSwaptionVolSurface():
-    ''' Class to perform a calibration of a chosen parametrised surface to the
+    """ Class to perform a calibration of a chosen parametrised surface to the
     prices of swaptions at different expiry dates and swap tenors. There is a 
     choice of volatility function from cubic in delta to full SABR and SSVI. 
     Check out FinVolFunctionTypes. Visualising the volatility curve is useful. 
-    Also, there is no guarantee that the implied pdf will be positive.'''
+    Also, there is no guarantee that the implied pdf will be positive."""
 
     def __init__(self,
-                 valueDate: FinDate,
-                 expiryDates: (list),
+                 valuation_date: Date,
+                 expiry_dates: (list),
                  fwdSwapRates: (list, np.ndarray),
                  strikeGrid: (np.ndarray),
                  volatilityGrid: (np.ndarray),
                  volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.SABR,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
-        ''' Create the FinSwaptionVolSurface object by passing in market vol 
-        data for a list of strikes and expiry dates. '''
+        """ Create the FinSwaptionVolSurface object by passing in market vol 
+        data for a list of strikes and expiry dates. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._valueDate = valueDate
+        self._valuation_date = valuation_date
 
         if len(strikeGrid.shape) != 2:
             raise FinError("Strike grid must be a 2D grid of values")
@@ -415,7 +415,7 @@ class FinSwaptionVolSurface():
         if len(strikeGrid[0]) != len(volatilityGrid[0]):
             raise FinError("Strike grid and volatility grid must have same size")
 
-        if len(expiryDates) != len(volatilityGrid[0]):
+        if len(expiry_dates) != len(volatilityGrid[0]):
             raise FinError("Expiry dates not same size as volatility grid")
 
         self._numExpiryDates = len(volatilityGrid[0])
@@ -424,7 +424,7 @@ class FinSwaptionVolSurface():
         self._strikeGrid = strikeGrid
         self._volatilityGrid = volatilityGrid
 
-        self._expiryDates = expiryDates
+        self._expiry_dates = expiry_dates
         self._volatilityFunctionType = volatilityFunctionType
 
         self._fwdSwapRates = fwdSwapRates
@@ -433,8 +433,8 @@ class FinSwaptionVolSurface():
 
 ###############################################################################
 
-    def volatilityFromStrikeDate(self, K, expiryDate):
-        ''' Interpolates the Black-Scholes volatility from the volatility
+    def volatilityFromStrikeDate(self, K, expiry_date):
+        """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are 
         determined by determining the strike that reproduces the provided delta
@@ -442,9 +442,9 @@ class FinSwaptionVolSurface():
         overriden by a provided delta convention. The resulting volatilities 
         are then determined for each bracketing expiry time and linear 
         interpolation is done in variance space and then converted back to a 
-        lognormal volatility.'''
+        lognormal volatility."""
 
-        texp = (expiryDate - self._valueDate) / gDaysInYear
+        texp = (expiry_date - self._valuation_date) / gDaysInYear
 
         volTypeValue = self._volatilityFunctionType.value
 
@@ -517,11 +517,11 @@ class FinSwaptionVolSurface():
 
 ###############################################################################
 
-    # def deltaToStrike(self, callDelta, expiryDate, deltaMethod):
-    #     ''' Interpolates the strike at a delta and expiry date. Linear 
-    #     interpolation is used in strike.'''
+    # def deltaToStrike(self, callDelta, expiry_date, deltaMethod):
+    #     """ Interpolates the strike at a delta and expiry date. Linear 
+    #     interpolation is used in strike."""
 
-    #     texp = (expiryDate - self._valueDate) / gDaysInYear
+    #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
     #     volTypeValue = self._volatilityFunctionType.value
 
@@ -611,9 +611,9 @@ class FinSwaptionVolSurface():
 
 ###############################################################################
         
-    # def volatilityFromDeltaDate(self, callDelta, expiryDate, 
+    # def volatilityFromDeltaDate(self, callDelta, expiry_date, 
     #                             deltaMethod = None):
-    #     ''' Interpolates the Black-Scholes volatility from the volatility
+    #     """ Interpolates the Black-Scholes volatility from the volatility
     #     surface given a call option delta and expiry date. Linear interpolation
     #     is done in variance space. The smile strikes at bracketed dates are 
     #     determined by determining the strike that reproduces the provided delta
@@ -621,9 +621,9 @@ class FinSwaptionVolSurface():
     #     overriden by a provided delta convention. The resulting volatilities 
     #     are then determined for each bracketing expiry time and linear 
     #     interpolation is done in variance space and then converted back to a 
-    #     lognormal volatility.'''
+    #     lognormal volatility."""
 
-    #     texp = (expiryDate - self._valueDate) / gDaysInYear
+    #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
     #     volTypeValue = self._volatilityFunctionType.value
 
@@ -731,7 +731,7 @@ class FinSwaptionVolSurface():
 ###############################################################################
 
     def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
-        ''' Main function to construct the vol surface. '''
+        """ Main function to construct the vol surface. """
 
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
@@ -764,8 +764,8 @@ class FinSwaptionVolSurface():
 
         for i in range(0, numExpiryDates):
 
-            expiryDate = self._expiryDates[i]
-            texp = (expiryDate - self._valueDate) / gDaysInYear
+            expiry_date = self._expiry_dates[i]
+            texp = (expiry_date - self._valuation_date) / gDaysInYear
             self._texp[i] = texp
 
         #######################################################################
@@ -799,14 +799,14 @@ class FinSwaptionVolSurface():
 ###############################################################################
 
     def checkCalibration(self, verbose: bool, tol: float = 1e-6):
-        ''' Compare calibrated vol surface with market and output a report
+        """ Compare calibrated vol surface with market and output a report
         which sets out the quality of fit to the ATM and 10 and 25 delta market
-        strangles and risk reversals. '''
+        strangles and risk reversals. """
 
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self._valueDate)
+            print("VALUE DATE:", self._valuation_date)
             print("STOCK PRICE:", self._stockPrice)
             print("==========================================================")
 
@@ -814,21 +814,21 @@ class FinSwaptionVolSurface():
 
         for i in range(0, self._numExpiryDates):
 
-            expiryDate = self._expiryDates[i]
+            expiry_date = self._expiry_dates[i]
             print("==========================================================")
 
             for j in range(0, self._numStrikes):
                 
                 strike = self._strikeGrid[j][i]
 
-                fittedVol = self.volatilityFromStrikeDate(strike, expiryDate)
+                fittedVol = self.volatilityFromStrikeDate(strike, expiry_date)
 
                 mktVol = self._volatilityGrid[j][i]
                 
                 diff = fittedVol - mktVol
                 
                 print("%s %12.3f %7.4f %7.4f %7.5f"% 
-                      (expiryDate, strike, 
+                      (expiry_date, strike, 
                        fittedVol*100.0, mktVol*100, diff*100))
 
         print("==========================================================")
@@ -836,8 +836,8 @@ class FinSwaptionVolSurface():
 ###############################################################################
 
     # def impliedDbns(self, lowS, highS, numIntervals):
-    #     ''' Calculate the pdf for each tenor horizon. Returns a list of
-    #     FinDistribution objects, one for each tenor horizon. '''
+    #     """ Calculate the pdf for each tenor horizon. Returns a list of
+    #     FinDistribution objects, one for each tenor horizon. """
 
     #     dbns = []
 
@@ -848,7 +848,7 @@ class FinSwaptionVolSurface():
 
     #         dS = (highS - lowS)/ numIntervals
 
-    #         disDF = self._discountCurve._df(t)
+    #         disDF = self._discount_curve._df(t)
     #         divDF = self._dividendCurve._df(t)
 
     #         r = -np.log(disDF) / t
@@ -881,8 +881,8 @@ class FinSwaptionVolSurface():
 ###############################################################################
 
     def plotVolCurves(self):
-        ''' Generates a plot of each of the vol curves implied by the market 
-        and fitted. '''
+        """ Generates a plot of each of the vol curves implied by the market 
+        and fitted. """
         
         volTypeVal = self._volatilityFunctionType.value
 
@@ -891,7 +891,7 @@ class FinSwaptionVolSurface():
             lowK = self._strikeGrid[0][tenorIndex] * 0.9
             highK = self._strikeGrid[-1][tenorIndex] * 1.1
 
-            expiryDate = self._expiryDates[tenorIndex]
+            expiry_date = self._expiry_dates[tenorIndex]
             plt.figure()
 
             ks = []
@@ -907,14 +907,14 @@ class FinSwaptionVolSurface():
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.volatilityFromStrikeDate(K, expiryDate) * 100.
+                fittedVol = self.volatilityFromStrikeDate(K, expiry_date) * 100.
                 fittedVols.append(fittedVol)
                 K = K + dK
 
-            labelStr = "FITTED AT " + str(self._expiryDates[tenorIndex])
+            labelStr = "FITTED AT " + str(self._expiry_dates[tenorIndex])
             plt.plot(ks, fittedVols, label=labelStr)
 
-            labelStr = "MARKET AT " + str(self._expiryDates[tenorIndex])
+            labelStr = "MARKET AT " + str(self._expiry_dates[tenorIndex])
             mktVols = self._volatilityGrid[:, tenorIndex] * 100.0
             plt.plot(self._strikeGrid[:, tenorIndex], mktVols, 'o', label=labelStr)
 
@@ -929,7 +929,7 @@ class FinSwaptionVolSurface():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VALUE DATE", self._valueDate)
+        s += labelToString("VALUE DATE", self._valuation_date)
         s += labelToString("STOCK PRICE", self._stockPrice)
         s += labelToString("ATM METHOD", self._atmMethod)
         s += labelToString("DELTA METHOD", self._deltaMethod)
@@ -939,7 +939,7 @@ class FinSwaptionVolSurface():
 
             s += "\n"
 
-            s += labelToString("EXPIRY DATE", self._expiryDates[i])
+            s += labelToString("EXPIRY DATE", self._expiry_dates[i])
             s += labelToString("TIME (YRS)", self._texp[i])
             s += labelToString("FWD FX", self._F0T[i])
 
@@ -949,15 +949,15 @@ class FinSwaptionVolSurface():
                 
                 k = self._strikes[j]
                 vol = self._volGrid[i][j]
-                print(expiryDate, k, vol)
+                print(expiry_date, k, vol)
 
         return s
 
 ###############################################################################
 
     def _print(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
+        """ Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. """
         print(self)
 
 ###############################################################################

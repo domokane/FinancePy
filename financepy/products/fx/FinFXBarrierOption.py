@@ -7,13 +7,13 @@ import numpy as np
 from enum import Enum
 
 
-from ...finutils.FinError import FinError
-from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.Math import N
+from ...utils.FinGlobalVariables import gDaysInYear
 from ...products.fx.FinFXOption import FinFXOption
 from ...models.FinProcessSimulator import FinProcessSimulator
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 
 ###############################################################################
 
@@ -34,20 +34,20 @@ class FinFXBarrierTypes(Enum):
 class FinFXBarrierOption(FinFXOption):
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikeFXRate: float,  # 1 unit of foreign in domestic
-                 currencyPair: str,    # FORDOM
+                 currencyPair: str,  # FORDOM
                  optionType: FinFXBarrierTypes,
                  barrierLevel: float,
                  numObservationsPerYear: int,
                  notional: float,
                  notionalCurrency: str):
-        ''' Create FX Barrier option product. This is an option that cancels if
-        the FX rate crosses a barrier during the life of the option. '''
+        """ Create FX Barrier option product. This is an option that cancels if
+        the FX rate crosses a barrier during the life of the option. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikeFXRate = float(strikeFXRate)
         self._currencyPair = currencyPair
         self._barrierLevel = float(barrierLevel)
@@ -59,13 +59,13 @@ class FinFXBarrierOption(FinFXOption):
 ##########################################################################
 
     def value(self,
-              valueDate,
+              valuation_date,
               spotFXRate,
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' Value FX Barrier Option using Black-Scholes model with closed-form
-        analytical models. '''
+        """ Value FX Barrier Option using Black-Scholes model with closed-form
+        analytical models. """
 
         # This prices the option using the formulae given in the paper
         # by Clewlow, Llanos and Strickland December 1994 which can be found at
@@ -75,7 +75,7 @@ class FinFXBarrierOption(FinFXOption):
         S0 = spotFXRate
         h = self._barrierLevel
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
         lnS0k = log(float(S0)/K)
         sqrtT = sqrt(t)
 
@@ -234,7 +234,7 @@ class FinFXBarrierOption(FinFXOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
+                valuation_date,
                 spotFXRate,
                 domInterestRate,
                 processType,
@@ -242,9 +242,9 @@ class FinFXBarrierOption(FinFXOption):
                 numAnnSteps=552,
                 numPaths=5000,
                 seed=4242):
-        ''' Value the FX Barrier Option using Monte Carlo. '''
+        """ Value the FX Barrier Option using Monte Carlo. """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
         numTimeSteps = int(t * numAnnSteps)
         K = self._strikeFXRate
         B = self._barrierLevel
@@ -360,7 +360,7 @@ class FinFXBarrierOption(FinFXOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE FX RATE", self._strikeFXRate)
         s += labelToString("CURRENCY PAIR", self._currencyPair)
         s += labelToString("OPTION TYPE", self._optionType)
@@ -373,8 +373,8 @@ class FinFXBarrierOption(FinFXOption):
 ###############################################################################
 
     def _print(self):
-        ''' Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. '''
+        """ Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. """
         print(self)
 
 

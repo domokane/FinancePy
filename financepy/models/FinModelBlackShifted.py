@@ -7,10 +7,10 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..finutils.FinHelperFunctions import labelToString
-from ..finutils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinHelperFunctions import labelToString
+from ..utils.FinGlobalTypes import FinOptionTypes
 
-from ..finutils.FinMath import N
+from ..utils.Math import N
 
 ###############################################################################
 # NOTE: Keeping this separate from SABR for the moment.
@@ -18,13 +18,13 @@ from ..finutils.FinMath import N
 
 
 class FinModelBlackShifted():
-    ''' Black's Model which prices call and put options in the forward
+    """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. This model also allows
     the distribution to be shifted to the negative in order to allow for
-    negative interest rates. '''
+    negative interest rates. """
 
     def __init__(self, volatility, shift, implementation=0):
-        ''' Create FinModel black using parameters. '''
+        """ Create FinModel black using parameters. """
         self._volatility = volatility
         self._shift = shift
         self._implementation = 0
@@ -41,9 +41,9 @@ class FinModelBlackShifted():
               timeToExpiry,  # time to expiry in years
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Price a derivative using Black's model which values in the forward
+        """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. The sign of the shift is the
-        same as Matlab. '''
+        same as Matlab. """
 
         s = self._shift
         f = forwardRate

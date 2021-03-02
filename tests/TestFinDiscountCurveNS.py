@@ -8,9 +8,9 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 from financepy.market.curves.FinDiscountCurveNS import FinDiscountCurveNS
-from financepy.finutils.FinMath import scale
+from financepy.utils.Math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -24,7 +24,7 @@ def test_FinNelsonSiegelCurve():
 
     tau = 2.0
     times = np.linspace(0.0, 10.0, 5)
-    curveDate = FinDate(6, 6, 2019)
+    curveDate = Date(6, 6, 2019)
     dates = curveDate.addYears(times)
 
     curve1 = FinDiscountCurveNS(curveDate, 1, 0, 0, tau)

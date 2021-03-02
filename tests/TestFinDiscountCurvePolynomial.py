@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from financepy.market.curves.FinDiscountCurvePoly import FinDiscountCurvePoly
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,7 +25,7 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurvePolynomial():
 
     times = np.linspace(0.00, 10.0, 21)
-    curveDate = FinDate(2, 2, 2019)
+    curveDate = Date(2, 2, 2019)
     dates = curveDate.addYears(times)
     coeffs = [0.0004, -0.0001, 0.00000010]
     curve1 = FinDiscountCurvePoly(curveDate, coeffs)

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 from financepy.models.FinModelVolatilityFns import volFunctionClark
@@ -35,15 +35,15 @@ def test_FinOptionImpliedDbn():
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valueDate = FinDate(10, 4, 2020)
+        valuation_date = Date(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -58,7 +58,7 @@ def test_FinOptionImpliedDbn():
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FinFXVolSurface(valueDate,
+        fxMarket = FinFXVolSurface(valuation_date,
                                    spotFXRate,
                                    currencyPair,
                                    notionalCurrency,

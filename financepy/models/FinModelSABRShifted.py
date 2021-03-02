@@ -6,10 +6,10 @@ import numpy as np
 from numba import njit, float64
 from scipy.optimize import minimize
 
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinError import FinError
-from ..finutils.FinMath import N
-from ..finutils.FinHelperFunctions import labelToString
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinError import FinError
+from ..utils.Math import N
+from ..utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # TODO: Should I merge this with SABR ?
@@ -20,14 +20,14 @@ from ..finutils.FinHelperFunctions import labelToString
 
 @njit
 def _x(rho, z):
-    '''Return function x used in Hagan's 2002 SABR lognormal vol expansion.'''
+    """Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
     a = (1.0 - 2.0*rho*z + z**2)**.5 + z - rho
     b = 1.0 - rho
     return np.log(a / b)
 
 @njit
 def volFunctionShiftedSABR(params, f, k, t):
-    ''' Black volatility implied by SABR model. '''
+    """ Black volatility implied by SABR model. """
 
     alpha = params[0]
     beta = params[1]
@@ -72,16 +72,16 @@ def volFunctionShiftedSABR(params, f, k, t):
 
 
 class FinModelSABRShifted():
-    ''' SABR - Shifted Stochastic alpha beta rho model by Hagan et al. is a 
+    """ SABR - Shifted Stochastic alpha beta rho model by Hagan et al. is a 
     stochastic volatility model where alpha controls the implied volatility,
     beta is the exponent on the the underlying asset's process so beta = 0
     is normal and beta = 1 is lognormal, rho is the correlation between the 
-    underlying and the volatility process. The shift allows negative rates.'''
+    underlying and the volatility process. The shift allows negative rates."""
 
     def __init__(self, alpha, beta, rho, nu, shift):
-        ''' Create FinModelSABRShifted with all of the model parameters. We 
+        """ Create FinModelSABRShifted with all of the model parameters. We 
         also provide functions below to assist with the calibration of the 
-        value of alpha. '''
+        value of alpha. """
 
         self._alpha = alpha
         self._beta = beta
@@ -92,7 +92,7 @@ class FinModelSABRShifted():
 ###############################################################################
 
     def blackVol(self, f, k, t):
-        ''' Black volatility from SABR model using Hagan et al. approx. '''
+        """ Black volatility from SABR model using Hagan et al. approx. """
 
         params = np.array([self._alpha, self._beta, self._rho, 
                            self._nu, self._shift])
@@ -137,8 +137,8 @@ class FinModelSABRShifted():
               timeToExpiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
-        ''' Price an option using Black's model which values in the forward
-        measure following a change of measure. '''
+        """ Price an option using Black's model which values in the forward
+        measure following a change of measure. """
 
         f = forwardRate
         t = timeToExpiry
@@ -159,9 +159,9 @@ class FinModelSABRShifted():
 ###############################################################################
 
     def setAlphaFromBlackVol(self, blackVol, forward, strike, timeToExpiry):
-        ''' Estimate the value of the alpha coefficient of the SABR model
+        """ Estimate the value of the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
-        to the input black vol. This uses a numerical 1D solver. '''
+        to the input black vol. This uses a numerical 1D solver. """
 
         texp = timeToExpiry
         f = forward
@@ -187,11 +187,11 @@ class FinModelSABRShifted():
 ###############################################################################
 
     def setAlphaFromATMBlackVol(self, blackVol, atmStrike, timeToExpiry):
-        ''' We solve cubic equation for the unknown variable alpha for the 
+        """ We solve cubic equation for the unknown variable alpha for the 
         special ATM case of the strike equalling the forward following Hagan 
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
-        chosen.''' 
+        chosen.""" 
 
         # For shifted SABR
         atmStrike = atmStrike + self._shift
@@ -216,7 +216,7 @@ class FinModelSABRShifted():
 ###############################################################################
 
     def __repr__(self):
-        ''' Return string with class details. '''
+        """ Return string with class details. """
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("Alpha", self._alpha)

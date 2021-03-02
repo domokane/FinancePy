@@ -9,7 +9,7 @@ import numpy as np
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 from financepy.market.volatility.FinEquityVolSurface import FinEquityVolSurface
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -27,14 +27,14 @@ PLOT_GRAPHS = False
 
 def test_FinEquityVolSurface(verboseCalibration):
 
-    valueDate = FinDate(11, 1, 2021)
+    valuation_date = Date(11, 1, 2021)
 
     stockPrice = 3800.0 # Check
 
-    expiryDates = [FinDate(11, 2, 2021), FinDate(11, 3, 2021),
-                   FinDate(11, 4, 2021), FinDate(11, 7, 2021), 
-                   FinDate(11,10, 2021), FinDate(11, 1, 2022), 
-                   FinDate(11, 1, 2023)]
+    expiry_dates = [Date(11, 2, 2021), Date(11, 3, 2021),
+                   Date(11, 4, 2021), Date(11, 7, 2021),
+                   Date(11, 10, 2021), Date(11, 1, 2022),
+                   Date(11, 1, 2023)]
 
     strikes = np.array([3037, 3418, 3608, 3703, 3798, 
                         3893, 3988, 4178, 4557])
@@ -51,18 +51,18 @@ def test_FinEquityVolSurface(verboseCalibration):
     volSurface = volSurface / 100.0
 
     r = 0.020  # USD
-    discountCurve = FinDiscountCurveFlat(valueDate, r)
+    discount_curve = FinDiscountCurveFlat(valuation_date, r)
 
     q = 0.010  # USD
-    dividendCurve = FinDiscountCurveFlat(valueDate, q)
+    dividendCurve = FinDiscountCurveFlat(valuation_date, q)
 
     volFunctionType = FinVolFunctionTypes.SVI
 
-    equitySurface = FinEquityVolSurface(valueDate,
+    equitySurface = FinEquityVolSurface(valuation_date,
                                         stockPrice,
-                                        discountCurve,
+                                        discount_curve,
                                         dividendCurve,
-                                        expiryDates,
+                                        expiry_dates,
                                         strikes,
                                         volSurface,
                                         volFunctionType)
@@ -82,8 +82,8 @@ def test_FinEquityVolSurface(verboseCalibration):
         dbns = equitySurface.impliedDbns(mins, maxs, 1000)
 
         for i in range(0, len(dbns)):
-            expiryDateStr = str(equitySurface._expiryDates[i])
-            plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiryDateStr)
+            expiry_dateStr = str(equitySurface._expiry_dates[i])
+            plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_dateStr)
             plt.title(volFunctionType)
             plt.legend()
             print("SUM:", dbns[i].sum())
@@ -91,10 +91,10 @@ def test_FinEquityVolSurface(verboseCalibration):
     deltas = np.linspace(0.10, 0.90, 9)
 
     testCases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
-    for expiryDate in expiryDates:
+    for expiry_date in expiry_dates:
         for delta in deltas:
-            vol = equitySurface.volatilityFromDeltaDate(delta, expiryDate)
-            testCases.print(expiryDate, delta, vol[0], vol[1])
+            vol = equitySurface.volatilityFromDeltaDate(delta, expiry_date)
+            testCases.print(expiry_date, delta, vol[0], vol[1])
 
 ###############################################################################
 

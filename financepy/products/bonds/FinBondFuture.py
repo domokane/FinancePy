@@ -2,10 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinGlobalVariables import gDaysInYear
 from ...products.bonds.FinBond import FinBond
-from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 # TODO: Examine other exchange conventions.
@@ -14,13 +14,13 @@ from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
 
 
 class FinBondFuture(object):
-    ''' Class for managing futures contracts on government bonds that follows
-    CME conventions and related analytics. '''
+    """ Class for managing futures contracts on government bonds that follows
+    CME conventions and related analytics. """
 
     def __init__(self,
                  tickerName: str,
-                 firstDeliveryDate: FinDate,
-                 lastDeliveryDate: FinDate,
+                 firstDeliveryDate: Date,
+                 lastDeliveryDate: Date,
                  contractSize: int,
                  coupon: float):
 
@@ -36,28 +36,28 @@ class FinBondFuture(object):
 
     def conversionFactor(self,
                          bond: FinBond):
-        ''' Determine the conversion factor for a specific bond using CME
+        """ Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
         must round the bond maturity (starting its life on the first delivery
         date) to the nearest 3 month multiple and then calculate the bond clean
-        price. '''
+        price. """
 
         # See
         # https://www.cmegroup.com//trading//interest-rates//us-treasury-futures-conversion-factor-lookup-tables.html
         # for a reference.
 
-        tmat = (bond._maturityDate - self._firstDeliveryDate) / gDaysInYear
+        tmat = (bond._maturity_date - self._firstDeliveryDate) / gDaysInYear
         roundedTmatInMonths = int(tmat * 4.0) * 3
         newMat = self._firstDeliveryDate.addMonths(roundedTmatInMonths)
         face = 1.0
 
-        issueDate = FinDate(newMat._d, newMat._m, 2000)
+        issue_date = Date(newMat._d, newMat._m, 2000)
 
-        newBond = FinBond(issueDate,
+        newBond = FinBond(issue_date,
                           newMat,
                           bond._coupon,
-                          bond._freqType,
-                          bond._accrualType,
+                          bond._freq_type,
+                          bond._accrual_type,
                           face)
 
         p = newBond.cleanPriceFromYTM(self._firstDeliveryDate,
@@ -71,27 +71,27 @@ class FinBondFuture(object):
 
     def principalInvoicePrice(self,
                               bond: FinBond,
-                              futuresPrice: float):
-        ' The principal invoice price as defined by the CME.'''
+                              futures_price: float):
+        """ The principal invoice price as defined by the CME."""
         cf = self.conversionFactor(bond)
-        pip = self._contractSize * (futuresPrice * cf) / 100.0
+        pip = self._contractSize * (futures_price * cf) / 100.0
         pip = round(pip, 2)
         return pip
 
 ###############################################################################
 
     def totalInvoiceAmount(self,
-                           settlementDate: FinDate,
+                           settlement_date: Date,
                            bond: FinBond,
-                           futuresPrice: float):
+                           futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accruedInterest is None:
-            bond.calculateFlowDates(settlementDate)
+            bond.calculateFlowDates(settlement_date)
 
         accd = bond._accruedInterest
 
-        pip = self.principalInvoicePrice(bond, futuresPrice)
+        pip = self.principalInvoicePrice(bond, futures_price)
         accrued = accd * self._contractSize / 100.0
         tia = pip + accrued
         tia = round(tia, 2)
@@ -102,13 +102,13 @@ class FinBondFuture(object):
     def cheapestToDeliver(self,
                           bonds: list,
                           bondCleanPrices: list,
-                          futuresPrice: float):
-        ''' Determination of CTD as deliverable bond with lowest cost to buy
-        versus what is received when the bond is delivered. '''
+                          futures_price: float):
+        """ Determination of CTD as deliverable bond with lowest cost to buy
+        versus what is received when the bond is delivered. """
         ctdBond = None
         ctdNet = -self._contractSize * 100
         for bondCleanPrice, bond in zip(bondCleanPrices, bonds):
-            receiveOnFuture = self.principalInvoicePrice(bond, futuresPrice)
+            receiveOnFuture = self.principalInvoicePrice(bond, futures_price)
             payForBond = self._contractSize * bondCleanPrice / 100.0
             net = receiveOnFuture - payForBond
             if net > ctdNet:
@@ -122,9 +122,9 @@ class FinBondFuture(object):
     def deliveryGainLoss(self,
                          bond: FinBond,
                          bondCleanPrice: float,
-                         futuresPrice: float):
-        ''' Determination of what is received when the bond is delivered. '''
-        receiveOnFuture = self.principalInvoicePrice(bond, futuresPrice)
+                         futures_price: float):
+        """ Determination of what is received when the bond is delivered. """
+        receiveOnFuture = self.principalInvoicePrice(bond, futures_price)
         payForBond = self._contractSize * bondCleanPrice / 100.0
         net = receiveOnFuture - payForBond
         return net, payForBond, receiveOnFuture
@@ -143,7 +143,7 @@ class FinBondFuture(object):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

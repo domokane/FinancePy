@@ -5,10 +5,10 @@
 import numpy as np
 from numba import njit
 
-from ..finutils.FinError import FinError
-from ..finutils.FinMath import N
+from ..utils.FinError import FinError
+from ..utils.Math import N
 from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
-from ..finutils.FinHelperFunctions import labelToString
+from ..utils.FinHelperFunctions import labelToString
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 
@@ -19,11 +19,11 @@ interp = FinInterpTypes.FLAT_FWD_RATES.value
 
 @njit(fastmath=True, cache=True)
 def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
-    ''' Forward discount factor as seen at some time t which may be in the
+    """ Forward discount factor as seen at some time t which may be in the
     future for payment at time T where Rt is the delta-period short rate
     seen at time t and pt is the discount factor to time t, ptd is the one
     period discount factor to time t+dt and pT is the discount factor from
-    now until the payment of the 1 dollar of the discount factor. '''
+    now until the payment of the 1 dollar of the discount factor. """
 
     BtT = (T-t)
     BtDelta = delta
@@ -41,9 +41,9 @@ def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
 class FinModelRatesHL():
 
     def __init__(self, sigma):
-        ''' Construct Ho-Lee model using single parameter of volatility. The
+        """ Construct Ho-Lee model using single parameter of volatility. The
         dynamical equation is dr = theta(t) dt + sigma * dW. Any no-arbitrage
-        fitting is done within functions below. '''
+        fitting is done within functions below. """
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
@@ -52,24 +52,24 @@ class FinModelRatesHL():
 
 ###############################################################################
 
-    def zcb(self, rt1, t1, t2, discountCurve):
+    def zcb(self, rt1, t1, t2, discount_curve):
 
         delta = t2 - t1
         dt = 1e-10
-        pt1 = discountCurve.df(t1)
-        pt1p = discountCurve.df(t1 + dt)
-        pt2 = discountCurve.df(t2)
+        pt1 = discount_curve.df(t1)
+        pt1p = discount_curve.df(t1 + dt)
+        pt2 = discount_curve.df(t2)
         z = P_Fast(t1, t2, rt1, delta, pt1, pt1p, pt2, self._sigma)
         return z
 
 ###############################################################################
 
     def optionOnZCB(self, texp, tmat,
-                    strikePrice, faceAmount,
+                    strikePrice, face_amount,
                     dfTimes, dfValues):
-        ''' Price an option on a zero coupon bond using analytical solution of
+        """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
-        date and maturity date. '''
+        date and maturity date. """
 
         if texp > tmat:
             raise FinError("Option expiry after bond matures.")
@@ -84,17 +84,17 @@ class FinModelRatesHL():
 
         sigmap = sigma * (tmat-texp) * np.sqrt(texp)
 
-        h = np.log((faceAmount*ptmat)/(strikePrice*ptexp))/sigmap+sigmap/2.0
+        h = np.log((face_amount*ptmat)/(strikePrice*ptexp))/sigmap+sigmap/2.0
 
-        callValue = faceAmount * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
-        putValue = strikePrice * ptexp * N(-h+sigmap) - faceAmount * ptmat * N(-h)
+        callValue = face_amount * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
+        putValue = strikePrice * ptexp * N(-h+sigmap) - face_amount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
 
     def __repr__(self):
-        ''' Return string with class details. '''
+        """ Return string with class details. """
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("Sigma", self._sigma)

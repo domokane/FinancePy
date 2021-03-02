@@ -5,10 +5,10 @@
 #TODO  Add Japan 
 
 
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinError import FinError
-from ...finutils.FinCalendar import FinCalendarTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.DayCount import FinDayCountTypes
+from ...utils.FinError import FinError
+from ...utils.Calendar import FinCalendarTypes
 
 
 from enum import Enum
@@ -56,9 +56,9 @@ class FinBondMarkets(Enum):
 ###############################################################################
     
 def getTreasuryBondMarketConventions(country):
-    ''' Returns the day count convention for accrued interest, the frequency
+    """ Returns the day count convention for accrued interest, the frequency
     and the number of days from trade date to settlement date.
-    This is for Treasury markets. And for secondary bond markets. '''
+    This is for Treasury markets. And for secondary bond markets. """
 
     annual = FinFrequencyTypes.ANNUAL
     semi_annual = FinFrequencyTypes.SEMI_ANNUAL

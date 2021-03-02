@@ -8,7 +8,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import *
+from financepy.utils.Date import *
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
@@ -18,7 +18,7 @@ from financepy.market.curves.FinDiscountCurvePWF import FinDiscountCurvePWF
 from financepy.market.curves.FinDiscountCurvePWL import FinDiscountCurvePWL
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 from financepy.market.curves.FinDiscountCurvePoly import FinDiscountCurvePoly
-from financepy.finutils.FinGlobalVariables import gDaysInYear
+from financepy.utils.FinGlobalVariables import gDaysInYear
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -35,45 +35,45 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurves():
 
     # Create a curve from times and discount factors
-    valuationDate = FinDate(1, 1, 2018)
+    valuation_date = Date(1, 1, 2018)
     years = [1.0, 2.0, 3.0, 4.0, 5.0]
-    dates = valuationDate.addYears(years)
+    dates = valuation_date.addYears(years)
     years2 = []
 
     for dt in dates:
-        y = (dt - valuationDate) / gDaysInYear
+        y = (dt - valuation_date) / gDaysInYear
         years2.append(y)
 
     rates = np.array([0.05, 0.06, 0.065, 0.07, 0.075])
     discountFactors = np.exp(-np.array(rates) * np.array(years2))
     curvesList = []
 
-    finDiscountCurve = FinDiscountCurve(valuationDate, dates, discountFactors,
+    finDiscountCurve = FinDiscountCurve(valuation_date, dates, discountFactors,
                                         FinInterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
-    finDiscountCurveFlat = FinDiscountCurveFlat(valuationDate, 0.05)
+    finDiscountCurveFlat = FinDiscountCurveFlat(valuation_date, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = FinDiscountCurveNS(valuationDate, 0.0305, -0.01,
+    finDiscountCurveNS = FinDiscountCurveNS(valuation_date, 0.0305, -0.01,
                                             0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = FinDiscountCurveNSS(valuationDate, 0.035, -0.02,
+    finDiscountCurveNSS = FinDiscountCurveNSS(valuation_date, 0.035, -0.02,
                                               0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = FinDiscountCurvePoly(valuationDate, [0.05, 0.002,
+    finDiscountCurvePoly = FinDiscountCurvePoly(valuation_date, [0.05, 0.002,
                                                                 -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
-    finDiscountCurvePWF = FinDiscountCurvePWF(valuationDate, dates, rates)
+    finDiscountCurvePWF = FinDiscountCurvePWF(valuation_date, dates, rates)
     curvesList.append(finDiscountCurvePWF)
 
-    finDiscountCurvePWL = FinDiscountCurvePWL(valuationDate, dates, rates)
+    finDiscountCurvePWL = FinDiscountCurvePWL(valuation_date, dates, rates)
     curvesList.append(finDiscountCurvePWL)
 
-    finDiscountCurveZeros = FinDiscountCurveZeros(valuationDate, dates, rates)
+    finDiscountCurveZeros = FinDiscountCurveZeros(valuation_date, dates, rates)
     curvesList.append(finDiscountCurveZeros)
 
     curveNames = []
@@ -84,7 +84,7 @@ def test_FinDiscountCurves():
     testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
 
     years = np.linspace(1, 10, 10)
-    fwdMaturityDates = valuationDate.addYears(years)
+    fwdMaturityDates = valuation_date.addYears(years)
 
     testCases.banner("######################################################")
     testCases.banner("SINGLE CALLS")
@@ -96,7 +96,7 @@ def test_FinDiscountCurves():
             zeroRate = curve.zeroRate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwdRate = curve.fwdRate(fwdMaturityDate, tenor)
-            swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
+            swapRate = curve.swapRate(valuation_date, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
             testCases.print("%-20s" % name,
@@ -117,7 +117,7 @@ def test_FinDiscountCurves():
         zeroRate = curve.zeroRate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwdRate = curve.fwdRate(fwdMaturityDates, tenor)
-        swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
+        swapRate = curve.swapRate(valuation_date, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
@@ -133,8 +133,8 @@ def test_FinDiscountCurves():
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
-        fwdDates = valuationDate.addYears(years)
-        fwdDates2 = valuationDate.addYears(years2)
+        fwdDates = valuation_date.addYears(years)
+        fwdDates2 = valuation_date.addYears(years2)
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):

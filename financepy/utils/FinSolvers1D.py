@@ -527,7 +527,7 @@ def brent_max(func, a, b, args, xtol=1e-5, maxiter=500):
 
 #@jit(fastmath=True, cache=True)
 def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
-    ''' Bisection algorithm. You need to supply root brackets x1 and x2. '''
+    """ Bisection algorithm. You need to supply root brackets x1 and x2. """
 
     if np.abs(x1-x2) < 1e-10:
         raise FinError("Brackets should not be equal")

@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ..finutils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinGlobalTypes import FinOptionTypes
 
 import numpy as np
 from numba import njit, float64, int64
@@ -18,20 +18,20 @@ def crrTreeVal(stockPrice,
                ccInterestRate,  # continuously compounded
                ccDividendRate,  # continuously compounded
                volatility,  # Black scholes volatility
-               numStepsPerYear,
+               num_steps_per_year,
                timeToExpiry,
                optionType,
                strikePrice,
                isEven):
-    ''' Value an American option using a Binomial Treee '''
+    """ Value an American option using a Binomial Treee """
 
-    numSteps = int(numStepsPerYear * timeToExpiry)
+    numSteps = int(num_steps_per_year * timeToExpiry)
 
     if numSteps < 30:
         numSteps = 30
 
     ## OVERRIDE JUST TO SEE
-    numSteps = numStepsPerYear
+    numSteps = num_steps_per_year
 
     # if the number of steps is even but we want odd then make it odd
     if numSteps % 2 == 0 and isEven == 0:
@@ -148,18 +148,18 @@ def crrTreeValAvg(stockPrice,
                   ccInterestRate,  # continuously compounded
                   ccDividendRate,  # continuously compounded
                   volatility,  # Black scholes volatility
-                  numStepsPerYear,
+                  num_steps_per_year,
                   timeToExpiry,
                   optionType,
                   strikePrice):
-    ''' Calculate the average values off the tree using an even and an odd
-    number of time steps. '''
+    """ Calculate the average values off the tree using an even and an odd
+    number of time steps. """
 
     value1 = crrTreeVal(stockPrice,
                         ccInterestRate,
                         ccDividendRate,
                         volatility,
-                        numStepsPerYear,
+                        num_steps_per_year,
                         timeToExpiry,
                         optionType,
                         strikePrice,
@@ -169,7 +169,7 @@ def crrTreeValAvg(stockPrice,
                         ccInterestRate,
                         ccDividendRate,
                         volatility,
-                        numStepsPerYear,
+                        num_steps_per_year,
                         timeToExpiry,
                         optionType,
                         strikePrice,

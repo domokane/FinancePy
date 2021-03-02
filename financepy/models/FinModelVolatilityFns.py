@@ -5,8 +5,8 @@
 import numpy as np
 from numba import njit, float64
 
-from ..finutils.FinMath import N
-from ..finutils.FinError import FinError
+from ..utils.Math import N
+from ..utils.FinError import FinError
 
 ###############################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
@@ -31,9 +31,9 @@ class FinVolFunctionTypes(Enum):
 @njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def volFunctionClark(params, f, k, t):
-    ''' Volatility Function in book by Iain Clark generalised to allow for 
+    """ Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
-    The exact reference is Clark Page 59. '''
+    The exact reference is Clark Page 59. """
 
     if f < 0.0:
         print("f:", f)
@@ -59,12 +59,12 @@ def volFunctionClark(params, f, k, t):
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
 def volFunctionBloomberg(params, f, k, t):
-    ''' Volatility Function similar to the one used by Bloomberg. It is 
+    """ Volatility Function similar to the one used by Bloomberg. It is 
     a quadratic function in the spot delta of the option. It can therefore 
     go negative so it requires a good initial guess when performing the 
     fitting to avoid this happening. The first parameter is the quadratic 
     coefficient i.e. sigma(K) = a * D * D + b * D + c where a = params[0], 
-    b = params[1], c = params[2] and D is the spot delta.'''
+    b = params[1], c = params[2] and D is the spot delta."""
  
     numParams = len(params)
 
@@ -94,13 +94,13 @@ def volFunctionBloomberg(params, f, k, t):
 @njit(float64(float64[:], float64, float64, float64), 
            fastmath=True, cache=True)
 def volFunctionSVI(params, f, k, t):
-    ''' Volatility Function proposed by Gatheral in 2004. Increasing a results 
+    """ Volatility Function proposed by Gatheral in 2004. Increasing a results 
     in a vertical translation of the smile in the positive direction. 
     Increasing b decreases the angle between the put and call wing, i.e. 
     tightens the smile. Increasing rho results in a counter-clockwise rotation
     of the smile. Increasing m results in a horizontal translation of the smile 
     in the positive direction. Increasing sigma reduces the at-the-money 
-    curvature of the smile. '''
+    curvature of the smile. """
 
     x = np.log(f/k)
 
@@ -129,7 +129,7 @@ def phiSSVI(theta, gamma):
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def SSVI(x, gamma, sigma, rho, t):
-    ''' This is the total variance w = sigma(t) x sigma(t) (0,t) x t ''' 
+    """ This is the total variance w = sigma(t) x sigma(t) (0,t) x t """ 
     
     theta = sigma * sigma * t
     p = phiSSVI(theta, gamma)
@@ -207,7 +207,7 @@ def SSVI_LocalVarg(x, gamma, sigma, rho, t):
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
 def volFunctionSSVI(params, f, k, t):
-    ''' Volatility Function proposed by Gatheral in 2004.'''
+    """ Volatility Function proposed by Gatheral in 2004."""
  
     gamma = params[0]
     sigma = params[1]

@@ -6,16 +6,16 @@
 import numpy as np
 from scipy import optimize
 
-from ...finutils.FinMath import M
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinGlobalVariables import gSmall
-from ...finutils.FinError import FinError
+from ...utils.Math import M
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.FinGlobalVariables import gSmall
+from ...utils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.FinGlobalTypes import FinOptionTypes
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 from ...models.FinModelBlackScholes import bsValue
 
 from scipy.stats import norm
@@ -29,9 +29,9 @@ N = norm.cdf
 
 
 def _f(ss, *args):
-    ''' Complex chooser option solve for critical stock price that makes the
+    """ Complex chooser option solve for critical stock price that makes the
     forward starting call and put options have the same price on the chooser
-    date. '''
+    date. """
 
     t = args[0]
     tc = args[1]
@@ -53,21 +53,21 @@ def _f(ss, *args):
 
 
 class FinEquityChooserOption(FinEquityOption):
-    ''' A FinEquityChooserOption is an option which allows the holder to
+    """ A FinEquityChooserOption is an option which allows the holder to
     either enter into a call or a put option on a later expiry date, with both
     strikes potentially different and both expiry dates potentially different.
     This is known as a complex chooser. All the option details are set at trade
-    initiation. '''
+    initiation. """
 
     def __init__(self,
-                 chooseDate: FinDate,
-                 callExpiryDate: FinDate,
-                 putExpiryDate: FinDate,
+                 chooseDate: Date,
+                 callExpiryDate: Date,
+                 putExpiryDate: Date,
                  callStrikePrice: float,
                  putStrikePrice: float):
-        ''' Create the FinEquityChooserOption by passing in the chooser date
+        """ Create the FinEquityChooserOption by passing in the chooser date
         and then the put and call expiry dates as well as the corresponding put
-        and call strike prices. '''
+        and call strike prices. """
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -86,26 +86,26 @@ class FinEquityChooserOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: float,
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model):
-        ''' Value the complex chooser option using an approach by Rubinstein
-        (1991). See also Haug page 129 for complex chooser options. '''
+        """ Value the complex chooser option using an approach by Rubinstein
+        (1991). See also Haug page 129 for complex chooser options. """
 
-        if valueDate > self._chooseDate:
+        if valuation_date > self._chooseDate:
             raise FinError("Value date after choose date.")
 
         DEBUG_MODE = False
 
-        t = (self._chooseDate - valueDate) / gDaysInYear
-        tc = (self._callExpiryDate - valueDate) / gDaysInYear
-        tp = (self._putExpiryDate - valueDate) / gDaysInYear
+        t = (self._chooseDate - valuation_date) / gDaysInYear
+        tc = (self._callExpiryDate - valuation_date) / gDaysInYear
+        tp = (self._putExpiryDate - valuation_date) / gDaysInYear
 
-        rt = discountCurve.ccRate(self._chooseDate)
-        rtc = discountCurve.ccRate(self._callExpiryDate)
-        rtp = discountCurve.ccRate(self._putExpiryDate)
+        rt = discount_curve.ccRate(self._chooseDate)
+        rtc = discount_curve.ccRate(self._callExpiryDate)
+        rtp = discount_curve.ccRate(self._putExpiryDate)
 
         q = dividendCurve.ccRate(self._chooseDate)
 
@@ -163,22 +163,22 @@ class FinEquityChooserOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
+                valuation_date: Date,
                 stockPrice: float,
-                discountCurve: FinDiscountCurve,
+                discount_curve: FinDiscountCurve,
                 dividendCurve: FinDiscountCurve,
                 model,
                 numPaths: int = 10000,
                 seed: int = 4242):
-        ''' Value the complex chooser option Monte Carlo. '''
+        """ Value the complex chooser option Monte Carlo. """
 
-        dft = discountCurve.df(self._chooseDate)
-        dftc = discountCurve.df(self._callExpiryDate)
-        dftp = discountCurve.df(self._putExpiryDate)
+        dft = discount_curve.df(self._chooseDate)
+        dftc = discount_curve.df(self._callExpiryDate)
+        dftp = discount_curve.df(self._putExpiryDate)
 
-        t = (self._chooseDate - valueDate) / gDaysInYear
-        tc = (self._callExpiryDate - valueDate) / gDaysInYear
-        tp = (self._putExpiryDate - valueDate) / gDaysInYear
+        t = (self._chooseDate - valuation_date) / gDaysInYear
+        tc = (self._callExpiryDate - valuation_date) / gDaysInYear
+        tp = (self._putExpiryDate - valuation_date) / gDaysInYear
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc
@@ -237,7 +237,7 @@ class FinEquityChooserOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

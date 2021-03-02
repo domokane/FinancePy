@@ -10,17 +10,17 @@ from scipy import optimize
 from numba import njit
 
 
-from ...finutils.FinMath import N, phi2
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.Math import N, phi2
+from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
 from ...market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
 
 ###############################################################################
 # TODO: Vectorise pricer
@@ -31,8 +31,8 @@ from ...finutils.FinDate import FinDate
 def _f(s0, *args):
 
     self = args[0]
-    valueDate = args[1]
-    discountCurve = args[2]
+    valuation_date = args[1]
+    discount_curve = args[2]
     dividendCurve = args[3]
     model = args[4]
     value = args[5]
@@ -40,9 +40,9 @@ def _f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits K1")
 
-    objFn = self.value(valueDate,
+    objFn = self.value(valuation_date,
                        s0,
-                       discountCurve,
+                       discount_curve,
                        dividendCurve,
                        model) - value
 
@@ -225,21 +225,21 @@ def _valueOnce(stockPrice,
 
 
 class FinEquityCompoundOption(FinEquityOption):
-    ''' A FinEquityCompoundOption is a compound option which allows the holder
+    """ A FinEquityCompoundOption is a compound option which allows the holder
     to either buy or sell another underlying option on a first expiry date that
     itself expires on a second expiry date. Both strikes are set at trade
-    initiation. '''
+    initiation. """
 
     def __init__(self,
-                 cExpiryDate: FinDate,  # Compound Option expiry date
+                 cExpiryDate: Date,  # Compound Option expiry date
                  cOptionType: FinOptionTypes,  # Compound option type
                  cStrikePrice: float,  # Compound option strike
-                 uExpiryDate: FinDate,  # Underlying option expiry date
+                 uExpiryDate: Date,  # Underlying option expiry date
                  uOptionType: FinOptionTypes,  # Underlying option type
                  uStrikePrice: float):  # Underlying option strike price
-        ''' Create the FinEquityCompoundOption by passing in the first and
+        """ Create the FinEquityCompoundOption by passing in the first and
         second expiry dates as well as the corresponding strike prices and
-        option types. '''
+        option types. """
 
         checkArgumentTypes(self.__init__, locals())
 
@@ -269,16 +269,16 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
+              valuation_date: Date,
               stockPrice: float,
-              discountCurve: FinDiscountCurve,
+              discount_curve: FinDiscountCurve,
               dividendCurve: FinDiscountCurve,
               model,
               numSteps: int = 200):
-        ''' Value the compound option using an analytical approach if it is
+        """ Value the compound option using an analytical approach if it is
         entirely European style. Otherwise use a Tree approach to handle the
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
-        Rubinstein (1991). See also Haug page 132. '''
+        Rubinstein (1991). See also Haug page 132. """
 
         # If the option has any American feature then use the tree
         if self._cOptionType == FinOptionTypes.AMERICAN_CALL or\
@@ -286,21 +286,21 @@ class FinEquityCompoundOption(FinEquityOption):
             self._cOptionType == FinOptionTypes.AMERICAN_PUT or\
                 self._uOptionType == FinOptionTypes.AMERICAN_PUT:
 
-            v = self._valueTree(valueDate,
+            v = self._valueTree(valuation_date,
                                 stockPrice,
-                                discountCurve,
+                                discount_curve,
                                 dividendCurve,
                                 model,
                                 numSteps)
 
             return v[0]
 
-        tc = (self._cExpiryDate - valueDate) / gDaysInYear
-        tu = (self._uExpiryDate - valueDate) / gDaysInYear
+        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
+        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
 
         s0 = stockPrice
 
-        df = discountCurve.df(self._uExpiryDate)
+        df = discount_curve.df(self._uExpiryDate)
         ru = -np.log(df)/tu
 
         # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
@@ -358,27 +358,27 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def _valueTree(self,
-                   valueDate,
+                   valuation_date,
                    stockPrice,
-                   discountCurve,
+                   discount_curve,
                    dividendCurve,
                    model,
                    numSteps=200):
-        ''' This function is called if the option has American features. '''
+        """ This function is called if the option has American features. """
 
-        if valueDate > self._cExpiryDate:
+        if valuation_date > self._cExpiryDate:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self._cExpiryDate - valueDate) / gDaysInYear
-        tu = (self._uExpiryDate - valueDate) / gDaysInYear
+        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
+        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
 
-        df = discountCurve.df(self._uExpiryDate)
+        df = discount_curve.df(self._uExpiryDate)
         r = -np.log(df)/tu
 
         dq = dividendCurve.df(self._uExpiryDate)
         q = -np.log(dq)/tu
 
-        r = discountCurve.zeroRate(self._uExpiryDate)
+        r = discount_curve.zeroRate(self._uExpiryDate)
 
         volatility = model._volatility
 
@@ -399,8 +399,8 @@ class FinEquityCompoundOption(FinEquityOption):
 
     def _impliedStockPrice(self,
                            stockPrice,
-                           expiryDate1,
-                           expiryDate2,
+                           expiry_date1,
+                           expiry_date2,
                            strikePrice1,
                            strikePrice2,
                            optionType2,
@@ -408,12 +408,12 @@ class FinEquityCompoundOption(FinEquityOption):
                            dividendYield,
                            model):
 
-        option = FinEquityVanillaOption(expiryDate2, strikePrice2, optionType2)
+        option = FinEquityVanillaOption(expiry_date2, strikePrice2, optionType2)
 
-        discountCurve = FinDiscountCurveFlat(expiryDate1, interestRate)
-        dividendCurve = FinDiscountCurveFlat(expiryDate1, dividendYield)
+        discount_curve = FinDiscountCurveFlat(expiry_date1, interestRate)
+        dividendCurve = FinDiscountCurveFlat(expiry_date1, dividendYield)
 
-        argtuple = (option, expiryDate1, discountCurve, dividendCurve,
+        argtuple = (option, expiry_date1, discount_curve, dividendCurve,
                     model, strikePrice1)
 
         sigma = optimize.newton(_f, x0=stockPrice, args=argtuple, tol=1e-8,
@@ -435,7 +435,7 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

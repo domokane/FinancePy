@@ -6,8 +6,8 @@ import sys
 sys.path.append("..")
 
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.utils.Date import Date
+from financepy.utils.Frequency import FinFrequencyTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -16,7 +16,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFlatCurve():
 
-    curveDate = FinDate(1, 1, 2019)
+    curveDate = Date(1, 1, 2019)
     months = range(1, 60, 3)
     dates = curveDate.addMonths(months)
     testCases.header("COMPOUNDING", "DFS")

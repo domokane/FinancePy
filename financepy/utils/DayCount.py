@@ -59,13 +59,13 @@ class FinDayCountTypes(Enum):
 ###############################################################################
 
 
-class FinDayCount(object):
-    ''' Calculate the fractional day count between two dates according to a
-    specified day count convention. '''
+class DayCount(object):
+    """ Calculate the fractional day count between two dates according to a
+    specified day count convention. """
 
     def __init__(self,
                  dccType: FinDayCountTypes):
-        ''' Create Day Count convention by passing in the Day Count Type. '''
+        """ Create Day Count convention by passing in the Day Count Type. """
 
         if dccType not in FinDayCountTypes:
             raise FinError("Need to pass FinDayCountType")
@@ -74,13 +74,13 @@ class FinDayCount(object):
 
 ###############################################################################
 
-    def yearFrac(self,
+    def year_frac(self,
                  dt1: Date,  # Start of coupon period
                  dt2: Date,  # Settlement (for bonds) or period end(swaps)
                  dt3: Date = None,  # End of coupon period for accrued
                  freq_type: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  isTerminationDate: bool = False):  # Is dt2 a termination date
-        ''' This method performs two functions:
+        """ This method performs two functions:
 
         1) It calculates the year fraction between dates dt1 and dt2 using the
         specified day count convention which is useful for calculating year
@@ -102,7 +102,7 @@ class FinDayCount(object):
         https://en.wikipedia.org/wiki/Day_count_convention
         and
         http://data.cbonds.info/files/cbondscalc/Calculator.pdf
-        '''
+        """
 
         d1 = dt1._d
         m1 = dt1._m
@@ -128,8 +128,8 @@ class FinDayCount(object):
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_360:
             # This is in section 4.16(g) of ISDA 2006 Definitions
@@ -145,8 +145,8 @@ class FinDayCount(object):
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_360_ISDA:
             # This is 30E/360 (ISDA 2000), 30E/360 (ISDA) section 4.16(h)
@@ -168,8 +168,8 @@ class FinDayCount(object):
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.THIRTY_E_PLUS_360:
 
@@ -182,8 +182,8 @@ class FinDayCount(object):
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_ACT_ISDA:
 
@@ -200,20 +200,20 @@ class FinDayCount(object):
             if y1 == y2:
                 num = dt2 - dt1
                 den = denom1
-                accFactor = (dt2 - dt1) / denom1
-                return (accFactor, num, den)
+                acc_factor = (dt2 - dt1) / denom1
+                return (acc_factor, num, den)
             else:
                 daysYear1 = datediff(dt1, Date(1, 1, y1 + 1))
                 daysYear2 = datediff(Date(1, 1, y2), dt2)
-                accFactor1 = daysYear1 / denom1
-                accFactor2 = daysYear2 / denom2
+                acc_factor1 = daysYear1 / denom1
+                acc_factor2 = daysYear2 / denom2
                 yearDiff = y2 - y1 - 1.0
-                # Note that num/den does not equal accFactor
+                # Note that num/den does not equal acc_factor
                 # I do need to pass num back
                 num = daysYear1 + daysYear2
                 den = denom1 + denom2
-                accFactor = accFactor1 + accFactor2 + yearDiff
-                return (accFactor, num, den)
+                acc_factor = acc_factor1 + acc_factor2 + yearDiff
+                return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
 
@@ -224,22 +224,22 @@ class FinDayCount(object):
 
             num = dt2 - dt1
             den = freq * (dt3 - dt1)
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365F:
 
             num = dt2 - dt1
             den = 365
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_360:
 
             num = dt2 - dt1
             den = 360
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.ACT_365L:
 
@@ -270,15 +270,15 @@ class FinDayCount(object):
                 if isLeapYear(y3) is True:
                     den = 366
 
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         elif self._type == FinDayCountTypes.SIMPLE:
             
             num = dt2 - dt1
             den = gDaysInYear
-            accFactor = num / den
-            return (accFactor, num, den)
+            acc_factor = num / den
+            return (acc_factor, num, den)
 
         else:
 
@@ -288,7 +288,7 @@ class FinDayCount(object):
 ###############################################################################
 
     def __repr__(self):
-        ''' Returns the calendar type as a string. '''
+        """ Returns the calendar type as a string. """
         return str(self._type)
 
 ###############################################################################

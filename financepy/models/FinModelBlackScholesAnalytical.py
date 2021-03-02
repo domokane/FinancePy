@@ -6,11 +6,11 @@ import numpy as np
 from numba import float64, int64, vectorize, njit
 from scipy import optimize
 
-from ..finutils.FinGlobalTypes import FinOptionTypes
-from ..finutils.FinGlobalVariables import gSmall
-from ..finutils.FinMath import NVect, NPrimeVect
-from ..finutils.FinError import FinError
-from ..finutils.FinSolvers1D import bisection, newton, newton_secant
+from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.FinGlobalVariables import gSmall
+from ..utils.Math import NVect, NPrimeVect
+from ..utils.FinError import FinError
+from ..utils.FinSolvers1D import bisection, newton, newton_secant
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -19,7 +19,7 @@ from ..finutils.FinSolvers1D import bisection, newton, newton_secant
 @vectorize([float64(float64, float64, float64, float64, float64, float64, 
                     int64)], fastmath=True, cache=True)
 def bsValue(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
@@ -46,7 +46,7 @@ def bsValue(s, t, k, r, q, v, optionTypeValue):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, float64, int64)], fastmath=True, cache=True)
 def bsDelta(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
         phi = +1.0
@@ -71,7 +71,7 @@ def bsDelta(s, t, k, r, q, v, optionTypeValue):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, float64, int64)], fastmath=True, cache=True)
 def bsGamma(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -89,7 +89,7 @@ def bsGamma(s, t, k, r, q, v, optionTypeValue):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, float64, int64)], fastmath=True, cache=True)
 def bsVega(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -108,7 +108,7 @@ def bsVega(s, t, k, r, q, v, optionTypeValue):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, float64, int64)], fastmath=True, cache=True)
 def bsTheta(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
@@ -137,7 +137,7 @@ def bsTheta(s, t, k, r, q, v, optionTypeValue):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, float64, int64)], fastmath=True, cache=True)
 def bsRho(s, t, k, r, q, v, optionTypeValue):
-    ''' Price a derivative using Black-Scholes model. ''' 
+    """ Price a derivative using Black-Scholes model. """ 
 
     if optionTypeValue == FinOptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
@@ -193,8 +193,8 @@ def _fvega(sigma, args):
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, int64)], fastmath=True, cache=True)
 def bsIntrinsic(s, t, k, r, q, optionTypeValue):
-    ''' Calculate the Black-Scholes implied volatility of a European 
-    vanilla option using Newton with a fallback to bisection. '''
+    """ Calculate the Black-Scholes implied volatility of a European 
+    vanilla option using Newton with a fallback to bisection. """
 
     fwd = s * np.exp((r-q)*t)
 
@@ -211,8 +211,8 @@ def bsIntrinsic(s, t, k, r, q, optionTypeValue):
 #@vectorize([float64(float64, float64, float64, float64, float64, float64, 
 #                    int64)], fastmath=True, cache=True,  forceobj=True)
 def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
-    ''' Calculate the Black-Scholes implied volatility of a European 
-    vanilla option using Newton with a fallback to bisection. '''
+    """ Calculate the Black-Scholes implied volatility of a European 
+    vanilla option using Newton with a fallback to bisection. """
 
     fwd = s * np.exp((r-q)*t)
                                 
@@ -331,7 +331,7 @@ def bsImpliedVolatility(s, t, k, r, q, price, optionTypeValue):
 
 @njit(fastmath=True, cache=True)
 def _fcall(si, *args):
-    ''' Function to determine ststar for pricing American call options. '''
+    """ Function to determine ststar for pricing American call options. """
 
     t = args[0]
     k = args[1]
@@ -358,7 +358,7 @@ def _fcall(si, *args):
 
 @njit(fastmath=True, cache=True)
 def _fput(si, *args):
-    ''' Function to determine sstar for pricing American put options. '''
+    """ Function to determine sstar for pricing American put options. """
 
     t = args[0]
     k = args[1]
@@ -385,8 +385,8 @@ def _fput(si, *args):
 
 @njit(fastmath=True)
 def bawValue(s, t, k, r, q, v, phi):
-    ''' American Option Pricing Approximation using the Barone-Adesi-Whaley
-    approximation for the Black Scholes Model '''
+    """ American Option Pricing Approximation using the Barone-Adesi-Whaley
+    approximation for the Black Scholes Model """
 
     b = r - q
 

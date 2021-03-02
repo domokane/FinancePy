@@ -12,8 +12,8 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTre
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.Date import Date
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
 
@@ -29,12 +29,12 @@ def test_FinBinomialTree():
     dividendYield = 0.04
     volatility = 0.40
 
-    valueDate = FinDate(1, 1, 2016)
-    expiryDate = FinDate(1, 1, 2017)
+    valuation_date = Date(1, 1, 2016)
+    expiry_date = Date(1, 1, 2017)
 
     model = FinModelBlackScholes(volatility)
-    discountCurve = FinDiscountCurveFlat(valueDate, riskFreeRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    discount_curve = FinDiscountCurveFlat(valuation_date, riskFreeRate)
+    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
 
     numStepsList = [100, 500, 1000, 2000, 5000]
 
@@ -43,13 +43,13 @@ def test_FinBinomialTree():
     testCases.banner("================== EUROPEAN PUT =======================")
 
     putOption = FinEquityVanillaOption(
-        expiryDate,
+        expiry_date,
         strikePrice,
         FinOptionTypes.EUROPEAN_PUT)
-    value = putOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    delta = putOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    gamma = putOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    theta = putOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    value = putOption.value(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    delta = putOption.delta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    gamma = putOption.gamma(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    theta = putOption.theta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -64,13 +64,13 @@ def test_FinBinomialTree():
         tree = FinEquityBinomialTree()
         results = tree.value(
             stockPrice,
-            discountCurve,
+            discount_curve,
             dividendCurve,
             volatility,
             numSteps,
-            valueDate,
+            valuation_date,
             payoff,
-            expiryDate,
+            expiry_date,
             payoff,
             exercise,
             params)
@@ -91,13 +91,13 @@ def test_FinBinomialTree():
         tree = FinEquityBinomialTree()
         results = tree.value(
             stockPrice,
-            discountCurve,
+            discount_curve,
             dividendCurve,
             volatility,
             numSteps,
-            valueDate,
+            valuation_date,
             payoff,
-            expiryDate,
+            expiry_date,
             payoff,
             exercise,
             params)
@@ -109,13 +109,13 @@ def test_FinBinomialTree():
         "================== EUROPEAN CALL =======================")
 
     callOption = FinEquityVanillaOption(
-        expiryDate,
+        expiry_date,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    delta = callOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    gamma = callOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
-    theta = callOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    value = callOption.value(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    delta = callOption.delta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    gamma = callOption.gamma(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    theta = callOption.theta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -130,13 +130,13 @@ def test_FinBinomialTree():
 
         results = tree.value(
             stockPrice,
-            discountCurve,
+            discount_curve,
             dividendCurve,
             volatility,
             numSteps,
-            valueDate,
+            valuation_date,
             payoff,
-            expiryDate,
+            expiry_date,
             payoff,
             exercise,
             params)
@@ -159,13 +159,13 @@ def test_FinBinomialTree():
 
         results = tree.value(
             stockPrice,
-            discountCurve,
+            discount_curve,
             dividendCurve,
             volatility,
             numSteps,
-            valueDate,
+            valuation_date,
             payoff,
-            expiryDate,
+            expiry_date,
             payoff,
             exercise,
             params)

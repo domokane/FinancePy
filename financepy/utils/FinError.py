@@ -41,12 +41,12 @@ def suppressTraceback():
 
 
 class FinError(Exception):
-    ''' Simple error class specific to FinPy. Need to decide how to handle
-    FinancePy errors. Work in progress. '''
+    """ Simple error class specific to FinPy. Need to decide how to handle
+    FinancePy errors. Work in progress. """
 
     def __init__(self,
                  message: str):
-        ''' Create FinError object by passing a message string. '''
+        """ Create FinError object by passing a message string. """
         self._message = message
 
     def _print(self):

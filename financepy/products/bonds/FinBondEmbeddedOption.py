@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.FinGlobalVariables import gDaysInYear
 from ...models.FinModelRatesHW import FinModelRatesHW
 from ...models.FinModelRatesBK import FinModelRatesBK
-from ...finutils.FinError import FinError
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinDayCount import FinDayCountTypes
+from ...utils.FinError import FinError
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.DayCount import FinDayCountTypes
 from ...products.bonds.FinBond import FinBond
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.Date import Date
+from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from enum import Enum
@@ -44,40 +44,40 @@ class FinBondOptionTypes(Enum):
 
 
 class FinBondEmbeddedOption(object):
-    ''' Class for fixed coupon bonds with embedded call or put optionality. '''
+    """ Class for fixed coupon bonds with embedded call or put optionality. """
 
     def __init__(self,
-                 issueDate: FinDate,
-                 maturityDate: FinDate,  # FinDate
+                 issue_date: Date,
+                 maturity_date: Date,  # FinDate
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
-                 freqType: FinFrequencyTypes,
-                 accrualType: FinDayCountTypes,
-                 callDates: List[FinDate],
+                 freq_type: FinFrequencyTypes,
+                 accrual_type: FinDayCountTypes,
+                 callDates: List[Date],
                  callPrices: List[float],
-                 putDates: List[FinDate],
+                 putDates: List[Date],
                  putPrices: List[float],
-                 faceAmount: float = 100.0):
-        ''' Create a FinBondEmbeddedOption object with a maturity date, coupon
-        and all of the bond inputs. '''
+                 face_amount: float = 100.0):
+        """ Create a FinBondEmbeddedOption object with a maturity date, coupon
+        and all of the bond inputs. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._issueDate = issueDate
-        self._maturityDate = maturityDate
+        self._issue_date = issue_date
+        self._maturity_date = maturity_date
         self._coupon = coupon
-        self._freqType = freqType
-        self._accrualType = accrualType
+        self._freq_type = freq_type
+        self._accrual_type = accrual_type
 
-        self._bond = FinBond(issueDate,
-                             maturityDate,
+        self._bond = FinBond(issue_date,
+                             maturity_date,
                              coupon,
-                             freqType,
-                             accrualType,
-                             faceAmount)
+                             freq_type,
+                             accrual_type,
+                             face_amount)
 
         # Validate call and put schedules
         for dt in callDates:
-            if dt > self._maturityDate:
+            if dt > self._maturity_date:
                 raise FinError("Call date after bond maturity date")
 
         if len(callDates) > 0:
@@ -89,7 +89,7 @@ class FinBondEmbeddedOption(object):
                     dtprev = dt
 
         for dt in putDates:
-            if dt > self._maturityDate:
+            if dt > self._maturity_date:
                 raise FinError("Put date after bond maturity date")
 
         if len(putDates) > 0:
@@ -118,27 +118,27 @@ class FinBondEmbeddedOption(object):
         self._callPrices = callPrices
         self._putDates = putDates
         self._putPrices = putPrices
-        self._faceAmount = faceAmount
+        self._face_amount = face_amount
         self._bond._calculateFlowDates()
 
 ###############################################################################
 
     def value(self,
-              settlementDate: FinDate,
-              discountCurve: FinDiscountCurve,
+              settlement_date: Date,
+              discount_curve: FinDiscountCurve,
               model):
-        ''' Value the bond that settles on the specified date that can have
+        """ Value the bond that settles on the specified date that can have
         both embedded call and put options. This is done using the specified
-        model and a discount curve. '''
+        model and a discount curve. """
 
         # Generate bond coupon flow schedule
         cpn = self._bond._coupon/self._bond._frequency
         cpnTimes = []
         cpnAmounts = []
 
-        for flowDate in self._bond._flowDates[1:]:
-            if flowDate > settlementDate:
-                cpnTime = (flowDate - settlementDate) / gDaysInYear
+        for flowDate in self._bond._flow_dates[1:]:
+            if flowDate > settlement_date:
+                cpnTime = (flowDate - settlement_date) / gDaysInYear
                 cpnTimes.append(cpnTime)
                 cpnAmounts.append(cpn)
 
@@ -148,8 +148,8 @@ class FinBondEmbeddedOption(object):
         # Generate bond call times and prices
         callTimes = []
         for dt in self._callDates:
-            if dt > settlementDate:
-                callTime = (dt - settlementDate) / gDaysInYear
+            if dt > settlement_date:
+                callTime = (dt - settlement_date) / gDaysInYear
                 callTimes.append(callTime)
         callTimes = np.array(callTimes)
         callPrices = np.array(self._callPrices)
@@ -157,36 +157,36 @@ class FinBondEmbeddedOption(object):
         # Generate bond put times and prices
         putTimes = []
         for dt in self._putDates:
-            if dt > settlementDate:
-                putTime = (dt - settlementDate) / gDaysInYear
+            if dt > settlement_date:
+                putTime = (dt - settlement_date) / gDaysInYear
                 putTimes.append(putTime)
         putTimes = np.array(putTimes)
         putPrices = np.array(self._putPrices)
 
-        maturityDate = self._bond._maturityDate
-        tmat = (maturityDate - settlementDate) / gDaysInYear
-        dfTimes = discountCurve._times
-        dfValues = discountCurve._dfs
+        maturity_date = self._bond._maturity_date
+        tmat = (maturity_date - settlement_date) / gDaysInYear
+        dfTimes = discount_curve._times
+        dfValues = discount_curve._dfs
 
-        faceAmount = self._bond._faceAmount
+        face_amount = self._bond._face_amount
 
         if isinstance(model, FinModelRatesHW):
 
-            ''' We need to build the tree out to the bond maturity date. To be
+            """ We need to build the tree out to the bond maturity date. To be
             more precise we only need to go out the the last option date but
-            we can do that refinement at a later date. '''
+            we can do that refinement at a later date. """
 
             model.buildTree(tmat, dfTimes, dfValues)
             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 faceAmount)
+                                                 face_amount)
             model._numTimeSteps += 1
             model.buildTree(tmat, dfTimes, dfValues)
             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 faceAmount)
+                                                 face_amount)
             model._numTimeSteps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
@@ -196,20 +196,20 @@ class FinBondEmbeddedOption(object):
 
         elif isinstance(model, FinModelRatesBK):
 
-            ''' Because we not have a closed form bond price we need to build
-            the tree out to the bond maturity which is after option expiry. '''
+            """ Because we not have a closed form bond price we need to build
+            the tree out to the bond maturity which is after option expiry. """
 
             model.buildTree(tmat, dfTimes, dfValues)
             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 faceAmount)
+                                                 face_amount)
             model._numTimeSteps += 1
             model.buildTree(tmat, dfTimes, dfValues)
             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
                                                  callTimes, callPrices,
                                                  putTimes, putPrices,
-                                                 faceAmount)
+                                                 face_amount)
             model._numTimeSteps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
@@ -223,12 +223,12 @@ class FinBondEmbeddedOption(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ISSUE DATE", self._issueDate)
-        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("ISSUE DATE", self._issue_date)
+        s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freqType)
-        s += labelToString("ACCRUAL TYPE", self._accrualType)
-        s += labelToString("FACE AMOUNT", self._faceAmount)
+        s += labelToString("FREQUENCY", self._freq_type)
+        s += labelToString("ACCRUAL TYPE", self._accrual_type)
+        s += labelToString("FACE AMOUNT", self._face_amount)
 
         s += labelToString("NUM CALL DATES", len(self._callDates))
         for i in range(0, len(self._callDates)):

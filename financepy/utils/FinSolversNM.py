@@ -353,7 +353,7 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
 
 @njit(cache=True, fastmath=True)
 def _check_bounds(x, bounds):
-    '''
+    """
     Checks whether `x` is within `bounds`. JIT-compiled in `nopython` mode
     using Numba.
 
@@ -370,7 +370,7 @@ def _check_bounds(x, bounds):
     bool
         `True` if `x` is within `bounds`, `False` otherwise.
 
-    '''
+    """
         
     if bounds.shape == (0, 2):
         return True

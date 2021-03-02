@@ -9,10 +9,10 @@ from enum import Enum
 import numpy as np
 from numba import jit, njit, float64, int64
 
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import heaviside
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinError import FinError
+from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.Math import heaviside
+from ...utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
@@ -204,22 +204,22 @@ class FinEquityBinomialTree():
 
     def value(self,
               stockPrice,
-              discountCurve,
+              discount_curve,
               dividendCurve,
               volatility,
               numSteps,
-              valueDate,
+              valuation_date,
               payoff,
-              expiryDate,
+              expiry_date,
               payoffType,
               exerciseType,
               payoffParams):
 
         # do some validation
-        texp = (expiryDate - valueDate) / gDaysInYear
-        r = discountCurve.zeroRate(expiryDate)
+        texp = (expiry_date - valuation_date) / gDaysInYear
+        r = discount_curve.zeroRate(expiry_date)
 
-        dq = dividendCurve.df(expiryDate)
+        dq = dividendCurve.df(expiry_date)
         q = -np.log(dq)/texp
 
         price1 = _valueOnce(stockPrice,

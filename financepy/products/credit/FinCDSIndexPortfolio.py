@@ -5,15 +5,15 @@
 
 from math import pow
 
-from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinError import FinError
+from ...utils.Calendar import FinCalendarTypes
+from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
+from ...utils.DayCount import FinDayCountTypes
+from ...utils.Frequency import FinFrequencyTypes
+from ...utils.FinError import FinError
 from ...products.credit.FinCDS import FinCDS
 from ...products.credit.FinCDSCurve import FinCDSCurve
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinHelperFunctions import checkArgumentTypes
+from ...utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 # TODO: Move index spread details into class and then pass in issuer curves
@@ -22,48 +22,48 @@ from ...finutils.FinHelperFunctions import labelToString
 
 
 class FinCDSIndexPortfolio():
-    ''' This class manages the calculations associated with an equally weighted
-    portfolio of CDS contracts with the same maturity date. '''
+    """ This class manages the calculations associated with an equally weighted
+    portfolio of CDS contracts with the same maturity date. """
 
     def __init__(self,
-                 freqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create FinCDSIndexPortfolio object. Note that all of the inputs
-        have a default value which reflects the CDS market standard. '''
+                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
+                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+        """ Create FinCDSIndexPortfolio object. Note that all of the inputs
+        have a default value which reflects the CDS market standard. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        self._dayCountType = dayCountType
-        self._dateGenRuleType = dateGenRuleType
-        self._calendarType = calendarType
-        self._freqType = freqType
-        self._busDayAdjustType = busDayAdjustType
+        self._day_count_type = day_count_type
+        self._date_gen_rule_type = date_gen_rule_type
+        self._calendar_type = calendar_type
+        self._freq_type = freq_type
+        self._bus_day_adjust_type = bus_day_adjust_type
 
 ###############################################################################
 
     def intrinsicRPV01(self,
-                       valuationDate,
-                       stepInDate,
-                       maturityDate,
-                       issuerCurves):
-        ''' Calculation of the risky PV01 of the CDS porfolio by taking the
-        average of the risky PV01s of each contract. '''
+                       valuation_date,
+                       step_in_date,
+                       maturity_date,
+                       issuer_curves):
+        """ Calculation of the risky PV01 of the CDS porfolio by taking the
+        average of the risky PV01s of each contract. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0)
 
         intrinsicRPV01 = 0.0
 
         for m in range(0, numCredits):
 
-            retValue = cdsContract.riskyPV01(valuationDate,
-                                             issuerCurves[m])
+            retValue = cdsContract.riskyPV01(valuation_date,
+                                             issuer_curves[m])
 
             cleanRPV01 = retValue['clean_rpv01']
 
@@ -75,27 +75,27 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def intrinsicProtectionLegPV(self,
-                                 valuationDate,
-                                 stepInDate,
-                                 maturityDate,
-                                 issuerCurves):
-        ''' Calculation of intrinsic protection leg value of the CDS porfolio
-        by taking the average sum the protection legs of each contract. '''
+                                 valuation_date,
+                                 step_in_date,
+                                 maturity_date,
+                                 issuer_curves):
+        """ Calculation of intrinsic protection leg value of the CDS porfolio
+        by taking the average sum the protection legs of each contract. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
         intrinsicProtPV = 0.0
 
         # All contracts have same flows so only need one object
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0,
                              1.0)
 
         for m in range(0, numCredits):
 
-            protectionPV = cdsContract.protectionLegPV(valuationDate,
-                                                       issuerCurves[m])
+            protectionPV = cdsContract.protectionLegPV(valuation_date,
+                                                       issuer_curves[m])
 
             intrinsicProtPV += protectionPV
 
@@ -105,23 +105,23 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def intrinsicSpread(self,
-                        valuationDate,
-                        stepInDate,
-                        maturityDate,
-                        issuerCurves):
-        ''' Calculation of the intrinsic spread of the CDS portfolio as the one
+                        valuation_date,
+                        step_in_date,
+                        maturity_date,
+                        issuer_curves):
+        """ Calculation of the intrinsic spread of the CDS portfolio as the one
         which would make the value of the protection legs equal to the value of
-        the premium legs if all premium legs paid the same spread. '''
+        the premium legs if all premium legs paid the same spread. """
 
-        intrinsicProtPV = self.intrinsicProtectionLegPV(valuationDate,
-                                                        stepInDate,
-                                                        maturityDate,
-                                                        issuerCurves)
+        intrinsicProtPV = self.intrinsicProtectionLegPV(valuation_date,
+                                                        step_in_date,
+                                                        maturity_date,
+                                                        issuer_curves)
 
-        intrinsicRPV01 = self.intrinsicRPV01(valuationDate,
-                                             stepInDate,
-                                             maturityDate,
-                                             issuerCurves)
+        intrinsicRPV01 = self.intrinsicRPV01(valuation_date,
+                                             step_in_date,
+                                             maturity_date,
+                                             issuer_curves)
 
         intrinsicSpread = intrinsicProtPV / intrinsicRPV01
 
@@ -130,22 +130,22 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def averageSpread(self,
-                      valuationDate,
-                      stepInDate,
-                      maturityDate,
-                      issuerCurves):
-        ''' Calculates the average par CDS spread of the CDS portfolio. '''
+                      valuation_date,
+                      step_in_date,
+                      maturity_date,
+                      issuer_curves):
+        """ Calculates the average par CDS spread of the CDS portfolio. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0)
 
         averageSpread = 0.0
 
         for m in range(0, numCredits):
-            spread = cdsContract.parSpread(valuationDate, issuerCurves[m])
+            spread = cdsContract.parSpread(valuation_date, issuer_curves[m])
             averageSpread += spread
 
         averageSpread /= numCredits
@@ -154,23 +154,23 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def totalSpread(self,
-                    valuationDate,
-                    stepInDate,
-                    maturityDate,
-                    issuerCurves):
-        ''' Calculates the total CDS spread of the CDS portfolio by summing
-        over all of the issuers and adding the spread with no weights. '''
+                    valuation_date,
+                    step_in_date,
+                    maturity_date,
+                    issuer_curves):
+        """ Calculates the total CDS spread of the CDS portfolio by summing
+        over all of the issuers and adding the spread with no weights. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0)
 
         totalSpread = 0.0
 
         for m in range(0, numCredits):
-            spread = cdsContract.parSpread(valuationDate, issuerCurves[m])
+            spread = cdsContract.parSpread(valuation_date, issuer_curves[m])
             totalSpread += spread
 
         return totalSpread
@@ -178,26 +178,26 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def minSpread(self,
-                  valuationDate,
-                  stepInDate,
-                  maturityDate,
-                  issuerCurves):
-        ''' Calculates the minimum par CDS spread across all of the issuers in
-        the CDS portfolio. '''
+                  valuation_date,
+                  step_in_date,
+                  maturity_date,
+                  issuer_curves):
+        """ Calculates the minimum par CDS spread across all of the issuers in
+        the CDS portfolio. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
         if numCredits < 1:
             raise FinError("Number of credits in index must be > 1 and not" + str(numCredits))
 
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0)
 
-        minSpread = cdsContract.parSpread(valuationDate, issuerCurves[0])
+        minSpread = cdsContract.parSpread(valuation_date, issuer_curves[0])
 
         for m in range(1, numCredits):
-            spread = cdsContract.parSpread(valuationDate, issuerCurves[m])
+            spread = cdsContract.parSpread(valuation_date, issuer_curves[m])
             if spread < minSpread:
                 minSpread = spread
 
@@ -206,26 +206,26 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def maxSpread(self,
-                  valuationDate,
-                  stepInDate,
-                  maturityDate,
-                  issuerCurves):
-        ''' Calculates the maximum par CDS spread across all of the issuers in
-        the CDS portfolio. '''
+                  valuation_date,
+                  step_in_date,
+                  maturity_date,
+                  issuer_curves):
+        """ Calculates the maximum par CDS spread across all of the issuers in
+        the CDS portfolio. """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
         if numCredits < 1:
             raise FinError("Number of credits in index must be > 1 and not " + str(numCredits))
 
-        cdsContract = FinCDS(stepInDate,
-                             maturityDate,
+        cdsContract = FinCDS(step_in_date,
+                             maturity_date,
                              0.0)
 
-        maxSpread = cdsContract.parSpread(valuationDate, issuerCurves[0])
+        maxSpread = cdsContract.parSpread(valuation_date, issuer_curves[0])
 
         for m in range(1, numCredits):
-            spread = cdsContract.parSpread(valuationDate, issuerCurves[m])
+            spread = cdsContract.parSpread(valuation_date, issuer_curves[m])
             if spread > maxSpread:
                 maxSpread = spread
 
@@ -234,35 +234,35 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def spreadAdjustIntrinsic(self,
-                              valuationDate,
-                              issuerCurves,
+                              valuation_date,
+                              issuer_curves,
                               indexCoupons,
                               indexUpfronts,
                               indexMaturityDates,
                               indexRecoveryRate,
                               tolerance=1e-6):
-        ''' Adjust individual CDS curves to reprice CDS index prices.
+        """ Adjust individual CDS curves to reprice CDS index prices.
         This approach uses an iterative scheme but is slow as it has to use a
         CDS curve bootstrap required when each trial spread adjustment is made
-        '''
+        """
 
-        numCredits = len(issuerCurves)
+        numCredits = len(issuer_curves)
 
         if numCredits < 1:
             raise FinError("Number of credits in index must be > 1 and not " + str(numCredits))
 
-        liborCurve = issuerCurves[0]._liborCurve
+        libor_curve = issuer_curves[0]._libor_curve
         numIndexMaturityPoints = len(indexCoupons)
 
         cdsMaturityDates = []
-        for cds in issuerCurves[0]._cdsContracts:
-            cdsDates = cds._maturityDate
+        for cds in issuer_curves[0]._cds_contracts:
+            cdsDates = cds._maturity_date
             cdsMaturityDates.append(cdsDates)
 
         numCDSMaturityPoints = len(cdsMaturityDates)
 
-        for issuerCurve in issuerCurves:
-            n = len(issuerCurve._cdsContracts)
+        for issuer_curve in issuer_curves:
+            n = len(issuer_curve._cds_contracts)
             if n != len(cdsMaturityDates):
                 raise FinError(
                     "All issuer curves must be built from same cds maturities")
@@ -283,7 +283,7 @@ class FinCDSIndexPortfolio():
 
             cdsCoupon = 1.0
 
-            cdsContract = FinCDS(valuationDate,
+            cdsContract = FinCDS(valuation_date,
                                  cdsMaturityDates[j],
                                  cdsCoupon)
 
@@ -311,31 +311,31 @@ class FinCDSIndexPortfolio():
 
                 # This is for the specific index maturity date
                 indexMaturityDate = indexMaturityDates[iMaturity]
-                cdsIndex = FinCDS(valuationDate, indexMaturityDate, 0.0, 1.0)
+                cdsIndex = FinCDS(valuation_date, indexMaturityDate, 0.0, 1.0)
 
                 for iCredit in range(0, numCredits):
 
-                    cdsContracts = issuerCurves[iCredit]._cdsContracts
-                    recoveryRate = issuerCurves[iCredit]._recoveryRate
+                    cds_contracts = issuer_curves[iCredit]._cds_contracts
+                    recovery_rate = issuer_curves[iCredit]._recovery_rate
                     adjustedCDSContracts = []
 
                     for j in range(0, numCDSMaturityPoints):
 
-                        cdsSpread = cdsContracts[j]._runningCoupon
+                        cdsSpread = cds_contracts[j]._running_coupon
                         adjustedCDSSpreads[j] = cdsSpread * \
                             cdsSpreadMultipliers[j]
-                        curveCDSContracts[j]._runningCoupon = adjustedCDSSpreads[j]
+                        curveCDSContracts[j]._running_coupon = adjustedCDSSpreads[j]
 
-                    adjustedIssuerCurve = FinCDSCurve(valuationDate,
+                    adjustedIssuerCurve = FinCDSCurve(valuation_date,
                                                       curveCDSContracts,
-                                                      liborCurve,
-                                                      recoveryRate)
+                                                      libor_curve,
+                                                      recovery_rate)
 
-                    indexProtectionPV = cdsIndex.protectionLegPV(valuationDate,
+                    indexProtectionPV = cdsIndex.protectionLegPV(valuation_date,
                                                                  adjustedIssuerCurve,
                                                                  indexRecoveryRate)
 
-                    cleanRPV01 = cdsIndex.riskyPV01(valuationDate,
+                    cleanRPV01 = cdsIndex.riskyPV01(valuation_date,
                                                     adjustedIssuerCurve)['clean_rpv01']
 
                     sumRPV01 += cleanRPV01
@@ -357,28 +357,28 @@ class FinCDSIndexPortfolio():
 
         for iCredit in range(0, numCredits):
 
-            recoveryRate = issuerCurves[iCredit]._recoveryRate
+            recovery_rate = issuer_curves[iCredit]._recovery_rate
 
             adjustedCDSContracts = []
             adjustedSpreads = []
 
             for j in range(0, numCDSMaturityPoints):
 
-                unadjustedSpread = issuerCurves[iCredit]._cdsContracts[j]._runningCoupon
+                unadjustedSpread = issuer_curves[iCredit]._cds_contracts[j]._running_coupon
 
                 adjustedSpread = unadjustedSpread * cdsSpreadMultipliers[j]
 
-                adjustedcdsContract = FinCDS(valuationDate,
+                adjustedcdsContract = FinCDS(valuation_date,
                                              cdsMaturityDates[j],
                                              adjustedSpread)
 
                 adjustedCDSContracts.append(adjustedcdsContract)
                 adjustedSpreads.append(adjustedSpread)
 
-                adjustedIssuerCurve = FinCDSCurve(valuationDate,
+                adjustedIssuerCurve = FinCDSCurve(valuation_date,
                                                   adjustedCDSContracts,
-                                                  liborCurve,
-                                                  recoveryRate)
+                                                  libor_curve,
+                                                  recovery_rate)
 
             adjustedIssuerCurves.append(adjustedIssuerCurve)
 
@@ -387,36 +387,36 @@ class FinCDSIndexPortfolio():
 ###############################################################################
 
     def hazardRateAdjustIntrinsic(self,
-                                  valuationDate,
-                                  issuerCurves,
+                                  valuation_date,
+                                  issuer_curves,
                                   indexCoupons,
                                   indexUpfronts,
                                   indexMaturityDates,
                                   indexRecoveryRate,
                                   tolerance=1e-6,
                                   maxIterations=100):
-        ''' Adjust individual CDS curves to reprice CDS index prices.
+        """ Adjust individual CDS curves to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish
-        CDS curve bootstrap required when a spread adjustment is made.'''
-        numCredits = len(issuerCurves)
+        CDS curve bootstrap required when a spread adjustment is made."""
+        numCredits = len(issuer_curves)
 
         if numCredits < 1:
             raise FinError("Number of credits must be greater than 1")
 
-        liborCurve = issuerCurves[0]._liborCurve
+        libor_curve = issuer_curves[0]._libor_curve
         numIndexMaturityPoints = len(indexCoupons)
 #        hazardRateMultipliers = [1.0] * numIndexMaturityPoints
         adjustedIssuerCurves = []
 
         # making a copy of the issuer curves
-        for issuerCurve in issuerCurves:
+        for issuer_curve in issuer_curves:
 
-            adjustedIssuerCurve = FinCDSCurve(valuationDate,
+            adjustedIssuerCurve = FinCDSCurve(valuation_date,
                                               [],
-                                              liborCurve)
+                                              libor_curve)
 
-            adjustedIssuerCurve._times = issuerCurve._times.copy()
-            adjustedIssuerCurve._values = issuerCurve._values.copy()
+            adjustedIssuerCurve._times = issuer_curve._times.copy()
+            adjustedIssuerCurve._values = issuer_curve._values.copy()
             adjustedIssuerCurves.append(adjustedIssuerCurve)
 
         # We solve for each maturity point
@@ -450,14 +450,14 @@ class FinCDSIndexPortfolio():
 
                     # the CDS spreads we extract here should be the index
                     # maturity dates
-                    cdsIndex = FinCDS(valuationDate, indexMaturityDate, 0, 1.0)
+                    cdsIndex = FinCDS(valuation_date, indexMaturityDate, 0, 1.0)
 
-                    indexProtPV = cdsIndex.protectionLegPV(valuationDate,
+                    indexProtPV = cdsIndex.protectionLegPV(valuation_date,
                                                            adjustedIssuerCurves[iCredit],
                                                            indexRecoveryRate)
 
                     rpv01Ret = cdsIndex.riskyPV01(
-                        valuationDate, adjustedIssuerCurves[iCredit])
+                        valuation_date, adjustedIssuerCurves[iCredit])
 
                     cleanRPV01 = rpv01Ret['clean_rpv01']
 
@@ -481,17 +481,17 @@ class FinCDSIndexPortfolio():
     def __repr__(self):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("FREQUENCY", self._freqType)
-        s += labelToString("DAYCOUNT", self._dayCountType)
-        s += labelToString("CALENDAR", self._calendarType)
-        s += labelToString("BUSDAYRULE", self._busDayAdjustType)
-        s += labelToString("DATEGENRULE", self._dateGenRuleType)
+        s += labelToString("FREQUENCY", self._freq_type)
+        s += labelToString("DAYCOUNT", self._day_count_type)
+        s += labelToString("CALENDAR", self._calendar_type)
+        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
+        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
         return s
 
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

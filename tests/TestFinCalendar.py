@@ -5,9 +5,9 @@
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
-from financepy.finutils.FinCalendar import FinCalendar, FinCalendarTypes
+from financepy.utils.Date import Date
+from financepy.utils.Date import setDateFormatType, FinDateFormatTypes
+from financepy.utils.Calendar import Calendar, FinCalendarTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -15,23 +15,23 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinCalendar():
+def test_Calendar():
 
     setDateFormatType(FinDateFormatTypes.US_LONGEST)
-    endDate = FinDate(31, 12, 2030)
+    end_date = Date(31, 12, 2030)
 
-    for calendarType in FinCalendarTypes:
+    for calendar_type in FinCalendarTypes:
 
         testCases.banner("================================")
         testCases.banner("================================")
 
         testCases.header("CALENDAR", "HOLIDAY")
-        testCases.print("STARTING", calendarType)
+        testCases.print("STARTING", calendar_type)
 
-        cal = FinCalendar(calendarType)
-        nextDate = FinDate(31, 12, 2020)
+        cal = Calendar(calendar_type)
+        nextDate = Date(31, 12, 2020)
 
-        while nextDate < endDate:
+        while nextDate < end_date:
             nextDate = nextDate.addDays(1)
             
             if nextDate._d == 1 and nextDate._m == 1:
@@ -48,5 +48,5 @@ def test_FinCalendar():
 ###############################################################################
 
 
-test_FinCalendar()
+test_Calendar()
 testCases.compareTestCases()

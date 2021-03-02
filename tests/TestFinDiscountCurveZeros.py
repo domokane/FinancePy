@@ -8,9 +8,9 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.Date import Date
 from financepy.market.curves.FinInterpolator import FinInterpTypes
 from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
 
@@ -21,24 +21,24 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinDiscountCurveZeros():
 
-    startDate = FinDate(1, 1, 2018)
+    start_date = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
-    dates = startDate.addYears(times)
+    dates = start_date.addYears(times)
     zeroRates = np.linspace(5.0, 6.0, 10)/100
-    freqType = FinFrequencyTypes.ANNUAL
-    dayCountType = FinDayCountTypes.ACT_ACT_ISDA
+    freq_type = FinFrequencyTypes.ANNUAL
+    day_count_type = FinDayCountTypes.ACT_ACT_ISDA
 
-    curve = FinDiscountCurveZeros(startDate,
+    curve = FinDiscountCurveZeros(start_date,
                                   dates,
                                   zeroRates,
-                                  freqType,
-                                  dayCountType,
+                                  freq_type,
+                                  day_count_type,
                                   FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF")
 
     years = np.linspace(0, 10, 21)
-    dates = startDate.addYears(years)
+    dates = start_date.addYears(years)
     for dt in dates:
         df = curve.df(dt)
         testCases.print(dt, df)
@@ -52,26 +52,26 @@ def test_FinDiscountCurveZeros():
     start = time.time()
 
     for i in range(0, numRepeats):
-        freqType = FinFrequencyTypes.ANNUAL
-        dayCountType = FinDayCountTypes.ACT_ACT_ISDA
+        freq_type = FinFrequencyTypes.ANNUAL
+        day_count_type = FinDayCountTypes.ACT_ACT_ISDA
 
-        dates = [FinDate(14, 6, 2016), FinDate(14, 9, 2016),
-                 FinDate(14, 12, 2016), FinDate(14, 6, 2017),
-                 FinDate(14, 6, 2019), FinDate(14, 6, 2021),
-                 FinDate(15, 6, 2026), FinDate(16, 6, 2031),
-                 FinDate(16, 6, 2036), FinDate(14, 6, 2046)]
+        dates = [Date(14, 6, 2016), Date(14, 9, 2016),
+                 Date(14, 12, 2016), Date(14, 6, 2017),
+                 Date(14, 6, 2019), Date(14, 6, 2021),
+                 Date(15, 6, 2026), Date(16, 6, 2031),
+                 Date(16, 6, 2036), Date(14, 6, 2046)]
 
         zeroRates = [0.000000, 0.006616, 0.007049, 0.007795,
                      0.009599, 0.011203, 0.015068, 0.017583,
                      0.018998, 0.020080]
 
-        startDate = dates[0]
+        start_date = dates[0]
 
-        curve = FinDiscountCurveZeros(startDate,
+        curve = FinDiscountCurveZeros(start_date,
                                       dates,
                                       zeroRates,
-                                      freqType,
-                                      dayCountType,
+                                      freq_type,
+                                      day_count_type,
                                       FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()

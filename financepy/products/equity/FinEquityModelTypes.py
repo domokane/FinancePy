@@ -2,13 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.FinHelperFunctions import labelToString
 
 ###############################################################################
 
 
 class FinEquityModel(object):
-    ''' This is a parent class for equity models. '''
+    """ This is a parent class for equity models. """
 
     def __init__(self):
         pass

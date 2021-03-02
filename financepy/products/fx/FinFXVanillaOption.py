@@ -6,11 +6,11 @@ import numpy as np
 from scipy import optimize
 from numba import njit
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import nprime
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.Date import Date
+from ...utils.Math import nprime
+from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModel
 #from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 #from ...products.fx.FinFXModelTypes import FinFXModelSABR
@@ -23,9 +23,9 @@ from ...models.FinModelBlackScholes import FinModelBlackScholes
 
 from ...models.FinModelBlackScholesAnalytical import bsValue, bsDelta
 
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
 
-from ...finutils.FinMath import N
+from ...utils.Math import N
 
 
 ###############################################################################
@@ -33,11 +33,11 @@ from ...finutils.FinMath import N
 ###############################################################################
 
 def f(volatility, *args):
-    ''' This is the objective function used in the determination of the FX
-    Option implied volatility which is computed in the class below. '''
+    """ This is the objective function used in the determination of the FX
+    Option implied volatility which is computed in the class below. """
 
     self = args[0]
-    valueDate = args[1]
+    valuation_date = args[1]
     spotFXRate = args[2]
     domDiscountCurve = args[3]
     forDiscountCurve = args[4]
@@ -45,7 +45,7 @@ def f(volatility, *args):
 
     model = FinModelBlackScholes(volatility)
 
-    vdf = self.value(valueDate,
+    vdf = self.value(valuation_date,
                      spotFXRate,
                      domDiscountCurve,
                      forDiscountCurve,
@@ -59,19 +59,19 @@ def f(volatility, *args):
 
 
 def fvega(volatility, *args):
-    ''' This is the derivative of the objective function with respect to the
+    """ This is the derivative of the objective function with respect to the
     option volatility. It is used to speed up the determination of the FX
-    Option implied volatility which is computed in the class below. '''
+    Option implied volatility which is computed in the class below. """
 
     self = args[0]
-    valueDate = args[1]
+    valuation_date = args[1]
     spotFXRate = args[2]
     domDiscountCurve = args[3]
     forDiscountCurve = args[4]
 
     model = FinModelBlackScholes(volatility)
 
-    fprime = self.vega(valueDate,
+    fprime = self.vega(valuation_date,
                        spotFXRate,
                        domDiscountCurve,
                        forDiscountCurve,
@@ -83,9 +83,9 @@ def fvega(volatility, *args):
 
 @njit(fastmath=True, cache=True)
 def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
-    ''' Calculation of the FX Option delta. Used in the determination of
+    """ Calculation of the FX Option delta. Used in the determination of
     the volatility surface. Avoids discount curve interpolation so it 
-    should be slightly faster than the full calculation of delta. '''
+    should be slightly faster than the full calculation of delta. """
 
     pips_spot_delta = bsDelta(s, t, k, rd, rf, vol, optionTypeValue)
 
@@ -108,11 +108,11 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 ###############################################################################
     
 # def g(K, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     Option implied strike which is computed in the class below. '''
+#     """ This is the objective function used in the determination of the FX
+#     Option implied strike which is computed in the class below. """
 
 #     self = args[0]
-#     valueDate = args[1]
+#     valuation_date = args[1]
 #     stockPrice = args[2]
 #     domDiscountCurve = args[3]
 #     forDiscountCurve = args[4]
@@ -124,7 +124,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 
 #     self._strikeFXRate = K
 
-#     deltaDict = self.delta(valueDate,
+#     deltaDict = self.delta(valuation_date,
 #                            stockPrice,
 #                            domDiscountCurve,
 #                            forDiscountCurve,
@@ -137,11 +137,11 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 # ## THIS IS A HOPEFULLY FASTER VERSION WHICH AVOIDS CALLING DF
 
 # def g2(K, *args):
-#     ''' This is the objective function used in the determination of the FX
-#     Option implied strike which is computed in the class below. '''
+#     """ This is the objective function used in the determination of the FX
+#     Option implied strike which is computed in the class below. """
 
 #     self = args[0]
-#     valueDate = args[1]
+#     valuation_date = args[1]
 #     stockPrice = args[2]
 #     domDF = args[3]
 #     forDF = args[4]
@@ -151,7 +151,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 
 #     self._strikeFXRate = K
 
-#     deltaDict = self.fastDelta(valueDate,
+#     deltaDict = self.fastDelta(valuation_date,
 #                                stockPrice,
 #                                domDF,
 #                                forDF,
@@ -172,43 +172,43 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 
 
 class FinFXVanillaOption():
-    ''' This is a class for an FX Option trade. It permits the user to
+    """ This is a class for an FX Option trade. It permits the user to
     calculate the price of an FX Option trade which can be expressed in a
     number of ways depending on the investor or hedger's currency. It aslo
     allows the calculation of the option's delta in a number of forms as
-    well as the various Greek risk sensitivies. '''
+    well as the various Greek risk sensitivies. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikeFXRate: (float, np.ndarray),  # 1 unit of foreign in domestic
                  currencyPair: str,  # FORDOM
                  optionType: (FinOptionTypes, list),
                  notional: float,
                  premCurrency: str,
                  spotDays: int = 0):
-        ''' Create the FX Vanilla Option object. Inputs include expiry date,
+        """ Create the FX Vanilla Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
         currency rates must be entered in the price in domestic currency of
         one unit of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
-        same for the domestic currency. '''
+        same for the domestic currency. """
 
         checkArgumentTypes(self.__init__, locals())
 
-        deliveryDate = expiryDate.addWeekDays(spotDays)
+        deliveryDate = expiry_date.addWeekDays(spotDays)
 
-        ''' The FX rate the price in domestic currency ccy2 of a single unit
+        """ The FX rate the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
-        price in USD (CCY2) of 1 unit of EUR (CCY1)'''
+        price in USD (CCY2) of 1 unit of EUR (CCY1)"""
 
-        if deliveryDate < expiryDate:
+        if deliveryDate < expiry_date:
             raise FinError("Delivery date must be on or after expiry date.")
 
         if len(currencyPair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._deliveryDate = deliveryDate
 
         if np.any(strikeFXRate < 0.0):
@@ -239,22 +239,22 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def value(self,
-              valueDate,
+              valuation_date,
               spotFXRate,  # 1 unit of foreign in domestic
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' This function calculates the value of the option using a specified
+        """ This function calculates the value of the option using a specified
         model with the resulting value being in domestic i.e. ccy2 terms.
         Recall that Domestic = CCY2 and Foreign = CCY1 and FX rate is in
-        price in domestic of one unit of foreign currency. '''
+        price in domestic of one unit of foreign currency. """
 
-        if type(valueDate) == FinDate:
-            spotDate = valueDate.addWeekDays(self._spotDays)
+        if type(valuation_date) == Date:
+            spotDate = valuation_date.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
-            texp = (self._expiryDate - valueDate) / gDaysInYear
+            texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            tdel = valueDate
+            tdel = valuation_date
             texp = tdel
 
         if np.any(spotFXRate <= 0.0):
@@ -304,12 +304,12 @@ class FinFXVanillaOption():
                               FinOptionTypes.EUROPEAN_PUT.value)
 
             elif self._optionType == FinOptionTypes.AMERICAN_CALL:
-                numStepsPerYear = 100
-                vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
+                num_steps_per_year = 100
+                vdf = crrTreeValAvg(S0, rd, rf, volatility, num_steps_per_year,
                           texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
             elif self._optionType == FinOptionTypes.AMERICAN_PUT:
-                numStepsPerYear = 100
-                vdf = crrTreeValAvg(S0, rd, rf, volatility, numStepsPerYear,
+                num_steps_per_year = 100
+                vdf = crrTreeValAvg(S0, rd, rf, volatility, num_steps_per_year,
                            texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
             else:
                 raise FinError("Unknown option type")
@@ -352,26 +352,26 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def delta_bump(self,
-                   valueDate,
+                   valuation_date,
                    spotFXRate,
                    ccy1DiscountCurve,
                    ccy2DiscountCurve,
                    model):
-        ''' Calculation of the FX option delta by bumping the spot FX rate by
+        """ Calculation of the FX option delta by bumping the spot FX rate by
         1 cent of its value. This gives the FX spot delta. For speed we prefer
-        to use the analytical calculation of the derivative given below. '''
+        to use the analytical calculation of the derivative given below. """
 
         bump = 0.0001 * spotFXRate
 
         v = self.value(
-            valueDate,
+            valuation_date,
             spotFXRate,
             ccy1DiscountCurve,
             ccy2DiscountCurve,
             model)
 
         vBumped = self.value(
-            valueDate,
+            valuation_date,
             spotFXRate + bump,
             ccy1DiscountCurve,
             ccy2DiscountCurve,
@@ -387,22 +387,22 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def delta(self,
-              valueDate,
+              valuation_date,
               spotFXRate,
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' Calculation of the FX Option delta. There are several definitions
+        """ Calculation of the FX Option delta. There are several definitions
         of delta and so we are required to return a dictionary of values. The
         definitions can be found on Page 44 of Foreign Exchange Option Pricing
-        by Iain Clark, published by Wiley Finance. '''
+        by Iain Clark, published by Wiley Finance. """
 
-        if type(valueDate) == FinDate:
-            spotDate = valueDate.addWeekDays(self._spotDays)
+        if type(valuation_date) == Date:
+            spotDate = valuation_date.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
-            texp = (self._expiryDate - valueDate) / gDaysInYear
+            texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            tdel = valueDate
+            tdel = valuation_date
             texp = tdel
 
         if np.any(spotFXRate <= 0.0):
@@ -450,12 +450,12 @@ class FinFXVanillaOption():
                   rd,
                   rf,
                   vol):
-        ''' Calculation of the FX Option delta. Used in the determination of
+        """ Calculation of the FX Option delta. Used in the determination of
         the volatility surface. Avoids discount curve interpolation so it 
-        should be slightly faster than the full calculation of delta. '''
+        should be slightly faster than the full calculation of delta. """
 
-#        spotDate = valueDate.addWeekDays(self._spotDays)
-#        tdel = (self._deliveryDate - valueDate) / gDaysInYear
+#        spotDate = valuation_date.addWeekDays(self._spotDays)
+#        tdel = (self._deliveryDate - valuation_date) / gDaysInYear
 #        tdel = np.maximum(tdel, gSmall)
 
 #        rd = -np.log(domDF)/tdel
@@ -481,18 +481,18 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def gamma(self,
-              valueDate,
+              valuation_date,
               spotFXRate,  # value of a unit of foreign in domestic currency
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' This function calculates the FX Option Gamma using the spot delta.
-        '''
+        """ This function calculates the FX Option Gamma using the spot delta.
+        """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(spotFXRate <= 0.0):
             raise FinError("FX Rate must be greater than zero.")
@@ -536,18 +536,18 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def vega(self,
-             valueDate,
+             valuation_date,
              spotFXRate,  # value of a unit of foreign in domestic currency
              domDiscountCurve,
              forDiscountCurve,
              model):
-        ''' This function calculates the FX Option Vega using the spot delta.
-        '''
+        """ This function calculates the FX Option Vega using the spot delta.
+        """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(spotFXRate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
@@ -590,17 +590,17 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def theta(self,
-              valueDate,
+              valuation_date,
               spotFXRate,  # value of a unit of foreign in domestic currency
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' This function calculates the time decay of the FX option. '''
+        """ This function calculates the time decay of the FX option. """
 
-        if type(valueDate) == FinDate:
-            t = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            t = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            t = valueDate
+            t = valuation_date
 
         if np.any(spotFXRate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
@@ -655,17 +655,17 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def impliedVolatility(self,
-                          valueDate,
+                          valuation_date,
                           stockPrice,
-                          discountCurve,
+                          discount_curve,
                           dividendCurve,
                           price):
-        ''' This function determines the implied volatility of an FX option
+        """ This function determines the implied volatility of an FX option
         given a price and the other option details. It uses a one-dimensional
-        Newton root search algorith to determine the implied volatility. '''
+        Newton root search algorith to determine the implied volatility. """
 
-        argtuple = (self, valueDate, stockPrice,
-                    discountCurve, dividendCurve, price)
+        argtuple = (self, valuation_date, stockPrice,
+                    discount_curve, dividendCurve, price)
 
         sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
                                 tol=1e-6, maxiter=50, fprime2=None)
@@ -674,18 +674,18 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
+                valuation_date,
                 spotFXRate,
                 domDiscountCurve,
                 forDiscountCurve,
                 model,
                 numPaths=10000,
                 seed=4242):
-        ''' Calculate the value of an FX Option using Monte Carlo methods.
+        """ Calculate the value of an FX Option using Monte Carlo methods.
         This function can be used to validate the risk measures calculated
         above or used as the starting code for a model exotic FX product that
         cannot be priced analytically. This function uses Numpy vectorisation
-        for speed of execution.'''
+        for speed of execution."""
 
         if isinstance(model, FinModelBlackScholes):
             volatility = model._volatility
@@ -693,10 +693,10 @@ class FinFXVanillaOption():
             raise FinError("Model Type invalid")
 
         np.random.seed(seed)
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        domDF = domDiscountCurve.df(self._expiryDate)
-        forDF = forDiscountCurve.df(self._expiryDate)
+        domDF = domDiscountCurve.df(self._expiry_date)
+        forDF = forDiscountCurve.df(self._expiry_date)
 
         rd = -np.log(domDF)/t
         rf = -np.log(forDF)/t
@@ -730,7 +730,7 @@ class FinFXVanillaOption():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("CURRENCY PAIR", self._currencyPair)
         s += labelToString("PREMIUM CCY", self._premCurrency)
         s += labelToString("STRIKE FX RATE", self._strikeFXRate)
@@ -742,7 +742,7 @@ class FinFXVanillaOption():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

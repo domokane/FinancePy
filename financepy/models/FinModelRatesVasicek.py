@@ -6,7 +6,7 @@ from math import sqrt, exp
 from numba import njit, float64, int64
 import numpy as np
 
-from ..finutils.FinHelperFunctions import labelToString
+from ..utils.FinHelperFunctions import labelToString
 
 ##########################################################################
 # dr = a(b-r) + sigma dW

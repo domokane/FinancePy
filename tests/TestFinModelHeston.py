@@ -9,9 +9,9 @@ import sys
 sys.path.append("..")
 
 from financepy.models.FinModelHeston import FinModelHeston, FinHestonNumericalScheme
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.Date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -22,8 +22,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def testAnalyticalModels():
 
     # Reference see table 4.1 of Rouah book
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 4, 2015)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 4, 2015)
     v0 = 0.05  # initial variance of volatility
     theta = 0.05  # long term variance
     kappa = 2.0  # speed of variance reversion
@@ -54,9 +54,9 @@ def testAnalyticalModels():
             hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
             for strikePrice in np.linspace(95, 105, 3):
                 callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
+                    expiry_date, strikePrice, FinOptionTypes.EUROPEAN_CALL)
                 valueMC_Heston = hestonModel.value_MC(
-                    valueDate,
+                    valuation_date,
                     callOption,
                     stockPrice,
                     interestRate,
@@ -66,13 +66,13 @@ def testAnalyticalModels():
                     seed)
                 start = time.time()
                 valueGatheral = hestonModel.value_Gatheral(
-                    valueDate, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
                 valueLewisRouah = hestonModel.value_Lewis_Rouah(
-                    valueDate, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
                 valueLewis = hestonModel.value_Lewis(
-                    valueDate, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
                 valueWeber = hestonModel.value_Weber(
-                    valueDate, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
                 err = (valueMC_Heston - valueWeber)
                 end = time.time()
                 elapsed = end - start
@@ -95,8 +95,8 @@ def testMonteCarlo():
     import time
 
     # Reference see table 4.1 of Rouah book
-    valueDate = FinDate(1, 1, 2015)
-    expiryDate = FinDate(1, 1, 2016)
+    valuation_date = Date(1, 1, 2015)
+    expiry_date = Date(1, 1, 2016)
     v0 = 0.04  # initial variance of volatility
     theta = 0.04  # long term variance
     kappa = 2.0  # speed of variance reversion
@@ -125,14 +125,14 @@ def testMonteCarlo():
             for numPaths in [10000, 20000]:
                 hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
                 callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
+                    expiry_date, strikePrice, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
-                    valueDate, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
 
                 start = time.time()
 
                 valueMC_EULER = hestonModel.value_MC(
-                    valueDate,
+                    valuation_date,
                     callOption,
                     stockPrice,
                     interestRate,
@@ -142,7 +142,7 @@ def testMonteCarlo():
                     seed,
                     FinHestonNumericalScheme.EULER)
                 valueMC_EULERLOG = hestonModel.value_MC(
-                    valueDate,
+                    valuation_date,
                     callOption,
                     stockPrice,
                     interestRate,
@@ -152,7 +152,7 @@ def testMonteCarlo():
                     seed,
                     FinHestonNumericalScheme.EULERLOG)
                 valueMC_QUADEXP = hestonModel.value_MC(
-                    valueDate,
+                    valuation_date,
                     callOption,
                     stockPrice,
                     interestRate,
