@@ -2,10 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from .FinDate import FinDate, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-from .FinDate import isLeapYear
+from .Date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
+from .Date import isLeapYear
 from .FinError import FinError
-from .FinFrequency import FinFrequencyTypes, FinFrequency
+from .Frequency import FinFrequencyTypes, Frequency
 from .FinGlobalVariables import gDaysInYear
 
 from enum import Enum
@@ -19,7 +19,7 @@ from enum import Enum
 ###############################################################################
 
 
-def isLastDayOfFeb(dt: FinDate):
+def isLastDayOfFeb(dt: Date):
     # Return true if we are on the last day of February
     if dt._m == 2:
         isLeap = isLeapYear(dt._y)
@@ -75,10 +75,10 @@ class FinDayCount(object):
 ###############################################################################
 
     def yearFrac(self,
-                 dt1: FinDate,    # Start of coupon period
-                 dt2: FinDate,    # Settlement (for bonds) or period end(swaps)
-                 dt3: FinDate = None,   # End of coupon period for accrued
-                 freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 dt1: Date,  # Start of coupon period
+                 dt2: Date,  # Settlement (for bonds) or period end(swaps)
+                 dt3: Date = None,  # End of coupon period for accrued
+                 freq_type: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
                  isTerminationDate: bool = False):  # Is dt2 a termination date
         ''' This method performs two functions:
 
@@ -203,8 +203,8 @@ class FinDayCount(object):
                 accFactor = (dt2 - dt1) / denom1
                 return (accFactor, num, den)
             else:
-                daysYear1 = datediff(dt1, FinDate(1, 1, y1+1))
-                daysYear2 = datediff(FinDate(1, 1, y2), dt2)
+                daysYear1 = datediff(dt1, Date(1, 1, y1 + 1))
+                daysYear2 = datediff(Date(1, 1, y2), dt2)
                 accFactor1 = daysYear1 / denom1
                 accFactor2 = daysYear2 / denom2
                 yearDiff = y2 - y1 - 1.0
@@ -217,7 +217,7 @@ class FinDayCount(object):
 
         elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
 
-            freq = FinFrequency(freqType)
+            freq = Frequency(freq_type)
 
             if dt3 is None or freq is None:
                 raise FinError("ACT_ACT_ICMA requires three dates and a freq")
@@ -246,7 +246,7 @@ class FinDayCount(object):
             # The ISDA calculator sheet appears to split this across the
             # non-leap and the leap year which I do not see in any conventions.
 
-            freq = FinFrequency(freqType)
+            freq = Frequency(freq_type)
 
             if dt3 is None:
                 y3 = y2
@@ -257,11 +257,11 @@ class FinDayCount(object):
             den = 365
 
             if isLeapYear(y1):
-                feb29 = FinDate(29, 2, y1)
+                feb29 = Date(29, 2, y1)
             elif isLeapYear(y3):
-                feb29 = FinDate(29, 2, y3)
+                feb29 = Date(29, 2, y3)
             else:
-                feb29 = FinDate(1, 1, 1900)
+                feb29 = Date(1, 1, 1900)
 
             if freq == 1:
                 if feb29 > dt1 and feb29 <= dt3:

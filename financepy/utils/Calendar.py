@@ -79,7 +79,7 @@ class FinDateGenRuleTypes(Enum):
 ###############################################################################
 
 
-class FinCalendar(object):
+class calendar(object):
     ''' Class to manage designation of payment dates as holidays according to
     a regional or country-specific calendar convention specified by the user.
     It also supplies an adjustment method which takes in an adjustment

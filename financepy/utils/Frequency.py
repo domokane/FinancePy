@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ..finutils.FinError import FinError
+from ..utils.FinError import FinError
 
 ###############################################################################
 
@@ -21,7 +21,7 @@ class FinFrequencyTypes(Enum):
 ###############################################################################
 
 
-def FinFrequency(freqType):
+def Frequency(freqType):
     ''' This is a function that takes in a Frequency Type and returns an
     integer for the number of times a year a payment occurs.'''
     if isinstance(freqType, FinFrequencyTypes) is False:

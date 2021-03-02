@@ -5,7 +5,7 @@
 
 from .FinHelperFunctions import checkArgumentTypes
 from .FinCurrency import FinCurrencyTypes
-from .FinMath import ONE_MILLION
+from .Math import ONE_MILLION
 
 ###############################################################################
 

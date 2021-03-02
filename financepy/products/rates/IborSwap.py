@@ -4,16 +4,16 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gSmall
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
-from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinGlobalTypes import FinSwapTypes
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gSmall
+from ...utils.DayCount import FinDayCountTypes
+from ...utils.Frequency import FinFrequencyTypes, Frequency
+from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
+from ...utils.Calendar import Calendar, FinBusDayAdjustTypes
+from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...utils.Math import ONE_MILLION
+from ...utils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 from .FinFixedLeg import FinFixedLeg
@@ -37,8 +37,8 @@ class FinIborSwap(object):
     which the implied index rates are extracted. '''
     
     def __init__(self,
-                 effectiveDate: FinDate,  # Date interest starts to accrue
-                 terminationDateOrTenor: (FinDate, str),  # Date contract ends
+                 effective_date: Date,  # Date interest starts to accrue
+                 termination_dateOrTenor: (Date, str),  # Date contract ends
                  fixedLegType: FinSwapTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FinFrequencyTypes,
@@ -47,9 +47,9 @@ class FinIborSwap(object):
                  floatSpread: float = 0.0,
                  floatFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
                  floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
         ''' Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -61,57 +61,57 @@ class FinIborSwap(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if type(terminationDateOrTenor) == FinDate:
-            self._terminationDate = terminationDateOrTenor
+        if type(termination_dateOrTenor) == Date:
+            self._termination_date = termination_dateOrTenor
         else:
-            self._terminationDate = effectiveDate.addTenor(terminationDateOrTenor)
+            self._termination_date = effective_date.addTenor(termination_dateOrTenor)
 
-        calendar = FinCalendar(calendarType)
-        self._maturityDate = calendar.adjust(self._terminationDate,
-                                             busDayAdjustType)
+        calendar = Calendar(calendar_type)
+        self._maturity_date = calendar.adjust(self._termination_date,
+                                             bus_day_adjust_type)
 
-        if effectiveDate > self._maturityDate:
+        if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
 
-        self._effectiveDate = effectiveDate
+        self._effective_date = effective_date
 
         floatLegType = FinSwapTypes.PAY
         if fixedLegType == FinSwapTypes.PAY:
             floatLegType = FinSwapTypes.RECEIVE
         
-        paymentLag = 0
+        payment_lag = 0
         principal = 0.0
 
-        self._fixedLeg = FinFixedLeg(effectiveDate,
-                                     self._terminationDate,
+        self._fixedLeg = FinFixedLeg(effective_date,
+                                     self._termination_date,
                                      fixedLegType,
                                      fixedCoupon,
                                      fixedFreqType,
                                      fixedDayCountType,
                                      notional,
                                      principal,
-                                     paymentLag,
-                                     calendarType,
-                                     busDayAdjustType,
-                                     dateGenRuleType)
+                                     payment_lag,
+                                     calendar_type,
+                                     bus_day_adjust_type,
+                                     date_gen_rule_type)
 
-        self._floatLeg = FinFloatLeg(effectiveDate,
-                                     self._terminationDate,
+        self._floatLeg = FinFloatLeg(effective_date,
+                                     self._termination_date,
                                      floatLegType,
                                      floatSpread,
                                      floatFreqType,
                                      floatDayCountType,
                                      notional,
                                      principal,
-                                     paymentLag,
-                                     calendarType,
-                                     busDayAdjustType,
-                                     dateGenRuleType)
+                                     payment_lag,
+                                     calendar_type,
+                                     bus_day_adjust_type,
+                                     date_gen_rule_type)
             
 ###############################################################################
 
     def value(self,
-              valuationDate: FinDate,
+              valuation_date: Date,
               discountCurve: FinDiscountCurve,
               indexCurve: FinDiscountCurve=None,
               firstFixingRate=None):
@@ -121,10 +121,10 @@ class FinIborSwap(object):
         if indexCurve is None:
             indexCurve = discountCurve
 
-        fixedLegValue = self._fixedLeg.value(valuationDate,
+        fixedLegValue = self._fixedLeg.value(valuation_date,
                                              discountCurve)
 
-        floatLegValue = self._floatLeg.value(valuationDate,
+        floatLegValue = self._floatLeg.value(valuation_date,
                                              discountCurve,
                                              indexCurve,
                                              firstFixingRate)
@@ -134,10 +134,10 @@ class FinIborSwap(object):
 
 ###############################################################################
 
-    def pv01(self, valuationDate, discountCurve):
+    def pv01(self, valuation_date, discountCurve):
         ''' Calculate the value of 1 basis point coupon on the fixed leg. '''
 
-        pv = self._fixedLeg.value(valuationDate, discountCurve)
+        pv = self._fixedLeg.value(valuation_date, discountCurve)
         
         # Needs to be positive even if it is a payer leg
         pv = np.abs(pv)
@@ -146,8 +146,8 @@ class FinIborSwap(object):
 
 ###############################################################################
 
-    def swapRate(self, 
-                 valuationDate:FinDate,
+    def swapRate(self,
+                 valuation_date:Date,
                  discountCurve: FinDiscountCurve,
                  indexCurve: FinDiscountCurve = None,
                  firstFixing: float = None):
@@ -160,23 +160,23 @@ class FinIborSwap(object):
         approach but in this case the first fixing on the floating leg is
         needed. '''
 
-        pv01 = self.pv01(valuationDate, discountCurve)
+        pv01 = self.pv01(valuation_date, discountCurve)
 
         if abs(pv01) < gSmall:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        if valuationDate < self._effectiveDate:
-            df0 = discountCurve.df(self._effectiveDate)
+        if valuation_date < self._effective_date:
+            df0 = discountCurve.df(self._effective_date)
         else:
-            df0 = discountCurve.df(valuationDate)
+            df0 = discountCurve.df(valuation_date)
 
         floatLegPV = 0.0
 
         if indexCurve is None:
-            dfT = discountCurve.df(self._maturityDate)
+            dfT = discountCurve.df(self._maturity_date)
             floatLegPV = (df0 - dfT) 
         else:
-            floatLegPV = self._floatLeg.value(valuationDate,
+            floatLegPV = self._floatLeg.value(valuation_date,
                                               discountCurve,
                                               indexCurve, 
                                               firstFixing)
@@ -189,7 +189,7 @@ class FinIborSwap(object):
 ##########################################################################
 
     def cashSettledPV01(self,
-                        valuationDate,
+                        valuation_date,
                         flatSwapRate,
                         frequencyType):
         ''' Calculate the forward value of an annuity of a forward starting
@@ -197,7 +197,7 @@ class FinIborSwap(object):
         used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods.'''
 
-        m = FinFrequency(frequencyType)
+        m = Frequency(frequencyType)
 
         if m == 0:
             raise FinError("Frequency cannot be zero.")
@@ -205,12 +205,12 @@ class FinIborSwap(object):
         ''' The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. '''
         startIndex = 0
-        while self._fixedLeg._paymentDates[startIndex] < valuationDate:
+        while self._fixedLeg._payment_dates[startIndex] < valuation_date:
             startIndex += 1
 
         ''' If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. '''
-        if valuationDate <= self._effectiveDate:
+        if valuation_date <= self._effective_date:
             startIndex = 1
 
         ''' Now PV fixed leg flows. '''
@@ -218,7 +218,7 @@ class FinIborSwap(object):
         df = 1.0
         alpha = 1.0 / m
 
-        for _ in self._fixedLeg._paymentDates[startIndex:]:
+        for _ in self._fixedLeg._payment_dates[startIndex:]:
             df = df / (1.0 + alpha * flatSwapRate)
             flatPV01 += df * alpha
 

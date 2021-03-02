@@ -5,9 +5,9 @@
 
 from .FinError import FinError
 from .FinDate import FinDate
-from .FinCalendar import (FinCalendar, FinCalendarTypes)
-from .FinCalendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
-from .FinFrequency import (FinFrequency, FinFrequencyTypes)
+from .calendar import (calendar, FinCalendarTypes)
+from .calendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
+from .Frequency import (Frequency, FinFrequencyTypes)
 from .FinHelperFunctions import labelToString
 from .FinHelperFunctions import checkArgumentTypes
 
@@ -15,7 +15,8 @@ from .FinHelperFunctions import checkArgumentTypes
 # TODO: Start and end date to allow for long stubs
 ###############################################################################
 
-class FinSchedule(object):
+
+class Schedule(object):
     ''' A schedule is a set of dates generated according to ISDA standard
     rules which starts on the next date after the effective date and runs up to
     a termination date. Dates are adjusted to a provided calendar. The zeroth
@@ -23,14 +24,14 @@ class FinSchedule(object):
     Next Coupon Date (NCD). We reference ISDA 2006.'''
 
     def __init__(self,
-                 effectiveDate: FinDate, # Also known as the start date
-                 terminationDate: FinDate, # This is UNADJUSTED (set flag to adjust it)
-                 freqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
+                 effective_date: FinDate,  # Also known as the start date
+                 termination_date: FinDate,  # This is UNADJUSTED (set flag to adjust it)
+                 freq_type: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
                  busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
                  dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
-                 adjustTerminationDate:bool = True, # Default is to adjust
-                 endOfMonthFlag:bool = False, # All flow dates are EOM if True
+                 adjustTerminationDate:bool = True,  # Default is to adjust
+                 endOfMonthFlag:bool = False,  # All flow dates are EOM if True
                  firstDate = None,  # First coupon date
                  nextToLastDate = None): # Penultimate coupon date
         ''' Create FinSchedule object which calculates a sequence of dates
@@ -68,16 +69,16 @@ class FinSchedule(object):
 
         checkArgumentTypes(self.__init__, locals())
 
-        if effectiveDate >= terminationDate:
+        if effective_date >= termination_date:
             raise FinError("Effective date must be before termination date.")
 
-        self._effectiveDate = effectiveDate
-        self._terminationDate = terminationDate
+        self._effectiveDate = effective_date
+        self._terminationDate = termination_date
 
         if firstDate is None:
-            self._firstDate  = effectiveDate
+            self._firstDate  = effective_date
         else:            
-            if firstDate > effectiveDate and firstDate < terminationDate:
+            if firstDate > effective_date and firstDate < termination_date:
                 self._firstDate = firstDate
                 print("FIRST DATE NOT IMPLEMENTED") # TODO
             else:
@@ -85,17 +86,17 @@ class FinSchedule(object):
                                " before termination date")
         
         if nextToLastDate is None:
-            self._nextToLastDate = terminationDate
+            self._nextToLastDate = termination_date
         else:
-            if nextToLastDate > effectiveDate and nextToLastDate < terminationDate:
+            if nextToLastDate > effective_date and nextToLastDate < termination_date:
                 self._nextToLastDate = nextToLastDate
                 print("NEXT TO LAST DATE NOT IMPLEMENTED") # TODO
             else:
                 raise FinError("Next to last date must be after effective date and" +
                                " before termination date")
 
-        self._freqType = freqType
-        self._calendarType = calendarType
+        self._freqType = freq_type
+        self._calendarType = calendar_type
         self._busDayAdjustType = busDayAdjustType
         self._dateGenRuleType = dateGenRuleType
         
@@ -127,8 +128,8 @@ class FinSchedule(object):
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. '''
 
-        calendar = FinCalendar(self._calendarType)
-        frequency = FinFrequency(self._freqType)
+        calendar = calendar(self._calendarType)
+        frequency = frequency(self._freqType)
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []
