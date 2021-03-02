@@ -8,36 +8,36 @@
 ###############################################################################
 
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ..bonds.FinBond import FinBond, FinYTMCalcType
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import labelToString, check_argument_types
+from ..bonds.bond import Bond, FinYTMCalcType
 
 ###############################################################################
 
 
-class FinInflationBond(FinBond):
+class FinInflationBond(Bond):
     """ Class for inflation-linked bonds like TIPS and related analytics. These
     are bonds with coupon and principal adjusted by an index such as the CPI.
-    We inherit from the FinBond class. """
+    We inherit from the Bond class. """
 
     def __init__(self,
                  issue_date: Date,
                  maturity_date: Date,
                  coupon: float,  # Annualised bond coupon before inflation
-                 freq_type: FinFrequencyTypes,
-                 accrual_type: FinDayCountTypes,
+                 freq_type: FrequencyTypes,
+                 accrual_type: DayCountTypes,
                  face_amount: float,
                  baseCPIValue: float,
                  numExDividendDays: int = 0): # Value of CPI index at bond issue date
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
-        The class inherits from FinBond so has many similar functions. The YTM"""
+        The class inherits from Bond so has many similar functions. The YTM"""
         
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if issue_date >= maturity_date:
             raise FinError("Issue Date must preceded maturity date.")
@@ -62,8 +62,8 @@ class FinInflationBond(FinBond):
         self._accrued_days = 0.0
         self._alpha = 0.0
                    
-        self._calculateFlowDates()
-        self._calculateFlowAmounts()
+        self._calculate_flow_dates()
+        self._calculateFlows()
 
 ###############################################################################
 
@@ -76,8 +76,8 @@ class FinInflationBond(FinBond):
         amount and the CPI growth. """
 
         indexRatio = referenceCPI / self._baseCPIValue
-        fullPrice = self.fullPriceFromYTM(settlement_date, ytm, convention)
-        principal = fullPrice * self._face_amount / self._par
+        full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
+        principal = full_price * self._face_amount / self._par
         principal = principal - self._accruedInterest
         principal *= indexRatio
         return principal
@@ -93,8 +93,8 @@ class FinInflationBond(FinBond):
         price amount and the CPI growth to the last coupon date. """
 
         indexRatio = lastCpnCPI / self._baseCPIValue
-        cleanPrice = self.cleanPriceFromYTM(settlement_date, ytm, convention)
-        flatPrice = cleanPrice * self._face_amount / self._par
+        clean_price = self.clean_price_from_ytm(settlement_date, ytm, convention)
+        flatPrice = clean_price * self._face_amount / self._par
         flatPrice *= indexRatio
         return flatPrice
 
@@ -108,7 +108,7 @@ class FinInflationBond(FinBond):
         We assume no ex-dividend period.
         """
 
-        self.calcAccruedInterest(settlement_date)        
+        self.calc_accrued_interest(settlement_date)
         indexRatio = referenceCPI/self._baseCPIValue
         self._inflationAccruedInterest = self._accruedInterest * indexRatio        
         return self._inflationAccruedInterest

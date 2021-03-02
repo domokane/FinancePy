@@ -7,8 +7,8 @@ import numpy as np
 
 ###############################################################################
 
-from ..utils.Math import N
-from ..utils.Math import normpdf, norminvcdf, M
+from ..utils.fin_math import N
+from ..utils.fin_math import normpdf, norminvcdf, M
 from ..utils.FinError import FinError
 
 ###############################################################################

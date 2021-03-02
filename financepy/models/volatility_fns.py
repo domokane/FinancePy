@@ -5,7 +5,7 @@
 import numpy as np
 from numba import njit, float64
 
-from ..utils.Math import N
+from ..utils.fin_math import N
 from ..utils.FinError import FinError
 
 ###############################################################################

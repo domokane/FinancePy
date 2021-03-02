@@ -5,15 +5,15 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...utils.Calendar import Calendar, FinBusDayAdjustTypes
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Math import ONE_MILLION
+from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
+from ...utils.calendar import Calendar, BusDayAdjustTypes
+from ...utils.helper_functions import check_argument_types
+from ...utils.fin_math import ONE_MILLION
 from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from .FinFixedLeg import FinFixedLeg
 from .FinFloatLeg import FinFloatLeg
@@ -62,19 +62,19 @@ class FinOIS(object):
 
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
-                 termination_dateOrTenor: (Date, str),  # Date contract ends
+                 termination_date_or_tenor: (Date, str),  # Date contract ends
                  fixed_legType: FinSwapTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
-                 fixedFreqType: FinFrequencyTypes,
-                 fixedDayCountType: FinDayCountTypes,
+                 fixedFreqType: FrequencyTypes,
+                 fixedDayCountType: DayCountTypes,
                  notional: float = ONE_MILLION,
                  payment_lag: int = 0,  # Number of days after period payment occurs
                  floatSpread: float = 0.0,
-                 floatFreqType: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 floatFreqType: FrequencyTypes = FrequencyTypes.ANNUAL,
+                 floatDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an overnight index swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -84,12 +84,12 @@ class FinOIS(object):
         termination date. This is not adjusted for business days. The adjusted
         termination date is called the maturity date. This is calculated. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if type(termination_dateOrTenor) == Date:
-            self._termination_date = termination_dateOrTenor
+        if type(termination_date_or_tenor) == Date:
+            self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.addTenor(termination_dateOrTenor)
+            self._termination_date = effective_date.addTenor(termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
@@ -136,7 +136,7 @@ class FinOIS(object):
 
     def value(self,
               valuation_date: Date,
-              oisCurve: FinDiscountCurve,
+              oisCurve: DiscountCurve,
               firstFixingRate=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
@@ -166,7 +166,7 @@ class FinOIS(object):
 
 ##########################################################################
 
-    def swapRate(self, valuation_date, oisCurve):
+    def swap_rate(self, valuation_date, oisCurve):
         """ Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate

@@ -4,20 +4,20 @@
 
 import numpy as np
 
-from ...utils.Date import Date
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gSmall
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.date import Date
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gSmall
+from ...utils.helper_functions import labelToString
 from ...utils.FinError import FinError
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import timesFromDates
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helper_functions import check_argument_types
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import timesFromDates
 
 ###############################################################################
 
 
-class FinDiscountCurveNSS(FinDiscountCurve):
+class DiscountCurveNSS(DiscountCurve):
     """ Implementation of Nelson-Siegel-Svensson parametrisation of the
     zero rate curve. The zero rate is assumed to be continuously compounded.
     This can be changed when calling for zero rates. A day count convention is
@@ -32,14 +32,14 @@ class FinDiscountCurveNSS(FinDiscountCurve):
                  beta3: float,
                  tau1: float,
                  tau2: float,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a FinDiscountCurveNSS object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
         rates produced by this parametrisation have an implicit compounding
         convention that defaults to continuous but can be overriden. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if tau1 <= 0:
             raise FinError("Tau1 must be positive")
@@ -61,8 +61,8 @@ class FinDiscountCurveNSS(FinDiscountCurve):
 
     def zeroRate(self,
                  dates: (list, Date),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency according to
         NSS parametrisation. This method overrides that in FinDiscountCurve.
         The NSS parametrisation is no strictly terms of continuously compounded
@@ -71,10 +71,10 @@ class FinDiscountCurveNSS(FinDiscountCurve):
         of dates so must use Numpy functions. The default frequency is a
         continuously compounded rate and ACT ACT day counting. """
 
-        if isinstance(freq_type, FinFrequencyTypes) is False:
+        if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(day_count_type, FinDayCountTypes) is False:
+        if isinstance(day_count_type, DayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention

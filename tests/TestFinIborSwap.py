@@ -6,20 +6,20 @@ import sys
 import numpy as np
 sys.path.append("..")
 
-from financepy.utils.Math import ONE_MILLION
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.utils.fin_math import ONE_MILLION
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborFRA import FinIborFRA
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.utils.Calendar import FinBusDayAdjustTypes
-from financepy.utils.Calendar import FinDateGenRuleTypes
-from financepy.utils.Calendar import FinCalendarTypes
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinInterpolator import FinInterpTypes
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.interpolator import FinInterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -30,7 +30,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def buildIborSingleCurve(valuation_date):
 
     settlement_date = valuation_date.addDays(2)
-    dcType = FinDayCountTypes.ACT_360
+    dcType = DayCountTypes.ACT_360
 
     depos = []
     fras = []
@@ -106,146 +106,146 @@ def buildIborSingleCurve(valuation_date):
     ###########################################################################
     ###########################################################################
     
-    fixedFreq = FinFrequencyTypes.ANNUAL
-    dcType = FinDayCountTypes.THIRTY_E_360
+    fixedFreq = FrequencyTypes.ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360
     fixed_legType = FinSwapTypes.PAY
 
     #######################################
     maturity_date = settlement_date.addMonths(24) 
-    swapRate = -0.001506    
+    swap_rate = -0.001506
     swap1 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap1)
 
     #######################################
     maturity_date = settlement_date.addMonths(36)
-    swapRate = -0.000185 
+    swap_rate = -0.000185
     swap2 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap2)
 
     #######################################
     maturity_date = settlement_date.addMonths(48)   
-    swapRate = 0.001358
+    swap_rate = 0.001358
     swap3 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap3)
 
     #######################################
     maturity_date = settlement_date.addMonths(60)   
-    swapRate = 0.0027652
+    swap_rate = 0.0027652
     swap4 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap4)
 
     #######################################
     maturity_date = settlement_date.addMonths(72)
-    swapRate = 0.0041539
+    swap_rate = 0.0041539
     swap5 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap5)
 
     #######################################
     maturity_date = settlement_date.addMonths(84)
-    swapRate = 0.0054604
+    swap_rate = 0.0054604
     swap6 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap6)
 
     #######################################
     maturity_date = settlement_date.addMonths(96)
-    swapRate = 0.006674
+    swap_rate = 0.006674
     swap7 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap7)
 
     #######################################
     maturity_date = settlement_date.addMonths(108)
-    swapRate = 0.007826
+    swap_rate = 0.007826
     swap8 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap8)
 
     #######################################
     maturity_date = settlement_date.addMonths(120)
-    swapRate = 0.008821
+    swap_rate = 0.008821
     swap9 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap9)
 
     #######################################
     maturity_date = settlement_date.addMonths(132)
-    swapRate = 0.0097379
+    swap_rate = 0.0097379
     swap10 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap10)
 
     #######################################
     maturity_date = settlement_date.addMonths(144)
-    swapRate = 0.0105406
+    swap_rate = 0.0105406
     swap11 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap11)
 
     #######################################
     maturity_date = settlement_date.addMonths(180)
-    swapRate = 0.0123927
+    swap_rate = 0.0123927
     swap12 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap12)
 
     #######################################
     maturity_date = settlement_date.addMonths(240)
-    swapRate = 0.0139882
+    swap_rate = 0.0139882
     swap13 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap13)
 
     #######################################
     maturity_date = settlement_date.addMonths(300)
-    swapRate = 0.0144972
+    swap_rate = 0.0144972
     swap14 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap14)
 
     #######################################
     maturity_date = settlement_date.addMonths(360)
-    swapRate = 0.0146081
+    swap_rate = 0.0146081
     swap15 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap15)
 
     #######################################
     maturity_date = settlement_date.addMonths(420)
-    swapRate = 0.01461897
+    swap_rate = 0.01461897
     swap16 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap16)
 
     #######################################
     maturity_date = settlement_date.addMonths(480)
-    swapRate = 0.014567455
+    swap_rate = 0.014567455
     swap17 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap17)
 
     #######################################
     maturity_date = settlement_date.addMonths(540)
-    swapRate = 0.0140826
+    swap_rate = 0.0140826
     swap18 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap18)
 
     #######################################
     maturity_date = settlement_date.addMonths(600)
-    swapRate = 0.01436822
+    swap_rate = 0.01436822
     swap19 = FinIborSwap(settlement_date, maturity_date, fixed_legType,
-                             swapRate, fixedFreq, dcType)
+                             swap_rate, fixedFreq, dcType)
     swaps.append(swap19)
     
     ########################################
     
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 
@@ -275,17 +275,17 @@ def test_LiborSwap():
     end_date = Date(27, 12, 2067)
 
     fixedCoupon = 0.015
-    fixedFreqType = FinFrequencyTypes.ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360
+    fixedFreqType = FrequencyTypes.ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360
 
     floatSpread = 0.0
-    floatFreqType = FinFrequencyTypes.SEMI_ANNUAL
-    floatDayCountType = FinDayCountTypes.ACT_360
+    floatFreqType = FrequencyTypes.SEMI_ANNUAL
+    floatDayCountType = DayCountTypes.ACT_360
     firstFixing = -0.00268
 
-    swapCalendarType = FinCalendarTypes.WEEKEND
-    bus_day_adjust_type = FinBusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = FinDateGenRuleTypes.BACKWARD
+    swapCalendarType = CalendarTypes.WEEKEND
+    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
     fixed_legType = FinSwapTypes.RECEIVE
     
     notional = 10.0 * ONE_MILLION
@@ -328,11 +328,11 @@ def test_dp_example():
 
     start_date = Date(14, 11, 2011)
     end_date = Date(14, 11, 2016)
-    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
-    swapCalendarType = FinCalendarTypes.TARGET
-    bus_day_adjust_type = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
-    date_gen_rule_type = FinDateGenRuleTypes.BACKWARD
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    swapCalendarType = CalendarTypes.TARGET
+    bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     fixed_legType = FinSwapTypes.PAY
     fixedCoupon = 0.0124
     notional = ONE_MILLION
@@ -343,8 +343,8 @@ def test_dp_example():
                         fixedCoupon=fixedCoupon,
                         fixedFreqType=fixedFreqType,
                         fixedDayCountType=fixedDayCountType,
-                        floatFreqType=FinFrequencyTypes.SEMI_ANNUAL,
-                        floatDayCountType=FinDayCountTypes.ACT_360,
+                        floatFreqType=FrequencyTypes.SEMI_ANNUAL,
+                        floatDayCountType=DayCountTypes.ACT_360,
                         notional=notional,
                         calendar_type=swapCalendarType,
                         bus_day_adjust_type=bus_day_adjust_type,
@@ -362,8 +362,8 @@ def test_dp_example():
 
     valuation_date = start_date
 
-    curve = FinDiscountCurve(valuation_date, dts, np.array(dfs),
-                             FinInterpTypes.FLAT_FWD_RATES)
+    curve = DiscountCurve(valuation_date, dts, np.array(dfs),
+                          FinInterpTypes.FLAT_FWD_RATES)
 
     v = swap.value(valuation_date, curve, curve)
 

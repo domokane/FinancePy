@@ -5,9 +5,9 @@
 import sys
 sys.path.append("..")
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.utils.Date import Date
-from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,29 +20,29 @@ def test_FinFlatCurve():
     months = range(1, 60, 3)
     dates = curveDate.addMonths(months)
     testCases.header("COMPOUNDING", "DFS")
-    compounding = FinFrequencyTypes.CONTINUOUS
+    compounding = FrequencyTypes.CONTINUOUS
 
-    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
+    flatCurve = DiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
-    compounding = FinFrequencyTypes.ANNUAL
-    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
+    compounding = FrequencyTypes.ANNUAL
+    flatCurve = DiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
-    compounding = FinFrequencyTypes.SEMI_ANNUAL
-    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
+    compounding = FrequencyTypes.SEMI_ANNUAL
+    flatCurve = DiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
-    compounding = FinFrequencyTypes.QUARTERLY
-    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
+    compounding = FrequencyTypes.QUARTERLY
+    flatCurve = DiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 
-    compounding = FinFrequencyTypes.MONTHLY
-    flatCurve = FinDiscountCurveFlat(curveDate, 0.05, compounding)
+    compounding = FrequencyTypes.MONTHLY
+    flatCurve = DiscountCurveFlat(curveDate, 0.05, compounding)
     dfs = flatCurve.df(dates)
     testCases.print(compounding, dfs)
 

@@ -4,28 +4,28 @@
 
 
 from ...utils.FinError import FinError
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Schedule import Schedule
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinDateGenRuleTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Date import Date
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.schedule import Schedule
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.date import Date
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 
 from enum import Enum
 
 
-class FinBondMortgageTypes(Enum):
+class BondMortgageTypes(Enum):
     REPAYMENT = 1
     INTEREST_ONLY = 2
 
 ###############################################################################
 
 
-class FinBondMortgage(object):
+class BondMortgage(object):
     """ A mortgage is a vector of dates and flows generated in order to repay
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.
@@ -35,14 +35,14 @@ class FinBondMortgage(object):
                  start_date: Date,
                  end_date: Date,
                  principal: float,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.MONTHLY,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
-                 dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360):
+                 freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Create the mortgage using start and end dates and principal. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if start_date > end_date:
             raise FinError("Start Date after End Date")
@@ -54,7 +54,7 @@ class FinBondMortgage(object):
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
         self._date_gen_rule_type = date_gen_rule_type
-        self._dayCountConventionType = dayCountConventionType
+        self._day_count_convention_type = day_count_convention_type
 
         self._schedule = Schedule(start_date,
                                   end_date,
@@ -71,8 +71,8 @@ class FinBondMortgage(object):
 
         frequency = Frequency(self._freq_type)
 
-        numFlows = len(self._schedule._adjustedDates)
-        p = (1.0 + zeroRate/frequency) ** (numFlows-1)
+        num_flows = len(self._schedule._adjusted_dates)
+        p = (1.0 + zeroRate/frequency) ** (num_flows-1)
         m = zeroRate * p / (p - 1.0) / frequency
         m = m * self._principal
         return m
@@ -81,7 +81,7 @@ class FinBondMortgage(object):
 
     def generateFlows(self,
                       zeroRate: float,
-                      mortgageType: FinBondMortgageTypes):
+                      mortgageType: BondMortgageTypes):
         """ Generate the bond flow amounts. """
 
         self._mortgageType = mortgageType
@@ -90,18 +90,18 @@ class FinBondMortgage(object):
         self._principalRemaining = [self._principal]
         self._totalFlows = [0]
 
-        numFlows = len(self._schedule._adjustedDates)
+        num_flows = len(self._schedule._adjusted_dates)
         principal = self._principal
         frequency = Frequency(self._freq_type)
 
-        if mortgageType == FinBondMortgageTypes.REPAYMENT:
+        if mortgageType == BondMortgageTypes.REPAYMENT:
             monthlyFlow = self.repaymentAmount(zeroRate)
-        elif mortgageType == FinBondMortgageTypes.INTEREST_ONLY:
+        elif mortgageType == BondMortgageTypes.INTEREST_ONLY:
             monthlyFlow = zeroRate * self._principal / frequency
         else:
             raise FinError("Unknown Mortgage type.")
 
-        for i in range(1, numFlows):
+        for i in range(1, num_flows):
             interestFlow = principal * zeroRate / frequency
             principalFlow = monthlyFlow - interestFlow
             principal = principal - principalFlow
@@ -121,16 +121,16 @@ class FinBondMortgage(object):
         print("BUSDAYRULE:", self._bus_day_adjust_type)
         print("DATEGENRULE:", self._date_gen_rule_type)
 
-        numFlows = len(self._schedule._adjustedDates)
+        num_flows = len(self._schedule._adjusted_dates)
 
         print("%15s %12s %12s %12s %12s" %
               ("PAYMENT DATE", "INTEREST", "PRINCIPAL",
                "OUTSTANDING", "TOTAL"))
 
         print("")
-        for i in range(0, numFlows):
+        for i in range(0, num_flows):
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
-                  (self._schedule._adjustedDates[i],
+                  (self._schedule._adjusted_dates[i],
                    self._interestFlows[i],
                    self._principalFlows[i],
                    self._principalRemaining[i],

@@ -699,7 +699,7 @@ def parseEnum(lines, startLine, endLine):
 def extractParams(functionSignature):
     """ Parse a function signature into a table containing each function
     argument's name, type, description and default value"""
-    # A good example to look at for testing is `FinBondConvertible`
+    # A good example to look at for testing is `BondConvertible`
 
     functionSignature = functionSignature.replace("\\", "\\textbackslash ")
     functionSignature = functionSignature.replace("_", "\_")

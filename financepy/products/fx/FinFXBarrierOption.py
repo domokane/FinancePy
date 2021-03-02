@@ -8,12 +8,12 @@ from enum import Enum
 
 
 from ...utils.FinError import FinError
-from ...utils.Math import N
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear
 from ...products.fx.FinFXOption import FinFXOption
-from ...models.FinProcessSimulator import FinProcessSimulator
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
+from ...models.process_simulator import FinProcessSimulator
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
 
 ###############################################################################
 
@@ -45,7 +45,7 @@ class FinFXBarrierOption(FinFXOption):
         """ Create FX Barrier option product. This is an option that cancels if
         the FX rate crosses a barrier during the life of the option. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._strikeFXRate = float(strikeFXRate)
@@ -240,7 +240,7 @@ class FinFXBarrierOption(FinFXOption):
                 processType,
                 modelParams,
                 numAnnSteps=552,
-                numPaths=5000,
+                num_paths=5000,
                 seed=4242):
         """ Value the FX Barrier Option using Monte Carlo. """
 
@@ -282,7 +282,7 @@ class FinFXBarrierOption(FinFXOption):
 
         if simplePut or simpleCall:
             Sall = process.getProcess(
-                processType, t, modelParams, 1, numPaths, seed)
+                processType, t, modelParams, 1, num_paths, seed)
 
         if simpleCall:
             sT = Sall[:, -1]
@@ -301,19 +301,19 @@ class FinFXBarrierOption(FinFXOption):
                                   t,
                                   modelParams,
                                   numTimeSteps,
-                                  numPaths,
+                                  num_paths,
                                   seed)
 
-        (numPaths, numTimeSteps) = Sall.shape
+        (num_paths, numTimeSteps) = Sall.shape
 
         if optionType == FinFXBarrierTypes.DOWN_AND_IN_CALL or \
            optionType == FinFXBarrierTypes.DOWN_AND_OUT_CALL or \
            optionType == FinFXBarrierTypes.DOWN_AND_IN_PUT or \
            optionType == FinFXBarrierTypes.DOWN_AND_OUT_PUT:
 
-            barrierCrossedFromAbove = [False] * numPaths
+            barrierCrossedFromAbove = [False] * num_paths
 
-            for p in range(0, numPaths):
+            for p in range(0, num_paths):
                 barrierCrossedFromAbove[p] = np.any(Sall[p] <= B)
 
         if optionType == FinFXBarrierTypes.UP_AND_IN_CALL or \
@@ -321,12 +321,12 @@ class FinFXBarrierOption(FinFXOption):
            optionType == FinFXBarrierTypes.UP_AND_IN_PUT or \
            optionType == FinFXBarrierTypes.UP_AND_OUT_PUT:
 
-            barrierCrossedFromBelow = [False] * numPaths
-            for p in range(0, numPaths):
+            barrierCrossedFromBelow = [False] * num_paths
+            for p in range(0, num_paths):
                 barrierCrossedFromBelow[p] = np.any(Sall[p] >= B)
 
-        payoff = np.zeros(numPaths)
-        ones = np.ones(numPaths)
+        payoff = np.zeros(num_paths)
+        ones = np.ones(num_paths)
 
         if optionType == FinFXBarrierTypes.DOWN_AND_OUT_CALL:
             payoff = np.maximum(Sall[:, -1] - K, 0.0) * \

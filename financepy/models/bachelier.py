@@ -7,7 +7,7 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..utils.FinHelperFunctions import labelToString
+from ..utils.helper_functions import labelToString
 from ..utils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################

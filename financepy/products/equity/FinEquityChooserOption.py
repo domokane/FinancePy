@@ -6,17 +6,17 @@
 import numpy as np
 from scipy import optimize
 
-from ...utils.Math import M
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.FinGlobalVariables import gSmall
+from ...utils.fin_math import M
+from ...utils.global_variables import gDaysInYear
+from ...utils.global_variables import gSmall
 from ...utils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...utils.FinGlobalTypes import FinOptionTypes
-from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
-from ...models.FinModelBlackScholes import bsValue
+from ...market.curves.FinDiscountCurveFlat import DiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
+from ...models.black_scholes import bsValue
 
 from scipy.stats import norm
 N = norm.cdf
@@ -69,7 +69,7 @@ class FinEquityChooserOption(FinEquityOption):
         and then the put and call expiry dates as well as the corresponding put
         and call strike prices. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if chooseDate > callExpiryDate:
             raise FinError("Expiry date must precede call option expiry date")
@@ -87,9 +87,9 @@ class FinEquityChooserOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options. """
@@ -116,7 +116,7 @@ class FinEquityChooserOption(FinEquityOption):
         v = model._volatility
         v = max(v, gSmall)
 
-        s0 = stockPrice
+        s0 = stock_price
         xc = self._callStrike
         xp = self._putStrike
         bt = rt - q
@@ -164,11 +164,11 @@ class FinEquityChooserOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                discount_curve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 model,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 seed: int = 4242):
         """ Value the complex chooser option Monte Carlo. """
 
@@ -200,12 +200,12 @@ class FinEquityChooserOption(FinEquityOption):
         kp = self._putStrike
 
         np.random.seed(seed)
-        sqrtdt = np.sqrt(t)
+        sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, numPaths))
-        s = stockPrice * np.exp((rt - q - v*v / 2.0) * t)
-        m = np.exp(g * sqrtdt * v)
+        g = np.random.normal(0.0, 1.0, size=(1, num_paths))
+        s = stock_price * np.exp((rt - q - v*v / 2.0) * t)
+        m = np.exp(g * sqrt_dt * v)
 
         s_1 = s * m
         s_2 = s / m

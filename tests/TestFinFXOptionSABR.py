@@ -7,11 +7,11 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -40,8 +40,8 @@ def test_FinFXOptionSABR():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy2CCRate)
-    forDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy1CCRate)
+    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
+    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 

@@ -9,17 +9,17 @@
 
 import numpy as np
 
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...models.FinGBMProcess import FinGBMProcess
+from ...utils.global_variables import gDaysInYear
+from ...models.gbm_process_simulator import FinGBMProcess
 
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.FinHelperFunctions import _funcName
-from ...utils.Date import Date
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helper_functions import _funcName
+from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...utils.Math import N
+from ...utils.fin_math import N
 
 
 ###############################################################################
@@ -40,7 +40,7 @@ class FinEquityBasketOption():
         its strike price, whether it is a put or call, and the number of
         underlying stocks in the basket. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
@@ -50,16 +50,16 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def _validate(self,
-                  stockPrices,
-                  dividendYields,
+                  stock_prices,
+                  dividend_yields,
                   volatilities,
                   correlations):
 
-        if len(stockPrices) != self._numAssets:
+        if len(stock_prices) != self._numAssets:
             raise FinError(
                 "Stock prices must have a length " + str(self._numAssets))
 
-        if len(dividendYields) != self._numAssets:
+        if len(dividend_yields) != self._numAssets:
             raise FinError(
                 "Dividend yields must have a length " + str(self._numAssets))
 
@@ -97,8 +97,8 @@ class FinEquityBasketOption():
 
     def value(self,
               valuation_date: Date,
-              stockPrices: np.ndarray,
-              discount_curve: FinDiscountCurve,
+              stock_prices: np.ndarray,
+              discount_curve: DiscountCurve,
               dividendCurves: (list),
               volatilities: np.ndarray,
               correlations: np.ndarray):
@@ -120,9 +120,9 @@ class FinEquityBasketOption():
             qs.append(q)
 
         v = volatilities
-        s = stockPrices
+        s = stock_prices
 
-        self._validate(stockPrices,
+        self._validate(stock_prices,
                        qs,
                        volatilities,
                        correlations)
@@ -183,43 +183,43 @@ class FinEquityBasketOption():
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrices: np.ndarray,
-                discount_curve: FinDiscountCurve,
+                stock_prices: np.ndarray,
+                discount_curve: DiscountCurve,
                 dividendCurves: (list),
                 volatilities: np.ndarray,
                 corrMatrix: np.ndarray,
-                numPaths:int = 10000,
+                num_paths:int = 10000,
                 seed:int = 4242):
         """ Valuation of the EquityBasketOption using a Monte-Carlo simulation
         of stock prices assuming a GBM distribution. Cholesky decomposition is
         used to handle a full rank correlation structure between the individual
-        assets. The numPaths and seed are pre-set to default values but can be
+        assets. The num_paths and seed are pre-set to default values but can be
         overwritten. """
 
-        checkArgumentTypes(getattr(self, _funcName(), None), locals())
+        check_argument_types(getattr(self, _funcName(), None), locals())
 
         if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         texp = (self._expiry_date - valuation_date) / gDaysInYear
 
-        dividendYields = []
+        dividend_yields = []
         for curve in dividendCurves:
             dq = curve.df(self._expiry_date)
             q = -np.log(dq) / texp
-            dividendYields.append(q)
+            dividend_yields.append(q)
 
-        self._validate(stockPrices,
-                       dividendYields,
+        self._validate(stock_prices,
+                       dividend_yields,
                        volatilities,
                        corrMatrix)
 
-        numAssets = len(stockPrices)
+        numAssets = len(stock_prices)
 
         df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/texp
 
-        mus = r - dividendYields
+        mus = r - dividend_yields
         k = self._strikePrice
 
         numTimeSteps = 2
@@ -228,11 +228,11 @@ class FinEquityBasketOption():
         np.random.seed(seed)
 
         Sall = model.getPathsAssets(numAssets,
-                                    numPaths,
+                                    num_paths,
                                     numTimeSteps,
                                     texp,
                                     mus,
-                                    stockPrices,
+                                    stock_prices,
                                     volatilities,
                                     corrMatrix,
                                     seed)

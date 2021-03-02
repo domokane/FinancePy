@@ -6,10 +6,10 @@ import sys
 import numpy as np
 from numba import njit, float64
 from typing import Union
-from .Date import Date
-from .FinGlobalVariables import gDaysInYear, gSmall
+from .date import Date
+from .global_variables import gDaysInYear, gSmall
 from .FinError import FinError
-from .DayCount import FinDayCountTypes, DayCount
+from .day_count import DayCountTypes, DayCount
 
 ###############################################################################
 
@@ -74,7 +74,7 @@ def pv01Times(t: float,
 
 def timesFromDates(dt: Date,
                    valuation_date: Date,
-                   day_count_type: FinDayCountTypes = None):
+                   day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
     times from the valuation date. The output is always a numpy vector of times
@@ -89,7 +89,7 @@ def timesFromDates(dt: Date,
         dcCounter = DayCount(day_count_type)
 
     if isinstance(dt, Date):
-        numDates = 1
+        num_dates = 1
         times = [None]
         if dcCounter is None:
             times[0] = (dt - valuation_date) / gDaysInYear
@@ -99,9 +99,9 @@ def timesFromDates(dt: Date,
         return times[0]
 
     elif isinstance(dt, list) and isinstance(dt[0], Date):
-        numDates = len(dt)
+        num_dates = len(dt)
         times = []
-        for i in range(0, numDates):
+        for i in range(0, num_dates):
             if dcCounter is None:
                 t = (dt[i] - valuation_date) / gDaysInYear
             else:

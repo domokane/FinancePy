@@ -8,13 +8,13 @@ sys.path.append("..")
 import numpy as np
 import matplotlib.pyplot as plt
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.utils.Date import Date
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.utils.date import Date
 
-from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
-from financepy.models.FinModelVolatilityFns import volFunctionClark
+from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.models.volatility_fns import volFunctionClark
 
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
+from financepy.models.black_scholes import FinModelBlackScholes
 from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
 
 from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
@@ -42,8 +42,8 @@ def test_FinOptionImpliedDbn():
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -85,8 +85,8 @@ def test_FinOptionImpliedDbn():
             startFX = F * 0.05
             endFX = F * 5.0
 
-            numSteps = 10000
-            dFX = (endFX - startFX)/ numSteps
+            num_steps = 10000
+            dFX = (endFX - startFX)/ num_steps
 
             domDF = domDiscountCurve._df(texp)
             forDF = forDiscountCurve._df(texp)
@@ -99,7 +99,7 @@ def test_FinOptionImpliedDbn():
             strikes = []
             vols = []
 
-            for iK in range(0, numSteps):
+            for iK in range(0, num_steps):
                 strike = startFX + iK*dFX                
                 vol = volFunctionClark(params, F, strike, texp)
                 strikes.append(strike) 

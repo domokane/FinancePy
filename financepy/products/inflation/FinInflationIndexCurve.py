@@ -5,13 +5,13 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.Math import testMonotonicity
-from ...utils.FinHelperFunctions import labelToString
-from ...utils.FinHelperFunctions import timesFromDates
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Date import daysInMonth
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.fin_math import testMonotonicity
+from ...utils.helper_functions import labelToString
+from ...utils.helper_functions import timesFromDates
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import daysInMonth
+from ...utils.global_variables import gDaysInYear
 
 ###############################################################################
 
@@ -31,7 +31,7 @@ class FinInflationIndexCurve():
                  indexValues: (list, np.ndarray),
                  lagInMonths: int = 3):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         # Validate curve
         if len(indexDates) == 0:

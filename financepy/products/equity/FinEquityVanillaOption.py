@@ -9,32 +9,32 @@ from numba import njit
 # from scipy import optimize
 from ...utils.FinSolvers1D import newton_secant, bisection, newton
 
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.FinModel import FinModel
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...models.FinModelBlackScholesAnalytical import bsValue
-from ...models.FinModelBlackScholesAnalytical import bsDelta
-from ...models.FinModelBlackScholesAnalytical import bsVega
-from ...models.FinModelBlackScholesAnalytical import bsGamma
-from ...models.FinModelBlackScholesAnalytical import bsRho
-from ...models.FinModelBlackScholesAnalytical import bsTheta
-from ...models.FinModelBlackScholesAnalytical import bsImpliedVolatility
-from ...models.FinModelBlackScholesAnalytical import bsIntrinsic
+from ...models.black_scholes import FinModelBlackScholes
+from ...models.black_scholes_analytic import bsValue
+from ...models.black_scholes_analytic import bsDelta
+from ...models.black_scholes_analytic import bsVega
+from ...models.black_scholes_analytic import bsGamma
+from ...models.black_scholes_analytic import bsRho
+from ...models.black_scholes_analytic import bsTheta
+from ...models.black_scholes_analytic import bsImpliedVolatility
+from ...models.black_scholes_analytic import bsIntrinsic
 
 
-from ...models.FinModelBlackScholesMC import _valueMC_NONUMBA_NONUMPY
-from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_NUMBA
-from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_ONLY
-from ...models.FinModelBlackScholesMC import _valueMC_NUMPY_ONLY
-from ...models.FinModelBlackScholesMC import _valueMC_NUMBA_PARALLEL
+from ...models.black_scholes_mc import _valueMC_NONUMBA_NONUMPY
+from ...models.black_scholes_mc import _valueMC_NUMPY_NUMBA
+from ...models.black_scholes_mc import _valueMC_NUMBA_ONLY
+from ...models.black_scholes_mc import _valueMC_NUMPY_ONLY
+from ...models.black_scholes_mc import _valueMC_NUMBA_PARALLEL
 
-from ...utils.Math import N
+from ...utils.fin_math import N
 
 ###############################################################################
 
@@ -83,7 +83,7 @@ class FinEquityVanillaOption():
         """ Create the Equity Vanilla option object by specifying the expiry
         date, the option strike, the option type and the number of options. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
            optionType != FinOptionTypes.EUROPEAN_PUT:
@@ -99,9 +99,9 @@ class FinEquityVanillaOption():
 
     def intrinsic(self,
                   valuation_date: (Date, list),
-                  stockPrice: (np.ndarray, float),
-                  discount_curve: FinDiscountCurve,
-                  dividendCurve: FinDiscountCurve):
+                  stock_price: (np.ndarray, float),
+                  discount_curve: DiscountCurve,
+                  dividendCurve: DiscountCurve):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
         if type(valuation_date) == Date:
@@ -111,7 +111,7 @@ class FinEquityVanillaOption():
 
         self._texp = texp
 
-        s0 = stockPrice
+        s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
         df = discount_curve.df(self._expiry_date)
@@ -132,9 +132,9 @@ class FinEquityVanillaOption():
 
     def value(self,
               valuation_date: (Date, list),
-              stockPrice: (np.ndarray, float),
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: (np.ndarray, float),
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model: FinModel):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
@@ -145,13 +145,13 @@ class FinEquityVanillaOption():
 
         self._texp = texp
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
 
         texp = np.maximum(texp, 1e-10)
 
@@ -178,9 +178,9 @@ class FinEquityVanillaOption():
 
     def delta(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Calculate the analytical delta of a European vanilla option. """
 
@@ -191,13 +191,13 @@ class FinEquityVanillaOption():
 
         self._texp = texp
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
         df = discount_curve.df(self._expiry_date)
@@ -222,9 +222,9 @@ class FinEquityVanillaOption():
 
     def gamma(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model:FinModel):
         """ Calculate the analytical gamma of a European vanilla option. """
 
@@ -233,13 +233,13 @@ class FinEquityVanillaOption():
         else:
             texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
 
         texp = np.maximum(texp, 1e-10)
 
@@ -265,9 +265,9 @@ class FinEquityVanillaOption():
 
     def vega(self,
              valuation_date: Date,
-             stockPrice: float,
-             discount_curve: FinDiscountCurve,
-             dividendCurve: FinDiscountCurve,
+             stock_price: float,
+             discount_curve: DiscountCurve,
+             dividendCurve: DiscountCurve,
              model:FinModel):
         """ Calculate the analytical vega of a European vanilla option. """
 
@@ -276,13 +276,13 @@ class FinEquityVanillaOption():
         else:
             texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
         df = discount_curve.df(self._expiry_date)
@@ -307,9 +307,9 @@ class FinEquityVanillaOption():
 
     def theta(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model:FinModel):
         """ Calculate the analytical theta of a European vanilla option. """
 
@@ -318,13 +318,13 @@ class FinEquityVanillaOption():
         else:
             texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
         df = discount_curve.df(self._expiry_date)
@@ -349,9 +349,9 @@ class FinEquityVanillaOption():
 
     def rho(self,
             valuation_date: Date,
-            stockPrice: float,
-            discount_curve: FinDiscountCurve,
-            dividendCurve: FinDiscountCurve,
+            stock_price: float,
+            discount_curve: DiscountCurve,
+            dividendCurve: DiscountCurve,
             model:FinModel):
         """ Calculate the analytical rho of a European vanilla option. """
 
@@ -360,13 +360,13 @@ class FinEquityVanillaOption():
         else:
             texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(texp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        s0 = stockPrice
+        s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
         df = discount_curve.df(self._expiry_date)
@@ -391,9 +391,9 @@ class FinEquityVanillaOption():
 
     def impliedVolatility(self,
                           valuation_date: Date,
-                          stockPrice: (float, list, np.ndarray),
-                          discount_curve: FinDiscountCurve,
-                          dividendCurve: FinDiscountCurve,
+                          stock_price: (float, list, np.ndarray),
+                          discount_curve: DiscountCurve,
+                          dividendCurve: DiscountCurve,
                           price):
         """ Calculate the Black-Scholes implied volatility of a European 
         vanilla option. """
@@ -411,7 +411,7 @@ class FinEquityVanillaOption():
         q = -np.log(dq)/texp
 
         k = self._strikePrice
-        s0 = stockPrice
+        s0 = stock_price
 
         sigma = bsImpliedVolatility(s0, texp, k, r, q, price, 
                                     self._optionType.value)
@@ -422,11 +422,11 @@ class FinEquityVanillaOption():
 
     def valueMC_NUMPY_ONLY(self,
                            valuation_date: Date,
-                           stockPrice: float,
-                           discount_curve: FinDiscountCurve,
-                           dividendCurve: FinDiscountCurve,
+                           stock_price: float,
+                           discount_curve: DiscountCurve,
+                           dividendCurve: DiscountCurve,
                            model:FinModel,
-                           numPaths: int = 10000,
+                           num_paths: int = 10000,
                            seed: int = 4242,
                            useSobol: int = 0):
 
@@ -440,14 +440,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NUMPY_ONLY(stockPrice, 
+        v = _valueMC_NUMPY_ONLY(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed,
                            useSobol)
 
@@ -457,11 +457,11 @@ class FinEquityVanillaOption():
 
     def valueMC_NUMBA_ONLY(self,
                            valuation_date: Date,
-                           stockPrice: float,
-                           discount_curve: FinDiscountCurve,
-                           dividendCurve: FinDiscountCurve,
+                           stock_price: float,
+                           discount_curve: DiscountCurve,
+                           dividendCurve: DiscountCurve,
                            model:FinModel,
-                           numPaths: int = 10000,
+                           num_paths: int = 10000,
                            seed: int = 4242,
                            useSobol: int = 0):
 
@@ -475,14 +475,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NUMBA_ONLY(stockPrice, 
+        v = _valueMC_NUMBA_ONLY(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed, 
                            useSobol)
 
@@ -492,11 +492,11 @@ class FinEquityVanillaOption():
 
     def valueMC_NUMBA_PARALLEL(self,
                                valuation_date: Date,
-                               stockPrice: float,
-                               discount_curve: FinDiscountCurve,
-                               dividendCurve: FinDiscountCurve,
+                               stock_price: float,
+                               discount_curve: DiscountCurve,
+                               dividendCurve: DiscountCurve,
                                model:FinModel,
-                               numPaths: int = 10000,
+                               num_paths: int = 10000,
                                seed: int = 4242,
                                useSobol: int = 0):
 
@@ -510,14 +510,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NUMBA_PARALLEL(stockPrice, 
+        v = _valueMC_NUMBA_PARALLEL(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed, 
                            useSobol)
 
@@ -529,11 +529,11 @@ class FinEquityVanillaOption():
 
     def valueMC_NUMPY_NUMBA(self,
                             valuation_date: Date,
-                            stockPrice: float,
-                            discount_curve: FinDiscountCurve,
-                            dividendCurve: FinDiscountCurve,
+                            stock_price: float,
+                            discount_curve: DiscountCurve,
+                            dividendCurve: DiscountCurve,
                             model:FinModel,
-                            numPaths: int = 10000,
+                            num_paths: int = 10000,
                             seed: int = 4242,
                             useSobol: int = 0):
 
@@ -547,14 +547,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NUMPY_NUMBA(stockPrice, 
+        v = _valueMC_NUMPY_NUMBA(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed,
                            useSobol)
 
@@ -564,11 +564,11 @@ class FinEquityVanillaOption():
 
     def valueMC_NONUMBA_NONUMPY(self,
                                 valuation_date: Date,
-                                stockPrice: float,
-                                discount_curve: FinDiscountCurve,
-                                dividendCurve: FinDiscountCurve,
+                                stock_price: float,
+                                discount_curve: DiscountCurve,
+                                dividendCurve: DiscountCurve,
                                 model:FinModel,
-                                numPaths: int = 10000,
+                                num_paths: int = 10000,
                                 seed: int = 4242,
                                 useSobol: int = 0):
 
@@ -582,14 +582,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NONUMBA_NONUMPY(stockPrice, 
+        v = _valueMC_NONUMBA_NONUMPY(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed,
                            useSobol)
 
@@ -599,11 +599,11 @@ class FinEquityVanillaOption():
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                discount_curve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 model:FinModel,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 seed: int = 4242,
                 useSobol: int = 0):
         """ Value European style call or put option using Monte Carlo. This is
@@ -619,14 +619,14 @@ class FinEquityVanillaOption():
 
         vol = model._volatility
 
-        v = _valueMC_NUMBA_ONLY(stockPrice, 
+        v = _valueMC_NUMBA_ONLY(stock_price,
                            texp, 
                            self._strikePrice,
                            self._optionType.value,
                            r, 
                            q, 
                            vol, 
-                           numPaths, 
+                           num_paths,
                            seed, 
                            useSobol)
 

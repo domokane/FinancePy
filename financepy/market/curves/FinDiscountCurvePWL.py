@@ -4,21 +4,21 @@
 
 import numpy as np
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gSmall
-from ...utils.Math import testMonotonicity
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinHelperFunctions import labelToString
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import timesFromDates
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.global_variables import gSmall
+from ...utils.fin_math import testMonotonicity
+from ...utils.frequency import FrequencyTypes
+from ...utils.helper_functions import labelToString
+from ...utils.helper_functions import check_argument_types
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import timesFromDates
+from ...market.curves.discount_curve import DiscountCurve
 
 ###############################################################################
 
 
-class FinDiscountCurvePWL(FinDiscountCurve):
+class DiscountCurvePWL(DiscountCurve):
     """ Curve is made up of a series of sections assumed to each have a
     piece-wise linear zero rate. The zero rate has a specified frequency
     which defaults to continuous. This curve inherits all of the extra methods
@@ -28,11 +28,11 @@ class FinDiscountCurvePWL(FinDiscountCurve):
                  valuation_date: Date,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Curve is defined by a vector of increasing times and zero rates."""
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
 

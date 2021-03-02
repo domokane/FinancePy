@@ -5,37 +5,38 @@
 
 import numpy as np
 
-from .FinInterpolator import FinInterpolator, FinInterpTypes, interpolate
+from .interpolator import FinInterpolator, FinInterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
 from ...utils.global_variables import gDaysInYear, gSmall
-from ...utils.frequency import Frequency, FinFrequencyTypes
-from ...utils.day_count import DayCount, FinDayCountTypes
-from ...utils.Math import testMonotonicity
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.fin_math import testMonotonicity
 from ...utils.schedule import Schedule
 from ...utils.helper_functions import check_argument_types
 from ...utils.helper_functions import timesFromDates
 from ...utils.helper_functions import labelToString
 
+
 ###############################################################################
 
 
-class FinDiscountCurve():
+class DiscountCurve():
     """ This is a base discount curve which has an internal representation of
     a vector of times and discount factors and an interpolation scheme for
     interpolating between these fixed points. """
 
-###############################################################################
+    ###############################################################################
 
     def __init__(self,
                  valuation_date: Date,
-                 dfDates: list,
-                 dfValues: np.ndarray,
-                 interpType: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
+                 df_dates: list,
+                 df_values: np.ndarray,
+                 interp_type: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         """ Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
-        are explicity linking dates and discount factors, we do not need to
+        are explicitly linking dates and discount factors, we do not need to
         specify any compounding convention or day count calculation since
         discount factors are pure prices. We do however need to specify a
         convention for interpolating the discount factors in time."""
@@ -43,28 +44,28 @@ class FinDiscountCurve():
         check_argument_types(self.__init__, locals())
 
         # Validate curve
-        if len(dfDates) < 1:
+        if len(df_dates) < 1:
             raise FinError("Times has zero length")
 
-        if len(dfDates) != len(dfValues):
+        if len(df_dates) != len(df_values):
             raise FinError("Times and Values are not the same")
 
         self._times = [0.0]
         self._dfs = [1.0]
-        self._dfDates = dfDates
+        self._df_dates = df_dates
 
-        num_points = len(dfDates)
+        num_points = len(df_dates)
 
-        startIndex = 0
+        start_index = 0
         if num_points > 0:
-            if dfDates[0] == valuation_date:
-                self._dfs[0] = dfValues[0]
-                startIndex = 1
+            if df_dates[0] == valuation_date:
+                self._dfs[0] = df_values[0]
+                start_index = 1
 
-        for i in range(startIndex, num_points):
-            t = (dfDates[i] - valuation_date) / gDaysInYear
+        for i in range(start_index, num_points):
+            t = (df_dates[i] - valuation_date) / gDaysInYear
             self._times.append(t)
-            self._dfs.append(dfValues[i])
+            self._dfs.append(df_values[i])
 
         self._times = np.array(self._times)
 
@@ -74,20 +75,20 @@ class FinDiscountCurve():
 
         self._valuation_date = valuation_date
         self._dfs = np.array(self._dfs)
-        self._interpType = interpType
-        self._freq_type = FinFrequencyTypes.CONTINUOUS
+        self._interp_type = interp_type
+        self._freq_type = FrequencyTypes.CONTINUOUS
         self._day_count_type = None  # Not needed for this curve
-        self._interpolator = FinInterpolator(self._interpType)
+        self._interpolator = FinInterpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
-###############################################################################
+    ###############################################################################
 
     def _zeroToDf(self,
                   valuation_date: Date,
                   rates: (float, np.ndarray),
                   times: (float, np.ndarray),
-                  freq_type: FinFrequencyTypes,
-                  day_count_type: FinDayCountTypes):
+                  freq_type: FrequencyTypes,
+                  day_count_type: DayCountTypes):
         """ Convert a zero with a specified compounding frequency and day count
         convention to a discount factor for a single maturity date or a list of
         dates. The day count is used to calculate the elapsed year fraction."""
@@ -99,31 +100,31 @@ class FinDiscountCurve():
 
         f = Frequency(freq_type)
 
-        if freq_type == FinFrequencyTypes.CONTINUOUS:
-            df = np.exp(-rates*t)
-        elif freq_type == FinFrequencyTypes.SIMPLE:
+        if freq_type == FrequencyTypes.CONTINUOUS:
+            df = np.exp(-rates * t)
+        elif freq_type == FrequencyTypes.SIMPLE:
             df = 1.0 / (1.0 + rates * t)
-        elif freq_type == FinFrequencyTypes.ANNUAL or \
-            freq_type == FinFrequencyTypes.SEMI_ANNUAL or \
-                freq_type == FinFrequencyTypes.QUARTERLY or \
-                freq_type == FinFrequencyTypes.MONTHLY:
-            df = 1.0 / np.power(1.0 + rates/f, f * t)
+        elif freq_type == FrequencyTypes.ANNUAL or \
+                freq_type == FrequencyTypes.SEMI_ANNUAL or \
+                freq_type == FrequencyTypes.QUARTERLY or \
+                freq_type == FrequencyTypes.MONTHLY:
+            df = 1.0 / np.power(1.0 + rates / f, f * t)
         else:
             raise FinError("Unknown Frequency type")
 
         return df
 
-###############################################################################
+    ###############################################################################
 
     def _dfToZero(self,
                   dfs: (float, np.ndarray),
                   maturityDts: (Date, list),
-                  freq_type: FinFrequencyTypes,
-                  day_count_type: FinDayCountTypes):
+                  freq_type: FrequencyTypes,
+                  day_count_type: DayCountTypes):
         """ Given a dates this first generates the discount factors. It then
         converts the discount factors to a zero rate with a chosen compounding
         frequency which may be continuous, simple, or compounded at a specific
-        frequency which are all choices of FinFrequencyTypes. Returns a list of
+        frequency which are all choices of FrequencyTypes. Returns a list of
         discount factor. """
 
         f = Frequency(freq_type)
@@ -141,43 +142,43 @@ class FinDiscountCurve():
         if len(dateList) != len(dfList):
             raise FinError("Date list and df list do not have same length")
 
-        numDates = len(dateList)
+        num_dates = len(dateList)
         zeroRates = []
 
         times = timesFromDates(dateList, self._valuation_date, day_count_type)
 
-        for i in range(0, numDates):
+        for i in range(0, num_dates):
 
             df = dfList[i]
 
             t = max(times[i], gSmall)
 
-            if freq_type == FinFrequencyTypes.CONTINUOUS:
-                r = -np.log(df)/t
-            elif freq_type == FinFrequencyTypes.SIMPLE:
-                r = (1.0/df - 1.0)/t
+            if freq_type == FrequencyTypes.CONTINUOUS:
+                r = -np.log(df) / t
+            elif freq_type == FrequencyTypes.SIMPLE:
+                r = (1.0 / df - 1.0) / t
             else:
-                r = (np.power(df, -1.0/(t * f))-1.0) * f
+                r = (np.power(df, -1.0 / (t * f)) - 1.0) * f
 
             zeroRates.append(r)
 
         return np.array(zeroRates)
 
-###############################################################################
+    ###############################################################################
 
     def zeroRate(self,
                  dts: (list, Date),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
         dates so must use Numpy functions. Default frequency is a
         continuously compounded rate. """
 
-        if isinstance(freq_type, FinFrequencyTypes) is False:
+        if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(day_count_type, FinDayCountTypes) is False:
+        if isinstance(day_count_type, DayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
         dfs = self.df(dts)
@@ -190,25 +191,25 @@ class FinDiscountCurve():
 
         return zeroRates
 
-###############################################################################
+    ###############################################################################
 
     def ccRate(self,
                dts: (list, Date),
-               day_count_type: FinDayCountTypes = FinDayCountTypes.SIMPLE):
+               day_count_type: DayCountTypes = DayCountTypes.SIMPLE):
         """ Calculation of zero rates with continuous compounding. This
         function can return a vector of cc rates given a vector of
         dates so must use Numpy functions. """
 
-        ccRates = self.zeroRate(dts, FinFrequencyTypes.CONTINUOUS, day_count_type)
+        ccRates = self.zeroRate(dts, FrequencyTypes.CONTINUOUS, day_count_type)
         return ccRates
 
-###############################################################################
+    ###############################################################################
 
-    def swapRate(self,
+    def swap_rate(self,
                  effective_date: Date,
                  maturity_date: (list, Date),
-                 freq_type=FinFrequencyTypes.ANNUAL,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360):
+                 freq_type=FrequencyTypes.ANNUAL,
+                 day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360):
         """ Calculate the swap rate to maturity date. This is the rate paid by
         a swap that has a price of par today. This is the same as a Libor swap
         rate except that we do not do any business day adjustments. """
@@ -220,15 +221,15 @@ class FinDiscountCurve():
         if effective_date < self._valuation_date:
             raise FinError("Swap starts before the curve valuation date.")
 
-        if isinstance(freq_type, FinFrequencyTypes) is False:
+        if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(freq_type, FinFrequencyTypes) is False:
+        if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if freq_type == FinFrequencyTypes.SIMPLE:
+        if freq_type == FrequencyTypes.SIMPLE:
             raise FinError("Cannot calculate par rate with simple yield freq.")
-        elif freq_type == FinFrequencyTypes.CONTINUOUS:
+        elif freq_type == FrequencyTypes.CONTINUOUS:
             raise FinError("Cannot calculate par rate with continuous freq.")
 
         if isinstance(maturity_date, Date):
@@ -249,7 +250,7 @@ class FinDiscountCurve():
 
             flow_dates = schedule._generate()
             flow_dates[0] = effective_date
-            
+
             day_counter = DayCount(day_count_type)
             prevDt = flow_dates[0]
             pv01 = 0.0
@@ -268,7 +269,7 @@ class FinDiscountCurve():
                 parRate = (dfStart - df) / pv01
 
             parRates.append(parRate)
- 
+
         parRates = np.array(parRates)
 
         if isinstance(maturity_date, Date):
@@ -276,7 +277,7 @@ class FinDiscountCurve():
         else:
             return parRates
 
-###############################################################################
+    ###############################################################################
 
     def df(self,
            dt: (list, Date)):
@@ -291,29 +292,29 @@ class FinDiscountCurve():
         else:
             return np.array(dfs)
 
-###############################################################################
+    ###############################################################################
 
     def _df(self,
             t: (float, np.ndarray)):
         """ Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. """
 
-        if self._interpType is FinInterpTypes.FLAT_FWD_RATES or\
-            self._interpType is FinInterpTypes.LINEAR_ZERO_RATES or\
-                self._interpType is FinInterpTypes.LINEAR_FWD_RATES:
-                    
-                    df = interpolate(t,
-                                     self._times,
-                                     self._dfs,
-                                     self._interpType.value)        
+        if self._interp_type is FinInterpTypes.FLAT_FWD_RATES or \
+                self._interp_type is FinInterpTypes.LINEAR_ZERO_RATES or \
+                self._interp_type is FinInterpTypes.LINEAR_FWD_RATES:
+
+            df = interpolate(t,
+                             self._times,
+                             self._dfs,
+                             self._interp_type.value)
 
         else:
 
-             df = self._interpolator.interpolate(t)
+            df = self._interpolator.interpolate(t)
 
         return df
 
-###############################################################################
+    ###############################################################################
 
     def survProb(self,
                  dt: Date):
@@ -325,7 +326,7 @@ class FinDiscountCurve():
         q = self.df(dt)
         return q
 
-###############################################################################
+    ###############################################################################
 
     def fwd(self,
             dts: Date):
@@ -346,7 +347,7 @@ class FinDiscountCurve():
         df1 = self.df(dts)
         df2 = self.df(dtsPlusOneDays)
         dt = 1.0 / gDaysInYear
-        fwd = np.log(df1/df2)/(1.0*dt)
+        fwd = np.log(df1 / df2) / (1.0 * dt)
 
         if isinstance(dts, Date):
             return fwd[0]
@@ -355,7 +356,7 @@ class FinDiscountCurve():
 
         return fwd
 
-###############################################################################
+    ###############################################################################
 
     def _fwd(self,
              times: (np.ndarray, float)):
@@ -367,15 +368,15 @@ class FinDiscountCurve():
         dt = 1e-6
         times = np.maximum(times, dt)
 
-        df1 = self._df(times-dt)
-        df2 = self._df(times+dt)
-        fwd = np.log(df1/df2)/(2.0*dt)
+        df1 = self._df(times - dt)
+        df2 = self._df(times + dt)
+        fwd = np.log(df1 / df2) / (2.0 * dt)
         return fwd
 
-###############################################################################
+    ###############################################################################
 
     def bump(self,
-             bumpSize: float):
+             bump_size: float):
         """ Adjust the continuously compounded forward rates by a perturbation
         upward equal to the bump size and return a curve objet with this bumped
         curve. This is used for interest rate risk. """
@@ -386,21 +387,21 @@ class FinDiscountCurve():
         n = len(self._times)
         for i in range(0, n):
             t = times[i]
-            values[i] = values[i] * np.exp(-bumpSize*t)
+            values[i] = values[i] * np.exp(-bump_size * t)
 
-        discCurve = FinDiscountCurve(self._valuation_date,
-                                     times,
-                                     values,
-                                     self._interpType)
+        discCurve = DiscountCurve(self._valuation_date,
+                                  times,
+                                  values,
+                                  self._interp_type)
 
         return discCurve
 
-###############################################################################
+    ###############################################################################
 
-    def fwdRate(self,
-                start_date: (list, Date),
-                dateOrTenor: (Date, str),
-                day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360):
+    def fwd_rate(self,
+                 start_date: (list, Date),
+                 date_or_tenor: (Date, str),
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculate the forward rate between two forward dates according to
         the specified day count convention. This defaults to Actual 360. The
         first date is specified and the second is given as a date or as a tenor
@@ -416,43 +417,43 @@ class FinDiscountCurve():
 
         dayCount = DayCount(day_count_type)
 
-        numDates = len(start_dates)
-        fwdRates = []
-        for i in range(0, numDates):
+        num_dates = len(start_dates)
+        fwd_rates = []
+        for i in range(0, num_dates):
             dt1 = start_dates[i]
 
-            if isinstance(dateOrTenor, str):
-                dt2 = dt1.addTenor(dateOrTenor)
-            elif isinstance(dateOrTenor, Date):
-                dt2 = dateOrTenor
-            elif isinstance(dateOrTenor, list):
-                dt2 = dateOrTenor[i]
+            if isinstance(date_or_tenor, str):
+                dt2 = dt1.addTenor(date_or_tenor)
+            elif isinstance(date_or_tenor, Date):
+                dt2 = date_or_tenor
+            elif isinstance(date_or_tenor, list):
+                dt2 = date_or_tenor[i]
 
             year_frac = dayCount.year_frac(dt1, dt2)[0]
             df1 = self.df(dt1)
             df2 = self.df(dt2)
-            fwdRate = (df1 / df2 - 1.0) / year_frac
-            fwdRates.append(fwdRate)
+            fwd_rate = (df1 / df2 - 1.0) / year_frac
+            fwd_rates.append(fwd_rate)
 
         if isinstance(start_date, Date):
-            return fwdRates[0]
+            return fwd_rates[0]
         else:
-            return np.array(fwdRates)
+            return np.array(fwd_rates)
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        num_points = len(self._dfDates)
+        num_points = len(self._df_dates)
         s += labelToString("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += labelToString("%12s" % self._dfDates[i],
+            s += labelToString("%12s" % self._df_dates[i],
                                "%12.8f" % self._dfs[i])
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

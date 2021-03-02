@@ -5,15 +5,15 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
 
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.models.FinModelBlackScholes import FinModelBlackScholesTypes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import FinModelBlackScholesTypes
 
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
@@ -31,7 +31,7 @@ def testFinModelBlackScholes():
     expiry_date = Date(15, 1, 2016)
 
     strikePrice = 130.0
-    stockPrice = 127.62
+    stock_price = 127.62
     volatility = 0.20
     interestRate = 0.001
     dividendYield = 0.0163
@@ -48,13 +48,13 @@ def testFinModelBlackScholes():
     euOption = FinEquityVanillaOption(expiry_date, strikePrice,
                                       euOptionType)
     
-    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate,
-                                         FinFrequencyTypes.CONTINUOUS, 
-                                         FinDayCountTypes.ACT_365F)
+    discount_curve = DiscountCurveFlat(valuation_date, interestRate,
+                                       FrequencyTypes.CONTINUOUS,
+                                       DayCountTypes.ACT_365F)
 
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield,
-                                         FinFrequencyTypes.CONTINUOUS, 
-                                         FinDayCountTypes.ACT_365F)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield,
+                                      FrequencyTypes.CONTINUOUS,
+                                      DayCountTypes.ACT_365F)
     
     num_steps_per_year = 400
     
@@ -62,24 +62,24 @@ def testFinModelBlackScholes():
                                      FinModelBlackScholesTypes.CRR_TREE, 
                                      num_steps_per_year)
     
-    v = amOption.value(valuation_date, stockPrice, discount_curve, 
+    v = amOption.value(valuation_date, stock_price, discount_curve,
                            dividendCurve, modelTree)
 #    print(v)
 
     modelApprox = FinModelBlackScholes(volatility, 
                                        FinModelBlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(valuation_date, stockPrice, discount_curve, 
+    v = amOption.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, modelApprox)
 
 #    print(v)
 
-    v = ameuOption.value(valuation_date, stockPrice, discount_curve, 
+    v = ameuOption.value(valuation_date, stock_price, discount_curve,
                            dividendCurve, modelTree)
 
 #    print(v)
 
-    v = euOption.value(valuation_date, stockPrice, discount_curve, 
+    v = euOption.value(valuation_date, stock_price, discount_curve,
                          dividendCurve, modelTree)
 
 #    print(v)
@@ -92,11 +92,11 @@ def testFinModelBlackScholes():
 
     # num_steps_per_year = range(5, 200, 1)
     
-    # for numSteps in num_steps_per_year:
+    # for num_steps in num_steps_per_year:
 
     #     modelTree = FinModelBlackScholes(volatility,
     #                                      FinModelBlackScholesTypes.CRR_TREE,
-    #                                      {'num_steps_per_year':numSteps})
+    #                                      {'num_steps_per_year':num_steps})
 
     #     modelAnal = FinModelBlackScholes(volatility, 
     #                                      FinModelBlackScholesTypes.ANALYTICAL)
@@ -105,16 +105,16 @@ def testFinModelBlackScholes():
     #                                     FinModelBlackScholesTypes.BARONE_ADESI)
 
 
-    #     v_am = amOption.value(valuation_date, stockPrice, discount_curve, 
+    #     v_am = amOption.value(valuation_date, stock_price, discount_curve,
     #                           dividendYield, modelTree)
 
-    #     v_eu = ameuOption.value(valuation_date, stockPrice, discount_curve, 
+    #     v_eu = ameuOption.value(valuation_date, stock_price, discount_curve,
     #                             dividendYield, modelTree)
  
-    #     v_bs = euOption.value(valuation_date, stockPrice, discount_curve, 
+    #     v_bs = euOption.value(valuation_date, stock_price, discount_curve,
     #                           dividendYield, modelAnal)
 
-    #     v_am_baw = amOption.value(valuation_date, stockPrice, discount_curve, 
+    #     v_am_baw = amOption.value(valuation_date, stock_price, discount_curve,
     #                               dividendYield, modelBAW)
         
     #     amTreeValue.append(v_am)

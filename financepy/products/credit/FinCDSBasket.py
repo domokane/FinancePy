@@ -9,26 +9,26 @@ import numpy as np
 
 from ...utils.FinError import FinError
 
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
-from ...products.credit.FinCDS import FinCDS
+from ...products.credit.cds import FinCDS
 
-from ...models.FinModelGaussianCopula1F import homogeneousBasketLossDbn
-from ...models.FinModelGaussianCopula import defaultTimesGC
-from ...models.FinModelStudentTCopula import FinModelStudentTCopula
+from ...models.credit_gaussian_copula_onefactor import homogeneousBasketLossDbn
+from ...models.credit_gaussian_copula import defaultTimesGC
+from ...models.credit_student_t_copula import FinModelStudentTCopula
 
-from ...products.credit.FinCDSCurve import FinCDSCurve
+from ...products.credit.cds_curve import FinCDSCurve
 
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
-from ...market.curves.FinInterpolator import interpolate, FinInterpTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
+from ...market.curves.interpolator import interpolate, FinInterpTypes
 
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Date import Date
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import Date
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 # TODO: Convert functions to use NUMBA!!
@@ -45,13 +45,13 @@ class FinCDSBasket(object):
                  notional: float = ONE_MILLION,
                  running_coupon: float = 0.0,
                  long_protection: bool = True,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._step_in_date = step_in_date
         self._maturity_date = maturity_date
@@ -89,23 +89,23 @@ class FinCDSBasket(object):
         numCredits = defaultTimes.shape[0]
         numTrials = defaultTimes.shape[1]
 
-        adjustedDates = self._cdsContract._adjustedDates
-        numFlows = len(adjustedDates)
+        adjusted_dates = self._cdsContract._adjusted_dates
+        num_flows = len(adjusted_dates)
         dayCount = DayCount(self._day_count_type)
 
         averageAccrualFactor = 0.0
 
-        rpv01ToTimes = np.zeros(numFlows)
-        for iTime in range(1, numFlows):
-            t = (adjustedDates[iTime] - valuation_date) / gDaysInYear
-            dt0 = adjustedDates[iTime - 1]
-            dt1 = adjustedDates[iTime]
+        rpv01ToTimes = np.zeros(num_flows)
+        for iTime in range(1, num_flows):
+            t = (adjusted_dates[iTime] - valuation_date) / gDaysInYear
+            dt0 = adjusted_dates[iTime - 1]
+            dt1 = adjusted_dates[iTime]
             accrualFactor = dayCount.year_frac(dt0, dt1)[0]
             averageAccrualFactor += accrualFactor
             rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
                 accrualFactor * libor_curve._df(t)
 
-        averageAccrualFactor /= numFlows
+        averageAccrualFactor /= num_flows
 
         tmat = (self._maturity_date - valuation_date) / gDaysInYear
 
@@ -255,7 +255,7 @@ class FinCDSBasket(object):
         if tmat < 0.0:
             raise FinError("Value date is after maturity date")
 
-        payment_dates = self._cdsContract._adjustedDates
+        payment_dates = self._cdsContract._adjusted_dates
         numTimes = len(payment_dates)
 
         issuerSurvivalProbabilities = np.zeros(numCredits)
@@ -316,7 +316,7 @@ class FinCDSBasket(object):
 
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
-        cashflows """
+        cash flows """
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("STEP-IN DATE", self._step_in_date)
         s += labelToString("MATURITY", self._maturity_date)
@@ -329,7 +329,7 @@ class FinCDSBasket(object):
         s += labelToString("DATEGENRULE", self._date_gen_rule_type)
 
 #        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-#        valueTable = [self._adjustedDates, self._accrualFactors, self._flows]
+#        valueTable = [self._adjusted_dates, self._accrualFactors, self._flows]
 #        precision = "12.6f"
 #        s += tableToString(header, valueTable, precision)
 

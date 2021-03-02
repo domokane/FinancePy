@@ -7,14 +7,14 @@ import sys
 sys.path.append("..")
 
 from financepy.products.credit.FinCDSOption import FinCDSOption
-from financepy.products.credit.FinCDS import FinCDS
+from financepy.products.credit.cds import FinCDS
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -28,7 +28,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def buildFullIssuerCurve(valuation_date):
 
-    dcType = FinDayCountTypes.ACT_360
+    dcType = DayCountTypes.ACT_360
     depos = []
     irBump = 0.0
 
@@ -64,8 +64,8 @@ def buildFullIssuerCurve(valuation_date):
     settlement_date = valuation_date.addDays(spotDays)
 
     swaps = []
-    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360_ISDA
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
     maturity_date = settlement_date.addMonths(24)
     swap1 = FinIborSwap(
@@ -157,7 +157,7 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap9)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     cdsMarketContracts = []
     cdsCoupon = 0.005743
@@ -212,7 +212,7 @@ def buildFullIssuerCurve(valuation_date):
 ##########################################################################
 
 
-def test_fullPriceCDSwaption():
+def test_full_priceCDSwaption():
 
     # This reproduces example on page 38 of Open Gamma note on CDS Option
     tradeDate = Date(5, 2, 2014)
@@ -248,7 +248,7 @@ def test_fullPriceCDSwaption():
     testCases.print("FULL VALUE", v['full_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
-    p = cdsContract.cleanPrice(valuation_date, issuer_curve, cdsRecovery)
+    p = cdsContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
     testCases.print("CLEAN PRICE", p)
 
     accrued_days = cdsContract.accrued_days()
@@ -335,5 +335,5 @@ def test_fullPriceCDSwaption():
 ##########################################################################
 
 
-test_fullPriceCDSwaption()
+test_full_priceCDSwaption()
 testCases.compareTestCases()

@@ -34,7 +34,7 @@ import os
 import numpy as np
 from numba import njit
 
-from financepy.utils.Math import norminvcdf
+from financepy.utils.fin_math import norminvcdf
 
 ###############################################################################
 # This code loads sobol coefficients from binary numpy file and allocates

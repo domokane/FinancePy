@@ -9,21 +9,21 @@ from numba import njit
 import numpy as np
 from typing import List
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.Math import testMonotonicity
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.fin_math import testMonotonicity
+from ...utils.global_variables import gDaysInYear
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
-from ...utils.Schedule import Schedule
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinDateGenRuleTypes
+from ...utils.schedule import Schedule
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
 
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
+from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.interpolator import FinInterpTypes, _uinterpolate
 
 ###############################################################################
 
@@ -31,62 +31,62 @@ from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
 @njit(fastmath=True, cache=True)
 def _valueConvertible(tmat,
                       face_amount,
-                      couponTimes,
-                      couponFlows,
-                      callTimes,
-                      callPrices,
-                      putTimes,
-                      putPrices,
+                      coupon_times,
+                      coupon_flows,
+                      call_times,
+                      call_prices,
+                      put_times,
+                      put_prices,
                       convRatio,
                       startConvertTime,
                       # Market inputs
-                      stockPrice,
+                      stock_price,
                       dfTimes,
-                      dfValues,
-                      dividendTimes,
-                      dividendYields,
-                      stockVolatility,
-                      creditSpread,
+                      df_values,
+                      dividend_times,
+                      dividend_yields,
+                      stock_volatility,
+                      credit_spread,
                       recRate,
                       # Tree details
                       num_steps_per_year):
 
     interp = FinInterpTypes.FLAT_FWD_RATES.value
 
-    if len(couponTimes) > 0:
-        if couponTimes[-1] > tmat:
+    if len(coupon_times) > 0:
+        if coupon_times[-1] > tmat:
             raise FinError("Coupon after maturity")
 
-    if len(callTimes) > 0:
-        if callTimes[-1] > tmat:
+    if len(call_times) > 0:
+        if call_times[-1] > tmat:
             raise FinError("Call times after maturity")
 
-    if len(putTimes) > 0:
-        if putTimes[-1] > tmat:
+    if len(put_times) > 0:
+        if put_times[-1] > tmat:
             raise FinError("Put times after maturity")
 
     if len(dfTimes) > 0:
         if dfTimes[-1] > tmat:
             raise FinError("Discount times after maturity")
 
-    if len(dividendTimes) > 0:
-        if dividendTimes[-1] > tmat:
+    if len(dividend_times) > 0:
+        if dividend_times[-1] > tmat:
             raise FinError("Dividend times after maturity")
 
-    if creditSpread < 0.0:
+    if credit_spread < 0.0:
         raise FinError("Credit spread negative.")
 
     if recRate < 0.0 or recRate > 1.0:
         raise FinError("Recovery rate should be between 0 and 1.")
 
-    if stockVolatility < 0.0:
+    if stock_volatility < 0.0:
         raise FinError("Stock volatility cannot be negative.")
 
     if num_steps_per_year < 1:
         raise FinError("Num Steps per year must more than 1.")
 
-    if len(dividendTimes) > 0.0:
-        if dividendTimes[-1] > tmat:
+    if len(dividend_times) > 0.0:
+        if dividend_times[-1] > tmat:
             raise FinError("Last dividend is after bond maturity.")
 
     if recRate > 0.999 or recRate < 0.0:
@@ -106,60 +106,60 @@ def _valueConvertible(tmat,
     treeTimes = np.linspace(0.0, tmat, numTimes)
     treeDfs = np.zeros(numTimes)
     for i in range(0, numTimes):
-        df = _uinterpolate(treeTimes[i], dfTimes, dfValues, interp)
+        df = _uinterpolate(treeTimes[i], dfTimes, df_values, interp)
         treeDfs[i] = df
 
-    h = creditSpread/(1.0 - recRate)
+    h = credit_spread/(1.0 - recRate)
     survProb = exp(-h*dt)
 
     # map coupons onto tree but preserve their present value using risky dfs
     treeFlows = np.zeros(numTimes)
-    numCoupons = len(couponTimes)
+    numCoupons = len(coupon_times)
     for i in range(0, numCoupons):
-        flowTime = couponTimes[i]
-        n = int(round(flowTime/dt, 0))
+        flow_time = coupon_times[i]
+        n = int(round(flow_time/dt, 0))
         treeTime = treeTimes[n]
-        df_flow = _uinterpolate(flowTime, dfTimes, dfValues, interp)
-        df_flow *= exp(-h*flowTime)
-        df_tree = _uinterpolate(treeTime, dfTimes, dfValues, interp)
+        df_flow = _uinterpolate(flow_time, dfTimes, df_values, interp)
+        df_flow *= exp(-h*flow_time)
+        df_tree = _uinterpolate(treeTime, dfTimes, df_values, interp)
         df_tree *= exp(-h*treeTime)
-        treeFlows[n] += couponFlows[i] * 1.0 * df_flow / df_tree
+        treeFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
     treeCallValue = np.ones(numTimes) * face_amount * 1000.0
-    numCalls = len(callTimes)
+    numCalls = len(call_times)
     for i in range(0, numCalls):
-        callTime = callTimes[i]
-        n = int(round(callTime/dt, 0))
-        treeCallValue[n] = callPrices[i]
+        call_time = call_times[i]
+        n = int(round(call_time/dt, 0))
+        treeCallValue[n] = call_prices[i]
 
     # map puts onto tree
     treePutValue = np.zeros(numTimes)
-    numPuts = len(putTimes)
+    numPuts = len(put_times)
     for i in range(0, numPuts):
-        putTime = putTimes[i]
-        n = int(round(putTime/dt, 0))
-        treePutValue[n] = putPrices[i]
+        put_time = put_times[i]
+        n = int(round(put_time/dt, 0))
+        treePutValue[n] = put_prices[i]
 
     # map discrete dividend yields onto tree dates when they are made
     treeDividendYield = np.zeros(numTimes)
-    numDividends = len(dividendTimes)
+    numDividends = len(dividend_times)
     for i in range(0, numDividends):
-        dividendTime = dividendTimes[i]
-        n = int(round(dividendTime/dt, 0))
-        treeDividendYield[n] = dividendYields[i]
+        dividend_time = dividend_times[i]
+        n = int(round(dividend_time/dt, 0))
+        treeDividendYield[n] = dividend_yields[i]
 
     # Set up the tree of stock prices using a 2D matrix (half the matrix is
     # unused but this may be a cost worth bearing for simpler code. Review.
     treeStockValue = np.zeros(shape=(numTimes, numLevels))
-    e = stockVolatility**2 - h
+    e = stock_volatility**2 - h
     if e < 0.0:
         raise FinError("Volatility squared minus the hazard rate is negative.")
 
     u = exp(sqrt(e*dt))
     d = 1.0 / u
     u2 = u*u
-    treeStockValue[0, 0] = stockPrice
+    treeStockValue[0, 0] = stock_price
     for iTime in range(1, numTimes):
         s = treeStockValue[iTime-1, 0] * d
         treeStockValue[iTime, 0] = s
@@ -196,7 +196,7 @@ def _valueConvertible(tmat,
         treeProbsUp[iTime] = (a - d*survProb) / (u - d)
         treeProbsDn[iTime] = (u*survProb - a) / (u - d)
 #        r = log(a)/dt
-#        n_min = r*r / stockVolatility / stockVolatility
+#        n_min = r*r / stock_volatility / stock_volatility
 
     if np.any(treeProbsUp > 1.0):
         raise FinError("pUp > 1.0. Increase time steps.")
@@ -250,7 +250,7 @@ def _valueConvertible(tmat,
 ###############################################################################
 
 
-class FinBondConvertible(object):
+class BondConvertible(object):
     """ Class for convertible bonds. These bonds embed rights to call and put
     the bond in return for equity. Until then they are bullet bonds which
     means they have regular coupon payments of a known size that are paid on
@@ -261,22 +261,22 @@ class FinBondConvertible(object):
     def __init__(self,
                  maturity_date: Date,  # bond maturity date
                  coupon: float,  # annual coupon
-                 freq_type: FinFrequencyTypes,  # coupon frequency type
+                 freq_type: FrequencyTypes,  # coupon frequency type
                  startConvertDate: Date,  # conversion starts on this date
                  conversionRatio: float,  # num shares per face of notional
-                 callDates: List[Date],  # list of call dates
-                 callPrices: List[float],  # list of call prices
-                 putDates: List[Date],  # list of put dates
-                 putPrices: List[float],  # list of put prices
-                 accrual_type: FinDayCountTypes,  # day count type for accrued
+                 call_dates: List[Date],  # list of call dates
+                 call_prices: List[float],  # list of call prices
+                 put_dates: List[Date],  # list of put dates
+                 put_prices: List[float],  # list of put prices
+                 accrual_type: DayCountTypes,  # day count type for accrued
                  face_amount: float = 100.0):  # face amount
-        """ Create FinBondConvertible object by providing the bond Maturity
+        """ Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all of
         the details regarding the conversion option including the list of the
         call and put dates and the corresponding list of call and put prices. 
         """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if startConvertDate > maturity_date:
             raise FinError("Start convert date is after bond maturity.")
@@ -287,24 +287,24 @@ class FinBondConvertible(object):
         self._frequency = Frequency(freq_type)
         self._freq_type = freq_type
 
-        self._callDates = callDates
-        self._callPrices = callPrices
+        self._call_dates = call_dates
+        self._call_prices = call_prices
 
-        if len(self._callDates) != len(self._callPrices):
+        if len(self._call_dates) != len(self._call_prices):
             raise FinError("Call dates and prices not same length.")
 
-        self._putDates = putDates
-        self._putPrices = putPrices
+        self._put_dates = put_dates
+        self._put_prices = put_prices
 
-        if len(self._putDates) != len(self._putPrices):
+        if len(self._put_dates) != len(self._put_prices):
             raise FinError("Put dates and prices not same length.")
 
-        if len(putDates) > 0:
-            if putDates[-1] > maturity_date:
+        if len(put_dates) > 0:
+            if put_dates[-1] > maturity_date:
                 raise FinError("Last put is after bond maturity.")
 
-        if len(callDates) > 0:
-            if callDates[-1] > maturity_date:
+        if len(call_dates) > 0:
+            if call_dates[-1] > maturity_date:
                 raise FinError("Last call is after bond maturity.")
 
         self._startConvertDate = startConvertDate
@@ -326,7 +326,7 @@ class FinBondConvertible(object):
        
 ###############################################################################
 
-    def _calculateFlowDates(self,
+    def _calculate_flow_dates(self,
                             settlement_date: Date):
         """ Determine the convertible bond cashflow payment dates. """
 
@@ -335,9 +335,9 @@ class FinBondConvertible(object):
             return
 
         self._settlement_date = settlement_date
-        calendar_type = FinCalendarTypes.NONE
-        busDayRuleType = FinBusDayAdjustTypes.NONE
-        date_gen_rule_type = FinDateGenRuleTypes.BACKWARD
+        calendar_type = CalendarTypes.NONE
+        busDayRuleType = BusDayAdjustTypes.NONE
+        date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(settlement_date,
                                    self._maturity_date,
@@ -348,18 +348,18 @@ class FinBondConvertible(object):
 
         self._pcd = self._flow_dates[0]
         self._ncd = self._flow_dates[1]
-        self.calcAccruedInterest(settlement_date)
+        self.calc_accrued_interest(settlement_date)
 
 ###############################################################################
 
     def value(self,
               settlement_date: Date,
-              stockPrice: float,
-              stockVolatility: float,
+              stock_price: float,
+              stock_volatility: float,
               dividend_dates: List[Date],
-              dividendYields: List[float],
-              discount_curve: FinDiscountCurve,
-              creditSpread: float,
+              dividend_yields: List[float],
+              discount_curve: DiscountCurve,
+              credit_spread: float,
               recovery_rate: float = 0.40,
               num_steps_per_year: int = 100):
         """
@@ -383,138 +383,138 @@ class FinBondConvertible(object):
         price. It also captures the embedded owner's put schedule of prices.
         """
 
-        if stockPrice <= 0.0:
-            stockPrice = 1e-10  # Avoid overflows in delta calc
+        if stock_price <= 0.0:
+            stock_price = 1e-10  # Avoid overflows in delta calc
 
-        if stockVolatility <= 0.0:
-            stockVolatility = 1e-10  # Avoid overflows in delta calc
+        if stock_volatility <= 0.0:
+            stock_volatility = 1e-10  # Avoid overflows in delta calc
 
-        self._calculateFlowDates(settlement_date)
+        self._calculate_flow_dates(settlement_date)
         tmat = (self._maturity_date - settlement_date) / gDaysInYear
         if tmat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
 
         # We include time zero in the coupon times and flows
-        couponTimes = [0.0]
-        couponFlows = [0.0]
+        coupon_times = [0.0]
+        coupon_flows = [0.0]
         cpn = self._coupon/self._frequency
         for dt in self._flow_dates[1:]:
-            flowTime = (dt - settlement_date) / gDaysInYear
-            couponTimes.append(flowTime)
-            couponFlows.append(cpn)
+            flow_time = (dt - settlement_date) / gDaysInYear
+            coupon_times.append(flow_time)
+            coupon_flows.append(cpn)
 
-        couponTimes = np.array(couponTimes)
-        couponFlows = np.array(couponFlows)
+        coupon_times = np.array(coupon_times)
+        coupon_flows = np.array(coupon_flows)
 
-        if np.any(couponTimes < 0.0):
+        if np.any(coupon_times < 0.0):
             raise FinError("No coupon times can be before the value date.")
 
-        if np.any(couponTimes > tmat):
+        if np.any(coupon_times > tmat):
             raise FinError("No coupon times can be after the maturity date.")
 
-        callTimes = []
-        for dt in self._callDates:
-            callTime = (dt - settlement_date) / gDaysInYear
-            callTimes.append(callTime)
-        callTimes = np.array(callTimes)
-        callPrices = np.array(self._callPrices)
+        call_times = []
+        for dt in self._call_dates:
+            call_time = (dt - settlement_date) / gDaysInYear
+            call_times.append(call_time)
+        call_times = np.array(call_times)
+        call_prices = np.array(self._call_prices)
 
-        if np.any(callTimes < 0.0):
+        if np.any(call_times < 0.0):
             raise FinError("No call times can be before the value date.")
 
-        if np.any(callTimes > tmat):
+        if np.any(call_times > tmat):
             raise FinError("No call times can be after the maturity date.")
 
-        putTimes = []
-        for dt in self._putDates:
-            putTime = (dt - settlement_date) / gDaysInYear
-            putTimes.append(putTime)
-        putTimes = np.array(putTimes)
-        putPrices = np.array(self._putPrices)
+        put_times = []
+        for dt in self._put_dates:
+            put_time = (dt - settlement_date) / gDaysInYear
+            put_times.append(put_time)
+        put_times = np.array(put_times)
+        put_prices = np.array(self._put_prices)
 
-        if np.any(putTimes > tmat):
+        if np.any(put_times > tmat):
             raise FinError("No put times can be after the maturity date.")
 
-        if np.any(putTimes <= 0.0):
+        if np.any(put_times <= 0.0):
             raise FinError("No put times can be on or before value date.")
 
-        if len(dividendYields) != len(dividend_dates):
+        if len(dividend_yields) != len(dividend_dates):
             raise FinError("Number of dividend yields and dates not same.")
 
-        dividendTimes = []
+        dividend_times = []
         for dt in dividend_dates:
-            dividendTime = (dt - settlement_date) / gDaysInYear
-            dividendTimes.append(dividendTime)
-        dividendTimes = np.array(dividendTimes)
-        dividendYields = np.array(dividendYields)
+            dividend_time = (dt - settlement_date) / gDaysInYear
+            dividend_times.append(dividend_time)
+        dividend_times = np.array(dividend_times)
+        dividend_yields = np.array(dividend_yields)
 
         # If it's before today it starts today
         tconv = (self._startConvertDate - settlement_date) / gDaysInYear
         tconv = max(tconv, 0.0)
 
-        discountFactors = []
-        for t in couponTimes:
+        discount_factors = []
+        for t in coupon_times:
             df = discount_curve._df(t)
-            discountFactors.append(df)
+            discount_factors.append(df)
 
-        discountTimes = np.array(couponTimes)
-        discountFactors = np.array(discountFactors)
+        discount_times = np.array(coupon_times)
+        discount_factors = np.array(discount_factors)
 
-        if testMonotonicity(couponTimes) is False:
+        if testMonotonicity(coupon_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(callTimes) is False:
+        if testMonotonicity(call_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(putTimes) is False:
+        if testMonotonicity(put_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(discountTimes) is False:
+        if testMonotonicity(discount_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(dividendTimes) is False:
+        if testMonotonicity(dividend_times) is False:
             raise FinError("Coupon times not monotonic")
 
         v1 = _valueConvertible(tmat,
                                self._face_amount,
-                               couponTimes,
-                               couponFlows,
-                               callTimes,
-                               callPrices,
-                               putTimes,
-                               putPrices,
+                               coupon_times,
+                               coupon_flows,
+                               call_times,
+                               call_prices,
+                               put_times,
+                               put_prices,
                                self._conversionRatio,
                                tconv,
                                # Market inputs
-                               stockPrice,
-                               discountTimes,
-                               discountFactors,
-                               dividendTimes,
-                               dividendYields,
-                               stockVolatility,
-                               creditSpread,
+                               stock_price,
+                               discount_times,
+                               discount_factors,
+                               dividend_times,
+                               dividend_yields,
+                               stock_volatility,
+                               credit_spread,
                                recovery_rate,
                                # Tree details
                                num_steps_per_year)
 
         v2 = _valueConvertible(tmat,
                                self._face_amount,
-                               couponTimes,
-                               couponFlows,
-                               callTimes,
-                               callPrices,
-                               putTimes,
-                               putPrices,
+                               coupon_times,
+                               coupon_flows,
+                               call_times,
+                               call_prices,
+                               put_times,
+                               put_prices,
                                self._conversionRatio,
                                tconv,
                                # Market inputs
-                               stockPrice,
-                               discountTimes,
-                               discountFactors,
-                               dividendTimes,
-                               dividendYields,
-                               stockVolatility,
-                               creditSpread,
+                               stock_price,
+                               discount_times,
+                               discount_factors,
+                               dividend_times,
+                               dividend_yields,
+                               stock_volatility,
+                               credit_spread,
                                recovery_rate,
                                # Tree details
                                num_steps_per_year + 1)
@@ -535,7 +535,7 @@ class FinBondConvertible(object):
     def accrued_days(self,
                     settlement_date: Date):
         """ Calculate number days from previous coupon date to settlement."""
-        self._calculateFlowDates(settlement_date)
+        self._calculate_flow_dates(settlement_date)
 
         if len(self._flow_dates) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -544,13 +544,13 @@ class FinBondConvertible(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self,
+    def calc_accrued_interest(self,
                             settlement_date: Date):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
         if settlement_date != self._settlement_date:
-            self._calculateFlowDates(settlement_date)
+            self._calculate_flow_dates(settlement_date)
 
         if len(self._flow_dates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -570,12 +570,12 @@ class FinBondConvertible(object):
 
 ###############################################################################
 
-    def currentYield(self,
-                     cleanPrice: float):
+    def current_yield(self,
+                     clean_price: float):
         """ Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)"""
 
-        y = self._coupon * self._face_amount / cleanPrice
+        y = self._coupon * self._face_amount / clean_price
         return y
 
 ###############################################################################
@@ -593,15 +593,15 @@ class FinBondConvertible(object):
         s += labelToString("START CONVERT DATE", self._startConvertDate)
         s += labelToString("CALL", "DATES")
 
-        for i in range(0, len(self._callDates)):
-            s += labelToString(self._callDates[i],
-                               self._callPrices[i])
+        for i in range(0, len(self._call_dates)):
+            s += labelToString(self._call_dates[i],
+                               self._call_prices[i])
 
         s += labelToString("PUT", "DATES")
 
-        for i in range(0, len(self._putDates)):
-            s += labelToString(self._putDates[i],
-                               self._putPrices[i])
+        for i in range(0, len(self._put_dates)):
+            s += labelToString(self._put_dates[i],
+                               self._put_prices[i])
 
         return s
 
@@ -619,8 +619,8 @@ class FinBondConvertible(object):
 #    if 1==0:
 #        pv = 0.0
 #        for i in range(0, numCoupons):
-#            t = couponTimes[i]
-#            df = uinterpolate(t, discountTimes, discountFactors, interp)
+#            t = coupon_times[i]
+#            df = uinterpolate(t, discount_times, discount_factors, interp)
 #            pv += df * couponAmounts[i]
 #            print(i, t, couponAmounts[i], df, pv)
 #        pv += df
@@ -630,7 +630,7 @@ class FinBondConvertible(object):
 #        pv = 0.0
 #        for i in range(0, numTimes):
 #            t = treeTimes[i]
-#            df = uinterpolate(t, discountTimes, discountFactors, interp)
+#            df = uinterpolate(t, discount_times, discount_factors, interp)
 #            pv += df * treeFlows[i]
 #            print(i, t, treeFlows[i], df, pv)
 #        pv += df

@@ -6,15 +6,16 @@
 
 import numpy as np
 
-from ...utils.Date import Date
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from .FinBond import FinYTMCalcType
+from ...utils.date import Date
+from ...utils.calendar import CalendarTypes
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.curves.discount_curve import DiscountCurve
+from .bond import FinYTMCalcType
 
 ###############################################################################
 
-class FinBondPortfolio(object):
+
+class BondPortfolio(object):
     """ Class for valuing and risk-managing a portfolio of bonds. """
 
     def __init__(self,
@@ -22,13 +23,13 @@ class FinBondPortfolio(object):
                  bondWeights: (list, np.ndarray)):
         """ XXX """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        self.calculateFlowAmounts()
+        self.calculateFlows()
 
 ###############################################################################
 
-    def _calculateFlowAmounts(self):
+    def _calculateFlows(self):
         """ Determine the bond cashflow payment amounts without principal """
 
         self._flow_amounts = [0.0]
@@ -39,7 +40,7 @@ class FinBondPortfolio(object):
     
 ###############################################################################
 
-    def dollarDuration(self,
+    def dollar_duration(self,
                        settlement_date: Date,
                        ytm: float,
                        convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
@@ -47,42 +48,42 @@ class FinBondPortfolio(object):
         known as the DV01 in Bloomberg. """
 
         dy = 0.0001 # 1 basis point
-        p0 = self.fullPriceFromYTM(settlement_date, ytm - dy, convention)
-        p2 = self.fullPriceFromYTM(settlement_date, ytm + dy, convention)
+        p0 = self.full_priceFromYTM(settlement_date, ytm - dy, convention)
+        p2 = self.full_priceFromYTM(settlement_date, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0
         return durn
 
 ###############################################################################
 
-    def macauleyDuration(self,
+    def macauley_duration(self,
                          settlement_date: Date,
                          ytm: float,
                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         """ Calculate the Macauley duration of the bond on a settlement date
         given its yield to maturity. """
 
-        dd = self.dollarDuration(settlement_date, ytm, convention)
-        fp = self.fullPriceFromYTM(settlement_date, ytm, convention)
+        dd = self.dollar_duration(settlement_date, ytm, convention)
+        fp = self.full_priceFromYTM(settlement_date, ytm, convention)
         md = dd * (1.0 + ytm / self._frequency) / fp
         return md
 
 ###############################################################################
 
-    def modifiedDuration(self,
+    def modified_duration(self,
                          settlement_date: Date,
                          ytm: float,
                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         """ Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. """
 
-        dd = self.dollarDuration(settlement_date, ytm, convention)
-        fp = self.fullPriceFromYTM(settlement_date, ytm, convention)
+        dd = self.dollar_duration(settlement_date, ytm, convention)
+        fp = self.full_priceFromYTM(settlement_date, ytm, convention)
         md = dd / fp
         return md
 
 ###############################################################################
 
-    def convexityFromYTM(self,
+    def convexity_from_ytm(self,
                          settlement_date: Date,
                          ytm: float,
                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
@@ -90,61 +91,61 @@ class FinBondPortfolio(object):
         function is vectorised with respect to the yield input. """
 
         dy = 0.0001
-        p0 = self.fullPriceFromYTM(settlement_date, ytm - dy, convention)
-        p1 = self.fullPriceFromYTM(settlement_date, ytm, convention)
-        p2 = self.fullPriceFromYTM(settlement_date, ytm + dy, convention)
+        p0 = self.full_priceFromYTM(settlement_date, ytm - dy, convention)
+        p1 = self.full_priceFromYTM(settlement_date, ytm, convention)
+        p2 = self.full_priceFromYTM(settlement_date, ytm + dy, convention)
         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
         return conv
 
 ###############################################################################
 
-    def cleanPriceFromYTM(self,
+    def clean_price_from_ytm(self,
                           settlement_date: Date,
                           ytm: float,
                           convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        fullPrice = self.fullPriceFromYTM(settlement_date, ytm, convention)
+        full_price = self.full_priceFromYTM(settlement_date, ytm, convention)
         accruedAmount = self._accruedInterest * self._par / self._face_amount
-        cleanPrice = fullPrice - accruedAmount
-        return cleanPrice
+        clean_price = full_price - accruedAmount
+        return clean_price
 
 ###############################################################################
 
-    def cleanPriceFromDiscountCurve(self,
-                                    settlement_date: Date,
-                                    discount_curve: FinDiscountCurve):
+    def clean_price_from_discount_curve(self,
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the clean bond value using some discount curve to
-        present-value the bond's cashflows back to the curve anchor date and
+        present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date. """
 
 
 ##############################################################################
 
-    def fullPriceFromDiscountCurve(self,
-                                   settlement_date: Date,
-                                   discount_curve: FinDiscountCurve):
+    def full_price_from_discount_curve(self,
+                                       settlement_date: Date,
+                                       discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
-        bond's cashflows to the settlement date. As such it is effectively a
+        bond's cash flows to the settlement date. As such it is effectively a
         forward bond price if the settlement date is after the valuation date.
         """
 
 
 ###############################################################################
 
-    def currentYield(self, cleanPrice):
+    def current_yield(self, clean_price):
         """ Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)"""
 
-        y = self._coupon * self._par / cleanPrice
+        y = self._coupon * self._par / clean_price
         return y
 
 ###############################################################################
 
-    def yieldToMaturity(self,
+    def yield_to_maturity(self,
                         settlement_date: Date,
-                        cleanPrice: float,
+                        clean_price: float,
                         convention: FinYTMCalcType = FinYTMCalcType.US_TREASURY):
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
@@ -152,10 +153,10 @@ class FinBondPortfolio(object):
 
 ###############################################################################
 
-    def calcAccruedInterest(self,
+    def calc_accrued_interest(self,
                             settlement_date: Date,
                             numExDividendDays: int = 0,
-                            calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND):
+                            calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
  
         return self._accruedInterest
 
@@ -173,16 +174,16 @@ class FinBondPortfolio(object):
             if dt >= settlement_date:
                 print("%12s" % dt, " %12.2f " % flow)
 
-        redemptionAmount = self._face_amount + flow
-        print("%12s" % self._flow_dates[-1], " %12.2f " % redemptionAmount)
+        redemption_amount = self._face_amount + flow
+        print("%12s" % self._flow_dates[-1], " %12.2f " % redemption_amount)
 
 ###############################################################################
 
-    def fullPriceFromSurvivalCurve(self,
-                                   settlement_date: Date,
-                                   discount_curve: FinDiscountCurve,
-                                   survivalCurve: FinDiscountCurve,
-                                   recovery_rate: float):
+    def full_price_from_survival_curve(self,
+                                       settlement_date: Date,
+                                       discount_curve: DiscountCurve,
+                                       survival_curve: DiscountCurve,
+                                       recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. For the 
@@ -207,7 +208,7 @@ class FinBondPortfolio(object):
             if dt >= settlement_date:
 
                 df = discount_curve.df(dt)
-                q = survivalCurve.survProb(dt)
+                q = survival_curve.survProb(dt)
 
                 # Add PV of coupon conditional on surviving to payment date  
                 # Any default results in all subsequent coupons being lost
@@ -231,24 +232,24 @@ class FinBondPortfolio(object):
 
 ###############################################################################
 
-    def cleanPriceFromSurvivalCurve(self,
-                                    settlement_date: Date,
-                                    discount_curve: FinDiscountCurve,
-                                    survivalCurve: FinDiscountCurve,
-                                    recovery_rate: float):
+    def clean_priceFromSurvivalCurve(self,
+                                     settlement_date: Date,
+                                     discount_curve: DiscountCurve,
+                                     survival_curve: DiscountCurve,
+                                     recovery_rate: float):
         """ Calculate clean price value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """ 
 
-        self.calcAccruedInterest(settlement_date)
+        self.calc_accrued_interest(settlement_date)
 
-        fullPrice = self.fullPriceFromSurvivalCurve(settlement_date,
+        full_price = self.full_price_from_survival_curve(settlement_date,
                                                     discount_curve,
-                                                    survivalCurve,
+                                                    survival_curve,
                                                     recovery_rate)
         
-        cleanPrice = fullPrice - self._accruedInterest
-        return cleanPrice
+        clean_price = full_price - self._accruedInterest
+        return clean_price
     
 ###############################################################################
 

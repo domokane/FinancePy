@@ -6,8 +6,8 @@
 
 import numpy as np
 
-from ..utils.Math import N
-from ..utils.FinHelperFunctions import uniformToDefaultTime
+from ..utils.fin_math import N
+from ..utils.helper_functions import uniformToDefaultTime
 
 ###############################################################################
 # TODO:

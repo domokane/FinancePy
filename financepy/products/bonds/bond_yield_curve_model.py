@@ -5,7 +5,7 @@
 
 import numpy as np
 from scipy.interpolate import splev
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 
@@ -16,7 +16,7 @@ class FinCurveFitMethod():
 ###############################################################################
 
 
-class FinCurveFitPolynomial():
+class CurveFitPolynomial():
 
     def __init__(self, power=3):
         self._parentType = FinCurveFitMethod
@@ -43,7 +43,7 @@ class FinCurveFitPolynomial():
 ###############################################################################
 
 
-class FinCurveFitNelsonSiegel():
+class CurveFitNelsonSiegel():
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
         self._parentType = FinCurveFitMethod
@@ -93,7 +93,7 @@ class FinCurveFitNelsonSiegel():
 ###############################################################################
 
 
-class FinCurveFitNelsonSiegelSvensson():
+class CurveFitNelsonSiegelSvensson():
 
     def __init__(self, tau1=None, tau2=None,
                  bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
@@ -163,7 +163,7 @@ class FinCurveFitNelsonSiegelSvensson():
 ###############################################################################
 
 
-class FinCurveFitBSpline():
+class CurveFitBSpline():
 
     def __init__(self, power=3, knots=[1, 3, 5, 10]):
         self._parentType = FinCurveFitMethod

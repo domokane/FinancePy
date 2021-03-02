@@ -4,24 +4,24 @@
 
 import numpy as np
 
-from ...utils.Date import Date
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinDateGenRuleTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
+from ...utils.date import Date
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
 from ...utils.FinGlobalTypes import FinExerciseTypes
 from ...utils.FinGlobalTypes import FinSwapTypes
 from ...utils.FinError import FinError
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 from ...products.rates.IborSwap import FinIborSwap
 
-from ...models.FinModelRatesBDT import FinModelRatesBDT
-from ...models.FinModelRatesBK import FinModelRatesBK
-from ...models.FinModelRatesHW import FinModelRatesHW
+from ...models.rates_bdt_tree import FinModelRatesBDT
+from ...models.rates_bk_tree import FinModelRatesBK
+from ...models.rates_hull_white_tree import FinModelRatesHW
 
 ###############################################################################
 
@@ -40,19 +40,19 @@ class FinIborBermudanSwaption(object):
                  fixed_legType: FinSwapTypes,
                  exerciseType: FinExerciseTypes,
                  fixedCoupon: float,
-                 fixedFrequencyType: FinFrequencyTypes,
-                 fixedDayCountType: FinDayCountTypes,
+                 fixedFrequencyType: FrequencyTypes,
+                 fixedDayCountType: DayCountTypes,
                  notional=ONE_MILLION,
-                 floatFrequencyType=FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType=FinDayCountTypes.THIRTY_E_360,
-                 calendar_type=FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type=FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type=FinDateGenRuleTypes.BACKWARD):
+                 floatFrequencyType=FrequencyTypes.QUARTERLY,
+                 floatDayCountType=DayCountTypes.THIRTY_E_360,
+                 calendar_type=CalendarTypes.WEEKEND,
+                 bus_day_adjust_type=BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type=DateGenRuleTypes.BACKWARD):
         """ Create a Bermudan swaption contract. This is an option to enter
         into a payer or receiver swap at a fixed coupon on all of the fixed
         # leg coupon dates until the exercise date inclusive. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if settlement_date > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
@@ -128,11 +128,11 @@ class FinIborBermudanSwaption(object):
         cpnFlows = [0.0]
 
         # The first flow is the expiry date
-        numFlows = len(self._underlyingSwap._fixed_leg._payment_dates)
+        num_flows = len(self._underlyingSwap._fixed_leg._payment_dates)
 
         swap = self._underlyingSwap
 
-        for iFlow in range(0, numFlows):
+        for iFlow in range(0, num_flows):
 
             flowDate = self._underlyingSwap._fixed_leg._payment_dates[iFlow]
 
@@ -149,10 +149,10 @@ class FinIborBermudanSwaption(object):
         self._cpnFlows = cpnFlows
 
         # Allow exercise on coupon dates but control this later for europeans
-        self._callTimes = cpnTimes
+        self._call_times = cpnTimes
 
         dfTimes = discount_curve._times
-        dfValues = discount_curve._dfs
+        df_values = discount_curve._dfs
 
         face_amount = 1.0
         strikePrice = 1.0 # Floating leg is assumed to price at par
@@ -164,7 +164,7 @@ class FinIborBermudanSwaption(object):
 
         if isinstance(model, FinModelRatesBDT) or isinstance(model, FinModelRatesBK) or isinstance(model, FinModelRatesHW):
 
-            model.buildTree(tmat, dfTimes, dfValues)
+            model.buildTree(tmat, dfTimes, df_values)
 
             v = model.bermudanSwaption(texp,
                                        tmat,
@@ -195,10 +195,10 @@ class FinIborBermudanSwaption(object):
         for i in range(0,n):
             print("CPN TIME: ", self._cpnTimes[i], "FLOW", self._cpnFlows[i])
 
-        n = len(self._callTimes)
+        n = len(self._call_times)
 
         for i in range(0,n):
-            print("CALL TIME: ", self._callTimes[i])
+            print("CALL TIME: ", self._call_times[i])
 
 ###############################################################################
         

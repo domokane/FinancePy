@@ -3,9 +3,9 @@
 ##############################################################################
 
 
-from .FinHelperFunctions import checkArgumentTypes
+from .helper_functions import check_argument_types
 from .Currency import FinCurrencyTypes
-from .Math import ONE_MILLION
+from .fin_math import ONE_MILLION
 
 ###############################################################################
 
@@ -18,7 +18,7 @@ class FinAmount(object):
                  currencyType: FinCurrencyTypes = FinCurrencyTypes.NONE):
         """ Create FinAmount object. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._notional = notional
         self._currencyType = currencyType

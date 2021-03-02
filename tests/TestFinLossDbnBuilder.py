@@ -9,8 +9,8 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelGaussianCopula1F import lossDbnRecursionGCD
-from financepy.models.FinModelGaussianCopula1F import lossDbnHeterogeneousAdjBinomial
+from financepy.models.credit_gaussian_copula_onefactor import lossDbnRecursionGCD
+from financepy.models.credit_gaussian_copula_onefactor import lossDbnHeterogeneousAdjBinomial
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -26,7 +26,7 @@ def test_FinLossDbnBuilder():
 
     x = np.linspace(0, numCredits, numCredits + 1)
     defaultProb = 0.30
-    numSteps = 25
+    num_steps = 25
     lossUnits = np.ones(numCredits)
     lossRatio = np.ones(numCredits)
 
@@ -50,7 +50,7 @@ def test_FinLossDbnBuilder():
                                    defaultProbs,
                                    lossUnits,
                                    betaVector,
-                                   numSteps)
+                                   num_steps)
 
         end = time.time()
 
@@ -70,7 +70,7 @@ def test_FinLossDbnBuilder():
                                                defaultProbs,
                                                lossRatio,
                                                betaVector,
-                                               numSteps)
+                                               num_steps)
         end = time.time()
 
         testCases.print(
@@ -113,7 +113,7 @@ def test_FinLossDbnBuilder():
                                defaultProbs,
                                lossUnits,
                                betaVector,
-                               numSteps)
+                               num_steps)
     end = time.time()
 
     testCases.print(
@@ -130,7 +130,7 @@ def test_FinLossDbnBuilder():
                                            defaultProbs,
                                            lossRatio,
                                            betaVector,
-                                           numSteps)
+                                           num_steps)
     end = time.time()
 
     testCases.print(

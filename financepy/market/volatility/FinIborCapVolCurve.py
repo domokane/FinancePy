@@ -5,10 +5,10 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.FinHelperFunctions import labelToString
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.DayCount import DayCount, FinDayCountTypes
+from ...utils.date import Date
+from ...utils.helper_functions import labelToString
+from ...utils.global_variables import gDaysInYear
+from ...utils.day_count import DayCount, DayCountTypes
 
 ##########################################################################
 # TODO: Calibration
@@ -71,8 +71,8 @@ class FinIborCapVolCurve():
 
         self._capMaturityDates = capMaturityDates
 
-        if isinstance(day_count_type, FinDayCountTypes) is False:
-            raise FinError("DayCountType must be of type FinDayCountTypes.")
+        if isinstance(day_count_type, DayCountTypes) is False:
+            raise FinError("DayCountType must be of type DayCountTypes.")
 
         self._day_count_type = day_count_type
 
@@ -99,10 +99,10 @@ class FinIborCapVolCurve():
             self._taus.append(tau)
             prevDt = dt
 
-        fwdRateVol = self._capSigmas[0]
+        fwd_rateVol = self._capSigmas[0]
         self._capletGammas = np.zeros(numCaps)
         self._capletGammas[0] = 0.0
-        cumIbor2Tau = (fwdRateVol**2) * self._taus[0]
+        cumIbor2Tau = (fwd_rateVol**2) * self._taus[0]
 
         sumTau = 0.0
         for i in range(1, len(self._capMaturityDates)):

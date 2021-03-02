@@ -10,7 +10,7 @@ from numba import njit, float64
 from ..utils.FinGlobalTypes import FinOptionTypes
 from ..utils.FinError import FinError
 
-from .FinModelBlackScholesAnalytical import bsValue
+from .black_scholes_analytic import bsValue
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -25,7 +25,7 @@ def optionImpliedDbn(s, t, r, q, strikes, sigmas):
     if len(strikes) != len(sigmas):
         raise FinError("Strike and Sigma vector do not have same length.")
 
-    numSteps = len(strikes)
+    num_steps = len(strikes)
 
     sigma = sigmas[0]
     strike = strikes[0]
@@ -35,9 +35,9 @@ def optionImpliedDbn(s, t, r, q, strikes, sigmas):
 
     inflator = np.exp((r-0) * t)
     dK = strikes[1] - strikes[0]
-    values = np.zeros(numSteps)
+    values = np.zeros(num_steps)
 
-    for ik in range(0, numSteps):
+    for ik in range(0, num_steps):
         strike = strikes[ik]        
         sigma = sigmas[ik]
         v = bsValue(s, t, strike, r, q, sigma, 
@@ -45,9 +45,9 @@ def optionImpliedDbn(s, t, r, q, strikes, sigmas):
         values[ik] = v
         
     # Calculate the density rho(K) dK
-    densitydk = np.zeros(numSteps)    
+    densitydk = np.zeros(num_steps)
 
-    for ik in range(1, numSteps-1):        
+    for ik in range(1, num_steps-1):
         d2VdK2 = (values[ik+1] - 2.0 * values[ik] + values[ik-1] ) / dK
         
  #       print("%d %12.8f %12.8f %12.8f" %

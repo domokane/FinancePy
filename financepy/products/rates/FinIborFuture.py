@@ -9,12 +9,12 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
-from ...utils.Date import Date
+from ...utils.day_count import DayCountTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
+from ...utils.date import Date
 
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 from ...products.rates.FinIborFRA import FinIborFRA
 
 ###############################################################################
@@ -30,14 +30,14 @@ class FinIborFuture(object):
                  todayDate: Date,
                  futureNumber: int,  # The number of the future after todayDate
                  futureTenor: str = "3M",  # '1M', '2M', '3M'
-                 accrual_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 accrual_type: DayCountTypes = DayCountTypes.ACT_360,
                  contractSize: float = ONE_MILLION):
         """ Create an interest rate futures contract which has the same
         conventions as those traded on the CME. The current date, the tenor of
         the future, the number of the future and the accrual convention and
         the contract size should be provided. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if futureNumber < 1:
             raise FinError("Future number must be 1 or more")

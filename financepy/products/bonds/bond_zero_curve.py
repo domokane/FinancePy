@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 
 from ...utils.date import Date
-from ...utils.Math import scale, testMonotonicity
+from ...utils.fin_math import scale, testMonotonicity
 from ...utils.global_variables import gDaysInYear
-from ...utils.day_count import DayCount, FinDayCountTypes
+from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helper_functions import input_time
 from ...utils.helper_functions import tableToString
-from ...market.curves.FinInterpolator import FinInterpTypes, interpolate
+from ...market.curves.interpolator import FinInterpTypes, interpolate
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FinFrequencyTypes
+from ...utils.frequency import Frequency, FrequencyTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helper_functions import labelToString
 
@@ -94,7 +94,7 @@ class BondZeroCurve(DiscountCurve):
 
     def zeroRate(self,
                  dt: Date,
-                 frequencyType: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS):
+                 frequencyType: FrequencyTypes = FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to maturity date. """
         t = input_time(dt, self)
         f = Frequency(frequencyType)
@@ -141,7 +141,7 @@ class BondZeroCurve(DiscountCurve):
     def fwd_rate(self,
                 date1: Date,
                 date2: Date,
-                day_count_type: FinDayCountTypes):
+                day_count_type: DayCountTypes):
         """ Calculate the forward rate according to the specified
         day count convention. """
 

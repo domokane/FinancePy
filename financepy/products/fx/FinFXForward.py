@@ -5,10 +5,10 @@
 import numpy as np
 
 
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -31,7 +31,7 @@ class FinFXForward():
         against the DOM currency at the strikeFXRate and to pay it in the
         notional currency. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         deliveryDate = expiry_date.addWeekDays(spotDays)
 

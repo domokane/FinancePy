@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from .Date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-from .Date import isLeapYear
+from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
+from .date import isLeapYear
 from .FinError import FinError
-from .Frequency import FinFrequencyTypes, Frequency
-from .FinGlobalVariables import gDaysInYear
+from .frequency import FrequencyTypes, Frequency
+from .global_variables import gDaysInYear
 
 from enum import Enum
 
@@ -44,7 +44,7 @@ def isLastDayOfFeb(dt: Date):
 #    ACT_365L = 9  # the 29 Feb is counted if it is in the date range
 ###############################################################################
         
-class FinDayCountTypes(Enum):
+class DayCountTypes(Enum):
     THIRTY_360_BOND = 1  
     THIRTY_E_360 = 2  
     THIRTY_E_360_ISDA = 3  
@@ -64,10 +64,10 @@ class DayCount(object):
     specified day count convention. """
 
     def __init__(self,
-                 dccType: FinDayCountTypes):
+                 dccType: DayCountTypes):
         """ Create Day Count convention by passing in the Day Count Type. """
 
-        if dccType not in FinDayCountTypes:
+        if dccType not in DayCountTypes:
             raise FinError("Need to pass FinDayCountType")
 
         self._type = dccType
@@ -78,7 +78,7 @@ class DayCount(object):
                  dt1: Date,  # Start of coupon period
                  dt2: Date,  # Settlement (for bonds) or period end(swaps)
                  dt3: Date = None,  # End of coupon period for accrued
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
+                 freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
                  isTerminationDate: bool = False):  # Is dt2 a termination date
         """ This method performs two functions:
 
@@ -115,7 +115,7 @@ class DayCount(object):
         num = 0
         den = 0
 
-        if self._type == FinDayCountTypes.THIRTY_360_BOND:
+        if self._type == DayCountTypes.THIRTY_360_BOND:
             # It is in accordance with section 4.16(f) of ISDA 2006 Definitions
             # Also known as 30/360, Bond Basis, 30A/360, 30-360 US Municipal
             # This method does not consider February as a special case.
@@ -131,7 +131,7 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.THIRTY_E_360:
+        elif self._type == DayCountTypes.THIRTY_E_360:
             # This is in section 4.16(g) of ISDA 2006 Definitions
             # Also known as 30/360 Eurobond, 30/360 ISMA, 30/360 ICMA,
             # 30/360 European, Special German, Eurobond basis (ISDA 2006)
@@ -148,7 +148,7 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.THIRTY_E_360_ISDA:
+        elif self._type == DayCountTypes.THIRTY_E_360_ISDA:
             # This is 30E/360 (ISDA 2000), 30E/360 (ISDA) section 4.16(h)
             # of ISDA 2006 Definitions, German, Eurobond basis (ISDA 2000)
 
@@ -171,7 +171,7 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.THIRTY_E_PLUS_360:
+        elif self._type == DayCountTypes.THIRTY_E_PLUS_360:
 
             if d1 == 31:
                 d1 = 30
@@ -185,7 +185,7 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.ACT_ACT_ISDA:
+        elif self._type == DayCountTypes.ACT_ACT_ISDA:
 
             if isLeapYear(y1):
                 denom1 = 366
@@ -215,7 +215,7 @@ class DayCount(object):
                 acc_factor = acc_factor1 + acc_factor2 + yearDiff
                 return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.ACT_ACT_ICMA:
+        elif self._type == DayCountTypes.ACT_ACT_ICMA:
 
             freq = Frequency(freq_type)
 
@@ -227,21 +227,21 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.ACT_365F:
+        elif self._type == DayCountTypes.ACT_365F:
 
             num = dt2 - dt1
             den = 365
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.ACT_360:
+        elif self._type == DayCountTypes.ACT_360:
 
             num = dt2 - dt1
             den = 360
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.ACT_365L:
+        elif self._type == DayCountTypes.ACT_365L:
 
             # The ISDA calculator sheet appears to split this across the
             # non-leap and the leap year which I do not see in any conventions.
@@ -273,7 +273,7 @@ class DayCount(object):
             acc_factor = num / den
             return (acc_factor, num, den)
 
-        elif self._type == FinDayCountTypes.SIMPLE:
+        elif self._type == DayCountTypes.SIMPLE:
             
             num = dt2 - dt1
             den = gDaysInYear
@@ -283,7 +283,7 @@ class DayCount(object):
         else:
 
             raise FinError(str(self._type) +
-                           " is not one of FinDayCountTypes")
+                           " is not one of DayCountTypes")
 
 ###############################################################################
 

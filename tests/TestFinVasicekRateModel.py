@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelRatesVasicek import zeroPrice, zeroPrice_MC
+from financepy.models.rates_vasicek import zeroPrice, zeroPrice_MC
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -26,7 +26,7 @@ def test_FinModelRatesVasicek():
 
     p = zeroPrice(r0, a, b, sigma, t)
 
-    numPaths = 1000
+    num_paths = 1000
     dt = 0.02
     seed = 1968
 
@@ -34,8 +34,8 @@ def test_FinModelRatesVasicek():
 
     for t in np.linspace(0, 10, 21):
         start = time.time()
-        p_MC = zeroPrice_MC(r0, a, b, sigma, t, dt, numPaths, seed)
-        p_MC2 = zeroPrice_MC(r0, a, b, sigma, t, dt, 10 * numPaths, seed)
+        p_MC = zeroPrice_MC(r0, a, b, sigma, t, dt, num_paths, seed)
+        p_MC2 = zeroPrice_MC(r0, a, b, sigma, t, dt, 10 * num_paths, seed)
         p = zeroPrice(r0, a, b, sigma, t)
         end = time.time()
         elapsed = end - start

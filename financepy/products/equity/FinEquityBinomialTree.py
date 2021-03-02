@@ -10,9 +10,9 @@ import numpy as np
 from numba import jit, njit, float64, int64
 
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import heaviside
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import heaviside
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 
@@ -96,46 +96,46 @@ def _payoffValue(s, payoffType, payoffParams):
 
 
 @njit(fastmath=True, cache=True)
-def _valueOnce(stockPrice,
+def _valueOnce(stock_price,
                r,
                q,
                volatility,
-               numSteps,
+               num_steps,
                timeToExpiry,
                payoffType,
                exerciseType,
                payoffParams):
 
-    if numSteps < 3:
-        numSteps = 3
+    if num_steps < 3:
+        num_steps = 3
 
 #        validatePayoff(payoffType.value,payoffParams)
 
     payoffTypeValue = payoffType.value
 
     # this is the size of the step
-    dt = timeToExpiry / numSteps
+    dt = timeToExpiry / num_steps
 
     # the number of nodes on the tree
-    numNodes = int(0.5 * (numSteps + 1) * (numSteps + 2))
+    numNodes = int(0.5 * (num_steps + 1) * (num_steps + 2))
     stockValues = np.zeros(numNodes)
-    stockValues[0] = stockPrice
+    stockValues[0] = stock_price
 
     optionValues = np.zeros(numNodes)
     u = exp(volatility * sqrt(dt))
     d = 1.0 / u
-    sLow = stockPrice
+    sLow = stock_price
 
-    probs = np.zeros(numSteps)
-    periodDiscountFactors = np.zeros(numSteps)
+    probs = np.zeros(num_steps)
+    periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, numSteps):
+    for iTime in range(0, num_steps):
         a = exp((r - q) * dt)
         probs[iTime] = (a - d) / (u - d)
         periodDiscountFactors[iTime] = exp(-r * dt)
 
-    for iTime in range(1, numSteps + 1):
+    for iTime in range(1, num_steps + 1):
         sLow *= d
         s = sLow
         for iNode in range(0, iTime + 1):
@@ -144,7 +144,7 @@ def _valueOnce(stockPrice,
             s = s * (u * u)
 
     # work backwards by first setting values at expiry date
-    index = int(0.5 * numSteps * (numSteps + 1))
+    index = int(0.5 * num_steps * (num_steps + 1))
 
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
@@ -152,7 +152,7 @@ def _valueOnce(stockPrice,
                      iNode] = _payoffValue(s, payoffTypeValue, payoffParams)
 
     # begin backward steps from expiry
-    for iTime in range(numSteps - 1, -1, -1):
+    for iTime in range(num_steps - 1, -1, -1):
 
         index = int(0.5 * iTime * (iTime + 1))
 
@@ -197,17 +197,17 @@ class FinEquityBinomialTree():
 #        self.m_stockValues = np.zeros()
 #        self.m_upProbabilities = np.zeros()
 #
-#       self.m_numSteps = 10
+#       self.m_num_steps = 10
 #        self.m_numNodes = 10
 
 ###############################################################################
 
     def value(self,
-              stockPrice,
+              stock_price,
               discount_curve,
               dividendCurve,
               volatility,
-              numSteps,
+              num_steps,
               valuation_date,
               payoff,
               expiry_date,
@@ -222,22 +222,22 @@ class FinEquityBinomialTree():
         dq = dividendCurve.df(expiry_date)
         q = -np.log(dq)/texp
 
-        price1 = _valueOnce(stockPrice,
+        price1 = _valueOnce(stock_price,
                             r,
                             q,
                             volatility,
-                            numSteps,
+                            num_steps,
                             texp,
                             payoffType,
                             exerciseType,
                             payoffParams)
 
         # Can I reuse the same tree ?
-        price2 = _valueOnce(stockPrice,
+        price2 = _valueOnce(stock_price,
                             r,
                             q,
                             volatility,
-                            numSteps + 1,
+                            num_steps + 1,
                             texp,
                             payoffType,
                             exerciseType,

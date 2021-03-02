@@ -7,13 +7,13 @@ import numpy as np
 from math import log, exp, sqrt
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.Math import ONE_MILLION
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...utils.date import Date
+from ...utils.fin_math import ONE_MILLION
+from ...utils.global_variables import gDaysInYear
+from ...models.black_scholes import FinModelBlackScholes
 from ...utils.FinGlobalTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 
@@ -29,7 +29,7 @@ class FinEquityVarianceSwap(object):
                  payStrikeFlag: bool = True):
         """ Create variance swap contract. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
@@ -106,7 +106,7 @@ class FinEquityVarianceSwap(object):
 
     def fairStrike(self,
                    valuation_date,
-                   stockPrice,
+                   stock_price,
                    dividendCurve,
                    volatilityCurve,
                    numCallOptions,
@@ -133,15 +133,15 @@ class FinEquityVarianceSwap(object):
         dq = dividendCurve._df(tmat)
         q = - log(dq)/tmat
 
-        s0 = stockPrice
+        s0 = stock_price
         g = exp(r*tmat)
-        fwd = stockPrice * g
+        fwd = stock_price * g
 
         # This fixes the centre strike of the replication options
         if useForward is True:
             sstar = fwd
         else:
-            sstar = stockPrice
+            sstar = stock_price
 
         """ Replication argument from Demeterfi, Derman, Kamal and Zhou from
         Goldman Sachs Research notes March 1999. See Appendix A. This aim is

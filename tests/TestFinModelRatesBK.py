@@ -8,14 +8,14 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.products.bonds.FinBond import FinBond
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.FinGlobalVariables import gDaysInYear
-from financepy.utils.FinHelperFunctions import printTree
-from financepy.models.FinModelRatesBK import FinModelRatesBK
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.products.bonds.bond import Bond
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_variables import gDaysInYear
+from financepy.utils.helper_functions import printTree
+from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.utils.FinGlobalTypes import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -65,31 +65,31 @@ def test_BKExampleTwo():
     expiry_date = settlement_date.addTenor("18m")
     maturity_date = settlement_date.addTenor("10Y")
     coupon = 0.05
-    freq_type = FinFrequencyTypes.SEMI_ANNUAL
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
-    couponTimes = []
-    couponFlows = []
+    coupon_times = []
+    coupon_flows = []
     cpn = bond._coupon/bond._frequency
-    numFlows = len(bond._flow_dates)
+    num_flows = len(bond._flow_dates)
 
-    for i in range(1, numFlows):
+    for i in range(1, num_flows):
         pcd = bond._flow_dates[i-1]
         ncd = bond._flow_dates[i]
         if pcd < settlement_date and ncd > settlement_date:
-            flowTime = (pcd - settlement_date) / gDaysInYear
-            couponTimes.append(flowTime)
-            couponFlows.append(cpn)
+            flow_time = (pcd - settlement_date) / gDaysInYear
+            coupon_times.append(flow_time)
+            coupon_flows.append(cpn)
 
     for flowDate in bond._flow_dates:
         if flowDate > settlement_date:
-            flowTime = (flowDate - settlement_date) / gDaysInYear
-            couponTimes.append(flowTime)
-            couponFlows.append(cpn)
+            flow_time = (flowDate - settlement_date) / gDaysInYear
+            coupon_times.append(flow_time)
+            coupon_flows.append(cpn)
 
-    couponTimes = np.array(couponTimes)
-    couponFlows = np.array(couponFlows)
+    coupon_times = np.array(coupon_times)
+    coupon_flows = np.array(coupon_flows)
 
     strikePrice = 105.0
     face = 100.0
@@ -99,9 +99,9 @@ def test_BKExampleTwo():
     times = np.linspace(0, tmat, 11)
     dates = settlement_date.addYears(times)
     dfs = np.exp(-0.05*times)
-    curve = FinDiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settlement_date, dates, dfs)
 
-    price = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
+    price = bond.clean_price_from_discount_curve(settlement_date, curve)
     testCases.header("LABEL", "VALUE")
     testCases.print("Fixed Income Price:", price)
 
@@ -112,27 +112,27 @@ def test_BKExampleTwo():
     model = FinModelRatesBK(sigma, a, numTimeSteps)
     model.buildTree(tmat, times, dfs)
     exerciseType = FinExerciseTypes.AMERICAN
-    v = model.bondOption(texp, strikePrice, face, couponTimes,
-                         couponFlows, exerciseType)
+    v = model.bondOption(texp, strikePrice, face, coupon_times,
+                         coupon_flows, exerciseType)
 
     # Test convergence
-    numStepsList = [100, 200, 300, 500, 1000]
+    num_stepsList = [100, 200, 300, 500, 1000]
     exerciseType = FinExerciseTypes.AMERICAN
 
     testCases.header("TIMESTEPS", "TIME", "VALUE")
     treeVector = []
-    for numTimeSteps in numStepsList:
+    for numTimeSteps in num_stepsList:
         start = time.time()
         model = FinModelRatesBK(sigma, a, numTimeSteps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strikePrice,
-                             face, couponTimes, couponFlows, exerciseType)
+                             face, coupon_times, coupon_flows, exerciseType)
         end = time.time()
         period = end-start
         treeVector.append(v)
         testCases.print(numTimeSteps, period, v)
 
-#    plt.plot(numStepsList, treeVector)
+#    plt.plot(num_stepsList, treeVector)
 
     # Value in Hill converges to 0.699 with 100 time steps while I get 0.700
 

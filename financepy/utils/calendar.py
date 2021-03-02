@@ -9,7 +9,7 @@
 
 import datetime
 from enum import Enum
-from .Date import Date
+from .date import Date
 from .FinError import FinError
 
 # from numba import njit, jit, int64, boolean
@@ -46,7 +46,7 @@ easterMondayDay = [98, 90, 103, 95, 114, 106, 91, 111, 102, 87,
                    116, 101, 93, 112, 97, 89, 109, 100, 85, 105]
 
 
-class FinBusDayAdjustTypes(Enum):
+class BusDayAdjustTypes(Enum):
     NONE = 1
     FOLLOWING = 2
     MODIFIED_FOLLOWING = 3
@@ -54,7 +54,7 @@ class FinBusDayAdjustTypes(Enum):
     MODIFIED_PRECEDING = 5
 
 
-class FinCalendarTypes(Enum):
+class CalendarTypes(Enum):
     NONE = 1
     WEEKEND = 2
     AUSTRALIA = 3
@@ -72,7 +72,7 @@ class FinCalendarTypes(Enum):
     UNITED_KINGDOM = 15
 
 
-class FinDateGenRuleTypes(Enum):
+class DateGenRuleTypes(Enum):
     FORWARD = 1
     BACKWARD = 2
 
@@ -87,10 +87,10 @@ class Calendar(object):
     specified calendar. """
 
     def __init__(self,
-                 calendar_type: FinCalendarTypes):
+                 calendar_type: CalendarTypes):
         """ Create a calendar based on a specified calendar type. """
 
-        if calendar_type not in FinCalendarTypes:
+        if calendar_type not in CalendarTypes:
             raise FinError(
                 "Need to pass FinCalendarType and not " +
                 str(calendar_type))
@@ -101,17 +101,17 @@ class Calendar(object):
 
     def adjust(self,
                dt: Date,
-               busDayConventionType: FinBusDayAdjustTypes):
+               busDayConventionType: BusDayAdjustTypes):
         """ Adjust a payment date if it falls on a holiday according to the
         specified business day convention. """
 
-        if type(busDayConventionType) != FinBusDayAdjustTypes:
+        if type(busDayConventionType) != BusDayAdjustTypes:
             raise FinError("Invalid type passed. Need FinBusDayConventionType")
 
-        if busDayConventionType == FinBusDayAdjustTypes.NONE:
+        if busDayConventionType == BusDayAdjustTypes.NONE:
             return dt
 
-        elif busDayConventionType == FinBusDayAdjustTypes.FOLLOWING:
+        elif busDayConventionType == BusDayAdjustTypes.FOLLOWING:
 
             # step forward until we find a business day
             while self.isBusinessDay(dt) is False:
@@ -119,7 +119,7 @@ class Calendar(object):
 
             return dt
 
-        elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_FOLLOWING:
+        elif busDayConventionType == BusDayAdjustTypes.MODIFIED_FOLLOWING:
 
             d_start = dt._d
             m_start = dt._m
@@ -139,7 +139,7 @@ class Calendar(object):
 
             return dt
 
-        elif busDayConventionType == FinBusDayAdjustTypes.PRECEDING:
+        elif busDayConventionType == BusDayAdjustTypes.PRECEDING:
 
             # if the business day is in the next month look back
             # for previous first business day one day at a time
@@ -148,7 +148,7 @@ class Calendar(object):
 
             return dt
 
-        elif busDayConventionType == FinBusDayAdjustTypes.MODIFIED_PRECEDING:
+        elif busDayConventionType == BusDayAdjustTypes.MODIFIED_PRECEDING:
 
             d_start = dt._d
             m_start = dt._m
@@ -247,35 +247,35 @@ class Calendar(object):
         self._weekday = weekday
         self._dt = dt
 
-        if self._type == FinCalendarTypes.NONE:
+        if self._type == CalendarTypes.NONE:
             return self.HOLIDAY_NONE()
-        elif self._type == FinCalendarTypes.WEEKEND:
+        elif self._type == CalendarTypes.WEEKEND:
             return self.HOLIDAY_WEEKEND()
-        elif self._type == FinCalendarTypes.AUSTRALIA:
+        elif self._type == CalendarTypes.AUSTRALIA:
             return self.HOLIDAY_AUSTRALIA()
-        elif self._type == FinCalendarTypes.CANADA:
+        elif self._type == CalendarTypes.CANADA:
             return self.HOLIDAY_CANADA()
-        elif self._type == FinCalendarTypes.FRANCE:
+        elif self._type == CalendarTypes.FRANCE:
             return self.HOLIDAY_FRANCE()
-        elif self._type == FinCalendarTypes.GERMANY:
+        elif self._type == CalendarTypes.GERMANY:
             return self.HOLIDAY_GERMANY()
-        elif self._type == FinCalendarTypes.ITALY:
+        elif self._type == CalendarTypes.ITALY:
             return self.HOLIDAY_ITALY()
-        elif self._type == FinCalendarTypes.JAPAN:
+        elif self._type == CalendarTypes.JAPAN:
             return self.HOLIDAY_JAPAN()
-        elif self._type == FinCalendarTypes.NEW_ZEALAND:
+        elif self._type == CalendarTypes.NEW_ZEALAND:
             return self.HOLIDAY_NEW_ZEALAND()
-        elif self._type == FinCalendarTypes.NORWAY:
+        elif self._type == CalendarTypes.NORWAY:
             return self.HOLIDAY_NORWAY()
-        elif self._type == FinCalendarTypes.SWEDEN:
+        elif self._type == CalendarTypes.SWEDEN:
             return self.HOLIDAY_SWEDEN()
-        elif self._type == FinCalendarTypes.SWITZERLAND:
+        elif self._type == CalendarTypes.SWITZERLAND:
             return self.HOLIDAY_SWITZERLAND()
-        elif self._type == FinCalendarTypes.TARGET:
+        elif self._type == CalendarTypes.TARGET:
             return self.HOLIDAY_TARGET()
-        elif self._type == FinCalendarTypes.UNITED_KINGDOM:
+        elif self._type == CalendarTypes.UNITED_KINGDOM:
             return self.HOLIDAY_UNITED_KINGDOM()
-        elif self._type == FinCalendarTypes.UNITED_STATES:
+        elif self._type == CalendarTypes.UNITED_STATES:
             return self.HOLIDAY_UNITED_STATES()
         else:
             print(self._type)

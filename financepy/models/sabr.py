@@ -8,9 +8,9 @@ from numba import njit, float64
 from scipy.optimize import minimize
 
 from ..utils.FinGlobalTypes import FinOptionTypes
-from ..utils.Math import N
+from ..utils.fin_math import N
 from ..utils.FinError import FinError
-from ..utils.FinHelperFunctions import labelToString
+from ..utils.helper_functions import labelToString
 
 ###############################################################################
 ###############################################################################

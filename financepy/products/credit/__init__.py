@@ -1,5 +1,5 @@
-from .FinCDS import *
-from .FinCDSCurve import *
+from .cds import *
+from .cds_curve import *
 from .FinCDSBasket import *
 from .FinCDSIndexOption import *
 from .FinCDSIndexPortfolio import *

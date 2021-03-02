@@ -8,8 +8,8 @@ from scipy.optimize import minimize
 
 from ..utils.FinGlobalTypes import FinOptionTypes
 from ..utils.FinError import FinError
-from ..utils.Math import N
-from ..utils.FinHelperFunctions import labelToString
+from ..utils.fin_math import N
+from ..utils.helper_functions import labelToString
 
 ###############################################################################
 # TODO: Should I merge this with SABR ?

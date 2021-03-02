@@ -7,9 +7,9 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
+from financepy.utils.date import Date
+from financepy.market.curves.interpolator import FinInterpTypes
+from financepy.market.curves.discount_curve import DiscountCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,7 +25,7 @@ def test_FinInterpolatedForwards():
 
     tValues = np.array([0.0, 3.0, 5.0, 10.0])
     rValues = np.array([0.04, 0.07, 0.08, 0.09])
-    dfValues = np.exp(-tValues*rValues)
+    df_values = np.exp(-tValues*rValues)
     tInterpValues = np.linspace(0.0, 12.0, 49)
 
     curveDate = Date(1, 1, 2019)
@@ -33,24 +33,24 @@ def test_FinInterpolatedForwards():
     tDates = curveDate.addYears(tValues)
     tInterpDates = curveDate.addYears(tInterpValues)
 
-    for interpType in FinInterpTypes:
+    for interp_type in FinInterpTypes:
 
-        discount_curve = FinDiscountCurve(curveDate, tDates, dfValues, interpType)
+        discount_curve = DiscountCurve(curveDate, tDates, df_values, interp_type)
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
         zeroInterpValues = discount_curve.zeroRate(tInterpDates)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(8, 6))
-            plt.plot(tValues, dfValues, 'o', color='g', label="DFS:")
+            plt.plot(tValues, df_values, 'o', color='g', label="DFS:")
             plt.plot(tInterpValues, dfInterpValues, color='r',
-                     label="DF:" + str(interpType))
+                     label="DF:" + str(interp_type))
             plt.legend()
             plt.figure(figsize=(8, 6))
             plt.plot(tInterpValues, fwdInterpValues, color='r',
-                     label="FWD:" + str(interpType))
+                     label="FWD:" + str(interp_type))
             plt.plot(tInterpValues, zeroInterpValues, color='b',
-                     label="ZERO:" + str(interpType))
+                     label="ZERO:" + str(interp_type))
             plt.plot(tValues, rValues, 'o', color='g',  label="ZERO RATES")
             plt.legend()
 

@@ -5,7 +5,7 @@
 from numba import njit, float64, int64
 import numpy as np
 
-from ..utils.Math import pairGCD
+from ..utils.fin_math import pairGCD
 
 ###############################################################################
 

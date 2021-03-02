@@ -7,9 +7,9 @@ sys.path.append("..")
 
 from financepy.products.equity.FinEquityOneTouchOption import FinEquityOneTouchOption
 from financepy.products.equity.FinEquityOneTouchOption import FinTouchOptionPayoffTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.utils.Date import Date
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -30,11 +30,11 @@ def test_FinFXOneTouchOption():
     domesticRate = 0.10
     foreignRate = 0.03
 
-    numPaths = 20000
+    num_paths = 20000
     num_steps_per_year = 252
 
-    domCurve = FinDiscountCurveFlat(valuation_date, domesticRate)
-    forCurve = FinDiscountCurveFlat(valuation_date, foreignRate)
+    domCurve = DiscountCurveFlat(valuation_date, domesticRate)
+    forCurve = DiscountCurveFlat(valuation_date, foreignRate)
 
     spotFXRate = 1.050
     paymentSize = 1.5
@@ -66,7 +66,7 @@ def test_FinFXOneTouchOption():
                               forCurve,
                               model,
                               num_steps_per_year,
-                              numPaths)
+                              num_paths)
 
         testCases.print("%60s " % downType,
                         "%9.5f" % v,
@@ -100,7 +100,7 @@ def test_FinFXOneTouchOption():
                               forCurve,
                               model,
                               num_steps_per_year,
-                              numPaths)
+                              num_paths)
 
         testCases.print("%60s " % upType,
                         "%9.5f" % v,
@@ -135,7 +135,7 @@ def test_FinFXOneTouchOption():
                               forCurve,
                               model,
                               num_steps_per_year,
-                              numPaths)
+                              num_paths)
 
         testCases.print("%60s " % downType,
                         "%9.5f" % v,
@@ -165,7 +165,7 @@ def test_FinFXOneTouchOption():
                               forCurve,
                               model,
                               num_steps_per_year,
-                              numPaths)
+                              num_paths)
 
         testCases.print("%60s " % upType,
                         "%9.5f" % v,

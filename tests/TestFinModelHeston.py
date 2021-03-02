@@ -8,10 +8,10 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelHeston import FinModelHeston, FinHestonNumericalScheme
+from financepy.models.heston import FinModelHeston, FinHestonNumericalScheme
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.utils.Date import Date
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -33,9 +33,9 @@ def testAnalyticalModels():
     dividendYield = 0.01
     seed = 2838
 
-    numSteps = 100
-    numPaths = 20000
-    stockPrice = 100.0
+    num_steps = 100
+    num_paths = 20000
+    stock_price = 100.0
 
     testCases.header(
         "TIME",
@@ -58,21 +58,21 @@ def testAnalyticalModels():
                 valueMC_Heston = hestonModel.value_MC(
                     valuation_date,
                     callOption,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield,
-                    numPaths,
-                    numSteps,
+                    num_paths,
+                    num_steps,
                     seed)
                 start = time.time()
                 valueGatheral = hestonModel.value_Gatheral(
-                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stock_price, interestRate, dividendYield)
                 valueLewisRouah = hestonModel.value_Lewis_Rouah(
-                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stock_price, interestRate, dividendYield)
                 valueLewis = hestonModel.value_Lewis(
-                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stock_price, interestRate, dividendYield)
                 valueWeber = hestonModel.value_Weber(
-                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stock_price, interestRate, dividendYield)
                 err = (valueMC_Heston - valueWeber)
                 end = time.time()
                 elapsed = end - start
@@ -106,7 +106,7 @@ def testMonteCarlo():
     dividendYield = 0.01
     seed = 238
 
-    stockPrice = 100.0
+    stock_price = 100.0
 
     testCases.header(
         "TIME",
@@ -121,44 +121,44 @@ def testMonteCarlo():
         "QE_ERR")
 
     for strikePrice in np.linspace(95, 105, 3):
-        for numSteps in [25, 50]:
-            for numPaths in [10000, 20000]:
+        for num_steps in [25, 50]:
+            for num_paths in [10000, 20000]:
                 hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
                 callOption = FinEquityVanillaOption(
                     expiry_date, strikePrice, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
-                    valuation_date, callOption, stockPrice, interestRate, dividendYield)
+                    valuation_date, callOption, stock_price, interestRate, dividendYield)
 
                 start = time.time()
 
                 valueMC_EULER = hestonModel.value_MC(
                     valuation_date,
                     callOption,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield,
-                    numPaths,
-                    numSteps,
+                    num_paths,
+                    num_steps,
                     seed,
                     FinHestonNumericalScheme.EULER)
                 valueMC_EULERLOG = hestonModel.value_MC(
                     valuation_date,
                     callOption,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield,
-                    numPaths,
-                    numSteps,
+                    num_paths,
+                    num_steps,
                     seed,
                     FinHestonNumericalScheme.EULERLOG)
                 valueMC_QUADEXP = hestonModel.value_MC(
                     valuation_date,
                     callOption,
-                    stockPrice,
+                    stock_price,
                     interestRate,
                     dividendYield,
-                    numPaths,
-                    numSteps,
+                    num_paths,
+                    num_steps,
                     seed,
                     FinHestonNumericalScheme.QUADEXP)
 
@@ -172,8 +172,8 @@ def testMonteCarlo():
                 testCases.print(elapsed, rho,
                                 sigma,
                                 strikePrice,
-                                numSteps,
-                                numPaths,
+                                num_steps,
+                                num_paths,
                                 valueWeber,
                                 err_EULER,
                                 err_EULERLOG,

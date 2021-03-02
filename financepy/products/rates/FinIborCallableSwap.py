@@ -6,15 +6,15 @@
 # from ...models.FinModelRatesHW import FinModelRatesHW
 # from ...models.FinModelRatesBK import FinModelRatesBK
 # from ...utils.FinError import FinError
-# from ...utils.FinFrequency import FinFrequencyTypes
+# from ...utils.FinFrequency import FrequencyTypes
 # from ...utils.FinDayCount import FinDayCount
-# from ...utils.FinDayCount import FinDayCountTypes
-# from ...products.bonds.FinBond import FinBond
+# from ...utils.FinDayCount import DayCountTypes
+# from ...products.bonds.Bond import Bond
 
 
 # from ...utils.FinDate import FinDate
-# from ...utils.FinCalendar import FinCalendar, FinCalendarTypes
-# from ...utils.FinCalendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
+# from ...utils.FinCalendar import FinCalendar, CalendarTypes
+# from ...utils.FinCalendar import BusDayAdjustTypes, DateGenRuleTypes
 # from ...utils.FinSchedule import FinSchedule
 # from ...utils.FinMath import ONE_MILLION
 
@@ -33,7 +33,7 @@
 # ###############################################################################
 
 
-# class FinBondOptionTypes(Enum):
+# class BondOptionTypes(Enum):
 #     EUROPEAN_CALL = 1
 #     EUROPEAN_PUT = 2
 #     AMERICAN_CALL = 3
@@ -63,11 +63,11 @@
 #                  fixedFrequencyType,
 #                  fixedDayCountType,
 #                  notional=ONE_MILLION,
-#                  floatFrequencyType=FinFrequencyTypes.QUARTERLY,
-#                  floatDayCountType=FinDayCountTypes.THIRTY_E_360,
-#                  calendar_type=FinCalendarTypes.WEEKEND,
-#                  bus_day_adjust_type=FinBusDayAdjustTypes.FOLLOWING,
-#                  date_gen_rule_type=FinDateGenRuleTypes.BACKWARD):
+#                  floatFrequencyType=FrequencyTypes.QUARTERLY,
+#                  floatDayCountType=DayCountTypes.THIRTY_E_360,
+#                  calendar_type=CalendarTypes.WEEKEND,
+#                  bus_day_adjust_type=BusDayAdjustTypes.FOLLOWING,
+#                  date_gen_rule_type=DateGenRuleTypes.BACKWARD):
 #         """ Create a Bermudan swaption contract. This is an option to enter
 #         into a swap at a fixed coupon on all of the fixed leg coupon dates
 #         until the exercise date. """
@@ -78,35 +78,35 @@
 #         if exerciseType not in FinSwaptionExerciseTypes:
 #             raise FinError("Exercise type must be a FinSwaptionExerciseTypes")
 
-#         if fixedDayCountType not in FinDayCountTypes:
+#         if fixedDayCountType not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Fixed Day Count Rule type " +
 #                 str(fixedDayCountType))
 
-#         if fixedFrequencyType not in FinFrequencyTypes:
+#         if fixedFrequencyType not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Fixed Frequency type " +
 #                 str(fixedFrequencyType))
 
-#         if floatDayCountType not in FinDayCountTypes:
+#         if floatDayCountType not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Float Day Count Rule type " +
 #                 str(floatDayCountType))
 
-#         if floatFrequencyType not in FinFrequencyTypes:
+#         if floatFrequencyType not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Float Frequency type " +
 #                 str(fixedFrequencyType))
 
-#         if calendar_type not in FinCalendarTypes:
+#         if calendar_type not in CalendarTypes:
 #             raise FinError("Unknown Calendar type " + str(calendar_type))
 
-#         if bus_day_adjust_type not in FinBusDayAdjustTypes:
+#         if bus_day_adjust_type not in BusDayAdjustTypes:
 #             raise FinError(
 #                 "Unknown Business Day Adjust type " +
 #                 str(bus_day_adjust_type))
 
-#         if date_gen_rule_type not in FinDateGenRuleTypes:
+#         if date_gen_rule_type not in DateGenRuleTypes:
 #             raise FinError(
 #                 "Unknown Date Gen Rule type " +
 #                 str(date_gen_rule_type))
@@ -171,34 +171,34 @@
 #         cpnAmounts = np.array(cpnAmounts)
 
 #         # Generate bond call times and prices
-#         callTimes = []
-#         for dt in self._callDates:
-#             callTime = (dt - settlement_date) / gDaysInYear
-#             callTimes.append(callTime)
-#         callTimes = np.array(callTimes)
-#         callPrices = np.array(self._callPrices)
+#         call_times = []
+#         for dt in self._call_dates:
+#             call_time = (dt - settlement_date) / gDaysInYear
+#             call_times.append(call_time)
+#         call_times = np.array(call_times)
+#         call_prices = np.array(self._call_prices)
 
 #         # Generate bond put times and prices
 #         if self._swaptionType == FinIborSwaptionType.PAY:
-#             callPrice = 100.0
+#             call_price = 100.0
 #             putPrice = 1e10
 #         else:
-#             callPrice = 1e10
+#             call_price = 1e10
 #             putPrice = 100.0
 
-#         putTimes = []
+#         put_times = []
 #         for putDate in swap._adjustedFixedDates[1:]:
 #             if putDate <= self._exerciseDate: 
-#                 putTime = (putDate - settlement_date) / gDaysInYear
-#                 putTimes.append(putTime)
+#                 put_time = (putDate - settlement_date) / gDaysInYear
+#                 put_times.append(put_time)
 
-#         putTimes = np.array(putTimes)
-#         putPrices = np.array(self._putPrices)
+#         put_times = np.array(put_times)
+#         put_prices = np.array(self._put_prices)
 
 #         maturity_date = self._bond._maturity_date
 #         tmat = (maturity_date - settlement_date) / gDaysInYear
 #         dfTimes = discount_curve._times
-#         dfValues = discount_curve._values
+#         df_values = discount_curve._values
 
 #         face = self._bond._face
 
@@ -208,15 +208,15 @@
 #             more precise we only need to go out the the last option date but
 #             we can do that refinement at a later date. """
 
-#             model.buildTree(tmat, dfTimes, dfValues)
+#             model.buildTree(tmat, dfTimes, df_values)
 #             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
-#                                                  callTimes, callPrices,
-#                                                  putTimes, putPrices, face)
+#                                                  call_times, call_prices,
+#                                                  put_times, put_prices, face)
 #             model._numTimeSteps += 1
-#             model.buildTree(tmat, dfTimes, dfValues)
+#             model.buildTree(tmat, dfTimes, df_values)
 #             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
-#                                                  callTimes, callPrices,
-#                                                  putTimes, putPrices, face)
+#                                                  call_times, call_prices,
+#                                                  put_times, put_prices, face)
 #             model._numTimeSteps -= 1
 
 #             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
@@ -229,16 +229,16 @@
 #             """ Because we not have a closed form bond price we need to build
 #             the tree out to the bond maturity which is after option expiry. """
 
-#             model.buildTree(tmat, dfTimes, dfValues)
+#             model.buildTree(tmat, dfTimes, df_values)
 #             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
-#                                                  callTimes, callPrices,
-#                                                  putTimes, putPrices,
+#                                                  call_times, call_prices,
+#                                                  put_times, put_prices,
 #                                                  face)
 #             model._numTimeSteps += 1
-#             model.buildTree(tmat, dfTimes, dfValues)
+#             model.buildTree(tmat, dfTimes, df_values)
 #             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
-#                                                  callTimes, callPrices,
-#                                                  putTimes, putPrices,
+#                                                  call_times, call_prices,
+#                                                  put_times, put_prices,
 #                                                  face)
 #             model._numTimeSteps -= 1
 
@@ -262,13 +262,13 @@
 #         s += labelToString("CONVERSION RATIO", self._conversionRatio)
 #         s += labelToString("START CONVERT DATE", self._startConvertDate)
 
-#         for i in range(0, len(self._callDates)):
-#             s += labelToString("CALL DATE AND PRICE", self._callDates[i],
-#                                self._callPrices[i])
+#         for i in range(0, len(self._call_dates)):
+#             s += labelToString("CALL DATE AND PRICE", self._call_dates[i],
+#                                self._call_prices[i])
 
-#         for i in range(0, len(self._putDates)):
-#             s += labelToString("PUT DATE AND PRICE", self._putDates[i],
-#                                self._putPrices[i])
+#         for i in range(0, len(self._put_dates)):
+#             s += labelToString("PUT DATE AND PRICE", self._put_dates[i],
+#                                self._put_prices[i])
 
 #         return s
 

@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
+from financepy.utils.date import Date
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode

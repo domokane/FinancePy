@@ -5,16 +5,16 @@
 #TODO  Add Japan 
 
 
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.DayCount import FinDayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.day_count import DayCountTypes
 from ...utils.FinError import FinError
-from ...utils.Calendar import FinCalendarTypes
+from ...utils.calendar import CalendarTypes
 
 
 from enum import Enum
 
 
-class FinBondMarkets(Enum):
+class BondMarkets(Enum):
     AUSTRIA = 1,
     BELGIUM = 2,
     CYPRUS = 3,
@@ -60,10 +60,10 @@ def getTreasuryBondMarketConventions(country):
     and the number of days from trade date to settlement date.
     This is for Treasury markets. And for secondary bond markets. """
 
-    annual = FinFrequencyTypes.ANNUAL
-    semi_annual = FinFrequencyTypes.SEMI_ANNUAL
-    act_act = FinDayCountTypes.ACT_ACT_ICMA
-    thirtye360 = FinDayCountTypes.THIRTY_E_360
+    annual = FrequencyTypes.ANNUAL
+    semi_annual = FrequencyTypes.SEMI_ANNUAL
+    act_act = DayCountTypes.ACT_ACT_ICMA
+    thirtye360 = DayCountTypes.THIRTY_E_360
 
     # TODO: CHECK CONVENTIONS
     
@@ -73,76 +73,76 @@ def getTreasuryBondMarketConventions(country):
     # SETTLEMENT DAYS
     # NUM EX DIVIDEND DAYS AND CALENDAR TO USE
 
-    if country == FinBondMarkets.AUSTRIA:
+    if country == BondMarkets.AUSTRIA:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.AUSTRALIA:
-        return (act_act, annual, 2, 7, FinCalendarTypes.NONE)
-    elif country == FinBondMarkets.BELGIUM:
+    elif country == BondMarkets.AUSTRALIA:
+        return (act_act, annual, 2, 7, CalendarTypes.NONE)
+    elif country == BondMarkets.BELGIUM:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.CYPRUS:
+    elif country == BondMarkets.CYPRUS:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.ESTONIA:
+    elif country == BondMarkets.ESTONIA:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.FINLAND:
+    elif country == BondMarkets.FINLAND:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.FRANCE:
+    elif country == BondMarkets.FRANCE:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.GERMANY:
+    elif country == BondMarkets.GERMANY:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.GREECE:
+    elif country == BondMarkets.GREECE:
         return (act_act, annual, 3, 0, None)
-    elif country == FinBondMarkets.IRELAND:
+    elif country == BondMarkets.IRELAND:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.ITALY:
+    elif country == BondMarkets.ITALY:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.LATVIA:
+    elif country == BondMarkets.LATVIA:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.LITHUANIA:
+    elif country == BondMarkets.LITHUANIA:
         return (act_act, annual, 1, 0, None)
-    elif country == FinBondMarkets.LUXEMBOURG:
+    elif country == BondMarkets.LUXEMBOURG:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.MALTA:
+    elif country == BondMarkets.MALTA:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.NETHERLANDS:
+    elif country == BondMarkets.NETHERLANDS:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.PORTUGAL:
+    elif country == BondMarkets.PORTUGAL:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.SLOVAKIA:
+    elif country == BondMarkets.SLOVAKIA:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.SLOVENIA:
+    elif country == BondMarkets.SLOVENIA:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.SPAIN:
+    elif country == BondMarkets.SPAIN:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.ESM:
+    elif country == BondMarkets.ESM:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.EFSF:
+    elif country == BondMarkets.EFSF:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.BULGARIA:
+    elif country == BondMarkets.BULGARIA:
         return (act_act, semi_annual, 0, 0, None)
-    elif country == FinBondMarkets.CROATIA:
+    elif country == BondMarkets.CROATIA:
         return (act_act, semi_annual, 3, 0, None)
-    elif country == FinBondMarkets.CZECH_REPUBLIC:
+    elif country == BondMarkets.CZECH_REPUBLIC:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.DENMARK:
+    elif country == BondMarkets.DENMARK:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.HUNGARY:
+    elif country == BondMarkets.HUNGARY:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.POLAND:
+    elif country == BondMarkets.POLAND:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.ROMANIA:
+    elif country == BondMarkets.ROMANIA:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.SOUTH_AFRICA:
-        return (act_act, annual, 2, 10, FinCalendarTypes.NONE) # CHECK
-    elif country == FinBondMarkets.SWEDEN:
+    elif country == BondMarkets.SOUTH_AFRICA:
+        return (act_act, annual, 2, 10, CalendarTypes.NONE) # CHECK
+    elif country == BondMarkets.SWEDEN:
         return (thirtye360, annual, 2, 0, None)
-    elif country == FinBondMarkets.JAPAN:
+    elif country == BondMarkets.JAPAN:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.SWITZERLAND:
+    elif country == BondMarkets.SWITZERLAND:
         return (act_act, annual, 2, 0, None)
-    elif country == FinBondMarkets.UNITED_STATES:
+    elif country == BondMarkets.UNITED_STATES:
         return (act_act, semi_annual, 2, 0, None)
-    elif country == FinBondMarkets.UNITED_KINGDOM:
-        return (act_act, semi_annual, 1, 6, FinCalendarTypes.UK)  # OR 7 DAYS ?
+    elif country == BondMarkets.UNITED_KINGDOM:
+        return (act_act, semi_annual, 1, 6, CalendarTypes.UK)  # OR 7 DAYS ?
     else:
         print("Unknown Country:", country)
         return (None, None, None, None, None)

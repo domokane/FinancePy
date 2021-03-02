@@ -11,23 +11,23 @@ sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-from financepy.utils.Date import Date
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.Calendar import FinCalendarTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.FinIborFRA import FinIborFRA
 from financepy.products.rates.FinIborFuture import FinIborFuture
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.products.rates.FinIborSwapOLD import FinIborSwapOLD
-from financepy.utils.Calendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.utils.Math import ONE_MILLION
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.market.curves.interpolator import FinInterpTypes
+from financepy.utils.fin_math import ONE_MILLION
 from financepy.utils.FinGlobalTypes import FinSwapTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
+from financepy.market.curves.interpolator import FinInterpTypes
 
 from financepy.products.rates.FinIborSingleCurveOLD import FinIborSingleCurveOLD
 from financepy.products.rates.FinIborDualCurveOLD import FinIborDualCurveOLD
-from financepy.products.rates.FinOISCurve import FinOISCurve
+from financepy.products.rates.FinOISCurve import OISCurve
 from financepy.products.rates.FinOIS import FinOIS
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -39,7 +39,7 @@ PLOT_GRAPHS = False
 def buildOIS(valuation_date):
     """ Build the OIS funding curve from futures (FRAs) and OIS """
 
-    dccType = FinDayCountTypes.THIRTY_E_360_ISDA
+    dccType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spotDays = 0
@@ -51,106 +51,106 @@ def buildOIS(valuation_date):
     # 1 x 4 FRA
     
     swaps = []
-    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDCCType = FinDayCountTypes.ACT_365F
+    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixedDCCType = DayCountTypes.ACT_365F
 
-    swapRate = 0.000022
+    swap_rate = 0.000022
     maturity_date = settlement_date.addMonths(24)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                             fixedFreqType, fixedDCCType)
     swaps.append(swap)
 
-    swapRate += 0.000
+    swap_rate += 0.000
     fixed_legType = FinSwapTypes.PAY
     maturity_date = settlement_date.addMonths(36)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType, fixedDCCType)
     swaps.append(swap)
 
-    swapRate += 0.000
+    swap_rate += 0.000
     maturity_date = settlement_date.addMonths(48)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
-    swapRate = 0.02
+    swap_rate = 0.02
     maturity_date = settlement_date.addMonths(60)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                   fixedFreqType,
                   fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(72)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                        fixedFreqType,
                        fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(84)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(96)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(108)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(120)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(132)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(144)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(180)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(240)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(300)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settlement_date.addMonths(360)
-    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swapRate,
+    swap = FinOIS(settlement_date, maturity_date, fixed_legType, swap_rate,
                         fixedFreqType,
                         fixedDCCType)
     swaps.append(swap)
 
-    oisCurve = FinOISCurve(valuation_date,
-                           [],
-                           fras,
-                           swaps)
+    oisCurve = OISCurve(valuation_date,
+                        [],
+                        fras,
+                        swaps)
 
     return oisCurve
 
@@ -168,11 +168,11 @@ def test_bloombergPricingExample():
     # We do the O/N rate which settles on trade date
     spotDays = 0
     settlement_date = valuation_date.addWeekDays(spotDays)
-    depoDCCType = FinDayCountTypes.ACT_360
+    depoDCCType = DayCountTypes.ACT_360
     depos = []
-    depositRate = 0.0231381
+    deposit_rate = 0.0231381
     maturity_date = settlement_date.addMonths(3)
-    depo = FinIborDeposit(settlement_date, maturity_date, depositRate,
+    depo = FinIborDeposit(settlement_date, maturity_date, deposit_rate,
                            depoDCCType)
     depos.append(depo)
 
@@ -192,14 +192,14 @@ def test_bloombergPricingExample():
     fras[4] = futs[4].toFRA(97.1450, -0.00411)
     fras[5] = futs[5].toFRA(97.0750, -0.00589)
 
-    accrual = FinDayCountTypes.THIRTY_E_360
-    freq = FinFrequencyTypes.SEMI_ANNUAL
+    accrual = DayCountTypes.THIRTY_E_360
+    freq = FrequencyTypes.SEMI_ANNUAL
 
     spotDays = 2
     settlement_date = valuation_date.addWeekDays(spotDays)
     notional = ONE_MILLION
     fixed_legType = FinSwapTypes.PAY
-    interpType = FinInterpTypes.FLAT_FWD_RATES
+    interp_type = FinInterpTypes.FLAT_FWD_RATES
 
     swaps = []
     swap = FinIborSwapOLD(settlement_date, "2Y", fixed_legType, (2.77417+2.77844)/200, freq, accrual); swaps.append(swap)
@@ -220,7 +220,7 @@ def test_bloombergPricingExample():
     swap = FinIborSwapOLD(settlement_date, "40Y", fixed_legType, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = FinIborSwapOLD(settlement_date, "50Y", fixed_legType, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps, interpType, True)
+    libor_curve = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type, True)
 
     principal = 0.0
     testCases.banner("======================================================")
@@ -300,21 +300,21 @@ def test_swapValuationExample():
     fixed_legType = FinSwapTypes.RECEIVE
     
     fixedRate = 0.0150
-    fixedDCCType = FinDayCountTypes.THIRTY_360_BOND
-    fixedFreqType = FinFrequencyTypes.ANNUAL
+    fixedDCCType = DayCountTypes.THIRTY_360_BOND
+    fixedFreqType = FrequencyTypes.ANNUAL
     
     floatSpread = 0.0
-    floatDCCType = FinDayCountTypes.ACT_360
-    floatFreqType = FinFrequencyTypes.SEMI_ANNUAL
+    floatDCCType = DayCountTypes.ACT_360
+    floatFreqType = FrequencyTypes.SEMI_ANNUAL
 
     offMarketSwap = FinIborSwapOLD(start_date, maturity_date, fixed_legType,
                                 fixedRate, fixedFreqType, fixedDCCType,
                                 notional,
                                 floatSpread, floatFreqType, floatDCCType)
     
-    interpType = FinInterpTypes.LINEAR_ZERO_RATES
+    interp_type = FinInterpTypes.LINEAR_ZERO_RATES
     
-    depoDCCType = FinDayCountTypes.ACT_360
+    depoDCCType = DayCountTypes.ACT_360
     depos = []
     
     ###########################################################################
@@ -326,7 +326,7 @@ def test_swapValuationExample():
     depo = FinIborDeposit(settlement_date, "6M", -0.2510/100.0, depoDCCType); depos.append(depo)
     
     fras = []
-    fraDCCType = FinDayCountTypes.ACT_360
+    fraDCCType = DayCountTypes.ACT_360
     
     fra = FinIborFRA(settlement_date.addTenor("1M"), "6M", -0.2450/100.0, fraDCCType); fras.append(fra)
     fra = FinIborFRA(settlement_date.addTenor("2M"), "6M", -0.2435/100.0, fraDCCType); fras.append(fra)
@@ -343,8 +343,8 @@ def test_swapValuationExample():
     
     swaps = []
     fixed_legType = FinSwapTypes.PAY
-    fixedDCCType = FinDayCountTypes.THIRTY_360_BOND
-    fixedFreqType = FinFrequencyTypes.ANNUAL
+    fixedDCCType = DayCountTypes.THIRTY_360_BOND
+    fixedFreqType = FrequencyTypes.ANNUAL
     
     swap = FinIborSwapOLD(settlement_date, "2Y", fixed_legType, -0.1525/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
     swap = FinIborSwapOLD(settlement_date, "3Y", fixed_legType, -0.0185/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
@@ -370,7 +370,7 @@ def test_swapValuationExample():
     iborFras = fras.copy()
     iborSwaps = swaps.copy()
     
-    iborCurve = FinIborSingleCurve(valuation_date, iborDepos, iborFras, iborSwaps, interpType)    
+    iborCurve = FinIborSingleCurve(valuation_date, iborDepos, iborFras, iborSwaps, interp_type)
     v1 = offMarketSwap.value(valuation_date, iborCurve, iborCurve, -0.268/100.0)    
 
     testCases.banner("DERISCOPE EXAMPLE REPLICATION")    
@@ -380,7 +380,7 @@ def test_swapValuationExample():
     
     ###############################################################################
     
-    depoDCCType = FinDayCountTypes.ACT_360
+    depoDCCType = DayCountTypes.ACT_360
     depos = []
     
     spotDays = 0
@@ -391,8 +391,8 @@ def test_swapValuationExample():
     
     swaps = []
     fixed_legType = FinSwapTypes.PAY
-    fixedDCCType = FinDayCountTypes.ACT_365F
-    fixedFreqType = FinFrequencyTypes.ANNUAL
+    fixedDCCType = DayCountTypes.ACT_365F
+    fixedFreqType = FrequencyTypes.ANNUAL
     
     # Standard OIS with standard annual terms
     swap = FinOIS(settlement_date, "2W", fixed_legType, -0.3600/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
@@ -434,17 +434,17 @@ def test_swapValuationExample():
     oisFras = fras.copy()
     oisSwaps = swaps.copy()
     
-#    oisCurveFF = FinOISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interpType)
+#    oisCurveFF = FinOISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interp_type)
     
-    iborDualCurve = FinIborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, iborSwaps, interpType)
+    iborDualCurve = FinIborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, iborSwaps, interp_type)
     
 #    v2 = offMarketSwap.value(valuation_date, oisCurveFF, iborDualCurve, -0.268/100.0)
     
 #    testCases.print("FP DUAL CURVE VALUE", v2)
 
-#    swapRate = offMarketSwap.swapRate(valuation_date, oisCurveFF, iborCurve, -0.268/100.0)
+#    swap_rate = offMarketSwap.swap_rate(valuation_date, oisCurveFF, iborCurve, -0.268/100.0)
 
-#    testCases.print("FP DUAL CURVE SWAP RATE", swapRate)
+#    testCases.print("FP DUAL CURVE SWAP RATE", swap_rate)
 
 #    offMarketSwap.printFixedLegFlows()
 #    offMarketSwap.printFloatLegFlows()

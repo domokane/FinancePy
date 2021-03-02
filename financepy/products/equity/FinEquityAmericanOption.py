@@ -5,12 +5,12 @@
 
 import numpy as np
 
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from ...models.FinModel import FinModel
@@ -35,7 +35,7 @@ class FinEquityAmericanOption(FinEquityOption):
         Specify the expiry date, strike price, whether the option is a call or
         put and the number of options. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
             optionType != FinOptionTypes.EUROPEAN_PUT and \
@@ -52,9 +52,9 @@ class FinEquityAmericanOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: (np.ndarray, float),
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: (np.ndarray, float),
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model: FinModel):
         """ Valuation of an American option using a CRR tree to take into
         account the value of early exercise. """
@@ -64,7 +64,7 @@ class FinEquityAmericanOption(FinEquityOption):
         else:
             texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if isinstance(model, FinModel) is False:
@@ -78,7 +78,7 @@ class FinEquityAmericanOption(FinEquityOption):
         r = discount_curve.ccRate(self._expiry_date)        
         q = dividendCurve.ccRate(self._expiry_date)
 
-        s = stockPrice
+        s = stock_price
         k = self._strikePrice
 
         v = model.value(s, texp, k, r, q, self._optionType)

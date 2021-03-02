@@ -9,16 +9,16 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.FinGlobalTypes import FinSwapTypes
-from financepy.utils.Date import Date
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.models.FinModelRatesHW import FinModelRatesHW
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
 
 from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -28,7 +28,7 @@ plotGraphs = False
 ###############################################################################
 
 
-def test_FinBondEmbeddedOptionMATLAB():
+def test_BondEmbeddedOptionMATLAB():
 
     # https://fr.mathworks.com/help/fininst/optembndbyhw.html
     # I FIND THAT THE PRICE CONVERGES TO 102.88 WHICH IS CLOSE TO 102.9127
@@ -40,14 +40,14 @@ def test_FinBondEmbeddedOptionMATLAB():
     
     ###########################################################################
 
-    dcType = FinDayCountTypes.THIRTY_E_360
-    fixedFreq = FinFrequencyTypes.ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360
+    fixedFreq = FrequencyTypes.ANNUAL
     fixed_legType = FinSwapTypes.PAY
     swap1 = FinIborSwap(settlement_date, "1Y", fixed_legType, 0.0350, fixedFreq, dcType)
     swap2 = FinIborSwap(settlement_date, "2Y", fixed_legType, 0.0400, fixedFreq, dcType)
     swap3 = FinIborSwap(settlement_date, "3Y", fixed_legType, 0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discount_curve = FinIborSingleCurve(valuation_date, [], [], swaps)
+    discount_curve = IborSingleCurve(valuation_date, [], [], swaps)
 
     ###########################################################################
 
@@ -55,33 +55,33 @@ def test_FinBondEmbeddedOptionMATLAB():
     maturity_date = Date(1, 1, 2010)
     
     coupon = 0.0525
-    freq_type = FinFrequencyTypes.ANNUAL
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    freq_type = FrequencyTypes.ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
-    callDates = []
-    callPrices = []
-    putDates = []
-    putPrices = []
+    call_dates = []
+    call_prices = []
+    put_dates = []
+    put_prices = []
 
     putDate = Date(1, 1, 2008)
     for _ in range(0, 24):
-        putDates.append(putDate)
-        putPrices.append(100)
+        put_dates.append(putDate)
+        put_prices.append(100)
         putDate = putDate.addMonths(1)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.cleanPriceFromDiscountCurve(settlement_date, discount_curve)
+    v = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     sigma = 0.01  # basis point volatility
     a = 0.1
 
-    puttableBond = FinBondEmbeddedOption(issue_date,
-                                         maturity_date, coupon,
-                                         freq_type, accrual_type,
-                                         callDates, callPrices,
-                                         putDates, putPrices)
+    puttableBond = BondEmbeddedOption(issue_date,
+                                      maturity_date, coupon,
+                                      freq_type, accrual_type,
+                                      call_dates, call_prices,
+                                      put_dates, put_prices)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
 
@@ -104,7 +104,7 @@ def test_FinBondEmbeddedOptionMATLAB():
 ###############################################################################
 
 
-def test_FinBondEmbeddedOptionQUANTLIB():
+def test_BondEmbeddedOptionQUANTLIB():
 
     # Based on example at the nice blog on Quantlib at
     # http://gouthamanbalaraman.com/blog/callable-bond-quantlib-python.html
@@ -117,46 +117,46 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
-    discount_curve = FinDiscountCurveFlat(valuation_date, 0.035,
-                                 FinFrequencyTypes.SEMI_ANNUAL)
+    discount_curve = DiscountCurveFlat(valuation_date, 0.035,
+                                       FrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 
     issue_date = Date(15, 9, 2010)
     maturity_date = Date(15, 9, 2022)
     coupon = 0.025
-    freq_type = FinFrequencyTypes.QUARTERLY
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    freq_type = FrequencyTypes.QUARTERLY
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     ###########################################################################
     # Set up the call and put times and prices
     ###########################################################################
 
     nextCallDate = Date(15, 9, 2016)
-    callDates = [nextCallDate]
-    callPrices = [100.0]
+    call_dates = [nextCallDate]
+    call_prices = [100.0]
 
     for _ in range(1, 24):
         nextCallDate = nextCallDate.addMonths(3)
-        callDates.append(nextCallDate)
-        callPrices.append(100.0)
+        call_dates.append(nextCallDate)
+        call_prices.append(100.0)
 
-    putDates = []
-    putPrices = []
+    put_dates = []
+    put_prices = []
 
     # the value used in blog of 12% bp vol is unrealistic
     sigma = 0.12  # basis point volatility
     a = 0.03
 
-    puttableBond = FinBondEmbeddedOption(issue_date,
-                                         maturity_date, coupon,
-                                         freq_type, accrual_type,
-                                         callDates, callPrices,
-                                         putDates, putPrices)
+    puttableBond = BondEmbeddedOption(issue_date,
+                                      maturity_date, coupon,
+                                      freq_type, accrual_type,
+                                      call_dates, call_prices,
+                                      put_dates, put_prices)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.cleanPriceFromDiscountCurve(settlement_date, discount_curve)
+    v = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
@@ -179,6 +179,6 @@ def test_FinBondEmbeddedOptionQUANTLIB():
 ###############################################################################
 
 
-test_FinBondEmbeddedOptionMATLAB()
-test_FinBondEmbeddedOptionQUANTLIB()
+test_BondEmbeddedOptionMATLAB()
+test_BondEmbeddedOptionQUANTLIB()
 testCases.compareTestCases()

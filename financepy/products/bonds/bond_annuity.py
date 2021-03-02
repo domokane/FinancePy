@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.Date import Date
-from ...utils.Frequency import Frequency, FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Schedule import Schedule
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinDateGenRuleTypes
-from ...utils.DayCount import DayCount, FinDayCountTypes
+from ...utils.date import Date
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.schedule import Schedule
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.FinError import FinError
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
+
 
 ###############################################################################
 
 
-class bond_annuity(object):
+class BondAnnuity(object):
     """ An annuity is a vector of dates and flows generated according to ISDA
     standard rules which starts on the next date after the start date
     (effective date) and runs up to an end date with no principal repayment.
@@ -25,14 +26,14 @@ class bond_annuity(object):
     def __init__(self,
                  maturity_date: Date,
                  coupon: float,
-                 freq_type: FinFrequencyTypes,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
-                 dayCountConventionType: FinDayCountTypes = FinDayCountTypes.ACT_360,
+                 freq_type: FrequencyTypes,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360,
                  face: float = 100.0):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._maturity_date = maturity_date
         self._coupon = coupon
@@ -43,7 +44,7 @@ class bond_annuity(object):
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
         self._date_gen_rule_type = date_gen_rule_type
-        self._dayCountConventionType = dayCountConventionType
+        self._day_count_convention_type = day_count_convention_type
 
         self._face = face
         self._par = 100.0
@@ -54,34 +55,34 @@ class bond_annuity(object):
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-###############################################################################
+    ###############################################################################
 
-    def cleanPriceFromDiscountCurve(self,
-                                    settlement_date: Date,
-                                    discount_curve: FinDiscountCurve):
+    def clean_price_from_discount_curve(self,
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using some discount curve to present-value
-        the bond's cashflows. """
+        the bond's cash flows. """
 
-        fullPrice = self.fullPriceFromDiscountCurve(settlement_date,
-                                                    discount_curve)
+        full_price = self.full_price_from_discount_curve(settlement_date,
+                                                         discount_curve)
         accrued = self._accruedInterest * self._par / self._face
-        cleanPrice = fullPrice - accrued
-        return cleanPrice
+        clean_price = full_price - accrued
+        return clean_price
 
-###############################################################################
+    ###############################################################################
 
-    def fullPriceFromDiscountCurve(self,
-                                   settlement_date: Date,
-                                   discount_curve: FinDiscountCurve):
+    def full_price_from_discount_curve(self,
+                                       settlement_date: Date,
+                                       discount_curve: DiscountCurve):
         """ Calculate the bond price using some discount curve to present-value
-        the bond's cashflows. """
+        the bond's cash flows. """
 
-        self.calculateFlowDatesPayments(settlement_date)
+        self.calculate_flow_datesPayments(settlement_date)
         pv = 0.0
 
-        numFlows = len(self._flow_dates)
+        num_flows = len(self._flow_dates)
 
-        for i in range(1, numFlows):
+        for i in range(1, num_flows):
             dt = self._flow_dates[i]
             df = discount_curve.df(dt)
             flow = self._flow_amounts[i]
@@ -89,10 +90,10 @@ class bond_annuity(object):
 
         return pv * self._par / self._face
 
-###############################################################################
+    ###############################################################################
 
-    def calculateFlowDatesPayments(self,
-                                   settlement_date: Date):
+    def calculate_flow_datesPayments(self,
+                                     settlement_date: Date):
 
         # No need to generate flows if settlement date has not changed
         if settlement_date == self._settlement_date:
@@ -102,23 +103,23 @@ class bond_annuity(object):
             raise FinError("Settlement date is maturity date.")
 
         self._settlement_date = settlement_date
-        calendar_type = FinCalendarTypes.NONE
-        busDayRuleType = FinBusDayAdjustTypes.NONE
-        date_gen_rule_type = FinDateGenRuleTypes.BACKWARD
+        calendar_type = CalendarTypes.NONE
+        busDayRuleType = BusDayAdjustTypes.NONE
+        date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(settlement_date,
-                                   self._maturity_date,
-                                   self._freq_type,
-                                   calendar_type,
-                                   busDayRuleType,
-                                   date_gen_rule_type)._generate()
+                                    self._maturity_date,
+                                    self._freq_type,
+                                    calendar_type,
+                                    busDayRuleType,
+                                    date_gen_rule_type)._generate()
 
         self._pcd = self._flow_dates[0]
         self._ncd = self._flow_dates[1]
-        self.calcAccruedInterest(settlement_date)
+        self.calc_accrued_interest(settlement_date)
 
         self._flow_amounts = [0.0]
-        basis = DayCount(self._dayCountConventionType)
+        basis = DayCount(self._day_count_convention_type)
 
         prevDt = self._pcd
 
@@ -128,25 +129,25 @@ class bond_annuity(object):
             self._flow_amounts.append(flow)
             prevDt = nextDt
 
-###############################################################################
+    ###############################################################################
 
-    def calcAccruedInterest(self,
-                            settlement_date: Date):
+    def calc_accrued_interest(self,
+                              settlement_date: Date):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
         if settlement_date != self._settlement_date:
-            self.calculateFlowDatesPayments(settlement_date)
+            self.calculate_flow_datesPayments(settlement_date)
 
         if len(self._flow_dates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self._dayCountConventionType)
+        dc = DayCount(self._day_count_convention_type)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
-                                          settlement_date,
-                                          self._ncd, 
-                                          self._frequency)
+                                            settlement_date,
+                                            self._ncd,
+                                            self._frequency)
 
         self._alpha = 1.0 - acc_factor * self._frequency
 
@@ -154,22 +155,22 @@ class bond_annuity(object):
         self._accrued_days = num
         return self._accruedInterest
 
-###############################################################################
+    ###############################################################################
 
     def printFlows(self,
                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        self.calculateFlowDatesPayments(settlement_date)
+        self.calculate_flow_datesPayments(settlement_date)
 
-        numFlows = len(self._flow_dates)
-        for i in range(1, numFlows):
+        num_flows = len(self._flow_dates)
+        for i in range(1, num_flows):
             dt = self._flow_dates[i]
             flow = self._flow_amounts[i]
             print(dt, ",", flow)
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
         """ Print a list of the unadjusted coupon payment dates used in
@@ -184,11 +185,10 @@ class bond_annuity(object):
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """
         print(self)
-
 
 ###############################################################################

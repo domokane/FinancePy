@@ -6,12 +6,12 @@ from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FinFrequencyTypes
-from ...utils.day_count import DayCount, FinDayCountTypes
+from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
-from ...utils.calendar import FinCalendarTypes
-from ...utils.calendar import FinBusDayAdjustTypes
-from ...utils.calendar import FinDateGenRuleTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
 from ...utils.helper_functions import labelToString, check_argument_types
 
 
@@ -51,8 +51,8 @@ class BondFRN(object):
                  issue_date: Date,
                  maturity_date: Date,
                  quotedMargin: float,  # Fixed spread paid on top of index
-                 freq_type: FinFrequencyTypes,
-                 accrual_type: FinDayCountTypes,
+                 freq_type: FrequencyTypes,
+                 accrual_type: DayCountTypes,
                  face_amount: float = 100.0):
         """ Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
@@ -87,9 +87,9 @@ class BondFRN(object):
 
         # This should only be called once from init 
 
-        calendar_type = FinCalendarTypes.NONE
-        busDayRuleType = FinBusDayAdjustTypes.NONE
-        date_gen_rule_type = FinDateGenRuleTypes.BACKWARD
+        calendar_type = CalendarTypes.NONE
+        busDayRuleType = BusDayAdjustTypes.NONE
+        date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(self._issue_date,
                                     self._maturity_date,

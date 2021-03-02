@@ -4,21 +4,21 @@
 
 import numpy as np
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gSmall
-from ...utils.Math import testMonotonicity
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinHelperFunctions import labelToString
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import timesFromDates
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.global_variables import gSmall
+from ...utils.fin_math import testMonotonicity
+from ...utils.frequency import FrequencyTypes
+from ...utils.helper_functions import labelToString
+from ...utils.helper_functions import check_argument_types
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import timesFromDates
+from ...market.curves.discount_curve import DiscountCurve
 
 ###############################################################################
 
 
-class FinDiscountCurvePWF(FinDiscountCurve):
+class DiscountCurvePWF(DiscountCurve):
     """ Curve is made up of a series of zero rates sections with each having
     a piecewise flat zero rate. The default compounding assumption is
     continuous. The class inherits methods from FinDiscountCurve. """
@@ -27,12 +27,12 @@ class FinDiscountCurvePWF(FinDiscountCurve):
                  valuation_date: Date,
                  zeroDates: list,
                  zeroRates: (list, np.ndarray),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
 

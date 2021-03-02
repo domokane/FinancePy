@@ -9,15 +9,15 @@ import numpy as np
 from numba import njit, float64, int64, prange
 from ..utils.FinGlobalTypes import FinOptionTypes
 from ..utils.FinError import FinError
-from ..model.FinSobol import getGaussianSobol
+from ..models.sobol import getGaussianSobol
 from math import exp
 
 ###############################################################################
 
-def _valueMC_NONUMBA_NONUMPY(s, t, K,  optionType, r, q, v, numPaths, seed, useSobol):
+def _valueMC_NONUMBA_NONUMPY(s, t, K,  optionType, r, q, v, num_paths, seed, useSobol):
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
 
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
     np.random.seed(seed)
     mu = r - q
     v2 = v**2
@@ -25,15 +25,15 @@ def _valueMC_NONUMBA_NONUMPY(s, t, K,  optionType, r, q, v, numPaths, seed, useS
     payoff = 0.0
 
     if useSobol == 1:
-        g = getGaussianSobol(numPaths, 1)[:,0]
+        g = getGaussianSobol(num_paths, 1)[:,0]
     else:
-        g = np.random.standard_normal(numPaths)
+        g = np.random.standard_normal(num_paths)
 
     ss = s * exp((mu - v2 / 2.0) * t)
 
     if optionType == FinOptionTypes.EUROPEAN_CALL.value:
 
-        for i in range(0, numPaths):
+        for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff += max(s_1 - K, 0.0)
@@ -41,7 +41,7 @@ def _valueMC_NONUMBA_NONUMPY(s, t, K,  optionType, r, q, v, numPaths, seed, useS
 
     elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
 
-        for i in range(0, numPaths):
+        for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff += max(K - s_1, 0.0)
@@ -50,24 +50,24 @@ def _valueMC_NONUMBA_NONUMPY(s, t, K,  optionType, r, q, v, numPaths, seed, useS
     else:
         raise FinError("Unknown option type.")
 
-    v = payoff * np.exp(-r * t) / numPaths / 2.0
+    v = payoff * np.exp(-r * t) / num_paths / 2.0
     return v
 
 ###############################################################################
 
-def _valueMC_NUMPY_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
+def _valueMC_NUMPY_ONLY(s, t, K, optionType, r, q, v, num_paths, seed, useSobol):
     # Use of NUMPY ONLY
 
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
     np.random.seed(seed)
     mu = r - q
     v2 = v**2
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(numPaths, 1)[:,0]
+        g = getGaussianSobol(num_paths, 1)[:,0]
     else:
-        g = np.random.standard_normal(numPaths)
+        g = np.random.standard_normal(num_paths)
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
     m = np.exp(g * vsqrtt)
@@ -92,19 +92,19 @@ def _valueMC_NUMPY_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64, 
              int64, int64, int64), cache=True, fastmath=True)
-def _valueMC_NUMPY_NUMBA(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
+def _valueMC_NUMPY_NUMBA(s, t, K, optionType, r, q, v, num_paths, seed, useSobol):
     # Use of NUMPY ONLY
 
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
     np.random.seed(seed)
     mu = r - q
     v2 = v**2
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(numPaths, 1)[:,0]
+        g = getGaussianSobol(num_paths, 1)[:,0]
     else:
-        g = np.random.standard_normal(numPaths)
+        g = np.random.standard_normal(num_paths)
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
     m = np.exp(g * vsqrtt)
@@ -129,10 +129,10 @@ def _valueMC_NUMPY_NUMBA(s, t, K, optionType, r, q, v, numPaths, seed, useSobol)
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64, 
              int64, int64, int64), fastmath=True, cache=True)
-def _valueMC_NUMBA_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
+def _valueMC_NUMBA_ONLY(s, t, K, optionType, r, q, v, num_paths, seed, useSobol):
     # No use of Numpy vectorisation but NUMBA 
 
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
     np.random.seed(seed)
     mu = r - q
     v2 = v**2
@@ -140,15 +140,15 @@ def _valueMC_NUMBA_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
     payoff = 0.0
 
     if useSobol == 1:
-        g = getGaussianSobol(numPaths, 1)[:,0]
+        g = getGaussianSobol(num_paths, 1)[:,0]
     else:
-        g = np.random.standard_normal(numPaths)
+        g = np.random.standard_normal(num_paths)
  
     ss = s * np.exp((mu - v2 / 2.0) * t)
 
     if optionType == FinOptionTypes.EUROPEAN_CALL.value:
 
-        for i in range(0, numPaths):
+        for i in range(0, num_paths):
             gg = g[i]
             s_1 = ss * np.exp(+gg * vsqrtt)
             s_2 = ss * np.exp(-gg * vsqrtt)    
@@ -157,7 +157,7 @@ def _valueMC_NUMBA_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
 
     elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
 
-        for i in range(0, numPaths):
+        for i in range(0, num_paths):
             gg = g[i]
             s_1 = ss * np.exp(+gg * vsqrtt)
             s_2 = ss * np.exp(-gg * vsqrtt)    
@@ -167,26 +167,26 @@ def _valueMC_NUMBA_ONLY(s, t, K, optionType, r, q, v, numPaths, seed, useSobol):
     else:
         raise FinError("Unknown option type.")
 
-    v = payoff * np.exp(-r * t) / numPaths / 2.0
+    v = payoff * np.exp(-r * t) / num_paths / 2.0
     return v
 
 ###############################################################################
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64, 
              int64, int64, int64), fastmath=True, cache=True, parallel=True)
-def _valueMC_NUMBA_PARALLEL(s, t, K,  optionType, r, q, v, numPaths, seed, useSobol):
+def _valueMC_NUMBA_PARALLEL(s, t, K,  optionType, r, q, v, num_paths, seed, useSobol):
     # No use of Numpy vectorisation but NUMBA 
 
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
     np.random.seed(seed)
     mu = r - q
     v2 = v**2
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(numPaths, 1)[:,0]
+        g = getGaussianSobol(num_paths, 1)[:,0]
     else:
-        g = np.random.standard_normal(numPaths)
+        g = np.random.standard_normal(num_paths)
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
 
@@ -195,7 +195,7 @@ def _valueMC_NUMBA_PARALLEL(s, t, K,  optionType, r, q, v, numPaths, seed, useSo
 
     if optionType == FinOptionTypes.EUROPEAN_CALL.value:
         
-        for i in prange(0, numPaths):
+        for i in prange(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff1 += max(s_1 - K, 0.0)
@@ -203,7 +203,7 @@ def _valueMC_NUMBA_PARALLEL(s, t, K,  optionType, r, q, v, numPaths, seed, useSo
 
     elif optionType == FinOptionTypes.EUROPEAN_PUT.value:
 
-        for i in prange(0, numPaths):
+        for i in prange(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff1 += max(K - s_1, 0.0)
@@ -212,7 +212,7 @@ def _valueMC_NUMBA_PARALLEL(s, t, K,  optionType, r, q, v, numPaths, seed, useSo
     else:
         raise FinError("Unknown option type.")
 
-    averagePayoff = (payoff1 + payoff2) / 2.0 / numPaths
+    averagePayoff = (payoff1 + payoff2) / 2.0 / num_paths
     v = averagePayoff * np.exp(-r * t)
     return v
 

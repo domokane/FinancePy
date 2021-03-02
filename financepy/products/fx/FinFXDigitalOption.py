@@ -6,14 +6,14 @@ from math import exp, log, sqrt
 import numpy as np
 
 
-from ...utils.Math import N
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
 # from ...products.equity.FinEquityOption import FinOption
-from ...utils.Date import Date
+from ...utils.date import Date
 #from ...products.fx.FinFXModelTypes import FinFXModel
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...models.black_scholes import FinModelBlackScholes
+from ...utils.helper_functions import labelToString, check_argument_types
 from ...utils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
@@ -36,7 +36,7 @@ class FinFXDigitalOption():
         where FOR is the foreign currency pair currency code and DOM is the
         same for the domestic currency. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)

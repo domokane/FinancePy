@@ -5,12 +5,12 @@
 from ...finutils.FinError import FinError
 from ...finutils.FinDate import FinDate
 from ...finutils.FinGlobalVariables import gSmall
-from ...finutils.FinDayCount import FinDayCount, FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes, FinFrequency
-from ...finutils.FinCalendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...finutils.FinCalendar import FinCalendar, FinBusDayAdjustTypes
+from ...finutils.FinDayCount import FinDayCount, DayCountTypes
+from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
+from ...finutils.FinCalendar import CalendarTypes,  DateGenRuleTypes
+from ...finutils.FinCalendar import FinCalendar, BusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...finutils.FinHelperFunctions import labelToString, check_argument_types
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -35,13 +35,13 @@ class FinSwapLeg(object):
                  end_date: (FinDate, str),  # Date contract ends
                  fixedFloatType: FinLegType,
                  couponOrSpread: (float),
-                 freq_type: FinFrequencyTypes,
-                 day_count_type: FinDayCountTypes,
+                 freq_type: FrequencyTypes,
+                 day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  currency: str = "USD",
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -51,7 +51,7 @@ class FinSwapLeg(object):
         termination date. This is not adjusted for business days. The adjusted
         termination date is called the maturity date. This is calculated. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if type(end_date) == FinDate:
             self._termination_date = end_date
@@ -198,7 +198,7 @@ class FinSwapLeg(object):
 
 ##########################################################################
 
-    def swapRate(self, valuation_date, discount_curve):
+    def swap_rate(self, valuation_date, discount_curve):
         """ Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -240,27 +240,27 @@ class FinSwapLeg(object):
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. """
-        startIndex = 0
-        while self._adjustedFixedDates[startIndex] < valuation_date:
-            startIndex += 1
+        start_index = 0
+        while self._adjustedFixedDates[start_index] < valuation_date:
+            start_index += 1
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
         if valuation_date <= self._start_date:
-            startIndex = 1
+            start_index = 1
 
-        self._fixedStartIndex = startIndex
+        self._fixedStartIndex = start_index
 
         """ Now PV fixed leg flows. """
         self._dfValuationDate = discount_curve.df(valuation_date)
 
         pv = 0.0
-        prevDt = self._adjustedFixedDates[startIndex - 1]
+        prevDt = self._adjustedFixedDates[start_index - 1]
         df_discount = 1.0
         if len(self._adjustedFixedDates) == 1:
             return 0.0
 
-        for nextDt in self._adjustedFixedDates[startIndex:]:
+        for nextDt in self._adjustedFixedDates[start_index:]:
             alpha = day_counter.year_frac(prevDt, nextDt)[0]
             df_discount = discount_curve.df(nextDt) / self._dfValuationDate
             flow = self._fixedCoupon * alpha * self._notional
@@ -299,21 +299,21 @@ class FinSwapLeg(object):
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. """
-        startIndex = 0
-        while self._adjustedFixedDates[startIndex] < valuation_date:
-            startIndex += 1
+        start_index = 0
+        while self._adjustedFixedDates[start_index] < valuation_date:
+            start_index += 1
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
         if valuation_date <= self._start_date:
-            startIndex = 1
+            start_index = 1
 
         """ Now PV fixed leg flows. """
         flatPV01 = 0.0
         df = 1.0
         alpha = 1.0 / m
 
-        for _ in self._adjustedFixedDates[startIndex:]:
+        for _ in self._adjustedFixedDates[start_index:]:
             df = df / (1.0 + alpha * flatSwapRate)
             flatPV01 += df * alpha
 
@@ -347,24 +347,24 @@ class FinSwapLeg(object):
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
-        startIndex = 0
-        while self._adjustedFloatDates[startIndex] < valuation_date:
-            startIndex += 1
+        start_index = 0
+        while self._adjustedFloatDates[start_index] < valuation_date:
+            start_index += 1
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
         if valuation_date <= self._start_date:
-            startIndex = 1
+            start_index = 1
 
-        self._floatStartIndex = startIndex
+        self._floatStartIndex = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
         self._dfValuationDate = discount_curve.df(valuation_date)
 
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
-        prevDt = self._adjustedFloatDates[startIndex - 1]
-        nextDt = self._adjustedFloatDates[startIndex]
+        prevDt = self._adjustedFloatDates[start_index - 1]
+        nextDt = self._adjustedFloatDates[start_index]
         alpha = basis.year_frac(prevDt, nextDt)[0]
         df1_index = index_curve.df(self._start_date)  # Cannot be pcd as has past
         df2_index = index_curve.df(nextDt)
@@ -393,7 +393,7 @@ class FinSwapLeg(object):
         prevDt = nextDt
         df1_index = index_curve.df(prevDt)
 
-        for nextDt in self._adjustedFloatDates[startIndex + 1:]:
+        for nextDt in self._adjustedFloatDates[start_index + 1:]:
             alpha = basis.year_frac(prevDt, nextDt)[0]
             df2_index = index_curve.df(nextDt)
             # The accrual factors cancel
@@ -450,7 +450,7 @@ class FinSwapLeg(object):
         if self._fixedStartIndex is None:
             raise FinError("Need to value swap before calling this function.")
 
-        startIndex = self._fixedStartIndex
+        start_index = self._fixedStartIndex
 
         # By definition the discount factor is 1.0 on the valuation date
         print("%15s %10s %12s %12.8f %12s %12s" %
@@ -462,7 +462,7 @@ class FinSwapLeg(object):
                "-"))
 
         iFlow = 0
-        for payment_date in self._adjustedFixedDates[startIndex:]:
+        for payment_date in self._adjustedFixedDates[start_index:]:
             print("%15s %10.7f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_date,
                    self._fixedYearFracs[iFlow],
@@ -492,10 +492,10 @@ class FinSwapLeg(object):
         header = "PAYMENT_DATE     YEAR_FRAC        FLOW"
         print(header)
 
-        startIndex = 1
+        start_index = 1
 
         iFlow = 0
-        for payment_date in self._adjustedFixedDates[startIndex:]:
+        for payment_date in self._adjustedFixedDates[start_index:]:
             print("%15s %12.8f %12.2f" %
                   (payment_date,
                    self._fixedYearFracs[iFlow],
@@ -528,7 +528,7 @@ class FinSwapLeg(object):
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
-        startIndex = self._floatStartIndex
+        start_index = self._floatStartIndex
 
         # By definition the discount factor is 1.0 on the valuation date
 
@@ -542,7 +542,7 @@ class FinSwapLeg(object):
                "-"))
 
         iFlow = 0
-        for payment_date in self._adjustedFloatDates[startIndex:]:
+        for payment_date in self._adjustedFloatDates[start_index:]:
             print("%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_date,
                    self._floatYearFracs[iFlow],

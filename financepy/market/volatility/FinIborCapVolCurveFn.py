@@ -5,8 +5,8 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 
 ##########################################################################
 # TODO: Market calibration (fitting)

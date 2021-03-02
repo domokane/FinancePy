@@ -6,15 +6,15 @@ from math import sqrt, log
 from scipy import optimize
 
 
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION, N
-from ...products.credit.FinCDS import FinCDS
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Date import Date
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION, N
+from ...products.credit.cds import FinCDS
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import Date
 from ...utils.FinError import FinError
 
 ##########################################################################
@@ -52,17 +52,17 @@ class FinCDSOption():
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  knockoutFlag: bool = True,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a FinCDSOption object with the option expiry date, the
         maturity date of the underlying CDS, the option strike coupon,
         notional, whether the option knocks out or not in the event of a credit
         event before expiry and the payment details of the underlying CDS. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if maturity_date < expiry_date:
             raise FinError("Maturity date must be after option expiry date")

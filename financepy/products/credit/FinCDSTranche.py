@@ -8,26 +8,26 @@ import numpy as np
 from math import sqrt
 
 
-from ...models.FinModelGaussianCopula1F import trSurvProbGaussian
-from ...models.FinModelGaussianCopula1F import trSurvProbAdjBinomial
-from ...models.FinModelGaussianCopula1F import trSurvProbRecursion
-from ...models.FinModelGaussianCopulaLHP import trSurvProbLHP
+from ...models.credit_gaussian_copula_onefactor import trSurvProbGaussian
+from ...models.credit_gaussian_copula_onefactor import trSurvProbAdjBinomial
+from ...models.credit_gaussian_copula_onefactor import trSurvProbRecursion
+from ...models.credit_gaussian_copula_lhp import trSurvProbLHP
 
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
-from ...products.credit.FinCDS import FinCDS
-from ...products.credit.FinCDSCurve import FinCDSCurve
+from ...products.credit.cds import FinCDS
+from ...products.credit.cds_curve import FinCDSCurve
 
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
-from ...market.curves.FinInterpolator import FinInterpTypes, interpolate
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
+from ...market.curves.interpolator import FinInterpTypes, interpolate
 from ...utils.FinError import FinError
 
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Date import Date
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import Date
 
 ###############################################################################
 
@@ -53,13 +53,13 @@ class FinCDSTranche(object):
                  notional: float = ONE_MILLION,
                  running_coupon: float = 0.0,
                  long_protection: bool = True,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if k1 >= k2:
             raise FinError("K1 must be less than K2")
@@ -126,7 +126,7 @@ class FinCDSTranche(object):
 
         recovery_rates = np.zeros(numCredits)
 
-        payment_dates = self._cdsContract._adjustedDates
+        payment_dates = self._cdsContract._adjusted_dates
         numTimes = len(payment_dates)
 
         beta1 = sqrt(corr1)

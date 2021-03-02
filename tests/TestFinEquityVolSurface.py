@@ -7,10 +7,10 @@ sys.path.append("..")
 
 import numpy as np
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 from financepy.market.volatility.FinEquityVolSurface import FinEquityVolSurface
-from financepy.utils.Date import Date
-from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
+from financepy.utils.date import Date
+from financepy.models.volatility_fns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -29,7 +29,7 @@ def test_FinEquityVolSurface(verboseCalibration):
 
     valuation_date = Date(11, 1, 2021)
 
-    stockPrice = 3800.0 # Check
+    stock_price = 3800.0 # Check
 
     expiry_dates = [Date(11, 2, 2021), Date(11, 3, 2021),
                    Date(11, 4, 2021), Date(11, 7, 2021),
@@ -51,15 +51,15 @@ def test_FinEquityVolSurface(verboseCalibration):
     volSurface = volSurface / 100.0
 
     r = 0.020  # USD
-    discount_curve = FinDiscountCurveFlat(valuation_date, r)
+    discount_curve = DiscountCurveFlat(valuation_date, r)
 
     q = 0.010  # USD
-    dividendCurve = FinDiscountCurveFlat(valuation_date, q)
+    dividendCurve = DiscountCurveFlat(valuation_date, q)
 
     volFunctionType = FinVolFunctionTypes.SVI
 
     equitySurface = FinEquityVolSurface(valuation_date,
-                                        stockPrice,
+                                        stock_price,
                                         discount_curve,
                                         dividendCurve,
                                         expiry_dates,

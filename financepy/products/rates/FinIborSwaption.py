@@ -12,26 +12,26 @@
 
 import numpy as np
 
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinDateGenRuleTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
 from ...utils.FinError import FinError
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
 
 from ...products.rates.IborSwap import FinIborSwap
 
-from ...models.FinModelBlack import FinModelBlack
-from ...models.FinModelBlackShifted import FinModelBlackShifted
-from ...models.FinModelSABR import FinModelSABR
-from ...models.FinModelSABRShifted import FinModelSABRShifted
-from ...models.FinModelRatesHW import FinModelRatesHW
-from ...models.FinModelRatesBK import FinModelRatesBK
-from ...models.FinModelRatesBDT import FinModelRatesBDT
+from ...models.black import FinModelBlack
+from ...models.black_shifted import FinModelBlackShifted
+from ...models.sabr import FinModelSABR
+from ...models.sabr_shifted import FinModelSABRShifted
+from ...models.rates_hull_white_tree import FinModelRatesHW
+from ...models.rates_bk_tree import FinModelRatesBK
+from ...models.rates_bdt_tree import FinModelRatesBDT
 
 from ...utils.FinGlobalTypes import FinOptionTypes
 from ...utils.FinGlobalTypes import FinSwapTypes
@@ -51,21 +51,21 @@ class FinIborSwaption():
                  maturity_date: Date,
                  fixed_legType: FinSwapTypes,
                  fixedCoupon: float,
-                 fixedFrequencyType: FinFrequencyTypes,
-                 fixedDayCountType: FinDayCountTypes,
+                 fixedFrequencyType: FrequencyTypes,
+                 fixedDayCountType: DayCountTypes,
                  notional: float = ONE_MILLION,
-                 floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 floatFrequencyType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 floatDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
         floating leg payment schedules. Bermudan style swaption should be
         priced using the FinIborBermudanSwaption class. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if settlement_date > exerciseDate:
             raise FinError("Settlement date must be before expiry date")
@@ -126,12 +126,12 @@ class FinIborSwaption():
 
         k = self._fixedCoupon
 
-        # The pv01 is the value of the swap cashflows as of the curve date
+        # The pv01 is the value of the swap cash flows as of the curve date
         pv01 = swap.pv01(valuation_date, discount_curve)
 
         # We need to calculate the forward swap rate on the swaption exercise
         # date that makes the forward swap worth par including principal
-        s = swap.swapRate(valuation_date, discount_curve)
+        s = swap.swap_rate(valuation_date, discount_curve)
 
         texp = (self._exerciseDate - self._settlement_date) / gDaysInYear
         tmat = (self._maturity_date - self._settlement_date) / gDaysInYear
@@ -147,9 +147,9 @@ class FinIborSwaption():
         cpnFlows = [0.0]
 
         # The first flow is on the day after the expiry date
-        numFlows = len(swap._fixed_leg._payment_dates)
+        num_flows = len(swap._fixed_leg._payment_dates)
 
-        for iFlow in range(0, numFlows):
+        for iFlow in range(0, num_flows):
             
             flowDate = swap._fixed_leg._payment_dates[iFlow]
 
@@ -165,7 +165,7 @@ class FinIborSwaption():
         cpnFlows = np.array(cpnFlows)
 
         dfTimes = discount_curve._times
-        dfValues = discount_curve._dfs
+        df_values = discount_curve._dfs
 
         if np.any(cpnTimes < 0.0):
             raise FinError("No coupon times can be before the value date.")
@@ -219,7 +219,7 @@ class FinIborSwaption():
                                                   cpnTimes,
                                                   cpnFlows,
                                                   dfTimes,
-                                                  dfValues)
+                                                  df_values)
 
             if self._fixed_legType == FinSwapTypes.PAY:
                 swaptionPrice = swaptionPx['put']
@@ -234,7 +234,7 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBK):
 
-            model.buildTree(tmat, dfTimes, dfValues)
+            model.buildTree(tmat, dfTimes, df_values)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
                                                 strikePrice,
@@ -252,7 +252,7 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBDT):
 
-            model.buildTree(tmat, dfTimes, dfValues)
+            model.buildTree(tmat, dfTimes, df_values)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
                                                 strikePrice,
@@ -287,7 +287,7 @@ class FinIborSwaption():
     def cashSettledValue(self,
                          valuation_date: Date,
                          discount_curve,
-                         swapRate: float,
+                         swap_rate: float,
                          model):
         """ Valuation of a Ibor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
@@ -312,10 +312,10 @@ class FinIborSwaption():
                             self._date_gen_rule_type)
 
         k = self._fixedCoupon
-        s = swapRate
+        s = swap_rate
 
         pv01 = swap.cashSettledPV01(valuation_date,
-                                    swapRate,
+                                    swap_rate,
                                     self._fixedFrequencyType)
 
         texp = (self._exerciseDate - self._settlement_date) / gDaysInYear
@@ -335,7 +335,7 @@ class FinIborSwaption():
             raise FinError("Cash settled swaptions must be priced using"
                            + " Black's model.")
 
-        self._fwdSwapRate = swapRate
+        self._fwdSwapRate = swap_rate
         self._forwardDf = discount_curve.df(self._exerciseDate)
         self._underlyingSwap = swap
         # The annuity needs to be discounted to today using the correct df

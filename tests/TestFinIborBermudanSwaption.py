@@ -5,20 +5,20 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 from financepy.utils.FinGlobalTypes import FinExerciseTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.IborSwap import FinIborSwap
 
 from financepy.products.rates.FinIborBermudanSwaption import FinIborBermudanSwaption
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.models.FinModelRatesBK import FinModelRatesBK
-from financepy.models.FinModelRatesHW import FinModelRatesHW
-from financepy.models.FinModelRatesBDT import FinModelRatesBDT
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.black import FinModelBlack
+from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
+from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -36,13 +36,13 @@ def test_FinIborBermudanSwaptionBKModel():
     swapMaturityDate = settlement_date.addYears(4)
 
     swapFixedCoupon = 0.060
-    swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.ACT_365F
+    swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    swapFixedDayCountType = DayCountTypes.ACT_365F
 
-    libor_curve = FinDiscountCurveFlat(valuation_date,
-                                      0.0625,
-                                      FinFrequencyTypes.SEMI_ANNUAL, 
-                                      FinDayCountTypes.ACT_365F)
+    libor_curve = DiscountCurveFlat(valuation_date,
+                                    0.0625,
+                                    FrequencyTypes.SEMI_ANNUAL,
+                                    DayCountTypes.ACT_365F)
 
     fwdPAYSwap = FinIborSwap(exerciseDate,
                                 swapMaturityDate,

@@ -5,15 +5,15 @@
 
 from math import pow
 
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
 from ...utils.FinError import FinError
-from ...products.credit.FinCDS import FinCDS
-from ...products.credit.FinCDSCurve import FinCDSCurve
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.FinHelperFunctions import labelToString
+from ...products.credit.cds import FinCDS
+from ...products.credit.cds_curve import FinCDSCurve
+from ...utils.helper_functions import check_argument_types
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 # TODO: Move index spread details into class and then pass in issuer curves
@@ -26,15 +26,15 @@ class FinCDSIndexPortfolio():
     portfolio of CDS contracts with the same maturity date. """
 
     def __init__(self,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create FinCDSIndexPortfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._day_count_type = day_count_type
         self._date_gen_rule_type = date_gen_rule_type

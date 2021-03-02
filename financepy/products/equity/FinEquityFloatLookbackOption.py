@@ -5,15 +5,15 @@
 import numpy as np
 
 
-from ...utils.Math import N
-from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear, gSmall
 from ...utils.FinError import FinError
-from ...utils.Date import Date
+from ...utils.date import Date
 
-from ...models.FinGBMProcess import FinGBMProcess
+from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.curves.discount_curve import DiscountCurve
 from ...utils.FinGlobalTypes import FinOptionTypes
 
 ##########################################################################
@@ -46,7 +46,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
         minimum of the stock price depending on whether it is a put or a call
         option. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
@@ -58,9 +58,9 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               volatility: float,
               stockMinMax: float):
         """ Valuation of the Floating Lookback option using Black-Scholes using
@@ -74,7 +74,7 @@ class FinEquityFloatLookbackOption(FinEquityOption):
         q = dividendCurve.ccRate(self._expiry_date)
 
         v = volatility
-        s0 = stockPrice
+        s0 = stock_price
         smin = 0.0
         smax = 0.0
 
@@ -140,12 +140,12 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                discount_curve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 volatility: float,
                 stockMinMax: float,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 num_steps_per_year: int = 252,
                 seed: int = 4242):
         """ Monte Carlo valuation of a floating strike lookback option using a
@@ -165,22 +165,22 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smin = stockMinMax
-            if smin > stockPrice:
+            if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smax = stockMinMax
-            if smax < stockPrice:
+            if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(numPaths, numTimeSteps, t, mu, stockPrice,
+        Sall = model.getPaths(num_paths, numTimeSteps, t, mu, stock_price,
                               volatility, seed)
 
         # Due to antithetics we have doubled the number of paths
-        numPaths = 2 * numPaths
-        payoff = np.zeros(numPaths)
+        num_paths = 2 * num_paths
+        payoff = np.zeros(num_paths)
 
         if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)

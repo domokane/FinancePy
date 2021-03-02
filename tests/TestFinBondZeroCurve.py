@@ -8,11 +8,11 @@ sys.path.append("..")
 import os
 import datetime as dt
 
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date, fromDatetime
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.bonds.FinBondZeroCurve import FinBondZeroCurve
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date, fromDatetime
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -22,19 +22,19 @@ plotGraphs = False
 ###############################################################################
 
 
-def test_FinBondZeroCurve():
+def test_BondZeroCurve():
 
     import pandas as pd
     path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    freq_type = FinFrequencyTypes.SEMI_ANNUAL
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
     settlement = Date(19, 9, 2012)
 
     bonds = []
-    cleanPrices = []
+    clean_prices = []
 
     for _, bondRow in bondDataFrame.iterrows():
         dateString = bondRow['maturity']
@@ -42,14 +42,14 @@ def test_FinBondZeroCurve():
         maturityDt = fromDatetime(matDatetime)
         issueDt = Date(maturityDt._d, maturityDt._m, 2000)
         coupon = bondRow['coupon']/100.0
-        cleanPrice = bondRow['mid']
-        bond = FinBond(issueDt, maturityDt, coupon, freq_type, accrual_type)
+        clean_price = bondRow['mid']
+        bond = Bond(issueDt, maturityDt, coupon, freq_type, accrual_type)
         bonds.append(bond)
-        cleanPrices.append(cleanPrice)
+        clean_prices.append(clean_price)
 
 ###############################################################################
 
-    bondCurve = FinBondZeroCurve(settlement, bonds, cleanPrices)
+    bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
 
     testCases.header("DATE", "ZERO RATE")
 
@@ -67,5 +67,5 @@ def test_FinBondZeroCurve():
 ###############################################################################
 
 
-test_FinBondZeroCurve()
+test_BondZeroCurve()
 testCases.compareTestCases()

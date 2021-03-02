@@ -5,21 +5,21 @@
 
 import numpy as np
 
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
 
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...utils.Schedule import Schedule
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
+from ...utils.schedule import Schedule
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
+from ...market.curves.FinDiscountCurveFlat import DiscountCurve
 
-from ...models.FinModelBlackScholes import bsValue, FinModelBlackScholes
+from ...models.black_scholes import bsValue, FinModelBlackScholes
 from ...models.FinModel import FinModel
 
 ###############################################################################
@@ -36,16 +36,16 @@ class FinEquityCliquetOption(FinEquityOption):
                  start_date: Date,
                  finalExpiryDate: Date,
                  optionType: FinOptionTypes,
-                 freq_type: FinFrequencyTypes,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes,
+                 day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create the FinEquityCliquetOption by passing in the start date
         and the end date and whether it is a call or a put. Some additional
         data is needed in order to calculate the individual payments. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
            optionType != FinOptionTypes.EUROPEAN_PUT:
@@ -74,9 +74,9 @@ class FinEquityCliquetOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model:FinModel):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
@@ -84,7 +84,7 @@ class FinEquityCliquetOption(FinEquityOption):
         if valuation_date > self._finalExpiryDate:
             raise FinError("Value date after final expiry date.")
 
-        s = stockPrice
+        s = stock_price
         v_cliquet = 0.0
 
         self._v_options = []

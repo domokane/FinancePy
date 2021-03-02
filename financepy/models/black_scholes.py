@@ -9,12 +9,12 @@ import numpy as np
 from ..utils.FinGlobalTypes import FinOptionTypes
 from ..utils.FinError import FinError
 
-from ..utils.FinHelperFunctions import check_argument_types
+from ..utils.helper_functions import check_argument_types
 
 from .FinModel import FinModel
-from .FinModelCRRTree import crrTreeValAvg
-from .FinModelBlackScholesAnalytical import bawValue
-from .FinModelBlackScholesAnalytical import bsValue
+from .equity_crr_tree import crrTreeValAvg
+from .black_scholes_analytic import bawValue
+from .black_scholes_analytic import bsValue
 
 from enum import Enum
 

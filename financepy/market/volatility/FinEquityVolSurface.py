@@ -9,25 +9,25 @@ import matplotlib.pyplot as plt
 from numba import njit, float64, int64
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinGlobalTypes import FinOptionTypes
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
-from ...models.FinModelVolatilityFns import volFunctionClark
-from ...models.FinModelVolatilityFns import volFunctionBloomberg
-from ...models.FinModelVolatilityFns import volFunctionSVI
-from ...models.FinModelVolatilityFns import volFunctionSSVI
-from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
-from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
+from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import volFunctionClark
+from ...models.volatility_fns import volFunctionBloomberg
+from ...models.volatility_fns import volFunctionSVI
+from ...models.volatility_fns import volFunctionSSVI
+from ...models.sabr import volFunctionSABR
+from ...models.sabr import volFunctionSABR_BETA_ONE
+from ...models.sabr import volFunctionSABR_BETA_HALF
 
-from ...utils.Math import norminvcdf
+from ...utils.fin_math import norminvcdf
 
-from ...models.FinModelBlackScholesAnalytical import bsDelta
+from ...models.black_scholes_analytic import bsDelta
 
 from ...utils.FinDistribution import FinDistribution
 
@@ -235,9 +235,9 @@ class FinEquityVolSurface():
 
     def __init__(self,
                  valuation_date: Date,
-                 stockPrice: float,
-                 discount_curve: FinDiscountCurve,
-                 dividendCurve: FinDiscountCurve,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividendCurve: DiscountCurve,
                  expiry_dates: (list),
                  strikes: (list, np.ndarray),
                  volatilityGrid: (list, np.ndarray),
@@ -246,10 +246,10 @@ class FinEquityVolSurface():
         """ Create the FinEquitySurface object by passing in market vol data
         for a list of strikes and expiry dates. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
-        self._stockPrice = stockPrice
+        self._stock_price = stock_price
 
         self._discount_curve = discount_curve
         self._dividendCurve = dividendCurve
@@ -472,7 +472,7 @@ class FinEquityVolSurface():
 
         volTypeValue = self._volatilityFunctionType.value
 
-        s = self._stockPrice
+        s = self._stock_price
 
         index0 = 0 # lower index in bracket
         index1 = 0 # upper index in bracket
@@ -512,7 +512,7 @@ class FinEquityVolSurface():
         t0 = self._texp[index0]
         t1 = self._texp[index1]
 
-        initialGuess = self._stockPrice
+        initialGuess = self._stock_price
 
         K0 = _solveForSmileStrike(s,
                                   texp,
@@ -568,7 +568,7 @@ class FinEquityVolSurface():
     def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
-        s = self._stockPrice
+        s = self._stock_price
 
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
@@ -659,7 +659,7 @@ class FinEquityVolSurface():
 
             print("==========================================================")
             print("VALUE DATE:", self._valuation_date)
-            print("STOCK PRICE:", self._stockPrice)
+            print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
         K_dummy = 999
@@ -723,7 +723,7 @@ class FinEquityVolSurface():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._stockPrice, t, r, q, Ks, vols)
+            density = optionImpliedDbn(self._stock_price, t, r, q, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)
@@ -777,7 +777,7 @@ class FinEquityVolSurface():
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUE DATE", self._valuation_date)
-        s += labelToString("STOCK PRICE", self._stockPrice)
+        s += labelToString("STOCK PRICE", self._stock_price)
         s += labelToString("VOL FUNCTION", self._volatilityFunctionType)
 
         for i in range(0, self._numExpiryDates):

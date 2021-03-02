@@ -14,33 +14,33 @@ from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.IborSwap import FinSwapTypes
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 
-from financepy.utils.Calendar import FinCalendarTypes
-from financepy.utils.Calendar import FinBusDayAdjustTypes
-from financepy.utils.Calendar import FinDateGenRuleTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
 
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveZeros import DiscountCurveZeros
+from financepy.market.curves.interpolator import FinInterpTypes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.models.FinModelBachelier import FinModelBachelier
-from financepy.models.FinModelBlackShifted import FinModelBlackShifted
-from financepy.models.FinModelSABR import FinModelSABR
-from financepy.models.FinModelSABRShifted import FinModelSABRShifted
-from financepy.models.FinModelRatesHW import FinModelRatesHW
+from financepy.models.black import FinModelBlack
+from financepy.models.bachelier import FinModelBachelier
+from financepy.models.black_shifted import FinModelBlackShifted
+from financepy.models.sabr import FinModelSABR
+from financepy.models.sabr_shifted import FinModelSABRShifted
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
 
-from financepy.utils.FinGlobalVariables import gDaysInYear
+from financepy.utils.global_variables import gDaysInYear
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
-from financepy.utils.Schedule import Schedule
+from financepy.utils.schedule import Schedule
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -49,16 +49,16 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinIborDepositsAndSwaps(valuation_date):
 
-    depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
+    depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spotDays = 0
     settlement_date = valuation_date.addWeekDays(spotDays)
-    depositRate = 0.05
+    deposit_rate = 0.05
 
-    depo1 = FinIborDeposit(settlement_date, "1M", depositRate, depoBasis)
-    depo2 = FinIborDeposit(settlement_date, "3M", depositRate, depoBasis)
-    depo3 = FinIborDeposit(settlement_date, "6M", depositRate, depoBasis)
+    depo1 = FinIborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
+    depo2 = FinIborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
+    depo3 = FinIborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -67,20 +67,20 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     fras = []
 
     swaps = []
-    fixedBasis = FinDayCountTypes.ACT_365F
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    fixedBasis = DayCountTypes.ACT_365F
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
     fixed_legType = FinSwapTypes.PAY
 
-    swapRate = 0.05
-    swap1 = FinIborSwap(settlement_date, "1Y", fixed_legType, swapRate, fixedFreq, fixedBasis)
-    swap2 = FinIborSwap(settlement_date, "3Y", fixed_legType, swapRate, fixedFreq, fixedBasis)
-    swap3 = FinIborSwap(settlement_date, "5Y", fixed_legType, swapRate, fixedFreq, fixedBasis)
+    swap_rate = 0.05
+    swap1 = FinIborSwap(settlement_date, "1Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
+    swap2 = FinIborSwap(settlement_date, "3Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
+    swap3 = FinIborSwap(settlement_date, "5Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
     swaps.append(swap3)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     return libor_curve
 
@@ -186,8 +186,8 @@ def test_FinIborCapFloorVolCurve():
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
     maturity_date = valuation_date.addTenor("3Y")
-    day_count_type = FinDayCountTypes.THIRTY_E_360
-    frequency = FinFrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.THIRTY_E_360
+    frequency = FrequencyTypes.ANNUAL
 
     k = 0.04
     capFloorType = FinCapFloorTypes.CAP
@@ -204,10 +204,10 @@ def test_FinIborCapFloorVolCurve():
                            frequency)._generate()
 
     flatRate = 0.04
-    libor_curve = FinDiscountCurveFlat(valuation_date,
-                                      flatRate,
-                                      frequency,
-                                      day_count_type)
+    libor_curve = DiscountCurveFlat(valuation_date,
+                                    flatRate,
+                                    frequency,
+                                    day_count_type)
 
     flat = False
     if flat is True:
@@ -268,10 +268,10 @@ def test_FinIborCapletHull():
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
     maturity_date = valuation_date.addTenor("2Y")
-    libor_curve = FinDiscountCurveFlat(valuation_date,
-                                      0.070,
-                                      FinFrequencyTypes.QUARTERLY,
-                                      FinDayCountTypes.THIRTY_E_360)
+    libor_curve = DiscountCurveFlat(valuation_date,
+                                    0.070,
+                                    FrequencyTypes.QUARTERLY,
+                                    DayCountTypes.THIRTY_E_360)
 
     k = 0.08
     capFloorType = FinCapFloorTypes.CAP
@@ -280,8 +280,8 @@ def test_FinIborCapletHull():
                                 capFloorType,
                                 k,
                                 None,
-                                FinFrequencyTypes.QUARTERLY,
-                                FinDayCountTypes.THIRTY_E_360)
+                                FrequencyTypes.QUARTERLY,
+                                DayCountTypes.THIRTY_E_360)
 
     # Value cap using a single flat cap volatility
     model = FinModelBlack(0.20)
@@ -318,25 +318,25 @@ def test_FinIborCapFloorQLExample():
              0.009599, 0.011203, 0.015068, 0.017583,
              0.018998, 0.020080]
 
-    freq_type = FinFrequencyTypes.ANNUAL
-    day_count_type = FinDayCountTypes.ACT_ACT_ISDA
+    freq_type = FrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.ACT_ACT_ISDA
 
-    discount_curve = FinDiscountCurveZeros(valuation_date,
-                                          dates,
-                                          rates,
-                                          freq_type,
-                                          day_count_type,
-                                          FinInterpTypes.LINEAR_ZERO_RATES)
+    discount_curve = DiscountCurveZeros(valuation_date,
+                                        dates,
+                                        rates,
+                                        freq_type,
+                                        day_count_type,
+                                        FinInterpTypes.LINEAR_ZERO_RATES)
 
     start_date = Date(14, 6, 2016)
     end_date = Date(14, 6, 2026)
-    calendar_type = FinCalendarTypes.UNITED_STATES
-    bus_day_adjust_type = FinBusDayAdjustTypes.MODIFIED_FOLLOWING
-    freq_type = FinFrequencyTypes.QUARTERLY
-    date_gen_rule_type = FinDateGenRuleTypes.FORWARD
+    calendar_type = CalendarTypes.UNITED_STATES
+    bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    freq_type = FrequencyTypes.QUARTERLY
+    date_gen_rule_type = DateGenRuleTypes.FORWARD
     lastFixing = 0.0065560
     notional = 1000000
-    day_count_type = FinDayCountTypes.ACT_360
+    day_count_type = DayCountTypes.ACT_360
     optionType = FinCapFloorTypes.CAP
     strikeRate = 0.02
 

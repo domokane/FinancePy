@@ -7,14 +7,14 @@ from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
-from ...utils.Math import N, M
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.fin_math import N, M
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
-from ...models.FinGBMProcess import FinGBMProcess
+from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
 
 from enum import Enum
 
@@ -65,7 +65,7 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
 
 def valueMCFast(t,
-                stockPrices,
+                stock_prices,
                 discount_curve,
                 dividendCurves,
                 volatilities,
@@ -73,7 +73,7 @@ def valueMCFast(t,
                 numAssets,
                 payoffType,
                 payoffParams,
-                numPaths=10000,
+                num_paths=10000,
                 seed=4242):
 
     np.random.seed(seed)
@@ -94,8 +94,8 @@ def valueMCFast(t,
     model = FinGBMProcess()
 
     numTimeSteps = 2
-    Sall = model.getPathsAssets(numAssets, numPaths, numTimeSteps,
-                                t, mus, stockPrices, volatilities, betas, seed)
+    Sall = model.getPathsAssets(numAssets, num_paths, numTimeSteps,
+                                t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoffValue(Sall, payoffType.value, payoffParams)
     payoff = np.mean(payoff)
@@ -113,7 +113,7 @@ class FinEquityRainbowOption(FinEquityOption):
                  payoffParams: List[float],
                  numAssets: int):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._validatePayoff(payoffType, payoffParams, numAssets)
 
@@ -125,12 +125,12 @@ class FinEquityRainbowOption(FinEquityOption):
 ###############################################################################
 
     def _validate(self,
-                  stockPrices,
+                  stock_prices,
                   dividendCurves,
                   volatilities,
                   betas):
 
-        if len(stockPrices) != self._numAssets:
+        if len(stock_prices) != self._numAssets:
             raise FinError(
                 "Stock prices must be a vector of length "
                 + str(self._numAssets))
@@ -187,8 +187,8 @@ class FinEquityRainbowOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrices: np.ndarray,
-              discount_curve: FinDiscountCurve,
+              stock_prices: np.ndarray,
+              discount_curve: DiscountCurve,
               dividendCurves: (list),
               volatilities: np.ndarray,
               corrMatrix: np.ndarray):
@@ -216,19 +216,19 @@ class FinEquityRainbowOption(FinEquityOption):
         q1 = dividendCurves[0].zeroRate(self._expiry_date)
         q2 = dividendCurves[1].zeroRate(self._expiry_date)
 
-        dividendYields = [q1, q2]
+        dividend_yields = [q1, q2]
 
-        self._validate(stockPrices,
-                       dividendYields,
+        self._validate(stock_prices,
+                       dividend_yields,
                        volatilities,
                        corrMatrix)
 
-#        q1 = dividendYields[0]
-#        q2 = dividendYields[1]
+#        q1 = dividend_yields[0]
+#        q2 = dividend_yields[1]
 
         rho = corrMatrix[0][1]
-        s1 = stockPrices[0]
-        s2 = stockPrices[1]
+        s1 = stock_prices[0]
+        s2 = stock_prices[1]
         b1 = r - q1
         b2 = r - q2
         v1 = volatilities[0]
@@ -270,15 +270,15 @@ class FinEquityRainbowOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date,
-                stockPrices,
+                stock_prices,
                 discount_curve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                numPaths=10000,
+                num_paths=10000,
                 seed=4242):
 
-        self._validate(stockPrices,
+        self._validate(stock_prices,
                        dividendCurves,
                        volatilities,
                        corrMatrix)
@@ -289,7 +289,7 @@ class FinEquityRainbowOption(FinEquityOption):
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
         v = valueMCFast(t,
-                        stockPrices,
+                        stock_prices,
                         discount_curve,
                         dividendCurves,
                         volatilities,
@@ -297,7 +297,7 @@ class FinEquityRainbowOption(FinEquityOption):
                         self._numAssets,
                         self._payoffType,
                         self._payoffParams,
-                        numPaths,
+                        num_paths,
                         seed)
 
         return v

@@ -7,13 +7,13 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.FinCDS import FinCDS
+from financepy.products.credit.cds import FinCDS
 from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -30,8 +30,8 @@ def test_FinCDSCurve():
     depos = []
     fras = []
 
-    fixedDCC = FinDayCountTypes.ACT_365F
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    fixedDCC = DayCountTypes.ACT_365F
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
     fixedCoupon = 0.05
 
     for i in range(1, 11):
@@ -45,7 +45,7 @@ def test_FinCDSCurve():
                            fixedDCC)
         swaps.append(swap)
 
-    libor_curve = FinIborSingleCurve(curveDate, depos, fras, swaps)
+    libor_curve = IborSingleCurve(curveDate, depos, fras, swaps)
 
     cds_contracts = []
 

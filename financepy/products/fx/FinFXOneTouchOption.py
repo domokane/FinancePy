@@ -7,17 +7,17 @@ import numpy as np
 from enum import Enum
 
 
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinError import FinError
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...models.FinGBMProcess import getPaths
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.gbm_process_simulator import getPaths
 
 from numba import njit
 
-from ...utils.Math import NVect
+from ...utils.fin_math import NVect
 
 ###############################################################################
 # TODO: Implement Sobol random numbers
@@ -45,10 +45,10 @@ class FinTouchOptionPayoffTypes(Enum):
 @njit(fastmath=True, cache=True)
 def _barrierPayOneAtHitPVDown(s, H, r, dt):
     """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
-    numPaths, numTimeSteps = s.shape
+    num_paths, numTimeSteps = s.shape
     pv = 0.0
 
-    for ip in range(0, numPaths):
+    for ip in range(0, num_paths):
         hitFlag = 0
 
         for it in range(0, numTimeSteps):
@@ -60,7 +60,7 @@ def _barrierPayOneAtHitPVDown(s, H, r, dt):
 
         pv = pv + v * hitFlag
 
-    pv = pv / numPaths
+    pv = pv / num_paths
     return pv
 
 ###############################################################################
@@ -70,10 +70,10 @@ def _barrierPayOneAtHitPVDown(s, H, r, dt):
 def _barrierPayOneAtHitPVUp(s, H, r, dt):
     """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
-    numPaths, numTimeSteps = s.shape
+    num_paths, numTimeSteps = s.shape
     pv = 0.0
 
-    for ip in range(0, numPaths):
+    for ip in range(0, num_paths):
         hitFlag = 0
 
         for it in range(0, numTimeSteps):
@@ -85,7 +85,7 @@ def _barrierPayOneAtHitPVUp(s, H, r, dt):
 
         pv = pv + v * hitFlag
 
-    pv = pv / numPaths
+    pv = pv / num_paths
     return pv
 
 ###############################################################################
@@ -94,10 +94,10 @@ def _barrierPayOneAtHitPVUp(s, H, r, dt):
 @njit(fastmath=True, cache=True)
 def _barrierPayAssetAtExpiryDownOut(s, H):
     """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
-    numPaths, numTimeSteps = s.shape
+    num_paths, numTimeSteps = s.shape
     pv = 0.0
 
-    for ip in range(0, numPaths):
+    for ip in range(0, num_paths):
         hitFlag = 1
 
         for it in range(0, numTimeSteps):
@@ -107,7 +107,7 @@ def _barrierPayAssetAtExpiryDownOut(s, H):
 
         pv = pv + hitFlag * s[ip][numTimeSteps-1]
 
-    pv = pv / numPaths
+    pv = pv / num_paths
     return pv
 
 ###############################################################################
@@ -117,10 +117,10 @@ def _barrierPayAssetAtExpiryDownOut(s, H):
 def _barrierPayAssetAtExpiryUpOut(s, H):
     """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
-    numPaths, numTimeSteps = s.shape
+    num_paths, numTimeSteps = s.shape
     pv = 0.0
 
-    for ip in range(0, numPaths):
+    for ip in range(0, num_paths):
         hitFlag = 1
 
         for it in range(0, numTimeSteps):
@@ -130,7 +130,7 @@ def _barrierPayAssetAtExpiryUpOut(s, H):
 
         pv = pv + hitFlag * s[ip][numTimeSteps-1]
 
-    pv = pv / numPaths
+    pv = pv / num_paths
     return pv
 
 ###############################################################################
@@ -152,7 +152,7 @@ class FinFXOneTouchOption(FinEquityOption):
         """ Create the one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash . """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._optionType = optionType
@@ -164,8 +164,8 @@ class FinFXOneTouchOption(FinEquityOption):
     def value(self,
               valuation_date: Date,
               spotFXRate: (float, np.ndarray),
-              domCurve: FinDiscountCurve,
-              forCurve: FinDiscountCurve,
+              domCurve: DiscountCurve,
+              forCurve: DiscountCurve,
               model):
         """ FX One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -398,11 +398,11 @@ class FinFXOneTouchOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                domCurve: FinDiscountCurve,
-                forCurve: FinDiscountCurve,
+                stock_price: float,
+                domCurve: DiscountCurve,
+                forCurve: DiscountCurve,
                 model,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 num_steps_per_year: int = 252,
                 seed: int = 4242):
         """ Touch Option valuation using the Black-Scholes model and Monte
@@ -422,10 +422,10 @@ class FinFXOneTouchOption(FinEquityOption):
         dt = t / numTimeSteps
 
         v = model._volatility
-        s0 = stockPrice
+        s0 = stock_price
         mu = rd - rf
 
-        s = getPaths(numPaths, numTimeSteps, t, mu, s0, v, seed)
+        s = getPaths(num_paths, numTimeSteps, t, mu, s0, v, seed)
 
         H = self._barrierPrice
         X = self._paymentSize

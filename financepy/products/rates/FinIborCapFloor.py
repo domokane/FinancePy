@@ -8,24 +8,24 @@
 
 from typing import Optional
 
-from ...utils.Date import Date
-from ...utils.Calendar import Calendar
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinDateGenRuleTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION
+from ...utils.date import Date
+from ...utils.calendar import Calendar
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION
 from ...utils.FinError import FinError
-from ...utils.Schedule import Schedule
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...models.FinModelBlack import FinModelBlack
-from ...models.FinModelBlackShifted import FinModelBlackShifted
-from ...models.FinModelBachelier import FinModelBachelier
-from ...models.FinModelSABR import FinModelSABR
-from ...models.FinModelSABRShifted import FinModelSABRShifted
-from ...models.FinModelRatesHW import FinModelRatesHW
+from ...utils.schedule import Schedule
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...models.black import FinModelBlack
+from ...models.black_shifted import FinModelBlackShifted
+from ...models.bachelier import FinModelBachelier
+from ...models.sabr import FinModelSABR
+from ...models.sabr_shifted import FinModelSABRShifted
+from ...models.rates_hull_white_tree import FinModelRatesHW
 from ...utils.FinGlobalTypes import FinCapFloorTypes, FinOptionTypes
 
 ##########################################################################
@@ -54,15 +54,15 @@ class FinIborCapFloor():
                  optionType: FinCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360_ISDA,
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialise FinIborCapFloor object. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
@@ -109,7 +109,7 @@ class FinIborCapFloor():
                             self._bus_day_adjust_type,
                             self._date_gen_rule_type)
 
-        self._capFloorLetDates = schedule._adjustedDates
+        self._capFloorLetDates = schedule._adjusted_dates
 
 ##########################################################################
 
@@ -145,23 +145,23 @@ class FinIborCapFloor():
         end_date = self._capFloorLetDates[1]
 
         if self._lastFixing is None:
-            fwdRate = libor_curve.fwdRate(start_date, end_date,
+            fwd_rate = libor_curve.fwd_rate(start_date, end_date,
                                          self._day_count_type)
         else:
-            fwdRate = self._lastFixing
+            fwd_rate = self._lastFixing
 
         alpha = self._day_counter.year_frac(start_date, end_date)[0]
         df = libor_curve.df(end_date)
 
         if self._optionType == FinCapFloorTypes.CAP:
-            capFloorLetValue = df * alpha * max(fwdRate - strikeRate, 0.0)
+            capFloorLetValue = df * alpha * max(fwd_rate - strikeRate, 0.0)
         elif self._optionType == FinCapFloorTypes.FLOOR:
-            capFloorLetValue = df * alpha * max(strikeRate - fwdRate, 0.0)
+            capFloorLetValue = df * alpha * max(strikeRate - fwd_rate, 0.0)
 
         capFloorLetValue *= self._notional
         capFloorValue += capFloorLetValue
 
-        self._capFloorLetFwdRates.append(fwdRate)
+        self._capFloorLetFwdRates.append(fwd_rate)
         self._capFloorLetValues.append(capFloorLetValue)
         self._capFloorLetAlphas.append(alpha)
         self._capFloorLetIntrinsic.append(capFloorLetValue)
@@ -175,13 +175,13 @@ class FinIborCapFloor():
             alpha = self._day_counter.year_frac(start_date, end_date)[0]
 
             df = libor_curve.df(end_date)
-            fwdRate = libor_curve.fwdRate(start_date, end_date,
+            fwd_rate = libor_curve.fwd_rate(start_date, end_date,
                                          self._day_count_type)
 
             if self._optionType == FinCapFloorTypes.CAP:
-                intrinsicValue = df * alpha * max(fwdRate - strikeRate, 0.0)
+                intrinsicValue = df * alpha * max(fwd_rate - strikeRate, 0.0)
             elif self._optionType == FinCapFloorTypes.FLOOR:
-                intrinsicValue = df * alpha * max(strikeRate - fwdRate, 0.0)
+                intrinsicValue = df * alpha * max(strikeRate - fwd_rate, 0.0)
 
             intrinsicValue *= self._notional
 
@@ -193,7 +193,7 @@ class FinIborCapFloor():
 
             capFloorValue += capFloorLetValue
 
-            self._capFloorLetFwdRates.append(fwdRate)
+            self._capFloorLetFwdRates.append(fwd_rate)
             self._capFloorLetValues.append(capFloorLetValue)
             self._capFloorLetAlphas.append(alpha)
             self._capFloorLetIntrinsic.append(intrinsicValue)
@@ -216,7 +216,7 @@ class FinIborCapFloor():
 
         alpha = self._day_counter.year_frac(capletStartDate, capletEndDate)[0]
 
-        f = libor_curve.fwdRate(capletStartDate, capletEndDate,
+        f = libor_curve.fwd_rate(capletStartDate, capletEndDate,
                                self._day_count_type)
 
         k = self._strikeRate
@@ -279,10 +279,10 @@ class FinIborCapFloor():
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face_amount = 1.0
             dfTimes = libor_curve._times
-            dfValues = libor_curve._dfs
+            df_values = libor_curve._dfs
 
             v = model.optionOnZCB(texp, tmat, strikePrice, face_amount,
-                                  dfTimes, dfValues)
+                                  dfTimes, df_values)
 
             # we divide by alpha to offset the multiplication above
             if self._optionType == FinCapFloorTypes.CAP:

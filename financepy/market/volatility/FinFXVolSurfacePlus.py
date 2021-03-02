@@ -9,30 +9,30 @@ import matplotlib.pyplot as plt
 from numba import njit, float64, int64
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...models.black_scholes import FinModelBlackScholes
 
-from ...models.FinModelVolatilityFns import volFunctionClark
-from ...models.FinModelVolatilityFns import volFunctionBloomberg
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
-from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
-from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
+from ...models.volatility_fns import volFunctionClark
+from ...models.volatility_fns import volFunctionBloomberg
+from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.sabr import volFunctionSABR
+from ...models.sabr import volFunctionSABR_BETA_ONE
+from ...models.sabr import volFunctionSABR_BETA_HALF
 
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
+from ...models.volatility_fns import FinVolFunctionTypes
 
-from ...utils.Math import norminvcdf
+from ...utils.fin_math import norminvcdf
 
-from ...models.FinModelBlackScholesAnalytical import bsValue
+from ...models.black_scholes_analytic import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
 from ...utils.FinDistribution import FinDistribution
 
@@ -859,8 +859,8 @@ class FinFXVolSurfacePlus():
                  spotFXRate: float,
                  currencyPair: str,
                  notionalCurrency: str,
-                 domDiscountCurve: FinDiscountCurve,
-                 forDiscountCurve: FinDiscountCurve,
+                 domDiscountCurve: DiscountCurve,
+                 forDiscountCurve: DiscountCurve,
                  tenors: (list),
                  atmVols: (list, np.ndarray),
                  mktStrangle25DeltaVols: (list, np.ndarray),
@@ -891,7 +891,7 @@ class FinFXVolSurfacePlus():
         if riskReversal25DeltaVols is None:
             riskReversal25DeltaVols = []
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
         self._spotFXRate = spotFXRate

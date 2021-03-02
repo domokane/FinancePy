@@ -5,11 +5,11 @@
 import numpy as np
 
 
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinGlobalTypes import FinLongShort
 from ...utils.FinError import FinError
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 # ADD START DATE TO CLASS ?
@@ -27,7 +27,7 @@ class FinEquityForward():
         """ Creates a FinEquityForward which allows the owner to buy the stock
         at a price agreed today. Need to specify if LONG or SHORT."""
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._forwardPrice = forwardPrice
@@ -38,7 +38,7 @@ class FinEquityForward():
 
     def value(self,
               valuation_date,
-              stockPrice,  # Current stock price
+              stock_price,  # Current stock price
               discount_curve,
               dividendCurve):
         """ Calculate the value of an equity forward contract from the stock
@@ -49,7 +49,7 @@ class FinEquityForward():
         else:
             t = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if np.any(t < 0.0):
@@ -58,7 +58,7 @@ class FinEquityForward():
         t = np.maximum(t, 1e-10)
 
         fwdStockPrice = self.forward(valuation_date,
-                                     stockPrice,
+                                     stock_price,
                                      discount_curve,
                                      dividendCurve)
 
@@ -76,7 +76,7 @@ class FinEquityForward():
 
     def forward(self,
                 valuation_date,
-                stockPrice,  # Current stock price
+                stock_price,  # Current stock price
                 discount_curve,
                 dividendCurve):
         """ Calculate the forward price of the equity forward contract. """
@@ -86,7 +86,7 @@ class FinEquityForward():
         else:
             t = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("spotFXRate must be greater than zero.")
 
         if np.any(t < 0.0):
@@ -97,7 +97,7 @@ class FinEquityForward():
         discountDF = discount_curve._df(t)
         dividendDF = dividendCurve._df(t)
 
-        fwdStockPrice = stockPrice * dividendDF / discountDF
+        fwdStockPrice = stock_price * dividendDF / discountDF
         return fwdStockPrice
 
 ###############################################################################

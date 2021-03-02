@@ -6,18 +6,18 @@
 from math import exp, log, sqrt
 
 
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes, FinDateGenRuleTypes
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...utils.Math import ONE_MILLION, INVROOT2PI, N
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_variables import gDaysInYear
+from ...utils.fin_math import ONE_MILLION, INVROOT2PI, N
 from ...utils.FinError import FinError
-from ...products.credit.FinCDSCurve import FinCDSCurve
-from ...products.credit.FinCDS import FinCDS
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Date import Date
-from ...utils.FinHelperFunctions import labelToString
+from ...products.credit.cds_curve import FinCDSCurve
+from ...products.credit.cds import FinCDS
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import Date
+from ...utils.helper_functions import labelToString
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -36,15 +36,15 @@ class FinCDSIndexOption(object):
                  strikeCoupon: float,
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract."""
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if expiry_date > maturity_date:
             raise FinError("Expiry date after end date")
@@ -289,16 +289,16 @@ class FinCDSIndexOption(object):
         dz = 0.2
         numZSteps = int(2.0 * abs(z) / dz)
 
-        flow_dates = self._cdsContract._adjustedDates
-        numFlows = len(flow_dates)
+        flow_dates = self._cdsContract._adjusted_dates
+        num_flows = len(flow_dates)
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         dfToExpiry = libor_curve.df(self._expiry_date)
         lgd = 1.0 - indexRecovery
 
-        fwdDfs = [1.0] * (numFlows)
-        expiryToFlowTimes = [1.0] * (numFlows)
+        fwdDfs = [1.0] * (num_flows)
+        expiryToFlowTimes = [1.0] * (num_flows)
 
-        for iFlow in range(1, numFlows):
+        for iFlow in range(1, num_flows):
             expiryToFlowTimes[iFlow] = (
                 flow_dates[iFlow] - self._expiry_date) / gDaysInYear
             fwdDfs[iFlow] = libor_curve.df(flow_dates[iFlow]) / dfToExpiry
@@ -319,7 +319,7 @@ class FinCDSIndexOption(object):
             z = z + dz
 
             fwdRPV01 = 0.0
-            for iFlow in range(1, numFlows):
+            for iFlow in range(1, num_flows):
                 acc_factor = self._cdsContract._accrualFactors[iFlow]
                 survivalProbability = exp(-s * expiryToFlowTimes[iFlow] / lgd)
                 fwdRPV01 += acc_factor * survivalProbability * fwdDfs[iFlow]
@@ -339,7 +339,7 @@ class FinCDSIndexOption(object):
 
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
-        cashflows """
+        cash flows """
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("MATURITY DATE", self._maturity_date)

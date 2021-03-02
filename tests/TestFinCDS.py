@@ -8,21 +8,21 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.FinCDS import FinCDS
-from financepy.utils.Math import ONE_MILLION
-from financepy.market.curves.FinInterpolator import FinInterpTypes
+from financepy.products.credit.cds import FinCDS
+from financepy.utils.fin_math import ONE_MILLION
+from financepy.market.curves.interpolator import FinInterpTypes
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.utils.FinGlobalVariables import gDaysInYear
-from financepy.utils.Calendar import FinBusDayAdjustTypes
-from financepy.utils.Calendar import FinDateGenRuleTypes
-from financepy.utils.Calendar import FinCalendarTypes
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.utils.global_variables import gDaysInYear
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -40,13 +40,13 @@ def test_CDSFastApproximation():
     times = np.linspace(0, 10.0, 11)
     r = 0.05
 
-    discountFactors = np.power((1.0 + r), -times)
+    discount_factors = np.power((1.0 + r), -times)
     dates = valuation_date.addYears(times)
 
-    libor_curve = FinDiscountCurve(valuation_date,
-                                  dates,
-                                  discountFactors,
-                                  FinInterpTypes.FLAT_FWD_RATES)
+    libor_curve = DiscountCurve(valuation_date,
+                                dates,
+                                discount_factors,
+                                FinInterpTypes.FLAT_FWD_RATES)
 
     ##########################################################################
 
@@ -124,12 +124,12 @@ def test_IssuerCurveBuild():
 
     times = np.linspace(0.0, 10.0, 11)
     r = 0.05
-    discountFactors = np.power((1.0 + r), -times)
+    discount_factors = np.power((1.0 + r), -times)
     dates = valuation_date.addYears(times)
-    libor_curve = FinDiscountCurve(valuation_date,
-                                  dates,
-                                  discountFactors,
-                                  FinInterpTypes.FLAT_FWD_RATES)
+    libor_curve = DiscountCurve(valuation_date,
+                                dates,
+                                discount_factors,
+                                FinInterpTypes.FLAT_FWD_RATES)
     recovery_rate = 0.40
 
     cds_contracts = []
@@ -184,7 +184,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     m = 1.0  # 0.00000000000
 
-    dcType = FinDayCountTypes.ACT_360
+    dcType = DayCountTypes.ACT_360
     depos = []
     depo1 = FinIborDeposit(valuation_date, "1D", m * 0.0220, dcType)
     depos.append(depo1)
@@ -216,8 +216,8 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     fras = []
 
     swaps = []
-    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360_ISDA
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
     maturity_date = settlement_date.addMonths(24)
     swap1 = FinIborSwap(
@@ -319,7 +319,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap10)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     cdsMarketContracts = []
 
@@ -373,7 +373,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 ##########################################################################
 
 
-def test_fullPriceCDS1():
+def test_full_priceCDS1():
 
     mktSpread = 0.040
 
@@ -409,7 +409,7 @@ def test_fullPriceCDS1():
     testCases.print("FULL_VALUE", v['full_pv'])
     testCases.print("CLEAN_VALUE", v['clean_pv'])
 
-    p = cdsContract.cleanPrice(valuation_date, issuer_curve, cdsRecovery)
+    p = cdsContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
     testCases.print("CLEAN_PRICE", p)
 
     # MARKIT PRICE IS 168517
@@ -472,7 +472,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     valuation_date = Date(24, 8, 2020)
     settlement_date = Date(24, 8, 2020)
-    dcType = FinDayCountTypes.ACT_360
+    dcType = DayCountTypes.ACT_360
     depos = []
 
     maturity_date = settlement_date.addMonths(1)
@@ -497,8 +497,8 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     depos.append(depo5)
 
     swaps = []
-    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360_ISDA
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
     maturity_date = settlement_date.addMonths(24)
     swap1 = FinIborSwap(
@@ -540,7 +540,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         dcType)
     swaps.append(swap4)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, [], swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, [], swaps)
 
     cdsCoupon = 0.01 + mktSpreadBump
 
@@ -590,7 +590,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 ##########################################################################
 
 
-def test_fullPriceCDSModelCheck():
+def test_full_priceCDSModelCheck():
 
     testCases.print("Example", "MARKIT CHECK 19 Aug 2020")
 
@@ -624,7 +624,7 @@ def test_fullPriceCDSModelCheck():
     testCases.print("FULL_VALUE", v['full_pv'])
     testCases.print("CLEAN_VALUE", v['clean_pv'])
 
-    p = cdsContract.cleanPrice(valuation_date, issuer_curve, cdsRecovery)
+    p = cdsContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
     testCases.print("CLEAN_PRICE", p)
 
     accrued_days = cdsContract.accrued_days()
@@ -670,7 +670,7 @@ def test_fullPriceCDSModelCheck():
 ##########################################################################
 
 
-def test_fullPriceCDSConvergence():
+def test_full_priceCDSConvergence():
 
     _, issuer_curve = buildFullIssuerCurve1(0.0, 0.0)
 
@@ -713,17 +713,17 @@ def test_CDSDateGeneration():
                          cdsCoupon,
                          ONE_MILLION,
                          True,
-                         FinFrequencyTypes.QUARTERLY,
-                         FinDayCountTypes.ACT_360,
-                         FinCalendarTypes.WEEKEND,
-                         FinBusDayAdjustTypes.FOLLOWING,
-                         FinDateGenRuleTypes.BACKWARD)
+                         FrequencyTypes.QUARTERLY,
+                         DayCountTypes.ACT_360,
+                         CalendarTypes.WEEKEND,
+                         BusDayAdjustTypes.FOLLOWING,
+                         DateGenRuleTypes.BACKWARD)
 
     testCases.header("Flow Date", "AccrualFactor", "Flow")
-    numFlows = len(cdsContract._adjustedDates)
-    for n in range(0, numFlows):
+    num_flows = len(cdsContract._adjusted_dates)
+    for n in range(0, num_flows):
         testCases.print(str(
-            cdsContract._adjustedDates[n]), cdsContract._accrualFactors[n],
+            cdsContract._adjusted_dates[n]), cdsContract._accrualFactors[n],
             cdsContract._flows[n])
 
 ##########################################################################
@@ -731,10 +731,10 @@ def test_CDSDateGeneration():
 
 
 test_CDSCurveBuildTiming()
-test_fullPriceCDSModelCheck()
+test_full_priceCDSModelCheck()
 test_CDSDateGeneration()
-test_fullPriceCDS1()
-test_fullPriceCDSConvergence()
+test_full_priceCDS1()
+test_full_priceCDSConvergence()
 test_CDSCurveRepricing()
 test_CDSFastApproximation()
 

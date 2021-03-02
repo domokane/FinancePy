@@ -7,15 +7,15 @@ import numpy as np
 from enum import Enum
 
 
-from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.global_variables import gDaysInYear, gSmall
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...utils.Math import NVect
+from ...utils.fin_math import NVect
 
 
 ###############################################################################
@@ -46,7 +46,7 @@ class FinEquityDigitalOption(FinEquityOption):
         or a EUROPEAN_PUT or an AMERICAN_CALL or AMERICAN_PUT. There are two
         types of underlying - cash or nothing and asset or nothing. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN CALL or EUROPEAN PUT")
@@ -60,9 +60,9 @@ class FinEquityDigitalOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: (float, np.ndarray),
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: (float, np.ndarray),
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Digital Option valuation using the Black-Scholes model assuming a
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
@@ -74,7 +74,7 @@ class FinEquityDigitalOption(FinEquityOption):
         t = (self._expiry_date - valuation_date) / gDaysInYear
         t = max(t, 1e-6)
 
-        S0 = stockPrice
+        S0 = stock_price
         X = self._barrierPrice
         lnS0k = np.log(S0 / X)
 
@@ -114,11 +114,11 @@ class FinEquityDigitalOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                discount_curve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 model,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 seed: int = 4242):
         """ Digital Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
@@ -134,12 +134,12 @@ class FinEquityDigitalOption(FinEquityOption):
 
         volatility = model._volatility
         K = self._barrierPrice
-        sqrtdt = np.sqrt(t)
+        sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, numPaths))
-        s = stockPrice * np.exp((r - q - volatility * volatility / 2.0) * t)
-        m = np.exp(g * sqrtdt * volatility)
+        g = np.random.normal(0.0, 1.0, size=(1, num_paths))
+        s = stock_price * np.exp((r - q - volatility * volatility / 2.0) * t)
+        m = np.exp(g * sqrt_dt * volatility)
 
         s_1 = s * m
         s_2 = s / m

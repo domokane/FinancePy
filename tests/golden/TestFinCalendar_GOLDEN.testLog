@@ -2,7 +2,7 @@ File Created on:20210208_162724
 BANNER,================================
 BANNER,================================
 HEADER,CALENDAR,HOLIDAY,
-RESULTS,STARTING,FinCalendarTypes.NONE,
+RESULTS,STARTING,CalendarTypes.NONE,
 BANNER,================================
 BANNER,================================
 BANNER,================================
@@ -16,7 +16,7 @@ BANNER,================================
 BANNER,================================
 BANNER,================================
 HEADER,CALENDAR,HOLIDAY,
-RESULTS,STARTING,FinCalendarTypes.WEEKEND,
+RESULTS,STARTING,CalendarTypes.WEEKEND,
 BANNER,================================
 RESULTS,WEEKEND,SAT JAN 02 2021,
 RESULTS,WEEKEND,SUN JAN 03 2021,
@@ -1074,7 +1074,7 @@ RESULTS,WEEKEND,SUN DEC 29 2030,
 BANNER,================================
 BANNER,================================
 HEADER,CALENDAR,HOLIDAY,
-RESULTS,STARTING,FinCalendarTypes.AUSTRALIA,
+RESULTS,STARTING,CalendarTypes.AUSTRALIA,
 BANNER,================================
 RESULTS,AUSTRALIA,FRI JAN 01 2021,
 RESULTS,AUSTRALIA,TUE JAN 26 2021,
@@ -1195,7 +1195,7 @@ RESULTS,AUSTRALIA,THU DEC 26 2030,
 BANNER,================================
 BANNER,================================
 HEADER,CALENDAR,HOLIDAY,
-RESULTS,STARTING,FinCalendarTypes.CANADA,
+RESULTS,STARTING,CalendarTypes.CANADA,
 BANNER,================================
 RESULTS,CANADA,FRI JAN 01 2021,
 RESULTS,CANADA,MON FEB 15 2021,
@@ -1332,7 +1332,7 @@ RESULTS,CANADA,THU DEC 26 2030,
 BANNER,================================
 BANNER,================================
 HEADER,CALENDAR,HOLIDAY,
-RESULTS,STARTING,FinCalendarTypes.FRANCE,
+RESULTS,STARTING,CalendarTypes.FRANCE,
 BANNER,================================
 RESULTS,FRANCE,FRI JAN 01 2021,
 RESULTS,FRANCE,FRI APR 02 2021,

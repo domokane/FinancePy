@@ -5,10 +5,10 @@
 
 from enum import Enum
 
-from ...utils.FinGlobalVariables import gDaysInYear
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.Date import Date
+from ...utils.global_variables import gDaysInYear
+from ...models.black_scholes import FinModelBlackScholes
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.date import Date
 
 ###############################################################################
 
@@ -31,8 +31,8 @@ class FinEquityOption(object):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
               dividendYield: float,
               model):
 
@@ -43,16 +43,16 @@ class FinEquityOption(object):
 
     def delta(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Calculation of option delta by perturbation of stock price and
         revaluation. """
-        v = self.value(valuation_date, stockPrice, discount_curve,
+        v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
-        vBumped = self.value(valuation_date, stockPrice + bump, discount_curve,
+        vBumped = self.value(valuation_date, stock_price + bump, discount_curve,
                              dividendCurve, model)
 
         delta = (vBumped - v) / bump
@@ -62,20 +62,20 @@ class FinEquityOption(object):
 
     def gamma(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Calculation of option gamma by perturbation of stock price and
         revaluation. """
 
-        v = self.value(valuation_date, stockPrice, discount_curve,
+        v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
-        vBumpedDn = self.value(valuation_date, stockPrice - bump, discount_curve,
+        vBumpedDn = self.value(valuation_date, stock_price - bump, discount_curve,
                                dividendCurve, model)
 
-        vBumpedUp = self.value(valuation_date, stockPrice + bump, discount_curve,
+        vBumpedUp = self.value(valuation_date, stock_price + bump, discount_curve,
                                dividendCurve, model)
 
         gamma = (vBumpedUp - 2.0 * v + vBumpedDn) / bump / bump
@@ -85,18 +85,18 @@ class FinEquityOption(object):
 
     def vega(self,
              valuation_date: Date,
-             stockPrice: float,
-             discount_curve: FinDiscountCurve,
-             dividendCurve: FinDiscountCurve,
+             stock_price: float,
+             discount_curve: DiscountCurve,
+             dividendCurve: DiscountCurve,
              model):
         """ Calculation of option vega by perturbing vol and revaluation. """
 
-        v = self.value(valuation_date, stockPrice, discount_curve,
+        v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
         model = FinModelBlackScholes(model._volatility + bump)
 
-        vBumped = self.value(valuation_date, stockPrice, discount_curve,
+        vBumped = self.value(valuation_date, stock_price, discount_curve,
                              dividendCurve, model)
 
         vega = (vBumped - v) / bump
@@ -106,15 +106,15 @@ class FinEquityOption(object):
 
     def theta(self,
               valuation_date: Date,
-              stockPrice: float,
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ Calculation of option theta by perturbing value date by one 
         calendar date (not a business date) and then doing revaluation and 
         calculating the difference divided by dt = 1 / gDaysInYear. """
 
-        v = self.value(valuation_date, stockPrice, 
+        v = self.value(valuation_date, stock_price,
                        discount_curve,
                        dividendCurve, model)
 
@@ -125,7 +125,7 @@ class FinEquityOption(object):
         discount_curve._valuation_date = nextDate
         bump = (nextDate - valuation_date) / gDaysInYear
 
-        vBumped = self.value(nextDate, stockPrice, 
+        vBumped = self.value(nextDate, stock_price,
                              discount_curve,
                              dividendCurve, model)
 
@@ -137,17 +137,17 @@ class FinEquityOption(object):
 
     def rho(self,
             valuation_date: Date,
-            stockPrice: float,
-            discount_curve: FinDiscountCurve,
-            dividendCurve: FinDiscountCurve,
+            stock_price: float,
+            discount_curve: DiscountCurve,
+            dividendCurve: DiscountCurve,
             model):
         """ Calculation of option rho by perturbing interest rate and
         revaluation. """
 
-        v = self.value(valuation_date, stockPrice, discount_curve,
+        v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
-        vBumped = self.value(valuation_date, stockPrice, discount_curve.bump(bump),
+        vBumped = self.value(valuation_date, stock_price, discount_curve.bump(bump),
                              dividendCurve, model)
 
         rho = (vBumped - v) / bump

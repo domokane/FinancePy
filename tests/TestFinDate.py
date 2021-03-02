@@ -8,9 +8,9 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date, dateRange
-from financepy.utils.Date import FinDateFormatTypes
-from financepy.utils.Date import setDateFormatType
+from financepy.utils.date import Date, dateRange
+from financepy.utils.date import FinDateFormatTypes
+from financepy.utils.date import setDateFormatType
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -160,10 +160,10 @@ def test_FinDateAddYears():
 
 def test_FinDateSpeed():
 
-    numSteps = 100
+    num_steps = 100
     start = time.time()
     dateList = []
-    for _ in range(0, numSteps):
+    for _ in range(0, num_steps):
         start_date = Date(1, 1, 2010)
         dateList.append(start_date)
     end = time.time()

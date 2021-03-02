@@ -9,32 +9,32 @@ import matplotlib.pyplot as plt
 from numba import jit, njit, float64, int64
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
 from ...utils.FinGlobalTypes import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...models.black_scholes import FinModelBlackScholes
 
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
-from ...models.FinModelVolatilityFns import volFunctionClark
-from ...models.FinModelVolatilityFns import volFunctionBloomberg
-from ...models.FinModelVolatilityFns import volFunctionSVI
-from ...models.FinModelVolatilityFns import volFunctionSSVI
-from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import volFunctionSABR_BETA_HALF
-from ...models.FinModelSABR import volFunctionSABR_BETA_ONE
+from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import volFunctionClark
+from ...models.volatility_fns import volFunctionBloomberg
+from ...models.volatility_fns import volFunctionSVI
+from ...models.volatility_fns import volFunctionSSVI
+from ...models.sabr import volFunctionSABR
+from ...models.sabr import volFunctionSABR_BETA_HALF
+from ...models.sabr import volFunctionSABR_BETA_ONE
 
-from ...models.FinModelVolatilityFns import FinVolFunctionTypes
+from ...models.volatility_fns import FinVolFunctionTypes
 
-from ...utils.Math import norminvcdf
+from ...utils.fin_math import norminvcdf
 
-from ...models.FinModelBlackScholesAnalytical import bsValue
+from ...models.black_scholes_analytic import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
 from ...utils.FinDistribution import FinDistribution
 
@@ -399,7 +399,7 @@ class FinSwaptionVolSurface():
         """ Create the FinSwaptionVolSurface object by passing in market vol 
         data for a list of strikes and expiry dates. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
 
@@ -807,7 +807,7 @@ class FinSwaptionVolSurface():
 
             print("==========================================================")
             print("VALUE DATE:", self._valuation_date)
-            print("STOCK PRICE:", self._stockPrice)
+            print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
         K_dummy = 999
@@ -871,7 +871,7 @@ class FinSwaptionVolSurface():
     #         Ks = np.array(Ks)
     #         vols = np.array(vols)
 
-    #         density = optionImpliedDbn(self._stockPrice, t, r, q, Ks, vols)
+    #         density = optionImpliedDbn(self._stock_price, t, r, q, Ks, vols)
 
     #         dbn = FinDistribution(Ks, density)
     #         dbns.append(dbn)
@@ -930,7 +930,7 @@ class FinSwaptionVolSurface():
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("VALUE DATE", self._valuation_date)
-        s += labelToString("STOCK PRICE", self._stockPrice)
+        s += labelToString("STOCK PRICE", self._stock_price)
         s += labelToString("ATM METHOD", self._atmMethod)
         s += labelToString("DELTA METHOD", self._deltaMethod)
         s += labelToString("VOL FUNCTION", self._volatilityFunctionType)

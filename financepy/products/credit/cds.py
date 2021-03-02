@@ -15,9 +15,9 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import Frequency, FrequencyTypes
 from ...utils.global_variables import gDaysInYear
-from ...utils.Math import ONE_MILLION
+from ...utils.fin_math import ONE_MILLION
 from ...utils.helper_functions import labelToString, tableToString
-from ...market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
+from ...market.curves.interpolator import FinInterpTypes, _uinterpolate
 
 from ...utils.helper_functions import check_argument_types
 

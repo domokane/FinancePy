@@ -7,8 +7,8 @@ from numba import float64, int64, vectorize, njit
 from scipy import optimize
 
 from ..utils.FinGlobalTypes import FinOptionTypes
-from ..utils.FinGlobalVariables import gSmall
-from ..utils.Math import NVect, NPrimeVect
+from ..utils.global_variables import gSmall
+from ..utils.fin_math import NVect, NPrimeVect
 from ..utils.FinError import FinError
 from ..utils.FinSolvers1D import bisection, newton, newton_secant
 

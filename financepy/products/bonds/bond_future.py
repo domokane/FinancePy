@@ -3,7 +3,7 @@
 ###############################################################################
 
 from ...utils.global_variables import gDaysInYear
-from ...products.bonds.Bond import Bond
+from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.helper_functions import labelToString, check_argument_types
 
@@ -89,10 +89,10 @@ class BondFuture(object):
         if bond._accruedInterest is None:
             bond.calculate_flow_dates(settlement_date)
 
-        accd = bond._accruedInterest
+        accrued_interest= bond._accruedInterest
 
         pip = self.principalInvoicePrice(bond, futures_price)
-        accrued = accd * self._contractSize / 100.0
+        accrued = accrued_interest* self._contractSize / 100.0
         tia = pip + accrued
         tia = round(tia, 2)
         return tia

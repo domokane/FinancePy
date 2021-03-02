@@ -4,20 +4,20 @@
 
 import numpy as np
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gSmall
-from ...utils.FinHelperFunctions import labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import timesFromDates
+from ...utils.global_variables import gSmall
+from ...utils.helper_functions import labelToString
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helper_functions import check_argument_types
+from ...utils.frequency import FrequencyTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import timesFromDates
 
 ###############################################################################
 
 
-class FinDiscountCurvePoly(FinDiscountCurve):
+class DiscountCurvePoly(DiscountCurve):
     """ Zero Rate Curve of a specified frequency parametrised using a cubic
     polynomial. The zero rate is assumed to be continuously compounded but
     this can be amended by providing a frequency when extracting zero rates.
@@ -27,13 +27,13 @@ class FinDiscountCurvePoly(FinDiscountCurve):
     def __init__(self,
                  valuation_date: Date,
                  coefficients: (list, np.ndarray),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create zero rate curve parametrised using a cubic curve from
         coefficients and specifying a compounding frequency type and day count
         convention. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
         self._coefficients = coefficients
@@ -45,8 +45,8 @@ class FinDiscountCurvePoly(FinDiscountCurve):
 
     def zeroRate(self,
                  dts: (list, Date),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_360):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency according to
         polynomial parametrisation. This method overrides FinDiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
@@ -55,10 +55,10 @@ class FinDiscountCurvePoly(FinDiscountCurve):
         of dates so must use Numpy functions. The default frequency is a
         continuously compounded rate and ACT ACT day counting. """
 
-        if isinstance(freq_type, FinFrequencyTypes) is False:
+        if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(day_count_type, FinDayCountTypes) is False:
+        if isinstance(day_count_type, DayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention

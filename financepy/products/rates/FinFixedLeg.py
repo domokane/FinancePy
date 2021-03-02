@@ -3,16 +3,16 @@
 ##############################################################################
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.Math import ONE_MILLION
-from ...utils.DayCount import DayCount, FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes,  FinDateGenRuleTypes
-from ...utils.Calendar import Calendar, FinBusDayAdjustTypes
-from ...utils.Schedule import Schedule
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.date import Date
+from ...utils.fin_math import ONE_MILLION
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
+from ...utils.calendar import Calendar, BusDayAdjustTypes
+from ...utils.schedule import Schedule
+from ...utils.helper_functions import labelToString, check_argument_types
 from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 ##########################################################################
 
@@ -26,19 +26,19 @@ class FinFixedLeg(object):
                  end_date: (Date, str),  # Date contract ends
                  leg_type: FinSwapTypes,
                  coupon: (float),
-                 freq_type: FinFrequencyTypes,
-                 day_count_type: FinDayCountTypes,
+                 freq_type: FrequencyTypes,
+                 day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  principal: float = 0.0,
                  payment_lag: int = 0,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional.  """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if type(end_date) == Date:
             self._termination_date = end_date
@@ -94,7 +94,7 @@ class FinFixedLeg(object):
                             self._bus_day_adjust_type,
                             self._date_gen_rule_type)
 
-        scheduleDates = schedule._adjustedDates
+        scheduleDates = schedule._adjusted_dates
 
         if len(scheduleDates) < 2:
             raise FinError("Schedule has none or only one date")
@@ -141,7 +141,7 @@ class FinFixedLeg(object):
 
     def value(self,
               valuation_date: Date,
-              discount_curve: FinDiscountCurve):
+              discount_curve: DiscountCurve):
 
         self._paymentDfs = []
         self._paymentPVs = []
@@ -207,9 +207,9 @@ class FinFixedLeg(object):
         header += "    RATE      PAYMENT "
         print(header)
 
-        numFlows = len(self._payment_dates)
+        num_flows = len(self._payment_dates)
         
-        for iFlow in range(0, numFlows):
+        for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  %8.6f  %11.2f" %
                   (self._payment_dates[iFlow],
                    self._startAccruedDates[iFlow],
@@ -240,9 +240,9 @@ class FinFixedLeg(object):
         header += "    RATE      PAYMENT       DF          PV        CUM PV"
         print(header)
 
-        numFlows = len(self._payment_dates)
+        num_flows = len(self._payment_dates)
         
-        for iFlow in range(0, numFlows):
+        for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  %8.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
                   (self._payment_dates[iFlow],
                    self._startAccruedDates[iFlow],

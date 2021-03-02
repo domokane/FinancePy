@@ -7,14 +7,14 @@ import numpy as np
 
 ###############################################################################
 
-from ...utils.Date import Date
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.FinHelperFunctions import labelToString
-from ...utils.FinHelperFunctions import checkArgumentTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.FinHelperFunctions import timesFromDates
-from ...market.curves.FinInterpolator import FinInterpTypes
+from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.helper_functions import labelToString
+from ...utils.helper_functions import check_argument_types
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helper_functions import timesFromDates
+from ...market.curves.interpolator import FinInterpTypes
 
 ###############################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in
@@ -22,7 +22,7 @@ from ...market.curves.FinInterpolator import FinInterpTypes
 ###############################################################################
 
 
-class FinDiscountCurveFlat(FinDiscountCurve):
+class DiscountCurveFlat(DiscountCurve):
     """ A very simple discount curve based on a single zero rate with its
     own specified compounding method. Hence the curve is assumed to be flat.
     It is used for quick and dirty analysis and when limited information is
@@ -33,8 +33,8 @@ class FinDiscountCurveFlat(FinDiscountCurve):
     def __init__(self,
                  valuation_date: Date,
                  flatRate: (float, np.ndarray),
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.CONTINUOUS,
-                 day_count_type: FinDayCountTypes = FinDayCountTypes.ACT_ACT_ISDA):
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date a rate and a compound
         frequency. As we have entered a rate, a corresponding day count
@@ -42,7 +42,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         As the curve is flat, no interpolation scheme is required.
         """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._valuation_date = valuation_date
         self._flatRate = flatRate
@@ -50,7 +50,7 @@ class FinDiscountCurveFlat(FinDiscountCurve):
         self._day_count_type = day_count_type
 
         # This is used by some inherited functions so we choose the simplest
-        self._interpType = FinInterpTypes.FLAT_FWD_RATES
+        self._interp_type = FinInterpTypes.FLAT_FWD_RATES
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
@@ -63,15 +63,15 @@ class FinDiscountCurveFlat(FinDiscountCurve):
 ###############################################################################
 
     def bump(self,
-             bumpSize: float):
+             bump_size: float):
         """ Creates a new FinDiscountCurveFlat object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
-        rBumped = self._flatRate + bumpSize
-        discCurve = FinDiscountCurveFlat(self._valuation_date,
-                                         rBumped,
-                                         freq_type=self._freq_type,
-                                         day_count_type=self._day_count_type)
+        rBumped = self._flatRate + bump_size
+        discCurve = DiscountCurveFlat(self._valuation_date,
+                                      rBumped,
+                                      freq_type=self._freq_type,
+                                      day_count_type=self._day_count_type)
         return discCurve
 
 ###############################################################################

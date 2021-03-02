@@ -2,14 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.Date import Date
+from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.Calendar import Calendar
-from ...utils.Calendar import FinCalendarTypes
-from ...utils.Calendar import FinBusDayAdjustTypes
-from ...utils.DayCount import DayCount
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.calendar import Calendar
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.day_count import DayCount
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 
@@ -37,11 +37,11 @@ class FinIborDeposit(object):
     def __init__(self,
                  start_date: Date,  #  When the interest starts to accrue
                  maturity_date_or_tenor: (Date, str),  # Repayment of interest
-                 depositRate: float,  # MM rate using simple interest
-                 day_count_type: FinDayCountTypes,  # How year fraction is calculated
+                 deposit_rate: float,  # MM rate using simple interest
+                 day_count_type: DayCountTypes,  # How year fraction is calculated
                  notional: float = 100.0,  # Amount borrowed
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,  #  Holidays for maturity date
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,  #  Holidays for maturity date
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
         deposit rate. If a tenor is used then this is added to the start
@@ -50,7 +50,7 @@ class FinIborDeposit(object):
         the start date you add the spot business days to the trade date
         which usually today. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
@@ -69,7 +69,7 @@ class FinIborDeposit(object):
 
         self._start_date = start_date
         self._maturity_date = maturity_date
-        self._depositRate = depositRate
+        self._deposit_rate = deposit_rate
         self._day_count_type = day_count_type
         self._notional = notional
 
@@ -82,7 +82,7 @@ class FinIborDeposit(object):
 
         dc = DayCount(self._day_count_type)
         acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        discountFactor = 1.0 / (1.0 + acc_factor * self._depositRate)
+        discountFactor = 1.0 / (1.0 + acc_factor * self._deposit_rate)
         return discountFactor
 
     ###########################################################################
@@ -102,7 +102,7 @@ class FinIborDeposit(object):
         df_settle = libor_curve.df(self._start_date)
         df_maturity = libor_curve.df(self._maturity_date)
 
-        value = (1.0 + acc_factor * self._depositRate) * self._notional
+        value = (1.0 + acc_factor * self._deposit_rate) * self._notional
 
         # Need to take into account spot days being zero so depo settling fwd
         value = value * df_maturity / df_settle
@@ -117,7 +117,7 @@ class FinIborDeposit(object):
 
         dc = DayCount(self._day_count_type)
         acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        flow = (1.0 + acc_factor * self._depositRate) * self._notional
+        flow = (1.0 + acc_factor * self._deposit_rate) * self._notional
         print(self._maturity_date, flow)
 
     ###########################################################################
@@ -128,7 +128,7 @@ class FinIborDeposit(object):
         s += labelToString("START DATE", self._start_date)
         s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("DEPOSIT RATE", self._depositRate)
+        s += labelToString("DEPOSIT RATE", self._deposit_rate)
         s += labelToString("DAY COUNT TYPE", self._day_count_type)
         s += labelToString("CALENDAR", self._calendar_type)
         s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)

@@ -8,19 +8,19 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.bonds.FinBond import FinBond
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.FinGlobalVariables import gDaysInYear
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.models.FinModelRatesBDT import FinModelRatesBDT
-from financepy.utils.FinHelperFunctions import printTree
+from financepy.models.black import FinModelBlack
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_variables import gDaysInYear
+from financepy.market.curves.FinDiscountCurveZeros import DiscountCurveZeros
+from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.utils.helper_functions import printTree
 from financepy.utils.FinGlobalTypes import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -37,16 +37,16 @@ def testBlackModelCheck():
     # Expect a price around 122 cents which is what I find.
 
     valuation_date = Date(1, 1, 2020)
-    libor_curve = FinDiscountCurveFlat(valuation_date, 0.06,
-                                      FinFrequencyTypes.SEMI_ANNUAL)
+    libor_curve = DiscountCurveFlat(valuation_date, 0.06,
+                                    FrequencyTypes.SEMI_ANNUAL)
 
     settlement_date = Date(1, 1, 2020)
     exerciseDate = Date(1, 1, 2021)
     maturity_date = Date(1, 1, 2024)
 
     fixedCoupon = 0.06
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     # Pricing a PAY
@@ -83,10 +83,10 @@ def test_BDTExampleOne():
     testCases.header("RATES")
     testCases.print(zeroRates)
 
-    curve = FinDiscountCurveZeros(valuation_date,
-                                  zeroDates,
-                                  zeroRates,
-                                  FinFrequencyTypes.ANNUAL)
+    curve = DiscountCurveZeros(valuation_date,
+                               zeroDates,
+                               zeroRates,
+                               FrequencyTypes.ANNUAL)
 
     yieldVol = 0.16
 
@@ -118,31 +118,31 @@ def test_BDTExampleTwo():
     expiry_date = settlement_date.addTenor("18m")
     maturity_date = settlement_date.addTenor("10Y")
     coupon = 0.05
-    freq_type = FinFrequencyTypes.SEMI_ANNUAL
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
-    bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
-    couponTimes = []
-    couponFlows = []
+    coupon_times = []
+    coupon_flows = []
     cpn = bond._coupon/bond._frequency
-    numFlows = len(bond._flow_dates)
+    num_flows = len(bond._flow_dates)
 
-    for i in range(1, numFlows):
+    for i in range(1, num_flows):
         pcd = bond._flow_dates[i-1]
         ncd = bond._flow_dates[i]
         if pcd < settlement_date and ncd > settlement_date:
-            flowTime = (pcd - settlement_date) / gDaysInYear
-            couponTimes.append(flowTime)
-            couponFlows.append(cpn)
+            flow_time = (pcd - settlement_date) / gDaysInYear
+            coupon_times.append(flow_time)
+            coupon_flows.append(cpn)
 
     for flowDate in bond._flow_dates:
         if flowDate > settlement_date:
-            flowTime = (flowDate - settlement_date) / gDaysInYear
-            couponTimes.append(flowTime)
-            couponFlows.append(cpn)
+            flow_time = (flowDate - settlement_date) / gDaysInYear
+            coupon_times.append(flow_time)
+            coupon_flows.append(cpn)
 
-    couponTimes = np.array(couponTimes)
-    couponFlows = np.array(couponFlows)
+    coupon_times = np.array(coupon_times)
+    coupon_flows = np.array(coupon_flows)
 
     strikePrice = 105.0
     face = 100.0
@@ -156,30 +156,30 @@ def test_BDTExampleTwo():
     testCases.header("LABEL", "VALUES")
     testCases.print("TIMES:", times)
 
-    curve = FinDiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settlement_date, dates, dfs)
 
-    price = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
+    price = bond.clean_price_from_discount_curve(settlement_date, curve)
     testCases.print("Fixed Income Price:", price)
 
     sigma = 0.20
 
     # Test convergence
-    numStepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    num_stepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exerciseType = FinExerciseTypes.AMERICAN
 
     testCases.header("Values")
     treeVector = []
-    for numTimeSteps in numStepsList:
+    for numTimeSteps in num_stepsList:
         model = FinModelRatesBDT(sigma, numTimeSteps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strikePrice,
-                             face, couponTimes, couponFlows, exerciseType)
+                             face, coupon_times, coupon_flows, exerciseType)
 
         testCases.print(v)
         treeVector.append(v['call'])
 
     if PLOT_GRAPHS:
-        plt.plot(numStepsList, treeVector)
+        plt.plot(num_stepsList, treeVector)
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
 
@@ -206,11 +206,11 @@ def test_BDTExampleThree():
     dates = settlement_date.addYears(times)
     rate = 0.06
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
-    curve = FinDiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settlement_date, dates, dfs)
 
     coupon = 0.06
-    freq_type = FinFrequencyTypes.SEMI_ANNUAL
-    accrual_type = FinDayCountTypes.ACT_ACT_ICMA
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
     strikePrice = 100.0
     face = 100.0
     # Andersen paper
@@ -241,21 +241,21 @@ def test_BDTExampleThree():
                 tmat = (maturity_date - settlement_date) / gDaysInYear
                 texp = (expiry_date - settlement_date) / gDaysInYear
 
-                bond = FinBond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+                bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
-                couponTimes = []
-                couponFlows = []
+                coupon_times = []
+                coupon_flows = []
                 cpn = bond._coupon/bond._frequency
                 for flowDate in bond._flow_dates:
                     if flowDate > expiry_date:
-                        flowTime = (flowDate - settlement_date) / gDaysInYear
-                        couponTimes.append(flowTime)
-                        couponFlows.append(cpn)
+                        flow_time = (flowDate - settlement_date) / gDaysInYear
+                        coupon_times.append(flow_time)
+                        coupon_flows.append(cpn)
 
-                couponTimes = np.array(couponTimes)
-                couponFlows = np.array(couponFlows)
+                coupon_times = np.array(coupon_times)
+                coupon_flows = np.array(coupon_flows)
 
-                price = bond.cleanPriceFromDiscountCurve(settlement_date, curve)
+                price = bond.clean_price_from_discount_curve(settlement_date, curve)
 
                 model = FinModelRatesBDT(sigma, numTimeSteps)
                 model.buildTree(tmat, times, dfs)
@@ -264,8 +264,8 @@ def test_BDTExampleThree():
                                            tmat,
                                            strikePrice,
                                            face,
-                                           couponTimes,
-                                           couponFlows,
+                                           coupon_times,
+                                           coupon_flows,
                                            exerciseType)
 
                 testCases.print("%s" % exerciseType,

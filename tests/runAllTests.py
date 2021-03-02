@@ -10,7 +10,7 @@ import glob
 from os.path import dirname, basename, join
 
 from financepy.utils.FinError import FinError
-from financepy.utils.Date import setDateFormatType, FinDateFormatTypes
+from financepy.utils.date import setDateFormatType, FinDateFormatTypes
 setDateFormatType(FinDateFormatTypes.UK_LONG)
 
 # I put this here to get the library loaded and header printed before loop

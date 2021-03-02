@@ -7,10 +7,10 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
+from financepy.utils.date import Date
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.products.equity.FinEquityVarianceSwap import FinEquityVarianceSwap
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -34,9 +34,9 @@ def test_FinEquityVarianceSwap():
     volSwap = FinEquityVarianceSwap(start_date, tenor, strike)
 
     valuation_date = Date(20, 3, 2018)
-    stockPrice = 100.0
+    stock_price = 100.0
     dividendYield = 0.0
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
 
     maturity_date = start_date.addMonths(3)
 
@@ -52,19 +52,19 @@ def test_FinEquityVarianceSwap():
     numPutOptions = 10
     r = 0.05
 
-    discount_curve = FinDiscountCurveFlat(valuation_date, r)
+    discount_curve = DiscountCurveFlat(valuation_date, r)
 
     useForward = False
 
     testCases.header("LABEL", "VALUE")
 
-    k1 = volSwap.fairStrike(valuation_date, stockPrice, dividendCurve,
+    k1 = volSwap.fairStrike(valuation_date, stock_price, dividendCurve,
                             volCurve, numCallOptions, numPutOptions,
                             strikeSpacing, discount_curve, useForward)
 
     testCases.print("REPLICATION VARIANCE:", k1)
 
-    k2 = volSwap.fairStrikeApprox(valuation_date, stockPrice, strikes, vols)
+    k2 = volSwap.fairStrikeApprox(valuation_date, stock_price, strikes, vols)
     testCases.print("DERMAN SKEW APPROX for K:", k2)
 
 ##########################################################################

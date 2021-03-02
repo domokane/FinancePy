@@ -6,11 +6,11 @@ import numpy as np
 from numba import njit, float64, int64
 
 from ..utils.FinError import FinError
-from ..utils.Math import accruedInterpolator
-from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
-from ..utils.FinHelperFunctions import labelToString
+from ..utils.fin_math import accruedInterpolator
+from ..market.curves.interpolator import FinInterpTypes, _uinterpolate
+from ..utils.helper_functions import labelToString
 from ..utils.FinGlobalTypes import FinExerciseTypes
-from ..utils.FinGlobalVariables import gSmall
+from ..utils.global_variables import gSmall
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 
@@ -99,7 +99,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
                                strikePrice, face_amount,
                                coupon_times, coupon_flows,
                                exerciseTypeInt,
-                               _dfTimes, _dfValues,
+                               _dfTimes, _df_values,
                                _treeTimes,
                                _Q, _rt, _dt):
     """ Option to enter into a swap that can be exercised on coupon payment
@@ -127,8 +127,8 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
         tcpn = coupon_times[i]
         n = int(tcpn/_dt + 0.50)
         ttree = _treeTimes[n]
-        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _df_values, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _df_values, interp)
         fixed_legFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
         floatLegValues[n] = strikePrice # * df_flow / df_tree
 
@@ -246,7 +246,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
                                  strikePrice, face_amount,
                                  coupon_times, coupon_flows,
                                  exerciseTypeInt,
-                                 _dfTimes, _dfValues,
+                                 _dfTimes, _df_values,
                                  _treeTimes, _Q,
                                  _rt, _dt):
     """ Option to buy or sell bond at a specified strike price that can be
@@ -287,8 +287,8 @@ def americanBondOption_Tree_Fast(texp, tmat,
 
         n = int(tcpn/_dt + 0.50)
         ttree = _treeTimes[n]
-        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _df_values, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _df_values, interp)
         treeFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
@@ -430,7 +430,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
                                    put_times, put_prices, face_amount,
                                    _sigma, _a, _Q,  # IS SIGMA USED ?
                                    _pu, _pm, _pd, _rt, _dt, _treeTimes,
-                                   _dfTimes, _dfValues):
+                                   _dfTimes, _df_values):
     """ Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
@@ -456,8 +456,8 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
         tcpn = coupon_times[i]
         n = int(tcpn/_dt + 0.50)
         ttree = _treeTimes[n]
-        df_flow = _uinterpolate(tcpn, _dfTimes, _dfValues, interp)
-        df_tree = _uinterpolate(ttree, _dfTimes, _dfValues, interp)
+        df_flow = _uinterpolate(tcpn, _dfTimes, _df_values, interp)
+        df_tree = _uinterpolate(ttree, _dfTimes, _df_values, interp)
         treeFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
 
     #######################################################################
@@ -519,7 +519,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
         for i in range(0, maturityStep+1):
             flow = treeFlows[i]
             t = _treeTimes[i]
-            df = _uinterpolate(t, _dfTimes, _dfValues, interp)
+            df = _uinterpolate(t, _dfTimes, _df_values, interp)
             px += flow * df
         px += df
 
@@ -669,12 +669,12 @@ class FinModelRatesBDT():
 
 ###############################################################################
 
-    def buildTree(self, treeMat, dfTimes, dfValues):
+    def buildTree(self, treeMat, dfTimes, df_values):
 
         if isinstance(dfTimes, np.ndarray) is False:
             raise FinError("DF TIMES must be a numpy vector")
 
-        if isinstance(dfValues, np.ndarray) is False:
+        if isinstance(df_values, np.ndarray) is False:
             raise FinError("DF VALUES must be a numpy vector")
 
         interp = FinInterpTypes.FLAT_FWD_RATES.value
@@ -688,10 +688,10 @@ class FinModelRatesBDT():
 
         for i in range(1, self._numTimeSteps+2):
             t = treeTimes[i]
-            dfTree[i] = _uinterpolate(t, dfTimes, dfValues, interp)
+            dfTree[i] = _uinterpolate(t, dfTimes, df_values, interp)
 
         self._dfTimes = dfTimes
-        self._dfs = dfValues
+        self._dfs = df_values
 
         self._Q, self._rt, self._dt \
             = buildTreeFast(self._sigma,

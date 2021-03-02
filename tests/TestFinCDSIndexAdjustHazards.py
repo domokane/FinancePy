@@ -8,13 +8,13 @@ import sys
 sys.path.append("..")
 
 from financepy.products.credit.FinCDSIndexPortfolio import FinCDSIndexPortfolio
-from financepy.products.credit.FinCDS import FinCDS
+from financepy.products.credit.cds import FinCDS
 from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -28,14 +28,14 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def buildIborCurve(tradeDate):
 
     valuation_date = tradeDate.addDays(1)
-    dcType = FinDayCountTypes.ACT_360
+    dcType = DayCountTypes.ACT_360
 
     depos = []
     fras = []
     swaps = []
 
-    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360_ISDA
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
     settlement_date = valuation_date
 
     maturity_date = settlement_date.addMonths(12)
@@ -88,7 +88,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     return libor_curve
 

@@ -5,12 +5,12 @@
 import sys
 sys.path.append("..")
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
 from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
 from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
-from financepy.utils.Date import Date
-from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
+from financepy.utils.date import Date
+from financepy.models.volatility_fns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -40,8 +40,8 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -121,8 +121,8 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         forCCRate = 0.0294  # EUR
         domCCRate = 0.0171  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 90.72
@@ -171,8 +171,8 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         forCCRate = 0.020113  # EUR
         domCCRate = 0.003525  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3088
@@ -219,8 +219,8 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         forCCRate = 0.003525  # USD
         domCCRate = 0.0042875  # JPY
 
-        domDiscountCurve = FinDiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
+        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 90.68

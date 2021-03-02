@@ -6,9 +6,9 @@ import numpy as np
 from numba import njit
 
 from ..utils.FinError import FinError
-from ..utils.Math import N
-from ..market.curves.FinInterpolator import FinInterpTypes, _uinterpolate
-from ..utils.FinHelperFunctions import labelToString
+from ..utils.fin_math import N
+from ..market.curves.interpolator import FinInterpTypes, _uinterpolate
+from ..utils.helper_functions import labelToString
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 
@@ -66,7 +66,7 @@ class FinModelRatesHL():
 
     def optionOnZCB(self, texp, tmat,
                     strikePrice, face_amount,
-                    dfTimes, dfValues):
+                    dfTimes, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
@@ -77,8 +77,8 @@ class FinModelRatesHL():
         if texp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        ptexp = _uinterpolate(texp, dfTimes, dfValues, interp)
-        ptmat = _uinterpolate(tmat, dfTimes, dfValues, interp)
+        ptexp = _uinterpolate(texp, dfTimes, df_values, interp)
+        ptmat = _uinterpolate(tmat, dfTimes, df_values, interp)
 
         sigma = self._sigma
 

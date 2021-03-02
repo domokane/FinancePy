@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelMertonCredit import FinModelMertonCredit
+from financepy.models.credit_merton import FinModelMertonCredit
 from financepy.models.FinModelMertonCreditMkt import FinModelMertonCreditMkt
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -39,7 +39,7 @@ def test_FinModelMertonCredit():
     testCases.print("ASSET VOLATILITY", model._vA)
     testCases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.creditSpread())
+    testCases.print("CREDIT SPREAD", model.credit_spread())
     testCases.print("LEVERAGE", model.leverage())
     testCases.print("PROD DEFAULT", model.probDefault())
 
@@ -62,7 +62,7 @@ def test_FinModelMertonCredit():
     testCases.print("ASSET VOLATILITY", model._vA)
     testCases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.creditSpread())
+    testCases.print("CREDIT SPREAD", model.credit_spread())
     testCases.print("LEVERAGE", model.leverage())
     testCases.print("PROD DEFAULT", model.probDefault())
     testCases.print("DISTANCE DEFAULT", model.distDefault())
@@ -90,7 +90,7 @@ def test_FinModelMertonCredit():
     testCases.print("ASSET VOLATILITY", model._vA)
     testCases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.creditSpread()*10000)
+    testCases.print("CREDIT SPREAD", model.credit_spread()*10000)
     testCases.print("LEVERAGE", model.leverage())
     testCases.print("PROD DEFAULT", model.probDefault())
     testCases.print("DISTANCE DEFAULT", model.distDefault())

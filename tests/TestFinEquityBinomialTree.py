@@ -13,9 +13,9 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExercis
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.utils.FinGlobalTypes import FinOptionTypes
-from financepy.utils.Date import Date
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.utils.date import Date
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -24,7 +24,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinBinomialTree():
 
-    stockPrice = 50.0
+    stock_price = 50.0
     riskFreeRate = 0.06
     dividendYield = 0.04
     volatility = 0.40
@@ -33,10 +33,10 @@ def test_FinBinomialTree():
     expiry_date = Date(1, 1, 2017)
 
     model = FinModelBlackScholes(volatility)
-    discount_curve = FinDiscountCurveFlat(valuation_date, riskFreeRate)
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
+    discount_curve = DiscountCurveFlat(valuation_date, riskFreeRate)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
 
-    numStepsList = [100, 500, 1000, 2000, 5000]
+    num_stepsList = [100, 500, 1000, 2000, 5000]
 
     strikePrice = 50.0
 
@@ -46,10 +46,10 @@ def test_FinBinomialTree():
         expiry_date,
         strikePrice,
         FinOptionTypes.EUROPEAN_PUT)
-    value = putOption.value(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    delta = putOption.delta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    gamma = putOption.gamma(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    theta = putOption.theta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    value = putOption.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    delta = putOption.delta(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    gamma = putOption.gamma(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    theta = putOption.theta(valuation_date, stock_price, discount_curve, dividendCurve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -59,15 +59,15 @@ def test_FinBinomialTree():
 
     testCases.header("NumSteps", "Results", "TIME")
 
-    for numSteps in numStepsList:
+    for num_steps in num_stepsList:
         start = time.time()
         tree = FinEquityBinomialTree()
         results = tree.value(
-            stockPrice,
+            stock_price,
             discount_curve,
             dividendCurve,
             volatility,
-            numSteps,
+            num_steps,
             valuation_date,
             payoff,
             expiry_date,
@@ -76,7 +76,7 @@ def test_FinBinomialTree():
             params)
         end = time.time()
         duration = end - start
-        testCases.print(numSteps, results, duration)
+        testCases.print(num_steps, results, duration)
 
     testCases.banner("================== AMERICAN PUT =======================")
 
@@ -86,15 +86,15 @@ def test_FinBinomialTree():
 
     testCases.header("NumSteps", "Results", "TIME")
 
-    for numSteps in numStepsList:
+    for num_steps in num_stepsList:
         start = time.time()
         tree = FinEquityBinomialTree()
         results = tree.value(
-            stockPrice,
+            stock_price,
             discount_curve,
             dividendCurve,
             volatility,
-            numSteps,
+            num_steps,
             valuation_date,
             payoff,
             expiry_date,
@@ -103,7 +103,7 @@ def test_FinBinomialTree():
             params)
         end = time.time()
         duration = end - start
-        testCases.print(numSteps, results, duration)
+        testCases.print(num_steps, results, duration)
 
     testCases.banner(
         "================== EUROPEAN CALL =======================")
@@ -112,10 +112,10 @@ def test_FinBinomialTree():
         expiry_date,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    delta = callOption.delta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    gamma = callOption.gamma(valuation_date, stockPrice, discount_curve, dividendCurve, model)
-    theta = callOption.theta(valuation_date, stockPrice, discount_curve, dividendCurve, model)
+    value = callOption.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    delta = callOption.delta(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    gamma = callOption.gamma(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    theta = callOption.theta(valuation_date, stock_price, discount_curve, dividendCurve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -124,16 +124,16 @@ def test_FinBinomialTree():
     params = np.array([1.0, strikePrice])
 
     testCases.header("NumSteps", "Results", "TIME")
-    for numSteps in numStepsList:
+    for num_steps in num_stepsList:
         start = time.time()
         tree = FinEquityBinomialTree()
 
         results = tree.value(
-            stockPrice,
+            stock_price,
             discount_curve,
             dividendCurve,
             volatility,
-            numSteps,
+            num_steps,
             valuation_date,
             payoff,
             expiry_date,
@@ -143,7 +143,7 @@ def test_FinBinomialTree():
 
         end = time.time()
         duration = end - start
-        testCases.print(numSteps, results, duration)
+        testCases.print(num_steps, results, duration)
 
     testCases.banner(
         "================== AMERICAN CALL =======================")
@@ -153,16 +153,16 @@ def test_FinBinomialTree():
     params = np.array([1.0, strikePrice])
 
     testCases.header("NumSteps", "Results", "TIME")
-    for numSteps in numStepsList:
+    for num_steps in num_stepsList:
         start = time.time()
         tree = FinEquityBinomialTree()
 
         results = tree.value(
-            stockPrice,
+            stock_price,
             discount_curve,
             dividendCurve,
             volatility,
-            numSteps,
+            num_steps,
             valuation_date,
             payoff,
             expiry_date,
@@ -172,7 +172,7 @@ def test_FinBinomialTree():
 
         end = time.time()
         duration = end - start
-        testCases.print(numSteps, results, duration)
+        testCases.print(num_steps, results, duration)
 
 ###############################################################################
 

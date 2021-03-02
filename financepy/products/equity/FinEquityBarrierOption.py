@@ -6,15 +6,15 @@ import numpy as np
 from enum import Enum
 
 from ...utils.FinError import FinError
-from ...utils.FinGlobalVariables import gDaysInYear
+from ...utils.global_variables import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...models.FinProcessSimulator import FinProcessSimulator
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...utils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...utils.Date import Date
+from ...models.process_simulator import FinProcessSimulator
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
 
 
-from ...utils.Math import N
+from ...utils.fin_math import N
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 
@@ -50,7 +50,7 @@ class FinEquityBarrierOption(FinEquityOption):
         strike price, option type, barrier level, the number of observations
         per year and the notional. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
@@ -67,9 +67,9 @@ class FinEquityBarrierOption(FinEquityOption):
 
     def value(self,
               valuation_date: Date,
-              stockPrice: (float, np.ndarray),
-              discount_curve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              stock_price: (float, np.ndarray),
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model):
         """ This prices an Equity Barrier option using the formulae given in
         the paper by Clewlow, Llanos and Strickland December 1994 which can be
@@ -78,21 +78,21 @@ class FinEquityBarrierOption(FinEquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
-        if isinstance(stockPrice, int):
-            stockPrice = float(stockPrice)
+        if isinstance(stock_price, int):
+            stock_price = float(stock_price)
 
-        if isinstance(stockPrice, float):
-            stockPrices = [stockPrice]
+        if isinstance(stock_price, float):
+            stock_prices = [stock_price]
         else:
-            stockPrices = stockPrice
+            stock_prices = stock_price
 
         values = []
-        for s in stockPrices:
+        for s in stock_prices:
             v = self._valueOne(valuation_date, s, discount_curve,
                                dividendCurve, model)
             values.append(v)
 
-        if isinstance(stockPrice, float):
+        if isinstance(stock_price, float):
             return values[0]
         else:
             return np.array(values)
@@ -101,9 +101,9 @@ class FinEquityBarrierOption(FinEquityOption):
 
     def _valueOne(self,
                   valuation_date: Date,
-                  stockPrice: (float, np.ndarray),
-                  discount_curve: FinDiscountCurve,
-                  dividendCurve: FinDiscountCurve,
+                  stock_price: (float, np.ndarray),
+                  discount_curve: DiscountCurve,
+                  dividendCurve: DiscountCurve,
                   model):
         """ This values a single option. Because of its structure it cannot
         easily be vectorised which is why it has been wrapped. """
@@ -115,14 +115,14 @@ class FinEquityBarrierOption(FinEquityOption):
 
         texp = max(texp, 1e-6)
 
-        lnS0k = np.log(stockPrice / self._strikePrice)
+        lnS0k = np.log(stock_price / self._strikePrice)
         sqrtT = np.sqrt(texp)
 
         r = discount_curve.ccRate(self._expiry_date)
         q = dividendCurve.ccRate(self._expiry_date)
 
         k = self._strikePrice
-        s = stockPrice
+        s = stock_price
         h = self._barrierLevel
 
         volatility = model._volatility
@@ -281,13 +281,13 @@ class FinEquityBarrierOption(FinEquityOption):
 
     def valueMC(self,
                 valuation_date: Date,
-                stockPrice: float,
-                discount_curve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 processType,
                 modelParams,
                 numAnnObs: int = 252,
-                numPaths: int = 10000,
+                num_paths: int = 10000,
                 seed: int = 4242):
         """ A Monte-Carlo based valuation of the barrier option which simulates
         the evolution of the stock price of at a specified number of annual
@@ -312,13 +312,13 @@ class FinEquityBarrierOption(FinEquityOption):
         
         #######################################################################
 
-        if optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL and stockPrice <= B:
+        if optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL and stock_price <= B:
             return 0.0
-        elif optionType == FinEquityBarrierTypes.UP_AND_OUT_CALL and stockPrice >= B:
+        elif optionType == FinEquityBarrierTypes.UP_AND_OUT_CALL and stock_price >= B:
             return 0.0
-        elif optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT and stockPrice <= B:
+        elif optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT and stock_price <= B:
             return 0.0
-        elif optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT and stockPrice >= B:
+        elif optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT and stock_price >= B:
             return 0.0
 
         #######################################################################
@@ -326,18 +326,18 @@ class FinEquityBarrierOption(FinEquityOption):
         simpleCall = False
         simplePut = False
 
-        if optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL and stockPrice <= B:
+        if optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL and stock_price <= B:
             simpleCall = True
-        elif optionType == FinEquityBarrierTypes.UP_AND_IN_CALL and stockPrice >= B:
+        elif optionType == FinEquityBarrierTypes.UP_AND_IN_CALL and stock_price >= B:
             simpleCall = True
-        elif optionType == FinEquityBarrierTypes.UP_AND_IN_PUT and stockPrice >= B:
+        elif optionType == FinEquityBarrierTypes.UP_AND_IN_PUT and stock_price >= B:
             simplePut = True
-        elif optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT and stockPrice <= B:
+        elif optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT and stock_price <= B:
             simplePut = True
 
         if simplePut or simpleCall:
             Sall = process.getProcess(
-                processType, texp, modelParams, 1, numPaths, seed)
+                processType, texp, modelParams, 1, num_paths, seed)
 
         if simpleCall:
             c = (np.maximum(Sall[:, -1] - K, 0.0)).mean()
@@ -351,18 +351,18 @@ class FinEquityBarrierOption(FinEquityOption):
 
         # Get full set of paths
         Sall = process.getProcess(processType, texp, modelParams, numTimeSteps,
-                                  numPaths, seed)
+                                  num_paths, seed)
 
-        (numPaths, numTimeSteps) = Sall.shape
+        (num_paths, numTimeSteps) = Sall.shape
 
         if optionType == FinEquityBarrierTypes.DOWN_AND_IN_CALL or \
            optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL or \
            optionType == FinEquityBarrierTypes.DOWN_AND_IN_PUT or \
            optionType == FinEquityBarrierTypes.DOWN_AND_OUT_PUT:
 
-            barrierCrossedFromAbove = [False] * numPaths
+            barrierCrossedFromAbove = [False] * num_paths
 
-            for p in range(0, numPaths):
+            for p in range(0, num_paths):
                 barrierCrossedFromAbove[p] = np.any(Sall[p] <= B)
 
         if optionType == FinEquityBarrierTypes.UP_AND_IN_CALL or \
@@ -370,12 +370,12 @@ class FinEquityBarrierOption(FinEquityOption):
            optionType == FinEquityBarrierTypes.UP_AND_IN_PUT or \
            optionType == FinEquityBarrierTypes.UP_AND_OUT_PUT:
 
-            barrierCrossedFromBelow = [False] * numPaths
-            for p in range(0, numPaths):
+            barrierCrossedFromBelow = [False] * num_paths
+            for p in range(0, num_paths):
                 barrierCrossedFromBelow[p] = np.any(Sall[p] >= B)
 
-        payoff = np.zeros(numPaths)
-        ones = np.ones(numPaths)
+        payoff = np.zeros(num_paths)
+        ones = np.ones(num_paths)
 
         if optionType == FinEquityBarrierTypes.DOWN_AND_OUT_CALL:
             payoff = np.maximum(Sall[:, -1] - K, 0.0) * \

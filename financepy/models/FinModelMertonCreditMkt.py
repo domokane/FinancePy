@@ -4,13 +4,13 @@
 
 import numpy as np
 
-from ..utils.Math import N
+from ..utils.fin_math import N
 
 from scipy import optimize
 
-from ..utils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ..utils.helper_functions import labelToString, check_argument_types
 from ..utils.FinError import FinError
-from .FinModelMertonCredit import FinModelMertonCredit
+from .credit_merton import FinModelMertonCredit
 
 ###############################################################################
 
@@ -58,7 +58,7 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if isinstance(equityValue, float):
             equityValue = [equityValue]

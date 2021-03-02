@@ -5,9 +5,9 @@ These modules create a family of curve types related to the term structures of i
 2. Discount curves that can be used to present value a future cash flow. These differ from best fits curves in that they exactly refit the prices of bonds or CDS. The different discount curves are created by calibrating to different instruments. They also differ in terms of the term structure shapes they can have. Different shapes have different impacts in terms of locality on risk management performed using these different curves. There is often a trade-off between smoothness and locality.
 
 ## Best Fit Bond Curves
-The first category are FinBondYieldCurves.
+The first category are BondYieldCurves.
 
-### FinBondYieldCurve
+### BondYieldCurve
 This module describes a curve that is fitted to bond yields calculated from bond market prices supplied by the user. The curve is not guaranteed to fit all of the bond prices exactly and a least squares approach is used. A number of fitting forms are provided which consist of 
 
 * Polynomial 

@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.products.rates.FinIborFuture import FinIborFuture
-from financepy.utils.Date import *
+from financepy.utils.date import *
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

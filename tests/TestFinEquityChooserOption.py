@@ -6,9 +6,9 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityChooserOption import FinEquityChooserOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.utils.Date import Date
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,14 +25,14 @@ def test_FinEquityChooserOptionHaug():
     putExpiryDate = Date(2, 8, 2015)
     callStrike = 55.0
     putStrike = 48.0
-    stockPrice = 50.0
+    stock_price = 50.0
     volatility = 0.35
     interestRate = 0.10
     dividendYield = 0.05
 
     model = FinModelBlackScholes(volatility)
-    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
+    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -41,13 +41,13 @@ def test_FinEquityChooserOptionHaug():
                                            putStrike)
 
     v = chooserOption.value(valuation_date,
-                            stockPrice,
+                            stock_price,
                             discount_curve,
                             dividendCurve,
                             model)
 
     v_mc = chooserOption.valueMC(valuation_date,
-                                 stockPrice,
+                                 stock_price,
                                  discount_curve,
                                  dividendCurve,
                                  model, 20000)
@@ -68,15 +68,15 @@ def test_FinEquityChooserOptionMatlab():
     putExpiryDate = Date(2, 12, 2007)
     callStrike = 60.0
     putStrike = 60.0
-    stockPrice = 50.0
+    stock_price = 50.0
     volatility = 0.20
     interestRate = 0.10
     dividendYield = 0.05
 
     model = FinModelBlackScholes(volatility)
 
-    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
+    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -85,13 +85,13 @@ def test_FinEquityChooserOptionMatlab():
                                            putStrike)
 
     v = chooserOption.value(valuation_date,
-                            stockPrice,
+                            stock_price,
                             discount_curve,
                             dividendCurve,
                             model)
 
     v_mc = chooserOption.valueMC(valuation_date,
-                                 stockPrice,
+                                 stock_price,
                                  discount_curve,
                                  dividendCurve,
                                  model, 20000)
@@ -112,14 +112,14 @@ def test_FinEquityChooserOptionDerivicom():
     putExpiryDate = Date(1, 5, 2007)
     callStrike = 40.0
     putStrike = 35.0
-    stockPrice = 38.0
+    stock_price = 38.0
     volatility = 0.20
     interestRate = 0.08
     dividendYield = 0.0625
 
     model = FinModelBlackScholes(volatility)
-    discount_curve = FinDiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)
+    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -128,13 +128,13 @@ def test_FinEquityChooserOptionDerivicom():
                                            putStrike)
 
     v = chooserOption.value(valuation_date,
-                            stockPrice,
+                            stock_price,
                             discount_curve,
                             dividendCurve,
                             model)
 
     v_mc = chooserOption.valueMC(valuation_date,
-                                 stockPrice,
+                                 stock_price,
                                  discount_curve,
                                  dividendCurve,
                                  model, 20000)

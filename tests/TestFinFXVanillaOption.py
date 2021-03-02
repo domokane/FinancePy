@@ -9,13 +9,13 @@ sys.path.append("..")
 
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Calendar import FinCalendarTypes
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.utils.Date import Date
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -48,8 +48,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy2CCRate)
-    forDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy1CCRate)
+    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
+    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 
@@ -120,8 +120,8 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy2CCRate)
-    forDiscountCurve = FinDiscountCurveFlat(valuation_date, ccy1CCRate)
+    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
+    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 
@@ -180,23 +180,23 @@ def test_FinFXVanillaOptionBloombergExample():
     maturity_date = settlement_date.addMonths(12)
     notional = 1000000.0
     notionalCurrency = "EUR"
-    calendar_type = FinCalendarTypes.TARGET
+    calendar_type = CalendarTypes.TARGET
 
     depos = []
     fras = []
     swaps = []
     depo = FinIborDeposit(settlement_date, maturity_date, domDepoRate,
-                           FinDayCountTypes.ACT_360, notional, calendar_type)
+                           DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
-    domDiscountCurve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    domDiscountCurve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     depos = []
     fras = []
     swaps = []
     depo = FinIborDeposit(settlement_date, maturity_date, forDepoRate,
-                           FinDayCountTypes.ACT_360, notional, calendar_type)
+                           DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
-    forDiscountCurve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    forDiscountCurve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     model = FinModelBlackScholes(volatility)
 
@@ -237,15 +237,15 @@ def test_FinFXVanillaOptionHullExample():
     domInterestRate = 0.08
     forInterestRate = 0.11
     model = FinModelBlackScholes(volatility)
-    domDiscountCurve = FinDiscountCurveFlat(valuation_date, domInterestRate)
-    forDiscountCurve = FinDiscountCurveFlat(valuation_date, forInterestRate)
+    domDiscountCurve = DiscountCurveFlat(valuation_date, domInterestRate)
+    forDiscountCurve = DiscountCurveFlat(valuation_date, forInterestRate)
 
-    numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
+    num_pathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
     strikeFXRate = 1.60
 
-    for numPaths in numPathsList:
+    for num_paths in num_pathsList:
 
         callOption = FinFXVanillaOption(expiry_date,
                                         strikeFXRate,
@@ -269,17 +269,17 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model,
-            numPaths)
+            num_paths)
 
         end = time.time()
         duration = end - start
-        testCases.print(numPaths, value, valueMC, duration)
+        testCases.print(num_paths, value, valueMC, duration)
 
 ##########################################################################
 
     spotFXRates = np.arange(100, 200, 10)
     spotFXRates = spotFXRates/100.0
-    numPaths = 100000
+    num_paths = 100000
 
     testCases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC", "TIME")
 
@@ -305,15 +305,15 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model,
-            numPaths)
+            num_paths)
         end = time.time()
         duration = end - start
-        testCases.print(numPaths, value, valueMC, duration)
+        testCases.print(num_paths, value, valueMC, duration)
 
 ##########################################################################
 
     spotFXRates = np.arange(100, 200, 10) / 100.0
-    numPaths = 100000
+    num_paths = 100000
 
     testCases.header("SPOT FX RATE", "PUT_VALUE_BS", "PUT_VALUE_MC", "TIME")
 
@@ -339,7 +339,7 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model,
-            numPaths)
+            num_paths)
         end = time.time()
         duration = end - start
         testCases.print(spotFXRate, value, valueMC, duration)
@@ -387,7 +387,7 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model)
-        #  callOption.rho(valuation_date,stockPrice, interestRate,
+        #  callOption.rho(valuation_date,stock_price, interestRate,
         #  dividendYield, modelType, modelParams)
         rho = 999
         testCases.print(spotFXRate, value, delta, vega, theta, rho)
@@ -432,7 +432,7 @@ def test_FinFXVanillaOptionHullExample():
             domDiscountCurve,
             forDiscountCurve,
             model)
-        # putOption.rho(valuation_date,stockPrice, interestRate, dividendYield,
+        # putOption.rho(valuation_date,stock_price, interestRate, dividendYield,
         # modelType, modelParams)
         rho = 999
         testCases.print(spotFXRate, value, delta, vega, theta, rho)

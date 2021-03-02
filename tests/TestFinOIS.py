@@ -5,12 +5,12 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.Math import ONE_MILLION
+from financepy.utils.fin_math import ONE_MILLION
 from financepy.products.rates.FinOIS import FinOIS
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.utils.Frequency import FinFrequencyTypes
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Date import Date
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 from financepy.utils.FinGlobalTypes import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -29,10 +29,10 @@ def test_FinFixedOIS():
     end_date = effective_date.addMonths(60)
     oisRate = 0.04
     fixed_legType = FinSwapTypes.PAY
-    fixedFreqType = FinFrequencyTypes.ANNUAL
-    fixedDayCount = FinDayCountTypes.ACT_360
-    floatFreqType = FinFrequencyTypes.ANNUAL
-    floatDayCount = FinDayCountTypes.ACT_360
+    fixedFreqType = FrequencyTypes.ANNUAL
+    fixedDayCount = DayCountTypes.ACT_360
+    floatFreqType = FrequencyTypes.ANNUAL
+    floatDayCount = DayCountTypes.ACT_360
     floatSpread = 0.0
     notional = ONE_MILLION
     payment_lag = 1
@@ -53,8 +53,8 @@ def test_FinFixedOIS():
 
     valuation_date = effective_date
     marketRate = 0.05
-    oisCurve = FinDiscountCurveFlat(valuation_date, marketRate,
-                                    FinFrequencyTypes.ANNUAL)
+    oisCurve = DiscountCurveFlat(valuation_date, marketRate,
+                                 FrequencyTypes.ANNUAL)
 
     v = ois.value(effective_date, oisCurve)
     

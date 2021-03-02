@@ -4,12 +4,12 @@
 
 
 from .FinError import FinError
-from .Date import Date
-from .Calendar import (Calendar, FinCalendarTypes)
-from .Calendar import (FinBusDayAdjustTypes, FinDateGenRuleTypes)
-from .Frequency import (Frequency, FinFrequencyTypes)
-from .FinHelperFunctions import labelToString
-from .FinHelperFunctions import checkArgumentTypes
+from .date import Date
+from .calendar import (Calendar, CalendarTypes)
+from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
+from .frequency import (Frequency, FrequencyTypes)
+from .helper_functions import labelToString
+from .helper_functions import check_argument_types
 
 ###############################################################################
 # TODO: Start and end date to allow for long stubs
@@ -26,10 +26,10 @@ class Schedule(object):
     def __init__(self,
                  effective_date: Date,  # Also known as the start date
                  termination_date: Date,  # This is UNADJUSTED (set flag to adjust it)
-                 freq_type: FinFrequencyTypes = FinFrequencyTypes.ANNUAL,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD,
+                 freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  adjustTerminationDate:bool = True,  # Default is to adjust
                  endOfMonthFlag:bool = False,  # All flow dates are EOM if True
                  firstDate = None,  # First coupon date
@@ -67,7 +67,7 @@ class Schedule(object):
         at the start and end of the swap but *have not yet been implemented*. All
         stubs are currently short, either at the start or end of swap. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if effective_date >= termination_date:
             raise FinError("Effective date must be before termination date.")
@@ -107,7 +107,7 @@ class Schedule(object):
         else:
             self._endOfMonthFlag = False
 
-        self._adjustedDates = None
+        self._adjusted_dates = None
 
         self._generate()
 
@@ -116,10 +116,10 @@ class Schedule(object):
     def scheduleDates(self):
         """ Returns a list of the schedule of FinDates. """
 
-        if self._adjustedDates is None:
+        if self._adjusted_dates is None:
             self._generate()
 
-        return self._adjustedDates
+        return self._adjusted_dates
 
 ###############################################################################
 
@@ -133,9 +133,9 @@ class Schedule(object):
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []
-        self._adjustedDates = []
+        self._adjusted_dates = []
 
-        if self._date_gen_rule_type == FinDateGenRuleTypes.BACKWARD:
+        if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
             nextDate = self._termination_date
             flowNum = 0
@@ -157,7 +157,7 @@ class Schedule(object):
             # reverse order and holiday adjust dates
             # the first date is not adjusted as this was provided
             dt = unadjustedScheduleDates[flowNum - 1]
-            self._adjustedDates.append(dt)
+            self._adjusted_dates.append(dt)
 
             # We adjust all flows after the effective date and before the
             # termination date to fall on business days according to their cal
@@ -166,11 +166,11 @@ class Schedule(object):
                 dt = calendar.adjust(unadjustedScheduleDates[flowNum - i - 1],
                                      self._bus_day_adjust_type)
 
-                self._adjustedDates.append(dt)
+                self._adjusted_dates.append(dt)
 
-            self._adjustedDates.append(self._termination_date)
+            self._adjusted_dates.append(self._termination_date)
 
-        elif self._date_gen_rule_type == FinDateGenRuleTypes.FORWARD:
+        elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             # This needs checking
             nextDate = self._effective_date
@@ -190,12 +190,12 @@ class Schedule(object):
                 dt = calendar.adjust(unadjustedScheduleDates[i],
                                      self._bus_day_adjust_type)
 
-                self._adjustedDates.append(dt)
+                self._adjusted_dates.append(dt)
 
-            self._adjustedDates.append(self._termination_date)
+            self._adjusted_dates.append(self._termination_date)
 
-        if self._adjustedDates[0] < self._effective_date:
-            self._adjustedDates[0] = self._effective_date
+        if self._adjusted_dates[0] < self._effective_date:
+            self._adjusted_dates[0] = self._effective_date
 
         # The market standard for swaps is not to adjust the termination date 
         # unless it is specified in the contract. It is standard for CDS. 
@@ -205,18 +205,18 @@ class Schedule(object):
             self._termination_date = calendar.adjust(self._termination_date,
                                                     self._bus_day_adjust_type)
         
-            self._adjustedDates[-1] = self._termination_date
+            self._adjusted_dates[-1] = self._termination_date
 
         #######################################################################
         # Check the resulting schedule to ensure that no two dates are the
         # same and that they are monotonic - this should never happen but ...
         #######################################################################
 
-        if len(self._adjustedDates) < 2:
+        if len(self._adjusted_dates) < 2:
             raise FinError("Schedule has two dates only.")
 
-        prevDt = self._adjustedDates[0]
-        for dt in self._adjustedDates[1:]:
+        prevDt = self._adjusted_dates[0]
+        for dt in self._adjusted_dates[1:]:
  
             if dt == prevDt:
                 raise FinError("Two matching dates in schedule")
@@ -228,7 +228,7 @@ class Schedule(object):
 
         #######################################################################
 
-        return self._adjustedDates
+        return self._adjusted_dates
 
 ##############################################################################
 
@@ -247,13 +247,13 @@ class Schedule(object):
         s += labelToString("END OF MONTH", self._endOfMonthFlag, "")
 
         if 1==0:
-            if len(self._adjustedDates) > 0:
+            if len(self._adjusted_dates) > 0:
                 s += "\n\n"
-                s += labelToString("EFF", self._adjustedDates[0], "")
+                s += labelToString("EFF", self._adjusted_dates[0], "")
     
-            if len(self._adjustedDates) > 1:
+            if len(self._adjusted_dates) > 1:
                 s += "\n"
-                s += labelToString("FLW", self._adjustedDates[1:], "",
+                s += labelToString("FLW", self._adjusted_dates[1:], "",
                                    listFormat=True)
 
         return s

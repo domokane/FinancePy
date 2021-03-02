@@ -3,15 +3,15 @@
 ##############################################################################
 
 from ...utils.FinError import FinError
-from ...utils.Date import Date
-from ...utils.DayCount import FinDayCountTypes
-from ...utils.Frequency import FinFrequencyTypes
-from ...utils.Calendar import FinCalendarTypes, FinDateGenRuleTypes
-from ...utils.Calendar import Calendar, FinBusDayAdjustTypes
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...utils.Math import ONE_MILLION
+from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.calendar import CalendarTypes, DateGenRuleTypes
+from ...utils.calendar import Calendar, BusDayAdjustTypes
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...utils.fin_math import ONE_MILLION
 from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from .FinFloatLeg import FinFloatLeg
 
@@ -31,19 +31,19 @@ class FinIborOIS(object):
     
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
-                 termination_dateOrTenor: (Date, str),  # Date contract ends
+                 termination_date_or_tenor: (Date, str),  # Date contract ends
                  iborType: FinSwapTypes,
-                 iborFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 iborDayCountType: FinDayCountTypes  = FinDayCountTypes.THIRTY_E_360,
+                 iborFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 iborDayCountType: DayCountTypes  = DayCountTypes.THIRTY_E_360,
                  iborSpread: float = 0.0,
-                 oisFreqType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 oisDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
+                 oisFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 oisDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  oisSpread: float = 0.0,
                  oisPaymentLag: int = 0,
                  notional: float = ONE_MILLION,
-                 calendar_type: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 bus_day_adjust_type: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating 
         legs and notional. The floating leg parameters have default
@@ -53,12 +53,12 @@ class FinIborOIS(object):
         termination date. This is not adjusted for business days. The adjusted
         termination date is called the maturity date. This is calculated. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if type(termination_dateOrTenor) == Date:
-            self._termination_date = termination_dateOrTenor
+        if type(termination_date_or_tenor) == Date:
+            self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.addTenor(termination_dateOrTenor)
+            self._termination_date = effective_date.addTenor(termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
@@ -103,9 +103,9 @@ class FinIborOIS(object):
 
     def value(self,
               valuation_date: Date,
-              discount_curve: FinDiscountCurve,
-              indexIborCurve: FinDiscountCurve = None,
-              indexOISCurve: FinDiscountCurve = None,
+              discount_curve: DiscountCurve,
+              indexIborCurve: DiscountCurve = None,
+              indexOISCurve: DiscountCurve = None,
               firstFixingRateLeg1=None,
               firstFixingRateLeg2=None):
         """ Value the interest rate swap on a value date given a single Ibor

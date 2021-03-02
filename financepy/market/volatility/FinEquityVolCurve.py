@@ -5,8 +5,8 @@
 import numpy as np
 
 from ...utils.FinError import FinError
-from ...utils.Math import testMonotonicity
-from ...utils.FinHelperFunctions import labelToString
+from ...utils.fin_math import testMonotonicity
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 # TODO: This should be deleted and replaced with FinEquityVolSurface

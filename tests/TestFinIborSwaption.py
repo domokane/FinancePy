@@ -7,27 +7,27 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.Date import Date
-from financepy.utils.DayCount import FinDayCountTypes
-from financepy.utils.Frequency import FinFrequencyTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
 
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.models.FinModelBlackShifted import FinModelBlackShifted
-from financepy.models.FinModelSABR import FinModelSABR
-from financepy.models.FinModelSABRShifted import FinModelSABRShifted
-from financepy.models.FinModelRatesHW import FinModelRatesHW
-from financepy.models.FinModelRatesBK import FinModelRatesBK
-from financepy.models.FinModelRatesBDT import FinModelRatesBDT
+from financepy.models.black import FinModelBlack
+from financepy.models.black_shifted import FinModelBlackShifted
+from financepy.models.sabr import FinModelSABR
+from financepy.models.sabr_shifted import FinModelSABRShifted
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
+from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.rates_bdt_tree import FinModelRatesBDT
 
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolator import FinInterpTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveZeros import DiscountCurveZeros
+from financepy.market.curves.interpolator import FinInterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -37,16 +37,16 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinIborDepositsAndSwaps(valuation_date):
 
-    depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
+    depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spotDays = 0
     settlement_date = valuation_date.addWeekDays(spotDays)
-    depositRate = 0.05
+    deposit_rate = 0.05
 
-    depo1 = FinIborDeposit(settlement_date, "1M", depositRate, depoBasis)
-    depo2 = FinIborDeposit(settlement_date, "3M", depositRate, depoBasis)
-    depo3 = FinIborDeposit(settlement_date, "6M", depositRate, depoBasis)
+    depo1 = FinIborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
+    depo2 = FinIborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
+    depo3 = FinIborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -55,20 +55,20 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     fras = []
 
     swaps = []
-    fixedBasis = FinDayCountTypes.ACT_365F
-    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    fixedBasis = DayCountTypes.ACT_365F
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
     fixed_legType = FinSwapTypes.PAY
     
-    swapRate = 0.05
-    swap1 = FinIborSwap(settlement_date, "1Y",  fixed_legType, swapRate, fixedFreq, fixedBasis)
-    swap2 = FinIborSwap(settlement_date, "3Y",  fixed_legType, swapRate, fixedFreq, fixedBasis)
-    swap3 = FinIborSwap(settlement_date, "5Y",  fixed_legType, swapRate, fixedFreq, fixedBasis)
+    swap_rate = 0.05
+    swap1 = FinIborSwap(settlement_date, "1Y",  fixed_legType, swap_rate, fixedFreq, fixedBasis)
+    swap2 = FinIborSwap(settlement_date, "3Y",  fixed_legType, swap_rate, fixedFreq, fixedBasis)
+    swap3 = FinIborSwap(settlement_date, "5Y",  fixed_legType, swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
     swaps.append(swap3)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     return libor_curve
 
@@ -87,8 +87,8 @@ def testFinIborSwaptionModels():
     exerciseDate = Date(1, 1, 2012)
     swapMaturityDate = Date(1, 1, 2017)
 
-    swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.ACT_365F
+    swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    swapFixedDayCountType = DayCountTypes.ACT_365F
 
     strikes = np.linspace(0.02, 0.08, 5)
 
@@ -151,7 +151,7 @@ def test_FinIborSwaptionQLExample():
     valuation_date = Date(4, 3, 2014)
     settlement_date = Date(4, 3, 2014)
 
-    depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
+    depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
     depo = FinIborDeposit(settlement_date, "1W", 0.0023, depoDCCType)
     depos.append(depo)
@@ -165,8 +165,8 @@ def test_FinIborSwaptionQLExample():
     # No convexity correction provided so I omit interest rate futures
 
     swaps = []
-    accType = FinDayCountTypes.ACT_365F
-    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
+    accType = DayCountTypes.ACT_365F
+    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
     fixed_legType = FinSwapTypes.PAY
     
     swap = FinIborSwap(settlement_date, "3Y", fixed_legType, 0.00790, fixedFreqType, accType)
@@ -194,16 +194,16 @@ def test_FinIborSwaptionQLExample():
     swap = FinIborSwap(settlement_date, "30Y", fixed_legType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, [], swaps,
-                                    FinInterpTypes.LINEAR_ZERO_RATES)
+    libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
+                                  FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlement_date.addTenor("5Y")
     swapMaturityDate = exerciseDate.addTenor("5Y")
     swapFixedCoupon = 0.040852
-    swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
-    swapFloatFrequencyType = FinFrequencyTypes.QUARTERLY
-    swapFloatDayCountType = FinDayCountTypes.ACT_360
+    swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
+    swapFloatFrequencyType = FrequencyTypes.QUARTERLY
+    swapFloatDayCountType = DayCountTypes.ACT_360
     swapNotional = 1000000
     swaptionType = FinSwapTypes.PAY
 
@@ -250,7 +250,7 @@ def testFinIborCashSettledSwaption():
     valuation_date = Date(1, 1, 2020)
     settlement_date = Date(1, 1, 2020)
 
-    depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
+    depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
     depo = FinIborDeposit(settlement_date, "1W", 0.0023, depoDCCType)
     depos.append(depo)
@@ -266,8 +266,8 @@ def testFinIborCashSettledSwaption():
     settlement_date = Date(2, 1, 2020)
 
     swaps = []
-    accType = FinDayCountTypes.ACT_365F
-    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
+    accType = DayCountTypes.ACT_365F
+    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
     fixed_legType = FinSwapTypes.PAY
     
     swap = FinIborSwap(settlement_date, "3Y", fixed_legType, 0.00790, fixedFreqType, accType)
@@ -295,16 +295,16 @@ def testFinIborCashSettledSwaption():
     swap = FinIborSwap(settlement_date, "30Y", fixed_legType, 0.0354, fixedFreqType, accType)
     swaps.append(swap)
 
-    libor_curve = FinIborSingleCurve(valuation_date, depos, [], swaps,
-                               FinInterpTypes.LINEAR_ZERO_RATES)
+    libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
+                                  FinInterpTypes.LINEAR_ZERO_RATES)
 
     exerciseDate = settlement_date.addTenor("5Y")
     swapMaturityDate = exerciseDate.addTenor("5Y")
     swapFixedCoupon = 0.040852
-    swapFixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
-    swapFloatFrequencyType = FinFrequencyTypes.QUARTERLY
-    swapFloatDayCountType = FinDayCountTypes.ACT_360
+    swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
+    swapFloatFrequencyType = FrequencyTypes.QUARTERLY
+    swapFloatDayCountType = DayCountTypes.ACT_360
     swapNotional = 1000000
     fixed_legType = FinSwapTypes.PAY
 
@@ -323,7 +323,7 @@ def testFinIborCashSettledSwaption():
     v = swaption.value(settlement_date, libor_curve, model)
     testCases.print("Swaption No-Arb Value:", v)
 
-    fwdSwapRate1 = libor_curve.swapRate(exerciseDate,
+    fwdSwapRate1 = libor_curve.swap_rate(exerciseDate,
                                        swapMaturityDate,
                                        swapFixedFrequencyType,
                                        swapFixedDayCountType)
@@ -337,7 +337,7 @@ def testFinIborCashSettledSwaption():
                           swapFixedFrequencyType, 
                           swapFixedDayCountType)
 
-    fwdSwapRate2 = fwdSwap.swapRate(settlement_date, libor_curve)
+    fwdSwapRate2 = fwdSwap.swap_rate(settlement_date, libor_curve)
     testCases.print("Fwd Swap Swap Rate:", fwdSwapRate2)
 
     model = FinModelBlack(0.1533)
@@ -362,17 +362,17 @@ def testFinIborSwaptionMatlabExamples():
     testCases.header("=======================================")
 
     valuation_date = Date(1, 1, 2010)
-    libor_curve = FinDiscountCurveFlat(valuation_date, 0.06,
-                                      FinFrequencyTypes.CONTINUOUS,
-                                      FinDayCountTypes.THIRTY_E_360)
+    libor_curve = DiscountCurveFlat(valuation_date, 0.06,
+                                    FrequencyTypes.CONTINUOUS,
+                                    DayCountTypes.THIRTY_E_360)
 
     settlement_date = Date(1, 1, 2011)
     exerciseDate = Date(1, 1, 2016)
     maturity_date = Date(1, 1, 2019)
 
     fixedCoupon = 0.062
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     # Pricing a PAY
@@ -408,23 +408,23 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = [0.03, 0.034, 0.037, 0.039, 0.040]
 
-    contFreq = FinFrequencyTypes.CONTINUOUS
-    interpType = FinInterpTypes.LINEAR_ZERO_RATES
-    day_count_type = FinDayCountTypes.THIRTY_E_360
+    contFreq = FrequencyTypes.CONTINUOUS
+    interp_type = FinInterpTypes.LINEAR_ZERO_RATES
+    day_count_type = DayCountTypes.THIRTY_E_360
 
-    libor_curve = FinDiscountCurveZeros(valuation_date, dates,
-                                       zeroRates, contFreq,
-                                       day_count_type, interpType)
+    libor_curve = DiscountCurveZeros(valuation_date, dates,
+                                     zeroRates, contFreq,
+                                     day_count_type, interp_type)
 
     settlement_date = Date(1, 1, 2011)
     exerciseDate = Date(1, 1, 2012)
     maturity_date = Date(1, 1, 2017)
     fixedCoupon = 0.03
 
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360
-    floatFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    floatDayCountType = FinDayCountTypes.THIRTY_E_360
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360
+    floatFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    floatDayCountType = DayCountTypes.THIRTY_E_360
     notional = 1000.0
 
     # Pricing a put
@@ -462,22 +462,22 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = np.array([-0.02, 0.024, 0.047, 0.090, 0.12])/100.0
 
-    contFreq = FinFrequencyTypes.ANNUAL
-    interpType = FinInterpTypes.LINEAR_ZERO_RATES
-    day_count_type = FinDayCountTypes.THIRTY_E_360
+    contFreq = FrequencyTypes.ANNUAL
+    interp_type = FinInterpTypes.LINEAR_ZERO_RATES
+    day_count_type = DayCountTypes.THIRTY_E_360
 
-    libor_curve = FinDiscountCurveZeros(valuation_date, dates, zeroRates,
-                                       contFreq, day_count_type, interpType)
+    libor_curve = DiscountCurveZeros(valuation_date, dates, zeroRates,
+                                     contFreq, day_count_type, interp_type)
 
     settlement_date = Date(1, 1, 2016)
     exerciseDate = Date(1, 1, 2017)
     maturity_date = Date(1, 1, 2020)
     fixedCoupon = -0.003
 
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
-    floatFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    floatDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
+    floatFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    floatDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 1000.0
 
     # Pricing a PAY
@@ -518,21 +518,21 @@ def testFinIborSwaptionMatlabExamples():
              Date(1, 1, 2011), Date(1, 7, 2011), Date(1, 1, 2012)]
 
     zeroRates = np.array([0.075] * 11)
-    interpType = FinInterpTypes.FLAT_FWD_RATES
-    day_count_type = FinDayCountTypes.THIRTY_E_360_ISDA
-    contFreq = FinFrequencyTypes.SEMI_ANNUAL
+    interp_type = FinInterpTypes.FLAT_FWD_RATES
+    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    contFreq = FrequencyTypes.SEMI_ANNUAL
 
-    libor_curve = FinDiscountCurveZeros(valuation_date, dates, zeroRates,
-                                       contFreq,
-                                       day_count_type, interpType)
+    libor_curve = DiscountCurveZeros(valuation_date, dates, zeroRates,
+                                     contFreq,
+                                     day_count_type, interp_type)
 
     settlement_date = valuation_date
     exerciseDate = Date(1, 1, 2010)
     maturity_date = Date(1, 1, 2012)
     fixedCoupon = 0.04
 
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     swaptionType = FinSwapTypes.RECEIVE
@@ -570,19 +570,19 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = np.array([0.07] * 11)
 
-    interpType = FinInterpTypes.FLAT_FWD_RATES
-    day_count_type = FinDayCountTypes.THIRTY_E_360_ISDA
-    contFreq = FinFrequencyTypes.SEMI_ANNUAL
+    interp_type = FinInterpTypes.FLAT_FWD_RATES
+    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    contFreq = FrequencyTypes.SEMI_ANNUAL
 
-    libor_curve = FinDiscountCurveZeros(valuation_date, dates, zeroRates,
-                                       contFreq, day_count_type, interpType)
+    libor_curve = DiscountCurveZeros(valuation_date, dates, zeroRates,
+                                     contFreq, day_count_type, interp_type)
 
     settlement_date = valuation_date
     exerciseDate = Date(1, 1, 2011)
     maturity_date = Date(1, 1, 2012)
 
-    fixedFrequencyType = FinFrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     model = FinModelRatesBK(0.1, 0.05, 200)
@@ -642,19 +642,19 @@ def testFinIborSwaptionMatlabExamples():
 
     zeroRates = np.array([0.06] * 11)
 
-    interpType = FinInterpTypes.FLAT_FWD_RATES
-    day_count_type = FinDayCountTypes.THIRTY_E_360_ISDA
-    contFreq = FinFrequencyTypes.ANNUAL
+    interp_type = FinInterpTypes.FLAT_FWD_RATES
+    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    contFreq = FrequencyTypes.ANNUAL
 
-    libor_curve = FinDiscountCurveZeros(valuation_date, dates, zeroRates,
-                                       contFreq, day_count_type, interpType)
+    libor_curve = DiscountCurveZeros(valuation_date, dates, zeroRates,
+                                     contFreq, day_count_type, interp_type)
 
     settlement_date = valuation_date
     exerciseDate = Date(1, 1, 2012)
     maturity_date = Date(1, 1, 2015)
 
-    fixedFrequencyType = FinFrequencyTypes.ANNUAL
-    fixedDayCountType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFrequencyType = FrequencyTypes.ANNUAL
+    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     fixedCoupon = 0.062

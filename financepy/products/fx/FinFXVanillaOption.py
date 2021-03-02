@@ -6,9 +6,9 @@ import numpy as np
 from scipy import optimize
 from numba import njit
 
-from ...utils.Date import Date
-from ...utils.Math import nprime
-from ...utils.FinGlobalVariables import gDaysInYear, gSmall
+from ...utils.date import Date
+from ...utils.fin_math import nprime
+from ...utils.global_variables import gDaysInYear, gSmall
 from ...utils.FinError import FinError
 from ...utils.FinGlobalTypes import FinOptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModel
@@ -16,16 +16,16 @@ from ...utils.FinGlobalTypes import FinOptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
 
-from ...models.FinModelCRRTree import crrTreeValAvg
-from ...models.FinModelSABR import volFunctionSABR
-from ...models.FinModelSABR import FinModelSABR
-from ...models.FinModelBlackScholes import FinModelBlackScholes
+from ...models.equity_crr_tree import crrTreeValAvg
+from ...models.sabr import volFunctionSABR
+from ...models.sabr import FinModelSABR
+from ...models.black_scholes import FinModelBlackScholes
 
-from ...models.FinModelBlackScholesAnalytical import bsValue, bsDelta
+from ...models.black_scholes_analytic import bsValue, bsDelta
 
-from ...utils.FinHelperFunctions import checkArgumentTypes, labelToString
+from ...utils.helper_functions import check_argument_types, labelToString
 
-from ...utils.Math import N
+from ...utils.fin_math import N
 
 
 ###############################################################################
@@ -113,7 +113,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 
 #     self = args[0]
 #     valuation_date = args[1]
-#     stockPrice = args[2]
+#     stock_price = args[2]
 #     domDiscountCurve = args[3]
 #     forDiscountCurve = args[4]
 #     delta = args[5]
@@ -125,7 +125,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 #     self._strikeFXRate = K
 
 #     deltaDict = self.delta(valuation_date,
-#                            stockPrice,
+#                            stock_price,
 #                            domDiscountCurve,
 #                            forDiscountCurve,
 #                            model)
@@ -142,7 +142,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 
 #     self = args[0]
 #     valuation_date = args[1]
-#     stockPrice = args[2]
+#     stock_price = args[2]
 #     domDF = args[3]
 #     forDF = args[4]
 #     delta = args[5]
@@ -152,7 +152,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, optionTypeValue):
 #     self._strikeFXRate = K
 
 #     deltaDict = self.fastDelta(valuation_date,
-#                                stockPrice,
+#                                stock_price,
 #                                domDF,
 #                                forDF,
 #                                volatility)
@@ -194,7 +194,7 @@ class FinFXVanillaOption():
         where FOR is the foreign currency pair currency code and DOM is the
         same for the domestic currency. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         deliveryDate = expiry_date.addWeekDays(spotDays)
 
@@ -656,7 +656,7 @@ class FinFXVanillaOption():
 
     def impliedVolatility(self,
                           valuation_date,
-                          stockPrice,
+                          stock_price,
                           discount_curve,
                           dividendCurve,
                           price):
@@ -664,7 +664,7 @@ class FinFXVanillaOption():
         given a price and the other option details. It uses a one-dimensional
         Newton root search algorith to determine the implied volatility. """
 
-        argtuple = (self, valuation_date, stockPrice,
+        argtuple = (self, valuation_date, stock_price,
                     discount_curve, dividendCurve, price)
 
         sigma = optimize.newton(f, x0=0.2, fprime=fvega, args=argtuple,
@@ -679,7 +679,7 @@ class FinFXVanillaOption():
                 domDiscountCurve,
                 forDiscountCurve,
                 model,
-                numPaths=10000,
+                num_paths=10000,
                 seed=4242):
         """ Calculate the value of an FX Option using Monte Carlo methods.
         This function can be used to validate the risk measures calculated
@@ -704,12 +704,12 @@ class FinFXVanillaOption():
         mu = rd - rf
         v2 = volatility**2
         K = self._strikeFXRate
-        sqrtdt = np.sqrt(t)
+        sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, numPaths))
+        g = np.random.normal(0.0, 1.0, size=(1, num_paths))
         s = spotFXRate * np.exp((mu - v2 / 2.0) * t)
-        m = np.exp(g * sqrtdt * volatility)
+        m = np.exp(g * sqrt_dt * volatility)
         s_1 = s * m
         s_2 = s / m
 

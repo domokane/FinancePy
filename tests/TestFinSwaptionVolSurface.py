@@ -7,10 +7,10 @@ sys.path.append("..")
 
 import numpy as np
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
 from financepy.market.volatility.FinSwaptionVolSurface import FinSwaptionVolSurface
-from financepy.utils.Date import Date
-from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
+from financepy.utils.date import Date
+from financepy.models.volatility_fns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -67,10 +67,10 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         atmVols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
-        discount_curve = FinDiscountCurveFlat(valuation_date, rfrRate)
+        discount_curve = DiscountCurveFlat(valuation_date, rfrRate)
 
         divRate = 0.010  # USD
-        dividendCurve = FinDiscountCurveFlat(valuation_date, divRate)
+        dividendCurve = DiscountCurveFlat(valuation_date, divRate)
 
         volFunctionType = FinVolFunctionTypes.SABR_BETA_HALF
 

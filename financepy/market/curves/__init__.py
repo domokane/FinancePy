@@ -1,5 +1,5 @@
-from .FinInterpolator import *
-from .FinDiscountCurve import *
+from .interpolator import *
+from .discount_curve import *
 from .FinDiscountCurveFlat import *
 from .FinDiscountCurveNS import *
 from .FinDiscountCurvePWF import *
