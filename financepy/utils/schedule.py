@@ -137,21 +137,21 @@ class Schedule(object):
 
         if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
-            nextDate = self._termination_date
+            next_date = self._termination_date
             flowNum = 0
 
-            while nextDate > self._effective_date:
+            while next_date > self._effective_date:
 
-                unadjustedScheduleDates.append(nextDate)
-                nextDate = nextDate.addMonths(-numMonths)
+                unadjustedScheduleDates.append(next_date)
+                next_date = next_date.addMonths(-numMonths)
                 
                 if self._endOfMonthFlag is True:
-                    nextDate = nextDate.EOM()
+                    next_date = next_date.EOM()
 
                 flowNum += 1
 
             # Add on the Previous Coupon Date
-            unadjustedScheduleDates.append(nextDate)
+            unadjustedScheduleDates.append(next_date)
             flowNum += 1
 
             # reverse order and holiday adjust dates
@@ -173,15 +173,15 @@ class Schedule(object):
         elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             # This needs checking
-            nextDate = self._effective_date
+            next_date = self._effective_date
             flowNum = 0
 
-            unadjustedScheduleDates.append(nextDate)
+            unadjustedScheduleDates.append(next_date)
             flowNum = 1
 
-            while nextDate < self._termination_date:
-                unadjustedScheduleDates.append(nextDate)
-                nextDate = nextDate.addMonths(numMonths)
+            while next_date < self._termination_date:
+                unadjustedScheduleDates.append(next_date)
+                next_date = next_date.addMonths(numMonths)
                 flowNum = flowNum + 1
 
             # The effective date is not adjusted as it is given

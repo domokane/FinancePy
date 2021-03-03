@@ -12,10 +12,10 @@ from ...utils.global_variables import gDaysInYear
 from ...utils.fin_math import scale
 from ...utils.helper_functions import labelToString
 
-from .bond_yield_curve_model import CurveFitPolynomial
-from .bond_yield_curve_model import CurveFitNelsonSiegel
-from .bond_yield_curve_model import CurveFitNelsonSiegelSvensson
-from .bond_yield_curve_model import CurveFitBSpline
+from .yield_curve_model import CurveFitPolynomial
+from .yield_curve_model import CurveFitNelsonSiegel
+from .yield_curve_model import CurveFitNelsonSiegelSvensson
+from .yield_curve_model import CurveFitBSpline
 
 from scipy.optimize import curve_fit
 from scipy.interpolate import splrep

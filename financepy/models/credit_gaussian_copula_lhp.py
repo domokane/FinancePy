@@ -17,7 +17,7 @@ from ..utils.FinError import FinError
 @njit(fastmath=True, cache=True)
 def trSurvProbLHP(k1,
                   k2,
-                  numCredits,
+                  num_credits,
                   survivalProbabilities,
                   recovery_rates,
                   beta):
@@ -34,7 +34,7 @@ def trSurvProbLHP(k1,
 
     p = 0.0
     portfolioEL = 0.0
-    for iCredit in range(0, numCredits):
+    for iCredit in range(0, num_credits):
         pd = (1.0 - survivalProbabilities[iCredit])
         p += pd
         portfolioEL += pd * (1.0 - recovery_rates[iCredit])
@@ -42,8 +42,8 @@ def trSurvProbLHP(k1,
     if p == 0.0:
         return 1.0
 
-    p = p / numCredits
-    portfolioEL = portfolioEL / numCredits
+    p = p / num_credits
+    portfolioEL = portfolioEL / num_credits
 
     recovery = 1.0 - portfolioEL / p
     elk1 = expMinLK(k1, p, recovery, 1.0, beta)
@@ -55,17 +55,17 @@ def trSurvProbLHP(k1,
 
 
 @njit(fastmath=True, cache=True)
-def portfolioCDF_LHP(k, numCredits, qvector, recovery_rates, beta, num_points):
+def portfolioCDF_LHP(k, num_credits, qvector, recovery_rates, beta, num_points):
 
     p = 0.0
     portfolioEL = 0.0
 
-    for j in range(0, numCredits):
+    for j in range(0, num_credits):
         p += (1.0 - qvector[j])
         portfolioEL += (1.0 - recovery_rates[j]) * (1 - qvector[j])
 
-    p = p / numCredits
-    portfolioEL /= numCredits
+    p = p / num_credits
+    portfolioEL /= num_credits
 
     if p == 0:
         return 0.0

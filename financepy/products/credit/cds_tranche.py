@@ -7,7 +7,6 @@
 import numpy as np
 from math import sqrt
 
-
 from ...models.credit_gaussian_copula_onefactor import trSurvProbGaussian
 from ...models.credit_gaussian_copula_onefactor import trSurvProbAdjBinomial
 from ...models.credit_gaussian_copula_onefactor import trSurvProbRecursion
@@ -39,6 +38,7 @@ class FinLossDistributionBuilder(Enum):
     ADJUSTED_BINOMIAL = 2
     GAUSSIAN = 3
     LHP = 4
+
 
 ###############################################################################
 
@@ -80,18 +80,18 @@ class FinCDSTranche(object):
 
         notional = 1.0
 
-        self._cdsContract = FinCDS(self._step_in_date,
-                                   self._maturity_date,
-                                   self._running_coupon,
-                                   notional,
-                                   self._long_protection,
-                                   self._freq_type,
-                                   self._day_count_type,
-                                   self._calendar_type,
-                                   self._bus_day_adjust_type,
-                                   self._date_gen_rule_type)
+        self._cds_contract = FinCDS(self._step_in_date,
+                                    self._maturity_date,
+                                    self._running_coupon,
+                                    notional,
+                                    self._long_protection,
+                                    self._freq_type,
+                                    self._day_count_type,
+                                    self._calendar_type,
+                                    self._bus_day_adjust_type,
+                                    self._date_gen_rule_type)
 
-###############################################################################
+    ###############################################################################
 
     def valueBC(self,
                 valuation_date,
@@ -103,7 +103,7 @@ class FinCDSTranche(object):
                 num_points=50,
                 model=FinLossDistributionBuilder.RECURSION):
 
-        numCredits = len(issuer_curves)
+        num_credits = len(issuer_curves)
         k1 = self._k1
         k2 = self._k2
         tmat = (self._maturity_date - valuation_date) / gDaysInYear
@@ -124,22 +124,22 @@ class FinCDSTranche(object):
 
         kappa = k2 / (k2 - k1)
 
-        recovery_rates = np.zeros(numCredits)
+        recovery_rates = np.zeros(num_credits)
 
-        payment_dates = self._cdsContract._adjusted_dates
+        payment_dates = self._cds_contract._adjusted_dates
         numTimes = len(payment_dates)
 
         beta1 = sqrt(corr1)
         beta2 = sqrt(corr2)
-        betaVector1 = np.zeros(numCredits)
-        for bb in range(0, numCredits):
+        betaVector1 = np.zeros(num_credits)
+        for bb in range(0, num_credits):
             betaVector1[bb] = beta1
 
-        betaVector2 = np.zeros(numCredits)
-        for bb in range(0, numCredits):
+        betaVector2 = np.zeros(num_credits)
+        for bb in range(0, num_credits):
             betaVector2[bb] = beta2
 
-        qVector = np.zeros(numCredits)
+        qVector = np.zeros(num_credits)
         qt1 = np.zeros(numTimes)
         qt2 = np.zeros(numTimes)
         trancheTimes = np.zeros(numTimes)
@@ -154,8 +154,7 @@ class FinCDSTranche(object):
 
             t = (payment_dates[i] - valuation_date) / gDaysInYear
 
-            for j in range(0, numCredits):
-
+            for j in range(0, num_credits):
                 issuer_curve = issuer_curves[j]
                 vTimes = issuer_curve._times
                 qRow = issuer_curve._values
@@ -165,23 +164,23 @@ class FinCDSTranche(object):
 
             if model == FinLossDistributionBuilder.RECURSION:
                 qt1[i] = trSurvProbRecursion(
-                    0.0, k1, numCredits, qVector, recovery_rates,
+                    0.0, k1, num_credits, qVector, recovery_rates,
                     betaVector1, num_points)
                 qt2[i] = trSurvProbRecursion(
-                    0.0, k2, numCredits, qVector, recovery_rates,
+                    0.0, k2, num_credits, qVector, recovery_rates,
                     betaVector2, num_points)
             elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
                 qt1[i] = trSurvProbAdjBinomial(
-                    0.0, k1, numCredits, qVector, recovery_rates,
+                    0.0, k1, num_credits, qVector, recovery_rates,
                     betaVector1, num_points)
                 qt2[i] = trSurvProbAdjBinomial(
-                    0.0, k2, numCredits, qVector, recovery_rates,
+                    0.0, k2, num_credits, qVector, recovery_rates,
                     betaVector2, num_points)
             elif model == FinLossDistributionBuilder.GAUSSIAN:
                 qt1[i] = trSurvProbGaussian(
                     0.0,
                     k1,
-                    numCredits,
+                    num_credits,
                     qVector,
                     recovery_rates,
                     betaVector1,
@@ -189,16 +188,16 @@ class FinCDSTranche(object):
                 qt2[i] = trSurvProbGaussian(
                     0.0,
                     k2,
-                    numCredits,
+                    num_credits,
                     qVector,
                     recovery_rates,
                     betaVector2,
                     num_points)
             elif model == FinLossDistributionBuilder.LHP:
                 qt1[i] = trSurvProbLHP(
-                    0.0, k1, numCredits, qVector, recovery_rates, beta1)
+                    0.0, k1, num_credits, qVector, recovery_rates, beta1)
                 qt2[i] = trSurvProbLHP(
-                    0.0, k2, numCredits, qVector, recovery_rates, beta2)
+                    0.0, k2, num_credits, qVector, recovery_rates, beta2)
             else:
                 raise FinError(
                     "Unknown model type only full and AdjBinomial allowed")
@@ -221,9 +220,9 @@ class FinCDSTranche(object):
         trancheCurve._times = trancheTimes
         trancheCurve._values = trancheSurvivalCurve
 
-        protLegPV = self._cdsContract.protectionLegPV(
+        protLegPV = self._cds_contract.protectionLegPV(
             valuation_date, trancheCurve, curveRecovery)
-        riskyPV01 = self._cdsContract.riskyPV01(valuation_date, trancheCurve)['clean_rpv01']
+        riskyPV01 = self._cds_contract.riskyPV01(valuation_date, trancheCurve)['clean_rpv01']
 
         mtm = self._notional * (protLegPV - upfront - riskyPV01 * running_coupon)
 

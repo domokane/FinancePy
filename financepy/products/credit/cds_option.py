@@ -48,7 +48,7 @@ class FinCDSOption():
     def __init__(self,
                  expiry_date: Date,
                  maturity_date: Date,
-                 strikeCoupon: float,
+                 strike_coupon: float,
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  knockoutFlag: bool = True,
@@ -67,12 +67,12 @@ class FinCDSOption():
         if maturity_date < expiry_date:
             raise FinError("Maturity date must be after option expiry date")
 
-        if strikeCoupon < 0.0:
+        if strike_coupon < 0.0:
             raise FinError("Strike must be greater than zero")
 
         self._expiry_date = expiry_date
         self._maturity_date = maturity_date
-        self._strikeCoupon = strikeCoupon
+        self._strike_coupon = strike_coupon
         self._long_protection = long_protection
         self._knockoutFlag = knockoutFlag
         self._notional = notional
@@ -104,7 +104,7 @@ class FinCDSOption():
         # set equal to the option spread strike
         cds = FinCDS(self._expiry_date,
                      self._maturity_date,
-                     self._strikeCoupon,
+                     self._strike_coupon,
                      self._notional,
                      self._long_protection,
                      self._freq_type,
@@ -113,7 +113,7 @@ class FinCDSOption():
                      self._businessDateAdjustType,
                      self._date_gen_rule_type)
 
-        strike = self._strikeCoupon
+        strike = self._strike_coupon
         forwardSpread = cds.parSpread(valuation_date, issuer_curve)
         forwardRPV01 = cds.riskyPV01(valuation_date, issuer_curve)['full_rpv01']
 

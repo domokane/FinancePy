@@ -89,10 +89,10 @@ class FinFXOption(object):
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
-        nextDate = valuation_date.addDays(1)
+        next_date = valuation_date.addDays(1)
         bump = 1.0 / gDaysInYear
 
-        vBumped = self.value(nextDate, stock_price, discount_curve,
+        vBumped = self.value(next_date, stock_price, discount_curve,
                              dividendCurve, model)
 
         if type(v) is dict:

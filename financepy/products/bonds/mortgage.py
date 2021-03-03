@@ -25,7 +25,7 @@ class BondMortgageTypes(Enum):
 ###############################################################################
 
 
-class BondMortgage(object):
+class Mortgage(object):
     """ A mortgage is a vector of dates and flows generated in order to repay
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.

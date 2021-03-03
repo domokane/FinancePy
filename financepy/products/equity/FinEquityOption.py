@@ -118,14 +118,14 @@ class FinEquityOption(object):
                        discount_curve,
                        dividendCurve, model)
 
-        nextDate = valuation_date.addDays(1)
+        next_date = valuation_date.addDays(1)
 
         # Need to do this carefully.
 
-        discount_curve._valuation_date = nextDate
-        bump = (nextDate - valuation_date) / gDaysInYear
+        discount_curve._valuation_date = next_date
+        bump = (next_date - valuation_date) / gDaysInYear
 
-        vBumped = self.value(nextDate, stock_price,
+        vBumped = self.value(next_date, stock_price,
                              discount_curve,
                              dividendCurve, model)
 

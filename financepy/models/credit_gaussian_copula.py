@@ -14,24 +14,24 @@ from ..utils.helper_functions import uniformToDefaultTime
 ###############################################################################
 
 
-def defaultTimesGC(issuer_curves,
+def default_timesGC(issuer_curves,
                    correlationMatrix,
-                   numTrials,
+                   num_trials,
                    seed):
     """ Generate a matrix of default times by credit and trial using a
     Gaussian copula model using a full rank correlation matrix. """
 
     np.random.seed(seed)
-    numCredits = len(issuer_curves)
-    x = np.random.normal(0.0, 1.0, size=(numCredits, numTrials))
+    num_credits = len(issuer_curves)
+    x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
     c = np.linalg.cholesky(correlationMatrix)
     y = np.dot(c, x)
 
-    corrTimes = np.empty(shape=(numCredits, 2 * numTrials))
+    corrTimes = np.empty(shape=(num_credits, 2 * num_trials))
 
-    for iCredit in range(0, numCredits):
+    for iCredit in range(0, num_credits):
         issuer_curve = issuer_curves[iCredit]
-        for iTrial in range(0, numTrials):
+        for iTrial in range(0, num_trials):
             g = y[iCredit, iTrial]
             u1 = 1.0 - N(g)
             u2 = 1.0 - u1
@@ -40,7 +40,7 @@ def defaultTimesGC(issuer_curves,
             t1 = uniformToDefaultTime(u1, times, values)
             t2 = uniformToDefaultTime(u2, times, values)
             corrTimes[iCredit, iTrial] = t1
-            corrTimes[iCredit, numTrials + iTrial] = t2
+            corrTimes[iCredit, num_trials + iTrial] = t2
 
     return corrTimes
 

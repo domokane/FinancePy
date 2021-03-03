@@ -75,7 +75,7 @@ class FinIborLMMProducts():
                                    bus_day_adjust_type,
                                    date_gen_rule_type)._generate()
 
-        self._accrualFactors = []
+        self._accrual_factors = []
         self._floatDayCountType = floatDayCountType
 
         basis = DayCount(self._floatDayCountType)
@@ -86,13 +86,13 @@ class FinIborLMMProducts():
         for nextDt in self._gridDates[1:]:
             tau = basis.year_frac(prevDt, nextDt)[0]
             t = (nextDt - self._gridDates[0]) / gDaysInYear
-            self._accrualFactors.append(tau)
+            self._accrual_factors.append(tau)
             self._gridTimes.append(t)
             prevDt = nextDt
 
 #        print(self._gridTimes)
-        self._accrualFactors = np.array(self._accrualFactors)
-        self._numForwards = len(self._accrualFactors)
+        self._accrual_factors = np.array(self._accrual_factors)
+        self._numForwards = len(self._accrual_factors)
         self._fwds = None
 
 #        print("Num FORWARDS", self._numForwards)
@@ -144,7 +144,7 @@ class FinIborLMMProducts():
                                        numeraireIndex,
                                        self._forwardCurve,
                                        gammas,
-                                       self._accrualFactors,
+                                       self._accrual_factors,
                                        useSobol,
                                        seed)
 
@@ -204,7 +204,7 @@ class FinIborLMMProducts():
                                        numeraireIndex,
                                        self._forwardCurve,
                                        lambdas,
-                                       self._accrualFactors,
+                                       self._accrual_factors,
                                        useSobol,
                                        seed)
 
@@ -267,7 +267,7 @@ class FinIborLMMProducts():
                                        self._forwardCurve,
                                        zetas,
                                        correlationMatrix,
-                                       self._accrualFactors,
+                                       self._accrual_factors,
                                        seed)
 
 ###############################################################################
@@ -395,7 +395,7 @@ class FinIborLMMProducts():
 
         fwd0 = self._forwardCurve
         fwds = self._fwds
-        taus = self._accrualFactors
+        taus = self._accrual_factors
 
         v = LMMCapFlrPricer(numFowards, num_paths, K, fwd0, fwds, taus, isCap)
 

@@ -558,11 +558,11 @@ class Date():
         """ Returns a CDS date that is mm months after the FinDate. If no
         argument is supplied then the next CDS date after today is returned."""
 
-        nextDate = self.addMonths(mm)
+        next_date = self.addMonths(mm)
 
-        y = nextDate._y
-        m = nextDate._m
-        d = nextDate._d
+        y = next_date._y
+        m = next_date._m
+        d = next_date._d
 
         d_cds = 20
         y_cds = y

@@ -32,8 +32,8 @@ class FinCDSIndexOption(object):
     def __init__(self,
                  expiry_date: Date,
                  maturity_date: Date,
-                 indexCoupon: float,
-                 strikeCoupon: float,
+                 index_coupon: float,
+                 strike_coupon: float,
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -49,16 +49,16 @@ class FinCDSIndexOption(object):
         if expiry_date > maturity_date:
             raise FinError("Expiry date after end date")
 
-        if indexCoupon < 0.0:
+        if index_coupon < 0.0:
             raise FinError("Index coupon is negative")
 
-        if strikeCoupon < 0.0:
+        if strike_coupon < 0.0:
             raise FinError("Index Option strike coupon is negative")
 
         self._expiry_date = expiry_date
         self._maturity_date = maturity_date
-        self._indexCoupon = indexCoupon
-        self._strikeCoupon = strikeCoupon
+        self._index_coupon = index_coupon
+        self._strike_coupon = strike_coupon
         self._notional = notional
         self._long_protection = long_protection
 
@@ -68,9 +68,9 @@ class FinCDSIndexOption(object):
         self._freq_type = freq_type
         self._bus_day_adjust_type = bus_day_adjust_type
 
-        self._cdsContract = FinCDS(self._expiry_date,
+        self._cds_contract = FinCDS(self._expiry_date,
                                    self._maturity_date,
-                                   self._indexCoupon,
+                                   self._index_coupon,
                                    1.0,
                                    self._long_protection,
                                    self._freq_type,
@@ -90,8 +90,8 @@ class FinCDSIndexOption(object):
         """ This approach uses two adjustments to Black's option pricing
         model to value an option on a CDS index. """
 
-        k = self._strikeCoupon
-        c = self._indexCoupon
+        k = self._strike_coupon
+        c = self._index_coupon
         timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
         df = libor_curve.df(self._expiry_date)
         qExpiryIndex = index_curve.survProb(timeToExpiry)
@@ -101,12 +101,12 @@ class FinCDSIndexOption(object):
             valuation_date, [cds], libor_curve, indexRecovery)
 #        qExpiryStrike = strikeCurve.survivalProbability(timeToExpiry)
 
-        strikeRPV01 = self._cdsContract.riskyPV01(
+        strikeRPV01 = self._cds_contract.riskyPV01(
             valuation_date, strikeCurve)['clean_rpv01']
-        indexRPV01 = self._cdsContract.riskyPV01(
+        indexRPV01 = self._cds_contract.riskyPV01(
             valuation_date, index_curve)['clean_rpv01']
 
-        s = self._cdsContract.parSpread(valuation_date, index_curve)
+        s = self._cds_contract.parSpread(valuation_date, index_curve)
 
         fep = df * (1.0 - qExpiryIndex) * (1.0 - indexRecovery)
         adjFwd = s + fep / indexRPV01
@@ -139,19 +139,19 @@ class FinCDSIndexOption(object):
         the forward spread as a log-normally distributed quantity and uses the
         credit triangle to compute the forward RPV01. """
 
-        numCredits = len(issuer_curves)
+        num_credits = len(issuer_curves)
         timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
 #        timeToMaturity = (self._maturity_date - valuation_date) / gDaysInYear
         dfToExpiry = issuer_curves[0].df(timeToExpiry)
         libor_curve = issuer_curves[0]._libor_curve
 
-        k = self._strikeCoupon
-        c = self._indexCoupon
+        k = self._strike_coupon
+        c = self._index_coupon
 
         strikeCDS = FinCDS(
             self._expiry_date,
             self._maturity_date,
-            self._strikeCoupon,
+            self._strike_coupon,
             1.0)
         strikeCurve = FinCDSCurve(valuation_date, [strikeCDS], libor_curve)
         strikeRPV01s = strikeCDS.riskyPV01(valuation_date, strikeCurve)
@@ -163,20 +163,20 @@ class FinCDSIndexOption(object):
         h1 = 0.0
         h2 = 0.0
 
-        for iCredit in range(0, numCredits):
+        for iCredit in range(0, num_credits):
 
             issuer_curve = issuer_curves[iCredit]
             q = issuer_curve.survProb(timeToExpiry)
             dh1 = (1.0 - issuer_curve._recovery_rate) * (1.0 - q)
 
-            s = self._cdsContract.parSpread(valuation_date, issuer_curve)
-            rpv01 = self._cdsContract.riskyPV01(valuation_date, issuer_curve)
+            s = self._cds_contract.parSpread(valuation_date, issuer_curve)
+            rpv01 = self._cds_contract.riskyPV01(valuation_date, issuer_curve)
             dh2 = (s - c) * rpv01['clean_rpv01'] / (dfToExpiry * qToExpiry)
 
             h1 = h1 + dh1
             h2 = h2 + dh2
 
-        expH = (h1 + h2) / numCredits
+        expH = (h1 + h2) / num_credits
 
         x = self._solveForX(valuation_date,
                             sigma,
@@ -206,7 +206,7 @@ class FinCDSIndexOption(object):
     def _solveForX(self,
                    valuation_date,
                    sigma,
-                   indexCoupon,
+                   index_coupon,
                    indexRecovery,
                    libor_curve,
                    expH):
@@ -218,10 +218,10 @@ class FinCDSIndexOption(object):
         xacc = 0.000000001
         rtb = 999999
 
-        f = self._calcObjFunc(x1, valuation_date, sigma, indexCoupon,
+        f = self._calcObjFunc(x1, valuation_date, sigma, index_coupon,
                               indexRecovery, libor_curve) - expH
 
-        fmid = self._calcObjFunc(x2, valuation_date, sigma, indexCoupon,
+        fmid = self._calcObjFunc(x2, valuation_date, sigma, index_coupon,
                                  indexRecovery, libor_curve) - expH
 
         if f * fmid >= 0.0:
@@ -237,7 +237,7 @@ class FinCDSIndexOption(object):
         for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self._calcObjFunc(xmid, valuation_date, sigma, indexCoupon,
+            fmid = self._calcObjFunc(xmid, valuation_date, sigma, index_coupon,
                                      indexRecovery, libor_curve) - expH
             if fmid <= 0.0:
                 rtb = xmid
@@ -252,7 +252,7 @@ class FinCDSIndexOption(object):
                      x,
                      valuation_date,
                      sigma,
-                     indexCoupon,
+                     index_coupon,
                      indexRecovery,
                      libor_curve):
         """ An internal function used in the Anderson valuation. """
@@ -264,7 +264,7 @@ class FinCDSIndexOption(object):
         values = self._calcIndexPayerOptionPrice(valuation_date,
                                                  x,
                                                  sigma,
-                                                 self._indexCoupon,
+                                                 self._index_coupon,
                                                  strikeValue,
                                                  libor_curve,
                                                  indexRecovery)
@@ -277,7 +277,7 @@ class FinCDSIndexOption(object):
                                    valuation_date,
                                    x,
                                    sigma,
-                                   indexCoupon,
+                                   index_coupon,
                                    strikeValue,
                                    libor_curve,
                                    indexRecovery):
@@ -289,7 +289,7 @@ class FinCDSIndexOption(object):
         dz = 0.2
         numZSteps = int(2.0 * abs(z) / dz)
 
-        flow_dates = self._cdsContract._adjusted_dates
+        flow_dates = self._cds_contract._adjusted_dates
         num_flows = len(flow_dates)
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         dfToExpiry = libor_curve.df(self._expiry_date)
@@ -309,7 +309,7 @@ class FinCDSIndexOption(object):
         dayCount = DayCount(self._day_count_type)
         pcd = flow_dates[0]  # PCD
         eff = self._expiry_date
-        accrualFactorPCDToExpiry = dayCount.year_frac(pcd, eff)[0]
+        accrual_factorPCDToExpiry = dayCount.year_frac(pcd, eff)[0]
 
         s0 = exp(-0.5 * sigma * sigma * texp)
 
@@ -320,12 +320,12 @@ class FinCDSIndexOption(object):
 
             fwdRPV01 = 0.0
             for iFlow in range(1, num_flows):
-                acc_factor = self._cdsContract._accrualFactors[iFlow]
+                acc_factor = self._cds_contract._accrual_factors[iFlow]
                 survivalProbability = exp(-s * expiryToFlowTimes[iFlow] / lgd)
                 fwdRPV01 += acc_factor * survivalProbability * fwdDfs[iFlow]
 
-            fwdRPV01 += -accrualFactorPCDToExpiry
-            h = (s - indexCoupon) * fwdRPV01
+            fwdRPV01 += -accrual_factorPCDToExpiry
+            h = (s - index_coupon) * fwdRPV01
             maxh = max(h - strikeValue, 0.0)
 
             intH += h * pdf
@@ -343,7 +343,7 @@ class FinCDSIndexOption(object):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("INDEX COUPON", self._indexCoupon*10000, "bp\n")
+        s += labelToString("INDEX COUPON", self._index_coupon*10000, "bp\n")
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("LONG PROTECTION", self._long_protection)
         s += labelToString("FREQUENCY", self._freq_type)

@@ -568,7 +568,7 @@ class IborSingleCurve(DiscountCurve):
         # Do I need this line ?
         interpolatedSwapRates[0] = interpolatedSwapRates[1]
 
-        accrualFactors = longestSwap._fixedYearFracs
+        accrual_factors = longestSwap._fixedYearFracs
 
         acc = 0.0
         df = 1.0
@@ -578,7 +578,7 @@ class IborSingleCurve(DiscountCurve):
         for i in range(1, start_index):
             dt = couponDates[i]
             df = self.df(dt)
-            acc = accrualFactors[i-1]
+            acc = accrual_factors[i-1]
             pv01 += acc * df
 
         for i in range(start_index, num_flows):
@@ -586,7 +586,7 @@ class IborSingleCurve(DiscountCurve):
             dt = couponDates[i]
             tmat = (dt - self._valuation_date) / gDaysInYear
             swap_rate = interpolatedSwapRates[i]
-            acc = accrualFactors[i-1]
+            acc = accrual_factors[i-1]
             pv01End = (acc * swap_rate + 1.0)
 
             dfMat = (dfSettle - swap_rate * pv01) / pv01End

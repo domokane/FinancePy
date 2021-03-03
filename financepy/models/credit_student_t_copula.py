@@ -13,25 +13,25 @@ from ..utils.helper_functions import uniformToDefaultTime
 
 class FinModelStudentTCopula():
 
-    def defaultTimes(self,
+    def default_times(self,
                      issuer_curves,
                      correlationMatrix,
                      degreesOfFreedom,
-                     numTrials,
+                     num_trials,
                      seed):
 
         np.random.seed(seed)
-        numCredits = len(issuer_curves)
-        x = np.random.normal(0.0, 1.0, size=(numCredits, numTrials))
+        num_credits = len(issuer_curves)
+        x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
         c = np.linalg.cholesky(correlationMatrix)
         y = np.dot(c, x)
 
-        corrTimes = np.empty(shape=(numCredits, 2 * numTrials))
+        corrTimes = np.empty(shape=(num_credits, 2 * num_trials))
 
-        for iTrial in range(0, numTrials):
+        for iTrial in range(0, num_trials):
             chi2 = np.random.chisquare(degreesOfFreedom)
             c = sqrt(chi2 / degreesOfFreedom)
-            for iCredit in range(0, numCredits):
+            for iCredit in range(0, num_credits):
                 issuer_curve = issuer_curves[iCredit]
                 g = y[iCredit, iTrial] / c
                 u1 = student.cdf(g, degreesOfFreedom)
@@ -41,7 +41,7 @@ class FinModelStudentTCopula():
                 t1 = uniformToDefaultTime(u1, times, values)
                 t2 = uniformToDefaultTime(u2, times, values)
                 corrTimes[iCredit, iTrial] = t1
-                corrTimes[iCredit, iTrial + numTrials] = t2
+                corrTimes[iCredit, iTrial + num_trials] = t2
 
         return corrTimes
 
