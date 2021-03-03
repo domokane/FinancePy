@@ -5,18 +5,18 @@
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.finutils.FinCalendar import FinDateGenRuleTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinAmount import FinAmount
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.fin_math import ONE_MILLION
+from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.Amount import FinAmount
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.date import Date
 from financepy.products.rates.FinFixedLeg import FinFixedLeg
 from financepy.products.rates.FinFloatLeg import FinFloatLeg
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -26,100 +26,100 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFixedIborSwapLeg():
 
-    effectiveDate = FinDate(28, 10, 2020)
-    maturityDate = FinDate(28, 10, 2025)
+    effective_date = Date(28, 10, 2020)
+    maturity_date = Date(28, 10, 2025)
     
     coupon = -0.44970/100.0
-    freqType = FinFrequencyTypes.ANNUAL    
-    dayCountType = FinDayCountTypes.THIRTY_360_BOND
+    freq_type = FrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = FinSwapTypes.PAY
-    calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
-    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-    paymentLag = 0
+    calendar_type = CalendarTypes.TARGET
+    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    payment_lag = 0
     principal = 0.0
 
-    swapFixedLeg = FinFixedLeg(effectiveDate,
-                               maturityDate,
+    swapFixedLeg = FinFixedLeg(effective_date,
+                               maturity_date,
                                legPayRecType,
                                coupon,
-                               freqType,
-                               dayCountType,
+                               freq_type,
+                               day_count_type,
                                notional,
                                principal,
-                               paymentLag,
-                               calendarType,
-                               busDayAdjustType,
-                               dateGenRuleType)
+                               payment_lag,
+                               calendar_type,
+                               bus_day_adjust_type,
+                               date_gen_rule_type)
 
 ###############################################################################
 
 def test_FinFixedOISSwapLeg():
 
-    effectiveDate = FinDate(28, 10, 2020)
-    maturityDate = FinDate(28, 10, 2025)
+    effective_date = Date(28, 10, 2020)
+    maturity_date = Date(28, 10, 2025)
     
     coupon = -0.515039/100.0
-    freqType = FinFrequencyTypes.ANNUAL    
-    dayCountType = FinDayCountTypes.ACT_360
+    freq_type = FrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = FinSwapTypes.PAY
-    calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
-    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-    paymentLag = 1
+    calendar_type = CalendarTypes.TARGET
+    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    payment_lag = 1
     principal = 0.0
 
-    swapFixedLeg = FinFixedLeg(effectiveDate,
-                                  maturityDate,
+    swapFixedLeg = FinFixedLeg(effective_date,
+                                  maturity_date,
                                   legPayRecType,
                                   coupon,
-                                  freqType,
-                                  dayCountType,
+                                  freq_type,
+                                  day_count_type,
                                   notional,
                                   principal,
-                                  paymentLag,
-                                  calendarType,
-                                  busDayAdjustType,
-                                  dateGenRuleType)
+                                  payment_lag,
+                                  calendar_type,
+                                  bus_day_adjust_type,
+                                  date_gen_rule_type)
 
 ###############################################################################
 
 def test_FinFloatIborLeg():
 
-    effectiveDate = FinDate(28, 10, 2020)
-    maturityDate = FinDate(28, 10, 2025)
+    effective_date = Date(28, 10, 2020)
+    maturity_date = Date(28, 10, 2025)
     
     spread = 0.0
-    freqType = FinFrequencyTypes.ANNUAL    
-    dayCountType = FinDayCountTypes.THIRTY_360_BOND
+    freq_type = FrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = FinSwapTypes.PAY
-    calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
-    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-    paymentLag = 0
+    calendar_type = CalendarTypes.TARGET
+    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    payment_lag = 0
     principal = 0.0
 
-    swapFloatLeg = FinFloatLeg(effectiveDate,
-                               maturityDate,
+    swapFloatLeg = FinFloatLeg(effective_date,
+                               maturity_date,
                                legPayRecType,
                                spread,
-                               freqType,
-                               dayCountType,
+                               freq_type,
+                               day_count_type,
                                notional,
                                principal,
-                               paymentLag,
-                               calendarType,
-                               busDayAdjustType,
-                               dateGenRuleType)
+                               payment_lag,
+                               calendar_type,
+                               bus_day_adjust_type,
+                               date_gen_rule_type)
 
-    liborCurve = FinDiscountCurveFlat(effectiveDate, 0.05)
+    libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effectiveDate, liborCurve, liborCurve, 
+    v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
                            firstFixing)
 
 
@@ -127,38 +127,38 @@ def test_FinFloatIborLeg():
 
 def test_FinFloatOISLeg():
 
-    effectiveDate = FinDate(28, 10, 2020)
-    maturityDate = FinDate(28, 10, 2025)
+    effective_date = Date(28, 10, 2020)
+    maturity_date = Date(28, 10, 2025)
     
     spread = 0.0
-    freqType = FinFrequencyTypes.ANNUAL    
-    dayCountType = FinDayCountTypes.ACT_360
+    freq_type = FrequencyTypes.ANNUAL
+    day_count_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = FinSwapTypes.PAY
-    calendarType = FinCalendarTypes.TARGET
-    busDayAdjustType = FinBusDayAdjustTypes.FOLLOWING
-    dateGenRuleType = FinDateGenRuleTypes.BACKWARD
-    paymentLag = 1
+    calendar_type = CalendarTypes.TARGET
+    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
+    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    payment_lag = 1
     principal = 0.0
 
-    swapFloatLeg = FinFloatLeg(effectiveDate,
-                                  maturityDate,
+    swapFloatLeg = FinFloatLeg(effective_date,
+                                  maturity_date,
                                   legPayRecType,
                                   spread,
-                                  freqType,
-                                  dayCountType,
+                                  freq_type,
+                                  day_count_type,
                                   notional,
                                   principal,
-                                  paymentLag,
-                                  calendarType,
-                                  busDayAdjustType,
-                                  dateGenRuleType)
+                                  payment_lag,
+                                  calendar_type,
+                                  bus_day_adjust_type,
+                                  date_gen_rule_type)
 
-    liborCurve = FinDiscountCurveFlat(effectiveDate, 0.05)
+    libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effectiveDate, liborCurve, liborCurve, 
+    v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
                            firstFixing)
 
 ###############################################################################

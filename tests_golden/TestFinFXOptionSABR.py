@@ -7,11 +7,11 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.date import Date
+from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,8 +25,8 @@ def test_FinFXOptionSABR():
     # There is no FXAmericanOption class. It is embedded in the FXVanillaOption
     # class. This test just compares it to the European
 
-    valueDate = FinDate(13, 2, 2018)
-    expiryDate = FinDate(13, 2, 2019)
+    valuation_date = Date(13, 2, 2018)
+    expiry_date = Date(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -40,8 +40,8 @@ def test_FinFXOptionSABR():
 
     notional = 1000000.0
 
-    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
-    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
+    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
+    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 
@@ -55,27 +55,27 @@ def test_FinFXOptionSABR():
 
     for spotFXRate in spotFXRates:
 
-        callOption = FinFXVanillaOption(expiryDate,
+        callOption = FinFXVanillaOption(expiry_date,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
                                         notional,
                                         "USD")
 
-        valueEuropean = callOption.value(valueDate,
+        valueEuropean = callOption.value(valuation_date,
                                          spotFXRate,
                                          domDiscountCurve,
                                          forDiscountCurve,
                                          model)['v']
 
-        callOption = FinFXVanillaOption(expiryDate,
+        callOption = FinFXVanillaOption(expiry_date,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.AMERICAN_CALL,
                                         1000000,
                                         "USD")
 
-        valueAmerican = callOption.value(valueDate,
+        valueAmerican = callOption.value(valuation_date,
                                          spotFXRate,
                                          domDiscountCurve,
                                          forDiscountCurve,
@@ -93,27 +93,27 @@ def test_FinFXOptionSABR():
 
     for spotFXRate in spotFXRates:
 
-        callOption = FinFXVanillaOption(expiryDate,
+        callOption = FinFXVanillaOption(expiry_date,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_PUT,
                                         1000000,
                                         "USD")
 
-        valueEuropean = callOption.value(valueDate,
+        valueEuropean = callOption.value(valuation_date,
                                          spotFXRate,
                                          domDiscountCurve,
                                          forDiscountCurve,
                                          model)['v']
 
-        callOption = FinFXVanillaOption(expiryDate,
+        callOption = FinFXVanillaOption(expiry_date,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.AMERICAN_PUT,
                                         1000000,
                                         "USD")
 
-        valueAmerican = callOption.value(valueDate,
+        valueAmerican = callOption.value(valuation_date,
                                          spotFXRate,
                                          domDiscountCurve,
                                          forDiscountCurve,

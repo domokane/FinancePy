@@ -11,7 +11,7 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes

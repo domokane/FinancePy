@@ -8,7 +8,7 @@ sys.path.append("..")
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityDigitalOption import FinEquityDigitalOption, FinDigitalOptionTypes
 from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode

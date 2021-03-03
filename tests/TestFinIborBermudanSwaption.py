@@ -18,7 +18,7 @@ from financepy.models.black import FinModelBlack
 from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

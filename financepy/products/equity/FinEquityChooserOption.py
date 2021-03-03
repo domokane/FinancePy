@@ -13,7 +13,7 @@ from ...utils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...utils.FinGlobalTypes import FinOptionTypes
-from ...market.curves.FinDiscountCurveFlat import DiscountCurve
+from ...market.curves.discount_curve_flat import DiscountCurve
 from ...utils.helper_functions import labelToString, check_argument_types
 from ...utils.date import Date
 from ...models.black_scholes import bsValue

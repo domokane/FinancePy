@@ -11,7 +11,7 @@ from financepy.utils.day_count import DayCountTypes
 
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import FinModelBlackScholes
 from financepy.models.black_scholes import FinModelBlackScholesTypes
 

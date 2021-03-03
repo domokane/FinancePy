@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.utils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityAsianOption import FinEquityAsianOption
 from financepy.products.equity.FinEquityAsianOption import FinAsianOptionValuationMethods
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import FinModelBlackScholes
 from financepy.utils.date import Date
 

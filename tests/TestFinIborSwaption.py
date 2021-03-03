@@ -25,8 +25,8 @@ from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
 
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
-from financepy.market.curves.FinDiscountCurveZeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.interpolator import FinInterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode

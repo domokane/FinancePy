@@ -11,13 +11,13 @@ sys.path.append("..")
 from financepy.utils.date import *
 from financepy.market.curves.interpolator import FinInterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import DiscountCurveFlat
-from financepy.market.curves.FinDiscountCurveNS import DiscountCurveNS
-from financepy.market.curves.FinDiscountCurveNSS import DiscountCurveNSS
-from financepy.market.curves.FinDiscountCurvePWF import DiscountCurvePWF
-from financepy.market.curves.FinDiscountCurvePWL import DiscountCurvePWL
-from financepy.market.curves.FinDiscountCurveZeros import DiscountCurveZeros
-from financepy.market.curves.FinDiscountCurvePoly import DiscountCurvePoly
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_ns import DiscountCurveNS
+from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
+from financepy.market.curves.discount_curve_pwf import DiscountCurvePWF
+from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.utils.global_variables import gDaysInYear
 
 from FinTestCases import FinTestCases, globalTestCaseMode
