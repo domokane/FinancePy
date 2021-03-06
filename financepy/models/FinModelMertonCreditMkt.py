@@ -4,18 +4,18 @@
 
 import numpy as np
 
-from ..finutils.FinMath import N
+from ..utils.fin_math import N
 
 from scipy import optimize
 
-from ..finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ..finutils.FinError import FinError
-from .FinModelMertonCredit import FinModelMertonCredit
+from ..utils.helper_functions import labelToString, check_argument_types
+from ..utils.FinError import FinError
+from .credit_merton import FinModelMertonCredit
 
 ###############################################################################
 
 def _fobj(x, *args):
-    ''' Find value of asset value and vol that fit equity value and vol '''
+    """ Find value of asset value and vol that fit equity value and vol """
 
     A, vA = x
 
@@ -41,12 +41,12 @@ def _fobj(x, *args):
 
 
 class FinModelMertonCreditMkt(FinModelMertonCredit):
-    ''' Market Extension of the Merton Credit Model according to the original
+    """ Market Extension of the Merton Credit Model according to the original
     formulation by Merton with the inputs being the equity value of the firm, 
     the liabilities (bond face), the time to maturity in years, the risk-free 
     rate, the asset growth rate and the equity volatility. The asset value and
     asset volatility are computed internally by solving two non-linear 
-    simultaneous equations. '''
+    simultaneous equations. """
 
     def __init__(self,
                  equityValue: (float, list, np.ndarray),
@@ -55,10 +55,10 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
                  riskFreeRate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
                  equityVolatility: (float, list, np.ndarray)):
-        ''' Create an object that holds all of the model parameters. These
-        parameters may be vectorised. '''
+        """ Create an object that holds all of the model parameters. These
+        parameters may be vectorised. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if isinstance(equityValue, float):
             equityValue = [equityValue]

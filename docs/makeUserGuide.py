@@ -154,8 +154,8 @@ def open_file(filename):
 
 
 def buildHead():
-    ''' Start latex file with a header that sets all of the document
-    properties. '''
+    """ Start latex file with a header that sets all of the document
+    properties. """
 
     f = open(newHeadFile, 'r')
     lines = f.readlines()
@@ -169,7 +169,7 @@ def buildHead():
 
 
 def buildTail():
-    ''' Add on end latex to close document. '''
+    """ Add on end latex to close document. """
     f = open(tailFile, 'r')
     lines = f.readlines()
     f.close()
@@ -182,7 +182,7 @@ def buildTail():
 
 
 def buildIntro(introfile):
-    ''' Add on end latex to close document. '''
+    """ Add on end latex to close document. """
     print("Building introduction from file:", introfile)
 
     f = open(introfile, 'r')
@@ -201,8 +201,8 @@ def buildIntro(introfile):
 
 
 def buildChapter(folderName):
-    ''' Parse a folder by loading up all of the modules in that folder that
-    start with the threee letters - Fin. '''
+    """ Parse a folder by loading up all of the modules in that folder that
+    start with the threee letters - Fin. """
 
     print("Building chapter in folder:", folderName)
 
@@ -282,8 +282,8 @@ def buildChapter(folderName):
 
 
 def parseModule(moduleName):
-    ''' Parse a module looking for classes, functions and classes for
-    enumerated types. Functions inside classes are parsed inside the class. '''
+    """ Parse a module looking for classes, functions and classes for
+    enumerated types. Functions inside classes are parsed inside the class. """
     print(moduleName)
     f = open(moduleName, 'r', encoding="utf8")
     lines = f.readlines()
@@ -353,7 +353,7 @@ def parseModule(moduleName):
 
 
 def parseClass(lines, startLine, endLine):
-    ''' Parse a Python class consisting of data members and functions. '''
+    """ Parse a Python class consisting of data members and functions. """
 
     n1 = lines[startLine].find("class")
 
@@ -388,7 +388,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find("'''") > 0:
+        if line.find(""""") > 0:
             startCommentRow = rowNum
             startComment = True
             startLine = rowNum + 1
@@ -396,7 +396,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find("'''") > 0:
+        if line.find(""""") > 0:
             endCommentRow = rowNum
             endComment = True
             break
@@ -501,9 +501,9 @@ def parseClass(lines, startLine, endLine):
 
 
 def parseFunction(lines, startLine, endLine, className=""):
-    ''' Given a set of lines and a start line I extract the function definiton
+    """ Given a set of lines and a start line I extract the function definiton
     and any comment that goes below.
-    TODO: Add parsing of function arguments and any comments.'''
+    TODO: Add parsing of function arguments and any comments."""
 
     functionLine = lines[startLine]
     leftCol = functionLine.find("def ")
@@ -585,9 +585,9 @@ def parseFunction(lines, startLine, endLine, className=""):
     for rowNum in range(startLine+1, endLine):
         line = lines[rowNum]
 
-        if line.count("'''") == 1 or line.count('"""') == 1:
-            if line.count("'''") == 1:
-                commentInit = "'''"
+        if line.count(""""") == 1 or line.count('"""') == 1:
+            if line.count(""""") == 1:
+                commentInit = """""
             else:
                 commentInit = '"""'
 
@@ -601,7 +601,7 @@ def parseFunction(lines, startLine, endLine, className=""):
                     break
             break
 
-        if line.count("'''") == 2 or line.count('"""') == 2:
+        if line.count(""""") == 2 or line.count('"""') == 2:
             startCommentRow = rowNum
             endCommentRow = rowNum
             startComment = True
@@ -618,7 +618,7 @@ def parseFunction(lines, startLine, endLine, className=""):
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("_", r"\_")
-            line = line.replace("'''", "")
+            line = line.replace(""""", "")
             line = line.replace('"""', '')
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
@@ -658,7 +658,7 @@ def parseFunction(lines, startLine, endLine, className=""):
 
 
 def parseEnum(lines, startLine, endLine):
-    ''' Parse a Class that implements an Enumerated type. '''
+    """ Parse a Class that implements an Enumerated type. """
     enumDescription = []
 
     enumLine = lines[startLine]
@@ -697,9 +697,9 @@ def parseEnum(lines, startLine, endLine):
 
 
 def extractParams(functionSignature):
-    ''' Parse a function signature into a table containing each function
-    argument's name, type, description and default value'''
-    # A good example to look at for testing is `FinBondConvertible`
+    """ Parse a function signature into a table containing each function
+    argument's name, type, description and default value"""
+    # A good example to look at for testing is `BondConvertible`
 
     functionSignature = functionSignature.replace("\\", "\\textbackslash ")
     functionSignature = functionSignature.replace("_", "\_")
@@ -730,7 +730,7 @@ def extractParams(functionSignature):
 
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
-        # This allows us to parse 'Union[FinDate, str]' for maturityDateOrTenor.
+        # This allows us to parse 'Union[FinDate, str]' for maturity_date_or_tenor.
         if line.find("[") != -1 or line.find("(") != -1:
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []
@@ -823,7 +823,7 @@ buildHead()
 buildIntro("..//README.md")
 
 if 1 == 1:
-    buildChapter("..//financepy//finutils")
+    buildChapter("..//financepy//utils")
     buildChapter("..//financepy//market//curves")
     buildChapter("..//financepy//market//volatility")
     buildChapter("..//financepy//products//equity")

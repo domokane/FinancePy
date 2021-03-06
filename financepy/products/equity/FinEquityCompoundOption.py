@@ -10,17 +10,17 @@ from scipy import optimize
 from numba import njit
 
 
-from ...finutils.FinMath import N, phi2
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.fin_math import N, phi2
+from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from ...market.curves.FinDiscountCurveFlat import FinDiscountCurve
-from ...market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.curves.discount_curve_flat import DiscountCurveFlat
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.date import Date
 
 ###############################################################################
 # TODO: Vectorise pricer
@@ -31,8 +31,8 @@ from ...finutils.FinDate import FinDate
 def _f(s0, *args):
 
     self = args[0]
-    valueDate = args[1]
-    discountCurve = args[2]
+    valuation_date = args[1]
+    discount_curve = args[2]
     dividendCurve = args[3]
     model = args[4]
     value = args[5]
@@ -40,9 +40,9 @@ def _f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits K1")
 
-    objFn = self.value(valueDate,
+    objFn = self.value(valuation_date,
                        s0,
-                       discountCurve,
+                       discount_curve,
                        dividendCurve,
                        model) - value
 
@@ -52,32 +52,32 @@ def _f(s0, *args):
 
 
 @njit(fastmath=True, cache=True, nogil=True)
-def _valueOnce(stockPrice,
+def _valueOnce(stock_price,
                r,
                q,
                volatility,
                t1, t2,
                optionType1, optionType2,
                k1, k2,
-               numSteps):
+               num_steps):
 
-    if numSteps < 3:
-        numSteps = 3
+    if num_steps < 3:
+        num_steps = 3
 
     # TODO EUROPEAN call-put works but AMERICAN call-put needs to be tested
 
     # Need equally spaced time intervals for a recombining tree
     # Downside is that we may not measure periods exactly
-    dt = t2 / numSteps
-    numSteps1 = int(t1 / dt)
-    numSteps2 = numSteps - numSteps1
+    dt = t2 / num_steps
+    num_steps1 = int(t1 / dt)
+    num_steps2 = num_steps - num_steps1
     dt1 = dt
     dt2 = dt
 
-    # print("T1:",t1,"T2:",t2,"dt:",dt,"N1*dt",numSteps1*dt,"N*dt",numSteps*dt)
+    # print("T1:",t1,"T2:",t2,"dt:",dt,"N1*dt",num_steps1*dt,"N*dt",num_steps*dt)
 
     # the number of nodes on the tree
-    numNodes = int(0.5 * (numSteps + 1) * (numSteps + 2))
+    numNodes = int(0.5 * (num_steps + 1) * (num_steps + 2))
     optionValues = np.zeros(numNodes)
 
     u1 = np.exp(volatility * np.sqrt(dt))
@@ -85,25 +85,25 @@ def _valueOnce(stockPrice,
     u2 = np.exp(volatility * np.sqrt(dt))
     d2 = 1.0 / u2
 
-    probs = np.zeros(numSteps)
-    periodDiscountFactors = np.zeros(numSteps)
+    probs = np.zeros(num_steps)
+    periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, numSteps1):
+    for iTime in range(0, num_steps1):
         a1 = np.exp((r - q) * dt1)
         probs[iTime] = (a1 - d1) / (u1 - d1)
         periodDiscountFactors[iTime] = np.exp(-r * dt1)
 
-    for iTime in range(numSteps1, numSteps):
+    for iTime in range(num_steps1, num_steps):
         a2 = np.exp((r - q) * dt2)
         probs[iTime] = (a2 - d2) / (u2 - d2)
         periodDiscountFactors[iTime] = np.exp(-r * dt2)
 
     stockValues = np.zeros(numNodes)
-    stockValues[0] = stockPrice
-    sLow = stockPrice
+    stockValues[0] = stock_price
+    sLow = stock_price
 
-    for iTime in range(1, numSteps1 + 1):
+    for iTime in range(1, num_steps1 + 1):
         sLow *= d1
         s = sLow
         for iNode in range(0, iTime + 1):
@@ -111,7 +111,7 @@ def _valueOnce(stockPrice,
             stockValues[index + iNode] = s
             s = s * (u1 * u1)
 
-    for iTime in range(numSteps1 + 1, numSteps + 1):
+    for iTime in range(num_steps1 + 1, num_steps + 1):
         sLow *= d2
         s = sLow
         for iNode in range(0, iTime + 1):
@@ -120,7 +120,7 @@ def _valueOnce(stockPrice,
             s = s * (u2 * u2)
 
     # work backwards by first setting values at expiry date t2
-    index = int(0.5 * numSteps * (numSteps + 1))
+    index = int(0.5 * num_steps * (num_steps + 1))
 
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
@@ -132,7 +132,7 @@ def _valueOnce(stockPrice,
             optionValues[index + iNode] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
-    for iTime in range(numSteps - 1, numSteps1, -1):
+    for iTime in range(num_steps - 1, num_steps1, -1):
         index = int(0.5 * iTime * (iTime + 1))
         for iNode in range(0, iTime + 1):
             s = stockValues[index + iNode]
@@ -155,7 +155,7 @@ def _valueOnce(stockPrice,
             optionValues[index + iNode] = max(exerciseValue, holdValue)
 
     # Now do payoff at the end of the first expiry period at t1
-    iTime = numSteps1
+    iTime = num_steps1
     index = int(0.5 * iTime * (iTime + 1))
     for iNode in range(0, iTime + 1):
         s = stockValues[index + iNode]
@@ -176,7 +176,7 @@ def _valueOnce(stockPrice,
             optionValues[index + iNode] = max(k1 - holdValue, 0.0)
 
     # begin backward steps from t1 expiry to value date
-    for iTime in range(numSteps1 - 1, -1, -1):
+    for iTime in range(num_steps1 - 1, -1, -1):
         index = int(0.5 * iTime * (iTime + 1))
         for iNode in range(0, iTime + 1):
             s = stockValues[index + iNode]
@@ -200,8 +200,8 @@ def _valueOnce(stockPrice,
 
     verbose = False
     if verbose:
-        print("numSteps1:", numSteps1)
-        print("numSteps2:", numSteps2)
+        print("num_steps1:", num_steps1)
+        print("num_steps2:", num_steps2)
         print("u1:", u1, "u2:", u2)
         print("dfs", periodDiscountFactors)
         print("probs:", probs)
@@ -225,23 +225,23 @@ def _valueOnce(stockPrice,
 
 
 class FinEquityCompoundOption(FinEquityOption):
-    ''' A FinEquityCompoundOption is a compound option which allows the holder
+    """ A FinEquityCompoundOption is a compound option which allows the holder
     to either buy or sell another underlying option on a first expiry date that
     itself expires on a second expiry date. Both strikes are set at trade
-    initiation. '''
+    initiation. """
 
     def __init__(self,
-                 cExpiryDate: FinDate,  # Compound Option expiry date
+                 cExpiryDate: Date,  # Compound Option expiry date
                  cOptionType: FinOptionTypes,  # Compound option type
                  cStrikePrice: float,  # Compound option strike
-                 uExpiryDate: FinDate,  # Underlying option expiry date
+                 uExpiryDate: Date,  # Underlying option expiry date
                  uOptionType: FinOptionTypes,  # Underlying option type
                  uStrikePrice: float):  # Underlying option strike price
-        ''' Create the FinEquityCompoundOption by passing in the first and
+        """ Create the FinEquityCompoundOption by passing in the first and
         second expiry dates as well as the corresponding strike prices and
-        option types. '''
+        option types. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if cExpiryDate > uExpiryDate:
             raise FinError("Compound expiry date must precede underlying expiry date")
@@ -269,16 +269,16 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrice: float,
-              discountCurve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model,
-              numSteps: int = 200):
-        ''' Value the compound option using an analytical approach if it is
+              num_steps: int = 200):
+        """ Value the compound option using an analytical approach if it is
         entirely European style. Otherwise use a Tree approach to handle the
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
-        Rubinstein (1991). See also Haug page 132. '''
+        Rubinstein (1991). See also Haug page 132. """
 
         # If the option has any American feature then use the tree
         if self._cOptionType == FinOptionTypes.AMERICAN_CALL or\
@@ -286,21 +286,21 @@ class FinEquityCompoundOption(FinEquityOption):
             self._cOptionType == FinOptionTypes.AMERICAN_PUT or\
                 self._uOptionType == FinOptionTypes.AMERICAN_PUT:
 
-            v = self._valueTree(valueDate,
-                                stockPrice,
-                                discountCurve,
+            v = self._valueTree(valuation_date,
+                                stock_price,
+                                discount_curve,
                                 dividendCurve,
                                 model,
-                                numSteps)
+                                num_steps)
 
             return v[0]
 
-        tc = (self._cExpiryDate - valueDate) / gDaysInYear
-        tu = (self._uExpiryDate - valueDate) / gDaysInYear
+        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
+        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
 
-        s0 = stockPrice
+        s0 = stock_price
 
-        df = discountCurve.df(self._uExpiryDate)
+        df = discount_curve.df(self._uExpiryDate)
         ru = -np.log(df)/tu
 
         # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
@@ -358,31 +358,31 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def _valueTree(self,
-                   valueDate,
-                   stockPrice,
-                   discountCurve,
+                   valuation_date,
+                   stock_price,
+                   discount_curve,
                    dividendCurve,
                    model,
-                   numSteps=200):
-        ''' This function is called if the option has American features. '''
+                   num_steps=200):
+        """ This function is called if the option has American features. """
 
-        if valueDate > self._cExpiryDate:
+        if valuation_date > self._cExpiryDate:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self._cExpiryDate - valueDate) / gDaysInYear
-        tu = (self._uExpiryDate - valueDate) / gDaysInYear
+        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
+        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
 
-        df = discountCurve.df(self._uExpiryDate)
+        df = discount_curve.df(self._uExpiryDate)
         r = -np.log(df)/tu
 
         dq = dividendCurve.df(self._uExpiryDate)
         q = -np.log(dq)/tu
 
-        r = discountCurve.zeroRate(self._uExpiryDate)
+        r = discount_curve.zeroRate(self._uExpiryDate)
 
         volatility = model._volatility
 
-        v1 = _valueOnce(stockPrice,
+        v1 = _valueOnce(stock_price,
                         r,
                         q,
                         volatility,
@@ -391,16 +391,16 @@ class FinEquityCompoundOption(FinEquityOption):
                         self._uOptionType,
                         self._cStrikePrice,
                         self._uStrikePrice,
-                        numSteps)
+                        num_steps)
 
         return v1
 
 ###############################################################################
 
     def _impliedStockPrice(self,
-                           stockPrice,
-                           expiryDate1,
-                           expiryDate2,
+                           stock_price,
+                           expiry_date1,
+                           expiry_date2,
                            strikePrice1,
                            strikePrice2,
                            optionType2,
@@ -408,15 +408,15 @@ class FinEquityCompoundOption(FinEquityOption):
                            dividendYield,
                            model):
 
-        option = FinEquityVanillaOption(expiryDate2, strikePrice2, optionType2)
+        option = FinEquityVanillaOption(expiry_date2, strikePrice2, optionType2)
 
-        discountCurve = FinDiscountCurveFlat(expiryDate1, interestRate)
-        dividendCurve = FinDiscountCurveFlat(expiryDate1, dividendYield)
+        discount_curve = DiscountCurveFlat(expiry_date1, interestRate)
+        dividendCurve = DiscountCurveFlat(expiry_date1, dividendYield)
 
-        argtuple = (option, expiryDate1, discountCurve, dividendCurve,
+        argtuple = (option, expiry_date1, discount_curve, dividendCurve,
                     model, strikePrice1)
 
-        sigma = optimize.newton(_f, x0=stockPrice, args=argtuple, tol=1e-8,
+        sigma = optimize.newton(_f, x0=stock_price, args=argtuple, tol=1e-8,
                                 maxiter=50, fprime2=None)
         return sigma
 
@@ -435,7 +435,7 @@ class FinEquityCompoundOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

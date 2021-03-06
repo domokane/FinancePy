@@ -7,7 +7,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinStatistics import mean, stdev, correlation
+from financepy.utils.fin_stats import mean, stdev, correlation
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -19,9 +19,9 @@ def test_FinStatistics():
     seed = 1972
     np.random.seed(seed)
 
-    numTrials = 1000000
-    x = np.random.normal(0.0, 1.0, size=(numTrials))
-    y = np.random.normal(0.0, 1.0, size=(numTrials))
+    num_trials = 1000000
+    x = np.random.normal(0.0, 1.0, size=(num_trials))
+    y = np.random.normal(0.0, 1.0, size=(num_trials))
 
     ##########################################################################
     # DO NUMPY TIMINGS

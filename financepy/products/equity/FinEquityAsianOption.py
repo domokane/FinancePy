@@ -9,16 +9,16 @@ from numba import njit
 # TODO: Add perturbatory risk using the analytical methods !!
 # TODO: Add Sobol to Monte Carlo
 
-from ...finutils.FinMath import covar
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
+from ...utils.fin_math import covar
+from ...utils.global_variables import gDaysInYear
+from ...utils.FinError import FinError
 
-from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...finutils.FinDate import FinDate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...finutils.FinMath import N
+from ...utils.fin_math import N
 
 
 ###############################################################################
@@ -72,11 +72,11 @@ def _valueMC_NUMBA(t0,
                    K,
                    n,
                    optionType,
-                   stockPrice,
+                   stock_price,
                    interestRate,
                    dividendYield,
                    volatility,
-                   numPaths,
+                   num_paths,
                    seed,
                    accruedAverage):
 
@@ -104,13 +104,13 @@ def _valueMC_NUMBA(t0,
 
     payoff_a = 0.0
 
-    for _ in range(0, numPaths):
+    for _ in range(0, num_paths):
 
         # evolve stock price to start of averaging period
         g = np.random.standard_normal(1)
-        s_1 = stockPrice * np.exp((mu - v2 / 2.0) * t0 +
+        s_1 = stock_price * np.exp((mu - v2 / 2.0) * t0 +
                                   g[0] * np.sqrt(t0) * volatility)
-        s_2 = stockPrice * np.exp((mu - v2 / 2.0) * t0 -
+        s_2 = stock_price * np.exp((mu - v2 / 2.0) * t0 -
                                   g[0] * np.sqrt(t0) * volatility)
 
         # enter averaging period
@@ -142,7 +142,7 @@ def _valueMC_NUMBA(t0,
         else:
             return None
 
-    v_a = payoff_a * np.exp(-interestRate * t) / numPaths / 2.0
+    v_a = payoff_a * np.exp(-interestRate * t) / num_paths / 2.0
     v_a = v_a * multiplier
     return v_a
 
@@ -156,11 +156,11 @@ def _valueMC_fast_NUMBA(t0: float,
                         K: float,
                         n: int,
                         optionType: FinOptionTypes,
-                        stockPrice: float,
+                        stock_price: float,
                         interestRate: float,
                         dividendYield: float,
                         volatility: float,
-                        numPaths: int,
+                        num_paths: int,
                         seed: int,
                         accruedAverage: float):
 
@@ -169,7 +169,7 @@ def _valueMC_fast_NUMBA(t0: float,
     v2 = volatility**2
     dt = (t - t0) / n
     r = interestRate
-    numPaths = int(numPaths)
+    num_paths = int(num_paths)
 
     multiplier = 1.0
 
@@ -188,36 +188,36 @@ def _valueMC_fast_NUMBA(t0: float,
         n = int(n * t / tau + 0.5) + 1
 
     # evolve stock price to start of averaging period
-    # g = np.random.normal(0.0, 1.0, size=(numPaths))
+    # g = np.random.normal(0.0, 1.0, size=(num_paths))
 
-    gg = np.empty(numPaths, np.float64)
-    for iPath in range(0, numPaths):
+    gg = np.empty(num_paths, np.float64)
+    for iPath in range(0, num_paths):
         rv = np.random.normal()
         gg[iPath] = rv
 
-    s_1 = np.empty(numPaths)
-    s_2 = np.empty(numPaths)
+    s_1 = np.empty(num_paths)
+    s_2 = np.empty(num_paths)
 
-    for ip in range(0, numPaths):
-        s_1[ip] = stockPrice * \
+    for ip in range(0, num_paths):
+        s_1[ip] = stock_price * \
             np.exp((mu - v2 / 2.0) * t0 + gg[ip] * np.sqrt(t0) * volatility)
-        s_2[ip] = stockPrice * \
+        s_2[ip] = stock_price * \
             np.exp((mu - v2 / 2.0) * t0 - gg[ip] * np.sqrt(t0) * volatility)
 
-    s_1_arithmetic = np.zeros(numPaths)
-    s_2_arithmetic = np.zeros(numPaths)
+    s_1_arithmetic = np.zeros(num_paths)
+    s_2_arithmetic = np.zeros(num_paths)
 
     for _ in range(0, n):
 
-        g = np.random.normal(0.0, 1.0, size=(numPaths))
+        g = np.random.normal(0.0, 1.0, size=(num_paths))
 
-        for ip in range(0, numPaths):
+        for ip in range(0, num_paths):
             s_1[ip] = s_1[ip] * np.exp((mu - v2 / 2.0) *
                                        dt + g[ip] * np.sqrt(dt) * volatility)
             s_2[ip] = s_2[ip] * np.exp((mu - v2 / 2.0) *
                                        dt - g[ip] * np.sqrt(dt) * volatility)
 
-        for ip in range(0, numPaths):
+        for ip in range(0, num_paths):
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
@@ -238,8 +238,8 @@ def _valueMC_fast_NUMBA(t0: float,
 
 
 @njit(cache=True, fastmath=True)
-def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
-                           interestRate, dividendYield, volatility, numPaths,
+def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stock_price,
+                           interestRate, dividendYield, volatility, num_paths,
                            seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
@@ -265,41 +265,41 @@ def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
         n = int(n * t / tau + 0.5) + 1
 
     # evolve stock price to start of averaging period
-    g = np.random.normal(0.0, 1.0, size=(numPaths))
+    g = np.random.normal(0.0, 1.0, size=(num_paths))
 
-    s_1 = np.empty(numPaths)
-    s_2 = np.empty(numPaths)
+    s_1 = np.empty(num_paths)
+    s_2 = np.empty(num_paths)
 
-    for ip in range(0, numPaths):
-        s_1[ip] = stockPrice * \
+    for ip in range(0, num_paths):
+        s_1[ip] = stock_price * \
             np.exp((mu - v2 / 2.0) * t0 + g[ip] * np.sqrt(t0) * volatility)
-        s_2[ip] = stockPrice * \
+        s_2[ip] = stock_price * \
             np.exp((mu - v2 / 2.0) * t0 - g[ip] * np.sqrt(t0) * volatility)
 
-    s_1_arithmetic = np.zeros(numPaths)
-    s_2_arithmetic = np.zeros(numPaths)
-    ln_s_1_geometric = np.zeros(numPaths)
-    ln_s_2_geometric = np.zeros(numPaths)
+    s_1_arithmetic = np.zeros(num_paths)
+    s_2_arithmetic = np.zeros(num_paths)
+    ln_s_1_geometric = np.zeros(num_paths)
+    ln_s_2_geometric = np.zeros(num_paths)
 
     for _ in range(0, n):
 
-        g = np.random.normal(0.0, 1.0, size=(numPaths))
-        for ip in range(0, numPaths):
+        g = np.random.normal(0.0, 1.0, size=(num_paths))
+        for ip in range(0, num_paths):
             s_1[ip] = s_1[ip] * np.exp((mu - v2 / 2.0) *
                                        dt + g[ip] * np.sqrt(dt) * volatility)
             s_2[ip] = s_2[ip] * np.exp((mu - v2 / 2.0) *
                                        dt - g[ip] * np.sqrt(dt) * volatility)
 
-        for ip in range(0, numPaths):
+        for ip in range(0, num_paths):
             s_1_arithmetic[ip] += s_1[ip]
             s_2_arithmetic[ip] += s_2[ip]
             ln_s_1_geometric[ip] += np.log(s_1[ip])
             ln_s_2_geometric[ip] += np.log(s_2[ip])
 
-    s_1_geometric = np.empty(numPaths)
-    s_2_geometric = np.empty(numPaths)
+    s_1_geometric = np.empty(num_paths)
+    s_2_geometric = np.empty(num_paths)
 
-    for ip in range(0, numPaths):
+    for ip in range(0, num_paths):
         s_1_arithmetic[ip] /= n
         s_1_geometric[ip] = np.exp(ln_s_1_geometric[ip] / n)
         s_2_arithmetic[ip] /= n
@@ -340,30 +340,30 @@ def _valueMC_fast_CV_NUMBA(t0, t, tau, K, n, optionType, stockPrice,
 
 
 class FinEquityAsianOption():
-    ''' Class for an Equity Asian Option. This is an option with a final payoff
+    """ Class for an Equity Asian Option. This is an option with a final payoff
     linked to the averaging of the stock price over some specified period
     before the option expires. The valuation is done for both an arithmetic and
     a geometric average but the former can only be done either using an
     analytical approximation of the arithmetic average distribution or by using
-    Monte-Carlo simulation.'''
+    Monte-Carlo simulation."""
 
     def __init__(self,
-                 startAveragingDate: FinDate,
-                 expiryDate: FinDate,
+                 startAveragingDate: Date,
+                 expiry_date: Date,
                  strikePrice: float,
                  optionType: FinOptionTypes,
                  numberOfObservations: int = 100):
-        ''' Create an FinEquityAsian option object which takes a start date for
+        """ Create an FinEquityAsian option object which takes a start date for
         the averaging, an expiry date, a strike price, an option type and a
-        number of observations. '''
+        number of observations. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if startAveragingDate > expiryDate:
+        if startAveragingDate > expiry_date:
             raise FinError("Averaging starts after expiry date")
 
         self._startAveragingDate = startAveragingDate
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
         self._optionType = optionType
         self._numObservations = numberOfObservations
@@ -371,14 +371,14 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrice: float,
-              discountCurve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model,
               method: FinAsianOptionValuationMethods,
               accruedAverage: float = None):
-        ''' Calculate the value of an Asian option using one of the specified
+        """ Calculate the value of an Asian option using one of the specified
         analytical approximations for an average rate option. These are the
         three enumerated values in the enum FinAsianOptionValuationMethods. The
         choices of approximation are (i) GEOMETRIC - the average is a geometric
@@ -390,31 +390,31 @@ class FinEquityAsianOption():
         different approaches.
 
         Note that the accrued average is only required if the value date is
-        inside the averaging period for the option. '''
+        inside the averaging period for the option. """
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         if method == FinAsianOptionValuationMethods.GEOMETRIC:
-            v = self._valueGeometric(valueDate,
-                                     stockPrice,
-                                     discountCurve,
+            v = self._valueGeometric(valuation_date,
+                                     stock_price,
+                                     discount_curve,
                                      dividendCurve,
                                      model,
                                      accruedAverage)
 
         elif method == FinAsianOptionValuationMethods.TURNBULL_WAKEMAN:
-            v = self._valueTurnbullWakeman(valueDate,
-                                           stockPrice,
-                                           discountCurve,
+            v = self._valueTurnbullWakeman(valuation_date,
+                                           stock_price,
+                                           discount_curve,
                                            dividendCurve,
                                            model,
                                            accruedAverage)
 
         elif method == FinAsianOptionValuationMethods.CURRAN:
-            v = self._valueCurran(valueDate,
-                                  stockPrice,
-                                  discountCurve,
+            v = self._valueCurran(valuation_date,
+                                  stock_price,
+                                  discount_curve,
                                   dividendCurve,
                                   model,
                                   accruedAverage)
@@ -425,24 +425,24 @@ class FinEquityAsianOption():
 
 ###############################################################################
 
-    def _valueGeometric(self, valueDate, stockPrice, discountCurve,
+    def _valueGeometric(self, valuation_date, stock_price, discount_curve,
                         dividendCurve, model, accruedAverage):
-        ''' This option valuation is based on paper by Kemna and Vorst 1990. It
+        """ This option valuation is based on paper by Kemna and Vorst 1990. It
         calculates the Geometric Asian option price which is a lower bound on
         the Arithmetic option price. This should not be used as a valuation
         model for the Arithmetic Average option but can be used as a control
-        variate for other approaches. '''
+        variate for other approaches. """
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
 #        print("r:", r, "q:", q)
         
@@ -450,7 +450,7 @@ class FinEquityAsianOption():
 
         K = self._strikePrice
         n = self._numObservations
-        S0 = stockPrice
+        S0 = stock_price
 
         multiplier = 1.0
 
@@ -492,26 +492,26 @@ class FinEquityAsianOption():
 
 ###############################################################################
 
-    def _valueCurran(self, valueDate, stockPrice, discountCurve,
+    def _valueCurran(self, valuation_date, stock_price, discount_curve,
                      dividendCurve, model, accruedAverage):
-        ''' Valuation of an Asian option using the result by Vorst. '''
+        """ Valuation of an Asian option using the result by Vorst. """
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
         multiplier = 1.0
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
         volatility = model._volatility
 
-        S0 = stockPrice
+        S0 = stock_price
         b = r - q
         sigma2 = volatility**2
         K = self._strikePrice
@@ -557,25 +557,25 @@ class FinEquityAsianOption():
 
 ###############################################################################
 
-    def _valueTurnbullWakeman(self, valueDate, stockPrice, discountCurve,
+    def _valueTurnbullWakeman(self, valuation_date, stock_price, discount_curve,
                               dividendCurve, model, accruedAverage):
-        ''' Asian option valuation based on paper by Turnbull and Wakeman 1991
+        """ Asian option valuation based on paper by Turnbull and Wakeman 1991
         which uses the edgeworth expansion to find the first two moments of the
-        arithmetic average. '''
+        arithmetic average. """
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after option expiry date.")
 
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         multiplier = 1.0
         n = self._numObservations
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -598,7 +598,7 @@ class FinEquityAsianOption():
         sigma2 = volatility**2
         a1 = b + sigma2
         a2 = 2 * b + sigma2
-        S0 = stockPrice
+        S0 = stock_price
 
         dt = texp - t0
 
@@ -635,32 +635,32 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def _valueMC(self,
-                 valueDate: FinDate,
-                 stockPrice: float,
-                 discountCurve: FinDiscountCurve,
-                 dividendCurve: FinDiscountCurve,
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividendCurve: DiscountCurve,
                  model,
-                 numPaths: int,
+                 num_paths: int,
                  seed: int,
                  accruedAverage: float):
-        ''' Monte Carlo valuation of the Asian Average option using standard
+        """ Monte Carlo valuation of the Asian Average option using standard
         Monte Carlo code enhanced by Numba. I have discontinued the use of this
-        as it is both slow and has limited variance reduction. '''
+        as it is both slow and has limited variance reduction. """
 
         # Basic validation
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after option expiry date.")
 
-        if valueDate > self._startAveragingDate and accruedAverage is None:
+        if valuation_date > self._startAveragingDate and accruedAverage is None:
             raise FinError(errorStr)
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -668,11 +668,11 @@ class FinEquityAsianOption():
         n = self._numObservations
 
         v = _valueMC_NUMBA(t0, texp, tau, K, n, self._optionType,
-                           stockPrice,
+                           stock_price,
                            r,
                            q,
                            volatility,
-                           numPaths,
+                           num_paths,
                            seed,
                            accruedAverage)
 
@@ -681,37 +681,37 @@ class FinEquityAsianOption():
 ##############################################################################
 
     def _valueMC_fast(self,
-                      valueDate,
-                      stockPrice,
-                      discountCurve,
+                      valuation_date,
+                      stock_price,
+                      discount_curve,
                       dividendCurve,  # Yield
                       model,          # Model
-                      numPaths,       # Numpaths integer
+                      num_paths,       # Numpaths integer
                       seed,
                       accruedAverage):
-        ''' Monte Carlo valuation of the Asian Average option. This method uses
-        a lot of Numpy vectorisation. It is also helped by Numba. '''
+        """ Monte Carlo valuation of the Asian Average option. This method uses
+        a lot of Numpy vectorisation. It is also helped by Numba. """
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
         volatility = model._volatility
 
         v = _valueMC_fast_NUMBA(t0, texp, tau,
                                 K, n, self._optionType,
-                                stockPrice,
+                                stock_price,
                                 r,
                                 q,
                                 volatility,
-                                numPaths,
+                                num_paths,
                                 seed,
                                 accruedAverage)
 
@@ -720,35 +720,35 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
-                stockPrice: float,
-                discountCurve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                valuation_date: Date,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 model,
-                numPaths: int,
+                num_paths: int,
                 seed: int,
                 accruedAverage: float):
-        ''' Monte Carlo valuation of the Asian Average option using a control
+        """ Monte Carlo valuation of the Asian Average option using a control
         variate method that improves accuracy and reduces the variance of the
-        price. This uses Numpy and Numba. This is the standard MC pricer. '''
+        price. This uses Numpy and Numba. This is the standard MC pricer. """
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - valueDate) / gDaysInYear
-        texp = (self._expiryDate - valueDate) / gDaysInYear
-        tau = (self._expiryDate - self._startAveragingDate) / gDaysInYear
+        t0 = (self._startAveragingDate - valuation_date) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
         K = self._strikePrice
         n = self._numObservations
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
         volatility = model._volatility
 
         # For control variate we price a Geometric average option exactly
-        v_g_exact = self._valueGeometric(valueDate,
-                                         stockPrice,
-                                         discountCurve,
+        v_g_exact = self._valueGeometric(valuation_date,
+                                         stock_price,
+                                         discount_curve,
                                          dividendCurve,
                                          model,
                                          accruedAverage)
@@ -759,11 +759,11 @@ class FinEquityAsianOption():
                                    K,
                                    n,
                                    self._optionType,
-                                   stockPrice,
+                                   stock_price,
                                    r,
                                    q,
                                    volatility,
-                                   numPaths,
+                                   num_paths,
                                    seed,
                                    accruedAverage,
                                    v_g_exact)
@@ -775,7 +775,7 @@ class FinEquityAsianOption():
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("START AVERAGING DATE", self._startAveragingDate)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("NUM OBSERVATIONS", self._numObservations, "")
@@ -784,7 +784,7 @@ class FinEquityAsianOption():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

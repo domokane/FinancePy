@@ -9,11 +9,11 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.bonds.FinBondConvertible import FinBondConvertible
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.products.bonds.convertible import BondConvertible
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -21,113 +21,113 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinBondConvertible():
+def test_BondConvertible():
 
-    settlementDate = FinDate(31, 12, 2003)
-    startConvertDate = FinDate(31, 12, 2003)
-    maturityDate = FinDate(15, 3, 2022)
+    settlement_date = Date(31, 12, 2003)
+    startConvertDate = Date(31, 12, 2003)
+    maturity_date = Date(15, 3, 2022)
     conversionRatio = 38.4615  # adjust for face
     coupon = 0.0575
-    freqType = FinFrequencyTypes.SEMI_ANNUAL
-    accrualBasis = FinDayCountTypes.ACT_365F
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrualBasis = DayCountTypes.ACT_365F
     face = 1000.0
 
-    callPrice = 1100
-    callDates = [FinDate(20, 3, 2007),
-                 FinDate(15, 3, 2012),
-                 FinDate(15, 3, 2017)]
-    callPrices = np.array([callPrice, callPrice, callPrice])
+    call_price = 1100
+    call_dates = [Date(20, 3, 2007),
+                 Date(15, 3, 2012),
+                 Date(15, 3, 2017)]
+    call_prices = np.array([call_price, call_price, call_price])
 
     putPrice = 90
-    putDates = [FinDate(20, 3, 2007),
-                FinDate(15, 3, 2012),
-                FinDate(15, 3, 2017)]
-    putPrices = np.array([putPrice, putPrice, putPrice])
+    put_dates = [Date(20, 3, 2007),
+                Date(15, 3, 2012),
+                Date(15, 3, 2017)]
+    put_prices = np.array([putPrice, putPrice, putPrice])
 
-    bond = FinBondConvertible(maturityDate,
+    bond = BondConvertible(maturity_date,
                               coupon,
-                              freqType,
+                              freq_type,
                               startConvertDate,
                               conversionRatio,
-                              callDates,
-                              callPrices,
-                              putDates,
-                              putPrices,
+                              call_dates,
+                              call_prices,
+                              put_dates,
+                              put_prices,
                               accrualBasis,
                               face)
 #    print(bond)
 
-    dividendDates = [FinDate(20, 3, 2007),
-                     FinDate(15, 3, 2008),
-                     FinDate(15, 3, 2009),
-                     FinDate(15, 3, 2010),
-                     FinDate(15, 3, 2011),
-                     FinDate(15, 3, 2012),
-                     FinDate(15, 3, 2013),
-                     FinDate(15, 3, 2014),
-                     FinDate(15, 3, 2015),
-                     FinDate(15, 3, 2016),
-                     FinDate(15, 3, 2017),
-                     FinDate(15, 3, 2018),
-                     FinDate(15, 3, 2019),
-                     FinDate(15, 3, 2020),
-                     FinDate(15, 3, 2021),
-                     FinDate(15, 3, 2022)]
+    dividend_dates = [Date(20, 3, 2007),
+                     Date(15, 3, 2008),
+                     Date(15, 3, 2009),
+                     Date(15, 3, 2010),
+                     Date(15, 3, 2011),
+                     Date(15, 3, 2012),
+                     Date(15, 3, 2013),
+                     Date(15, 3, 2014),
+                     Date(15, 3, 2015),
+                     Date(15, 3, 2016),
+                     Date(15, 3, 2017),
+                     Date(15, 3, 2018),
+                     Date(15, 3, 2019),
+                     Date(15, 3, 2020),
+                     Date(15, 3, 2021),
+                     Date(15, 3, 2022)]
 
-    dividendYields = [0.00] * 16
-    stockPrice = 28.5
-    stockVolatility = 0.370
+    dividend_yields = [0.00] * 16
+    stock_price = 28.5
+    stock_volatility = 0.370
     rate = 0.04
-    discountCurve = FinDiscountCurveFlat(settlementDate,
-                                         rate,
-                                         FinFrequencyTypes.CONTINUOUS)
-    creditSpread = 0.00
-    recoveryRate = 0.40
-    numStepsPerYear = 20
+    discount_curve = DiscountCurveFlat(settlement_date,
+                                       rate,
+                                       FrequencyTypes.CONTINUOUS)
+    credit_spread = 0.00
+    recovery_rate = 0.40
+    num_steps_per_year = 20
 
     testCases.header("LABEL")
     testCases.print("NO CALLS OR PUTS")
 
     testCases.header("TIME", "NUMSTEPS", "PRICE")
 
-    for numStepsPerYear in [5, 10, 20, 80]:
+    for num_steps_per_year in [5, 10, 20, 80]:
         start = time.time()
-        res = bond.value(settlementDate,
-                         stockPrice,
-                         stockVolatility,
-                         dividendDates,
-                         dividendYields,
-                         discountCurve,
-                         creditSpread,
-                         recoveryRate,
-                         numStepsPerYear)
+        res = bond.value(settlement_date,
+                         stock_price,
+                         stock_volatility,
+                         dividend_dates,
+                         dividend_yields,
+                         discount_curve,
+                         credit_spread,
+                         recovery_rate,
+                         num_steps_per_year)
 
         end = time.time()
         period = end - start
-        testCases.print(period, numStepsPerYear, res)
+        testCases.print(period, num_steps_per_year, res)
 
-    dividendYields = [0.02] * 16
+    dividend_yields = [0.02] * 16
     testCases.header("LABEL")
     testCases.print("DIVIDENDS")
 
     testCases.header("TIME", "NUMSTEPS", "PRICE")
-    for numStepsPerYear in [5, 20, 80]:
+    for num_steps_per_year in [5, 20, 80]:
         start = time.time()
-        res = bond.value(settlementDate,
-                         stockPrice,
-                         stockVolatility,
-                         dividendDates,
-                         dividendYields,
-                         discountCurve,
-                         creditSpread,
-                         recoveryRate,
-                         numStepsPerYear)
+        res = bond.value(settlement_date,
+                         stock_price,
+                         stock_volatility,
+                         dividend_dates,
+                         dividend_yields,
+                         discount_curve,
+                         credit_spread,
+                         recovery_rate,
+                         num_steps_per_year)
         end = time.time()
         period = end - start
-        testCases.print(period, numStepsPerYear, res)
+        testCases.print(period, num_steps_per_year, res)
 
 ###############################################################################
 
 
-test_FinBondConvertible()
+test_BondConvertible()
 testCases.compareTestCases()

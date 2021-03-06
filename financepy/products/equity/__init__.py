@@ -17,4 +17,4 @@ from .FinEquityVarianceSwap import *
 from .FinEquityOneTouchOption import *
 
 
-# dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+# dividendCurve = FinDiscountCurveFlat(valuation_date, dividendYield)

@@ -5,11 +5,11 @@
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.date import Date
 
-from financepy.products.bonds.FinBondMortgage import FinBondMortgage
-from financepy.products.bonds.FinBondMortgage import FinBondMortgageTypes
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.products.bonds.mortgage import Mortgage
+from financepy.products.bonds.mortgage import BondMortgageTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -18,35 +18,35 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinBondMortgage():
+def test_BondMortgage():
 
     principal = 130000
-    startDate = FinDate(23, 2, 2018)
-    endDate = startDate.addTenor("10Y")
-    mortgage = FinBondMortgage(startDate, endDate, principal)
+    start_date = Date(23, 2, 2018)
+    end_date = start_date.addTenor("10Y")
+    mortgage = Mortgage(start_date, end_date, principal)
 
     rate = 0.035
-    mortgage.generateFlows(rate, FinBondMortgageTypes.REPAYMENT)
+    mortgage.generateFlows(rate, BondMortgageTypes.REPAYMENT)
 
-    numFlows = len(mortgage._schedule._adjustedDates)
+    num_flows = len(mortgage._schedule._adjusted_dates)
 
     testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
                      "TOTAL")
 
-    for i in range(0, numFlows):
-        testCases.print(mortgage._schedule._adjustedDates[i],
+    for i in range(0, num_flows):
+        testCases.print(mortgage._schedule._adjusted_dates[i],
                         mortgage._interestFlows[i],
                         mortgage._principalFlows[i],
                         mortgage._principalRemaining[i],
                         mortgage._totalFlows[i])
 
-    mortgage.generateFlows(rate, FinBondMortgageTypes.INTEREST_ONLY)
+    mortgage.generateFlows(rate, BondMortgageTypes.INTEREST_ONLY)
 
     testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
                      "TOTAL")
 
-    for i in range(0, numFlows):
-        testCases.print(mortgage._schedule._adjustedDates[i],
+    for i in range(0, num_flows):
+        testCases.print(mortgage._schedule._adjusted_dates[i],
                         mortgage._interestFlows[i],
                         mortgage._principalFlows[i],
                         mortgage._principalRemaining[i],
@@ -56,5 +56,5 @@ def test_FinBondMortgage():
 ###############################################################################
 
 
-test_FinBondMortgage()
+test_BondMortgage()
 testCases.compareTestCases()

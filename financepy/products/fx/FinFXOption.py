@@ -3,9 +3,9 @@
 ##############################################################################
 
 
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinHelperFunctions import labelToString
+from ...models.black_scholes import FinModelBlackScholes
+from ...utils.global_variables import gDaysInYear
+from ...utils.helper_functions import labelToString
 
 ##########################################################################
 
@@ -15,19 +15,19 @@ bump = 1e-4
 
 
 class FinFXOption(object):
-    ''' Class that is used to perform perturbation risk for FX options. '''
+    """ Class that is used to perform perturbation risk for FX options. """
 
 ###############################################################################
 
-    def delta(self, valueDate, stockPrice, discountCurve,
+    def delta(self, valuation_date, stock_price, discount_curve,
               dividendCurve, model):
-        ''' Calculate the option delta (FX rate sensitivity) by adding on a
-        small bump and calculating the change in the option price. '''
+        """ Calculate the option delta (FX rate sensitivity) by adding on a
+        small bump and calculating the change in the option price. """
 
-        v = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
+        v = self.value(valuation_date, stock_price, discount_curve, dividendCurve,
                        model)
 
-        vBumped = self.value(valueDate, stockPrice + bump, discountCurve,
+        vBumped = self.value(valuation_date, stock_price + bump, discount_curve,
                              dividendCurve, model)
 
         if type(vBumped) is dict:
@@ -39,18 +39,18 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def gamma(self, valueDate, stockPrice, discountCurve, dividendCurve,
+    def gamma(self, valuation_date, stock_price, discount_curve, dividendCurve,
               model):
-        ''' Calculate the option gamma (delta sensitivity) by adding on a
-        small bump and calculating the change in the option delta. '''
+        """ Calculate the option gamma (delta sensitivity) by adding on a
+        small bump and calculating the change in the option delta. """
 
-        v = self.delta(valueDate, stockPrice, discountCurve, dividendCurve,
+        v = self.delta(valuation_date, stock_price, discount_curve, dividendCurve,
             model)
 
-        vBumpedDn = self.delta(valueDate, stockPrice + bump, discountCurve,
+        vBumpedDn = self.delta(valuation_date, stock_price + bump, discount_curve,
             dividendCurve, model)
 
-        vBumpedUp = self.delta(valueDate, stockPrice + bump, discountCurve,
+        vBumpedUp = self.delta(valuation_date, stock_price + bump, discount_curve,
             dividendCurve, model)
 
         if type(v) is dict:
@@ -63,14 +63,14 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def vega(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
-        ''' Calculate the option vega (volatility sensitivity) by adding on a
-        small bump and calculating the change in the option price. '''
+    def vega(self, valuation_date, stock_price, discount_curve, dividendCurve, model):
+        """ Calculate the option vega (volatility sensitivity) by adding on a
+        small bump and calculating the change in the option price. """
 
-        v = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
+        v = self.value(valuation_date, stock_price, discount_curve, dividendCurve,
                        model)
 
-        vp = self.value(valueDate, stockPrice, discountCurve, dividendCurve,
+        vp = self.value(valuation_date, stock_price, discount_curve, dividendCurve,
                         FinModelBlackScholes(model._volatility + bump))
 
         if type(v) is dict:
@@ -82,17 +82,17 @@ class FinFXOption(object):
 
 ###############################################################################
 
-    def theta(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
-        ''' Calculate the option theta (calendar time sensitivity) by moving
-        forward one day and calculating the change in the option price. '''
+    def theta(self, valuation_date, stock_price, discount_curve, dividendCurve, model):
+        """ Calculate the option theta (calendar time sensitivity) by moving
+        forward one day and calculating the change in the option price. """
 
-        v = self.value(valueDate, stockPrice, discountCurve,
+        v = self.value(valuation_date, stock_price, discount_curve,
                        dividendCurve, model)
 
-        nextDate = valueDate.addDays(1)
+        next_date = valuation_date.addDays(1)
         bump = 1.0 / gDaysInYear
 
-        vBumped = self.value(nextDate, stockPrice, discountCurve,
+        vBumped = self.value(next_date, stock_price, discount_curve,
                              dividendCurve, model)
 
         if type(v) is dict:
@@ -102,20 +102,20 @@ class FinFXOption(object):
 
         return theta
 
-    def rho(self, valueDate, stockPrice, discountCurve, dividendCurve, model):
-        ''' Calculate the option rho (interest rate sensitivity) by perturbing
-        the discount curve and revaluing. '''
+    def rho(self, valuation_date, stock_price, discount_curve, dividendCurve, model):
+        """ Calculate the option rho (interest rate sensitivity) by perturbing
+        the discount curve and revaluing. """
 
         v = self.value(
-            valueDate,
-            stockPrice,
-            discountCurve,
+            valuation_date,
+            stock_price,
+            discount_curve,
             dividendCurve,
             model)
         vBumped = self.value(
-            valueDate,
-            stockPrice,
-            discountCurve.bump(bump),
+            valuation_date,
+            stock_price,
+            discount_curve.bump(bump),
             dividendCurve,
             model)
 

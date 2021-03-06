@@ -5,16 +5,16 @@
 import numpy as np
 
 
-from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...utils.date import Date
 
-from ...models.FinGBMProcess import FinGBMProcess
+from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.FinGlobalTypes import FinOptionTypes
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -31,50 +31,50 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 
 
 class FinEquityFloatLookbackOption(FinEquityOption):
-    ''' This is an equity option in which the strike of the option is not fixed
+    """ This is an equity option in which the strike of the option is not fixed
     but is set at expiry to equal the minimum stock price in the case of a call
     or the maximum stock price in the case of a put. In other words the buyer
     of the call gets to buy the asset at the lowest price over the period
     before expiry while the buyer of the put gets to sell the asset at the
-    highest price before expiry. '''
+    highest price before expiry. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  optionType: FinOptionTypes):
-        ''' Create the FloatLookbackOption by specifying the expiry date and
+        """ Create the FloatLookbackOption by specifying the expiry date and
         the option type. The strike is determined internally as the maximum or
         minimum of the stock price depending on whether it is a put or a call
-        option. '''
+        option. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and optionType != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._optionType = optionType
 
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrice: float,
-              discountCurve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               volatility: float,
               stockMinMax: float):
-        ''' Valuation of the Floating Lookback option using Black-Scholes using
-        the formulae derived by Goldman, Sosin and Gatto (1979). '''
+        """ Valuation of the Floating Lookback option using Black-Scholes using
+        the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
-        df = discountCurve.df(self._expiryDate)
+        t = (self._expiry_date - valuation_date) / gDaysInYear
+        df = discount_curve.df(self._expiry_date)
 
 
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
 
         v = volatility
-        s0 = stockPrice
+        s0 = stock_price
         smin = 0.0
         smax = 0.0
 
@@ -139,24 +139,24 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
-                stockPrice: float,
-                discountCurve: FinDiscountCurve,
-                dividendCurve: FinDiscountCurve,
+                valuation_date: Date,
+                stock_price: float,
+                discount_curve: DiscountCurve,
+                dividendCurve: DiscountCurve,
                 volatility: float,
                 stockMinMax: float,
-                numPaths: int = 10000,
-                numStepsPerYear: int = 252,
+                num_paths: int = 10000,
+                num_steps_per_year: int = 252,
                 seed: int = 4242):
-        ''' Monte Carlo valuation of a floating strike lookback option using a
-        Black-Scholes model that assumes the stock follows a GBM process. '''
+        """ Monte Carlo valuation of a floating strike lookback option using a
+        Black-Scholes model that assumes the stock follows a GBM process. """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
-        numTimeSteps = int(t * numStepsPerYear)
+        t = (self._expiry_date - valuation_date) / gDaysInYear
+        numTimeSteps = int(t * num_steps_per_year)
 
-        df = discountCurve.df(self._expiryDate)
-        r = discountCurve.ccRate(self._expiryDate)
-        q = dividendCurve.ccRate(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
+        r = discount_curve.ccRate(self._expiry_date)
+        q = dividendCurve.ccRate(self._expiry_date)
         mu = r - q
 
         optionType = self._optionType
@@ -165,22 +165,22 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smin = stockMinMax
-            if smin > stockPrice:
+            if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smax = stockMinMax
-            if smax < stockPrice:
+            if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(numPaths, numTimeSteps, t, mu, stockPrice,
+        Sall = model.getPaths(num_paths, numTimeSteps, t, mu, stock_price,
                               volatility, seed)
 
         # Due to antithetics we have doubled the number of paths
-        numPaths = 2 * numPaths
-        payoff = np.zeros(numPaths)
+        num_paths = 2 * num_paths
+        payoff = np.zeros(num_paths)
 
         if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)
@@ -200,14 +200,14 @@ class FinEquityFloatLookbackOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("OPTION TYPE", self._optionType, "")
         return s
 
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

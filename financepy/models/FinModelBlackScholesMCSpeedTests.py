@@ -12,29 +12,29 @@ from math import exp, sqrt
 
 ###############################################################################
 
-def valueMC1(s0, t, K, r, q, v, numPaths, seed):
+def valueMC1(s0, t, K, r, q, v, num_paths, seed):
 
     vsqrtt = v * sqrt(t)
     ss = s0 * exp((r - q - v*v / 2.0) * t)
 
     np.random.seed(seed)
-    g = np.random.standard_normal(numPaths)
+    g = np.random.standard_normal(num_paths)
 
     payoff = 0.0
-    for i in range(0, numPaths):
+    for i in range(0, num_paths):
         s = ss * exp(+g[i] * vsqrtt)
         payoff += max(s - K, 0.0)
 
-    v = payoff * np.exp(-r * t) / numPaths
+    v = payoff * np.exp(-r * t) / num_paths
 
     return v
 
 ###############################################################################
 
-def valueMC2(s0, t, K, r, q, v, numPaths, seed):
+def valueMC2(s0, t, K, r, q, v, num_paths, seed):
 
     np.random.seed(seed)
-    g = np.random.standard_normal(numPaths)
+    g = np.random.standard_normal(num_paths)
     vsqrtt = v * np.sqrt(t)
     s = s0 * exp((r - q - v*v / 2.0) * t) 
 
@@ -49,20 +49,20 @@ def valueMC2(s0, t, K, r, q, v, numPaths, seed):
 
 @njit(float64(float64, float64, float64, float64, float64, float64, 
              int64, int64), cache=True, fastmath=True)
-def valueMC3(s0, t, K, r, q, v, numPaths, seed):
+def valueMC3(s0, t, K, r, q, v, num_paths, seed):
 
     vsqrtt = v * sqrt(t)
     ss = s0 * exp((r - q - v*v / 2.0) * t)
 
     np.random.seed(seed)
-    g = np.random.standard_normal(numPaths)
+    g = np.random.standard_normal(num_paths)
 
     payoff = 0.0
-    for i in range(0, numPaths):
+    for i in range(0, num_paths):
         s = ss * exp(+g[i] * vsqrtt)
         payoff += max(s - K, 0.0)
 
-    v = payoff * np.exp(-r * t) / numPaths
+    v = payoff * np.exp(-r * t) / num_paths
 
     return v
 
@@ -70,10 +70,10 @@ def valueMC3(s0, t, K, r, q, v, numPaths, seed):
 
 @njit(float64(float64, float64, float64, float64, float64, float64, 
              int64, int64), cache=True, fastmath=True)
-def valueMC4(s0, t, K, r, q, v, numPaths, seed):
+def valueMC4(s0, t, K, r, q, v, num_paths, seed):
 
     np.random.seed(seed)
-    g = np.random.standard_normal(numPaths)
+    g = np.random.standard_normal(num_paths)
 
     vsqrtt = v * np.sqrt(t)
 
@@ -90,20 +90,20 @@ def valueMC4(s0, t, K, r, q, v, numPaths, seed):
 
 @njit(float64(float64, float64, float64, float64, float64, float64, 
              int64, int64), cache=True, fastmath=True, parallel=True)
-def valueMC5(s0, t, K, r, q, v, numPaths, seed):
+def valueMC5(s0, t, K, r, q, v, num_paths, seed):
 
     vsqrtt = v * sqrt(t)
     ss = s0 * exp((r - q - v*v / 2.0) * t)
 
     np.random.seed(seed)
-    g = np.random.standard_normal(numPaths)
+    g = np.random.standard_normal(num_paths)
 
     payoff = 0.0
-    for i in prange(0, numPaths):
+    for i in prange(0, num_paths):
         s = ss * exp(+g[i] * vsqrtt)
         payoff += max(s - K, 0.0)
 
-    v = payoff * np.exp(-r * t) / numPaths
+    v = payoff * np.exp(-r * t) / num_paths
 
     return v
 

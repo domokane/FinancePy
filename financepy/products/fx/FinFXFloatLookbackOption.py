@@ -5,15 +5,15 @@
 import numpy as np
 from enum import Enum
 
-from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear, gSmall
-from ...finutils.FinError import FinError
-from ...models.FinGBMProcess import FinGBMProcess
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.FinError import FinError
+from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.fx.FinFXOption import FinFXOption
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.helper_functions import check_argument_types
+from ...utils.date import Date
+from ...utils.FinGlobalTypes import FinOptionTypes
+from ...market.curves.discount_curve import DiscountCurve
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -30,34 +30,34 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 
 
 class FinFXFloatLookbackOption(FinFXOption):
-    ''' This is an FX option in which the strike of the option is not fixed
+    """ This is an FX option in which the strike of the option is not fixed
     but is set at expiry to equal the minimum fx rate in the case of a call
-    or the maximum fx rate in the case of a put. '''
+    or the maximum fx rate in the case of a put. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  optionType: FinOptionTypes):
-        ''' Create the FloatLookbackOption by specifying the expiry date and
-        the option type. '''
+        """ Create the FloatLookbackOption by specifying the expiry date and
+        the option type. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._optionType = optionType
 
 ##########################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrice: float,
-              domesticCurve: FinDiscountCurve,
-              foreignCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_price: float,
+              domesticCurve: DiscountCurve,
+              foreignCurve: DiscountCurve,
               volatility: float,
               stockMinMax: float):
-        ''' Valuation of the Floating Lookback option using Black-Scholes using
-        the formulae derived by Goldman, Sosin and Gatto (1979). '''
+        """ Valuation of the Floating Lookback option using Black-Scholes using
+        the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
         df = domesticCurve._df(t)
         r = -np.log(df)/t
@@ -66,7 +66,7 @@ class FinFXFloatLookbackOption(FinFXOption):
         q = -np.log(dq)/t
 
         v = volatility
-        s0 = stockPrice
+        s0 = stock_price
         smin = 0.0
         smax = 0.0
 
@@ -132,24 +132,24 @@ class FinFXFloatLookbackOption(FinFXOption):
 
     def valueMC(
             self,
-            valueDate,
-            stockPrice,
+            valuation_date,
+            stock_price,
             domesticCurve,
             foreignCurve,
             volatility,
             stockMinMax,
-            numPaths=10000,
-            numStepsPerYear=252,
+            num_paths=10000,
+            num_steps_per_year=252,
             seed=4242):
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
         df = domesticCurve._df(t)
         r = -np.log(df)/t
 
         dq = domesticCurve._df(t)
         q = -np.log(dq)/t
 
-        numTimeSteps = int(t * numStepsPerYear)
+        numTimeSteps = int(t * num_steps_per_year)
         mu = r - q
 
         optionType = self._optionType
@@ -158,28 +158,28 @@ class FinFXFloatLookbackOption(FinFXOption):
 
         if self._optionType == FinOptionTypes.EUROPEAN_CALL:
             smin = stockMinMax
-            if smin > stockPrice:
+            if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._optionType == FinOptionTypes.EUROPEAN_PUT:
             smax = stockMinMax
-            if smax < stockPrice:
+            if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
         Sall = model.getPaths(
-            numPaths,
+            num_paths,
             numTimeSteps,
             t,
             mu,
-            stockPrice,
+            stock_price,
             volatility,
             seed)
 
         # Due to antithetics we have doubled the number of paths
-        numPaths = 2 * numPaths
-        payoff = np.zeros(numPaths)
+        num_paths = 2 * num_paths
+        payoff = np.zeros(num_paths)
 
         if optionType == FinOptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)

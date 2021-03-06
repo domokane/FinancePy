@@ -9,8 +9,8 @@ sys.path.append("..")
 import glob
 from os.path import dirname, basename, join
 
-from financepy.finutils.FinError import FinError
-from financepy.finutils.FinDate import setDateFormatType, FinDateFormatTypes
+from financepy.utils.FinError import FinError
+from financepy.utils.date import setDateFormatType, FinDateFormatTypes
 setDateFormatType(FinDateFormatTypes.UK_LONG)
 
 # I put this here to get the library loaded and header printed before loop
@@ -20,7 +20,7 @@ print("Looking in folder:", dirname(__file__))
 modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
 numModules = len(modules)
 
-''' This is the index of the file - change this to start later in the list '''
+""" This is the index of the file - change this to start later in the list """
 n = 0
 m = numModules
 

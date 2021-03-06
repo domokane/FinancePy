@@ -9,40 +9,40 @@
 
 import numpy as np
 
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...models.FinGBMProcess import FinGBMProcess
+from ...utils.global_variables import gDaysInYear
+from ...models.gbm_process_simulator import FinGBMProcess
 
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinHelperFunctions import _funcName
-from ...finutils.FinDate import FinDate
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helper_functions import _funcName
+from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
 
-from ...finutils.FinMath import N
+from ...utils.fin_math import N
 
 
 ###############################################################################
 
 
 class FinEquityBasketOption():
-    ''' A FinEquityBasketOption is a contract to buy a put or a call option on
+    """ A FinEquityBasketOption is a contract to buy a put or a call option on
     an equally weighted portfolio of different stocks, each with its own price,
     volatility and dividend yield. An analytical and monte-carlo pricing model
-    have been implemented for a European style option. '''
+    have been implemented for a European style option. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikePrice: float,
                  optionType: FinOptionTypes,
                  numAssets: int):
-        ''' Define the FinEquityBasket option by specifying its expiry date,
+        """ Define the FinEquityBasket option by specifying its expiry date,
         its strike price, whether it is a put or call, and the number of
-        underlying stocks in the basket. '''
+        underlying stocks in the basket. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
         self._optionType = optionType
         self._numAssets = numAssets
@@ -50,16 +50,16 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def _validate(self,
-                  stockPrices,
-                  dividendYields,
+                  stock_prices,
+                  dividend_yields,
                   volatilities,
                   correlations):
 
-        if len(stockPrices) != self._numAssets:
+        if len(stock_prices) != self._numAssets:
             raise FinError(
                 "Stock prices must have a length " + str(self._numAssets))
 
-        if len(dividendYields) != self._numAssets:
+        if len(dividend_yields) != self._numAssets:
             raise FinError(
                 "Dividend yields must have a length " + str(self._numAssets))
 
@@ -96,40 +96,40 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrices: np.ndarray,
-              discountCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_prices: np.ndarray,
+              discount_curve: DiscountCurve,
               dividendCurves: (list),
               volatilities: np.ndarray,
               correlations: np.ndarray):
-        ''' Basket valuation using a moment matching method to approximate the
+        """ Basket valuation using a moment matching method to approximate the
         effective variance of the underlying basket value. This approach is
         able to handle a full rank correlation structure between the individual
-        assets. '''
+        assets. """
 
     # https://pdfs.semanticscholar.org/16ed/c0e804379e22ff36dcbab7e9bb06519faa43.pdf
 
-        texp = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         qs = []
         for curve in dividendCurves:
-            q = curve.ccRate(self._expiryDate)
+            q = curve.ccRate(self._expiry_date)
             qs.append(q)
 
         v = volatilities
-        s = stockPrices
+        s = stock_prices
 
-        self._validate(stockPrices,
+        self._validate(stock_prices,
                        qs,
                        volatilities,
                        correlations)
 
         a = np.ones(self._numAssets) * (1.0 / self._numAssets)
 
-        r = discountCurve.ccRate(self._expiryDate)        
+        r = discount_curve.ccRate(self._expiry_date)        
 
         smean = 0.0
         for ia in range(0, self._numAssets):
@@ -182,44 +182,44 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def valueMC(self,
-                valueDate: FinDate,
-                stockPrices: np.ndarray,
-                discountCurve: FinDiscountCurve,
+                valuation_date: Date,
+                stock_prices: np.ndarray,
+                discount_curve: DiscountCurve,
                 dividendCurves: (list),
                 volatilities: np.ndarray,
                 corrMatrix: np.ndarray,
-                numPaths:int = 10000,
+                num_paths:int = 10000,
                 seed:int = 4242):
-        ''' Valuation of the EquityBasketOption using a Monte-Carlo simulation
+        """ Valuation of the EquityBasketOption using a Monte-Carlo simulation
         of stock prices assuming a GBM distribution. Cholesky decomposition is
         used to handle a full rank correlation structure between the individual
-        assets. The numPaths and seed are pre-set to default values but can be
-        overwritten. '''
+        assets. The num_paths and seed are pre-set to default values but can be
+        overwritten. """
 
-        checkArgumentTypes(getattr(self, _funcName(), None), locals())
+        check_argument_types(getattr(self, _funcName(), None), locals())
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        texp = (self._expiryDate - valueDate) / gDaysInYear
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
 
-        dividendYields = []
+        dividend_yields = []
         for curve in dividendCurves:
-            dq = curve.df(self._expiryDate)
+            dq = curve.df(self._expiry_date)
             q = -np.log(dq) / texp
-            dividendYields.append(q)
+            dividend_yields.append(q)
 
-        self._validate(stockPrices,
-                       dividendYields,
+        self._validate(stock_prices,
+                       dividend_yields,
                        volatilities,
                        corrMatrix)
 
-        numAssets = len(stockPrices)
+        numAssets = len(stock_prices)
 
-        df = discountCurve.df(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/texp
 
-        mus = r - dividendYields
+        mus = r - dividend_yields
         k = self._strikePrice
 
         numTimeSteps = 2
@@ -228,11 +228,11 @@ class FinEquityBasketOption():
         np.random.seed(seed)
 
         Sall = model.getPathsAssets(numAssets,
-                                    numPaths,
+                                    num_paths,
                                     numTimeSteps,
                                     texp,
                                     mus,
-                                    stockPrices,
+                                    stock_prices,
                                     volatilities,
                                     corrMatrix,
                                     seed)
@@ -252,7 +252,7 @@ class FinEquityBasketOption():
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("NUM ASSETS", self._numAssets, "")
@@ -261,7 +261,7 @@ class FinEquityBasketOption():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

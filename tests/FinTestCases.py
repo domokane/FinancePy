@@ -9,7 +9,7 @@ from os.path import join, exists, split
 import time
 
 from enum import Enum
-from financepy.finutils.FinError import FinError
+from financepy.utils.FinError import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
@@ -39,7 +39,7 @@ tolerance = 1e-8
 
 
 class FinTestCases():
-    ''' Test case framework for FinancePy.
+    """ Test case framework for FinancePy.
     - The basic step is that we generate a GOLDEN folder that creates an output
     file for each testcase which is assumed to be correct. This can be done by
     running the test cases Python file with the globalTestCaseMode flag set to
@@ -59,13 +59,13 @@ class FinTestCases():
 
     Note that the header TIME is special as it tells the analysis that the
     value in the corresponding column is a timing and so its value is allowed
-    to change without triggering an error.'''
+    to change without triggering an error."""
 
 ###############################################################################
 
     def __init__(self, moduleName, mode):
-        ''' Create the TestCase given the module name and whether we are in
-        GOLDEN or COMPARE mode. '''
+        """ Create the TestCase given the module name and whether we are in
+        GOLDEN or COMPARE mode. """
 
         rootFolder, moduleFilename = split(moduleName)
 
@@ -161,7 +161,7 @@ class FinTestCases():
 ###############################################################################
 
     def print(self, *args):
-        ''' Print comma separated output to GOLDEN or COMPARE directory. '''
+        """ Print comma separated output to GOLDEN or COMPARE directory. """
 
         if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
             print(args)
@@ -201,7 +201,7 @@ class FinTestCases():
 ###############################################################################
 
     def banner(self, txt):
-        ''' Print a banner on a line to the GOLDEN or COMPARE directory. '''
+        """ Print a banner on a line to the GOLDEN or COMPARE directory. """
 
         if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
             print(txt)
@@ -227,7 +227,7 @@ class FinTestCases():
 ###############################################################################
 
     def header(self, *args):
-        ''' Print a header on a line to the GOLDEN or COMPARE directory. '''
+        """ Print a header on a line to the GOLDEN or COMPARE directory. """
 
         if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
             self.printLog(args)
@@ -260,7 +260,7 @@ class FinTestCases():
 ###############################################################################
 
     def compareRows(self, goldenRow, compareRow, rowNum):
-        ''' Compare the contents of two rows in GOLDEN and COMPARE folders.'''
+        """ Compare the contents of two rows in GOLDEN and COMPARE folders."""
 
         numWarnings = 0
         numErrors = 0
@@ -340,7 +340,7 @@ class FinTestCases():
 ###############################################################################
 
     def compareTestCases(self):
-        ''' Compare output of COMPARE mode to GOLDEN output '''
+        """ Compare output of COMPARE mode to GOLDEN output """
         
         self.startLog()
 

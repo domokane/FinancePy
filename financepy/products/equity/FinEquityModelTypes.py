@@ -2,13 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.helper_functions import labelToString
 
 ###############################################################################
 
 
 class FinEquityModel(object):
-    ''' This is a parent class for equity models. '''
+    """ This is a parent class for equity models. """
 
     def __init__(self):
         pass
@@ -21,7 +21,7 @@ class FinEquityModel(object):
 #                  volatility: float, 
 #                  implementation, parameters):
 
-#         checkArgumentTypes(self.__init__, locals())
+#         check_argument_types(self.__init__, locals())
 
 #         self._volatility = volatility
 #         self._implementation = implementation 
