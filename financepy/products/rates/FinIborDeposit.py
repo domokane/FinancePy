@@ -2,20 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinError import FinError
-from ...finutils.FinCalendar import FinCalendar
-from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
-from ...finutils.FinDayCount import FinDayCount
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.date import Date
+from ...utils.FinError import FinError
+from ...utils.calendar import Calendar
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.day_count import DayCount
+from ...utils.day_count import DayCountTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 
 
 class FinIborDeposit(object):
-    ''' An Ibor deposit is an agreement to borrow money interbank at the Ibor
+    """ An Ibor deposit is an agreement to borrow money interbank at the Ibor
     fixing rate starting on the start date and repaid on the maturity date
     with the interest amount calculated according to a day count convention and
     dates calculated according to a calendar and business day adjustment rule.
@@ -32,77 +32,77 @@ class FinIborDeposit(object):
     settlement is in one business day with maturity on the following business
     day. For later maturity deposits, settlement is usually in 1-3 business
     days. The number of days depends on the currency and jurisdiction of the
-    deposit contract. '''
+    deposit contract. """
 
     def __init__(self,
-                 startDate: FinDate,  #  When the interest starts to accrue
-                 maturityDateOrTenor: (FinDate, str),  # Repayment of interest
-                 depositRate: float,   # MM rate using simple interest
-                 dayCountType: FinDayCountTypes,  # How year fraction is calculated
-                 notional: float = 100.0,   # Amount borrowed
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,  #  Holidays for maturity date
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.MODIFIED_FOLLOWING):
-        ''' Create a Libor deposit object which takes the start date when
+                 start_date: Date,  #  When the interest starts to accrue
+                 maturity_date_or_tenor: (Date, str),  # Repayment of interest
+                 deposit_rate: float,  # MM rate using simple interest
+                 day_count_type: DayCountTypes,  # How year fraction is calculated
+                 notional: float = 100.0,  # Amount borrowed
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,  #  Holidays for maturity date
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
+        """ Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
         deposit rate. If a tenor is used then this is added to the start
         date and the calendar and business day adjustment method are applied if
         the maturity date fall on a holiday. Note that in order to calculate
         the start date you add the spot business days to the trade date
-        which usually today. '''
+        which usually today. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        self._calendarType = calendarType
-        self._busDayAdjustType = busDayAdjustType
+        self._calendar_type = calendar_type
+        self._bus_day_adjust_type = bus_day_adjust_type
 
-        if type(maturityDateOrTenor) == FinDate:
-            maturityDate = maturityDateOrTenor
+        if type(maturity_date_or_tenor) == Date:
+            maturity_date = maturity_date_or_tenor
         else:
-            maturityDate = startDate.addTenor(maturityDateOrTenor)
+            maturity_date = start_date.addTenor(maturity_date_or_tenor)
 
-        calendar = FinCalendar(self._calendarType)
+        calendar = Calendar(self._calendar_type)
 
-        maturityDate = calendar.adjust(maturityDate,
-                                       self._busDayAdjustType)
-        if startDate > maturityDate:
+        maturity_date = calendar.adjust(maturity_date,
+                                       self._bus_day_adjust_type)
+        if start_date > maturity_date:
             raise FinError("Start date cannot be after maturity date")
 
-        self._startDate = startDate
-        self._maturityDate = maturityDate
-        self._depositRate = depositRate
-        self._dayCountType = dayCountType
+        self._start_date = start_date
+        self._maturity_date = maturity_date
+        self._deposit_rate = deposit_rate
+        self._day_count_type = day_count_type
         self._notional = notional
 
     ###########################################################################
 
     def _maturityDf(self):
-        ''' Returns the maturity date discount factor that would allow the
+        """ Returns the maturity date discount factor that would allow the
         Libor curve to reprice the contractual market deposit rate. Note that
-        this is a forward discount factor that starts on settlement date.'''
+        this is a forward discount factor that starts on settlement date."""
 
-        dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
-        discountFactor = 1.0 / (1.0 + accFactor * self._depositRate)
+        dc = DayCount(self._day_count_type)
+        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
+        discountFactor = 1.0 / (1.0 + acc_factor * self._deposit_rate)
         return discountFactor
 
     ###########################################################################
 
     def value(self,
-              valuationDate: FinDate,
-              liborCurve):
-        ''' Determine the value of an existing Libor Deposit contract given a
+              valuation_date: Date,
+              libor_curve):
+        """ Determine the value of an existing Libor Deposit contract given a
         valuation date and a Libor curve. This is simply the PV of the future
-        repayment plus interest discounted on the current Libor curve. '''
+        repayment plus interest discounted on the current Libor curve. """
 
-        if valuationDate > self._maturityDate:
+        if valuation_date > self._maturity_date:
             raise FinError("Start date after maturity date")
 
-        dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
-        df_settle = liborCurve.df(self._startDate)
-        df_maturity = liborCurve.df(self._maturityDate)
+        dc = DayCount(self._day_count_type)
+        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
+        df_settle = libor_curve.df(self._start_date)
+        df_maturity = libor_curve.df(self._maturity_date)
 
-        value = (1.0 + accFactor * self._depositRate) * self._notional
+        value = (1.0 + acc_factor * self._deposit_rate) * self._notional
 
         # Need to take into account spot days being zero so depo settling fwd
         value = value * df_maturity / df_settle
@@ -112,26 +112,26 @@ class FinIborDeposit(object):
     ###########################################################################
 
     def printFlows(self,
-                   valuationDate: FinDate):
-        ''' Print the date and size of the future repayment. '''
+                   valuation_date: Date):
+        """ Print the date and size of the future repayment. """
 
-        dc = FinDayCount(self._dayCountType)
-        accFactor = dc.yearFrac(self._startDate, self._maturityDate)[0]
-        flow = (1.0 + accFactor * self._depositRate) * self._notional
-        print(self._maturityDate, flow)
+        dc = DayCount(self._day_count_type)
+        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
+        flow = (1.0 + acc_factor * self._deposit_rate) * self._notional
+        print(self._maturity_date, flow)
 
     ###########################################################################
 
     def __repr__(self):
-        ''' Print the contractual details of the Libor deposit. '''
+        """ Print the contractual details of the Libor deposit. """
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._startDate)
-        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("START DATE", self._start_date)
+        s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("DEPOSIT RATE", self._depositRate)
-        s += labelToString("DAY COUNT TYPE", self._dayCountType)
-        s += labelToString("CALENDAR", self._calendarType)
-        s += labelToString("BUS DAY ADJUST TYPE", self._busDayAdjustType)
+        s += labelToString("DEPOSIT RATE", self._deposit_rate)
+        s += labelToString("DAY COUNT TYPE", self._day_count_type)
+        s += labelToString("CALENDAR", self._calendar_type)
+        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
         return s
 
     ###########################################################################

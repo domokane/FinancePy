@@ -6,15 +6,15 @@ from math import exp, log, sqrt
 import numpy as np
 
 
-from ...finutils.FinMath import N
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
+from ...utils.fin_math import N
+from ...utils.global_variables import gDaysInYear
+from ...utils.FinError import FinError
 # from ...products.equity.FinEquityOption import FinOption
-from ...finutils.FinDate import FinDate
+from ...utils.date import Date
 #from ...products.fx.FinFXModelTypes import FinFXModel
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...models.black_scholes import FinModelBlackScholes
+from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.FinGlobalTypes import FinOptionTypes
 
 ###############################################################################
 
@@ -22,23 +22,23 @@ from ...finutils.FinGlobalTypes import FinOptionTypes
 class FinFXDigitalOption():
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikePrice: float,  # 1 unit of foreign in domestic
                  currencyPair: str,  # FORDOM
                  optionType: FinOptionTypes,
                  notional: float,
                  premCurrency: str):
-        ''' Create the FX Digital Option object. Inputs include expiry date,
+        """ Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
         currency rates must be entered in the price in domestic currency of
         one unit of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
-        same for the domestic currency. '''
+        same for the domestic currency. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = float(strikePrice)
         self._currencyPair = currencyPair
         self._optionType = optionType
@@ -53,23 +53,23 @@ class FinFXDigitalOption():
 ###############################################################################
 
     def value(self,
-              valueDate,
+              valuation_date,
               spotFXRate,  # 1 unit of foreign in domestic
               domDiscountCurve,
               forDiscountCurve,
               model):
-        ''' Valuation of a digital option using Black-Scholes model. This
+        """ Valuation of a digital option using Black-Scholes model. This
         allows for 4 cases - first upper barriers that when crossed pay out
         cash (calls) and lower barriers than when crossed from above cause a
         cash payout (puts) PLUS the fact that the cash payment can be in
-        domestic or foreign currency. '''
+        domestic or foreign currency. """
 
-        if type(valueDate) == FinDate:
-            spotDate = valueDate.addWeekDays(self._spotDays)
+        if type(valuation_date) == Date:
+            spotDate = valuation_date.addWeekDays(self._spotDays)
             tdel = (self._deliveryDate - spotDate) / gDaysInYear
-            texp = (self._expiryDate - valueDate) / gDaysInYear
+            texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            tdel = valueDate
+            tdel = valuation_date
             texp = tdel
 
         if np.any(spotFXRate <= 0.0):

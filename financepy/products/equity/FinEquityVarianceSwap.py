@@ -6,41 +6,41 @@
 import numpy as np
 from math import log, exp, sqrt
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...models.FinModelBlackScholes import FinModelBlackScholes
-from ...finutils.FinGlobalTypes import FinOptionTypes
+from ...utils.FinError import FinError
+from ...utils.date import Date
+from ...utils.fin_math import ONE_MILLION
+from ...utils.global_variables import gDaysInYear
+from ...models.black_scholes import FinModelBlackScholes
+from ...utils.FinGlobalTypes import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
-from ...finutils.FinHelperFunctions import labelToString, checkArgumentTypes
+from ...utils.helper_functions import labelToString, check_argument_types
 
 ###############################################################################
 
 
 class FinEquityVarianceSwap(object):
-    ''' Class for managing an equity variance swap contract. '''
+    """ Class for managing an equity variance swap contract. """
 
     def __init__(self,
-                 startDate: FinDate,
-                 maturityDateOrTenor: (FinDate, str),
+                 start_date: Date,
+                 maturity_date_or_tenor: (Date, str),
                  strikeVariance: float,
                  notional: float = ONE_MILLION,
                  payStrikeFlag: bool = True):
-        ''' Create variance swap contract. '''
+        """ Create variance swap contract. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if type(maturityDateOrTenor) == FinDate:
-            maturityDate = maturityDateOrTenor
+        if type(maturity_date_or_tenor) == Date:
+            maturity_date = maturity_date_or_tenor
         else:
-            maturityDate = startDate.addTenor(maturityDateOrTenor)
+            maturity_date = start_date.addTenor(maturity_date_or_tenor)
 
-        if startDate >= maturityDate:
+        if start_date >= maturity_date:
             raise FinError("Start date after or same as maturity date")
 
-        self._startDate = startDate
-        self._maturityDate = maturityDate
+        self._start_date = start_date
+        self._maturity_date = maturity_date
         self._strikeVariance = strikeVariance
         self._notional = notional
         self._payStrikeFlag = payStrikeFlag
@@ -56,45 +56,45 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def value(self,
-              valuationDate,
+              valuation_date,
               realisedVar,
               fairStrikeVar,
-              liborCurve):
-        ''' Calculate the value of the variance swap based on the realised
+              libor_curve):
+        """ Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
-        volatility to the maturity date using the libor discount curve. '''
+        volatility to the maturity date using the libor discount curve. """
 
-        t1 = (valuationDate - self._startDate) / gDaysInYear
-        t2 = (self._maturityDate - self._startDate) / gDaysInYear
+        t1 = (valuation_date - self._start_date) / gDaysInYear
+        t2 = (self._maturity_date - self._start_date) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
         expectedVariance += (t2-t1) * fairStrikeVar / t2
 
         payoff = expectedVariance - self._strikeVariance
 
-        df = liborCurve.df(self._maturityDate)
+        df = libor_curve.df(self._maturity_date)
         v = payoff * self._notional * df
         return v
 
 ###############################################################################
 
     def fairStrikeApprox(self,
-                         valuationDate,
+                         valuation_date,
                          fwdStockPrice,
                          strikes,
                          volatilities):
-        ''' This is an approximation of the fair strike variance by Demeterfi
+        """ This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
-        F is the forward stock price and sigma(F) is the ATM forward vol. '''
+        F is the forward stock price and sigma(F) is the ATM forward vol. """
 
         f = fwdStockPrice
 
         # TODO Linear interpolation - to be revisited
         atmVol = np.interp(f, strikes, volatilities)
-        tmat = (self._maturityDate - valuationDate)/gDaysInYear
+        tmat = (self._maturity_date - valuation_date)/gDaysInYear
 
-        ''' Calculate the slope of the volatility curve by taking the end
-        points in the volatilities and strikes to calculate the gradient.'''
+        """ Calculate the slope of the volatility curve by taking the end
+        points in the volatilities and strikes to calculate the gradient."""
 
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
@@ -105,19 +105,19 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def fairStrike(self,
-                   valuationDate,
-                   stockPrice,
+                   valuation_date,
+                   stock_price,
                    dividendCurve,
                    volatilityCurve,
                    numCallOptions,
                    numPutOptions,
                    strikeSpacing,
-                   discountCurve,
+                   discount_curve,
                    useForward=True):
-        ''' Calculate the implied variance according to the volatility surface
+        """ Calculate the implied variance according to the volatility surface
         using a static replication methodology with a specially weighted
         portfolio of put and call options across a range of strikes using the
-        approximate method set out by Demeterfi et al. 1999. '''
+        approximate method set out by Demeterfi et al. 1999. """
 
         self._numPutOptions = numPutOptions
         self._numCallOptions = numCallOptions
@@ -125,27 +125,27 @@ class FinEquityVarianceSwap(object):
         callType = FinOptionTypes.EUROPEAN_CALL
         putType = FinOptionTypes.EUROPEAN_PUT
 
-        tmat = (self._maturityDate - valuationDate)/gDaysInYear
+        tmat = (self._maturity_date - valuation_date)/gDaysInYear
 
-        df = discountCurve._df(tmat)
+        df = discount_curve._df(tmat)
         r = - log(df)/tmat
 
         dq = dividendCurve._df(tmat)
         q = - log(dq)/tmat
 
-        s0 = stockPrice
+        s0 = stock_price
         g = exp(r*tmat)
-        fwd = stockPrice * g
+        fwd = stock_price * g
 
         # This fixes the centre strike of the replication options
         if useForward is True:
             sstar = fwd
         else:
-            sstar = stockPrice
+            sstar = stock_price
 
-        ''' Replication argument from Demeterfi, Derman, Kamal and Zhou from
+        """ Replication argument from Demeterfi, Derman, Kamal and Zhou from
         Goldman Sachs Research notes March 1999. See Appendix A. This aim is
-        to use calls and puts to approximate the payoff of a log contract '''
+        to use calls and puts to approximate the payoff of a log contract """
 
         minStrike = sstar - (numPutOptions+1) * strikeSpacing
 
@@ -198,9 +198,9 @@ class FinEquityVarianceSwap(object):
         for n in range(0, numPutOptions):
             k = putK[n]
             vol = volatilityCurve.volatility(k)
-            opt = FinEquityVanillaOption(self._maturityDate, k, putType)
+            opt = FinEquityVanillaOption(self._maturity_date, k, putType)
             model = FinModelBlackScholes(vol)
-            v = opt.value(valuationDate, s0, discountCurve,
+            v = opt.value(valuation_date, s0, discount_curve,
                           dividendCurve, model)
             piPut += v * self._putWts[n]
 
@@ -208,9 +208,9 @@ class FinEquityVarianceSwap(object):
         for n in range(0, numCallOptions):
             k = callK[n]
             vol = volatilityCurve.volatility(k)
-            opt = FinEquityVanillaOption(self._maturityDate, k, callType)
+            opt = FinEquityVanillaOption(self._maturity_date, k, callType)
             model = FinModelBlackScholes(vol)
-            v = opt.value(valuationDate, s0, discountCurve,
+            v = opt.value(valuation_date, s0, discount_curve,
                           dividendCurve, model)
             piCall += v * self._callWts[n]
 
@@ -223,8 +223,8 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def realisedVariance(self, closePrices, useLogs=True):
-        ''' Calculate the realised variance according to market standard
-        calculations which can either use log or percentage returns.'''
+        """ Calculate the realised variance according to market standard
+        calculations which can either use log or percentage returns."""
 
         numObservations = len(closePrices)
 
@@ -250,8 +250,8 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def printWeights(self):
-        ''' Print the list of puts and calls used to replicate the static
-        replication component of the variance swap hedge. '''
+        """ Print the list of puts and calls used to replicate the static
+        replication component of the variance swap hedge. """
 
         if self._numPutOptions == 0 and self._numCallOptions == 0:
             print("No call or put options generated.")
@@ -272,8 +272,8 @@ class FinEquityVarianceSwap(object):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._startDate)
-        s += labelToString("MATURITY DATE", self._maturityDate)
+        s += labelToString("START DATE", self._start_date)
+        s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("STRIKE VARIANCE", self._strikeVariance)
         s += labelToString("NOTIONAL", self._notional)
         s += labelToString("PAY STRIKE FLAG", self._payStrikeFlag, "")
@@ -282,7 +282,7 @@ class FinEquityVarianceSwap(object):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

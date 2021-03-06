@@ -5,12 +5,12 @@
 
 import numpy as np
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
-from ...finutils.FinGlobalTypes import FinOptionTypes
-from ...finutils.FinHelperFunctions import checkArgumentTypes, labelToString
-from ...market.curves.FinDiscountCurve import FinDiscountCurve
+from ...utils.date import Date
+from ...utils.global_variables import gDaysInYear
+from ...utils.FinError import FinError
+from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.helper_functions import check_argument_types, labelToString
+from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from ...models.FinModel import FinModel
@@ -23,19 +23,19 @@ from ...models.FinModel import FinModel
 
 
 class FinEquityAmericanOption(FinEquityOption):
-    ''' Class for American (and European) style options on simple vanilla
-    calls and puts - a tree valuation model is used that can handle both. '''
+    """ Class for American (and European) style options on simple vanilla
+    calls and puts - a tree valuation model is used that can handle both. """
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  strikePrice: float,
                  optionType: FinOptionTypes,
                  numOptions: float = 1.0):
-        ''' Class for American style options on simple vanilla calls and puts.
+        """ Class for American style options on simple vanilla calls and puts.
         Specify the expiry date, strike price, whether the option is a call or
-        put and the number of options. '''
+        put and the number of options. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         if optionType != FinOptionTypes.EUROPEAN_CALL and \
             optionType != FinOptionTypes.EUROPEAN_PUT and \
@@ -43,7 +43,7 @@ class FinEquityAmericanOption(FinEquityOption):
                 optionType != FinOptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type" + str(optionType))
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._strikePrice = strikePrice
         self._optionType = optionType
         self._numOptions = numOptions
@@ -51,20 +51,20 @@ class FinEquityAmericanOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate: FinDate,
-              stockPrice: (np.ndarray, float),
-              discountCurve: FinDiscountCurve,
-              dividendCurve: FinDiscountCurve,
+              valuation_date: Date,
+              stock_price: (np.ndarray, float),
+              discount_curve: DiscountCurve,
+              dividendCurve: DiscountCurve,
               model: FinModel):
-        ''' Valuation of an American option using a CRR tree to take into
-        account the value of early exercise. '''
+        """ Valuation of an American option using a CRR tree to take into
+        account the value of early exercise. """
 
-        if type(valueDate) == FinDate:
-            texp = (self._expiryDate - valueDate) / gDaysInYear
+        if type(valuation_date) == Date:
+            texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
-            texp = valueDate
+            texp = valuation_date
 
-        if np.any(stockPrice <= 0.0):
+        if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
         if isinstance(model, FinModel) is False:
@@ -75,10 +75,10 @@ class FinEquityAmericanOption(FinEquityOption):
 
         texp = np.maximum(texp, 1e-10)
 
-        r = discountCurve.ccRate(self._expiryDate)        
-        q = dividendCurve.ccRate(self._expiryDate)
+        r = discount_curve.ccRate(self._expiry_date)        
+        q = dividendCurve.ccRate(self._expiry_date)
 
-        s = stockPrice
+        s = stock_price
         k = self._strikePrice
 
         v = model.value(s, texp, k, r, q, self._optionType)
@@ -94,7 +94,7 @@ class FinEquityAmericanOption(FinEquityOption):
 
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiryDate)
+        s += labelToString("EXPIRY DATE", self._expiry_date)
         s += labelToString("STRIKE PRICE", self._strikePrice)
         s += labelToString("OPTION TYPE", self._optionType)
         s += labelToString("NUMBER", self._numOptions, "")
@@ -103,7 +103,7 @@ class FinEquityAmericanOption(FinEquityOption):
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

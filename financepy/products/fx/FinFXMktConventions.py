@@ -2,9 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinError import FinError
+from ...utils.FinError import FinError
 from enum import Enum
-from ...finutils.FinHelperFunctions import labelToString
+from ...utils.helper_functions import labelToString
 
 # Non exhaustive list of country codes and currency names
 

@@ -5,16 +5,16 @@
 import numpy as np
 from typing import List
 
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import N, M
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinError import FinError
-from ...models.FinGBMProcess import FinGBMProcess
+from ...utils.date import Date
+from ...utils.fin_math import N, M
+from ...utils.global_variables import gDaysInYear
+from ...utils.FinError import FinError
+from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from enum import Enum
 
-from ...finutils.FinHelperFunctions import checkArgumentTypes
+from ...utils.helper_functions import check_argument_types
 
 ###############################################################################
 
@@ -65,27 +65,27 @@ def payoffValue(s, payoffTypeValue, payoffParams):
 
 
 def valueMCFast(t,
-                stockPrices,
-                discountCurve,
-                dividendYields,
+                stock_prices,
+                discount_curve,
+                dividend_yields,
                 volatilities,
                 betas,
                 numAssets,
                 payoffType,
                 payoffParams,
-                numPaths=10000,
+                num_paths=10000,
                 seed=4242):
 
     np.random.seed(seed)
-    df = discountCurve._df(t)
+    df = discount_curve._df(t)
     r = -np.log(df)/t
-    mus = r - dividendYields
+    mus = r - dividend_yields
 
     model = FinGBMProcess()
 
     numTimeSteps = 2
-    Sall = model.getPathsAssets(numAssets, numPaths, numTimeSteps,
-                                t, mus, stockPrices, volatilities, betas, seed)
+    Sall = model.getPathsAssets(numAssets, num_paths, numTimeSteps,
+                                t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoffValue(Sall, payoffType.value, payoffParams)
     payoff = np.mean(payoff)
@@ -98,16 +98,16 @@ def valueMCFast(t,
 class FinRainbowOption(FinEquityOption):
 
     def __init__(self,
-                 expiryDate: FinDate,
+                 expiry_date: Date,
                  payoffType: FinFXRainbowOptionTypes,
                  payoffParams: List[float],
                  numAssets: int):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         self.validatePayoff(payoffType, payoffParams, numAssets)
 
-        self._expiryDate = expiryDate
+        self._expiry_date = expiry_date
         self._payoffType = payoffType
         self._payoffParams = payoffParams
         self._numAssets = numAssets
@@ -115,17 +115,17 @@ class FinRainbowOption(FinEquityOption):
 ###############################################################################
 
     def validate(self,
-                 stockPrices,
-                 dividendYields,
+                 stock_prices,
+                 dividend_yields,
                  volatilities,
                  betas):
 
-        if len(stockPrices) != self._numAssets:
+        if len(stock_prices) != self._numAssets:
             raise FinError(
                 "Stock prices must be a vector of length "
                 + str(self._numAssets))
 
-        if len(dividendYields) != self._numAssets:
+        if len(dividend_yields) != self._numAssets:
             raise FinError(
                 "Dividend yields must be a vector of length "
                 + str(self._numAssets))
@@ -177,36 +177,36 @@ class FinRainbowOption(FinEquityOption):
 ###############################################################################
 
     def value(self,
-              valueDate,
-              expiryDate,
-              stockPrices,
-              discountCurve,
-              dividendYields,
+              valuation_date,
+              expiry_date,
+              stock_prices,
+              discount_curve,
+              dividend_yields,
               volatilities,
               betas):
 
         if self._numAssets != 2:
             raise FinError("Analytical results for two assets only.")
 
-        if valueDate > self._expiryDate:
+        if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stockPrices,
-                      dividendYields,
+        self.validate(stock_prices,
+                      dividend_yields,
                       volatilities,
                       betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discountCurve._df(t)
+        df = discount_curve._df(t)
         r = -np.log(df)/t
 
-        q1 = dividendYields[0]
-        q2 = dividendYields[1]
+        q1 = dividend_yields[0]
+        q2 = dividend_yields[1]
         rho = betas[0]**2
-        s1 = stockPrices[0]
-        s2 = stockPrices[1]
+        s1 = stock_prices[0]
+        s2 = stock_prices[1]
         b1 = r - q1
         b2 = r - q2
         v1 = volatilities[0]
@@ -249,36 +249,36 @@ class FinRainbowOption(FinEquityOption):
 ###############################################################################
 
     def valueMC(self,
-                valueDate,
-                expiryDate,
-                stockPrices,
-                discountCurve,
-                dividendYields,
+                valuation_date,
+                expiry_date,
+                stock_prices,
+                discount_curve,
+                dividend_yields,
                 volatilities,
                 betas,
-                numPaths=10000,
+                num_paths=10000,
                 seed=4242):
 
-        self.validate(stockPrices,
-                      dividendYields,
+        self.validate(stock_prices,
+                      dividend_yields,
                       volatilities,
                       betas)
 
-        if valueDate > expiryDate:
+        if valuation_date > expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiryDate - valueDate) / gDaysInYear
+        t = (self._expiry_date - valuation_date) / gDaysInYear
 
         v = valueMCFast(t,
-                        stockPrices,
-                        discountCurve,
-                        dividendYields,
+                        stock_prices,
+                        discount_curve,
+                        dividend_yields,
                         volatilities,
                         betas,
                         self._numAssets,
                         self._payoffType,
                         self._payoffParams,
-                        numPaths,
+                        num_paths,
                         seed)
 
         return v
