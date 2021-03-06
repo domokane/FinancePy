@@ -5,7 +5,7 @@
 from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
 from .date import isLeapYear
 from .FinError import FinError
-from .frequency import FrequencyTypes, Frequency
+from .Frequency import FrequencyTypes, Frequency
 from .global_variables import gDaysInYear
 
 from enum import Enum
