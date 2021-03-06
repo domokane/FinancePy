@@ -8,6 +8,7 @@
 # PYTHON AND JUPYTER FILES
 build/
 env/
+.venv/
 develop-eggs/
 __pycache__/
 dist/
@@ -43,7 +44,6 @@ TestFin*_COMPARE.testLog
 
 # MYPY
 .mypy_cache
-financepy/__init__.py
 
 # bytecode
 *.py[cod]
