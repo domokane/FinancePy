@@ -7,7 +7,7 @@ from .FinError import FinError
 from .date import Date
 from .calendar import (Calendar, CalendarTypes)
 from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
-from .frequency import (Frequency, FrequencyTypes)
+from .Frequency import (Frequency, FrequencyTypes)
 from .helper_functions import labelToString
 from .helper_functions import check_argument_types
 

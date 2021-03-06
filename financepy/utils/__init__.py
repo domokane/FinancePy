@@ -2,7 +2,7 @@ from .calendar import *
 from .Currency import *
 from .date import *
 from .day_count import *
-from .frequency import *
+from .Frequency import *
 from .global_variables import *
 from .FinGlobalTypes import *
 from .helper_functions import *
