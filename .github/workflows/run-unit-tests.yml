@@ -26,4 +26,4 @@ jobs:
         pip list
    - name: unit tests
      run: |        
-        pytest
+        pytest -vv
