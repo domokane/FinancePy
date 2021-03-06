@@ -18,11 +18,12 @@ jobs:
        pip install -r requirements.txt
        pip install pytest  
        pip install -e . 
-   - name: list dependencies
+   - name: show pakage is importable
      run: |        
         python -c "import financepy as fp"
+   - name: list dependencies
+     run: |        
         pip list
    - name: unit tests
      run: |        
-        pytest tests
-
+        pytest
