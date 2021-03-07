@@ -244,3 +244,4 @@ def test_DateEOM():
 
     dt = Date(7, 12, 2010)
     assert dt.EOM().isEOM() == True
+
