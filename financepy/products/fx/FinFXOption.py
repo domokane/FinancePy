@@ -4,8 +4,8 @@
 
 
 from ...models.black_scholes import FinModelBlackScholes
-from ...utils.global_variables import gDaysInYear
-from ...utils.helper_functions import labelToString
+from ...utils.global_vars import gDaysInYear
+from ...utils.helpers import labelToString
 
 ##########################################################################
 

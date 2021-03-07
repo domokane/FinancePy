@@ -8,8 +8,8 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
-from financepy.utils.FinGlobalTypes import FinOptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.global_types import FinOptionTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import FinModelBlackScholes, FinModelBlackScholesTypes
 from financepy.utils.date import Date
 

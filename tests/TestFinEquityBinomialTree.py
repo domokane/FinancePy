@@ -12,10 +12,10 @@ from financepy.products.equity.FinEquityBinomialTree import FinEquityBinomialTre
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreeExerciseTypes
 from financepy.products.equity.FinEquityBinomialTree import FinEquityTreePayoffTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.utils.date import Date
 from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

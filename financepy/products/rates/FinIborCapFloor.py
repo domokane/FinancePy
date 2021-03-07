@@ -15,18 +15,18 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
 from ...utils.FinError import FinError
 from ...utils.schedule import Schedule
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...models.black import FinModelBlack
 from ...models.black_shifted import FinModelBlackShifted
 from ...models.bachelier import FinModelBachelier
 from ...models.sabr import FinModelSABR
 from ...models.sabr_shifted import FinModelSABRShifted
 from ...models.rates_hull_white_tree import FinModelRatesHW
-from ...utils.FinGlobalTypes import FinCapFloorTypes, FinOptionTypes
+from ...utils.global_types import FinCapFloorTypes, FinOptionTypes
 
 ##########################################################################
 

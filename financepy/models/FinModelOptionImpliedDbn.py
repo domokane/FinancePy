@@ -7,7 +7,7 @@
 import numpy as np
 from numba import njit, float64
 
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.global_types import FinOptionTypes
 from ..utils.FinError import FinError
 
 from .black_scholes_analytic import bsValue

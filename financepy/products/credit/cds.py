@@ -13,13 +13,13 @@ from ...utils.FinError import FinError
 from ...utils.calendar import Calendar, CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
-from ...utils.helper_functions import labelToString, tableToString
-from ...market.curves.interpolator import FinInterpTypes, _uinterpolate
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...utils.helpers import labelToString, tableToString
+from ...market.discount.interpolator import FinInterpTypes, _uinterpolate
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 
 useFlatHazardRateIntegral = True
 standard_recovery_rate = 0.40
@@ -233,7 +233,7 @@ class FinCDS(object):
 
     def _generateAdjustedCDSPaymentDates(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
-        frequency = Frequency(self._freq_type)
+        frequency = annual_frequency(self._freq_type)
         calendar = Calendar(self._calendar_type)
         start_date = self._step_in_date
         end_date = self._maturity_date

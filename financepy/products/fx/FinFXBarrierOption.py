@@ -8,11 +8,11 @@ from enum import Enum
 
 
 from ...utils.FinError import FinError
-from ...utils.fin_math import N
-from ...utils.global_variables import gDaysInYear
+from ...utils.math import N
+from ...utils.global_vars import gDaysInYear
 from ...products.fx.FinFXOption import FinFXOption
 from ...models.process_simulator import FinProcessSimulator
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
 ###############################################################################

@@ -8,8 +8,8 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.curves.interpolator import FinInterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve import DiscountCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

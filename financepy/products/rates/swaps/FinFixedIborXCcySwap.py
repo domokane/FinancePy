@@ -25,7 +25,7 @@ class FinFixedIborXCcySwap(object):
     date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curves (one for each leg) which is separate
+    is done on a supplied discount discount (one for each leg) which is separate
     from the curve from which the implied index rates are extracted. """
     
     def __init__(self,

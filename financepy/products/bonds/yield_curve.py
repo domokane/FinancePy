@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import scale
-from ...utils.helper_functions import labelToString
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import scale
+from ...utils.helpers import labelToString
 
 from .yield_curve_model import CurveFitPolynomial
 from .yield_curve_model import CurveFitNelsonSiegel

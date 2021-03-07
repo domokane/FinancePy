@@ -4,15 +4,15 @@
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.fin_math import ONE_MILLION
+from ...utils.math import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
+from ...utils.global_types import FinSwapTypes
+from ...market.discount.curve import DiscountCurve
 
 ##########################################################################
 

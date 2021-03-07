@@ -25,16 +25,16 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
 
 from scipy import optimize
 
@@ -111,7 +111,7 @@ class Bond(object):
         self._coupon = coupon
         self._freq_type = freq_type
         self._accrual_type = accrual_type
-        self._frequency = Frequency(freq_type)
+        self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0  # This is amount paid at maturity
@@ -173,7 +173,7 @@ class Bond(object):
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
 
-        f = Frequency(self._freq_type)
+        f = annual_frequency(self._freq_type)
         c = self._coupon
         v = 1.0 / (1.0 + ytm / f)
 

@@ -5,18 +5,18 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.fin_math import ONE_MILLION
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_types import FinSwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.Amount import FinAmount
+from financepy.utils.amount import FinAmount
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
 from financepy.products.rates.FinFixedLeg import FinFixedLeg
 from financepy.products.rates.FinFloatLeg import FinFloatLeg
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

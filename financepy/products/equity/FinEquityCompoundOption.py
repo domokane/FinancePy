@@ -10,16 +10,16 @@ from scipy import optimize
 from numba import njit
 
 
-from ...utils.fin_math import N, phi2
-from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.math import N, phi2
+from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_types import FinOptionTypes
 
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from ...market.curves.discount_curve_flat import DiscountCurve
-from ...market.curves.discount_curve_flat import DiscountCurveFlat
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.discount.curve_flat import DiscountCurve
+from ...market.discount.curve_flat import DiscountCurveFlat
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
 ###############################################################################

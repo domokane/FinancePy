@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit, float64
 from typing import Union
 from .date import Date
-from .global_variables import gDaysInYear, gSmall
+from .global_vars import gDaysInYear, gSmall
 from .FinError import FinError
 from .day_count import DayCountTypes, DayCount
 

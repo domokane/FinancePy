@@ -5,7 +5,7 @@
 
 import numpy as np
 from scipy.interpolate import splev
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import labelToString
 
 ###############################################################################
 

@@ -7,9 +7,9 @@ from scipy import integrate
 from math import exp, log, pi
 import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
 
-from ..utils.global_variables import gDaysInYear
-from ..utils.FinGlobalTypes import FinOptionTypes
-from ..utils.fin_math import norminvcdf
+from ..utils.global_vars import gDaysInYear
+from ..utils.global_types import FinOptionTypes
+from ..utils.math import norminvcdf
 from ..utils.FinError import FinError
 
 ##########################################################################

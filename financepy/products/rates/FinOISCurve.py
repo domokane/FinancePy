@@ -8,11 +8,11 @@ import copy
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString
-from ...utils.helper_functions import check_argument_types, _funcName
-from ...utils.global_variables import gDaysInYear
-from ...market.curves.interpolator import FinInterpTypes, FinInterpolator
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString
+from ...utils.helpers import check_argument_types, _funcName
+from ...utils.global_vars import gDaysInYear
+from ...market.discount.interpolator import FinInterpTypes, FinInterpolator
+from ...market.discount.curve import DiscountCurve
 
 from ...products.rates.FinIborDeposit import FinIborDeposit
 from ...products.rates.FinOIS import FinOIS
@@ -58,7 +58,7 @@ def _f(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valuation_date, curve, None)
     notional = swap._fixed_leg._notional
@@ -76,7 +76,7 @@ def _g(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_fra = fra.value(valuation_date, curve)
     v_fra /= fra._notional

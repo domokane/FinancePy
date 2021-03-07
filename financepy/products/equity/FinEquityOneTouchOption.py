@@ -7,17 +7,17 @@ import numpy as np
 from enum import Enum
 
 
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
-from ...market.curves.discount_curve import DiscountCurve
+from ...market.discount.curve import DiscountCurve
 from ...models.gbm_process_simulator import getPaths
 
 from numba import njit
 
-from ...utils.fin_math import NVect
+from ...utils.math import NVect
 
 ###############################################################################
 # TODO: Implement Sobol random numbers

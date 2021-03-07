@@ -6,9 +6,9 @@ import numpy as np
 from numba import float64, int64, vectorize, njit
 from scipy import optimize
 
-from ..utils.FinGlobalTypes import FinOptionTypes
-from ..utils.global_variables import gSmall
-from ..utils.fin_math import NVect, NPrimeVect
+from ..utils.global_types import FinOptionTypes
+from ..utils.global_vars import gSmall
+from ..utils.math import NVect, NPrimeVect
 from ..utils.FinError import FinError
 from ..utils.FinSolvers1D import bisection, newton, newton_secant
 

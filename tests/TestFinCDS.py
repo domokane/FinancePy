@@ -9,21 +9,21 @@ import sys
 sys.path.append("..")
 
 from financepy.products.credit.cds import FinCDS
-from financepy.utils.fin_math import ONE_MILLION
-from financepy.market.curves.interpolator import FinInterpTypes
+from financepy.utils.math import ONE_MILLION
+from financepy.market.discount.interpolator import FinInterpTypes
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.discount.curve import DiscountCurve
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.credit.cds_curve import FinCDSCurve
-from financepy.utils.global_variables import gDaysInYear
+from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -111,7 +111,7 @@ def test_CDSCurveBuildTiming():
 
     testCases.header("LABEL", "TIME")
     duration = (end - start) / numCurves
-    testCases.print(str(numCurves) + " Libor curves", duration)
+    testCases.print(str(numCurves) + " Libor discount", duration)
 
 ##########################################################################
 

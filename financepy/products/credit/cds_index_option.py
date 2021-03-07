@@ -10,14 +10,14 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION, INVROOT2PI, N
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION, INVROOT2PI, N
 from ...utils.FinError import FinError
 from ...products.credit.cds_curve import FinCDSCurve
 from ...products.credit.cds import FinCDS
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import labelToString
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 

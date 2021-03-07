@@ -9,7 +9,7 @@ import sys
 sys.path.append("..")
 
 from financepy.models.heston import FinModelHeston, FinHestonNumericalScheme
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.utils.date import Date
 

@@ -9,7 +9,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.FinGlobalTypes import FinCapFloorTypes
+from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.IborSwap import FinSwapTypes
@@ -24,11 +24,11 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.market.curves.interpolator import FinInterpTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from financepy.models.black import FinModelBlack
 from financepy.models.bachelier import FinModelBachelier
@@ -37,7 +37,7 @@ from financepy.models.sabr import FinModelSABR
 from financepy.models.sabr_shifted import FinModelSABRShifted
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
 
-from financepy.utils.global_variables import gDaysInYear
+from financepy.utils.global_vars import gDaysInYear
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.utils.schedule import Schedule

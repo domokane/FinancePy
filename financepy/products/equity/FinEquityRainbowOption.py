@@ -7,13 +7,13 @@ from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
-from ...utils.fin_math import N, M
-from ...utils.global_variables import gDaysInYear
+from ...utils.math import N, M
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
 from enum import Enum
@@ -137,7 +137,7 @@ class FinEquityRainbowOption(FinEquityOption):
 
         if len(dividendCurves) != self._numAssets:
             raise FinError(
-                "Dividend curves must be a vector of length "
+                "Dividend discount must be a vector of length "
                 + str(self._numAssets))
 
         if len(volatilities) != self._numAssets:

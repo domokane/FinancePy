@@ -8,10 +8,10 @@
 import numpy as np
 from numba import njit, float64, float64
 
-from ..utils.fin_math import NVect, NPrimeVect
-from ..utils.global_variables import gSmall
-from ..utils.helper_functions import labelToString
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.math import NVect, NPrimeVect
+from ..utils.global_vars import gSmall
+from ..utils.helpers import labelToString
+from ..utils.global_types import FinOptionTypes
 from ..utils.FinError import FinError
 
 ###############################################################################

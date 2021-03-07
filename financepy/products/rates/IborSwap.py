@@ -6,15 +6,15 @@ import numpy as np
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.global_variables import gSmall
+from ...utils.global_vars import gSmall
 from ...utils.day_count import DayCountTypes
-from ...utils.frequency import FrequencyTypes, Frequency
+from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...utils.fin_math import ONE_MILLION
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...utils.math import ONE_MILLION
+from ...utils.global_types import FinSwapTypes
+from ...market.discount.curve import DiscountCurve
 
 from .FinFixedLeg import FinFixedLeg
 from .FinFloatLeg import FinFloatLeg
@@ -197,7 +197,7 @@ class FinIborSwap(object):
         used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods."""
 
-        m = Frequency(frequencyType)
+        m = annual_frequency(frequencyType)
 
         if m == 0:
             raise FinError("Frequency cannot be zero.")

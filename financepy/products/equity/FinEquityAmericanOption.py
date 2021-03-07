@@ -6,11 +6,11 @@
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.global_types import FinOptionTypes
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from ...models.FinModel import FinModel

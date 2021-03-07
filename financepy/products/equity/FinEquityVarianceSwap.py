@@ -8,12 +8,12 @@ from math import log, exp, sqrt
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.fin_math import ONE_MILLION
-from ...utils.global_variables import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
 from ...models.black_scholes import FinModelBlackScholes
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_types import FinOptionTypes
 from .FinEquityVanillaOption import FinEquityVanillaOption
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 
 ###############################################################################
 

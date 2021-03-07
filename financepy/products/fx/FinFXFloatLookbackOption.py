@@ -5,15 +5,15 @@
 import numpy as np
 from enum import Enum
 
-from ...utils.fin_math import N
-from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.math import N
+from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.FinError import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.fx.FinFXOption import FinFXOption
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.global_types import FinOptionTypes
+from ...market.discount.curve import DiscountCurve
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

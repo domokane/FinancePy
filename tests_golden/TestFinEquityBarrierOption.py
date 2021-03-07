@@ -10,7 +10,7 @@ from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierTypes
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierOption
 from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode

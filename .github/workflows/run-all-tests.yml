@@ -22,7 +22,7 @@ jobs:
        pip install matplotlib==3.3.2       
        pip install ipython==7.18.1
        python setup.py install
-       python tests/runAllTests.py
+       python tests_golden/runAllTests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v2
      with:

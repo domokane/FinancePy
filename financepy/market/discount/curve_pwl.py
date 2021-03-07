@@ -6,22 +6,23 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.global_variables import gSmall
-from ...utils.fin_math import testMonotonicity
+from ...utils.global_vars import gSmall
+from ...utils.math import testMonotonicity
 from ...utils.frequency import FrequencyTypes
-from ...utils.helper_functions import labelToString
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import labelToString
+from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes
-from ...utils.helper_functions import timesFromDates
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import timesFromDates
+from ...market.discount.curve import DiscountCurve
 
 ###############################################################################
 
 
-class DiscountCurvePWF(DiscountCurve):
-    """ Curve is made up of a series of zero rates sections with each having
-    a piecewise flat zero rate. The default compounding assumption is
-    continuous. The class inherits methods from FinDiscountCurve. """
+class DiscountCurvePWL(DiscountCurve):
+    """ Curve is made up of a series of sections assumed to each have a
+    piece-wise linear zero rate. The zero rate has a specified frequency
+    which defaults to continuous. This curve inherits all of the extra methods
+    from FinDiscountCurve. """
 
     def __init__(self,
                  valuation_date: Date,
@@ -29,8 +30,7 @@ class DiscountCurvePWF(DiscountCurve):
                  zeroRates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
-        """ Creates a discount curve using a vector of times and zero rates
-        that assumes that the zero rates are piecewise flat. """
+        """ Curve is defined by a vector of increasing times and zero rates."""
 
         check_argument_types(self.__init__, locals())
 
@@ -42,8 +42,8 @@ class DiscountCurvePWF(DiscountCurve):
         if len(zeroDates) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._zeroDates = zeroDates
         self._zeroRates = np.array(zeroRates)
+        self._zeroDates = zeroDates
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
@@ -59,8 +59,10 @@ class DiscountCurvePWF(DiscountCurve):
 ###############################################################################
 
     def _zeroRate(self,
-                  times: (float, np.ndarray, list)):
-        """ The piecewise flat zero rate is selected and returned. """
+                  times: (list, np.ndarray)):
+        """ Calculate the piecewise linear zero rate. This is taken from the
+        initial inputs. A simple linear interpolation scheme is used. If the
+        user supplies a frequency type then a conversion is done. """
 
         if isinstance(times, float):
             times = np.array([times])
@@ -68,7 +70,7 @@ class DiscountCurvePWF(DiscountCurve):
         if np.any(times < 0.0):
             raise FinError("All times must be positive")
 
-        times = np.maximum(times, gSmall)
+        times = np.maximum(times, 1e-6)
 
         zeroRates = []
 
@@ -83,39 +85,19 @@ class DiscountCurvePWF(DiscountCurve):
                     found = 1
                     break
 
+            t0 = self._times[l_index]
             r0 = self._zeroRates[l_index]
+            t1 = self._times[l_index+1]
+            r1 = self._zeroRates[l_index+1]
 
             if found == 1:
-                zeroRate = r0
+                zeroRate = ((t1 - t) * r0 + (t - t0) * r1)/(t1 - t0)
             else:
                 zeroRate = self._zeroRates[-1]
 
             zeroRates.append(zeroRate)
 
         return np.array(zeroRates)
-
-###############################################################################
-
-    def _fwd(self,
-             times: (np.ndarray, list)):
-        """ Calculate the continuously compounded forward rate at the forward
-        time provided. This is done by perturbing the time by a small amount
-        and measuring the change in the log of the discount factor divided by
-        the time increment dt."""
-
-        dt = 1e-6
-        times = np.maximum(times, dt)
-
-        df1 = self._df(times-dt)
-        df2 = self._df(times+dt)
-        fwd = np.log(df1/df2)/(2.0*dt)
-
-        # Prevent the discontinuous spikes by capping them at the sum of short
-        # plus the long end zero rate !
-        cap = (self._zeroRates[0] + self._zeroRates[-1])
-        fwd = np.minimum(fwd, cap)
-
-        return fwd
 
 ###############################################################################
 
@@ -141,6 +123,17 @@ class DiscountCurvePWF(DiscountCurve):
                             self._day_count_type)
 
         return df
+
+###############################################################################
+
+    # def _df(self,
+    #         t: (float, np.ndarray)):
+    #     """ Returns the discount factor at time t taking into account the
+    #     piecewise flat zero rate curve and the compunding frequency. """
+
+    #     r = self._zeroRate(t, self._freq_type)
+    #     df = zeroToDf(r, t, self._freq_type)
+    #     return df
 
 ###############################################################################
 

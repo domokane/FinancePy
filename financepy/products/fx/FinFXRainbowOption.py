@@ -6,15 +6,15 @@ import numpy as np
 from typing import List
 
 from ...utils.date import Date
-from ...utils.fin_math import N, M
-from ...utils.global_variables import gDaysInYear
+from ...utils.math import N, M
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
 
 from enum import Enum
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 
 ###############################################################################
 

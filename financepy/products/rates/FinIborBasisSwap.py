@@ -8,10 +8,10 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...utils.fin_math import ONE_MILLION
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...utils.math import ONE_MILLION
+from ...utils.global_types import FinSwapTypes
+from ...market.discount.curve import DiscountCurve
 
 from .FinFloatLeg import FinFloatLeg
 
@@ -27,7 +27,7 @@ class FinIborBasisSwap(object):
     
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which can be different from the two 
-    index curves from which the implied index rates are extracted. """
+    index discount from which the implied index rates are extracted. """
     
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue

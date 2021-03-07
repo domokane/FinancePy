@@ -5,7 +5,7 @@
 from numba import njit, float64, int64
 import numpy as np
 from ...utils.FinError import FinError
-from ...utils.global_variables import gSmall
+from ...utils.global_vars import gSmall
 
 
 from scipy.interpolate import PchipInterpolator
@@ -116,7 +116,7 @@ def _uinterpolate(t, times, dfs, method):
 
     ###########################################################################
     # linear interpolation of log(y(x)) which means the linear interpolation of
-    # continuously compounded zero rates in the case of discount curves
+    # continuously compounded zero rates in the case of discount discount
     # This is also FLAT FORWARDS
     ###########################################################################
 

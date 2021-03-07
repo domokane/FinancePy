@@ -25,7 +25,7 @@ class FinIborIborSwap(object):
     from a start date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which is separate from the curves from
+    is done on a supplied discount curve which is separate from the discount from
     which the implied index rates are extracted. """
     
     def __init__(self,
@@ -120,7 +120,7 @@ class FinIborIborSwap(object):
               principal=0.0):
 
         """ Value the LIBOR basis swap on a value date given a single Ibor
-        discount curve and each of the index curves for the two floating legs
+        discount curve and each of the index discount for the two floating legs
         of the swap. """
 
         payFloatLegValue = self.floatLegValue(valuation_date,

@@ -10,15 +10,15 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve import DiscountCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_variables import gDaysInYear
+from financepy.utils.global_vars import gDaysInYear
 from financepy.products.bonds.bond_option import BondOption
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
 
 from FinTestCases import FinTestCases, globalTestCaseMode

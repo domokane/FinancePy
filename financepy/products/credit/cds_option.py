@@ -10,10 +10,10 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION, N
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION, N
 from ...products.credit.cds import FinCDS
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.FinError import FinError
 

@@ -10,11 +10,11 @@ import numpy as np
 
 from ...utils.FinError import FinError
 from ...utils.day_count import DayCountTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
 from ...utils.date import Date
 
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...products.rates.FinIborFRA import FinIborFRA
 
 ###############################################################################

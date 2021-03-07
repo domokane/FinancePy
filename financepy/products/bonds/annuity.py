@@ -3,15 +3,15 @@
 ##############################################################################
 
 from ...utils.date import Date
-from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.FinError import FinError
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 
 
 ###############################################################################
@@ -38,7 +38,7 @@ class BondAnnuity(object):
         self._maturity_date = maturity_date
         self._coupon = coupon
         self._freq_type = freq_type
-        self._frequency = Frequency(freq_type)
+        self._frequency = annual_frequency(freq_type)
 
         # ISDA Style conventions
         self._calendar_type = calendar_type

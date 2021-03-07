@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import norm
 N = norm.cdf
 
-from ..utils.helper_functions import labelToString, check_argument_types
+from ..utils.helpers import labelToString, check_argument_types
 
 # TODO: Redesign this class
 

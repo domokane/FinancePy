@@ -34,7 +34,7 @@ def _f(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valuation_date, discount_curve, curve, None)
 
@@ -55,7 +55,7 @@ def _g(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_fra = fra.value(valuation_date, discount_curve, curve)
     v_fra /= fra._notional

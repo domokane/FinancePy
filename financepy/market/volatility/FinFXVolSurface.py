@@ -10,14 +10,14 @@ from numba import njit, float64, int64
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_types import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 
 from ...models.black_scholes import FinModelBlackScholes
 
@@ -28,11 +28,11 @@ from ...models.sabr import volFunctionSABR
 from ...models.sabr import volFunctionSABR_BETA_ONE
 from ...models.sabr import volFunctionSABR_BETA_HALF
 
-from ...utils.fin_math import norminvcdf
+from ...utils.math import norminvcdf
 
 from ...models.black_scholes_analytic import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
-from ...utils.FinDistribution import FinDistribution
+from ...utils.distribution import FinDistribution
 
 from ...utils.FinSolvers1D import newton_secant
 

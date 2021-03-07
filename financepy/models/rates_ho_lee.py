@@ -6,9 +6,9 @@ import numpy as np
 from numba import njit
 
 from ..utils.FinError import FinError
-from ..utils.fin_math import N
-from ..market.curves.interpolator import FinInterpTypes, _uinterpolate
-from ..utils.helper_functions import labelToString
+from ..utils.math import N
+from ..market.discount.interpolator import FinInterpTypes, _uinterpolate
+from ..utils.helpers import labelToString
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 

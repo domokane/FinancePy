@@ -6,15 +6,15 @@
 import numpy as np
 from scipy import optimize
 
-from ...utils.fin_math import M
-from ...utils.global_variables import gDaysInYear
-from ...utils.global_variables import gSmall
+from ...utils.math import M
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import gSmall
 from ...utils.FinError import FinError
 
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...market.curves.discount_curve_flat import DiscountCurve
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.global_types import FinOptionTypes
+from ...market.discount.curve_flat import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 from ...models.black_scholes import bsValue
 

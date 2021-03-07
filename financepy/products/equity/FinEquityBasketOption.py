@@ -9,17 +9,17 @@
 
 import numpy as np
 
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...models.gbm_process_simulator import FinGBMProcess
 
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...utils.helper_functions import _funcName
+from ...utils.global_types import FinOptionTypes
+from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import _funcName
 from ...utils.date import Date
-from ...market.curves.discount_curve import DiscountCurve
+from ...market.discount.curve import DiscountCurve
 
-from ...utils.fin_math import N
+from ...utils.math import N
 
 
 ###############################################################################

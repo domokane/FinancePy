@@ -8,8 +8,8 @@ sys.path.append("..")
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.FinGlobalTypes import FinSwapTypes
-from financepy.utils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import FinExerciseTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.IborSwap import FinIborSwap
 
@@ -18,7 +18,7 @@ from financepy.models.black import FinModelBlack
 from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

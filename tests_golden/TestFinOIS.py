@@ -5,13 +5,13 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.fin_math import ONE_MILLION
+from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.FinOIS import FinOIS
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

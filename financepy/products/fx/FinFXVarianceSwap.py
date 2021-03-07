@@ -6,13 +6,13 @@ import numpy as np
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.fin_math import ONE_MILLION
-from ...utils.global_variables import gDaysInYear
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_types import FinOptionTypes
 from .FinFXVanillaOption import FinFXVanillaOption
 from ...models.black_scholes import FinModelBlackScholes
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 
 ###############################################################################
 

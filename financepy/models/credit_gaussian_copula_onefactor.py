@@ -7,7 +7,7 @@ import numpy as np
 
 ##########################################################################
 
-from ..utils.fin_math import norminvcdf, N, INVROOT2PI
+from ..utils.math import norminvcdf, N, INVROOT2PI
 from ..utils.FinError import FinError
 from .credit_loss_dbn_builder import indepLossDbnRecursionGCD
 from .credit_loss_dbn_builder import indepLossDbnHeterogeneousAdjBinomial

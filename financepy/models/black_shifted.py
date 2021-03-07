@@ -7,10 +7,10 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..utils.helper_functions import labelToString
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.helpers import labelToString
+from ..utils.global_types import FinOptionTypes
 
-from ..utils.fin_math import N
+from ..utils.math import N
 
 ###############################################################################
 # NOTE: Keeping this separate from SABR for the moment.

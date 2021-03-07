@@ -21,9 +21,9 @@ class FrequencyTypes(Enum):
 ###############################################################################
 
 
-def Frequency(freq_type):
+def annual_frequency(freq_type: FrequencyTypes):
     """ This is a function that takes in a Frequency Type and returns an
-    integer for the number of times a year a payment occurs."""
+    float value for the number of times a year a payment occurs."""
     if isinstance(freq_type, FrequencyTypes) is False:
         print("FinFrequency:", freq_type)
         raise FinError("Unknown frequency type")
@@ -31,16 +31,16 @@ def Frequency(freq_type):
     if freq_type == FrequencyTypes.CONTINUOUS:
         return -1
     elif freq_type == FrequencyTypes.SIMPLE:
-        return 0
+        return 0.0
     elif freq_type == FrequencyTypes.ANNUAL:
-        return 1
+        return 1.0
     elif freq_type == FrequencyTypes.SEMI_ANNUAL:
-        return 2
+        return 2.0
     elif freq_type == FrequencyTypes.TRI_ANNUAL:
-        return 3
+        return 3.0
     elif freq_type == FrequencyTypes.QUARTERLY:
-        return 4
+        return 4.0
     elif freq_type == FrequencyTypes.MONTHLY:
-        return 12
+        return 12.0
 
 ###############################################################################

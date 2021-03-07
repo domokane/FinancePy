@@ -5,8 +5,8 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.Amount import FinAmount
-from financepy.utils.Currency import FinCurrencyTypes
+from financepy.utils.amount import FinAmount
+from financepy.utils.currency import FinCurrencyTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

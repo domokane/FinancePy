@@ -2,12 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.FinGlobalTypes import FinOptionTypes, FinExerciseTypes
+from ...utils.helpers import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
+from ...utils.global_types import FinOptionTypes, FinExerciseTypes
 from ...products.bonds.bond import Bond
 
 from enum import Enum

@@ -22,7 +22,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCount
 from ...utils.schedule import Schedule
 from ...utils.FinError import FinError
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
 from ...models.rates_libor_market_model import LMMSimulateFwds1F
@@ -31,11 +31,11 @@ from ...models.rates_libor_market_model import LMMSimulateFwdsNF
 from ...models.rates_libor_market_model import FinRateModelLMMModelTypes
 from ...models.rates_libor_market_model import LMMCapFlrPricer
 
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
 
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...utils.FinGlobalTypes import FinCapFloorTypes
+from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import FinCapFloorTypes
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 
@@ -174,7 +174,7 @@ class FinIborLMMProducts():
 
         print("LEN LAMBDAS", len(lambdas))
         print("LEN", len(lambdas[0]))
-        # We pass a vector of vol curves, one for each factor
+        # We pass a vector of vol discount, one for each factor
         if numFactors != len(lambdas):
             raise FinError("Lambda doesn't have specified number of factors.")
 

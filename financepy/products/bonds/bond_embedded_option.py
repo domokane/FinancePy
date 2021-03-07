@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...models.rates_hull_white_tree import FinModelRatesHW
 from ...models.rates_bk_tree import FinModelRatesBK
 from ...utils.FinError import FinError
@@ -11,8 +11,8 @@ from ...utils.day_count import DayCountTypes
 from ...products.bonds.bond import Bond
 
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
 
 from enum import Enum
 import numpy as np

@@ -7,7 +7,7 @@ sys.path.append("..")
 
 import numpy as np
 from financepy.models.sabr_shifted import FinModelSABRShifted
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

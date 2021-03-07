@@ -10,9 +10,9 @@ import numpy as np
 from numba import jit, njit, float64, int64
 
 from ...utils.FinError import FinError
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import heaviside
-from ...utils.helper_functions import labelToString
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import heaviside
+from ...utils.helpers import labelToString
 
 ###############################################################################
 

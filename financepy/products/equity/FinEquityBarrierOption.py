@@ -6,15 +6,15 @@ import numpy as np
 from enum import Enum
 
 from ...utils.FinError import FinError
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...products.equity.FinEquityOption import FinEquityOption
 from ...models.process_simulator import FinProcessSimulator
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
 
-from ...utils.fin_math import N
+from ...utils.math import N
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 

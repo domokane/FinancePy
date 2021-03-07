@@ -9,9 +9,9 @@ sys.path.append("..")
 
 import numpy as np
 
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import FinModelBlackScholes
 from financepy.utils.date import Date
 from financepy.utils.FinError import FinError

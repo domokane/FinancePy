@@ -7,10 +7,10 @@ from scipy import optimize
 from numba import njit
 
 from ...utils.date import Date
-from ...utils.fin_math import nprime
-from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.math import nprime
+from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_types import FinOptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModel
 #from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 #from ...products.fx.FinFXModelTypes import FinFXModelSABR
@@ -23,9 +23,9 @@ from ...models.black_scholes import FinModelBlackScholes
 
 from ...models.black_scholes_analytic import bsValue, bsDelta
 
-from ...utils.helper_functions import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, labelToString
 
-from ...utils.fin_math import N
+from ...utils.math import N
 
 
 ###############################################################################

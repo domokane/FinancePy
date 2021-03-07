@@ -10,11 +10,11 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.helper_functions import labelToString
-from ...utils.helper_functions import check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helper_functions import timesFromDates
-from ...market.curves.interpolator import FinInterpTypes
+from ...utils.helpers import labelToString
+from ...utils.helpers import check_argument_types
+from ...market.discount.curve import DiscountCurve
+from ...utils.helpers import timesFromDates
+from ...market.discount.interpolator import FinInterpTypes
 
 ###############################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in

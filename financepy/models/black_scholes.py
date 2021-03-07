@@ -6,10 +6,10 @@
 
 import numpy as np
 
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.global_types import FinOptionTypes
 from ..utils.FinError import FinError
 
-from ..utils.helper_functions import check_argument_types
+from ..utils.helpers import check_argument_types
 
 from .FinModel import FinModel
 from .equity_crr_tree import crrTreeValAvg
