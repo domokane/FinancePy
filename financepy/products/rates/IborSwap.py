@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gSmall
 from ...utils.day_count import DayCountTypes
@@ -22,7 +22,7 @@ from .FinFloatLeg import FinFloatLeg
 ##########################################################################
 
 
-class FinIborSwap(object):
+class FinIborSwap:
     """ Class for managing a standard Fixed vs IBOR swap. This is a contract
     in which a fixed payment leg is exchanged for a series of floating rates
     payments linked to some IBOR index rate. There is no exchange of principal.
@@ -242,7 +242,7 @@ class FinIborSwap(object):
 
 ###############################################################################
 
-    def printFlows(self):
+    def print_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

@@ -18,7 +18,7 @@ from ...market.curves.FinDiscountCurve import FinDiscountCurve
 ##########################################################################
 
 
-class FinIborSwapOLD(object):
+class FinIborSwapOLD
     """ Class for managing a Fixed vs IBOR swap contract. This is a contract
     in which a fixed payment leg is exchanged for a series of floating rates
     payments linked to some IBOR index rate. There is no exchange of par.

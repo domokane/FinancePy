@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
@@ -16,7 +16,7 @@ from ...market.discount.curve import DiscountCurve
 
 ##########################################################################
 
-class FinFixedLeg(object):
+class FinFixedLeg:
     """ Class for managing the fixed leg of a swap. A fixed leg is a leg with
     a sequence of flows calculated according to an ISDA schedule and with a 
     coupon that is fixed over the life of the swap. """

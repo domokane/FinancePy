@@ -24,14 +24,14 @@ def test_FinNelsonSiegelCurve():
 
     tau = 2.0
     times = np.linspace(0.0, 10.0, 5)
-    curveDate = Date(6, 6, 2019)
-    dates = curveDate.addYears(times)
+    curve_date = Date(6, 6, 2019)
+    dates = curve_date.addYears(times)
 
-    curve1 = DiscountCurveNS(curveDate, 1, 0, 0, tau)
+    curve1 = DiscountCurveNS(curve_date, 1, 0, 0, tau)
     factor1loading = curve1.zeroRate(dates)
-    curve2 = DiscountCurveNS(curveDate, 0, 1, 0, tau)
+    curve2 = DiscountCurveNS(curve_date, 0, 1, 0, tau)
     factor2loading = curve2.zeroRate(dates)
-    curve3 = DiscountCurveNS(curveDate, 0, 0, 1, tau)
+    curve3 = DiscountCurveNS(curve_date, 0, 0, 1, tau)
     factor3loading = curve3.zeroRate(dates)
 
     testCases.header("FACTOR LOADING ON ZERO RATES")
@@ -58,35 +58,35 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.03
     beta2 = -0.02
     beta3 = 0.02
-    curve1 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve1 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates1 = curve1.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates1)
 
     beta1 = 0.04
     beta2 = -0.02
     beta3 = 0.02
-    curve2 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve2 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates2 = curve2.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates2)
 
     beta1 = 0.05
     beta2 = -0.02
     beta3 = 0.02
-    curve3 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve3 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates3 = curve3.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates3)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve4 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve4 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates4 = curve4.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates4)
 
     beta1 = 0.07
     beta2 = -0.02
     beta3 = 0.02
-    curve5 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve5 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates5 = curve5.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates5)
 
@@ -109,35 +109,35 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.04
     beta3 = 0.02
-    curve1 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve1 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates1 = curve1.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates1)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve2 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve2 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates2 = curve2.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates2)
 
     beta1 = 0.06
     beta2 = 0.00
     beta3 = 0.02
-    curve3 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve3 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates3 = curve3.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates3)
 
     beta1 = 0.06
     beta2 = 0.02
     beta3 = 0.02
-    curve4 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve4 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates4 = curve4.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates4)
 
     beta1 = 0.06
     beta2 = 0.04
     beta3 = 0.02
-    curve5 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve5 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates5 = curve5.zeroRate(dates)
     testCases.print(beta1, beta2, beta3, zeroRates5)
 
@@ -158,7 +158,7 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = -0.02
-    curve1 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve1 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates1 = curve1.zeroRate(dates)
 
     testCases.print(beta1, beta2, beta3, zeroRates1)
@@ -166,7 +166,7 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.00
-    curve2 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve2 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates2 = curve2.zeroRate(dates)
 
     testCases.print(beta1, beta2, beta3, zeroRates2)
@@ -174,7 +174,7 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.02
-    curve3 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve3 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates3 = curve3.zeroRate(dates)
 
     testCases.print(beta1, beta2, beta3, zeroRates3)
@@ -182,7 +182,7 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.04
-    curve4 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve4 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates4 = curve4.zeroRate(dates)
 
     testCases.print(beta1, beta2, beta3, zeroRates4)
@@ -190,7 +190,7 @@ def test_FinNelsonSiegelCurve():
     beta1 = 0.06
     beta2 = -0.02
     beta3 = 0.06
-    curve5 = DiscountCurveNS(curveDate, beta1, beta2, beta3, tau)
+    curve5 = DiscountCurveNS(curve_date, beta1, beta2, beta3, tau)
     zeroRates5 = curve5.zeroRate(dates)
 
     testCases.print(beta1, beta2, beta3, zeroRates5)

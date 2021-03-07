@@ -8,7 +8,7 @@ sys.path.append("..")
 import numpy as np
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.market.volatility.FinEquityVolSurface import FinEquityVolSurface
+from financepy.market.volatility.equity_vol_surface import equity_vol_surface
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
@@ -25,7 +25,7 @@ PLOT_GRAPHS = False
 # TODO: ADD LOGGING TO TEST CASES
 ###############################################################################
 
-def test_FinEquityVolSurface(verboseCalibration):
+def test_equity_vol_surface(verboseCalibration):
 
     valueDate = FinDate(11, 1, 2021)
 
@@ -54,14 +54,14 @@ def test_FinEquityVolSurface(verboseCalibration):
     discountCurve = FinDiscountCurveFlat(valueDate, r)
 
     q = 0.010  # USD
-    dividendCurve = FinDiscountCurveFlat(valueDate, q)
+    dividend_curve = FinDiscountCurveFlat(valueDate, q)
 
     volFunctionType = FinVolFunctionTypes.SVI
 
-    equitySurface = FinEquityVolSurface(valueDate,
+    equitySurface = equity_vol_surface(valueDate,
                                         stockPrice,
                                         discountCurve,
-                                        dividendCurve,
+                                        dividend_curve,
                                         expiryDates,
                                         strikes,
                                         volSurface,
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     verboseCalibration = False
 
-    test_FinEquityVolSurface(verboseCalibration)
+    test_equity_vol_surface(verboseCalibration)
     
     end = time.time()
     

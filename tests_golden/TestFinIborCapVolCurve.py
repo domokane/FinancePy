@@ -9,7 +9,7 @@ sys.path.append("..")
 
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -38,10 +38,10 @@ def test_FinCapVolCurve():
     capVolatilities = np.array(capVolatilities)/100.0
 
     day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = FinIborCapVolCurve(valuation_date,
-                                   capVolDates,
-                                   capVolatilities,
-                                   day_count_type)
+    volCurve = IborCapVolCurve(valuation_date,
+                               capVolDates,
+                               capVolatilities,
+                               day_count_type)
 
     testCases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in capVolDates:

@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import FinModelBlack

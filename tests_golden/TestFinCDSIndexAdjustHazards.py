@@ -7,11 +7,11 @@ from os.path import dirname, join
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import FinCDSIndexPortfolio
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds import CDS
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -103,15 +103,15 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
     cdsCoupon = 0.0048375
     maturity_date = Date(29, 6, 2010)
-    cds = FinCDS(valuation_date, maturity_date, cdsCoupon)
+    cds = CDS(valuation_date, maturity_date, cdsCoupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = FinCDSCurve(valuation_date,
-                              cdsMarketContracts,
-                              libor_curve,
-                              recovery_rate)
+    issuer_curve = CDSCurve(valuation_date,
+                            cdsMarketContracts,
+                            libor_curve,
+                            recovery_rate)
 
     return issuer_curve
 
@@ -148,16 +148,16 @@ def test_performCDSIndexHazardRateAdjustment():
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = FinCDS(step_in_date, maturity3Y, spd3Y)
-        cds5Y = FinCDS(step_in_date, maturity5Y, spd5Y)
-        cds7Y = FinCDS(step_in_date, maturity7Y, spd7Y)
-        cds10Y = FinCDS(step_in_date, maturity10Y, spd10Y)
+        cds3Y = CDS(step_in_date, maturity3Y, spd3Y)
+        cds5Y = CDS(step_in_date, maturity5Y, spd5Y)
+        cds7Y = CDS(step_in_date, maturity7Y, spd7Y)
+        cds10Y = CDS(step_in_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = FinCDSCurve(valuation_date,
-                                  cds_contracts,
-                                  libor_curve,
-                                  recovery_rate)
+        issuer_curve = CDSCurve(valuation_date,
+                                cds_contracts,
+                                libor_curve,
+                                recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -165,7 +165,7 @@ def test_performCDSIndexHazardRateAdjustment():
     # Now determine the average spread of the index
     ##########################################################################
 
-    cdsIndex = FinCDSIndexPortfolio()
+    cdsIndex = CDSIndexPortfolio()
 
     averageSpd3Y = cdsIndex.averageSpread(valuation_date,
                                           step_in_date,
@@ -200,7 +200,7 @@ def test_performCDSIndexHazardRateAdjustment():
     # As the single name CDS contracts
     ##########################################################################
 
-    cdsIndex = FinCDSIndexPortfolio()
+    cdsIndex = CDSIndexPortfolio()
 
     intrinsicSpd3Y = cdsIndex.intrinsicSpread(valuation_date,
                                               step_in_date,
@@ -251,7 +251,7 @@ def test_performCDSIndexHazardRateAdjustment():
     import time
     start = time.time()
 
-    indexPortfolio = FinCDSIndexPortfolio()
+    indexPortfolio = CDSIndexPortfolio()
     adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
         valuation_date,
         issuer_curves,
@@ -269,11 +269,11 @@ def test_performCDSIndexHazardRateAdjustment():
 #    testCases.print("#","MATURITY","CDS_UNADJ","CDS_ADJ")
 #    for m in range(0,num_credits):
 #        for cds in cds_contracts:
-#            unadjustedSpread = cds.parSpread(valuation_date,issuer_curves[m])
-#            adjustedSpread = cds.parSpread(valuation_date,adjustedIssuerCurves[m])
+#            unadjustedSpread = cds.par_spread(valuation_date,issuer_curves[m])
+#            adjustedSpread = cds.par_spread(valuation_date,adjustedIssuerCurves[m])
 #            testCases.print(m,str(cds._maturity_date),"%10.3f"%(unadjustedSpread*10000),"%10.3f" %(adjustedSpread*10000))
 
-    cdsIndex = FinCDSIndexPortfolio()
+    cdsIndex = CDSIndexPortfolio()
 
     intrinsicSpd3Y = cdsIndex.intrinsicSpread(valuation_date,
                                               step_in_date,

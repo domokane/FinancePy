@@ -9,7 +9,7 @@ from .helpers import *
 from .math import *
 from .stats import *
 from .schedule import *
-from .FinError import *
+from .error import *
 from .currency import *
 from .amount import *
 from .distribution import *

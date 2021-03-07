@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityForward import FinEquityForward
+from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinLongShort
 from financepy.market.discount.curve_flat import DiscountCurveFlat
@@ -16,7 +16,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def test_FinEquityForward():
+def test_EquityForward():
 
     valueDate = FinDate(13, 2, 2018)
     expiryDate = valueDate.addMonths(12)
@@ -32,9 +32,9 @@ def test_FinEquityForward():
     notional = 100.0
 
     discountCurve = FinDiscountCurveFlat(valueDate, discountRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendRate)
+    dividend_curve = FinDiscountCurveFlat(valueDate, dividendRate)
 
-    equityForward = FinEquityForward(expiryDate,
+    equityForward = EquityForward(expiryDate,
                                      forwardPrice,
                                      notional,
                                      FinLongShort.LONG)
@@ -44,12 +44,12 @@ def test_FinEquityForward():
     fwdPrice = equityForward.forward(valueDate,
                                      stockPrice,
                                      discountCurve, 
-                                     dividendCurve)
+                                     dividend_curve)
 
     fwdValue = equityForward.value(valueDate,
                                    stockPrice,
                                    discountCurve, 
-                                   dividendCurve)
+                                   dividend_curve)
 
 #    print(stockPrice, fwdPrice, fwdValue)
     testCases.print(stockPrice, fwdPrice, fwdValue)
@@ -57,5 +57,5 @@ def test_FinEquityForward():
 ###############################################################################
 
 
-test_FinEquityForward()
+test_EquityForward()
 testCases.compareTestCases()

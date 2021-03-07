@@ -9,7 +9,7 @@ import numpy as np
 
 from ..utils.math import N
 from ..utils.math import normpdf, norminvcdf, M
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 ###############################################################################
 

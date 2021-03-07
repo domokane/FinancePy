@@ -5,8 +5,8 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityCliquetOption import FinEquityCliquetOption
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
+from financepy.models.black_scholes import BlackScholes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -18,16 +18,16 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityCliquetOption():
+def test_EquityCliquetOption():
 
     startDate = FinDate(1, 1, 2014)
     finalExpiryDate = FinDate(1, 1, 2017)
     freqType = FinFrequencyTypes.QUARTERLY
-    optionType = FinOptionTypes.EUROPEAN_CALL
+    option_type = FinOptionTypes.EUROPEAN_CALL
 
-    cliquetOption = FinEquityCliquetOption(startDate,
+    cliquetOption = EquityCliquetOption(startDate,
                                            finalExpiryDate,
-                                           optionType,
+                                           option_type,
                                            freqType)
 
     valueDate = FinDate(1, 1, 2015)
@@ -35,14 +35,14 @@ def test_FinEquityCliquetOption():
     volatility = 0.20
     interestRate = 0.05
     dividendYield = 0.02
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    dividend_curve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     v = cliquetOption.value(valueDate,
                             stockPrice,
                             discountCurve,
-                            dividendCurve,
+                            dividend_curve,
                             model)
 
     testCases.header("LABEL", "VALUE")
@@ -51,5 +51,5 @@ def test_FinEquityCliquetOption():
 ###############################################################################
 
 
-test_FinEquityCliquetOption()
+test_EquityCliquetOption()
 testCases.compareTestCases()

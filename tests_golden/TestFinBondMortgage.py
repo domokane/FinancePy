@@ -7,8 +7,8 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 
-from financepy.products.bonds.mortgage import Mortgage
-from financepy.products.bonds.mortgage import BondMortgageTypes
+from financepy.products.bonds.bond_mortgage import BondMortgage
+from financepy.products.bonds.bond_mortgage import BondMortgageTypes
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -23,7 +23,7 @@ def test_BondMortgage():
     principal = 130000
     start_date = Date(23, 2, 2018)
     end_date = start_date.addTenor("10Y")
-    mortgage = Mortgage(start_date, end_date, principal)
+    mortgage = BondMortgage(start_date, end_date, principal)
 
     rate = 0.035
     mortgage.generateFlows(rate, BondMortgageTypes.REPAYMENT)

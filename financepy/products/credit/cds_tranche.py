@@ -17,13 +17,13 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
-from ...products.credit.cds import FinCDS
-from ...products.credit.cds_curve import FinCDSCurve
+from ...products.credit.cds import CDS
+from ...products.credit.cds_curve import CDSCurve
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...market.discount.interpolator import FinInterpTypes, interpolate
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
@@ -43,7 +43,7 @@ class FinLossDistributionBuilder(Enum):
 ###############################################################################
 
 
-class FinCDSTranche(object):
+class CDSTranche:
 
     def __init__(self,
                  step_in_date: Date,
@@ -80,16 +80,16 @@ class FinCDSTranche(object):
 
         notional = 1.0
 
-        self._cds_contract = FinCDS(self._step_in_date,
-                                    self._maturity_date,
-                                    self._running_coupon,
-                                    notional,
-                                    self._long_protection,
-                                    self._freq_type,
-                                    self._day_count_type,
-                                    self._calendar_type,
-                                    self._bus_day_adjust_type,
-                                    self._date_gen_rule_type)
+        self._cds_contract = CDS(self._step_in_date,
+                                 self._maturity_date,
+                                 self._running_coupon,
+                                 notional,
+                                 self._long_protection,
+                                 self._freq_type,
+                                 self._day_count_type,
+                                 self._calendar_type,
+                                 self._bus_day_adjust_type,
+                                 self._date_gen_rule_type)
 
     ###############################################################################
 
@@ -215,25 +215,25 @@ class FinCDSTranche(object):
 
         curveRecovery = 0.0  # For tranches only
         libor_curve = issuer_curves[0]._libor_curve
-        trancheCurve = FinCDSCurve(
+        trancheCurve = CDSCurve(
             valuation_date, [], libor_curve, curveRecovery)
         trancheCurve._times = trancheTimes
         trancheCurve._values = trancheSurvivalCurve
 
-        protLegPV = self._cds_contract.protectionLegPV(
+        protLegPV = self._cds_contract.protection_leg_pv(
             valuation_date, trancheCurve, curveRecovery)
-        riskyPV01 = self._cds_contract.riskyPV01(valuation_date, trancheCurve)['clean_rpv01']
+        risky_pv01 = self._cds_contract.risky_pv01(valuation_date, trancheCurve)['clean_rpv01']
 
-        mtm = self._notional * (protLegPV - upfront - riskyPV01 * running_coupon)
+        mtm = self._notional * (protLegPV - upfront - risky_pv01 * running_coupon)
 
         if not self._long_protection:
             mtm *= -1.0
 
         trancheOutput = np.zeros(4)
         trancheOutput[0] = mtm
-        trancheOutput[1] = riskyPV01 * self._notional * running_coupon
+        trancheOutput[1] = risky_pv01 * self._notional * running_coupon
         trancheOutput[2] = protLegPV * self._notional
-        trancheOutput[3] = protLegPV / riskyPV01
+        trancheOutput[3] = protLegPV / risky_pv01
 
         return trancheOutput
 

@@ -24,7 +24,7 @@
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.day_count import DayCount, DayCountTypes
@@ -48,7 +48,7 @@ from scipy import optimize
 from enum import Enum
 
 
-class FinYTMCalcType(Enum):
+class YTMCalcType(Enum):
     UK_DMO = 1,
     US_STREET = 2,
     US_TREASURY = 3
@@ -64,8 +64,8 @@ def _f(y, *args):
     price = args[2]
     convention = args[3]
     px = bond.full_price_from_ytm(settlement_date, y, convention)
-    objFn = px - price
-    return objFn
+    obj_fn = px - price
+    return obj_fn
 
 
 ###############################################################################
@@ -78,14 +78,14 @@ def _g(oas, *args):
     price = args[2]
     discount_curve = args[3]
     px = bond.full_price_from_oas(settlement_date, discount_curve, oas)
-    objFn = px - price
-    return objFn
+    obj_fn = px - price
+    return obj_fn
 
 
 ###############################################################################
 
 
-class Bond(object):
+class Bond:
     """ Class for fixed coupon bonds and performing related analytics. These
     are bullet bonds which means they have regular coupon payments of a known
     size that are paid on known dates plus a payment of par at maturity. """
@@ -119,7 +119,7 @@ class Bond(object):
         self._flow_dates = []
         self._flow_amounts = []
 
-        self._accruedInterest = None
+        self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
 
@@ -129,7 +129,7 @@ class Bond(object):
     ###############################################################################
 
     def _calculate_flow_dates(self):
-        """ Determine the bond cashflow payment dates."""
+        """ Determine the bond cash flow payment dates."""
 
         # This should only be called once from init 
 
@@ -147,7 +147,7 @@ class Bond(object):
     ###############################################################################
 
     def _calculateFlows(self):
-        """ Determine the bond cashflow payment amounts without principal """
+        """ Determine the bond cash flow payment amounts without principal """
 
         self._flow_amounts = [0.0]
 
@@ -160,12 +160,12 @@ class Bond(object):
     def full_price_from_ytm(self,
                             settlement_date: Date,
                             ytm: float,
-                            convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                            convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the full price of bond from its yield to maturity. This
         function is vectorised with respect to the yield input. It implements
         a number of standard conventions for calculating the YTM. """
 
-        if convention not in FinYTMCalcType:
+        if convention not in YTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
         self.calc_accrued_interest(settlement_date)
@@ -187,7 +187,7 @@ class Bond(object):
         if n < 0:
             raise FinError("No coupons left")
 
-        if convention == FinYTMCalcType.UK_DMO:
+        if convention == YTMCalcType.UK_DMO:
             if n == 0:
                 fp = (v ** (self._alpha)) * (self._redemption + c / f)
             else:
@@ -196,7 +196,7 @@ class Bond(object):
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = self._redemption * (v ** n)
                 fp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
-        elif convention == FinYTMCalcType.US_TREASURY:
+        elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
                 fp = (v ** (self._alpha)) * (self._redemption + c / f)
             else:
@@ -206,7 +206,7 @@ class Bond(object):
                 term4 = self._redemption * (v ** n)
                 vw = 1.0 / (1.0 + self._alpha * ytm / f)
                 fp = (vw) * (term1 + term2 + term3 + term4)
-        elif convention == FinYTMCalcType.US_STREET:
+        elif convention == YTMCalcType.US_STREET:
             vw = 1.0 / (1.0 + self._alpha * ytm / f)
             if n == 0:
                 vw = 1.0 / (1.0 + self._alpha * ytm / f)
@@ -227,7 +227,7 @@ class Bond(object):
     def principal(self,
                   settlement_date: Date,
                   y: float,
-                  convention: FinYTMCalcType):
+                  convention: YTMCalcType):
         """ Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
@@ -235,7 +235,7 @@ class Bond(object):
         full_price = self.full_price_from_ytm(settlement_date, y, convention)
 
         principal = full_price * self._face_amount / self._par
-        principal = principal - self._accruedInterest
+        principal = principal - self._accrued_interest
         return principal
 
     ###############################################################################
@@ -243,7 +243,7 @@ class Bond(object):
     def dollar_duration(self,
                         settlement_date: Date,
                         ytm: float,
-                        convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                        convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. """
 
@@ -258,7 +258,7 @@ class Bond(object):
     def macauley_duration(self,
                           settlement_date: Date,
                           ytm: float,
-                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                          convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the Macauley duration of the bond on a settlement date
         given its yield to maturity. """
 
@@ -272,7 +272,7 @@ class Bond(object):
     def modified_duration(self,
                           settlement_date: Date,
                           ytm: float,
-                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                          convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. """
 
@@ -286,7 +286,7 @@ class Bond(object):
     def convexity_from_ytm(self,
                            settlement_date: Date,
                            ytm: float,
-                           convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                           convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
@@ -302,13 +302,13 @@ class Bond(object):
     def clean_price_from_ytm(self,
                              settlement_date: Date,
                              ytm: float,
-                             convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                             convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
         full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
-        accruedAmount = self._accruedInterest * self._par / self._face_amount
-        clean_price = full_price - accruedAmount
+        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        clean_price = full_price - accrued_amount
         return clean_price
 
     ###############################################################################
@@ -324,7 +324,7 @@ class Bond(object):
         full_price = self.full_price_from_discount_curve(settlement_date,
                                                          discount_curve)
 
-        accrued = self._accruedInterest * self._par / self._face_amount
+        accrued = self._accrued_interest * self._par / self._face_amount
         clean_price = full_price - accrued
         return clean_price
 
@@ -376,7 +376,7 @@ class Bond(object):
     def yield_to_maturity(self,
                           settlement_date: Date,
                           clean_price: float,
-                          convention: FinYTMCalcType = FinYTMCalcType.US_TREASURY):
+                          convention: YTMCalcType = YTMCalcType.US_TREASURY):
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
@@ -389,8 +389,8 @@ class Bond(object):
                            + str(type(clean_price)))
 
         self.calc_accrued_interest(settlement_date)
-        accruedAmount = self._accruedInterest * self._par / self._face_amount
-        full_prices = (clean_prices + accruedAmount)
+        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        full_prices = (clean_prices + accrued_amount)
         ytms = []
 
         for full_price in full_prices:
@@ -451,10 +451,10 @@ class Bond(object):
             acc_factor = acc_factor - 1.0 / self._frequency
 
         self._alpha = 1.0 - acc_factor * self._frequency
-        self._accruedInterest = acc_factor * self._face_amount * self._coupon
+        self._accrued_interest = acc_factor * self._face_amount * self._coupon
         self._accrued_days = num
 
-        return self._accruedInterest
+        return self._accrued_interest
 
     ###############################################################################
 
@@ -474,8 +474,8 @@ class Bond(object):
 
         clean_price = np.array(clean_price)
         self.calc_accrued_interest(settlement_date)
-        accruedAmount = self._accruedInterest * self._par / self._face_amount
-        bondPrice = clean_price + accruedAmount
+        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        bondPrice = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pvIbor = 0.0
         prev_date = self._pcd
@@ -564,8 +564,8 @@ class Bond(object):
 
         self.calc_accrued_interest(settlement_date)
 
-        accruedAmount = self._accruedInterest * self._par / self._face_amount
-        full_prices = clean_prices + accruedAmount
+        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        full_prices = clean_prices + accrued_amount
 
         oass = []
 
@@ -589,8 +589,8 @@ class Bond(object):
 
     ###############################################################################
 
-    def printFlows(self,
-                   settlement_date: Date):
+    def print_flows(self,
+                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -614,8 +614,8 @@ class Bond(object):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. For the 
-        defaulting principal we discretise the time steps using the coupon
-        payment times. A finer discretisation may handle the time value with
+        defaulting principal we discretize the time steps using the coupon
+        payment times. A finer discretization may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
         end payment present values. """
 
@@ -674,7 +674,7 @@ class Bond(object):
                                                          survival_curve,
                                                          recovery_rate)
 
-        clean_price = full_price - self._accruedInterest
+        clean_price = full_price - self._accrued_interest
         return clean_price
 
     ###############################################################################

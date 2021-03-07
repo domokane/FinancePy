@@ -13,7 +13,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date, setDateFormatType, DateFormatTypes
-from financepy.products.bonds.annuity import BondAnnuity
+from financepy.products.bonds.bond_annuity import BondAnnuity
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -38,17 +38,16 @@ def test_BondAnnuity():
     basisType = DayCountTypes.ACT_360
     face = 1000000
 
-    annuity = BondAnnuity(
-        maturity_date,
-        coupon,
-        freq_type,
-        calendar_type,
-        bus_day_adjust_type,
-        date_gen_rule_type,
-        basisType,
-        face)
+    annuity = BondAnnuity(maturity_date,
+                          coupon,
+                          freq_type,
+                          calendar_type,
+                          bus_day_adjust_type,
+                          date_gen_rule_type,
+                          basisType,
+                          face)
 
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)
@@ -79,7 +78,7 @@ def test_BondAnnuity():
         basisType,
         face)
 
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)
@@ -100,17 +99,16 @@ def test_BondAnnuity():
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     basisType = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(
-        maturity_date,
-        coupon,
-        freq_type,
-        calendar_type,
-        bus_day_adjust_type,
-        date_gen_rule_type,
-        basisType,
-        face)
+    annuity = BondAnnuity(maturity_date,
+                          coupon,
+                          freq_type,
+                          calendar_type,
+                          bus_day_adjust_type,
+                          date_gen_rule_type,
+                          basisType,
+                          face)
 
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)
@@ -131,17 +129,16 @@ def test_BondAnnuity():
     date_gen_rule_type = DateGenRuleTypes.FORWARD
     basisType = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(
-        maturity_date,
-        coupon,
-        freq_type,
-        calendar_type,
-        bus_day_adjust_type,
-        date_gen_rule_type,
-        basisType,
-        face)
+    annuity = BondAnnuity(maturity_date,
+                          coupon,
+                          freq_type,
+                          calendar_type,
+                          bus_day_adjust_type,
+                          date_gen_rule_type,
+                          basisType,
+                          face)
 
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)
@@ -162,17 +159,16 @@ def test_BondAnnuity():
     date_gen_rule_type = DateGenRuleTypes.FORWARD
     basisType = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(
-        maturity_date,
-        coupon,
-        freq_type,
-        calendar_type,
-        bus_day_adjust_type,
-        date_gen_rule_type,
-        basisType,
-        face)
+    annuity = BondAnnuity(maturity_date,
+                          coupon, 
+                          freq_type,
+                          calendar_type,
+                          bus_day_adjust_type,
+                          date_gen_rule_type,
+                          basisType,
+                          face)
 
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)
@@ -193,17 +189,16 @@ def test_BondAnnuity():
     date_gen_rule_type = DateGenRuleTypes.FORWARD
     basisType = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(
-        maturity_date,
-        coupon,
-        freq_type,
-        calendar_type,
-        bus_day_adjust_type,
-        date_gen_rule_type,
-        basisType,
-        face)
-
-    annuity.calculate_flow_datesPayments(settlement_date)
+    annuity = BondAnnuity(maturity_date,
+                          coupon,
+                          freq_type,
+                          calendar_type,
+                          bus_day_adjust_type,
+                          date_gen_rule_type,
+                          basisType,
+                          face)
+    
+    annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._flow_dates)

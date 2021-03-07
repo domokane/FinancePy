@@ -27,7 +27,7 @@ class FinLegType(Enum):
 ##########################################################################
 
 
-class FinSwapLeg(object):
+class FinSwapLeg
     """ Class for managing the leg of a swap. """
     
     def __init__(self,

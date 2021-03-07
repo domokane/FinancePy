@@ -43,7 +43,7 @@ from financepy.utils.global_vars import gDaysInYear
 from financepy.finutils.FinGlobalVariables import gDaysInYear
 >>>>>>> 019b440a749b7ae4da4b786f6dd9c2bb01bd6529
 
-from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.finutils.FinSchedule import FinSchedule
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -56,8 +56,8 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    spotDays = 0
-    settlementDate = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settlementDate = valuationDate.addWeekDays(spot_days)
     depositRate = 0.05
 
     depo1 = FinIborDeposit(settlementDate, "1M", depositRate, depoBasis)
@@ -224,10 +224,10 @@ def test_FinIborCapFloorVolCurve():
     capVolatilities = np.array(capVolatilities)/100.0
     capVolatilities[0] = 0.0
 
-    volCurve = FinIborCapVolCurve(valuationDate,
-                                   capVolDates,
-                                   capVolatilities,
-                                   dayCountType)
+    volCurve = IborCapVolCurve(valuationDate,
+                               capVolDates,
+                               capVolatilities,
+                               dayCountType)
 
 #    print(volCurve._capletGammas)
 
@@ -341,10 +341,10 @@ def test_FinIborCapFloorQLExample():
     lastFixing = 0.0065560
     notional = 1000000
     dayCountType = FinDayCountTypes.ACT_360
-    optionType = FinCapFloorTypes.CAP
+    option_type = FinCapFloorTypes.CAP
     strikeRate = 0.02
 
-    cap = FinIborCapFloor(startDate, endDate, optionType, strikeRate,
+    cap = FinIborCapFloor(startDate, endDate, option_type, strikeRate,
                            lastFixing, freqType,  dayCountType, notional,
                            calendarType, busDayAdjustType, dateGenRuleType)
 

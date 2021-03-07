@@ -6,7 +6,7 @@
 from math import exp, sqrt, fabs, log
 from numba import njit, boolean, int64, float64, vectorize
 import numpy as np
-from .FinError import FinError
+from .error import FinError
 
 PI = 3.14159265358979323846
 INVROOT2PI = 0.3989422804014327
@@ -21,7 +21,7 @@ ONE_BILLION = 1000000000
 
 
 @njit(fastmath=True, cache=True)
-def accruedInterpolator(tset: float,  # Settlement time in years
+def accrued_interpolator(tset: float,  # Settlement time in years
                         coupon_times: np.ndarray,
                         couponAmounts: np.ndarray):
     """ Fast calulation of accrued interest using an Actual/Actual type of

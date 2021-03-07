@@ -8,9 +8,9 @@ import numpy as np
 from numba import njit, float64
 
 from ..utils.global_types import FinOptionTypes
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
-from .black_scholes_analytic import bsValue
+from .black_scholes_analytic import bs_value
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations
@@ -40,7 +40,7 @@ def optionImpliedDbn(s, t, r, q, strikes, sigmas):
     for ik in range(0, num_steps):
         strike = strikes[ik]        
         sigma = sigmas[ik]
-        v = bsValue(s, t, strike, r, q, sigma, 
+        v = bs_value(s, t, strike, r, q, sigma,
                     FinOptionTypes.EUROPEAN_CALL.value)
         values[ik] = v
         

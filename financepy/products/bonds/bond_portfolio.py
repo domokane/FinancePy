@@ -10,12 +10,12 @@ from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
 from ...utils.helpers import labelToString, check_argument_types
 from ...market.discount.curve import DiscountCurve
-from .bond import FinYTMCalcType
+from .bond import YTMCalcType
 
 ###############################################################################
 
 
-class BondPortfolio(object):
+class BondPortfolio:
     """ Class for valuing and risk-managing a portfolio of bonds. """
 
     def __init__(self,
@@ -41,9 +41,9 @@ class BondPortfolio(object):
 ###############################################################################
 
     def dollar_duration(self,
-                       settlement_date: Date,
-                       ytm: float,
-                       convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                        settlement_date: Date,
+                        ytm: float,
+                        convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. """
 
@@ -56,9 +56,9 @@ class BondPortfolio(object):
 ###############################################################################
 
     def macauley_duration(self,
-                         settlement_date: Date,
-                         ytm: float,
-                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                          settlement_date: Date,
+                          ytm: float,
+                          convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the Macauley duration of the bond on a settlement date
         given its yield to maturity. """
 
@@ -70,9 +70,9 @@ class BondPortfolio(object):
 ###############################################################################
 
     def modified_duration(self,
-                         settlement_date: Date,
-                         ytm: float,
-                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                          settlement_date: Date,
+                          ytm: float,
+                          convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the modified duration of the bondon a settlement date
         given its yield to maturity. """
 
@@ -84,9 +84,9 @@ class BondPortfolio(object):
 ###############################################################################
 
     def convexity_from_ytm(self,
-                         settlement_date: Date,
-                         ytm: float,
-                         convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                           settlement_date: Date,
+                           ytm: float,
+                           convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
@@ -100,15 +100,15 @@ class BondPortfolio(object):
 ###############################################################################
 
     def clean_price_from_ytm(self,
-                          settlement_date: Date,
-                          ytm: float,
-                          convention: FinYTMCalcType = FinYTMCalcType.UK_DMO):
+                             settlement_date: Date,
+                             ytm: float,
+                             convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
         full_price = self.full_priceFromYTM(settlement_date, ytm, convention)
-        accruedAmount = self._accruedInterest * self._par / self._face_amount
-        clean_price = full_price - accruedAmount
+        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        clean_price = full_price - accrued_amount
         return clean_price
 
 ###############################################################################
@@ -144,9 +144,9 @@ class BondPortfolio(object):
 ###############################################################################
 
     def yield_to_maturity(self,
-                        settlement_date: Date,
-                        clean_price: float,
-                        convention: FinYTMCalcType = FinYTMCalcType.US_TREASURY):
+                          settlement_date: Date,
+                          clean_price: float,
+                          convention: YTMCalcType = YTMCalcType.US_TREASURY):
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
@@ -158,11 +158,11 @@ class BondPortfolio(object):
                             numExDividendDays: int = 0,
                             calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
  
-        return self._accruedInterest
+        return self._accrued_interest
 
 ###############################################################################
 
-    def printFlows(self,
+    def print_flows(self,
                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
@@ -248,7 +248,7 @@ class BondPortfolio(object):
                                                     survival_curve,
                                                     recovery_rate)
         
-        clean_price = full_price - self._accruedInterest
+        clean_price = full_price - self._accrued_interest
         return clean_price
     
 ###############################################################################

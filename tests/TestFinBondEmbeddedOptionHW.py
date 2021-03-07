@@ -18,7 +18,7 @@ from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
+from financepy.products.bonds.bond_callable import BondEmbeddedOption
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -87,13 +87,13 @@ def test_FinBondEmbeddedOptionMATLAB():
 
     timeSteps = range(50, 1000, 10)
     values = []
-    for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(sigma, a, numTimeSteps)
+    for num_time_steps in timeSteps:
+        model = FinModelRatesHW(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, numTimeSteps, v['bondwithoption'],
+        testCases.print(period, num_time_steps, v['bondwithoption'],
                         v['bondpure'])
         values.append(v['bondwithoption'])
 
@@ -162,13 +162,13 @@ def test_FinBondEmbeddedOptionQUANTLIB():
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
     timeSteps = range(100, 1000, 100)
     values = []
-    for numTimeSteps in timeSteps:
-        model = FinModelRatesHW(sigma, a, numTimeSteps)
+    for num_time_steps in timeSteps:
+        model = FinModelRatesHW(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlementDate, discountCurve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, numTimeSteps, v['bondwithoption'], v['bondpure'])
+        testCases.print(period, num_time_steps, v['bondwithoption'], v['bondpure'])
         values.append(v['bondwithoption'])
 
     if plotGraphs:

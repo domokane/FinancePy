@@ -7,7 +7,7 @@ These modules create a family of curve types related to the market volatility. T
 
 The classes are as follows:
 
-### FinEquityVolSurface
+### equity_vol_surface
 Constructs an equity volatility surface that fits to a grid of market volatilities at a set of strikes and expiry dates. It implements the SVI parameteric form for fitting and interpolating volatilities. It also provides plotting of the volatility curve and surfaces.
 
 ### FinFXVolSurface

@@ -11,7 +11,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.products.inflation.FinInflationBond import FinInflationBond
-from financepy.products.bonds import FinYTMCalcType
+from financepy.products.bonds import YTMCalcType
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 from financepy.market.discount.curve_zeros import DiscountCurveZeros
 from financepy.market.discount.curve_flat import DiscountCurveFlat
@@ -58,20 +58,20 @@ def test_FinInflationBondBBG():
     ###########################################################################
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.UK_DMO)
+                                 clean_price,
+                                 YTMCalcType.UK_DMO)
 
     testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.US_STREET)
+                                 clean_price,
+                                 YTMCalcType.US_STREET)
 
     testCases.print("US STREET REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.US_TREASURY)
+                                 clean_price,
+                                 YTMCalcType.US_TREASURY)
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -84,7 +84,7 @@ def test_FinInflationBondBBG():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    accrued_interest= bond._accruedInterest
+    accrued_interest= bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
@@ -106,15 +106,15 @@ def test_FinInflationBondBBG():
     lastCpnCPIValue = 244.61839
 
     clean_price = bond.flatPriceFromYieldToMaturity(settlement_date, ytm,
-                                                   lastCpnCPIValue,
-                                                   FinYTMCalcType.US_TREASURY)
+                                                    lastCpnCPIValue,
+                                                    YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
-    principal = bond.inflationPrincipal(settlement_date, 
+    principal = bond.inflationPrincipal(settlement_date,
                                         ytm,
                                         refCPIValue,
-                                        FinYTMCalcType.US_TREASURY)
+                                        YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 
@@ -268,20 +268,20 @@ def test_FinInflationBondStack():
     ###########################################################################
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.UK_DMO)
+                                 clean_price,
+                                 YTMCalcType.UK_DMO)
 
     testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.US_STREET)
+                                 clean_price,
+                                 YTMCalcType.US_STREET)
 
     testCases.print("US STREET REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date,
-                               clean_price,
-                               FinYTMCalcType.US_TREASURY)
+                                 clean_price,
+                                 YTMCalcType.US_TREASURY)
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -294,7 +294,7 @@ def test_FinInflationBondStack():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    accrued_interest= bond._accruedInterest
+    accrued_interest= bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
@@ -317,15 +317,15 @@ def test_FinInflationBondStack():
     lastCpnCPIValue = 244.61839
 
     clean_price = bond.flatPriceFromYieldToMaturity(settlement_date, ytm,
-                                                   lastCpnCPIValue,
-                                                   FinYTMCalcType.US_TREASURY)
+                                                    lastCpnCPIValue,
+                                                    YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
-    principal = bond.inflationPrincipal(settlement_date, 
+    principal = bond.inflationPrincipal(settlement_date,
                                         ytm,
                                         refCPIValue,
-                                        FinYTMCalcType.US_TREASURY)
+                                        YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 

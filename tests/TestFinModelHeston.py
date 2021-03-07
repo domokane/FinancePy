@@ -10,7 +10,7 @@ sys.path.append("..")
 
 from financepy.models.heston import FinModelHeston, FinHestonNumericalScheme
 from financepy.utils.global_types import FinOptionTypes
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -52,10 +52,10 @@ def testAnalyticalModels():
     for sigma in [0.5, 0.75, 1.0]:
         for rho in [-0.9, -0.5, 0.0]:
             hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
-            for strikePrice in np.linspace(95, 105, 3):
-                callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
-                valueMC_Heston = hestonModel.value_MC(
+            for strike_price in np.linspace(95, 105, 3):
+                callOption = EquityVanillaOption(
+                    expiryDate, strike_price, FinOptionTypes.EUROPEAN_CALL)
+                value_mc_Heston = hestonModel.value_MC(
                     valueDate,
                     callOption,
                     stockPrice,
@@ -73,14 +73,14 @@ def testAnalyticalModels():
                     valueDate, callOption, stockPrice, interestRate, dividendYield)
                 valueWeber = hestonModel.value_Weber(
                     valueDate, callOption, stockPrice, interestRate, dividendYield)
-                err = (valueMC_Heston - valueWeber)
+                err = (value_mc_Heston - valueWeber)
                 end = time.time()
                 elapsed = end - start
                 testCases.print("%6.3f" % elapsed,
                                 "% 7.5f" % rho,
                                 "%7.5f" % sigma,
-                                "%7.2f" % strikePrice,
-                                "%12.9f" % valueMC_Heston,
+                                "%7.2f" % strike_price,
+                                "%12.9f" % value_mc_Heston,
                                 "%12.9f" % valueGatheral,  # problem
                                 "%12.9f" % valueLewisRouah,
                                 "%12.9f" % valueLewis,
@@ -120,18 +120,18 @@ def testMonteCarlo():
         "EULLOG_ERR",
         "QE_ERR")
 
-    for strikePrice in np.linspace(95, 105, 3):
+    for strike_price in np.linspace(95, 105, 3):
         for numSteps in [25, 50]:
             for numPaths in [10000, 20000]:
                 hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
-                callOption = FinEquityVanillaOption(
-                    expiryDate, strikePrice, FinOptionTypes.EUROPEAN_CALL)
+                callOption = EquityVanillaOption(
+                    expiryDate, strike_price, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
                     valueDate, callOption, stockPrice, interestRate, dividendYield)
 
                 start = time.time()
 
-                valueMC_EULER = hestonModel.value_MC(
+                value_mc_EULER = hestonModel.value_MC(
                     valueDate,
                     callOption,
                     stockPrice,
@@ -141,7 +141,7 @@ def testMonteCarlo():
                     numSteps,
                     seed,
                     FinHestonNumericalScheme.EULER)
-                valueMC_EULERLOG = hestonModel.value_MC(
+                value_mc_EULERLOG = hestonModel.value_MC(
                     valueDate,
                     callOption,
                     stockPrice,
@@ -151,7 +151,7 @@ def testMonteCarlo():
                     numSteps,
                     seed,
                     FinHestonNumericalScheme.EULERLOG)
-                valueMC_QUADEXP = hestonModel.value_MC(
+                value_mc_QUADEXP = hestonModel.value_MC(
                     valueDate,
                     callOption,
                     stockPrice,
@@ -162,16 +162,16 @@ def testMonteCarlo():
                     seed,
                     FinHestonNumericalScheme.QUADEXP)
 
-                err_EULER = (valueMC_EULER - valueWeber)
-                err_EULERLOG = (valueMC_EULERLOG - valueWeber)
-                err_QUADEXP = (valueMC_QUADEXP - valueWeber)
+                err_EULER = (value_mc_EULER - valueWeber)
+                err_EULERLOG = (value_mc_EULERLOG - valueWeber)
+                err_QUADEXP = (value_mc_QUADEXP - valueWeber)
 
                 end = time.time()
                 elapsed = end - start
 
                 testCases.print(elapsed, rho,
                                 sigma,
-                                strikePrice,
+                                strike_price,
                                 numSteps,
                                 numPaths,
                                 valueWeber,

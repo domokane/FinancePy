@@ -5,10 +5,10 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityOneTouchOption import FinEquityOneTouchOption
-from financepy.products.equity.FinEquityOneTouchOption import FinTouchOptionPayoffTypes
+from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
+from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -24,8 +24,8 @@ def test_FinFXOneTouchOption():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(2, 7, 2016)
     volatility = 0.20
-    barrierLevel = 1.0  # H
-    model = FinModelBlackScholes(volatility)
+    barrier_level = 1.0  # H
+    model = BlackScholes(volatility)
 
     domesticRate = 0.10
     foreignRate = 0.03
@@ -36,7 +36,7 @@ def test_FinFXOneTouchOption():
     domCurve = DiscountCurveFlat(valuation_date, domesticRate)
     forCurve = DiscountCurveFlat(valuation_date, foreignRate)
 
-    spotFXRate = 1.050
+    spot_fx_rate = 1.050
     paymentSize = 1.5
 
     testCases.header("================================= CASH ONLY")
@@ -49,19 +49,19 @@ def test_FinFXOneTouchOption():
 
     for downType in downTypes:
 
-        option = FinEquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_date,
                                          downType,
-                                         barrierLevel,
+                                         barrier_level,
                                          paymentSize)
 
         v = option.value(valuation_date,
-                         spotFXRate,
+                         spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.valueMC(valuation_date,
-                              spotFXRate,
+        v_mc = option.value_mc(valuation_date,
+                              spot_fx_rate,
                               domCurve,
                               forCurve,
                               model,
@@ -72,7 +72,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-    spotFXRate = 0.950
+    spot_fx_rate = 0.950
     paymentSize = 1.5
 
     upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT,
@@ -83,19 +83,19 @@ def test_FinFXOneTouchOption():
 
     for upType in upTypes:
 
-        option = FinEquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_date,
                                          upType,
-                                         barrierLevel,
+                                         barrier_level,
                                          paymentSize)
 
         v = option.value(valuation_date,
-                         spotFXRate,
+                         spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.valueMC(valuation_date,
-                              spotFXRate,
+        v_mc = option.value_mc(valuation_date,
+                              spot_fx_rate,
                               domCurve,
                               forCurve,
                               model,
@@ -108,7 +108,7 @@ def test_FinFXOneTouchOption():
 
     ###########################################################################
 
-    spotFXRate = 1.050
+    spot_fx_rate = 1.050
 
     testCases.banner("================= ASSET ONLY")
 
@@ -119,18 +119,18 @@ def test_FinFXOneTouchOption():
     testCases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
 
-        option = FinEquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_date,
                                          downType,
-                                         barrierLevel)
+                                         barrier_level)
 
         v = option.value(valuation_date,
-                         spotFXRate,
+                         spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.valueMC(valuation_date,
-                              spotFXRate,
+        v_mc = option.value_mc(valuation_date,
+                              spot_fx_rate,
                               domCurve,
                               forCurve,
                               model,
@@ -141,7 +141,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-    spotFXRate = 0.950
+    spot_fx_rate = 0.950
 
     upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_HIT,
                FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_EXPIRY,
@@ -149,18 +149,18 @@ def test_FinFXOneTouchOption():
 
     for upType in upTypes:
 
-        option = FinEquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_date,
                                          upType,
-                                         barrierLevel)
+                                         barrier_level)
 
         v = option.value(valuation_date,
-                         spotFXRate,
+                         spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.valueMC(valuation_date,
-                              spotFXRate,
+        v_mc = option.value_mc(valuation_date,
+                              spot_fx_rate,
                               domCurve,
                               forCurve,
                               model,

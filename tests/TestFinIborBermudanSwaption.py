@@ -131,8 +131,8 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000000001
     a = 0.01
-    numTimeSteps = 100
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    num_time_steps = 100
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuationDate, liborCurve, model)
     testCases.print("EUROPEAN BK PAY VALUE:", valuePay)
@@ -149,7 +149,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -194,7 +194,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -211,7 +211,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.2
     a = 0.01
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -256,7 +256,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -273,7 +273,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -303,8 +303,8 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.00001
-    numTimeSteps = 200
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    num_time_steps = 200
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuationDate, liborCurve, model)
     testCases.print("EUROPEAN BDT PAY VALUE:", valuePay)
@@ -320,7 +320,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BDT MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -362,7 +362,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.000001
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -378,7 +378,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.2
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -421,7 +421,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -438,7 +438,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBDT(sigma, numTimeSteps)
+    model = FinModelRatesBDT(sigma, num_time_steps)
 
 #    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -468,8 +468,8 @@ def test_FinIborBermudanSwaptionBKModel():
 
     sigma = 0.0000001
     a = 0.1
-    numTimeSteps = 200
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    num_time_steps = 200
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuationDate, liborCurve, model)
     testCases.print("EUROPEAN HW PAY VALUE:", valuePay)
@@ -485,7 +485,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.01
     a = 0.01
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -526,7 +526,7 @@ def test_FinIborBermudanSwaptionBKModel():
     testCases.banner("======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE HW MODEL ========")
 
     sigma = 0.000001
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -542,7 +542,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.01
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -585,7 +585,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)
@@ -602,7 +602,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.01
     a = 0.01
-    model = FinModelRatesHW(sigma, a, numTimeSteps)
+    model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudanSwaptionPay.value(valuationDate, liborCurve, model)

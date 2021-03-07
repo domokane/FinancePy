@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
@@ -18,7 +18,7 @@ from .FinFloatLeg import FinFloatLeg
 ###############################################################################
 
 
-class FinIborBasisSwap(object):
+class FinIborBasisSwap
     """ Class for managing an Ibor-Ibor basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment in a different LIBOR tenor. There is no exchange of
@@ -148,7 +148,7 @@ class FinIborBasisSwap(object):
 
 ###############################################################################
 
-    def printFlows(self):
+    def print_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

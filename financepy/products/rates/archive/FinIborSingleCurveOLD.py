@@ -24,7 +24,7 @@ from ...products.rates.FinIborSwapOLD import FinIborSwapOLD
 swaptol = 1e-10
 
 ##############################################################################
-# TODO: CHANGE times to dfTimes
+# TODO: CHANGE times to df_times
 ##############################################################################
 
 

@@ -3,7 +3,7 @@
 ##############################################################################
 
 from ...utils.global_vars import gDaysInYear
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import labelToString, check_argument_types
 from ...market.discount.curve import DiscountCurve
@@ -39,16 +39,16 @@ class BondOption():
     def __init__(self,
                  bond: Bond,
                  expiry_date: Date,
-                 strikePrice: float,
+                 strike_price: float,
                  face_amount: float,
-                 optionType: FinOptionTypes):
+                 option_type: FinOptionTypes):
 
         check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
-        self._strikePrice = strikePrice
+        self._strike_price = strike_price
         self._bond = bond
-        self._optionType = optionType
+        self._option_type = option_type
         self._face_amount = face_amount
 
 ###############################################################################
@@ -64,7 +64,7 @@ class BondOption():
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         tmat = (self._bond._maturity_date - valuation_date) / gDaysInYear
 
-        dfTimes = discount_curve._times
+        df_times = discount_curve._times
         df_values = discount_curve._dfs
 
         # We need all of the flows in case the option is American and some occur before expiry
@@ -107,24 +107,24 @@ class BondOption():
 
         exerciseType = FinExerciseTypes.AMERICAN
 
-        if self._optionType == FinOptionTypes.EUROPEAN_CALL \
-            or self._optionType == FinOptionTypes.EUROPEAN_PUT:
+        if self._option_type == FinOptionTypes.EUROPEAN_CALL \
+            or self._option_type == FinOptionTypes.EUROPEAN_PUT:
                 exerciseType = FinExerciseTypes.EUROPEAN                
 
         # This is wasteful if the model is Jamshidian but how to do neat design ?
-        model.buildTree(tmat, dfTimes, df_values)
+        model.buildTree(tmat, df_times, df_values)
 
-        v = model.bondOption(texp, self._strikePrice, self._face_amount,
+        v = model.bondOption(texp, self._strike_price, self._face_amount,
                              coupon_times, coupon_flows, exerciseType)
 
-        if self._optionType == FinOptionTypes.EUROPEAN_CALL \
-            or self._optionType == FinOptionTypes.AMERICAN_CALL:
+        if self._option_type == FinOptionTypes.EUROPEAN_CALL \
+            or self._option_type == FinOptionTypes.AMERICAN_CALL:
                 return v['call']    
-        elif self._optionType == FinOptionTypes.EUROPEAN_PUT \
-            or self._optionType == FinOptionTypes.AMERICAN_PUT:
+        elif self._option_type == FinOptionTypes.EUROPEAN_PUT \
+            or self._option_type == FinOptionTypes.AMERICAN_PUT:
                 return v['put']
         else:
-            print(self._optionType)
+            print(self._option_type)
             raise FinError("Unknown option type.")
 
 ###############################################################################
@@ -132,8 +132,8 @@ class BondOption():
     def __repr__(self):
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE", self._strikePrice)
-        s += labelToString("OPTION TYPE", self._optionType)
+        s += labelToString("STRIKE", self._strike_price)
+        s += labelToString("OPTION TYPE", self._option_type)
         s += labelToString("FACE AMOUNT", self._face_amount, "")
         s += "Underlying Bond\n"
         s += str(self._bond)

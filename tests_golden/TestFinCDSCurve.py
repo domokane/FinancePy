@@ -7,9 +7,9 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds import CDS
 from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -24,7 +24,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinCDSCurve():
 
-    curveDate = Date(20, 12, 2018)
+    curve_date = Date(20, 12, 2018)
 
     swaps = []
     depos = []
@@ -36,8 +36,8 @@ def test_FinCDSCurve():
 
     for i in range(1, 11):
 
-        maturity_date = curveDate.addMonths(12 * i)
-        swap = FinIborSwap(curveDate,
+        maturity_date = curve_date.addMonths(12 * i)
+        swap = FinIborSwap(curve_date,
                            maturity_date,
                            FinSwapTypes.PAY,
                            fixedCoupon,
@@ -45,20 +45,20 @@ def test_FinCDSCurve():
                            fixedDCC)
         swaps.append(swap)
 
-    libor_curve = IborSingleCurve(curveDate, depos, fras, swaps)
+    libor_curve = IborSingleCurve(curve_date, depos, fras, swaps)
 
     cds_contracts = []
 
     for i in range(1, 11):
-        maturity_date = curveDate.addMonths(12 * i)
-        cds = FinCDS(curveDate, maturity_date, 0.005 + 0.001 * (i - 1))
+        maturity_date = curve_date.addMonths(12 * i)
+        cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
         cds_contracts.append(cds)
 
-    issuer_curve = FinCDSCurve(curveDate,
-                              cds_contracts,
-                              libor_curve,
-                              recovery_rate=0.40,
-                              useCache=False)
+    issuer_curve = CDSCurve(curve_date,
+                            cds_contracts,
+                            libor_curve,
+                            recovery_rate=0.40,
+                            use_cache=False)
 
     testCases.header("T", "Q")
     n = len(issuer_curve._times)
@@ -67,9 +67,9 @@ def test_FinCDSCurve():
 
     testCases.header("CONTRACT", "VALUE")
     for i in range(1, 11):
-        maturity_date = curveDate.addMonths(12 * i)
-        cds = FinCDS(curveDate, maturity_date, 0.005 + 0.001 * (i - 1))
-        v = cds.value(curveDate, issuer_curve)
+        maturity_date = curve_date.addMonths(12 * i)
+        cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
+        v = cds.value(curve_date, issuer_curve)
         testCases.print(i, v)
 
     if 1 == 0:

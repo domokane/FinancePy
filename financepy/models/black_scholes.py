@@ -7,14 +7,14 @@
 import numpy as np
 
 from ..utils.global_types import FinOptionTypes
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 from ..utils.helpers import check_argument_types
 
 from .FinModel import FinModel
 from .equity_crr_tree import crrTreeValAvg
 from .black_scholes_analytic import bawValue
-from .black_scholes_analytic import bsValue
+from .black_scholes_analytic import bs_value
 
 from enum import Enum
 
@@ -26,7 +26,7 @@ class FinModelBlackScholesTypes(Enum):
 
 ###############################################################################
 
-class FinModelBlackScholes(FinModel):
+class BlackScholes(FinModel):
     
     def __init__(self,
                  volatility: (float, np.ndarray), 
@@ -41,23 +41,23 @@ class FinModelBlackScholes(FinModel):
 
     def value(self, 
               spotPrice: float, 
-              timeToExpiry: float, 
-              strikePrice: float, 
+              time_to_expiry: float,
+              strike_price: float,
               riskFreeRate: float, 
               dividendRate: float, 
-              optionType: FinOptionTypes):
+              option_type: FinOptionTypes):
 
-        if optionType == FinOptionTypes.EUROPEAN_CALL \
-            or optionType == FinOptionTypes.EUROPEAN_PUT:
+        if option_type == FinOptionTypes.EUROPEAN_CALL \
+            or option_type == FinOptionTypes.EUROPEAN_PUT:
 
             if self._implementationType is FinModelBlackScholesTypes.DEFAULT:
                 self._implementationType = FinModelBlackScholesTypes.ANALYTICAL
 
             if self._implementationType == FinModelBlackScholesTypes.ANALYTICAL:
 
-                v =  bsValue(spotPrice, timeToExpiry, strikePrice, 
+                v =  bs_value(spotPrice, time_to_expiry, strike_price,
                              riskFreeRate, dividendRate, self._volatility,
-                             optionType.value)
+                             option_type.value)
 
                 return v
 
@@ -65,8 +65,8 @@ class FinModelBlackScholes(FinModel):
                 
                 v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate, 
                                   self._volatility, self._num_steps_per_year,
-                                  timeToExpiry, optionType.value, 
-                                  strikePrice)['value']
+                                  time_to_expiry, option_type.value,
+                                  strike_price)['value']
 
                 return v
 
@@ -74,20 +74,20 @@ class FinModelBlackScholes(FinModel):
                 
                 raise FinError("Implementation not available for this product")
 
-        elif optionType == FinOptionTypes.AMERICAN_CALL \
-            or optionType == FinOptionTypes.AMERICAN_PUT:
+        elif option_type == FinOptionTypes.AMERICAN_CALL \
+            or option_type == FinOptionTypes.AMERICAN_PUT:
 
             if self._implementationType is FinModelBlackScholesTypes.DEFAULT:
                 self._implementationType = FinModelBlackScholesTypes.CRR_TREE
 
             if self._implementationType == FinModelBlackScholesTypes.BARONE_ADESI:
 
-                if optionType == FinOptionTypes.AMERICAN_CALL:
+                if option_type == FinOptionTypes.AMERICAN_CALL:
                     phi = +1
-                elif optionType == FinOptionTypes.AMERICAN_PUT:
+                elif option_type == FinOptionTypes.AMERICAN_PUT:
                     phi = -1
 
-                v =  bawValue(spotPrice, timeToExpiry, strikePrice,
+                v =  bawValue(spotPrice, time_to_expiry, strike_price,
                               riskFreeRate, dividendRate, self._volatility,
                               phi)
 
@@ -97,8 +97,8 @@ class FinModelBlackScholes(FinModel):
 
                 v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate, 
                                   self._volatility, self._num_steps_per_year,
-                                  timeToExpiry, optionType.value, 
-                                  strikePrice)['value']
+                                  time_to_expiry, option_type.value,
+                                  strike_price)['value']
 
                 return v
 

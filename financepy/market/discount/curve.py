@@ -8,7 +8,7 @@ import numpy as np
 from .interpolator import FinInterpolator, FinInterpTypes, interpolate
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCount, DayCountTypes

@@ -4,7 +4,7 @@
 
 from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
 from .date import isLeapYear
-from .FinError import FinError
+from .error import FinError
 from .frequency import FrequencyTypes, annual_frequency
 from .global_vars import gDaysInYear
 
@@ -59,7 +59,7 @@ class DayCountTypes(Enum):
 ###############################################################################
 
 
-class DayCount(object):
+class DayCount:
     """ Calculate the fractional day count between two dates according to a
     specified day count convention. """
 

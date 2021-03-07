@@ -5,7 +5,7 @@
 import numpy as np
 from numba import njit
 
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 from ..utils.math import N
 from ..market.discount.interpolator import FinInterpTypes, _uinterpolate
 from ..utils.helpers import labelToString
@@ -65,8 +65,8 @@ class FinModelRatesHL():
 ###############################################################################
 
     def optionOnZCB(self, texp, tmat,
-                    strikePrice, face_amount,
-                    dfTimes, df_values):
+                    strike_price, face_amount,
+                    df_times, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
@@ -77,17 +77,17 @@ class FinModelRatesHL():
         if texp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        ptexp = _uinterpolate(texp, dfTimes, df_values, interp)
-        ptmat = _uinterpolate(tmat, dfTimes, df_values, interp)
+        ptexp = _uinterpolate(texp, df_times, df_values, interp)
+        ptmat = _uinterpolate(tmat, df_times, df_values, interp)
 
         sigma = self._sigma
 
         sigmap = sigma * (tmat-texp) * np.sqrt(texp)
 
-        h = np.log((face_amount*ptmat)/(strikePrice*ptexp))/sigmap+sigmap/2.0
+        h = np.log((face_amount*ptmat)/(strike_price*ptexp))/sigmap+sigmap/2.0
 
-        callValue = face_amount * ptmat * N(h) - strikePrice * ptexp * N(h-sigmap)
-        putValue = strikePrice * ptexp * N(-h+sigmap) - face_amount * ptmat * N(-h)
+        callValue = face_amount * ptmat * N(h) - strike_price * ptexp * N(h-sigmap)
+        putValue = strike_price * ptexp * N(-h+sigmap) - face_amount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 

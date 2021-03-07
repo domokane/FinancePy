@@ -12,7 +12,7 @@ from ..utils.math import NVect, NPrimeVect
 from ..utils.global_vars import gSmall
 from ..utils.helpers import labelToString
 from ..utils.global_types import FinOptionTypes
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 ###############################################################################
 # TODO: Use Numba ?
@@ -56,16 +56,16 @@ class FinModelBlack():
 
 
     def value(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
               callOrPut):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         v = self._volatility
         
@@ -84,16 +84,16 @@ class FinModelBlack():
 
 
     def delta(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
               callOrPut):    # Call or put
         """ Calculate delta using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         v = self._volatility
 
@@ -112,16 +112,16 @@ class FinModelBlack():
 
 
     def gamma(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
               callOrPut):    # Call or put
         """ Calculate gamma using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         v = self._volatility
 
@@ -135,16 +135,16 @@ class FinModelBlack():
 
 
     def theta(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,  # Discount Factor to expiry date
               callOrPut):    # Call or put
         """ Calculate theta using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         v = self._volatility
         r = -np.log(df)/t
@@ -167,16 +167,16 @@ class FinModelBlack():
 ###############################################################################
 
     def vega(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
               callOrPut):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         v = self._volatility
         sqrtT = np.sqrt(t)

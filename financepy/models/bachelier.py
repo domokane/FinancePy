@@ -27,15 +27,15 @@ class FinModelBachelier():
 ###############################################################################
 
     def value(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
         """ Price a call or put option using Bachelier's model. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         sqrtT = np.sqrt(t)
         vol = self._volatility

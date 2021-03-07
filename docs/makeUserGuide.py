@@ -585,9 +585,9 @@ def parseFunction(lines, startLine, endLine, className=""):
     for rowNum in range(startLine+1, endLine):
         line = lines[rowNum]
 
-        if line.count(""""") == 1 or line.count('"""') == 1:
-            if line.count(""""") == 1:
-                commentInit = """""
+        if line.count("'''") == 1 or line.count('"""') == 1:
+            if line.count("'''") == 1:
+                commentInit = "'''"
             else:
                 commentInit = '"""'
 
@@ -601,7 +601,7 @@ def parseFunction(lines, startLine, endLine, className=""):
                     break
             break
 
-        if line.count(""""") == 2 or line.count('"""') == 2:
+        if line.count("'''") == 2 or line.count('"""') == 2:
             startCommentRow = rowNum
             endCommentRow = rowNum
             startComment = True
@@ -618,7 +618,7 @@ def parseFunction(lines, startLine, endLine, className=""):
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("_", r"\_")
-            line = line.replace(""""", "")
+            line = line.replace("'''", "")
             line = line.replace('"""', '')
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
@@ -856,7 +856,7 @@ if 1 == 1:
 
     print("Removing unneeded files.")
     os.remove(fileName + ".out")
-    os.remove(fileName + ".tex")
+#    os.remove(fileName + ".tex")
     os.remove(fileName + ".toc")
     os.remove(fileName + ".aux")
     os.remove(fileName + ".log")

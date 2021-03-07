@@ -8,8 +8,8 @@ import sys
 sys.path.append("..")
 
 from financepy.finutils.FinDate import FinDate
-from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
-from financepy.products.equity.FinEquityVarianceSwap import FinEquityVarianceSwap
+from financepy.market.volatility.equity_vol_curve import EquityVolCurve
+from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -25,18 +25,18 @@ def volSkew(K, atmVol, atmK, skew):
 ###############################################################################
 
 
-def test_FinEquityVarianceSwap():
+def test_EquityVarianceSwap():
 
     startDate = FinDate(20, 3, 2018)
     tenor = "3M"
     strike = 0.3*0.3
 
-    volSwap = FinEquityVarianceSwap(startDate, tenor, strike)
+    volSwap = EquityVarianceSwap(startDate, tenor, strike)
 
     valuationDate = FinDate(20, 3, 2018)
     stockPrice = 100.0
     dividendYield = 0.0
-    dividendCurve = FinDiscountCurveFlat(valuationDate, dividendYield)
+    dividend_curve = FinDiscountCurveFlat(valuationDate, dividendYield)
 
     maturityDate = startDate.addMonths(3)
 
@@ -45,7 +45,7 @@ def test_FinEquityVarianceSwap():
     skew = -0.02/5.0  # defined as dsigma/dK
     strikes = np.linspace(50.0, 135.0, 18)
     vols = volSkew(strikes, atmVol, atmK, skew)
-    volCurve = FinEquityVolCurve(valuationDate, maturityDate, strikes, vols)
+    volCurve = EquityVolCurve(valuationDate, maturityDate, strikes, vols)
 
     strikeSpacing = 5.0
     numCallOptions = 10
@@ -58,7 +58,7 @@ def test_FinEquityVarianceSwap():
 
     testCases.header("LABEL", "VALUE")
 
-    k1 = volSwap.fairStrike(valuationDate, stockPrice, dividendCurve,
+    k1 = volSwap.fairStrike(valuationDate, stockPrice, dividend_curve,
                             volCurve, numCallOptions, numPutOptions,
                             strikeSpacing, discountCurve, useForward)
 
@@ -70,5 +70,5 @@ def test_FinEquityVarianceSwap():
 ##########################################################################
 
 
-test_FinEquityVarianceSwap()
+test_EquityVarianceSwap()
 testCases.compareTestCases()

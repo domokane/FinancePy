@@ -8,7 +8,7 @@ from ...utils.date import Date
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gSmall
 from ...utils.helpers import labelToString
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...market.discount.curve import DiscountCurve
 from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes

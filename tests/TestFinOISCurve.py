@@ -35,8 +35,8 @@ def test_FinOISFRAsOnly():
     # TO DO FIX THIS
     valuationDate = FinDate(23, 2, 2018)
 
-    spotDays = 0
-    settleDt = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settleDt = valuationDate.addWeekDays(spot_days)
 
     depoDCCType = FinDayCountTypes.ACT_360
     notional = 100.0
@@ -85,8 +85,8 @@ def test_FinOISDepositsFRAsSwaps():
     dccType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    spotDays = 0
-    settleDt = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settleDt = valuationDate.addWeekDays(spot_days)
 
     depoDCCType = FinDayCountTypes.ACT_360
     notional = 100.0
@@ -261,8 +261,8 @@ def test_FinOISDepositsFuturesSwaps():
 
     
     spotDate = FinDate(6, 6, 2018)
-    spotDays = 0
-    settleDt = spotDate.addWeekDays(spotDays)
+    spot_days = 0
+    settleDt = spotDate.addWeekDays(spot_days)
     depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
 
     depo = FinIborDeposit(settleDt, "1D", 1.712/100.0, depoDCCType)
@@ -308,8 +308,8 @@ def test_FinOISDepositsFuturesSwaps():
 
     ###########################################################################
 
-    spotDays = 2
-    startDate = spotDate.addWeekDays(spotDays)
+    spot_days = 2
+    startDate = spotDate.addWeekDays(spot_days)
 
     swaps = []
     fixedLegType = FinSwapTypes.PAY
@@ -387,8 +387,8 @@ def test_derivativePricingExample():
     valuationDate = FinDate(10, 11, 2011)
 
     # We do the O/N rate which settles on trade date
-    spotDays = 0
-    settleDt = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settleDt = valuationDate.addWeekDays(spot_days)
 
     fras = []
 
@@ -465,8 +465,8 @@ def test_bloombergPricingExample():
     valuationDate = FinDate(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
-    spotDays = 0
-    settleDt = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settleDt = valuationDate.addWeekDays(spot_days)
     accrual = FinDayCountTypes.THIRTY_E_360
 
     depo = FinIborDeposit(settleDt, "1D", 1.712/100.0, accrual)
@@ -490,8 +490,8 @@ def test_bloombergPricingExample():
 
     accrual = FinDayCountTypes.THIRTY_E_360
     freq = FinFrequencyTypes.SEMI_ANNUAL
-    spotDays = 2
-    settleDt = valuationDate.addWeekDays(spotDays)
+    spot_days = 2
+    settleDt = valuationDate.addWeekDays(spot_days)
     payRec = FinSwapTypes.PAY
     lag = 1 # Not used
 

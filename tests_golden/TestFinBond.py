@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import FinSwapTypes
-from financepy.products.bonds.bond import FinYTMCalcType
+from financepy.products.bonds.bond import YTMCalcType
 from financepy.products.bonds.bond import Bond
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
@@ -40,8 +40,8 @@ def buildIborCurve(valuation_date):
         deposit_rate,
         depoDCCType)
 
-    spotDays = 2
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 2
+    settlement_date = valuation_date.addWeekDays(spot_days)
 
     maturity_date = settlement_date.addMonths(1)
     depo1 = FinIborDeposit(settlement_date,
@@ -251,7 +251,7 @@ def test_Bond():
                         coupon, freq_type, accrual_type, 100)
 
             ytm = bond.yield_to_maturity(settlement_date, clean_price)
-            accrued_interest= bond._accruedInterest
+            accrued_interest= bond._accrued_interest
             accd_days = bond._accrued_days
 
             testCases.print("%18s" % maturityDt, "%8.4f" % coupon,
@@ -277,7 +277,7 @@ def test_Bond():
     testCases.print("Full Price = ", full_price)
     clean_price = bond.clean_price_from_ytm(settlement_date, y)
     testCases.print("Clean Price = ", clean_price)
-    accrued_interest= bond._accruedInterest
+    accrued_interest= bond._accrued_interest
     testCases.print("Accrued = ", accrued_interest)
     ytm = bond.yield_to_maturity(settlement_date, clean_price)
     testCases.print("Yield to Maturity = ", ytm)
@@ -372,15 +372,15 @@ def test_Bond():
     testCases.print("Current Yield = ", yld)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.UK_DMO)
+                                 YTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_STREET)
+                                 YTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity = ", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_TREASURY)
+                                 YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
     full_price = bond.full_price_from_ytm(settlement_date, ytm)
@@ -389,7 +389,7 @@ def test_Bond():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price = ", clean_price)
 
-    accrued_interest= bond._accruedInterest
+    accrued_interest= bond._accrued_interest
     testCases.print("Accrued = ", accrued_interest)
 
     accddays = bond._accrued_days
@@ -430,15 +430,15 @@ def test_Bond():
     testCases.print("Current Yield", yld)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.UK_DMO)
+                                 YTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_STREET)
+                                 YTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity", ytm)
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_TREASURY)
+                                 YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity", ytm)
 
     full_price = bond.full_price_from_ytm(settlement_date, ytm)
@@ -450,7 +450,7 @@ def test_Bond():
     accddays = bond._accrued_days
     testCases.print("Accrued Days", accddays)
 
-    accrued_interest= bond._accruedInterest
+    accrued_interest= bond._accrued_interest
     testCases.print("Accrued", accrued_interest)
 
     duration = bond.dollar_duration(settlement_date, ytm)

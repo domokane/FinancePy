@@ -11,7 +11,7 @@ from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import FinDate
 from financepy.products.inflation.FinInflationBond import FinInflationBond
-from financepy.products.bonds import FinYTMCalcType
+from financepy.products.bonds import YTMCalcType
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 from financepy.market.discount.curve_zeros import DiscountCurveZeros
 from financepy.market.discount.curve_flat import DiscountCurveFlat
@@ -59,19 +59,19 @@ def test_FinInflationBondBBG():
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.UK_DMO)
+                               YTMCalcType.UK_DMO)
 
     testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.US_STREET)
+                               YTMCalcType.US_STREET)
 
     testCases.print("US STREET REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.US_TREASURY)
+                               YTMCalcType.US_TREASURY)
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -84,7 +84,7 @@ def test_FinInflationBondBBG():
     accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accd = bond._accruedInterest
+    accd = bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accd)
 
     ###########################################################################
@@ -107,27 +107,27 @@ def test_FinInflationBondBBG():
 
     cleanPrice = bond.flatPriceFromYieldToMaturity(settlementDate, ytm,
                                                    lastCpnCPIValue,
-                                                   FinYTMCalcType.US_TREASURY)
+                                                   YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", cleanPrice)
 
-    principal = bond.inflationPrincipal(settlementDate, 
+    principal = bond.inflationPrincipal(settlementDate,
                                         ytm,
                                         refCPIValue,
-                                        FinYTMCalcType.US_TREASURY)
+                                        YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 
     ###########################################################################
 
-    duration = bond.dollarDuration(settlementDate, ytm)
+    duration = bond.dollar_duration(settlementDate, ytm)
     testCases.print("Dollar Duration = ", duration)
 
     modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
     testCases.print("Modified Duration = ", modifiedDuration)
 
-    macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
-    testCases.print("Macauley Duration = ", macauleyDuration)
+    macauley_duration = bond.macauley_duration(settlementDate, ytm)
+    testCases.print("Macauley Duration = ", macauley_duration)
 
     conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)
@@ -269,19 +269,19 @@ def test_FinInflationBondStack():
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.UK_DMO)
+                               YTMCalcType.UK_DMO)
 
     testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.US_STREET)
+                               YTMCalcType.US_STREET)
 
     testCases.print("US STREET REAL Yield To Maturity = ", ytm)
 
     ytm = bond.yieldToMaturity(settlementDate,
                                cleanPrice,
-                               FinYTMCalcType.US_TREASURY)
+                               YTMCalcType.US_TREASURY)
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -294,7 +294,7 @@ def test_FinInflationBondStack():
     accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accd = bond._accruedInterest
+    accd = bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accd)
 
     ###########################################################################
@@ -318,27 +318,27 @@ def test_FinInflationBondStack():
 
     cleanPrice = bond.flatPriceFromYieldToMaturity(settlementDate, ytm,
                                                    lastCpnCPIValue,
-                                                   FinYTMCalcType.US_TREASURY)
+                                                   YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", cleanPrice)
 
-    principal = bond.inflationPrincipal(settlementDate, 
+    principal = bond.inflationPrincipal(settlementDate,
                                         ytm,
                                         refCPIValue,
-                                        FinYTMCalcType.US_TREASURY)
+                                        YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 
     ###########################################################################
 
-    duration = bond.dollarDuration(settlementDate, ytm)
+    duration = bond.dollar_duration(settlementDate, ytm)
     testCases.print("Dollar Duration = ", duration)
 
     modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
     testCases.print("Modified Duration = ", modifiedDuration)
 
-    macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
-    testCases.print("Macauley Duration = ", macauleyDuration)
+    macauley_duration = bond.macauley_duration(settlementDate, ytm)
+    testCases.print("Macauley Duration = ", macauley_duration)
 
     conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)

@@ -5,11 +5,11 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds import CDS
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -104,15 +104,15 @@ def buildIssuerCurve(tradeDate, liborCurve):
 
     cdsCoupon = 0.0048375
     maturityDate = FinDate(20, 6, 2010)
-    cds = FinCDS(valuationDate, maturityDate, cdsCoupon)
+    cds = CDS(valuationDate, maturityDate, cdsCoupon)
     cdsMarketContracts.append(cds)
 
     recoveryRate = 0.40
 
-    issuerCurve = FinCDSCurve(valuationDate,
-                              cdsMarketContracts,
-                              liborCurve,
-                              recoveryRate)
+    issuerCurve = CDSCurve(valuationDate,
+                           cdsMarketContracts,
+                           liborCurve,
+                           recoveryRate)
     return issuerCurve
 
 ##########################################################################
@@ -133,17 +133,17 @@ def test_valueCDSIndex():
     longProtection = True
     indexCoupon = 0.004
 
-    cdsIndexContract = FinCDS(stepInDate,
-                              maturityDate,
-                              indexCoupon,
-                              notional,
-                              longProtection)
+    cdsIndexContract = CDS(stepInDate,
+                           maturityDate,
+                           indexCoupon,
+                           notional,
+                           longProtection)
 
 #    cdsIndexContract.print(valuationDate)
 
     testCases.header("LABEL", "VALUE")
 
-    spd = cdsIndexContract.parSpread(
+    spd = cdsIndexContract.par_spread(
         valuationDate, issuerCurve, cdsRecovery) * 10000.0
     testCases.print("PAR SPREAD", spd)
 
@@ -157,23 +157,23 @@ def test_valueCDSIndex():
     accruedDays = cdsIndexContract.accruedDays()
     testCases.print("ACCRUED DAYS", accruedDays)
 
-    accruedInterest = cdsIndexContract.accruedInterest()
-    testCases.print("ACCRUED COUPON", accruedInterest)
+    accrued_interest = cdsIndexContract.accrued_interest()
+    testCases.print("ACCRUED COUPON", accrued_interest)
 
-    protPV = cdsIndexContract.protectionLegPV(
+    protPV = cdsIndexContract.protection_leg_pv(
         valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", protPV)
 
-    premPV = cdsIndexContract.premiumLegPV(
+    premPV = cdsIndexContract.premium_leg_pv(
         valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cdsIndexContract.riskyPV01(
+    fullRPV01, cleanRPV01 = cdsIndexContract.risky_pv01(
         valuationDate, issuerCurve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cdsIndexContract.printFlows(issuerCurve)
+#    cdsIndexContract.print_flows(issuerCurve)
 
 
 test_valueCDSIndex()

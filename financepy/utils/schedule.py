@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-from .FinError import FinError
+from .error import FinError
 from .date import Date
 from .calendar import (Calendar, CalendarTypes)
 from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
@@ -16,7 +16,7 @@ from .helpers import check_argument_types
 ###############################################################################
 
 
-class Schedule(object):
+class Schedule:
     """ A schedule is a set of dates generated according to ISDA standard
     rules which starts on the next date after the effective date and runs up to
     a termination date. Dates are adjusted to a provided calendar. The zeroth

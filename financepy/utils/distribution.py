@@ -4,7 +4,7 @@
 
 
 import numpy as np
-from .FinError import FinError
+from .error import FinError
 
 
 class FinDistribution():

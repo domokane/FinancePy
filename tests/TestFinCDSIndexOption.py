@@ -9,12 +9,12 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import FinCDSIndexPortfolio
-from financepy.products.credit.cds_index_option import FinCDSIndexOption
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds_index_option import CDSIndexOption
+from financepy.products.credit.cds import CDS
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -109,13 +109,13 @@ def buildFlatIssuerCurve(tradeDate, liborCurve, spread, recoveryRate):
     cdsMarketContracts = []
 
     maturityDate = FinDate(29, 6, 2010)
-    cds = FinCDS(valuationDate, maturityDate, spread)
+    cds = CDS(valuationDate, maturityDate, spread)
     cdsMarketContracts.append(cds)
 
-    issuerCurve = FinCDSCurve(valuationDate,
-                              cdsMarketContracts,
-                              liborCurve,
-                              recoveryRate)
+    issuerCurve = CDSCurve(valuationDate,
+                           cdsMarketContracts,
+                           liborCurve,
+                           recoveryRate)
 
     return issuerCurve
 
@@ -151,16 +151,16 @@ def test_fullPriceCDSIndexOption():
         spd10Y = float(splitRow[4]) / 10000.0
         recoveryRate = float(splitRow[5])
 
-        cds3Y = FinCDS(stepInDate, maturity3Y, spd3Y)
-        cds5Y = FinCDS(stepInDate, maturity5Y, spd5Y)
-        cds7Y = FinCDS(stepInDate, maturity7Y, spd7Y)
-        cds10Y = FinCDS(stepInDate, maturity10Y, spd10Y)
+        cds3Y = CDS(stepInDate, maturity3Y, spd3Y)
+        cds5Y = CDS(stepInDate, maturity5Y, spd5Y)
+        cds7Y = CDS(stepInDate, maturity7Y, spd7Y)
+        cds10Y = CDS(stepInDate, maturity10Y, spd10Y)
         cdsContracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuerCurve = FinCDSCurve(valuationDate,
-                                  cdsContracts,
-                                  liborCurve,
-                                  recoveryRate)
+        issuerCurve = CDSCurve(valuationDate,
+                               cdsContracts,
+                               liborCurve,
+                               recoveryRate)
 
         issuerCurves.append(issuerCurve)
 
@@ -202,17 +202,17 @@ def test_fullPriceCDSIndexOption():
 
         cdsContracts = []
         for dt in indexMaturityDates:
-            cds = FinCDS(valuationDate, dt, index / 10000.0)
+            cds = CDS(valuationDate, dt, index / 10000.0)
             cdsContracts.append(cds)
 
-        indexCurve = FinCDSCurve(valuationDate, cdsContracts,
-                                 liborCurve, indexRecovery)
+        indexCurve = CDSCurve(valuationDate, cdsContracts,
+                              liborCurve, indexRecovery)
 
         if 1 == 1:
 
             indexSpreads = [index / 10000.0] * 4
 
-            indexPortfolio = FinCDSIndexPortfolio()
+            indexPortfolio = CDSIndexPortfolio()
             adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
                 valuationDate,
                 issuerCurves,
@@ -239,11 +239,11 @@ def test_fullPriceCDSIndexOption():
 
             start = time.time()
 
-            option = FinCDSIndexOption(expiryDate,
-                                       maturityDate,
-                                       indexCoupon,
-                                       strike / 10000.0,
-                                       notional)
+            option = CDSIndexOption(expiryDate,
+                                    maturityDate,
+                                    indexCoupon,
+                                    strike / 10000.0,
+                                    notional)
 
             v_pay_1, v_rec_1, strikeValue, mu, expH = option.valueAnderson(
                 valuationDate, adjustedIssuerCurves, indexRecovery, volatility)

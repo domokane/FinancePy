@@ -6,7 +6,7 @@ import numpy as np
 from scipy import optimize
 import copy
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import labelToString
 from ...utils.helpers import check_argument_types, _funcName
@@ -20,7 +20,7 @@ from ...products.rates.IborSwap import FinIborSwap
 swaptol = 1e-10
 
 ###############################################################################
-# TODO: CHANGE times to dfTimes
+# TODO: CHANGE times to df_times
 ###############################################################################
 
 

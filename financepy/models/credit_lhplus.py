@@ -6,7 +6,7 @@ import numpy as np
 
 from ..utils.math import N, M, phi3
 from ..utils.math import norminvcdf as NormSInv
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 ###############################################################################
 

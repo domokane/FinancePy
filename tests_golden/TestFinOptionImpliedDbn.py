@@ -14,12 +14,12 @@ from financepy.utils.date import Date
 from financepy.models.volatility_fns import FinVolFunctionTypes
 from financepy.models.volatility_fns import volFunctionClark
 
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
 
-from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
-from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
-from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
+from financepy.market.volatility.fx_vol_surface import FXVolSurface
+from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -42,34 +42,34 @@ def test_FinOptionImpliedDbn():
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        dom_discount_curve = DiscountCurveFlat(valuation_date, domCCRate)
+        for_discount_curve = DiscountCurveFlat(valuation_date, forCCRate)
 
-        currencyPair = forName + domName
-        spotFXRate = 1.3465
+        currency_pair = forName + domName
+        spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
-        notionalCurrency = forName
+        notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FinFXVolSurface(valuation_date,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
+        fxMarket = FXVolSurface(valuation_date,
+                                spot_fx_rate,
+                                currency_pair,
+                                notional_currency,
+                                dom_discount_curve,
+                                for_discount_curve,
+                                tenors,
+                                atmVols,
+                                marketStrangle25DeltaVols,
+                                riskReversal25DeltaVols,
+                                atmMethod,
+                                deltaMethod)
 
 #        fxMarket.checkCalibration(True)
 
@@ -88,8 +88,8 @@ def test_FinOptionImpliedDbn():
             num_steps = 10000
             dFX = (endFX - startFX)/ num_steps
 
-            domDF = domDiscountCurve._df(texp)
-            forDF = forDiscountCurve._df(texp)
+            domDF = dom_discount_curve._df(texp)
+            forDF = for_discount_curve._df(texp)
 
             rd = -np.log(domDF) / texp
             rf = -np.log(forDF) / texp
@@ -108,7 +108,7 @@ def test_FinOptionImpliedDbn():
             strikes = np.array(strikes)
             vols = np.array(vols)
 
-            dbn = optionImpliedDbn(spotFXRate, texp, rd, rf, strikes, vols)
+            dbn = optionImpliedDbn(spot_fx_rate, texp, rd, rf, strikes, vols)
             
 #            print("SUM:", dbn.sum())
 #            plt.figure()

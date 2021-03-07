@@ -5,7 +5,7 @@
 import numpy as np
 from scipy import optimize
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import labelToString
 from ...utils.helpers import check_argument_types, _funcName
@@ -16,7 +16,7 @@ from ...market.discount.curve import DiscountCurve
 swaptol = 1e-8
 
 ##############################################################################
-# TODO: CHANGE times to dfTimes
+# TODO: CHANGE times to df_times
 ##############################################################################
 
 

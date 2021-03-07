@@ -8,7 +8,7 @@ sys.path.append("..")
 import numpy as np
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.market.volatility.FinSwaptionVolSurface import FinSwaptionVolSurface
+from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
 from financepy.utils.date import Date
 from financepy.models.volatility_fns import FinVolFunctionTypes
 
@@ -63,23 +63,23 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         
         marketStrikes = np.array(marketStrikes) / 100.0
         
-        fwdSwapRates = marketStrikes[3]
+        fwd_swap_rates = marketStrikes[3]
         atmVols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
         discount_curve = DiscountCurveFlat(valuation_date, rfrRate)
 
         divRate = 0.010  # USD
-        dividendCurve = DiscountCurveFlat(valuation_date, divRate)
+        dividend_curve = DiscountCurveFlat(valuation_date, divRate)
 
         volFunctionType = FinVolFunctionTypes.SABR_BETA_HALF
 
-        swaptionSurface = FinSwaptionVolSurface(valuation_date,
-                                                exerciseDates,
-                                                fwdSwapRates,
-                                                marketStrikes,
-                                                marketVolatilities,
-                                                volFunctionType)
+        swaptionSurface = SwaptionVolSurface(valuation_date,
+                                             exerciseDates,
+                                             fwd_swap_rates,
+                                             marketStrikes,
+                                             marketVolatilities,
+                                             volFunctionType)
 
         tol = 1e-4
         swaptionSurface.checkCalibration(False, tol)

@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityForward import FinEquityForward
+from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinLongShort
 from financepy.market.discount.curve_flat import DiscountCurveFlat
@@ -16,7 +16,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def test_FinEquityForward():
+def test_EquityForward():
 
     valuation_date = Date(13, 2, 2018)
     expiry_date = valuation_date.addMonths(12)
@@ -32,9 +32,9 @@ def test_FinEquityForward():
     notional = 100.0
 
     discount_curve = DiscountCurveFlat(valuation_date, discountRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendRate)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividendRate)
 
-    equityForward = FinEquityForward(expiry_date,
+    equityForward = EquityForward(expiry_date,
                                      forwardPrice,
                                      notional,
                                      FinLongShort.LONG)
@@ -44,12 +44,12 @@ def test_FinEquityForward():
     fwdPrice = equityForward.forward(valuation_date,
                                      stock_price,
                                      discount_curve, 
-                                     dividendCurve)
+                                     dividend_curve)
 
     fwdValue = equityForward.value(valuation_date,
                                    stock_price,
                                    discount_curve, 
-                                   dividendCurve)
+                                   dividend_curve)
 
 #    print(stock_price, fwdPrice, fwdValue)
     testCases.print(stock_price, fwdPrice, fwdValue)
@@ -57,5 +57,5 @@ def test_FinEquityForward():
 ###############################################################################
 
 
-test_FinEquityForward()
+test_EquityForward()
 testCases.compareTestCases()

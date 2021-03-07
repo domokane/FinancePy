@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import testMonotonicity
 from ...utils.helpers import labelToString

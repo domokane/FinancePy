@@ -46,45 +46,45 @@ def test_BondOption():
     discount_curve = DiscountCurve(settlement_date, dates, dfs)
 
     expiry_date = settlement_date.addTenor("18m")
-    strikePrice = 105.0
+    strike_price = 105.0
     face = 100.0
 
     ###########################################################################
 
     strikes = [80, 90, 100, 110, 120]
 
-    optionType = FinOptionTypes.EUROPEAN_CALL
+    option_type = FinOptionTypes.EUROPEAN_CALL
 
     testCases.header("LABEL", "VALUE")
 
     price = bond.full_price_from_discount_curve(settlement_date, discount_curve)
     testCases.print("Fixed Income Price:", price)
 
-    numTimeSteps = 100
+    num_time_steps = 100
 
     testCases.header("OPTION TYPE AND MODEL", "STRIKE", "VALUE")
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("EUROPEAN CALL - BK", strikePrice, v)
+        testCases.print("EUROPEAN CALL - BK", strike_price, v)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("EUROPEAN CALL - BK", strikePrice, v)
+        testCases.print("EUROPEAN CALL - BK", strike_price, v)
 
     ###########################################################################
 
-    optionType = FinOptionTypes.AMERICAN_CALL
+    option_type = FinOptionTypes.AMERICAN_CALL
 
     price = bond.full_price_from_discount_curve(settlement_date, discount_curve)
     testCases.header("LABEL", "VALUE")
@@ -92,71 +92,71 @@ def test_BondOption():
 
     testCases.header("OPTION TYPE AND MODEL", "STRIKE", "VALUE")
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("AMERICAN CALL - BK", strikePrice, v)
+        testCases.print("AMERICAN CALL - BK", strike_price, v)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("AMERICAN CALL - BK", strikePrice, v)
+        testCases.print("AMERICAN CALL - BK", strike_price, v)
 
     ###########################################################################
 
-    optionType = FinOptionTypes.EUROPEAN_PUT
+    option_type = FinOptionTypes.EUROPEAN_PUT
 
     price = bond.full_price_from_discount_curve(settlement_date, discount_curve)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.01
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("EUROPEAN PUT - BK", strikePrice, v)
+        testCases.print("EUROPEAN PUT - BK", strike_price, v)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("EUROPEAN PUT - BK", strikePrice, v)
+        testCases.print("EUROPEAN PUT - BK", strike_price, v)
 
     ###########################################################################
 
-    optionType = FinOptionTypes.AMERICAN_PUT
+    option_type = FinOptionTypes.AMERICAN_PUT
 
     price = bond.full_price_from_discount_curve(settlement_date, discount_curve)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.02
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("AMERICAN PUT - BK", strikePrice, v)
+        testCases.print("AMERICAN PUT - BK", strike_price, v)
 
-    for strikePrice in strikes:
+    for strike_price in strikes:
 
         sigma = 0.20
 
-        bondOption = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        bondOption = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v = bondOption.value(settlement_date, discount_curve, model)
-        testCases.print("AMERICAN PUT - BK", strikePrice, v)
+        testCases.print("AMERICAN PUT - BK", strike_price, v)
 
 ###############################################################################
 
@@ -177,7 +177,7 @@ def test_BondOptionAmericanConvergenceONE():
 
     # Option Details
     expiry_date = Date(1, 12, 2020)
-    strikePrice = 100.0
+    strike_price = 100.0
     face = 100.0
 
     testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
@@ -185,37 +185,37 @@ def test_BondOptionAmericanConvergenceONE():
 
     timeSteps = range(30, 100, 1)
 
-    for numTimeSteps in timeSteps:
+    for num_time_steps in timeSteps:
 
         sigma = 0.20
 
         start = time.time()
 
-        optionType = FinOptionTypes.AMERICAN_PUT
-        bondOption1 = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        option_type = FinOptionTypes.AMERICAN_PUT
+        bondOption1 = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v1put = bondOption1.value(settlement_date, discount_curve, model)
 
-        optionType = FinOptionTypes.EUROPEAN_PUT
-        bondOption2 = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        option_type = FinOptionTypes.EUROPEAN_PUT
+        bondOption2 = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v2put = bondOption2.value(settlement_date, discount_curve, model)
 
-        optionType = FinOptionTypes.AMERICAN_CALL
-        bondOption1 = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        option_type = FinOptionTypes.AMERICAN_CALL
+        bondOption1 = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v1call = bondOption1.value(settlement_date, discount_curve, model)
 
-        optionType = FinOptionTypes.EUROPEAN_CALL
-        bondOption2 = BondOption(bond, expiry_date, strikePrice, face, optionType)
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+        option_type = FinOptionTypes.EUROPEAN_CALL
+        bondOption2 = BondOption(bond, expiry_date, strike_price, face, option_type)
+        model = FinModelRatesBDT(sigma, num_time_steps)
         v2call = bondOption2.value(settlement_date, discount_curve, model)
 
         end = time.time()
 
         period = end - start
 
-        testCases.print(period, numTimeSteps, v1put, v2put, v1call, v2call)
+        testCases.print(period, num_time_steps, v1put, v2put, v1call, v2call)
 
 ###############################################################################
 
@@ -349,7 +349,7 @@ def test_BondOptionZEROVOLConvergence():
     fwdCleanValue = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
 #    print("BOND SpotCleanBondPx", spotCleanValue)
 #    print("BOND FwdCleanBondPx", fwdCleanValue)
-#    print("BOND Accrued:", bond._accruedInterest)
+#    print("BOND Accrued:", bond._accrued_interest)
 
     spotCleanValue = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
 
@@ -357,38 +357,38 @@ def test_BondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER") 
 
-    numTimeSteps = range(100, 1000, 200)
-    strikePrices = [90, 100, 110, 120]
+    num_time_steps = range(100, 1000, 200)
+    strike_prices = [90, 100, 110, 120]
 
-    for strikePrice in strikePrices:
+    for strike_price in strike_prices:
         
-        callIntrinsic = max(spotCleanValue - strikePrice, 0)
-        putIntrinsic = max(strikePrice - spotCleanValue, 0)
-        callIntrinsicPV = max(fwdCleanValue - strikePrice, 0) * dfExpiry
-        putIntrinsicPV = max(strikePrice - fwdCleanValue, 0) * dfExpiry
+        callIntrinsic = max(spotCleanValue - strike_price, 0)
+        putIntrinsic = max(strike_price - spotCleanValue, 0)
+        callIntrinsicPV = max(fwdCleanValue - strike_price, 0) * dfExpiry
+        putIntrinsicPV = max(strike_price - fwdCleanValue, 0) * dfExpiry
 
-        for num_steps in numTimeSteps:
+        for num_steps in num_time_steps:
 
             sigma = 0.0000001
             model = FinModelRatesBDT(sigma, num_steps)
         
-            optionType = FinOptionTypes.EUROPEAN_CALL
-            bondOption1 = BondOption(bond, expiry_date, strikePrice, face, optionType)
+            option_type = FinOptionTypes.EUROPEAN_CALL
+            bondOption1 = BondOption(bond, expiry_date, strike_price, face, option_type)
             v1 = bondOption1.value(settlement_date, discount_curve, model)
 
-            optionType = FinOptionTypes.AMERICAN_CALL
-            bondOption2 = BondOption(bond, expiry_date, strikePrice, face, optionType)
+            option_type = FinOptionTypes.AMERICAN_CALL
+            bondOption2 = BondOption(bond, expiry_date, strike_price, face, option_type)
             v2 = bondOption2.value(settlement_date, discount_curve, model)
 
-            optionType = FinOptionTypes.EUROPEAN_PUT
-            bondOption3 = BondOption(bond, expiry_date, strikePrice, face, optionType)
+            option_type = FinOptionTypes.EUROPEAN_PUT
+            bondOption3 = BondOption(bond, expiry_date, strike_price, face, option_type)
             v3 = bondOption3.value(settlement_date, discount_curve, model)
         
-            optionType = FinOptionTypes.AMERICAN_PUT
-            bondOption4 = BondOption(bond, expiry_date, strikePrice, face, optionType)
+            option_type = FinOptionTypes.AMERICAN_PUT
+            bondOption4 = BondOption(bond, expiry_date, strike_price, face, option_type)
             v4 = bondOption4.value(settlement_date, discount_curve, model)
         
-            testCases.print(strikePrice, num_steps,
+            testCases.print(strike_price, num_steps,
                             callIntrinsic, callIntrinsicPV, v1, v2,
                             putIntrinsic, putIntrinsicPV, v3, v4)
 

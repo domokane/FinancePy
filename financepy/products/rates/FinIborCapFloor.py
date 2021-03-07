@@ -17,7 +17,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.schedule import Schedule
 from ...utils.helpers import labelToString, check_argument_types
 from ...models.black import FinModelBlack
@@ -51,7 +51,7 @@ class FinIborCapFloor():
     def __init__(self,
                  start_date: Date,
                  maturity_date_or_tenor: (Date, str),
-                 optionType: FinCapFloorTypes,
+                 option_type: FinCapFloorTypes,
                  strikeRate: float,
                  lastFixing: Optional[float] = None,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -80,7 +80,7 @@ class FinIborCapFloor():
 
         self._start_date = start_date
         self._maturity_date = maturity_date
-        self._optionType = optionType
+        self._option_type = option_type
         self._strikeRate = strikeRate
         self._lastFixing = lastFixing
         self._freq_type = freq_type
@@ -153,9 +153,9 @@ class FinIborCapFloor():
         alpha = self._day_counter.year_frac(start_date, end_date)[0]
         df = libor_curve.df(end_date)
 
-        if self._optionType == FinCapFloorTypes.CAP:
+        if self._option_type == FinCapFloorTypes.CAP:
             capFloorLetValue = df * alpha * max(fwd_rate - strikeRate, 0.0)
-        elif self._optionType == FinCapFloorTypes.FLOOR:
+        elif self._option_type == FinCapFloorTypes.FLOOR:
             capFloorLetValue = df * alpha * max(strikeRate - fwd_rate, 0.0)
 
         capFloorLetValue *= self._notional
@@ -178,9 +178,9 @@ class FinIborCapFloor():
             fwd_rate = libor_curve.fwd_rate(start_date, end_date,
                                          self._day_count_type)
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 intrinsicValue = df * alpha * max(fwd_rate - strikeRate, 0.0)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 intrinsicValue = df * alpha * max(strikeRate - fwd_rate, 0.0)
 
             intrinsicValue *= self._notional
@@ -227,46 +227,46 @@ class FinIborCapFloor():
 
         if isinstance(model, FinModelBlack):
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBlackShifted):
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelBachelier):
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABR):
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, FinModelSABRShifted):
 
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_CALL)
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
@@ -275,19 +275,19 @@ class FinIborCapFloor():
             tmat = (capletEndDate - valuation_date) / gDaysInYear
             alpha = self._day_counter.year_frac(capletStartDate,
                                               capletEndDate)[0]
-            strikePrice = 1.0/(1.0 + alpha * self._strikeRate)
+            strike_price = 1.0/(1.0 + alpha * self._strikeRate)
             notionalAdj = (1.0 + self._strikeRate * alpha)
             face_amount = 1.0
-            dfTimes = libor_curve._times
+            df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.optionOnZCB(texp, tmat, strikePrice, face_amount,
-                                  dfTimes, df_values)
+            v = model.optionOnZCB(texp, tmat, strike_price, face_amount,
+                                  df_times, df_values)
 
             # we divide by alpha to offset the multiplication above
-            if self._optionType == FinCapFloorTypes.CAP:
+            if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = v['put'] * notionalAdj / alpha
-            elif self._optionType == FinCapFloorTypes.FLOOR:
+            elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = v['call'] * notionalAdj / alpha
 
         else:
@@ -304,7 +304,7 @@ class FinIborCapFloor():
 
         print("START DATE:", self._start_date)
         print("MATURITY DATE:", self._maturity_date)
-        print("OPTION TYPE", str(self._optionType))
+        print("OPTION TYPE", str(self._option_type))
         print("STRIKE (%):", self._strikeRate * 100)
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
@@ -314,10 +314,10 @@ class FinIborCapFloor():
             print("Caplets not calculated.")
             return
 
-        if self._optionType == FinCapFloorTypes.CAP:
+        if self._option_type == FinCapFloorTypes.CAP:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    CAPLET_PV       CUM_PV"
-        elif self._optionType == FinCapFloorTypes.FLOOR:
+        elif self._option_type == FinCapFloorTypes.FLOOR:
             header = "PAYMENT_DATE     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    FLRLET_PV       CUM_PV"
 
@@ -349,7 +349,7 @@ class FinIborCapFloor():
         s += labelToString("START DATE", self._start_date)
         s += labelToString("MATURITY DATE", self._maturity_date)
         s += labelToString("STRIKE COUPON", self._strikeRate * 100)
-        s += labelToString("OPTION TYPE", str(self._optionType))
+        s += labelToString("OPTION TYPE", str(self._option_type))
         s += labelToString("FREQUENCY", str(self._freq_type))
         s += labelToString("DAY COUNT", str(self._day_count_type), "")
         return s

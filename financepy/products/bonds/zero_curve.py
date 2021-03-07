@@ -14,7 +14,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import input_time
 from ...utils.helpers import tableToString
 from ...market.discount.interpolator import FinInterpTypes, interpolate
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...market.discount.curve import DiscountCurve
 from ...utils.helpers import labelToString
@@ -30,8 +30,8 @@ def _f(df, *args):
     num_points = len(curve._times)
     curve._values[num_points - 1] = df
     bondDiscountPrice = bond.clean_price_from_discount_curve(valuation_date, curve)
-    objFn = bondDiscountPrice - marketCleanPrice
-    return objFn
+    obj_fn = bondDiscountPrice - marketCleanPrice
+    return obj_fn
 
 ###############################################################################
 

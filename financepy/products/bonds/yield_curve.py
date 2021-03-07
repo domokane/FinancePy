@@ -6,7 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import scale

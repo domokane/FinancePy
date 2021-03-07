@@ -9,11 +9,11 @@
 
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import labelToString, check_argument_types
-from ..bonds.bond import Bond, FinYTMCalcType
+from ..bonds.bond import Bond, YTMCalcType
 
 ###############################################################################
 
@@ -58,7 +58,7 @@ class FinInflationBond(Bond):
         self._flow_amounts = []
 
         self._settlement_date = Date(1, 1, 1900)
-        self._accruedInterest = None
+        self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
                    
@@ -71,14 +71,14 @@ class FinInflationBond(Bond):
                            settlement_date: Date,
                            ytm: float,
                            referenceCPI: float,
-                           convention: FinYTMCalcType):
+                           convention: YTMCalcType):
         """ Calculate the principal value of the bond based on the face
         amount and the CPI growth. """
 
         indexRatio = referenceCPI / self._baseCPIValue
         full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
         principal = full_price * self._face_amount / self._par
-        principal = principal - self._accruedInterest
+        principal = principal - self._accrued_interest
         principal *= indexRatio
         return principal
 
@@ -88,7 +88,7 @@ class FinInflationBond(Bond):
                                      settlement_date: Date,
                                      ytm: float,
                                      lastCpnCPI: float,
-                                     convention: FinYTMCalcType):
+                                     convention: YTMCalcType):
         """ Calculate the flat clean price value of the bond based on the clean
         price amount and the CPI growth to the last coupon date. """
 
@@ -110,7 +110,7 @@ class FinInflationBond(Bond):
 
         self.calc_accrued_interest(settlement_date)
         indexRatio = referenceCPI/self._baseCPIValue
-        self._inflationAccruedInterest = self._accruedInterest * indexRatio        
+        self._inflationAccruedInterest = self._accrued_interest * indexRatio
         return self._inflationAccruedInterest
 
 ###############################################################################

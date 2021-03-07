@@ -10,7 +10,7 @@
 import datetime
 from enum import Enum
 from .date import Date
-from .FinError import FinError
+from .error import FinError
 
 # from numba import njit, jit, int64, boolean
 
@@ -79,7 +79,7 @@ class DateGenRuleTypes(Enum):
 ###############################################################################
 
 
-class Calendar(object):
+class Calendar:
     """ Class to manage designation of payment dates as holidays according to
     a regional or country-specific calendar convention specified by the user.
     It also supplies an adjustment method which takes in an adjustment

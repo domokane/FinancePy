@@ -9,7 +9,7 @@ from os.path import join, exists, split
 import time
 
 from enum import Enum
-from financepy.utils.FinError import FinError
+from financepy.utils.error import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1

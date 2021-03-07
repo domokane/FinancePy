@@ -9,7 +9,7 @@ from ..utils.math import N
 from scipy import optimize
 
 from ..utils.helpers import labelToString, check_argument_types
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 from .credit_merton import FinModelMertonCredit
 
 ###############################################################################

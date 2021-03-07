@@ -28,14 +28,14 @@ def test_FinInterpolatedForwards():
     df_values = np.exp(-tValues*rValues)
     tInterpValues = np.linspace(0.0, 12.0, 49)
 
-    curveDate = Date(1, 1, 2019)
+    curve_date = Date(1, 1, 2019)
 
-    tDates = curveDate.addYears(tValues)
-    tInterpDates = curveDate.addYears(tInterpValues)
+    tDates = curve_date.addYears(tValues)
+    tInterpDates = curve_date.addYears(tInterpValues)
 
     for interp_type in FinInterpTypes:
 
-        discount_curve = DiscountCurve(curveDate, tDates, df_values, interp_type)
+        discount_curve = DiscountCurve(curve_date, tDates, df_values, interp_type)
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
         zeroInterpValues = discount_curve.zeroRate(tInterpDates)

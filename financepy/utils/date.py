@@ -3,7 +3,7 @@
 ##############################################################################
 
 import datetime
-from .FinError import FinError
+from .error import FinError
 from numba import njit, boolean, int64
 import numpy as np
 

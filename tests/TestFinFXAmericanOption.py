@@ -9,8 +9,8 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinOptionTypes
-from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.models.black_scholes import BlackScholes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -34,84 +34,84 @@ def test_FinFXAmericanOption():
     ccy1CCRate = 0.030  # EUR
     ccy2CCRate = 0.025  # USD
 
-    currencyPair = ccy1 + ccy2  # Always ccy1ccy2
-    spotFXRate = 1.20
-    strikeFXRate = 1.250
+    currency_pair = ccy1 + ccy2  # Always ccy1ccy2
+    spot_fx_rate = 1.20
+    strike_fx_rate = 1.250
     volatility = 0.10
 
-    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
-    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
+    dom_discount_curve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    for_discount_curve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
 
     testCases.header("SPOT FX RATE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 
-    spotFXRates = np.arange(50, 200, 10)/100.0
+    spot_fx_rates = np.arange(50, 200, 10)/100.0
 
-    for spotFXRate in spotFXRates:
+    for spot_fx_rate in spot_fx_rates:
 
-        callOption = FinFXVanillaOption(expiryDate,
-                                        strikeFXRate,
-                                        currencyPair,
-                                        FinOptionTypes.EUROPEAN_CALL,
-                                        1000000,
+        callOption = FXVanillaOption(expiryDate,
+                                     strike_fx_rate,
+                                     currency_pair,
+                                     FinOptionTypes.EUROPEAN_CALL,
+                                     1000000,
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                         spotFXRate,
-                                         domDiscountCurve,
-                                         forDiscountCurve,
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
                                          model)['v']
 
-        callOption = FinFXVanillaOption(expiryDate,
-                                        strikeFXRate,
+        callOption = FXVanillaOption(expiryDate,
+                                     strike_fx_rate,
                                         "EURUSD",
-                                        FinOptionTypes.AMERICAN_CALL,
-                                        1000000,
+                                     FinOptionTypes.AMERICAN_CALL,
+                                     1000000,
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                         spotFXRate,
-                                         domDiscountCurve,
-                                         forDiscountCurve,
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
+        testCases.print(spot_fx_rate, valueEuropean, valueAmerican, diff)
 
-    for spotFXRate in spotFXRates:
+    for spot_fx_rate in spot_fx_rates:
 
-        callOption = FinFXVanillaOption(expiryDate,
-                                        strikeFXRate,
+        callOption = FXVanillaOption(expiryDate,
+                                     strike_fx_rate,
                                         "EURUSD",
-                                        FinOptionTypes.EUROPEAN_PUT,
-                                        1000000,
+                                     FinOptionTypes.EUROPEAN_PUT,
+                                     1000000,
                                         "USD")
 
         valueEuropean = callOption.value(valueDate,
-                                         spotFXRate,
-                                         domDiscountCurve,
-                                         forDiscountCurve,
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
                                          model)['v']
 
-        callOption = FinFXVanillaOption(expiryDate,
-                                        strikeFXRate,
+        callOption = FXVanillaOption(expiryDate,
+                                     strike_fx_rate,
                                         "EURUSD",
-                                        FinOptionTypes.AMERICAN_PUT,
-                                        1000000,
+                                     FinOptionTypes.AMERICAN_PUT,
+                                     1000000,
                                         "USD")
 
         valueAmerican = callOption.value(valueDate,
-                                         spotFXRate,
-                                         domDiscountCurve,
-                                         forDiscountCurve,
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
                                          model)['v']
 
         diff = (valueAmerican - valueEuropean)
-        testCases.print(spotFXRate, valueEuropean, valueAmerican, diff)
+        testCases.print(spot_fx_rate, valueEuropean, valueAmerican, diff)
 
 ###############################################################################
 

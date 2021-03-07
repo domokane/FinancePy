@@ -27,8 +27,8 @@ def buildIborCurve(valuationDate):
 
     payFixed = FinSwapTypes.PAY
 
-    spotDays = 2
-    settlementDate = valuationDate.addWeekDays(spotDays)
+    spot_days = 2
+    settlementDate = valuationDate.addWeekDays(spot_days)
 
     depositRate = 0.050
     maturityDate = settlementDate.addMonths(1)
@@ -247,7 +247,7 @@ def test_FinBondFRN():
     accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond._accruedInterest
+    accdAmount = bond._accrued_interest
     testCases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settlementDate,
@@ -258,7 +258,7 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Principal = ", principal)
 
-    duration = bond.dollarDuration(settlementDate,
+    duration = bond.dollar_duration(settlementDate,
                                    resetIbor,
                                    currentIbor,
                                    futureIbors,
@@ -266,7 +266,7 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Rate Duration = ", duration)
 
-    modifiedDuration = bond.modifiedRateDuration(settlementDate,
+    modifiedDuration = bond.modified_duration(settlementDate,
                                                  resetIbor,
                                                  currentIbor,
                                                  futureIbors,
@@ -274,13 +274,13 @@ def test_FinBondFRN():
 
     testCases.print("Modified Rate Duration = ", modifiedDuration)
 
-    macauleyDuration = bond.macauleyRateDuration(settlementDate,
+    macauley_duration = bond.macauley_duration(settlementDate,
                                                  resetIbor,
                                                  currentIbor,
                                                  futureIbors,
                                                  dm)
 
-    testCases.print("Macauley Duration = ", macauleyDuration)
+    testCases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexityFromDM(settlementDate,
                                      resetIbor,
@@ -290,7 +290,7 @@ def test_FinBondFRN():
 
     testCases.print("Convexity = ", convexity)
 
-    duration = bond.dollarCreditDuration(settlementDate,
+    duration = bond.dollar_credit_duration(settlementDate,
                                          resetIbor,
                                          currentIbor,
                                          futureIbors,
@@ -355,7 +355,7 @@ def test_FinBondFRN():
     accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond._accruedInterest
+    accdAmount = bond._accrued_interest
     testCases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settlementDate,
@@ -366,7 +366,7 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Principal = ", principal)
 
-    duration = bond.dollarDuration(settlementDate,
+    duration = bond.dollar_duration(settlementDate,
                                        resetIbor,
                                        currentIbor,
                                        futureIbors,
@@ -374,7 +374,7 @@ def test_FinBondFRN():
 
     testCases.print("Dollar Rate Duration = ", duration)
 
-    modifiedDuration = bond.modifiedRateDuration(settlementDate,
+    modifiedDuration = bond.modified_duration(settlementDate,
                                                  resetIbor,
                                                  currentIbor,
                                                  futureIbors,
@@ -382,13 +382,13 @@ def test_FinBondFRN():
 
     testCases.print("Modified Rate Duration = ", modifiedDuration)
 
-    macauleyDuration = bond.macauleyRateDuration(settlementDate,
+    macauley_duration = bond.macauley_duration(settlementDate,
                                                  resetIbor,
                                                  currentIbor,
                                                  futureIbors,
                                                  dm)
 
-    testCases.print("Macauley Duration = ", macauleyDuration)
+    testCases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexityFromDM(settlementDate,
                                      resetIbor,
@@ -406,7 +406,7 @@ def test_FinBondFRN():
 
     testCases.print("Principal = ", principal)
 
-    duration = bond.dollarCreditDuration(settlementDate,
+    duration = bond.dollar_credit_duration(settlementDate,
                                          resetIbor,
                                          currentIbor,
                                          futureIbors,

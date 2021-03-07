@@ -7,7 +7,7 @@
 
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.calendar import CalendarTypes
 
 

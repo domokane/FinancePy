@@ -7,20 +7,20 @@
 
 import numpy as np
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
-from ...products.credit.cds import FinCDS
+from ...products.credit.cds import CDS
 
 from ...models.credit_gaussian_copula_onefactor import homogeneousBasketLossDbn
 from ...models.credit_gaussian_copula import default_timesGC
 from ...models.credit_student_t_copula import FinModelStudentTCopula
 
-from ...products.credit.cds_curve import FinCDSCurve
+from ...products.credit.cds_curve import CDSCurve
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
@@ -35,7 +35,7 @@ from ...utils.helpers import labelToString
 ###############################################################################
 
 
-class FinCDSBasket(object):
+class CDSBasket:
 
     """ Class to deal with n-to-default CDS baskets. """
 
@@ -64,16 +64,16 @@ class FinCDSBasket(object):
         self._freq_type = freq_type
         self._bus_day_adjust_type = bus_day_adjust_type
 
-        self._cds_contract = FinCDS(self._step_in_date,
-                                   self._maturity_date,
-                                   self._running_coupon,
-                                   1.0,
-                                   self._long_protection,
-                                   self._freq_type,
-                                   self._day_count_type,
-                                   self._calendar_type,
-                                   self._bus_day_adjust_type,
-                                   self._date_gen_rule_type)
+        self._cds_contract = CDS(self._step_in_date,
+                                 self._maturity_date,
+                                 self._running_coupon,
+                                 1.0,
+                                 self._long_protection,
+                                 self._freq_type,
+                                 self._day_count_type,
+                                 self._calendar_type,
+                                 self._bus_day_adjust_type,
+                                 self._date_gen_rule_type)
 
 ###############################################################################
 
@@ -290,25 +290,25 @@ class FinCDSBasket(object):
 
         curveRecovery = recovery_rates[0]
         libor_curve = issuer_curves[0]._libor_curve
-        basketCurve = FinCDSCurve(valuation_date, [], libor_curve, curveRecovery)
+        basketCurve = CDSCurve(valuation_date, [], libor_curve, curveRecovery)
         basketCurve._times = basketTimes
         basketCurve._values = basketSurvivalCurve
 
-        protLegPV = self._cds_contract.protectionLegPV(
+        protLegPV = self._cds_contract.protection_leg_pv(
             valuation_date, basketCurve, curveRecovery)
-        riskyPV01 = self._cds_contract.riskyPV01(valuation_date, basketCurve)['clean_rpv01']
+        risky_pv01 = self._cds_contract.risky_pv01(valuation_date, basketCurve)['clean_rpv01']
 
         # Long protection
-        mtm = self._notional * (protLegPV - riskyPV01 * self._running_coupon)
+        mtm = self._notional * (protLegPV - risky_pv01 * self._running_coupon)
 
         if not self._long_protection:
             mtm *= -1.0
 
         basketOutput = np.zeros(4)
         basketOutput[0] = mtm
-        basketOutput[1] = riskyPV01 * self._notional * self._running_coupon
+        basketOutput[1] = risky_pv01 * self._notional * self._running_coupon
         basketOutput[2] = protLegPV * self._notional
-        basketOutput[3] = protLegPV / riskyPV01
+        basketOutput[3] = protLegPV / risky_pv01
 
         return basketOutput
 

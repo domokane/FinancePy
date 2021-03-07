@@ -11,7 +11,7 @@ from financepy.products.credit.FinCDS import FinCDS
 from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -34,8 +34,8 @@ def buildFullIssuerCurve(valuationDate):
 
     m = 1.0  # 0.00000000000
 
-    spotDays = 0
-    settlementDate = valuationDate.addDays(spotDays)
+    spot_days = 0
+    settlementDate = valuationDate.addDays(spot_days)
 
     maturityDate = settlementDate.addMonths(1)
     depo1 = FinIborDeposit(settlementDate, maturityDate, m * 0.0016, dcType)
@@ -60,8 +60,8 @@ def buildFullIssuerCurve(valuationDate):
 
     fras = []
 
-    spotDays = 2
-    settlementDate = valuationDate.addDays(spotDays)
+    spot_days = 2
+    settlementDate = valuationDate.addDays(spot_days)
 
     swaps = []
     dcType = FinDayCountTypes.THIRTY_E_360_ISDA
@@ -202,10 +202,10 @@ def buildFullIssuerCurve(valuationDate):
 
     recoveryRate = 0.40
 
-    issuerCurve = FinCDSCurve(valuationDate,
-                              cdsMarketContracts,
-                              liborCurve,
-                              recoveryRate)
+    issuerCurve = CDSCurve(valuationDate,
+                           cdsMarketContracts,
+                           liborCurve,
+                           recoveryRate)
 
     return liborCurve, issuerCurve
 
@@ -238,7 +238,7 @@ def test_fullPriceCDSwaption():
 #    cdsContract.print(valuationDate)
 
     testCases.header("LABEL", "VALUE")
-    spd = cdsContract.parSpread(
+    spd = cdsContract.par_spread(
         valuationDate,
         issuerCurve,
         cdsRecovery) * 10000.0
@@ -254,21 +254,21 @@ def test_fullPriceCDSwaption():
     accruedDays = cdsContract.accruedDays()
     testCases.print("ACCRUED DAYS", accruedDays)
 
-    accruedInterest = cdsContract.accruedInterest()
-    testCases.print("ACCRUED COUPON", accruedInterest)
+    accrued_interest = cdsContract.accrued_interest()
+    testCases.print("ACCRUED COUPON", accrued_interest)
 
-    protPV = cdsContract.protectionLegPV(
+    protPV = cdsContract.protection_leg_pv(
         valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", protPV)
 
-    premPV = cdsContract.premiumLegPV(valuationDate, issuerCurve, cdsRecovery)
+    premPV = cdsContract.premium_leg_pv(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cdsContract.riskyPV01(valuationDate, issuerCurve)
+    fullRPV01, cleanRPV01 = cdsContract.risky_pv01(valuationDate, issuerCurve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cdsContract.printFlows(issuerCurve)
+#    cdsContract.print_flows(issuerCurve)
 
     testCases.banner(
         "=========================== FORWARD CDS ===========================")
@@ -281,7 +281,7 @@ def test_fullPriceCDSwaption():
 
 #    cdsContract.print(valuationDate)
 
-    spd = cdsContract.parSpread(
+    spd = cdsContract.par_spread(
         valuationDate,
         issuerCurve,
         cdsRecovery) * 10000.0
@@ -291,18 +291,18 @@ def test_fullPriceCDSwaption():
     testCases.print("FULL VALUE", v['full_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
-    protPV = cdsContract.protectionLegPV(
+    protPV = cdsContract.protection_leg_pv(
         valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", protPV)
 
-    premPV = cdsContract.premiumLegPV(valuationDate, issuerCurve, cdsRecovery)
+    premPV = cdsContract.premium_leg_pv(valuationDate, issuerCurve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cdsContract.riskyPV01(valuationDate, issuerCurve)
+    fullRPV01, cleanRPV01 = cdsContract.risky_pv01(valuationDate, issuerCurve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cdsContract.printFlows(issuerCurve)
+#    cdsContract.print_flows(issuerCurve)
 
     testCases.banner(
         "========================== CDS OPTIONS ============================")
@@ -326,7 +326,7 @@ def test_fullPriceCDSwaption():
                             issuerCurve,
                             volatility)
 
-        vol = cdsOption.impliedVolatility(valuationDate,
+        vol = cdsOption.implied_volatility(valuationDate,
                                           issuerCurve,
                                           v)
 

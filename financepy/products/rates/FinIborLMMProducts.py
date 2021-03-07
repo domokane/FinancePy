@@ -21,7 +21,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCount
 from ...utils.schedule import Schedule
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
@@ -37,7 +37,7 @@ from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinSwapTypes
 from ...utils.global_types import FinCapFloorTypes
 
-from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 ###############################################################################
 
@@ -101,7 +101,7 @@ class FinIborLMMProducts():
 
     def simulate1F(self,
                    discount_curve,
-                   volCurve: FinIborCapVolCurve,
+                   volCurve: IborCapVolCurve,
                    num_paths: int = 1000,
                    numeraireIndex: int = 0,
                    useSobol: bool = True,
@@ -169,7 +169,7 @@ class FinIborLMMProducts():
         if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discount_curve._curveDate != self._start_date:
+        if discount_curve._curve_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         print("LEN LAMBDAS", len(lambdas))
@@ -212,7 +212,7 @@ class FinIborLMMProducts():
 
     def simulateNF(self,
                    discount_curve,
-                   volCurve: FinIborCapVolCurve,
+                   volCurve: IborCapVolCurve,
                    correlationMatrix: np.ndarray,
                    modelType: FinRateModelLMMModelTypes,
                    num_paths: int = 1000,
@@ -231,7 +231,7 @@ class FinIborLMMProducts():
         if isinstance(modelType, FinRateModelLMMModelTypes) is False:
             raise FinError("Model type must be type FinRateModelLMMModelTypes")
 
-        if discount_curve.curveDate != self._start_date:
+        if discount_curve.curve_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         self._num_paths = num_paths
@@ -249,7 +249,7 @@ class FinIborLMMProducts():
         for i in range(1, numGridPoints):
             start_date = self._gridDates[i-1]
             end_date = self._gridDates[i]
-            fwd_rate = discount_curve.forwardRate(start_date,
+            fwd_rate = discount_curve.forward_rate(start_date,
                                                 end_date,
                                                 self._floatDayCountType)
             self._forwardCurve.append(fwd_rate)

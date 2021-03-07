@@ -6,9 +6,9 @@ import sys
 sys.path.append("..")
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
-from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
-from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
+from financepy.market.volatility.fx_vol_surface import FXVolSurface
+from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
@@ -40,36 +40,36 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+        dom_discount_curve = FinDiscountCurveFlat(valueDate, domCCRate)
+        for_discount_curve = FinDiscountCurveFlat(valueDate, forCCRate)
 
-        currencyPair = forName + domName
-        spotFXRate = 1.3465
+        currency_pair = forName + domName
+        spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
-        notionalCurrency = forName
+        notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
         volFunctionType = FinVolFunctionTypes.CLARK
 
-        fxMarket = FinFXVolSurface(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod, 
-                                   volFunctionType)
+        fxMarket = FXVolSurface(valueDate,
+                                spot_fx_rate,
+                                currency_pair,
+                                notional_currency,
+                                dom_discount_curve,
+                                for_discount_curve,
+                                tenors,
+                                atmVols,
+                                marketStrangle25DeltaVols,
+                                riskReversal25DeltaVols,
+                                atmMethod,
+                                deltaMethod,
+                                volFunctionType)
 
         fxMarket.checkCalibration(verboseCalibration)
 
@@ -79,11 +79,11 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #         for volFunctionType in FinVolFunctionTypes:
     
         #             fxMarket = FinFXVolSurface(valueDate,
-        #                                        spotFXRate,
-        #                                        currencyPair,
-        #                                        notionalCurrency,
-        #                                        domDiscountCurve,
-        #                                        forDiscountCurve,
+        #                                        spot_fx_rate,
+        #                                        currency_pair,
+        #                                        notional_currency,
+        #                                        dom_discount_curve,
+        #                                        for_discount_curve,
         #                                        tenors,
         #                                        atmVols,
         #                                        marketStrangle25DeltaVols,
@@ -121,34 +121,34 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         forCCRate = 0.0294  # EUR
         domCCRate = 0.0171  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+        dom_discount_curve = FinDiscountCurveFlat(valueDate, domCCRate)
+        for_discount_curve = FinDiscountCurveFlat(valueDate, forCCRate)
 
-        currencyPair = forName + domName
-        spotFXRate = 90.72
+        currency_pair = forName + domName
+        spot_fx_rate = 90.72
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atmVols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
         marketStrangle25DeltaVols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
         riskReversal25DeltaVols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
 
-        notionalCurrency = forName
+        notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-        fxMarket = FinFXVolSurface(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
+        fxMarket = FXVolSurface(valueDate,
+                                spot_fx_rate,
+                                currency_pair,
+                                notional_currency,
+                                dom_discount_curve,
+                                for_discount_curve,
+                                tenors,
+                                atmVols,
+                                marketStrangle25DeltaVols,
+                                riskReversal25DeltaVols,
+                                atmMethod,
+                                deltaMethod)
 
         fxMarket.checkCalibration(verboseCalibration)
 
@@ -171,34 +171,34 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         forCCRate = 0.020113  # EUR
         domCCRate = 0.003525  # USD
 
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+        dom_discount_curve = FinDiscountCurveFlat(valueDate, domCCRate)
+        for_discount_curve = FinDiscountCurveFlat(valueDate, forCCRate)
 
-        currencyPair = forName + domName
-        spotFXRate = 1.3088
+        currency_pair = forName + domName
+        spot_fx_rate = 1.3088
 
         tenors = ['1M']
         atmVols = [21.6215]
         marketStrangle25DeltaVols = [0.7375]
         riskReversal25DeltaVols = [-0.50]
 
-        notionalCurrency = forName
+        notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FinFXVolSurface(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
+        fxMarket = FXVolSurface(valueDate,
+                                spot_fx_rate,
+                                currency_pair,
+                                notional_currency,
+                                dom_discount_curve,
+                                for_discount_curve,
+                                tenors,
+                                atmVols,
+                                marketStrangle25DeltaVols,
+                                riskReversal25DeltaVols,
+                                atmMethod,
+                                deltaMethod)
 
         fxMarket.checkCalibration(verboseCalibration)
 
@@ -219,34 +219,34 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         forCCRate = 0.003525  # USD
         domCCRate = 0.0042875  # JPY
 
-        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
-        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
+        dom_discount_curve = FinDiscountCurveFlat(valueDate, domCCRate)
+        for_discount_curve = FinDiscountCurveFlat(valueDate, forCCRate)
 
-        currencyPair = forName + domName
-        spotFXRate = 90.68
+        currency_pair = forName + domName
+        spot_fx_rate = 90.68
 
         tenors = ['1M']
         atmVols = [21.00]
         marketStrangle25DeltaVols = [0.184]
         riskReversal25DeltaVols = [-5.30]
 
-        notionalCurrency = forName
+        notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-        fxMarket = FinFXVolSurface(valueDate,
-                                   spotFXRate,
-                                   currencyPair,
-                                   notionalCurrency,
-                                   domDiscountCurve,
-                                   forDiscountCurve,
-                                   tenors,
-                                   atmVols,
-                                   marketStrangle25DeltaVols,
-                                   riskReversal25DeltaVols,
-                                   atmMethod,
-                                   deltaMethod)
+        fxMarket = FXVolSurface(valueDate,
+                                spot_fx_rate,
+                                currency_pair,
+                                notional_currency,
+                                dom_discount_curve,
+                                for_discount_curve,
+                                tenors,
+                                atmVols,
+                                marketStrangle25DeltaVols,
+                                riskReversal25DeltaVols,
+                                atmMethod,
+                                deltaMethod)
 
         fxMarket.checkCalibration(verboseCalibration)
 

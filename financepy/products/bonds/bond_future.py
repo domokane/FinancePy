@@ -13,7 +13,7 @@ from ...utils.helpers import labelToString, check_argument_types
 ###############################################################################
 
 
-class BondFuture(object):
+class BondFuture:
     """ Class for managing futures contracts on government bonds that follows
     CME conventions and related analytics. """
 
@@ -86,10 +86,10 @@ class BondFuture(object):
                            futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
-        if bond._accruedInterest is None:
+        if bond._accrued_interest is None:
             bond.calculate_flow_dates(settlement_date)
 
-        accrued_interest= bond._accruedInterest
+        accrued_interest= bond._accrued_interest
 
         pip = self.principalInvoicePrice(bond, futures_price)
         accrued = accrued_interest* self._contractSize / 100.0

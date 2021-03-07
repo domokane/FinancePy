@@ -40,9 +40,9 @@ def buildOIS(valuation_date):
     dccType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    spotDays = 0
-    spotDays = 0
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 0
+    spot_days = 0
+    settlement_date = valuation_date.addWeekDays(spot_days)
     fixed_legType = FinSwapTypes.PAY
 
     fras = []
@@ -164,8 +164,8 @@ def test_bloombergPricingExample():
     valuation_date = Date(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
-    spotDays = 0
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 0
+    settlement_date = valuation_date.addWeekDays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
@@ -193,8 +193,8 @@ def test_bloombergPricingExample():
     accrual = DayCountTypes.THIRTY_E_360
     freq = FrequencyTypes.SEMI_ANNUAL
 
-    spotDays = 2
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 2
+    settlement_date = valuation_date.addWeekDays(spot_days)
     notional = ONE_MILLION
     fixed_legType = FinSwapTypes.PAY
     interp_type = FinInterpTypes.FLAT_FWD_RATES
@@ -319,8 +319,8 @@ def test_swapValuationExample():
     # MARKET
     ###########################################################################
     
-    spotDays = 0
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 0
+    settlement_date = valuation_date.addWeekDays(spot_days)
     depo = FinIborDeposit(settlement_date, "6M", -0.2510/100.0, depoDCCType); depos.append(depo)
     
     fras = []
@@ -381,8 +381,8 @@ def test_swapValuationExample():
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     
-    spotDays = 0
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    spot_days = 0
+    settlement_date = valuation_date.addWeekDays(spot_days)
     depo = FinIborDeposit(settlement_date, "1D", -0.3490/100.0, depoDCCType); depos.append(depo)
     
     fras = []

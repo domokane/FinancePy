@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
@@ -14,7 +14,7 @@ from ...utils.helpers import labelToString, check_argument_types
 ###############################################################################
 
 
-class FinInflationSwap(object):
+class FinInflationSwap
     """ Class for managing LIBOR forward rate agreements. A forward rate
     agreement is an agreement to exchange a fixed pre-agreed rate for a
     floating rate linked to LIBOR that is not known until some specified
@@ -113,7 +113,7 @@ class FinInflationSwap(object):
 
     ###########################################################################
 
-    def printFlows(self, valuation_date):
+    def print_flows(self, valuation_date):
         """ Determine the value of the Deposit given a Ibor curve. """
 
         flow_settle = self._notional

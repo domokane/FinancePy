@@ -9,7 +9,7 @@ from math import exp, log
 from copy import deepcopy
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.calendar import Calendar, CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
@@ -36,7 +36,7 @@ standard_recovery_rate = 0.40
 @njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
                  float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def _riskyPV01_NUMBA(teff,
+def _risky_pv01_NUMBA(teff,
                      accrual_factorPCDToNow,
                      paymentTimes,
                      year_fracs,
@@ -126,15 +126,15 @@ def _riskyPV01_NUMBA(teff,
 
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
-def _protectionLegPV_NUMBA(teff,
-                           tmat,
-                           npIborTimes,
-                           npIborValues,
-                           npSurvTimes,
-                           npSurvValues,
-                           contract_recovery_rate,
-                           num_steps_per_year,
-                           protMethod):
+def _protection_leg_pv_NUMBA(teff,
+                             tmat,
+                             npIborTimes,
+                             npIborValues,
+                             npSurvTimes,
+                             npSurvValues,
+                             contract_recovery_rate,
+                             num_steps_per_year,
+                             protMethod):
     """ Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. """
 
@@ -184,7 +184,7 @@ def _protectionLegPV_NUMBA(teff,
 ###############################################################################
 
 
-class FinCDS(object):
+class CDS:
     """ A class which manages a Credit Default Swap. It performs schedule
     generation and the valuation and risk management of CDS. """
 
@@ -336,18 +336,18 @@ class FinCDS(object):
         """ Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
 
-        rpv01 = self.riskyPV01(valuation_date,
+        rpv01 = self.risky_pv01(valuation_date,
                                issuer_curve,
                                pv01_method)
 
         fullRPV01 = rpv01['full_rpv01']
         cleanRPV01 = rpv01['clean_rpv01']
 
-        prot_pv = self.protectionLegPV(valuation_date,
-                                       issuer_curve,
-                                       contract_recovery_rate,
-                                       num_steps_per_year,
-                                       prot_method)
+        prot_pv = self.protection_leg_pv(valuation_date,
+                                         issuer_curve,
+                                         contract_recovery_rate,
+                                         num_steps_per_year,
+                                         prot_method)
 
         fwdDf = 1.0
 
@@ -450,14 +450,14 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def cashSettlementAmount(self,
-                             valuation_date,
-                             settlement_date,
-                             issuer_curve,
-                             contract_recovery_rate=standard_recovery_rate,
-                             pv01_method=0,
-                             prot_method=0,
-                             num_steps_per_year=25):
+    def cash_settlement_amount(self,
+                               valuation_date,
+                               settlement_date,
+                               issuer_curve,
+                               contract_recovery_rate=standard_recovery_rate,
+                               pv01_method=0,
+                               prot_method=0,
+                               num_steps_per_year=25):
         """ Value of the contract on the settlement date including accrued
         interest. """
 
@@ -484,15 +484,15 @@ class FinCDS(object):
                     num_steps_per_year=52):
         """ Value of the CDS contract excluding accrued interest. """
 
-        riskyPV01 = self.riskyPV01(valuation_date, issuer_curve, pv01_method)
+        risky_pv01 = self.risky_pv01(valuation_date, issuer_curve, pv01_method)
 
-        cleanRPV01 = riskyPV01['clean_rpv01']
+        cleanRPV01 = risky_pv01['clean_rpv01']
 
-        prot_pv = self.protectionLegPV(valuation_date,
-                                       issuer_curve,
-                                       contract_recovery_rate,
-                                       num_steps_per_year,
-                                       prot_method)
+        prot_pv = self.protection_leg_pv(valuation_date,
+                                         issuer_curve,
+                                         contract_recovery_rate,
+                                         num_steps_per_year,
+                                         prot_method)
 
         fwdDf = 1.0
 
@@ -503,10 +503,10 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def riskyPV01OLD(self,
-                     valuation_date,
-                     issuer_curve,
-                     pv01_method=0):
+    def risky_pv01_OLD(self,
+                       valuation_date,
+                       issuer_curve,
+                       pv01_method=0):
         """ RiskyPV01 of the contract using the OLD method. """
 
         payment_dates = self._adjusted_dates
@@ -605,7 +605,7 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def accruedInterest(self):
+    def accrued_interest(self):
         """ Calculate the amount of accrued interest that has accrued from the
         previous coupon date (PCD) to the step_in_date of the CDS contract. """
 
@@ -613,21 +613,21 @@ class FinCDS(object):
         payment_dates = self._adjusted_dates
         pcd = payment_dates[0]
         accrual_factor = dayCount.year_frac(pcd, self._step_in_date)[0]
-        accruedInterest = accrual_factor * self._notional * self._running_coupon
+        accrued_interest = accrual_factor * self._notional * self._running_coupon
 
         if self._long_protection:
-            accruedInterest *= -1.0
+            accrued_interest *= -1.0
 
-        return accruedInterest
+        return accrued_interest
 
     ###############################################################################
 
-    def protectionLegPV(self,
-                        valuation_date,
-                        issuer_curve,
-                        contract_recovery_rate=standard_recovery_rate,
-                        num_steps_per_year=25,
-                        protMethod=0):
+    def protection_leg_pv(self,
+                          valuation_date,
+                          issuer_curve,
+                          contract_recovery_rate=standard_recovery_rate,
+                          num_steps_per_year=25,
+                          protMethod=0):
         """ Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above. """
 
@@ -636,25 +636,25 @@ class FinCDS(object):
 
         libor_curve = issuer_curve._libor_curve
 
-        v = _protectionLegPV_NUMBA(teff,
-                                   tmat,
-                                   libor_curve._times,
-                                   libor_curve._dfs,
-                                   issuer_curve._times,
-                                   issuer_curve._values,
-                                   contract_recovery_rate,
-                                   num_steps_per_year,
-                                   protMethod)
+        v = _protection_leg_pv_NUMBA(teff,
+                                     tmat,
+                                     libor_curve._times,
+                                     libor_curve._dfs,
+                                     issuer_curve._times,
+                                     issuer_curve._values,
+                                     contract_recovery_rate,
+                                     num_steps_per_year,
+                                     protMethod)
 
         return v * self._notional
 
     ###############################################################################
 
-    def riskyPV01(self,
+    def risky_pv01(self,
                   valuation_date,
                   issuer_curve,
                   pv01_method=0):
-        """ The riskyPV01 is the present value of a risky one dollar paid on
+        """ The risky_pv01 is the present value of a risky one dollar paid on
         the premium leg of a CDS contract. """
 
         libor_curve = issuer_curve._libor_curve
@@ -675,7 +675,7 @@ class FinCDS(object):
         year_fracs = self._accrual_factors
         teff = (eff - valuation_date) / gDaysInYear
 
-        valueRPV01 = _riskyPV01_NUMBA(teff,
+        valueRPV01 = _risky_pv01_NUMBA(teff,
                                       accrual_factorPCDToNow,
                                       np.array(paymentTimes),
                                       np.array(year_fracs),
@@ -693,13 +693,13 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def premiumLegPV(self,
-                     valuation_date,
-                     issuer_curve,
-                     pv01_method=0):
+    def premium_leg_pv(self,
+                       valuation_date,
+                       issuer_curve,
+                       pv01_method=0):
         """ Value of the premium leg of a CDS. """
 
-        fullRPV01 = self.riskyPV01(valuation_date,
+        fullRPV01 = self.risky_pv01(valuation_date,
                                    issuer_curve,
                                    pv01_method)['full_rpv01']
 
@@ -708,7 +708,7 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def parSpread(self,
+    def par_spread(self,
                   valuation_date,
                   issuer_curve,
                   contract_recovery_rate=standard_recovery_rate,
@@ -718,15 +718,15 @@ class FinCDS(object):
         """ Breakeven CDS coupon that would make the value of the CDS contract
         equal to zero. """
 
-        cleanRPV01 = self.riskyPV01(valuation_date,
+        cleanRPV01 = self.risky_pv01(valuation_date,
                                     issuer_curve,
                                     pv01_method)['clean_rpv01']
 
-        prot = self.protectionLegPV(valuation_date,
-                                    issuer_curve,
-                                    contract_recovery_rate,
-                                    num_steps_per_year,
-                                    protMethod)
+        prot = self.protection_leg_pv(valuation_date,
+                                      issuer_curve,
+                                      contract_recovery_rate,
+                                      num_steps_per_year,
+                                      protMethod)
 
         # By convention this is calculated using the clean RPV01
         spd = prot / cleanRPV01 / self._notional
@@ -761,7 +761,7 @@ class FinCDS(object):
             long_protection = -1
 
         # The sign of he accrued has already been sign adjusted for direction
-        accrued = self.accruedInterest()
+        accrued = self.accrued_interest()
 
         # This is the clean RPV01 as it treats the PV01 stream as though it
         # pays just the accrued for the time between 0 and the maturity
@@ -811,7 +811,7 @@ class FinCDS(object):
 
     ###############################################################################
 
-    def printFlows(self, issuer_curve):
+    def print_flows(self, issuer_curve):
 
         num_flows = len(self._adjusted_dates)
 

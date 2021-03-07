@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
@@ -31,7 +31,7 @@ class FinCompoundingTypes(Enum):
 
 ###############################################################################
 
-class FinOIS(object):
+class FinOIS:
     """ Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate (OIR). There is no exchange
@@ -207,7 +207,7 @@ class FinOIS(object):
 
 ###############################################################################
 
-    def printFlows(self):
+    def print_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

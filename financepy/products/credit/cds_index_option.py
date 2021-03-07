@@ -12,9 +12,9 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION, INVROOT2PI, N
-from ...utils.FinError import FinError
-from ...products.credit.cds_curve import FinCDSCurve
-from ...products.credit.cds import FinCDS
+from ...utils.error import FinError
+from ...products.credit.cds_curve import CDSCurve
+from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.helpers import labelToString
@@ -24,7 +24,7 @@ RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 ###############################################################################
 
 
-class FinCDSIndexOption(object):
+class CDSIndexOption:
 
     """ Class to manage the pricing and risk management of an option to enter
     into a CDS index. Different pricing algorithms are presented."""
@@ -68,16 +68,16 @@ class FinCDSIndexOption(object):
         self._freq_type = freq_type
         self._bus_day_adjust_type = bus_day_adjust_type
 
-        self._cds_contract = FinCDS(self._expiry_date,
-                                   self._maturity_date,
-                                   self._index_coupon,
-                                   1.0,
-                                   self._long_protection,
-                                   self._freq_type,
-                                   self._day_count_type,
-                                   self._calendar_type,
-                                   self._bus_day_adjust_type,
-                                   self._date_gen_rule_type)
+        self._cds_contract = CDS(self._expiry_date,
+                                 self._maturity_date,
+                                 self._index_coupon,
+                                 1.0,
+                                 self._long_protection,
+                                 self._freq_type,
+                                 self._day_count_type,
+                                 self._calendar_type,
+                                 self._bus_day_adjust_type,
+                                 self._date_gen_rule_type)
 
 ###############################################################################
 
@@ -92,29 +92,29 @@ class FinCDSIndexOption(object):
 
         k = self._strike_coupon
         c = self._index_coupon
-        timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
+        time_to_expiry = (self._expiry_date - valuation_date) / gDaysInYear
         df = libor_curve.df(self._expiry_date)
-        qExpiryIndex = index_curve.survProb(timeToExpiry)
+        qExpiryIndex = index_curve.survProb(time_to_expiry)
 
-        cds = FinCDS(valuation_date, self._maturity_date, k)
-        strikeCurve = FinCDSCurve(
+        cds = CDS(valuation_date, self._maturity_date, k)
+        strikeCurve = CDSCurve(
             valuation_date, [cds], libor_curve, indexRecovery)
-#        qExpiryStrike = strikeCurve.survivalProbability(timeToExpiry)
+#        qExpiryStrike = strikeCurve.survivalProbability(time_to_expiry)
 
-        strikeRPV01 = self._cds_contract.riskyPV01(
+        strikeRPV01 = self._cds_contract.risky_pv01(
             valuation_date, strikeCurve)['clean_rpv01']
-        indexRPV01 = self._cds_contract.riskyPV01(
+        indexRPV01 = self._cds_contract.risky_pv01(
             valuation_date, index_curve)['clean_rpv01']
 
-        s = self._cds_contract.parSpread(valuation_date, index_curve)
+        s = self._cds_contract.par_spread(valuation_date, index_curve)
 
         fep = df * (1.0 - qExpiryIndex) * (1.0 - indexRecovery)
         adjFwd = s + fep / indexRPV01
         adjStrike = c + (k - c) * strikeRPV01 / indexRPV01 / qExpiryIndex
 
-        denom = sigma * sqrt(timeToExpiry)
-        d1 = log(adjFwd / adjStrike) + 0.5 * sigma * sigma * timeToExpiry
-        d2 = log(adjFwd / adjStrike) - 0.5 * sigma * sigma * timeToExpiry
+        denom = sigma * sqrt(time_to_expiry)
+        d1 = log(adjFwd / adjStrike) + 0.5 * sigma * sigma * time_to_expiry
+        d2 = log(adjFwd / adjStrike) - 0.5 * sigma * sigma * time_to_expiry
         d1 /= denom
         d2 /= denom
 
@@ -140,22 +140,22 @@ class FinCDSIndexOption(object):
         credit triangle to compute the forward RPV01. """
 
         num_credits = len(issuer_curves)
-        timeToExpiry = (self._expiry_date - valuation_date) / gDaysInYear
+        time_to_expiry = (self._expiry_date - valuation_date) / gDaysInYear
 #        timeToMaturity = (self._maturity_date - valuation_date) / gDaysInYear
-        dfToExpiry = issuer_curves[0].df(timeToExpiry)
+        dfToExpiry = issuer_curves[0].df(time_to_expiry)
         libor_curve = issuer_curves[0]._libor_curve
 
         k = self._strike_coupon
         c = self._index_coupon
 
-        strikeCDS = FinCDS(
+        strikeCDS = CDS(
             self._expiry_date,
             self._maturity_date,
             self._strike_coupon,
             1.0)
-        strikeCurve = FinCDSCurve(valuation_date, [strikeCDS], libor_curve)
-        strikeRPV01s = strikeCDS.riskyPV01(valuation_date, strikeCurve)
-        qToExpiry = strikeCurve.survProb(timeToExpiry)
+        strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve)
+        strikeRPV01s = strikeCDS.risky_pv01(valuation_date, strikeCurve)
+        qToExpiry = strikeCurve.survProb(time_to_expiry)
         strikeValue = (k - c) * strikeRPV01s['clean_rpv01']
         strikeValue /= (dfToExpiry * qToExpiry)
 
@@ -166,11 +166,11 @@ class FinCDSIndexOption(object):
         for iCredit in range(0, num_credits):
 
             issuer_curve = issuer_curves[iCredit]
-            q = issuer_curve.survProb(timeToExpiry)
+            q = issuer_curve.survProb(time_to_expiry)
             dh1 = (1.0 - issuer_curve._recovery_rate) * (1.0 - q)
 
-            s = self._cds_contract.parSpread(valuation_date, issuer_curve)
-            rpv01 = self._cds_contract.riskyPV01(valuation_date, issuer_curve)
+            s = self._cds_contract.par_spread(valuation_date, issuer_curve)
+            rpv01 = self._cds_contract.risky_pv01(valuation_date, issuer_curve)
             dh2 = (s - c) * rpv01['clean_rpv01'] / (dfToExpiry * qToExpiry)
 
             h1 = h1 + dh1

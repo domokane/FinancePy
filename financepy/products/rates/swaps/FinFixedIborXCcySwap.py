@@ -17,7 +17,7 @@ from ...finutils.FinGlobalTypes import FinSwapTypes
 ##########################################################################
 
 
-class FinFixedIborXCcySwap(object):
+class FinFixedIborXCcySwap
     """ Class for managing a cross currency swap contract. This is a contract
     in which a fixed payment leg in one currency is exchanged for floating
     payments in a second currency. There is an exchange of par at maturity.

@@ -5,7 +5,7 @@
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 from ...utils.math import testMonotonicity
 from ...utils.frequency import FrequencyTypes

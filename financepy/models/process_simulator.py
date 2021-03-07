@@ -8,7 +8,7 @@ from enum import Enum
 from numba import njit, float64, int64
 import numpy as np
 
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 from ..utils.math import norminvcdf
 from ..utils.helpers import labelToString
 
@@ -33,21 +33,21 @@ class FinProcessSimulator():
 
     def getProcess(
             self,
-            processType,
+            process_type,
             t,
-            modelParams,
+            model_params,
             numAnnSteps,
             num_paths,
             seed):
 
-        if processType == FinProcessTypes.GBM:
-            (stock_price, drift, volatility, scheme) = modelParams
+        if process_type == FinProcessTypes.GBM:
+            (stock_price, drift, volatility, scheme) = model_params
             paths = getGBMPaths(num_paths, numAnnSteps, t, drift,
                                 stock_price, volatility, scheme.value, seed)
             return paths
 
-        elif processType == FinProcessTypes.HESTON:
-            (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = modelParams
+        elif process_type == FinProcessTypes.HESTON:
+            (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = model_params
             paths = getHestonPaths(num_paths,
                                    numAnnSteps,
                                    t,
@@ -62,8 +62,8 @@ class FinProcessSimulator():
                                    seed)
             return paths
 
-        elif processType == FinProcessTypes.VASICEK:
-            (r0, kappa, theta, sigma, scheme) = modelParams
+        elif process_type == FinProcessTypes.VASICEK:
+            (r0, kappa, theta, sigma, scheme) = model_params
             paths = getVasicekPaths(
                 num_paths,
                 numAnnSteps,
@@ -76,14 +76,14 @@ class FinProcessSimulator():
                 seed)
             return paths
 
-        elif processType == FinProcessTypes.CIR:
-            (r0, kappa, theta, sigma, scheme) = modelParams
+        elif process_type == FinProcessTypes.CIR:
+            (r0, kappa, theta, sigma, scheme) = model_params
             paths = getCIRPaths(num_paths, numAnnSteps, t,
                                 r0, kappa, theta, sigma, scheme.value, seed)
             return paths
 
         else:
-            raise FinError("Unknown process" + str(processType))
+            raise FinError("Unknown process" + str(process_type))
 
 ###############################################################################
 
@@ -228,15 +228,15 @@ def getGBMPaths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed)
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
-    numTimeSteps = int(t / dt + 0.50)
+    num_time_steps = int(t / dt + 0.50)
     vsqrt_dt = sigma * sqrt(dt)
     m = exp((mu - sigma * sigma / 2.0) * dt)
 
     if scheme == FinGBMNumericalScheme.NORMAL.value:
 
-        Sall = np.empty((num_paths, numTimeSteps + 1))
+        Sall = np.empty((num_paths, num_time_steps + 1))
         Sall[:, 0] = stock_price
-        for it in range(1, numTimeSteps + 1):
+        for it in range(1, num_time_steps + 1):
             g1D = np.random.standard_normal((num_paths))
             for ip in range(0, num_paths):
                 w = np.exp(g1D[ip] * vsqrt_dt)
@@ -244,9 +244,9 @@ def getGBMPaths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed)
 
     elif scheme == FinGBMNumericalScheme.ANTITHETIC.value:
 
-        Sall = np.empty((2 * num_paths, numTimeSteps + 1))
+        Sall = np.empty((2 * num_paths, num_time_steps + 1))
         Sall[:, 0] = stock_price
-        for it in range(1, numTimeSteps + 1):
+        for it in range(1, num_time_steps + 1):
             g1D = np.random.standard_normal((num_paths))
             for ip in range(0, num_paths):
                 w = np.exp(g1D[ip] * vsqrt_dt)

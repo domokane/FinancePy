@@ -14,7 +14,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinExerciseTypes
 from ...utils.global_types import FinSwapTypes
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.helpers import labelToString, check_argument_types
 
 from ...products.rates.IborSwap import FinIborSwap
@@ -26,7 +26,7 @@ from ...models.rates_hull_white_tree import FinModelRatesHW
 ###############################################################################
 
 
-class FinIborBermudanSwaption(object):
+class FinIborBermudanSwaption:
     """ This is the class for the Bermudan-style swaption, an option to enter
     into a swap (payer or receiver of the fixed coupon), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. This swaption
@@ -84,7 +84,7 @@ class FinIborBermudanSwaption(object):
         self._fwdSwapRate = None
         self._forwardDf = None
         self._underlyingSwap = None
-        self._cpnTimes = None
+        self._cpn_times = None
         self._cpnFlows = None
         
 ###############################################################################
@@ -124,7 +124,7 @@ class FinIborBermudanSwaption(object):
         # For the tree models we need to generate a vector of the coupons
         #######################################################################
 
-        cpnTimes = [texp]
+        cpn_times = [texp]
         cpnFlows = [0.0]
 
         # The first flow is the expiry date
@@ -137,25 +137,25 @@ class FinIborBermudanSwaption(object):
             flowDate = self._underlyingSwap._fixed_leg._payment_dates[iFlow]
 
             if flowDate > self._exerciseDate:
-                cpnTime = (flowDate - valuation_date) / gDaysInYear
+                cpn_time = (flowDate - valuation_date) / gDaysInYear
                 cpnFlow = swap._fixed_leg._payments[iFlow-1] / self._notional
-                cpnTimes.append(cpnTime)
+                cpn_times.append(cpn_time)
                 cpnFlows.append(cpnFlow)
 
-        cpnTimes = np.array(cpnTimes)
+        cpn_times = np.array(cpn_times)
         cpnFlows = np.array(cpnFlows)
 
-        self._cpnTimes = cpnTimes
+        self._cpn_times = cpn_times
         self._cpnFlows = cpnFlows
 
         # Allow exercise on coupon dates but control this later for europeans
-        self._call_times = cpnTimes
+        self._call_times = cpn_times
 
-        dfTimes = discount_curve._times
+        df_times = discount_curve._times
         df_values = discount_curve._dfs
 
         face_amount = 1.0
-        strikePrice = 1.0 # Floating leg is assumed to price at par
+        strike_price = 1.0 # Floating leg is assumed to price at par
 
         #######################################################################
         # For both models, the tree needs to extend out to maturity because of
@@ -164,13 +164,13 @@ class FinIborBermudanSwaption(object):
 
         if isinstance(model, FinModelRatesBDT) or isinstance(model, FinModelRatesBK) or isinstance(model, FinModelRatesHW):
 
-            model.buildTree(tmat, dfTimes, df_values)
+            model.buildTree(tmat, df_times, df_values)
 
             v = model.bermudanSwaption(texp,
                                        tmat,
-                                       strikePrice,
+                                       strike_price,
                                        face_amount,
-                                       cpnTimes,
+                                       cpn_times,
                                        cpnFlows,
                                        self._exerciseType)
         else:
@@ -190,10 +190,10 @@ class FinIborBermudanSwaption(object):
 
         print("SWAP PV01:", self._pv01)
         
-        n = len(self._cpnTimes)
+        n = len(self._cpn_times)
         
         for i in range(0,n):
-            print("CPN TIME: ", self._cpnTimes[i], "FLOW", self._cpnFlows[i])
+            print("CPN TIME: ", self._cpn_times[i], "FLOW", self._cpnFlows[i])
 
         n = len(self._call_times)
 

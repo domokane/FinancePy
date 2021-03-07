@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
@@ -16,7 +16,7 @@ from ...market.discount.curve import DiscountCurve
 
 ##########################################################################
 
-class FinFloatLeg(object):
+class FinFloatLeg:
     """ Class for managing the floating leg of a swap. A float leg consists of
     a sequence of flows calculated according to an ISDA schedule and with a 
     coupon determined by an index curve which changes over life of the swap."""

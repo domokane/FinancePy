@@ -9,12 +9,12 @@ from os.path import dirname, join
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import FinCDSIndexPortfolio
-from financepy.products.credit.cds_basket import FinCDSBasket
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds_basket import CDSBasket
+from financepy.products.credit.cds import CDS
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.math import corrMatrixGenerator
@@ -115,17 +115,17 @@ def loadHomogeneousSpreadCurves(valuation_date,
 
     recovery_rate = 0.40
 
-    cds3Y = FinCDS(valuation_date, maturity3Y, cdsSpread3Y)
-    cds5Y = FinCDS(valuation_date, maturity5Y, cdsSpread5Y)
-    cds7Y = FinCDS(valuation_date, maturity7Y, cdsSpread7Y)
-    cds10Y = FinCDS(valuation_date, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(valuation_date, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(valuation_date, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(valuation_date, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(valuation_date, maturity10Y, cdsSpread10Y)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-    issuer_curve = FinCDSCurve(valuation_date,
-                              contracts,
-                              libor_curve,
-                              recovery_rate)
+    issuer_curve = CDSCurve(valuation_date,
+                            contracts,
+                            libor_curve,
+                            recovery_rate)
 
     issuer_curves = []
     for _ in range(0, num_credits):
@@ -160,16 +160,16 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = FinCDS(valuation_date, maturity3Y, spd3Y)
-        cds5Y = FinCDS(valuation_date, maturity5Y, spd5Y)
-        cds7Y = FinCDS(valuation_date, maturity7Y, spd7Y)
-        cds10Y = FinCDS(valuation_date, maturity10Y, spd10Y)
+        cds3Y = CDS(valuation_date, maturity3Y, spd3Y)
+        cds5Y = CDS(valuation_date, maturity5Y, spd5Y)
+        cds7Y = CDS(valuation_date, maturity7Y, spd7Y)
+        cds10Y = CDS(valuation_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = FinCDSCurve(valuation_date,
-                                  cds_contracts,
-                                  libor_curve,
-                                  recovery_rate)
+        issuer_curve = CDSCurve(valuation_date,
+                                cds_contracts,
+                                libor_curve,
+                                recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -188,7 +188,7 @@ def test_FinCDSBasket():
 
     basketMaturity = Date(20, 12, 2011)
 
-    cdsIndex = FinCDSIndexPortfolio()
+    cdsIndex = CDSIndexPortfolio()
 
 ##########################################################################
 
@@ -248,8 +248,8 @@ def test_FinCDSBasket():
     testCases.print("MAXIMUM SPD BASKET MATURITY", maxSpd)
 
     seed = 1967
-    basket = FinCDSBasket(valuation_date,
-                          basketMaturity)
+    basket = CDSBasket(valuation_date,
+                       basketMaturity)
 
     testCases.banner(
         "===================================================================")
@@ -367,18 +367,18 @@ def test_FinCDSBasket():
 
 def testFinGBMProcess():
 
-    numAssets = 3
+    num_assets = 3
     num_paths = 5
-    numTimeSteps = 1
+    num_time_steps = 1
     t = 1.0
-    mus = 0.03 * np.ones(numAssets)
-    stock_prices = 100.0 * np.ones(numAssets)
-    volatilities = 0.2 * np.ones(numAssets)
+    mus = 0.03 * np.ones(num_assets)
+    stock_prices = 100.0 * np.ones(num_assets)
+    volatilities = 0.2 * np.ones(num_assets)
     rho = 0.8
-    corrMatrix = corrMatrixGenerator(rho, numAssets)
+    corrMatrix = corrMatrixGenerator(rho, num_assets)
     seed = 1912
 
-    _ = getPathsAssets(numAssets, num_paths, numTimeSteps, t,
+    _ = getPathsAssets(num_assets, num_paths, num_time_steps, t,
                        mus, stock_prices, volatilities,
                        corrMatrix, seed)
 

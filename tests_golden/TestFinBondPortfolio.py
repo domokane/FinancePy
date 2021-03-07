@@ -46,7 +46,7 @@ def test_BondPortfolio():
                            coupon, freq_type, accrual_type)
 
             ytm = bond.yield_to_maturity(settlement, clean_price)
-            accrued_interest= bond._accruedInterest
+            accrued_interest= bond._accrued_interest
 
             testCases.print(accrual_type, maturityDt, coupon*100.0,
                             clean_price, accrued_interest, ytm*100.0)

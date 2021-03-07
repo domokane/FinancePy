@@ -8,7 +8,7 @@
 
 import numpy as np
 
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.day_count import DayCountTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
@@ -20,7 +20,7 @@ from ...products.rates.FinIborFRA import FinIborFRA
 ###############################################################################
 
 
-class FinIborFuture(object):
+class FinIborFuture:
     """ Class for managing short term interest rate futures contracts. """
 
     # Reference
@@ -45,14 +45,14 @@ class FinIborFuture(object):
         if futureTenor != "3M" and futureTenor != "3m":
             raise FinError("Only 3M IMM futures handled currently.")
 
-        self._deliveryDate = todayDate.nextIMMDate()
+        self._delivery_date = todayDate.nextIMMDate()
 
         for iFut in range(0, futureNumber - 1):
-            self._deliveryDate = self._deliveryDate.nextIMMDate()
+            self._delivery_date = self._delivery_date.nextIMMDate()
 
-        self._endOfInterestPeriod = self._deliveryDate.nextIMMDate()
+        self._endOfInterestPeriod = self._delivery_date.nextIMMDate()
 
-        self._lastTradingDate = self._deliveryDate.addDays(-2)
+        self._lastTradingDate = self._delivery_date.addDays(-2)
         self._accrual_type = accrual_type
         self._contractSize = contractSize
 
@@ -65,7 +65,7 @@ class FinIborFuture(object):
 
         fraRate = self.FRARate(futures_price, convexity)
 
-        fra = FinIborFRA(self._deliveryDate,
+        fra = FinIborFRA(self._delivery_date,
                           self._endOfInterestPeriod,
                           fraRate,
                           self._accrual_type,
@@ -136,7 +136,7 @@ class FinIborFuture(object):
         analytic calculations for the bond. """
         s = labelToString("OBJECT TYPE", type(self).__name__)
         s += labelToString("LAST TRADING DATE", self._lastTradingDate)
-        s += labelToString("DELIVERY DATE", self._deliveryDate)
+        s += labelToString("DELIVERY DATE", self._delivery_date)
         s += labelToString("END INTEREST PERIOD", self._endOfInterestPeriod)
         s += labelToString("ACCRUAL TYPE", self._accrual_type)
         s += labelToString("CONTRACT SIZE", self._contractSize)

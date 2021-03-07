@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.utils.math import accruedInterpolator
+from financepy.utils.math import accrued_interpolator
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -37,7 +37,7 @@ def test_FinMathAccdInterpolator():
     values = []
 
     for t in treeTimes:
-        v = accruedInterpolator(t, couponTimes, couponFlows)
+        v = accrued_interpolator(t, couponTimes, couponFlows)
         values.append(v)
 
     testCases.header("VALUE")

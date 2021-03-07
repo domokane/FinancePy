@@ -12,11 +12,11 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_types import FinOptionTypes
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.models.black_scholes import FinModelBlackScholesTypes
 
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
-from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.products.equity.equity_american_option import EquityAmericanOption
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -30,57 +30,57 @@ def testFinModelBlackScholes():
     valuation_date = Date(8, 5, 2015)
     expiry_date = Date(15, 1, 2016)
 
-    strikePrice = 130.0
+    strike_price = 130.0
     stock_price = 127.62
     volatility = 0.20
     interestRate = 0.001
     dividendYield = 0.0163
 
-    optionType = FinOptionTypes.AMERICAN_CALL
+    option_type = FinOptionTypes.AMERICAN_CALL
     euOptionType = FinOptionTypes.EUROPEAN_CALL
     
-    amOption = FinEquityAmericanOption(expiry_date, strikePrice,
-                                       optionType)
+    amOption = EquityAmericanOption(expiry_date, strike_price,
+                                       option_type)
     
-    ameuOption = FinEquityAmericanOption(expiry_date, strikePrice, 
+    ameuOption = EquityAmericanOption(expiry_date, strike_price,
                                          euOptionType)
     
-    euOption = FinEquityVanillaOption(expiry_date, strikePrice,
+    euOption = EquityVanillaOption(expiry_date, strike_price,
                                       euOptionType)
     
     discount_curve = DiscountCurveFlat(valuation_date, interestRate,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield,
+    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield,
                                       FrequencyTypes.CONTINUOUS,
                                       DayCountTypes.ACT_365F)
     
     num_steps_per_year = 400
     
-    modelTree = FinModelBlackScholes(volatility, 
-                                     FinModelBlackScholesTypes.CRR_TREE, 
-                                     num_steps_per_year)
+    modelTree = BlackScholes(volatility,
+                             FinModelBlackScholesTypes.CRR_TREE,
+                             num_steps_per_year)
     
     v = amOption.value(valuation_date, stock_price, discount_curve,
-                           dividendCurve, modelTree)
+                           dividend_curve, modelTree)
 #    print(v)
 
-    modelApprox = FinModelBlackScholes(volatility, 
-                                       FinModelBlackScholesTypes.BARONE_ADESI)
+    modelApprox = BlackScholes(volatility,
+                               FinModelBlackScholesTypes.BARONE_ADESI)
 
     v = amOption.value(valuation_date, stock_price, discount_curve,
-                       dividendCurve, modelApprox)
+                       dividend_curve, modelApprox)
 
 #    print(v)
 
     v = ameuOption.value(valuation_date, stock_price, discount_curve,
-                           dividendCurve, modelTree)
+                           dividend_curve, modelTree)
 
 #    print(v)
 
     v = euOption.value(valuation_date, stock_price, discount_curve,
-                         dividendCurve, modelTree)
+                         dividend_curve, modelTree)
 
 #    print(v)
 

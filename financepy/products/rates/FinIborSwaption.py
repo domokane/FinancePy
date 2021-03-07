@@ -19,7 +19,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
@@ -143,7 +143,7 @@ class FinIborSwaption():
         # For the tree models we need to generate a vector of the coupons
         #######################################################################
 
-        cpnTimes = [texp]
+        cpn_times = [texp]
         cpnFlows = [0.0]
 
         # The first flow is on the day after the expiry date
@@ -156,21 +156,21 @@ class FinIborSwaption():
             # Only flows occurring after option expiry are counted. 
             # Flows on the expiry date are not included
             if flowDate > self._exerciseDate:
-                cpnTime = (flowDate - valuation_date) / gDaysInYear
+                cpn_time = (flowDate - valuation_date) / gDaysInYear
                 cpnFlow = swap._fixed_leg._payments[iFlow] / self._notional
-                cpnTimes.append(cpnTime)
+                cpn_times.append(cpn_time)
                 cpnFlows.append(cpnFlow)
 
-        cpnTimes = np.array(cpnTimes)
+        cpn_times = np.array(cpn_times)
         cpnFlows = np.array(cpnFlows)
 
-        dfTimes = discount_curve._times
+        df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        if np.any(cpnTimes < 0.0):
+        if np.any(cpn_times < 0.0):
             raise FinError("No coupon times can be before the value date.")
 
-        strikePrice = 1.0
+        strike_price = 1.0
         face_amount = 1.0
 
         #######################################################################
@@ -214,11 +214,11 @@ class FinIborSwaption():
         elif isinstance(model, FinModelRatesHW):
 
             swaptionPx = model.europeanBondOptionJamshidian(texp,
-                                                  strikePrice,
+                                                  strike_price,
                                                   face_amount,
-                                                  cpnTimes,
+                                                  cpn_times,
                                                   cpnFlows,
-                                                  dfTimes,
+                                                  df_times,
                                                   df_values)
 
             if self._fixed_legType == FinSwapTypes.PAY:
@@ -234,12 +234,12 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBK):
 
-            model.buildTree(tmat, dfTimes, df_values)
+            model.buildTree(tmat, df_times, df_values)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
-                                                strikePrice,
+                                                strike_price,
                                                 face_amount,
-                                                cpnTimes,
+                                                cpn_times,
                                                 cpnFlows,
                                                 FinExerciseTypes.EUROPEAN)
 
@@ -252,12 +252,12 @@ class FinIborSwaption():
 
         elif isinstance(model, FinModelRatesBDT):
 
-            model.buildTree(tmat, dfTimes, df_values)
+            model.buildTree(tmat, df_times, df_values)
             swaptionPx = model.bermudanSwaption(texp,
                                                 tmat,
-                                                strikePrice,
+                                                strike_price,
                                                 face_amount,
-                                                cpnTimes,
+                                                cpn_times,
                                                 cpnFlows,
                                                 FinExerciseTypes.EUROPEAN)
 

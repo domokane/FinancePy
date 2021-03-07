@@ -40,8 +40,8 @@ def test_FinIborDepositsAndSwaps(valuationDate):
     depoBasis = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    spotDays = 0
-    settlementDate = valuationDate.addWeekDays(spotDays)
+    spot_days = 0
+    settlementDate = valuationDate.addWeekDays(spot_days)
     depositRate = 0.05
 
     depo1 = FinIborDeposit(settlementDate, "1M", depositRate, depoBasis)

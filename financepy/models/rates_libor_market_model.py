@@ -5,7 +5,7 @@
 import numpy as np
 from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
 
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 from ..utils.math import N
 from ..utils.math import norminvcdf
 from ..models.sobol import getUniformSobol

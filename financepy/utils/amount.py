@@ -10,7 +10,7 @@ from .math import ONE_MILLION
 ###############################################################################
 
 
-class FinAmount(object):
+class FinAmount:
     """ A FinAmount is a holder for an amount in a specific currency. """
 
     def __init__(self,

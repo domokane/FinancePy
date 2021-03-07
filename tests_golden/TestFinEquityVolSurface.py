@@ -8,7 +8,7 @@ sys.path.append("..")
 import numpy as np
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.market.volatility.FinEquityVolSurface import FinEquityVolSurface
+from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.utils.date import Date
 from financepy.models.volatility_fns import FinVolFunctionTypes
 
@@ -25,7 +25,7 @@ PLOT_GRAPHS = False
 # TODO: ADD LOGGING TO TEST CASES
 ###############################################################################
 
-def test_FinEquityVolSurface(verboseCalibration):
+def test_equity_vol_surface(verboseCalibration):
 
     valuation_date = Date(11, 1, 2021)
 
@@ -54,18 +54,18 @@ def test_FinEquityVolSurface(verboseCalibration):
     discount_curve = DiscountCurveFlat(valuation_date, r)
 
     q = 0.010  # USD
-    dividendCurve = DiscountCurveFlat(valuation_date, q)
+    dividend_curve = DiscountCurveFlat(valuation_date, q)
 
     volFunctionType = FinVolFunctionTypes.SVI
 
-    equitySurface = FinEquityVolSurface(valuation_date,
-                                        stock_price,
-                                        discount_curve,
-                                        dividendCurve,
-                                        expiry_dates,
-                                        strikes,
-                                        volSurface,
-                                        volFunctionType)
+    equitySurface = EquityVolSurface(valuation_date,
+                                     stock_price,
+                                     discount_curve,
+                                     dividend_curve,
+                                     expiry_dates,
+                                     strikes,
+                                     volSurface,
+                                     volFunctionType)
 
 #    tol = 1e-4
 #    equitySurface.checkCalibration(False, tol)
@@ -106,10 +106,10 @@ if __name__ == '__main__':
 
     verboseCalibration = False
 
-    test_FinEquityVolSurface(verboseCalibration)
+    test_equity_vol_surface(verboseCalibration)
     
     end = time.time()
     
     elapsed = end - start
-    print("Elapsed Time:", elapsed)
+#    print("Elapsed Time:", elapsed)
     testCases.compareTestCases()

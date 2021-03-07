@@ -6,7 +6,7 @@ from numba import njit
 import numpy as np
 import operator
 
-from .FinError import FinError
+from .error import FinError
 
 ###############################################################################
 ## from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/root_finding.html #####################

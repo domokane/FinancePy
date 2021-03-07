@@ -5,7 +5,7 @@
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.math import testMonotonicity

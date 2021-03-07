@@ -7,7 +7,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
+from financepy.products.equity.equity_basket_option import EquityBasketOption
 from financepy.utils.global_types import FinOptionTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.helpers import betaVectorToCorrMatrix
@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityBasketOption():
+def test_EquityBasketOption():
 
     import time
 
@@ -33,15 +33,15 @@ def test_FinEquityBasketOption():
     # Homogeneous Basket
     ##########################################################################
 
-    numAssets = 5
-    volatilities = np.ones(numAssets) * volatility
-    dividendYields = np.ones(numAssets) * 0.01
-    stockPrices = np.ones(numAssets) * 100
+    num_assets = 5
+    volatilities = np.ones(num_assets) * volatility
+    dividendYields = np.ones(num_assets) * 0.01
+    stockPrices = np.ones(num_assets) * 100
 
-    dividendCurves = []
+    dividend_curves = []
     for q in dividendYields:
-        dividendCurve = FinDiscountCurveFlat(valueDate, q)
-        dividendCurves.append(dividendCurve)
+        dividend_curve = FinDiscountCurveFlat(valueDate, q)
+        dividend_curves.append(dividend_curve)
 
     betaList = np.linspace(0.0, 0.999999, 11)
 
@@ -49,9 +49,9 @@ def test_FinEquityBasketOption():
 
     for beta in betaList:
         for numPaths in [10000]:
-            callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
-            betas = np.ones(numAssets) * beta
+            callOption = EquityBasketOption(
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
+            betas = np.ones(num_assets) * beta
             corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
@@ -59,15 +59,15 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix)
 
-            vMC = callOption.valueMC(
+            vMC = callOption.value_mc(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -79,15 +79,15 @@ def test_FinEquityBasketOption():
     # INHomogeneous Basket
     ##########################################################################
 
-    numAssets = 5
+    num_assets = 5
     volatilities = np.array([0.3, 0.2, 0.25, 0.22, 0.4])
     dividendYields = np.array([0.01, 0.02, 0.04, 0.01, 0.02])
     stockPrices = np.array([100, 105, 120, 100, 90])
 
-    dividendCurves = []
+    dividend_curves = []
     for q in dividendYields:
-        dividendCurve = FinDiscountCurveFlat(valueDate, q)
-        dividendCurves.append(dividendCurve)
+        dividend_curve = FinDiscountCurveFlat(valueDate, q)
+        dividend_curves.append(dividend_curve)
 
     betaList = np.linspace(0.0, 0.999999, 11)
 
@@ -97,9 +97,9 @@ def test_FinEquityBasketOption():
 
         for numPaths in [10000]:
 
-            callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, numAssets)
-            betas = np.ones(numAssets) * beta
+            callOption = EquityBasketOption(
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
+            betas = np.ones(num_assets) * beta
             corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
@@ -108,15 +108,15 @@ def test_FinEquityBasketOption():
                     valueDate,
                     stockPrices,
                     discountCurve,
-                    dividendCurves,
+                    dividend_curves,
                     volatilities,
                     corrMatrix)
 
-            vMC = callOption.valueMC(
+            vMC = callOption.value_mc(
                     valueDate,
                     stockPrices,
                     discountCurve,
-                    dividendCurves,
+                    dividend_curves,
                     volatilities,
                     corrMatrix,
                     numPaths)
@@ -129,24 +129,24 @@ def test_FinEquityBasketOption():
     # Homogeneous Basket
     ##########################################################################
 
-    numAssets = 5
-    volatilities = np.ones(numAssets) * volatility
-    dividendYields = np.ones(numAssets) * 0.01
-    stockPrices = np.ones(numAssets) * 100
+    num_assets = 5
+    volatilities = np.ones(num_assets) * volatility
+    dividendYields = np.ones(num_assets) * 0.01
+    stockPrices = np.ones(num_assets) * 100
     betaList = np.linspace(0.0, 0.999999, 11)
 
-    dividendCurves = []
+    dividend_curves = []
     for q in dividendYields:
-        dividendCurve = FinDiscountCurveFlat(valueDate, q)
-        dividendCurves.append(dividendCurve)
+        dividend_curve = FinDiscountCurveFlat(valueDate, q)
+        dividend_curves.append(dividend_curve)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
 
     for beta in betaList:
         for numPaths in [10000]:
-            callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
-            betas = np.ones(numAssets) * beta
+            callOption = EquityBasketOption(
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
+            betas = np.ones(num_assets) * beta
             corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
@@ -154,14 +154,14 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix)
-            vMC = callOption.valueMC(
+            vMC = callOption.value_mc(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -173,16 +173,16 @@ def test_FinEquityBasketOption():
     # INHomogeneous Basket
     ##########################################################################
 
-    numAssets = 5
+    num_assets = 5
     volatilities = np.array([0.3, 0.2, 0.25, 0.22, 0.4])
     dividendYields = np.array([0.01, 0.02, 0.04, 0.01, 0.02])
     stockPrices = np.array([100, 105, 120, 100, 90])
     betaList = np.linspace(0.0, 0.999999, 11)
 
-    dividendCurves = []
+    dividend_curves = []
     for q in dividendYields:
-        dividendCurve = FinDiscountCurveFlat(valueDate, q)
-        dividendCurves.append(dividendCurve)
+        dividend_curve = FinDiscountCurveFlat(valueDate, q)
+        dividend_curves.append(dividend_curve)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
 
@@ -190,9 +190,9 @@ def test_FinEquityBasketOption():
 
         for numPaths in [10000]:
 
-            callOption = FinEquityBasketOption(
-                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, numAssets)
-            betas = np.ones(numAssets) * beta
+            callOption = EquityBasketOption(
+                expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
+            betas = np.ones(num_assets) * beta
             corrMatrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
@@ -200,14 +200,14 @@ def test_FinEquityBasketOption():
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix)
-            vMC = callOption.valueMC(
+            vMC = callOption.value_mc(
                 valueDate,
                 stockPrices,
                 discountCurve,
-                dividendCurves,
+                dividend_curves,
                 volatilities,
                 corrMatrix,
                 numPaths)
@@ -219,5 +219,5 @@ def test_FinEquityBasketOption():
 ###############################################################################
 
 
-test_FinEquityBasketOption()
+test_EquityBasketOption()
 testCases.compareTestCases()

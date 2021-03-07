@@ -20,7 +20,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
 from financepy.market.discount.curve_zeros import DiscountCurveZeros
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
-from financepy.utils.helpers import printTree
+from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -90,7 +90,7 @@ def test_BDTExampleOne():
 
     yieldVol = 0.16
 
-    numTimeSteps = 5
+    num_time_steps = 5
     tmat = years[-1]
     dfs = curve.df(zeroDates)
 
@@ -100,7 +100,7 @@ def test_BDTExampleOne():
     years = np.array(years)
     dfs = np.array(dfs)
 
-    model = FinModelRatesBDT(yieldVol, numTimeSteps)
+    model = FinModelRatesBDT(yieldVol, num_time_steps)
     model.buildTree(tmat, years, dfs)
 
 ###############################################################################
@@ -144,7 +144,7 @@ def test_BDTExampleTwo():
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
 
-    strikePrice = 105.0
+    strike_price = 105.0
     face = 100.0
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
@@ -169,10 +169,10 @@ def test_BDTExampleTwo():
 
     testCases.header("Values")
     treeVector = []
-    for numTimeSteps in numStepsList:
-        model = FinModelRatesBDT(sigma, numTimeSteps)
+    for num_time_steps in numStepsList:
+        model = FinModelRatesBDT(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
-        v = model.bondOption(texp, strikePrice,
+        v = model.bondOption(texp, strike_price,
                              face, couponTimes, couponFlows, exerciseType)
 
         testCases.print(v)
@@ -185,9 +185,9 @@ def test_BDTExampleTwo():
 
     if 1 == 0:
         print("RT")
-        printTree(model._rt, 5)
+        print_tree(model._rt, 5)
         print("Q")
-        printTree(model._Q, 5)
+        print_tree(model._Q, 5)
 
 ###############################################################################
 
@@ -211,10 +211,10 @@ def test_BDTExampleThree():
     coupon = 0.06
     freqType = FinFrequencyTypes.SEMI_ANNUAL
     accrualType = FinDayCountTypes.ACT_ACT_ICMA
-    strikePrice = 100.0
+    strike_price = 100.0
     face = 100.0
     # Andersen paper
-    numTimeSteps = 200
+    num_time_steps = 200
 
     testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", 
                      "V_Fixed", "V_pay", "V_rec")
@@ -257,12 +257,12 @@ def test_BDTExampleThree():
 
                 price = bond.cleanPriceFromDiscountCurve(settlementDate, curve)
 
-                model = FinModelRatesBDT(sigma, numTimeSteps)
+                model = FinModelRatesBDT(sigma, num_time_steps)
                 model.buildTree(tmat, times, dfs)
 
                 v = model.bermudanSwaption(texp,
                                            tmat,
-                                           strikePrice,
+                                           strike_price,
                                            face,
                                            couponTimes,
                                            couponFlows,
@@ -270,7 +270,7 @@ def test_BDTExampleThree():
 
                 testCases.print("%s" % exerciseType,
                                 "%9.5f" % sigma,
-                                "%9.5f" % numTimeSteps,
+                                "%9.5f" % num_time_steps,
                                 "%9.5f" % expiryYears,
                                 "%9.5f" % maturityYears,
                                 "%9.5f" % price,

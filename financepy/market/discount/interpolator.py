@@ -4,7 +4,7 @@
 
 from numba import njit, float64, int64
 import numpy as np
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 
 

@@ -10,7 +10,7 @@ import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY
 from ..utils.global_vars import gDaysInYear
 from ..utils.global_types import FinOptionTypes
 from ..utils.math import norminvcdf
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 ##########################################################################
 # Heston Process
@@ -176,7 +176,7 @@ class FinModelHeston():
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
-        K = option._strikePrice
+        K = option._strike_price
         dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
@@ -194,9 +194,9 @@ class FinModelHeston():
                           seed,
                           schemeValue)
 
-        if option._optionType == FinOptionTypes.EUROPEAN_CALL:
+        if option._option_type == FinOptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(sPaths[:, -1] - K, 0.0)
-        elif option._optionType == FinOptionTypes.EUROPEAN_PUT:
+        elif option._option_type == FinOptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - sPaths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
@@ -225,7 +225,7 @@ class FinModelHeston():
         r = interestRate
         q = dividendYield
         S0 = stock_price
-        K = option._strikePrice
+        K = option._strike_price
         F = S0 * exp((r - q) * tau)
         V = sigma * sigma
 
@@ -289,7 +289,7 @@ class FinModelHeston():
 
         S0 = stock_price
         F = S0 * exp((r - q) * tau)
-        K = option._strikePrice
+        K = option._strike_price
         X = log(F / K)
         integral = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
         v = S0 * exp(-q * tau) - K * exp(-r * tau) * integral
@@ -317,7 +317,7 @@ class FinModelHeston():
         q = dividendYield
         r = interestRate
         S0 = stock_price
-        K = option._strikePrice
+        K = option._strike_price
         V = sigma**2
 
         def F(s, b):
@@ -363,7 +363,7 @@ class FinModelHeston():
         q = dividendYield
         r = interestRate
         S0 = stock_price
-        K = option._strikePrice
+        K = option._strike_price
         F = S0 * exp((r - q) * tau)
         x0 = log(F / K)
 

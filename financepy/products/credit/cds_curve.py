@@ -6,7 +6,7 @@ import numpy as np
 import scipy.optimize as optimize
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
 from ...market.discount.interpolator import _uinterpolate, FinInterpTypes
 from ...utils.helpers import input_time, tableToString
@@ -30,13 +30,13 @@ def f(q, *args):
     self._values[num_points - 1] = q
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    objFn = cds.value(valuation_date, self)['clean_pv']
-    return objFn
+    obj_fn = cds.value(valuation_date, self)['clean_pv']
+    return obj_fn
 
 ###############################################################################
 
 
-class FinCDSCurve():
+class CDSCurve:
     """ Generate a survival probability curve implied by the value of CDS
     contracts given a Ibor curve and an assumed recovery rate. A scheme for
     the interpolation of the survival probabilities is also required. """
@@ -46,7 +46,7 @@ class FinCDSCurve():
                  cds_contracts: list,
                  libor_curve,
                  recovery_rate: float = 0.40,
-                 useCache: bool = False,
+                 use_cache: bool = False,
                  interpolation_method: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
         """ Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the

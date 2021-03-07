@@ -36,9 +36,9 @@ class FinModelBlackShifted():
 ###############################################################################
 
     def value(self,
-              forwardRate,   # Forward rate
+              forward_rate,   # Forward rate
               strikeRate,    # Strike Rate
-              timeToExpiry,  # time to expiry in years
+              time_to_expiry,  # time to expiry in years
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
         """ Price a derivative using Black's model which values in the forward
@@ -46,8 +46,8 @@ class FinModelBlackShifted():
         same as Matlab. """
 
         s = self._shift
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         sqrtT = np.sqrt(t)
         vol = self._volatility

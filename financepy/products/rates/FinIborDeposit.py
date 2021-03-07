@@ -3,7 +3,7 @@
 ##############################################################################
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
@@ -14,7 +14,7 @@ from ...utils.helpers import labelToString, check_argument_types
 ###############################################################################
 
 
-class FinIborDeposit(object):
+class FinIborDeposit:
     """ An Ibor deposit is an agreement to borrow money interbank at the Ibor
     fixing rate starting on the start date and repaid on the maturity date
     with the interest amount calculated according to a day count convention and
@@ -111,7 +111,7 @@ class FinIborDeposit(object):
 
     ###########################################################################
 
-    def printFlows(self,
+    def print_flows(self,
                    valuation_date: Date):
         """ Print the date and size of the future repayment. """
 

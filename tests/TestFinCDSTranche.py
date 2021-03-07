@@ -9,12 +9,12 @@ import sys
 sys.path.append("..")
 
 from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
-from financepy.products.credit.cds_index_portfolio import FinCDSIndexPortfolio
-from financepy.products.credit.cds_tranche import FinCDSTranche
-from financepy.products.credit.cds import FinCDS
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds_tranche import CDSTranche
+from financepy.products.credit.cds import CDS
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -113,17 +113,17 @@ def loadHomogeneousCDSCurves(valuationDate,
 
     recoveryRate = 0.40
 
-    cds3Y = FinCDS(valuationDate, maturity3Y, cdsSpread3Y)
-    cds5Y = FinCDS(valuationDate, maturity5Y, cdsSpread5Y)
-    cds7Y = FinCDS(valuationDate, maturity7Y, cdsSpread7Y)
-    cds10Y = FinCDS(valuationDate, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(valuationDate, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(valuationDate, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(valuationDate, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(valuationDate, maturity10Y, cdsSpread10Y)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-    issuerCurve = FinCDSCurve(valuationDate,
-                              contracts,
-                              liborCurve,
-                              recoveryRate)
+    issuerCurve = CDSCurve(valuationDate,
+                           contracts,
+                           liborCurve,
+                           recoveryRate)
 
     issuerCurves = []
     for _ in range(0, numCredits):
@@ -155,16 +155,16 @@ def loadHeterogeneousSpreadCurves(valuationDate, liborCurve):
         spd10Y = float(splitRow[4]) / 10000.0
         recoveryRate = float(splitRow[5])
 
-        cds3Y = FinCDS(valuationDate, maturity3Y, spd3Y)
-        cds5Y = FinCDS(valuationDate, maturity5Y, spd5Y)
-        cds7Y = FinCDS(valuationDate, maturity7Y, spd7Y)
-        cds10Y = FinCDS(valuationDate, maturity10Y, spd10Y)
+        cds3Y = CDS(valuationDate, maturity3Y, spd3Y)
+        cds5Y = CDS(valuationDate, maturity5Y, spd5Y)
+        cds7Y = CDS(valuationDate, maturity7Y, spd7Y)
+        cds10Y = CDS(valuationDate, maturity10Y, spd10Y)
         cdsContracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuerCurve = FinCDSCurve(valuationDate,
-                                  cdsContracts,
-                                  liborCurve,
-                                  recoveryRate)
+        issuerCurve = CDSCurve(valuationDate,
+                               cdsContracts,
+                               liborCurve,
+                               recoveryRate)
 
         issuerCurves.append(issuerCurve)
 
@@ -187,13 +187,13 @@ def test_FinCDSTranche():
     liborCurve = buildIborCurve(tradeDate)
 
     trancheMaturity = FinDate(20, 12, 2011)
-    tranche1 = FinCDSTranche(valuationDate, trancheMaturity, 0.00, 0.03)
-    tranche2 = FinCDSTranche(valuationDate, trancheMaturity, 0.03, 0.06)
-    tranche3 = FinCDSTranche(valuationDate, trancheMaturity, 0.06, 0.09)
-    tranche4 = FinCDSTranche(valuationDate, trancheMaturity, 0.09, 0.12)
-    tranche5 = FinCDSTranche(valuationDate, trancheMaturity, 0.12, 0.22)
-    tranche6 = FinCDSTranche(valuationDate, trancheMaturity, 0.22, 0.60)
-    tranche7 = FinCDSTranche(valuationDate, trancheMaturity, 0.00, 0.60)
+    tranche1 = CDSTranche(valuationDate, trancheMaturity, 0.00, 0.03)
+    tranche2 = CDSTranche(valuationDate, trancheMaturity, 0.03, 0.06)
+    tranche3 = CDSTranche(valuationDate, trancheMaturity, 0.06, 0.09)
+    tranche4 = CDSTranche(valuationDate, trancheMaturity, 0.09, 0.12)
+    tranche5 = CDSTranche(valuationDate, trancheMaturity, 0.12, 0.22)
+    tranche6 = CDSTranche(valuationDate, trancheMaturity, 0.22, 0.60)
+    tranche7 = CDSTranche(valuationDate, trancheMaturity, 0.00, 0.60)
     tranches = [
         tranche1,
         tranche2,
@@ -208,7 +208,7 @@ def test_FinCDSTranche():
     upfront = 0.0
     spd = 0.0
 
-    cdsIndex = FinCDSIndexPortfolio()
+    cdsIndex = CDSIndexPortfolio()
 
 ##########################################################################
 

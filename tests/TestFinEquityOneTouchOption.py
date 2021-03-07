@@ -5,10 +5,10 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.FinEquityOneTouchOption import FinEquityOneTouchOption
-from financepy.products.equity.FinEquityOneTouchOption import FinTouchOptionPayoffTypes
+from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
+from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -17,7 +17,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityOneTouchOption():
+def test_EquityOneTouchOption():
     # Examples Haug Page 180 Table 4-22
     # Agreement not exact at t is not exactly 0.50
 
@@ -25,14 +25,14 @@ def test_FinEquityOneTouchOption():
     expiryDate = FinDate(2, 7, 2016)
     interestRate = 0.10
     volatility = 0.20
-    barrierLevel = 100.0  # H
-    model = FinModelBlackScholes(volatility)
+    barrier_level = 100.0  # H
+    model = BlackScholes(volatility)
     dividendYield = 0.03
     numPaths = 10000
     numStepsPerYear = 252
 
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    dividend_curve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     stockPrice = 105.0
     paymentSize = 15.0
@@ -47,21 +47,21 @@ def test_FinEquityOneTouchOption():
 
     for downType in downTypes:
 
-        option = FinEquityOneTouchOption(expiryDate,
+        option = EquityOneTouchOption(expiryDate,
                                          downType,
-                                         barrierLevel,
+                                         barrier_level,
                                          paymentSize)
 
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendCurve,
+                         dividend_curve,
                          model)
 
-        v_mc = option.valueMC(valueDate,
+        v_mc = option.value_mc(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendCurve,
+                              dividend_curve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -81,21 +81,21 @@ def test_FinEquityOneTouchOption():
 
     for upType in upTypes:
 
-        option = FinEquityOneTouchOption(expiryDate,
+        option = EquityOneTouchOption(expiryDate,
                                          upType,
-                                         barrierLevel,
+                                         barrier_level,
                                          paymentSize)
 
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendCurve,
+                         dividend_curve,
                          model)
 
-        v_mc = option.valueMC(valueDate,
+        v_mc = option.value_mc(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendCurve,
+                              dividend_curve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -117,20 +117,20 @@ def test_FinEquityOneTouchOption():
     testCases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
 
-        option = FinEquityOneTouchOption(expiryDate,
+        option = EquityOneTouchOption(expiryDate,
                                          downType,
-                                         barrierLevel)
+                                         barrier_level)
 
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendCurve,
+                         dividend_curve,
                          model)
 
-        v_mc = option.valueMC(valueDate,
+        v_mc = option.value_mc(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendCurve,
+                              dividend_curve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -147,20 +147,20 @@ def test_FinEquityOneTouchOption():
 
     for upType in upTypes:
 
-        option = FinEquityOneTouchOption(expiryDate,
+        option = EquityOneTouchOption(expiryDate,
                                          upType,
-                                         barrierLevel)
+                                         barrier_level)
 
         v = option.value(valueDate,
                          stockPrice,
                          discountCurve,
-                         dividendCurve,
+                         dividend_curve,
                          model)
 
-        v_mc = option.valueMC(valueDate,
+        v_mc = option.value_mc(valueDate,
                               stockPrice,
                               discountCurve,
-                              dividendCurve,
+                              dividend_curve,
                               model,
                               numStepsPerYear,
                               numPaths)
@@ -172,5 +172,5 @@ def test_FinEquityOneTouchOption():
 ###############################################################################
 
 
-test_FinEquityOneTouchOption()
+test_EquityOneTouchOption()
 testCases.compareTestCases()

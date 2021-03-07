@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gSmall
-from ...utils.FinError import FinError
+from ...utils.error import FinError
 from ...market.discount.curve import DiscountCurve
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import labelToString

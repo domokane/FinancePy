@@ -51,7 +51,7 @@
 # ###############################################################################
 
 
-# class FinIborBermudanSwaption(object):
+# class FinIborBermudanSwaption
 #     """ Class for fixed coupon bonds with embedded call or put optionality. """
 
 #     def __init__(self,
@@ -157,18 +157,18 @@
 #                             self._date_gen_rule_type)
 
 #         swap.generateFlows()
-#         cpnTimes = []
-#         cpnAmounts = []
+#         cpn_times = []
+#         cpn_amounts = []
 
 #         for iFlow in range(1, len(self._swap._adjustedFixedDates)):
 #             flowDate= swap._adjustedFixedDates[iFlow]
-#             cpnTime = (flowDate - settlement_date) / gDaysInYear
+#             cpn_time = (flowDate - settlement_date) / gDaysInYear
 #             cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
-#             cpnTimes.append(cpnTime)
-#             cpnAmounts.append(cpnFlow)
+#             cpn_times.append(cpn_time)
+#             cpn_amounts.append(cpnFlow)
 
-#         cpnTimes = np.array(cpnTimes)
-#         cpnAmounts = np.array(cpnAmounts)
+#         cpn_times = np.array(cpn_times)
+#         cpn_amounts = np.array(cpn_amounts)
 
 #         # Generate bond call times and prices
 #         call_times = []
@@ -197,7 +197,7 @@
 
 #         maturity_date = self._bond._maturity_date
 #         tmat = (maturity_date - settlement_date) / gDaysInYear
-#         dfTimes = discount_curve._times
+#         df_times = discount_curve._times
 #         df_values = discount_curve._values
 
 #         face = self._bond._face
@@ -208,16 +208,16 @@
 #             more precise we only need to go out the the last option date but
 #             we can do that refinement at a later date. """
 
-#             model.buildTree(tmat, dfTimes, df_values)
-#             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+#             model.buildTree(tmat, df_times, df_values)
+#             v1 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
-#             model._numTimeSteps += 1
-#             model.buildTree(tmat, dfTimes, df_values)
-#             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+#             model._num_time_steps += 1
+#             model.buildTree(tmat, df_times, df_values)
+#             v2 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
-#             model._numTimeSteps -= 1
+#             model._num_time_steps -= 1
 
 #             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
 #             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
@@ -229,18 +229,18 @@
 #             """ Because we not have a closed form bond price we need to build
 #             the tree out to the bond maturity which is after option expiry. """
 
-#             model.buildTree(tmat, dfTimes, df_values)
-#             v1 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+#             model.buildTree(tmat, df_times, df_values)
+#             v1 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
-#             model._numTimeSteps += 1
-#             model.buildTree(tmat, dfTimes, df_values)
-#             v2 = model.callablePuttableBond_Tree(cpnTimes, cpnAmounts,
+#             model._num_time_steps += 1
+#             model.buildTree(tmat, df_times, df_values)
+#             v2 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
-#             model._numTimeSteps -= 1
+#             model._num_time_steps -= 1
 
 #             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
 #             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2

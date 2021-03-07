@@ -35,12 +35,12 @@ def test_FinProcessSimulator():
     stock_price = 100.0
     drift = 0.04
     scheme = FinGBMNumericalScheme.NORMAL
-    modelParams = (stock_price, drift, sigma, scheme)
+    model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.GBM,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -57,12 +57,12 @@ def test_FinProcessSimulator():
     stock_price = 100.0
     drift = 0.04
     scheme = FinGBMNumericalScheme.ANTITHETIC
-    modelParams = (stock_price, drift, sigma, scheme)
+    model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.GBM,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -81,12 +81,12 @@ def test_FinProcessSimulator():
     sigma = 0.90
     rho = -0.9
     scheme = FinHestonNumericalScheme.EULER
-    modelParams = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
+    model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.HESTON,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -105,12 +105,12 @@ def test_FinProcessSimulator():
     sigma = 0.90
     rho = -0.9
     scheme = FinHestonNumericalScheme.EULERLOG
-    modelParams = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
+    model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.HESTON,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -129,12 +129,12 @@ def test_FinProcessSimulator():
     sigma = 0.90
     rho = -0.9
     scheme = FinHestonNumericalScheme.QUADEXP
-    modelParams = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
+    model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.HESTON,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -151,12 +151,12 @@ def test_FinProcessSimulator():
     theta = 0.05
     sigma = 0.90
     scheme = FinVasicekNumericalScheme.NORMAL
-    modelParams = (r0, kappa, theta, sigma, scheme)
+    model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.VASICEK,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -173,12 +173,12 @@ def test_FinProcessSimulator():
     theta = 0.05
     sigma = 0.90
     scheme = FinVasicekNumericalScheme.ANTITHETIC
-    modelParams = (r0, kappa, theta, sigma, scheme)
+    model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.VASICEK,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)
@@ -195,12 +195,12 @@ def test_FinProcessSimulator():
     theta = 0.05
     sigma = 0.90
     scheme = FinCIRNumericalScheme.MILSTEIN
-    modelParams = (r0, kappa, theta, sigma, scheme)
+    model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.getProcess(
         FinProcessTypes.CIR,
         t,
-        modelParams,
+        model_params,
         numAnnSteps,
         num_paths,
         seed)

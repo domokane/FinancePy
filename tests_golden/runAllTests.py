@@ -9,7 +9,7 @@ sys.path.append("..")
 import glob
 from os.path import dirname, basename, join
 
-from financepy.utils.FinError import FinError
+from financepy.utils.error import FinError
 from financepy.utils.date import setDateFormatType, DateFormatTypes
 setDateFormatType(DateFormatTypes.UK_LONG)
 

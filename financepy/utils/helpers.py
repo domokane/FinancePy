@@ -8,7 +8,7 @@ from numba import njit, float64
 from typing import Union
 from .date import Date
 from .global_vars import gDaysInYear, gSmall
-from .FinError import FinError
+from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
 ###############################################################################
@@ -40,9 +40,9 @@ def betaVectorToCorrMatrix(betas):
     """ Convert a one-factor vector of factor weights to a square correlation
     matrix. """
 
-    numAssets = len(betas)
-    correlation = np.ones(shape=(numAssets, numAssets))
-    for i in range(0, numAssets):
+    num_assets = len(betas)
+    correlation = np.ones(shape=(num_assets, num_assets))
+    for i in range(0, num_assets):
         for j in range(0, i):
             c = betas[i] * betas[j]
             correlation[i, j] = c
@@ -178,7 +178,7 @@ def dump(obj):
 ###############################################################################
 
 
-def printTree(array: np.ndarray,
+def print_tree(array: np.ndarray,
               depth: int = None):
     """ Function that prints a binomial or trinonial tree to screen for the
     purpose of debugging. """
@@ -211,7 +211,7 @@ def input_time(dt: Date,
     def check(t):
         if t < 0.0:
             raise FinError("Date " + str(dt) +
-                           " is before curve date " + str(curve._curveDate))
+                           " is before curve date " + str(curve._curve_date))
         elif t < small:
             t = small
         return t
@@ -428,11 +428,11 @@ def accruedTree(gridTimes: np.ndarray,
 
     for iGrid in range(1, numGridTimes):
 
-        cpnTime = gridTimes[iGrid]
+        cpn_time = gridTimes[iGrid]
         cpnFlow = gridFlows[iGrid]
 
         if gridFlows[iGrid] > gSmall:
-            coupon_times = np.append(coupon_times, cpnTime)
+            coupon_times = np.append(coupon_times, cpn_time)
             coupon_flows = np.append(coupon_flows, cpnFlow)
 
     numCoupons = len(coupon_times)

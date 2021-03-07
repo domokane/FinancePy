@@ -10,9 +10,9 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import FinOptionTypes
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -31,14 +31,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     dividendYield = 0.01
     seed = 1999
 
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interestRate)
 
     useSobolInt = int(useSobol)
     
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    callOption = FinEquityVanillaOption(expiry_date, 100.0, 
+    callOption = EquityVanillaOption(expiry_date, 100.0, 
                                         FinOptionTypes.EUROPEAN_CALL)
 
     value = callOption.value(valuation_date, stock_price, discount_curve,
@@ -60,14 +60,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NONUMBA_NONUMPY(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NONUMBA_NONUMPY(valuation_date, stock_price, discount_curve,
                                       dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NONUMBA_NONUMPY_v.append(valueMC)
+        NONUMBA_NONUMPY_v.append(value_mc)
         NONUMBA_NONUMPY_t.append(duration+1e-10)
 
     NUMPY_ONLY_v = []
@@ -77,14 +77,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_ONLY(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMPY_ONLY(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMPY_ONLY_v.append(valueMC)
+        NUMPY_ONLY_v.append(value_mc)
         NUMPY_ONLY_t.append(duration+1e-10)
 
 #    speedUp = np.array(NONUMBA_NONUMPY_t)/np.array(NUMPY_ONLY_t)
@@ -128,14 +128,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_ONLY(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMPY_ONLY(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMPY_ONLY_v.append(valueMC)
+        NUMPY_ONLY_v.append(value_mc)
         NUMPY_ONLY_t.append(duration)
 
     NUMBA_NUMPY_v = []
@@ -145,14 +145,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMPY_NUMBA(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMPY_NUMBA(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_NUMPY_v.append(valueMC)
+        NUMBA_NUMPY_v.append(value_mc)
         NUMBA_NUMPY_t.append(duration)
 
     NUMBA_ONLY_v = []
@@ -162,14 +162,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_ONLY(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMBA_ONLY(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_ONLY_v.append(valueMC)
+        NUMBA_ONLY_v.append(value_mc)
         NUMBA_ONLY_t.append(duration)
 
     NUMBA_PARALLEL_v = []
@@ -179,14 +179,14 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_PARALLEL(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMBA_PARALLEL(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_PARALLEL_v.append(valueMC)
+        NUMBA_PARALLEL_v.append(value_mc)
         NUMBA_PARALLEL_t.append(duration)
 
 #    speedUp = np.array(NUMBA_ONLY_t)/np.array(NUMBA_PARALLEL_t)
@@ -261,14 +261,14 @@ def test_FinNumbaNumbaParallel(useSobol):
     dividendYield = 0.01
     seed = 2021
 
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interestRate)
 
     useSobolInt = int(useSobol)
     
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    callOption = FinEquityVanillaOption(expiry_date, 100.0, 
+    callOption = EquityVanillaOption(expiry_date, 100.0, 
                                         FinOptionTypes.EUROPEAN_CALL)
 
     value = callOption.value(valuation_date, stock_price, discount_curve,
@@ -286,14 +286,14 @@ def test_FinNumbaNumbaParallel(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_ONLY(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMBA_ONLY(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_ONLY_v.append(valueMC)
+        NUMBA_ONLY_v.append(value_mc)
         NUMBA_ONLY_t.append(duration)
 
     NUMBA_PARALLEL_v = []
@@ -303,14 +303,14 @@ def test_FinNumbaNumbaParallel(useSobol):
     for num_paths in num_pathsList:
 
         start = time.time()
-        valueMC = callOption.valueMC_NUMBA_PARALLEL(valuation_date, stock_price, discount_curve,
+        value_mc = callOption.value_mc_NUMBA_PARALLEL(valuation_date, stock_price, discount_curve,
                                      dividendYield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
 
-        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, valueMC, duration))
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_PARALLEL_v.append(valueMC)
+        NUMBA_PARALLEL_v.append(value_mc)
         NUMBA_PARALLEL_t.append(duration)
 
     ###########################################################################

@@ -6,7 +6,7 @@ import numpy as np
 from numba import njit, float64
 
 from ..utils.math import N
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 
 ###############################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
@@ -66,12 +66,12 @@ def volFunctionBloomberg(params, f, k, t):
     coefficient i.e. sigma(K) = a * D * D + b * D + c where a = params[0], 
     b = params[1], c = params[2] and D is the spot delta."""
  
-    numParams = len(params)
+    num_params = len(params)
 
     # Rather than pass in the ATM vol, I imply it from the delta=0.50 curve
     sigma = 0.0
     for i in range(0, len(params)):
-        pwr = numParams - i - 1
+        pwr = num_params - i - 1
         sigma += params[i] * ((0.50) ** pwr)
 
     vsqrtt = sigma * np.sqrt(t)
@@ -81,7 +81,7 @@ def volFunctionBloomberg(params, f, k, t):
 
     v = 0.0
     for i in range(0, len(params)):
-        pwr = numParams - i - 1
+        pwr = num_params - i - 1
         v += params[i] * (delta ** pwr)
 
     return v

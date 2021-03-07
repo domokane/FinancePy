@@ -7,7 +7,7 @@ from numba import njit, float64
 from scipy.optimize import minimize
 
 from ..utils.global_types import FinOptionTypes
-from ..utils.FinError import FinError
+from ..utils.error import FinError
 from ..utils.math import N
 from ..utils.helpers import labelToString
 
@@ -132,16 +132,16 @@ class FinModelSABRShifted():
 ###############################################################################
 
     def value(self,
-              forwardRate,   # Forward rate F
+              forward_rate,   # Forward rate F
               strikeRate,    # Strike Rate K
-              timeToExpiry,  # Time to Expiry (years)
+              time_to_expiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               callOrPut):    # Call or put
         """ Price an option using Black's model which values in the forward
         measure following a change of measure. """
 
-        f = forwardRate
-        t = timeToExpiry
+        f = forward_rate
+        t = time_to_expiry
         k = strikeRate
         sqrtT = np.sqrt(t)
         vol = self.blackVol(f, k, t)
@@ -158,17 +158,17 @@ class FinModelSABRShifted():
 
 ###############################################################################
 
-    def setAlphaFromBlackVol(self, blackVol, forward, strike, timeToExpiry):
+    def setAlphaFromBlackVol(self, blackVol, forward, strike, time_to_expiry):
         """ Estimate the value of the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver. """
 
-        texp = timeToExpiry
+        texp = time_to_expiry
         f = forward
         K = strike
 
         # The starting point is based on assuming that the strike is ATM
-        self.setAlphaFromATMBlackVol(blackVol, strike, timeToExpiry)
+        self.setAlphaFromATMBlackVol(blackVol, strike, time_to_expiry)
 
         initAlpha = self._alpha
 
@@ -186,7 +186,7 @@ class FinModelSABRShifted():
 
 ###############################################################################
 
-    def setAlphaFromATMBlackVol(self, blackVol, atmStrike, timeToExpiry):
+    def setAlphaFromATMBlackVol(self, blackVol, atmStrike, time_to_expiry):
         """ We solve cubic equation for the unknown variable alpha for the 
         special ATM case of the strike equalling the forward following Hagan 
         and al. equation (3.3). We take the smallest real root as the preferred
@@ -199,7 +199,7 @@ class FinModelSABRShifted():
         beta = self._beta
         rho = self._rho
         nu = self._nu
-        texp = timeToExpiry
+        texp = time_to_expiry
         K = atmStrike
 
         coeff0 = -blackVol * (K**(1.0 - self._beta))

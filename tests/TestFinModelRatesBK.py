@@ -14,7 +14,7 @@ from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.helpers import printTree
+from financepy.utils.helpers import print_tree
 from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.utils.global_types import FinExerciseTypes
 
@@ -37,17 +37,17 @@ def test_BKExampleOne():
     endDate = FinDate(1, 6, 2021)
     sigma = 0.25
     a = 0.22
-    numTimeSteps = 3
+    num_time_steps = 3
     tmat = (endDate - startDate)/gDaysInYear
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
 
     # Agrees with Figure 28.10 - Not exact as we have dt not exactly 0.50
-    if numTimeSteps < 5:
+    if num_time_steps < 5:
         testCases.header("LABEL", "VALUE")
         testCases.print("QTREE", model._Q)
         testCases.print("RTREE", model._rt)
-#        printTree(model._rt)
+#        print_tree(model._rt)
         testCases.print("PU AT LAST TIME", model._pu)
         testCases.print("PDM AT LAST TIME", model._pm)
         testCases.print("PD AT LAST TIME", model._pd)
@@ -91,7 +91,7 @@ def test_BKExampleTwo():
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
 
-    strikePrice = 105.0
+    strike_price = 105.0
     face = 100.0
 
     tmat = (maturityDate - settlementDate) / gDaysInYear
@@ -107,12 +107,12 @@ def test_BKExampleTwo():
 
     sigma = 0.20
     a = 0.05
-    numTimeSteps = 26
+    num_time_steps = 26
 
-    model = FinModelRatesBK(sigma, a, numTimeSteps)
+    model = FinModelRatesBK(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
     exerciseType = FinExerciseTypes.AMERICAN
-    v = model.bondOption(texp, strikePrice, face, couponTimes,
+    v = model.bondOption(texp, strike_price, face, couponTimes,
                          couponFlows, exerciseType)
 
     # Test convergence
@@ -121,16 +121,16 @@ def test_BKExampleTwo():
 
     testCases.header("TIMESTEPS", "TIME", "VALUE")
     treeVector = []
-    for numTimeSteps in numStepsList:
+    for num_time_steps in numStepsList:
         start = time.time()
-        model = FinModelRatesBK(sigma, a, numTimeSteps)
+        model = FinModelRatesBK(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
-        v = model.bondOption(texp, strikePrice,
+        v = model.bondOption(texp, strike_price,
                              face, couponTimes, couponFlows, exerciseType)
         end = time.time()
         period = end-start
         treeVector.append(v)
-        testCases.print(numTimeSteps, period, v)
+        testCases.print(num_time_steps, period, v)
 
 #    plt.plot(numStepsList, treeVector)
 
@@ -138,9 +138,9 @@ def test_BKExampleTwo():
 
     if 1 == 0:
         print("RT")
-        printTree(model._rt, 5)
+        print_tree(model._rt, 5)
         print("Q")
-        printTree(model._Q, 5)
+        print_tree(model._Q, 5)
 
 ###############################################################################
 

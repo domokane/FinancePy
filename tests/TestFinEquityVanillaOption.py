@@ -10,11 +10,11 @@ sys.path.append("..")
 import numpy as np
 
 from financepy.utils.global_types import FinOptionTypes
-from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.utils.FinError import FinError
+from financepy.utils.error import FinError
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -22,7 +22,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinEquityVanillaOption():
+def test_EquityVanillaOption():
 
     valueDate = FinDate(1, 1, 2015)
     expiryDate = FinDate(1, 7, 2015)
@@ -30,9 +30,9 @@ def test_FinEquityVanillaOption():
     volatility = 0.30
     interestRate = 0.05
     dividendYield = 0.01
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    dividend_curve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 
@@ -40,16 +40,16 @@ def test_FinEquityVanillaOption():
 
     for numPaths in numPathsList:
 
-        callOption = FinEquityVanillaOption(
+        callOption = EquityVanillaOption(
             expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         start = time.time()
-        valueMC = callOption.valueMC(valueDate, stockPrice, discountCurve,
-                                     dividendCurve, model, numPaths)
+        value_mc = callOption.value_mc(valueDate, stockPrice, discountCurve,
+                                     dividend_curve, model, numPaths)
         end = time.time()
         duration = end - start
-        testCases.print(numPaths, value, valueMC, duration)
+        testCases.print(numPaths, value, value_mc, duration)
 
 ###############################################################################
 
@@ -62,25 +62,25 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        callOption = EquityVanillaOption(expiryDate, 100.0, 
                                             FinOptionTypes.EUROPEAN_CALL)
 
         value = callOption.value(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
 
         start = time.time()
 
         useSobol = False
-        valueMC1 = callOption.valueMC(valueDate, stockPrice, discountCurve,
-                                      dividendCurve, model, numPaths, useSobol)
+        value_mc1 = callOption.value_mc(valueDate, stockPrice, discountCurve,
+                                      dividend_curve, model, numPaths, useSobol)
 
         useSobol = True
-        valueMC2 = callOption.valueMC(valueDate, stockPrice, discountCurve,
-                                      dividendCurve, model, numPaths, useSobol)
+        value_mc2 = callOption.value_mc(valueDate, stockPrice, discountCurve,
+                                      dividend_curve, model, numPaths, useSobol)
 
         end = time.time()
         duration = end - start
-        testCases.print(numPaths, value, valueMC1, valueMC2, duration)
+        testCases.print(numPaths, value, value_mc1, value_mc2, duration)
 
 ###############################################################################
 
@@ -92,25 +92,25 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        putOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        putOption = EquityVanillaOption(expiryDate, 100.0, 
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valueDate, stockPrice, discountCurve,
-                                dividendCurve, model)
+                                dividend_curve, model)
 
         start = time.time()
 
         useSobol = False
-        valueMC1 = putOption.valueMC(valueDate, stockPrice, discountCurve,
-                                      dividendCurve, model, numPaths, useSobol)
+        value_mc1 = putOption.value_mc(valueDate, stockPrice, discountCurve,
+                                      dividend_curve, model, numPaths, useSobol)
 
         useSobol = True
-        valueMC2 = putOption.valueMC(valueDate, stockPrice, discountCurve,
-                                      dividendCurve, model, numPaths, useSobol)
+        value_mc2 = putOption.value_mc(valueDate, stockPrice, discountCurve,
+                                      dividend_curve, model, numPaths, useSobol)
 
         end = time.time()
         duration = end - start
-        testCases.print(numPaths, value, valueMC1, valueMC2, duration)
+        testCases.print(numPaths, value, value_mc1, value_mc2, duration)
 
 ###############################################################################
 
@@ -121,18 +121,18 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
 
-        callOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        callOption = EquityVanillaOption(expiryDate, 100.0, 
                                             FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         delta = callOption.delta(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         vega = callOption.vega(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         theta = callOption.theta(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         rho = callOption.rho(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         testCases.print(stockPrice, value, delta, vega, theta, rho)
 
     ###########################################################################
@@ -142,19 +142,19 @@ def test_FinEquityVanillaOption():
 
     for stockPrice in stockPrices:
         
-        putOption = FinEquityVanillaOption(expiryDate, 100.0, 
+        putOption = EquityVanillaOption(expiryDate, 100.0, 
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         delta = putOption.delta(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         vega = putOption.vega(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         theta = putOption.theta(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         rho = putOption.rho(valueDate, stockPrice, discountCurve,
-                                 dividendCurve, model)
+                                 dividend_curve, model)
         testCases.print(stockPrice, value, delta, vega, theta, rho)
 
 
@@ -166,12 +166,12 @@ def testImpliedVolatility_NEW():
     interestRate = 0.05
     dividendYield = 0.03
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
-    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+    dividend_curve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     strikes = np.linspace(50, 150, 11)
     timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]    
     sigmas = np.arange(1, 100, 5) / 100.0
-    optionTypes = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
+    option_types = [FinOptionTypes.EUROPEAN_CALL, FinOptionTypes.EUROPEAN_PUT]
 
     testCases.header("OPT_TYPE", "TEXP", "STOCK_PRICE", "STRIKE", "INTRINSIC",
                      "VALUE", "INPUT_VOL", "IMPLIED_VOL")
@@ -182,24 +182,24 @@ def testImpliedVolatility_NEW():
     
     for vol in sigmas:
 
-        model = FinModelBlackScholes(vol)
+        model = BlackScholes(vol)
 
-        for timeToExpiry in timesToExpiry:     
+        for time_to_expiry in timesToExpiry:
 
-            expiryDate = valueDate.addYears(timeToExpiry)
+            expiryDate = valueDate.addYears(time_to_expiry)
 
             for strike in strikes:
 
-                for optionType in optionTypes:
+                for option_type in option_types:
 
-                    option = FinEquityVanillaOption(expiryDate, strike, 
-                                                    optionType)
+                    option = EquityVanillaOption(expiryDate, strike, 
+                                                    option_type)
                 
                     value = option.value(valueDate, stockPrice, discountCurve, 
-                                         dividendCurve, model)
+                                         dividend_curve, model)
 
                     intrinsic = option.intrinsic(valueDate, stockPrice,
-                                             discountCurve, dividendCurve)
+                                             discountCurve, dividend_curve)
 
                     # I remove the cases where the time value is zero
                     # This is arbitrary but 1e-10 seems good enough to me
@@ -208,10 +208,10 @@ def testImpliedVolatility_NEW():
 
                     if value - intrinsic > 1e-10:
 
-                        impliedVol = option.impliedVolatility(valueDate, 
+                        impliedVol = option.implied_volatility(valueDate,
                                                               stockPrice, 
                                                               discountCurve, 
-                                                              dividendCurve, 
+                                                              dividend_curve,
                                                               value)
     
                     numTests += 1    
@@ -220,8 +220,8 @@ def testImpliedVolatility_NEW():
     
                     if errVol > tol:
     
-                        testCases.print(optionType, 
-                                  timeToExpiry, 
+                        testCases.print(option_type,
+                                  time_to_expiry,
                                   stockPrice,
                                   strike, 
                                   intrinsic,
@@ -232,7 +232,7 @@ def testImpliedVolatility_NEW():
                         # These fails include ones due to the zero time value    
                         numFails += 1
                             
-                        testCases.print(optionType, timeToExpiry, stockPrice,
+                        testCases.print(option_type, time_to_expiry, stockPrice,
                                         strike,
                                         stockPrice, value, vol, impliedVol)
 
@@ -242,7 +242,7 @@ def testImpliedVolatility_NEW():
 
 ###############################################################################
 
-test_FinEquityVanillaOption()
+test_EquityVanillaOption()
 
 start = time.time()
 testImpliedVolatility_NEW()
