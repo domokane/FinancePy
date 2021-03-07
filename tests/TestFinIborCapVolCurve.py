@@ -7,8 +7,8 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
+from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -20,14 +20,14 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinCapVolCurve():
 
     # Reproduces example in Table 32.1 of Hull Book
-    valuation_date = Date(1, 1, 2020)
+    valuationDate = FinDate(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     numPeriods = 10
-    capletDt = valuation_date
+    capletDt = valuationDate
 
-    capVolDates.append(valuation_date)
+    capVolDates.append(valuationDate)
 
     for i in range(0, numPeriods):
         capletDt = capletDt.addTenor(capletVolTenor)
@@ -37,11 +37,11 @@ def test_FinCapVolCurve():
                        16.79, 16.30, 16.01, 15.76, 15.54]
     capVolatilities = np.array(capVolatilities)/100.0
 
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = FinIborCapVolCurve(valuation_date,
+    dayCountType = FinDayCountTypes.ACT_ACT_ISDA
+    volCurve = FinIborCapVolCurve(valuationDate,
                                    capVolDates,
                                    capVolatilities,
-                                   day_count_type)
+                                   dayCountType)
 
     testCases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in capVolDates:

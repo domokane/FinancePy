@@ -7,7 +7,7 @@ import sys
 sys.path.append("..")
 
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
-from financepy.utils.date import Date
+from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -19,12 +19,12 @@ PLOT_GRAPHS = False
 
 def test_FinVolatilityCurve():
 
-    valuation_date = Date(20, 6, 2012)
-    expiry_date = Date(20, 12, 2012)
+    valueDate = FinDate(20, 6, 2012)
+    expiryDate = FinDate(20, 12, 2012)
     strikes = np.linspace(70, 130, 7)
     vols = np.array([0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35])
     polynomial = 5
-    volCurve = FinEquityVolCurve(valuation_date, expiry_date,
+    volCurve = FinEquityVolCurve(valueDate, expiryDate,
                                  strikes, vols, polynomial)
 
     interpStrikes = np.linspace(50, 150, 10)

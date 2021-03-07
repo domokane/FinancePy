@@ -7,15 +7,15 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinDayCount import FinDayCountTypes
+from financepy.finutils.FinCalendar import FinCalendarTypes
+from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.utils.date import Date
+from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -30,8 +30,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     # Not exactly T=1.0 but close so don't exact exact agreement
     # (in fact I do not get exact agreement even if I do set T=1.0)
-    valuation_date = Date(13, 2, 2018)
-    expiry_date = Date(13, 2, 2019)
+    valueDate = FinDate(13, 2, 2018)
+    expiryDate = FinDate(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -48,15 +48,15 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
-    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
     notional = 1000000.0
-    callOption = FinFXVanillaOption(expiry_date,
+    callOption = FinFXVanillaOption(expiryDate,
                                     strikeFXRate,
                                     currencyPair,
                                     FinOptionTypes.EUROPEAN_CALL,
@@ -71,7 +71,7 @@ def test_FinFXVanillaOptionWystupExample1():
         model)
 
     notional = 1250000.0
-    callOption = FinFXVanillaOption(expiry_date,
+    callOption = FinFXVanillaOption(expiryDate,
                                     strikeFXRate,
                                     currencyPair,
                                     FinOptionTypes.EUROPEAN_CALL,
@@ -79,14 +79,14 @@ def test_FinFXVanillaOptionWystupExample1():
                                     "USD", 2)
 
     value = callOption.value(
-        valuation_date,
+        valueDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
         model)
 
     delta = callOption.delta(
-        valuation_date,
+        valueDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
@@ -102,8 +102,8 @@ def test_FinFXVanillaOptionWystupExample2():
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    valuation_date = Date(13, 2, 2018)
-    expiry_date = Date(13, 2, 2019)
+    valueDate = FinDate(13, 2, 2018)
+    expiryDate = FinDate(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -120,15 +120,15 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    domDiscountCurve = DiscountCurveFlat(valuation_date, ccy2CCRate)
-    forDiscountCurve = DiscountCurveFlat(valuation_date, ccy1CCRate)
+    domDiscountCurve = FinDiscountCurveFlat(valueDate, ccy2CCRate)
+    forDiscountCurve = FinDiscountCurveFlat(valueDate, ccy1CCRate)
 
     model = FinModelBlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
     notional = 1000000.0
-    callOption = FinFXVanillaOption(expiry_date,
+    callOption = FinFXVanillaOption(expiryDate,
                                     strikeFXRate,
                                     currencyPair,
                                     FinOptionTypes.EUROPEAN_PUT,
@@ -136,14 +136,14 @@ def test_FinFXVanillaOptionWystupExample2():
                                     "EUR", 2)
 
     value = callOption.value(
-            valuation_date,
+            valueDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
 
     delta = callOption.delta(
-            valuation_date,
+            valueDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -159,8 +159,8 @@ def test_FinFXVanillaOptionBloombergExample():
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    valuation_date = Date(13, 2, 2018)
-    expiry_date = Date(15, 2, 2019)
+    valuationDate = FinDate(13, 2, 2018)
+    expiryDate = FinDate(15, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -176,31 +176,31 @@ def test_FinFXVanillaOptionBloombergExample():
     volatility = 0.20
 
     spotDays = 0
-    settlement_date = valuation_date.addWeekDays(spotDays)
-    maturity_date = settlement_date.addMonths(12)
+    settlementDate = valuationDate.addWeekDays(spotDays)
+    maturityDate = settlementDate.addMonths(12)
     notional = 1000000.0
     notionalCurrency = "EUR"
-    calendar_type = CalendarTypes.TARGET
+    calendarType = FinCalendarTypes.TARGET
 
     depos = []
     fras = []
     swaps = []
-    depo = FinIborDeposit(settlement_date, maturity_date, domDepoRate,
-                           DayCountTypes.ACT_360, notional, calendar_type)
+    depo = FinIborDeposit(settlementDate, maturityDate, domDepoRate,
+                           FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    domDiscountCurve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    domDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     depos = []
     fras = []
     swaps = []
-    depo = FinIborDeposit(settlement_date, maturity_date, forDepoRate,
-                           DayCountTypes.ACT_360, notional, calendar_type)
+    depo = FinIborDeposit(settlementDate, maturityDate, forDepoRate,
+                           FinDayCountTypes.ACT_360, notional, calendarType)
     depos.append(depo)
-    forDiscountCurve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    forDiscountCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
     model = FinModelBlackScholes(volatility)
 
-    callOption = FinFXVanillaOption(expiry_date,
+    callOption = FinFXVanillaOption(expiryDate,
                                     strikeFXRate,
                                     currencyPair,
                                     FinOptionTypes.EUROPEAN_CALL,
@@ -208,14 +208,14 @@ def test_FinFXVanillaOptionBloombergExample():
                                     notionalCurrency, 2)
 
     value = callOption.value(
-        valuation_date,
+        valuationDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
         model)
 
     delta = callOption.delta(
-        valuation_date,
+        valuationDate,
         spotFXRate,
         domDiscountCurve,
         forDiscountCurve,
@@ -230,24 +230,24 @@ def test_FinFXVanillaOptionBloombergExample():
 def test_FinFXVanillaOptionHullExample():
 
     #   Example from Hull 4th edition page 284
-    valuation_date = Date(1, 1, 2015)
-    expiry_date = valuation_date.addMonths(4)
+    valuationDate = FinDate(1, 1, 2015)
+    expiryDate = valuationDate.addMonths(4)
     spotFXRate = 1.60
     volatility = 0.1411
     domInterestRate = 0.08
     forInterestRate = 0.11
     model = FinModelBlackScholes(volatility)
-    domDiscountCurve = DiscountCurveFlat(valuation_date, domInterestRate)
-    forDiscountCurve = DiscountCurveFlat(valuation_date, forInterestRate)
+    domDiscountCurve = FinDiscountCurveFlat(valuationDate, domInterestRate)
+    forDiscountCurve = FinDiscountCurveFlat(valuationDate, forInterestRate)
 
-    num_pathsList = [10000, 20000, 40000, 80000, 160000, 320000]
+    numPathsList = [10000, 20000, 40000, 80000, 160000, 320000]
 
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
     strikeFXRate = 1.60
 
-    for num_paths in num_pathsList:
+    for numPaths in numPathsList:
 
-        callOption = FinFXVanillaOption(expiry_date,
+        callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
@@ -255,7 +255,7 @@ def test_FinFXVanillaOptionHullExample():
                                         "USD")
 
         value = callOption.value(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
@@ -264,28 +264,28 @@ def test_FinFXVanillaOptionHullExample():
         start = time.time()
 
         valueMC = callOption.valueMC(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model,
-            num_paths)
+            numPaths)
 
         end = time.time()
         duration = end - start
-        testCases.print(num_paths, value, valueMC, duration)
+        testCases.print(numPaths, value, valueMC, duration)
 
 ##########################################################################
 
     spotFXRates = np.arange(100, 200, 10)
     spotFXRates = spotFXRates/100.0
-    num_paths = 100000
+    numPaths = 100000
 
     testCases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC", "TIME")
 
     for spotFXRate in spotFXRates:
 
-        callOption = FinFXVanillaOption(expiry_date,
+        callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
@@ -293,33 +293,33 @@ def test_FinFXVanillaOptionHullExample():
                                         "USD")
 
         value = callOption.value(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         start = time.time()
         valueMC = callOption.valueMC(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model,
-            num_paths)
+            numPaths)
         end = time.time()
         duration = end - start
-        testCases.print(num_paths, value, valueMC, duration)
+        testCases.print(numPaths, value, valueMC, duration)
 
 ##########################################################################
 
     spotFXRates = np.arange(100, 200, 10) / 100.0
-    num_paths = 100000
+    numPaths = 100000
 
     testCases.header("SPOT FX RATE", "PUT_VALUE_BS", "PUT_VALUE_MC", "TIME")
 
     for spotFXRate in spotFXRates:
 
-        putOption = FinFXVanillaOption(expiry_date,
+        putOption = FinFXVanillaOption(expiryDate,
                                        strikeFXRate,
                                        "EURUSD",
                                        FinOptionTypes.EUROPEAN_PUT,
@@ -327,19 +327,19 @@ def test_FinFXVanillaOptionHullExample():
                                        "USD")
 
         value = putOption.value(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         start = time.time()
         valueMC = putOption.valueMC(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model,
-            num_paths)
+            numPaths)
         end = time.time()
         duration = end - start
         testCases.print(spotFXRate, value, valueMC, duration)
@@ -357,37 +357,37 @@ def test_FinFXVanillaOptionHullExample():
         "RHO_BS")
 
     for spotFXRate in spotFXRates:
-        callOption = FinFXVanillaOption(expiry_date,
+        callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
                                         1000000,
                                         "USD")
         value = callOption.value(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         delta = callOption.delta(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         vega = callOption.vega(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         theta = callOption.theta(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
-        #  callOption.rho(valuation_date,stock_price, interestRate,
+        #  callOption.rho(valueDate,stockPrice, interestRate,
         #  dividendYield, modelType, modelParams)
         rho = 999
         testCases.print(spotFXRate, value, delta, vega, theta, rho)
@@ -401,7 +401,7 @@ def test_FinFXVanillaOptionHullExample():
         "RHO_BS")
 
     for spotFXRate in spotFXRates:
-        putOption = FinFXVanillaOption(expiry_date,
+        putOption = FinFXVanillaOption(expiryDate,
                                        strikeFXRate,
                                        "EURUSD",
                                        FinOptionTypes.EUROPEAN_PUT,
@@ -409,30 +409,30 @@ def test_FinFXVanillaOptionHullExample():
                                        "USD")
 
         value = putOption.value(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         delta = putOption.delta(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         vega = putOption.vega(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
         theta = putOption.theta(
-            valuation_date,
+            valuationDate,
             spotFXRate,
             domDiscountCurve,
             forDiscountCurve,
             model)
-        # putOption.rho(valuation_date,stock_price, interestRate, dividendYield,
+        # putOption.rho(valueDate,stockPrice, interestRate, dividendYield,
         # modelType, modelParams)
         rho = 999
         testCases.print(spotFXRate, value, delta, vega, theta, rho)
@@ -444,20 +444,20 @@ def test_FinFXVanillaOptionHullExample():
     spotFXRates = np.arange(100, 200, 10)/100.0
 
     for spotFXRate in spotFXRates:
-        callOption = FinFXVanillaOption(expiry_date,
+        callOption = FinFXVanillaOption(expiryDate,
                                         strikeFXRate,
                                         "EURUSD",
                                         FinOptionTypes.EUROPEAN_CALL,
                                         1000000,
                                         "USD")
 
-        value = callOption.value(valuation_date,
+        value = callOption.value(valuationDate,
                                  spotFXRate,
                                  domDiscountCurve,
                                  forDiscountCurve,
                                  model)['v']
 
-        impliedVol = callOption.impliedVolatility(valuation_date,
+        impliedVol = callOption.impliedVolatility(valuationDate,
                                                   spotFXRate,
                                                   domDiscountCurve,
                                                   forDiscountCurve,

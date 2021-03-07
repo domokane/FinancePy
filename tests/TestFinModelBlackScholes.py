@@ -5,15 +5,15 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
+from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinDayCount import FinDayCountTypes
 
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.models.black_scholes import FinModelBlackScholesTypes
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholesTypes
 
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
@@ -27,11 +27,11 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def testFinModelBlackScholes():
 
-    valuation_date = Date(8, 5, 2015)
-    expiry_date = Date(15, 1, 2016)
+    valueDate = FinDate(8, 5, 2015)
+    expiryDate = FinDate(15, 1, 2016)
 
     strikePrice = 130.0
-    stock_price = 127.62
+    stockPrice = 127.62
     volatility = 0.20
     interestRate = 0.001
     dividendYield = 0.0163
@@ -39,47 +39,47 @@ def testFinModelBlackScholes():
     optionType = FinOptionTypes.AMERICAN_CALL
     euOptionType = FinOptionTypes.EUROPEAN_CALL
     
-    amOption = FinEquityAmericanOption(expiry_date, strikePrice,
+    amOption = FinEquityAmericanOption(expiryDate, strikePrice,
                                        optionType)
     
-    ameuOption = FinEquityAmericanOption(expiry_date, strikePrice, 
+    ameuOption = FinEquityAmericanOption(expiryDate, strikePrice, 
                                          euOptionType)
     
-    euOption = FinEquityVanillaOption(expiry_date, strikePrice,
+    euOption = FinEquityVanillaOption(expiryDate, strikePrice,
                                       euOptionType)
     
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate,
-                                       FrequencyTypes.CONTINUOUS,
-                                       DayCountTypes.ACT_365F)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate,
+                                         FinFrequencyTypes.CONTINUOUS, 
+                                         FinDayCountTypes.ACT_365F)
 
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield,
-                                      FrequencyTypes.CONTINUOUS,
-                                      DayCountTypes.ACT_365F)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield,
+                                         FinFrequencyTypes.CONTINUOUS, 
+                                         FinDayCountTypes.ACT_365F)
     
-    num_steps_per_year = 400
+    numStepsPerYear = 400
     
     modelTree = FinModelBlackScholes(volatility, 
                                      FinModelBlackScholesTypes.CRR_TREE, 
-                                     num_steps_per_year)
+                                     numStepsPerYear)
     
-    v = amOption.value(valuation_date, stock_price, discount_curve,
+    v = amOption.value(valueDate, stockPrice, discountCurve, 
                            dividendCurve, modelTree)
 #    print(v)
 
     modelApprox = FinModelBlackScholes(volatility, 
                                        FinModelBlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(valuation_date, stock_price, discount_curve,
+    v = amOption.value(valueDate, stockPrice, discountCurve, 
                        dividendCurve, modelApprox)
 
 #    print(v)
 
-    v = ameuOption.value(valuation_date, stock_price, discount_curve,
+    v = ameuOption.value(valueDate, stockPrice, discountCurve, 
                            dividendCurve, modelTree)
 
 #    print(v)
 
-    v = euOption.value(valuation_date, stock_price, discount_curve,
+    v = euOption.value(valueDate, stockPrice, discountCurve, 
                          dividendCurve, modelTree)
 
 #    print(v)
@@ -90,13 +90,13 @@ def testFinModelBlackScholes():
     euAnalValue = []
     volatility = 0.20
 
-    # num_steps_per_year = range(5, 200, 1)
+    # numStepsPerYear = range(5, 200, 1)
     
-    # for num_steps in num_steps_per_year:
+    # for numSteps in numStepsPerYear:
 
     #     modelTree = FinModelBlackScholes(volatility,
     #                                      FinModelBlackScholesTypes.CRR_TREE,
-    #                                      {'num_steps_per_year':num_steps})
+    #                                      {'numStepsPerYear':numSteps})
 
     #     modelAnal = FinModelBlackScholes(volatility, 
     #                                      FinModelBlackScholesTypes.ANALYTICAL)
@@ -105,16 +105,16 @@ def testFinModelBlackScholes():
     #                                     FinModelBlackScholesTypes.BARONE_ADESI)
 
 
-    #     v_am = amOption.value(valuation_date, stock_price, discount_curve,
+    #     v_am = amOption.value(valueDate, stockPrice, discountCurve, 
     #                           dividendYield, modelTree)
 
-    #     v_eu = ameuOption.value(valuation_date, stock_price, discount_curve,
+    #     v_eu = ameuOption.value(valueDate, stockPrice, discountCurve, 
     #                             dividendYield, modelTree)
  
-    #     v_bs = euOption.value(valuation_date, stock_price, discount_curve,
+    #     v_bs = euOption.value(valueDate, stockPrice, discountCurve, 
     #                           dividendYield, modelAnal)
 
-    #     v_am_baw = amOption.value(valuation_date, stock_price, discount_curve,
+    #     v_am_baw = amOption.value(valueDate, stockPrice, discountCurve, 
     #                               dividendYield, modelBAW)
         
     #     amTreeValue.append(v_am)
@@ -124,10 +124,10 @@ def testFinModelBlackScholes():
         
     
     # plt.title("American PUT Option Price Convergence Analysis")
-    # plt.plot(num_steps_per_year, amTreeValue, label="American Tree")
-    # plt.plot(num_steps_per_year, amBAWValue, label="American BAW")
-    # plt.plot(num_steps_per_year, euTreeValue, label="European Tree")
-    # plt.plot(num_steps_per_year, euAnalValue, label="European Anal", lw =2)
+    # plt.plot(numStepsPerYear, amTreeValue, label="American Tree")
+    # plt.plot(numStepsPerYear, amBAWValue, label="American BAW")
+    # plt.plot(numStepsPerYear, euTreeValue, label="European Tree")
+    # plt.plot(numStepsPerYear, euAnalValue, label="European Anal", lw =2)
     # plt.xlabel("Num Steps")
     # plt.ylabel("Value")
     # plt.legend();

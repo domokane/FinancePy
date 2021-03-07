@@ -8,10 +8,10 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption
-from financepy.utils.FinGlobalTypes import FinOptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import FinModelBlackScholes, FinModelBlackScholesTypes
-from financepy.utils.date import Date
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes, FinModelBlackScholesTypes
+from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,55 +20,55 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def testFinEquityAmericanOption():
 
-    valuation_date = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2017)
-    stock_price = 50.0
+    valueDate = FinDate(1, 1, 2016)
+    expiryDate = FinDate(1, 1, 2017)
+    stockPrice = 50.0
     interestRate = 0.06
     dividendYield = 0.04
     volatility = 0.40
     strikePrice = 50.0
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
-    putOption = FinEquityAmericanOption(expiry_date, strikePrice, FinOptionTypes.EUROPEAN_PUT)
+    putOption = FinEquityAmericanOption(expiryDate, strikePrice, FinOptionTypes.EUROPEAN_PUT)
 
     model = FinModelBlackScholes(volatility, 
                                  FinModelBlackScholesTypes.CRR_TREE,
                                  100)
 
-    value = putOption.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    delta = putOption.delta(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    gamma = putOption.gamma(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    theta = putOption.theta(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    value = putOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    delta = putOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    gamma = putOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    theta = putOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
-    option = FinEquityAmericanOption(expiry_date, strikePrice, FinOptionTypes.EUROPEAN_PUT)
+    option = FinEquityAmericanOption(expiryDate, strikePrice, FinOptionTypes.EUROPEAN_PUT)
 
     testCases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
-    num_stepsList = [100, 200, 500, 1000, 2000]
+    numStepsList = [100, 200, 500, 1000, 2000]
 
-    for num_steps in num_stepsList:
+    for numSteps in numStepsList:
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     num_steps)
+                                     numSteps)
 
         start = time.time()
-        results = option.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
+        results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
         end = time.time()
         duration = end - start
-        testCases.print("EUROPEAN_PUT_TREE", num_steps, results, duration)
+        testCases.print("EUROPEAN_PUT_TREE", numSteps, results, duration)
 
     testCases.banner("================== AMERICAN PUT =======================")
 
     option = FinEquityAmericanOption(
-        expiry_date,
+        expiryDate,
         strikePrice,
         FinOptionTypes.AMERICAN_PUT)
 
@@ -78,35 +78,35 @@ def testFinEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    for num_steps in num_stepsList:
+    for numSteps in numStepsList:
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     num_steps)
+                                     numSteps)
 
         start = time.time()
-        results = option.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
+        results = option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
         end = time.time()
         duration = end - start
-        testCases.print("AMERICAN_PUT", num_steps, results, duration)
+        testCases.print("AMERICAN_PUT", numSteps, results, duration)
 
     testCases.banner(
         "================== EUROPEAN CALL =======================")
 
     callOption = FinEquityAmericanOption(
-        expiry_date,
+        expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    delta = callOption.delta(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    gamma = callOption.gamma(valuation_date, stock_price, discount_curve, dividendCurve, model)
-    theta = callOption.theta(valuation_date, stock_price, discount_curve, dividendCurve, model)
+    value = callOption.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    delta = callOption.delta(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    gamma = callOption.gamma(valueDate, stockPrice, discountCurve, dividendCurve, model)
+    theta = callOption.theta(valueDate, stockPrice, discountCurve, dividendCurve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
 
     option = FinEquityAmericanOption(
-        expiry_date,
+        expiryDate,
         strikePrice,
         FinOptionTypes.EUROPEAN_CALL)
 
@@ -116,17 +116,17 @@ def testFinEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    for num_steps in num_stepsList:
+    for numSteps in numStepsList:
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     num_steps)
+                                     numSteps)
         start = time.time()
-        results = option.value(valuation_date, stock_price, discount_curve,
+        results = option.value(valueDate, stockPrice, discountCurve, 
                                dividendCurve, model)
         end = time.time()
         duration = end - start
-        testCases.print("EUROPEAN_CALL_TREE", num_steps, results, duration)
+        testCases.print("EUROPEAN_CALL_TREE", numSteps, results, duration)
 
     testCases.banner(
         "================== AMERICAN CALL =======================")
@@ -136,23 +136,23 @@ def testFinEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    option = FinEquityAmericanOption(expiry_date, strikePrice,
+    option = FinEquityAmericanOption(expiryDate, strikePrice,
                                      FinOptionTypes.AMERICAN_CALL)
 
-    for num_steps in num_stepsList:
+    for numSteps in numStepsList:
 
         model = FinModelBlackScholes(volatility,
                                      FinModelBlackScholesTypes.CRR_TREE,
-                                     num_steps)
+                                     numSteps)
 
         start = time.time()
 
-        results = option.value(valuation_date, stock_price, discount_curve,
+        results = option.value(valueDate, stockPrice, discountCurve, 
                                dividendCurve, model)
 
         end = time.time()
         duration = end - start
-        testCases.print("AMERICAN_CALL", num_steps, results, duration)
+        testCases.print("AMERICAN_CALL", numSteps, results, duration)
 
 #    FinTest.TestReport(filename)
 

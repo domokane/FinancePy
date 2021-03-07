@@ -8,8 +8,8 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.rates_cir_tree import zeroPrice_MC, zeroPrice
-from financepy.models.rates_cir_tree import FinCIRNumericalScheme
+from financepy.models.FinModelRatesCIR import zeroPrice_MC, zeroPrice
+from financepy.models.FinModelRatesCIR import FinCIRNumericalScheme
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,7 +25,7 @@ def test_FinModelRatesCIR():
     sigma = 0.20
     t = 5.0
 
-    num_paths = 2000
+    numPaths = 2000
     dt = 0.05
     seed = 1968
 
@@ -50,7 +50,7 @@ def test_FinModelRatesCIR():
             sigma,
             t,
             dt,
-            num_paths,
+            numPaths,
             seed,
             FinCIRNumericalScheme.EULER.value)
         p_MC2 = zeroPrice_MC(
@@ -60,7 +60,7 @@ def test_FinModelRatesCIR():
             sigma,
             t,
             dt,
-            num_paths,
+            numPaths,
             seed,
             FinCIRNumericalScheme.LOGNORMAL.value)
         p_MC3 = zeroPrice_MC(
@@ -70,7 +70,7 @@ def test_FinModelRatesCIR():
             sigma,
             t,
             dt,
-            num_paths,
+            numPaths,
             seed,
             FinCIRNumericalScheme.MILSTEIN.value)
         p_MC4 = zeroPrice_MC(
@@ -80,7 +80,7 @@ def test_FinModelRatesCIR():
             sigma,
             t,
             dt,
-            num_paths,
+            numPaths,
             seed,
             FinCIRNumericalScheme.KAHLJACKEL.value)
         p_MC5 = zeroPrice_MC(
@@ -90,7 +90,7 @@ def test_FinModelRatesCIR():
             sigma,
             t,
             dt,
-            num_paths,
+            numPaths,
             seed,
             FinCIRNumericalScheme.EXACT.value)
         end = time.time()

@@ -7,11 +7,11 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.fx.FinFXFloatLookbackOption import FinFXFloatLookbackOption
 from financepy.products.fx.FinFXFixedLookbackOption import FinFXFixedLookbackOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinDate import FinDate
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -19,19 +19,19 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 def test_FinEquityLookBackOption():
-    valuation_date = Date(1, 1, 2015)
-    expiry_date = Date(1, 1, 2016)
-    stock_price = 100.0
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
+    stockPrice = 100.0
     volatility = 0.3
-    num_pathsRange = [10000]
-    stock_priceRange = range(90, 110, 5)
-    num_steps_per_year = 252
+    numPathsRange = [10000]
+    stockPriceRange = range(90, 110, 5)
+    numStepsPerYear = 252
 
     domesticRate = 0.05
-    domesticCurve = DiscountCurveFlat(valuation_date, domesticRate)
+    domesticCurve = FinDiscountCurveFlat(valueDate, domesticRate)
 
     foreignRate = 0.02
-    foreignCurve = DiscountCurveFlat(valuation_date, foreignRate)
+    foreignCurve = FinDiscountCurveFlat(valueDate, foreignRate)
 
 ###############################################################################
 
@@ -46,34 +46,34 @@ def test_FinEquityLookBackOption():
         "TIME")
 
     optionType = FinOptionTypes.EUROPEAN_CALL
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFloatLookbackOption(expiry_date, optionType)
-            stockMin = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
+            stockMin = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 stockMin,
                 value,
                 valueMC,
@@ -91,34 +91,34 @@ def test_FinEquityLookBackOption():
         "TIME")
 
     optionType = FinOptionTypes.EUROPEAN_CALL
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFloatLookbackOption(expiry_date, optionType)
-            stockMin = stock_price - 10
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
+            stockMin = stockPrice - 10
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 stockMin,
                 value,
                 valueMC,
@@ -136,34 +136,34 @@ def test_FinEquityLookBackOption():
         "TIME")
 
     optionType = FinOptionTypes.EUROPEAN_PUT
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFloatLookbackOption(expiry_date, optionType)
-            stockMax = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
+            stockMax = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 stockMax,
                 value,
                 valueMC,
@@ -181,34 +181,34 @@ def test_FinEquityLookBackOption():
         "TIME")
 
     optionType = FinOptionTypes.EUROPEAN_PUT
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFloatLookbackOption(expiry_date, optionType)
-            stockMax = stock_price + 10
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFloatLookbackOption(expiryDate, optionType)
+            stockMax = stockPrice + 10
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 stockMax,
                 value,
                 valueMC,
@@ -218,8 +218,8 @@ def test_FinEquityLookBackOption():
 ###############################################################################
 ###############################################################################
 
-    stock_priceRange = range(90, 110, 5)
-    num_steps_per_year = 252
+    stockPriceRange = range(90, 110, 5)
+    numStepsPerYear = 252
 
     testCases.header(
         "NUMPATHS",
@@ -234,34 +234,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_CALL
     k = 95.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMax = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMax = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMax,
                 value,
@@ -282,34 +282,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_CALL
     k = 100.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMax = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMax = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMax,
                 value,
@@ -330,34 +330,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_CALL
     k = 105.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMax = stock_price + 10.0
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMax = stockPrice + 10.0
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMax,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMax,
                 value,
@@ -378,34 +378,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_PUT
     k = 95.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMin = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMin = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMin,
                 value,
@@ -426,34 +426,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_PUT
     k = 100.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMin = stock_price
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMin = stockPrice
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMin,
                 value,
@@ -474,34 +474,34 @@ def test_FinEquityLookBackOption():
 
     optionType = FinOptionTypes.EUROPEAN_PUT
     k = 105.0
-    for stock_price in stock_priceRange:
-        for num_paths in num_pathsRange:
-            option = FinFXFixedLookbackOption(expiry_date, optionType, k)
-            stockMin = stock_price - 10.0
+    for stockPrice in stockPriceRange:
+        for numPaths in numPathsRange:
+            option = FinFXFixedLookbackOption(expiryDate, optionType, k)
+            stockMin = stockPrice - 10.0
             value = option.value(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin)
             start = time.time()
             valueMC = option.valueMC(
-                valuation_date,
-                stock_price,
+                valueDate,
+                stockPrice,
                 domesticCurve,
                 foreignCurve,
                 volatility,
                 stockMin,
-                num_paths,
-                num_steps_per_year)
+                numPaths,
+                numStepsPerYear)
             end = time.time()
             timeElapsed = round(end - start, 3)
             diff = valueMC - value
             testCases.print(
-                num_paths,
+                numPaths,
                 optionType,
-                stock_price,
+                stockPrice,
                 k,
                 stockMin,
                 value,

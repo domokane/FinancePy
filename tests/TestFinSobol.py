@@ -5,7 +5,7 @@ from numba import jit
 import sys
 sys.path.append("..")
 
-from financepy.models.sobol import getUniformSobol, getGaussianSobol
+from financepy.models.FinSobol import getUniformSobol, getGaussianSobol
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -15,10 +15,10 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinSobol():
 
-    num_points = 1000
+    numPoints = 1000
     dimensions = 3
 
-    points = getUniformSobol(num_points, dimensions)
+    points = getUniformSobol(numPoints, dimensions)
 
     for d in range(dimensions):
         av = 0.0
@@ -28,8 +28,8 @@ def test_FinSobol():
             av += point
             var += point ** 2
 
-        av /= num_points
-        var /= num_points
+        av /= numPoints
+        var /= numPoints
 
         avError = abs(av - (1/2))
         varError = abs(var - (1/3))

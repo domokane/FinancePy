@@ -6,11 +6,11 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityCliquetOption import FinEquityCliquetOption
-from financepy.models.black_scholes import FinModelBlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.utils.FinGlobalTypes import FinOptionTypes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
+from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinGlobalTypes import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,28 +20,28 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityCliquetOption():
 
-    start_date = Date(1, 1, 2014)
-    finalExpiryDate = Date(1, 1, 2017)
-    freq_type = FrequencyTypes.QUARTERLY
+    startDate = FinDate(1, 1, 2014)
+    finalExpiryDate = FinDate(1, 1, 2017)
+    freqType = FinFrequencyTypes.QUARTERLY
     optionType = FinOptionTypes.EUROPEAN_CALL
 
-    cliquetOption = FinEquityCliquetOption(start_date,
+    cliquetOption = FinEquityCliquetOption(startDate,
                                            finalExpiryDate,
                                            optionType,
-                                           freq_type)
+                                           freqType)
 
-    valuation_date = Date(1, 1, 2015)
-    stock_price = 100.0
+    valueDate = FinDate(1, 1, 2015)
+    stockPrice = 100.0
     volatility = 0.20
     interestRate = 0.05
     dividendYield = 0.02
     model = FinModelBlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
-    v = cliquetOption.value(valuation_date,
-                            stock_price,
-                            discount_curve,
+    v = cliquetOption.value(valueDate,
+                            stockPrice,
+                            discountCurve,
                             dividendCurve,
                             model)
 
