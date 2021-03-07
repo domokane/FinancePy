@@ -16,15 +16,14 @@ expiryDate = Date(1, 7, 2015)
 call_option = FinEquityVanillaOption(expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
 put_option = FinEquityVanillaOption(expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT)
 
+valueDate = Date(1, 1, 2015)
+stockPrice = 100
 volatility = 0.30
 interestRate = 0.05
 dividendYield = 0.01
 model = FinModelBlackScholes(volatility)
-valueDate = Date(1, 1, 2015)
 discountCurve = DiscountCurveFlat(valueDate, interestRate)
 dividendCurve = DiscountCurveFlat(valueDate, dividendYield)
-
-stockPrice = 100
 
 def test_call_option():
     v = call_option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)
