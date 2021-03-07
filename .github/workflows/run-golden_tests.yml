@@ -12,15 +12,15 @@ jobs:
      uses: actions/setup-python@v2
      with:
        python-version: 3.7.6
-   - name: run test script
+   - name: Install dependencies and package
      run: |
        pip install -r requirements.txt
        pip install -r requirements-dev.txt
        python setup.py install
+   - name: Run tests
        python tests_golden/runAllTests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v2
      with:
         name: result-differences-file-upload
         path: tests_golden/differences/*.testLog
-
