@@ -18,6 +18,7 @@ jobs:
        pip install -r requirements-dev.txt
        python setup.py install
    - name: Run tests
+     run: 
        python tests_golden/runAllTests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v2
