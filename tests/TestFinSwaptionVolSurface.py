@@ -9,8 +9,8 @@ import numpy as np
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.market.volatility.FinSwaptionVolSurface import FinSwaptionVolSurface
-from financepy.utils.date import Date
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.finutils.FinDate import FinDate
+from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -33,13 +33,13 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
 
         # https://fr.mathworks.com/help/fininst/pricing-a-swaption-using-the-sabr-model.html
 
-        valuation_date = Date(12, 6, 2013)
+        valueDate = FinDate(12, 6, 2013)
 
         # These are 3M, 1Y, 2Y, 3Y, 4Y, 5Y, 7Y, 10Y
-        exerciseDates = [Date(12, 9, 2013), Date(12, 6, 2014),
-                         Date(12, 6, 2015), Date(12, 6, 2016),
-                         Date(12, 6, 2017), Date(12, 6, 2018),
-                         Date(12, 6, 2020), Date(12, 6, 2023)]
+        exerciseDates = [FinDate(12, 9, 2013), FinDate(12, 6, 2014),
+                       FinDate(12, 6, 2015), FinDate(12, 6, 2016), 
+                       FinDate(12, 6, 2017), FinDate(12, 6, 2018), 
+                       FinDate(12, 6, 2020), FinDate(12, 6, 2023)]
 
         # First dimension is the strike, then the expiry date
         marketVolatilities = [[57.6, 53.7, 49.4, 45.6, 44.1, 41.1, 35.2, 32.0],
@@ -67,14 +67,14 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         atmVols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
-        discount_curve = DiscountCurveFlat(valuation_date, rfrRate)
+        discountCurve = FinDiscountCurveFlat(valueDate, rfrRate)
 
         divRate = 0.010  # USD
-        dividendCurve = DiscountCurveFlat(valuation_date, divRate)
+        dividendCurve = FinDiscountCurveFlat(valueDate, divRate)
 
         volFunctionType = FinVolFunctionTypes.SABR_BETA_HALF
 
-        swaptionSurface = FinSwaptionVolSurface(valuation_date,
+        swaptionSurface = FinSwaptionVolSurface(valueDate,
                                                 exerciseDates,
                                                 fwdSwapRates,
                                                 marketStrikes,
@@ -96,8 +96,8 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
             # dbns = swaptionSurface.impliedDbns(mins, maxs, 1000)
 
             # for i in range(0, len(dbns)):
-            #     expiry_dateStr = str(equitySurface._expiry_dates[i])
-            #     plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_dateStr)
+            #     expiryDateStr = str(equitySurface._expiryDates[i])
+            #     plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiryDateStr)
             #     plt.title(volFunctionType)
             #     plt.legend()
             #     print("SUM:", dbns[i].sum())

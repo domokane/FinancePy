@@ -5,33 +5,32 @@
 import numpy as np
 import time
 
-from financepy.finutils.FinDate import FinDate, dateRange
+from financepy.utils.date import Date, dateRange
 
 # Not under test
 
-from financepy.finutils.FinDate import FinDateFormatTypes
-from financepy.finutils.FinDate import setDateFormatType
+from financepy.utils.date import DateFormatTypes, setDateFormatType
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(DateFormatTypes.UK_LONGEST)
 
 # new sample tests
 
 
 def test_addDays():
-    assert FinDate(1, 1, 2018).addDays(-1).addDays(1) == FinDate(1, 1, 2018)
+    assert Date(1, 1, 2018).addDays(-1).addDays(1) == Date(1, 1, 2018)
 
 
 def test_from_string():
-    assert FinDate.fromString("1-1-2018", "%d-%m-%Y") == FinDate(1, 1, 2018)
+    assert Date.fromString("1-1-2018", "%d-%m-%Y") == Date(1, 1, 2018)
 
 
 def test_weekday():
-    assert FinDate(3, 3, 2021)._weekday == FinDate.WED
+    assert Date(3, 3, 2021)._weekday == Date.WED
 
 
 def test_excel_representation():
-    assert FinDate(5, 1, 1900)._excelDate == 5
-    assert FinDate(1, 3, 2020)._excelDate == 43891
+    assert Date(5, 1, 1900)._excelDate == 5
+    assert Date(1, 3, 2020)._excelDate == 43891
 
 
 # tests not refactored below
@@ -40,15 +39,15 @@ def test_excel_representation():
 # - some tests may be "parametrised" (probably not todo now)
 
 
-def test_FinDate():
+def test_Date():
 
-    startDate = FinDate(1, 1, 2018)
+    startDate = Date(1, 1, 2018)
 
     for numMonths in range(0, 120):
         nextCDSDate = startDate.nextCDSDate(numMonths)
         print(str(startDate), numMonths, str(nextCDSDate))
 
-    startDate = FinDate(1, 1, 2018)
+    startDate = Date(1, 1, 2018)
 
     for numMonths in range(0, 365):
         startDate = startDate.addDays(1)
@@ -56,9 +55,9 @@ def test_FinDate():
         print(numMonths, str(startDate), str(nextIMMDate))
 
 
-def test_FinDateTenors():
+def test_DateTenors():
 
-    startDate = FinDate(23, 2, 2018)
+    startDate = Date(23, 2, 2018)
 
     tenor = "5d"
     print(tenor, startDate.addTenor(tenor))
@@ -91,9 +90,9 @@ def test_FinDateTenors():
     print(tenor, startDate.addTenor(tenor))
 
 
-def test_FinDateRange():
+def test_DateRange():
 
-    startDate = FinDate(1, 1, 2010)
+    startDate = Date(1, 1, 2010)
 
     endDate = startDate.addDays(3)
     tenor = "Default"
@@ -112,9 +111,9 @@ def test_FinDateRange():
     print(case, dateRange(endDate, startDate))
 
 
-def test_FinDateAddMonths():
+def test_DateAddMonths():
 
-    startDate = FinDate(1, 1, 2010)
+    startDate = Date(1, 1, 2010)
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
 
@@ -124,9 +123,9 @@ def test_FinDateAddMonths():
         print("DATE", dt)
 
 
-def test_FinDateAddYears():
+def test_DateAddYears():
 
-    startDate = FinDate(1, 1, 2010)
+    startDate = Date(1, 1, 2010)
 
     years = [1, 3, 5, 7, 10]
     dates1 = startDate.addYears(years)
@@ -154,9 +153,9 @@ def test_FinDateAddYears():
         print("DATES4", dt)
 
 
-def test_FinDateFormat():
+def test_DateFormat():
 
-    dt = FinDate(20, 10, 2019)
+    dt = Date(20, 10, 2019)
 
     for formatType in FinDateFormatTypes:
         setDateFormatType(formatType)
@@ -165,83 +164,83 @@ def test_FinDateFormat():
 
 def test_IntraDay():
 
-    d1 = FinDate(20, 10, 2019, 0, 0, 0)
-    d2 = FinDate(25, 10, 2019, 0, 0, 0)
+    d1 = Date(20, 10, 2019, 0, 0, 0)
+    d2 = Date(25, 10, 2019, 0, 0, 0)
     diff = d2 - d1
     print(d1, d2, diff)
     print(d1._excelDate, d2._excelDate, diff)
 
     ###########################################################################
 
-    d1 = FinDate(20, 10, 2019, 10, 0, 0)
-    d2 = FinDate(25, 10, 2019, 10, 25, 0)
+    d1 = Date(20, 10, 2019, 10, 0, 0)
+    d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     print(d1, d2, diff)
     print(d1._excelDate, d2._excelDate, diff)
 
     ###########################################################################
 
-    d1 = FinDate(20, 10, 2019, 10, 0, 0)
-    d2 = FinDate(20, 10, 2019, 10, 25, 30)
+    d1 = Date(20, 10, 2019, 10, 0, 0)
+    d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     print(d1, d2, diff)
     print(d1._excelDate, d2._excelDate, diff)
 
     ###########################################################################
 
-    d1 = FinDate(19, 10, 2019, 10, 0, 0)
-    d2 = FinDate(20, 10, 2019, 10, 25, 40)
+    d1 = Date(19, 10, 2019, 10, 0, 0)
+    d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
     print(d1, d2, diff)
     print(d1._excelDate, d2._excelDate, diff)
 
 
-def test_FinDateEOM():
+def test_DateEOM():
 
-    dt = FinDate(29, 2, 2000)
+    dt = Date(29, 2, 2000)
     assert dt.isEOM() == True
 
-    dt = FinDate(28, 2, 2001)
+    dt = Date(28, 2, 2001)
     assert dt.isEOM() == True
 
-    dt = FinDate(29, 2, 2004)
+    dt = Date(29, 2, 2004)
     assert dt.isEOM() == True
 
-    dt = FinDate(28, 2, 2005)
+    dt = Date(28, 2, 2005)
     assert dt.isEOM() == True
 
-    dt = FinDate(31, 3, 2003)
+    dt = Date(31, 3, 2003)
     assert dt.isEOM() == True
 
-    dt = FinDate(30, 4, 2004)
+    dt = Date(30, 4, 2004)
     assert dt.isEOM() == True
 
-    dt = FinDate(31, 5, 2004)
+    dt = Date(31, 5, 2004)
     assert dt.isEOM() == True
 
-    dt = FinDate(31, 12, 2010)
+    dt = Date(31, 12, 2010)
     assert dt.isEOM() == True
 
-    dt = FinDate(2, 2, 2000)
+    dt = Date(2, 2, 2000)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(24, 2, 2001)
+    dt = Date(24, 2, 2001)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(22, 2, 2004)
+    dt = Date(22, 2, 2004)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(1, 2, 2005)
+    dt = Date(1, 2, 2005)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(1, 3, 2003)
+    dt = Date(1, 3, 2003)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(3, 4, 2004)
+    dt = Date(3, 4, 2004)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(5, 5, 2004)
+    dt = Date(5, 5, 2004)
     assert dt.EOM().isEOM() == True
 
-    dt = FinDate(7, 12, 2010)
+    dt = Date(7, 12, 2010)
     assert dt.EOM().isEOM() == True

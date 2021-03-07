@@ -331,7 +331,7 @@ class DiscountCurve():
     def fwd(self,
             dts: Date):
         """ Calculate the continuously compounded forward rate at the forward
-        FinDate provided. This is done by perturbing the time by one day only
+        Date provided. This is done by perturbing the time by one day only
         and measuring the change in the log of the discount factor divided by
         the time increment dt. I am assuming continuous compounding over the
         one date. """

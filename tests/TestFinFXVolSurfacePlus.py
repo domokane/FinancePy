@@ -12,8 +12,8 @@ from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
 from financepy.market.volatility.FinFXVolSurfacePlus import FinFXVolSurfacePlus
 from financepy.market.volatility.FinFXVolSurfacePlus import FinFXATMMethod
 from financepy.market.volatility.FinFXVolSurfacePlus import FinFXDeltaMethod
-from financepy.utils.date import Date
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.finutils.FinDate import FinDate
+from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -37,15 +37,15 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -64,7 +64,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         volFunctionType = FinVolFunctionTypes.CLARK5
         alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FinFXVolSurfacePlus(valuation_date,
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
                                        currencyPair,
                                        notionalCurrency,
@@ -106,15 +106,15 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
         # print("EURJPY EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "JPY"
         forCCRate = 0.0294  # EUR
         domCCRate = 0.0171  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 90.72
@@ -133,7 +133,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
         volFunctionType = FinVolFunctionTypes.CLARK5
 
-        fxMarketPlus = FinFXVolSurfacePlus(valuation_date,
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                            spotFXRate,
                                            currencyPair,
                                            notionalCurrency,
@@ -176,15 +176,15 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         # Example from Book extract by Iain Clark using Tables 4.4 and 4.5
         # where we examine the calibration to a full surface in Chapter 4
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -206,7 +206,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         volFunctionType = FinVolFunctionTypes.CLARK5
         alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FinFXVolSurfacePlus(valuation_date,
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
                                        currencyPair,
                                        notionalCurrency,
@@ -241,7 +241,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         # Test interpolation
         
         years = [1.0, 1.5, 2.0]
-        dates = valuation_date.addYears(years)
+        dates = valueDate.addYears(years)
 
         strikes = np.linspace(1.0, 2.0, 20)
 
@@ -313,15 +313,15 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -343,7 +343,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         volFunctionType = FinVolFunctionTypes.CLARK
         alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FinFXVolSurfacePlus(valuation_date,
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
                                        currencyPair,
                                        notionalCurrency,
@@ -364,7 +364,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         years = [1.0/12.0, 2./12., 0.25, 0.5, 1.0, 2.0]
 
-        dates = valuation_date.addYears(years)
+        dates = valueDate.addYears(years)
 
         deltas = np.linspace(0.10, 0.90, 17)
 
@@ -406,15 +406,15 @@ def test_FinFXMktVolSurface5(verboseCalibration):
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -436,7 +436,7 @@ def test_FinFXMktVolSurface5(verboseCalibration):
         volFunctionType = FinVolFunctionTypes.CLARK
         alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FinFXVolSurfacePlus(valuation_date,
+        fxMarketPlus = FinFXVolSurfacePlus(valueDate,
                                        spotFXRate,
                                        currencyPair,
                                        notionalCurrency,

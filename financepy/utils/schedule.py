@@ -114,7 +114,7 @@ class Schedule(object):
 ###############################################################################
 
     def scheduleDates(self):
-        """ Returns a list of the schedule of FinDates. """
+        """ Returns a list of the schedule of Dates. """
 
         if self._adjusted_dates is None:
             self._generate()

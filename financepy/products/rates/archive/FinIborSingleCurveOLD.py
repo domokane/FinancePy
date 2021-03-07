@@ -11,7 +11,7 @@ from scipy.interpolate import PchipInterpolator
 import copy
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import check_argument_types, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -155,7 +155,7 @@ class FinOIRSwapCurve(FinDiscountCurve):
 
     def __init__(self,
 <<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
-                 valuation_date: FinDate, # This is the trade date (not T+2)
+                 valuation_date: Date, # This is the trade date (not T+2)
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
@@ -164,7 +164,7 @@ class FinOIRSwapCurve(FinDiscountCurve):
         """ Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
 =======
-                 valuation_date: FinDate,
+                 valuation_date: Date,
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
@@ -368,9 +368,9 @@ class FinOIRSwapCurve(FinDiscountCurve):
         # Now we have ensure they are in order check for overlaps and the like
         #######################################################################
 
-        lastDepositMaturityDate = FinDate(1, 1, 1900)
-        firstFRAMaturityDate = FinDate(1, 1, 1900)
-        lastFRAMaturityDate = FinDate(1, 1, 1900)
+        lastDepositMaturityDate = Date(1, 1, 1900)
+        firstFRAMaturityDate = Date(1, 1, 1900)
+        lastFRAMaturityDate = Date(1, 1, 1900)
 
         if numDepos > 0:
             lastDepositMaturityDate = iborDeposits[-1]._maturity_date

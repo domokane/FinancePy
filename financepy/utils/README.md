@@ -2,7 +2,7 @@
 
 This is a collection of modules used across a wide range of FinancePy functions. Examples include date generation, special mathematical functions and useful helper functions for performing some repeated action
 
-* FinDate is a class for handling dates in a financial setting. Special functions are included for computing IMM dates and CDS dates and moving dates forward by tenors.
+* Date is a class for handling dates in a financial setting. Special functions are included for computing IMM dates and CDS dates and moving dates forward by tenors.
 * FinCalendar is a class for determining which dates are not business dates in a specific region or country.
 * FinDayCount is a class for determining accrued interest in bonds and also accrual factors in ISDA swap-like contracts.
 * FinError is a class which handles errors in the calculations done within FinancePy

@@ -35,45 +35,45 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurves():
 
     # Create a curve from times and discount factors
-    valuation_date = Date(1, 1, 2018)
+    valuationDate = FinDate(1, 1, 2018)
     years = [1.0, 2.0, 3.0, 4.0, 5.0]
-    dates = valuation_date.addYears(years)
+    dates = valuationDate.addYears(years)
     years2 = []
 
     for dt in dates:
-        y = (dt - valuation_date) / gDaysInYear
+        y = (dt - valuationDate) / gDaysInYear
         years2.append(y)
 
     rates = np.array([0.05, 0.06, 0.065, 0.07, 0.075])
-    discount_factors = np.exp(-np.array(rates) * np.array(years2))
+    discountFactors = np.exp(-np.array(rates) * np.array(years2))
     curvesList = []
 
-    finDiscountCurve = DiscountCurve(valuation_date, dates, discount_factors,
-                                     FinInterpTypes.FLAT_FWD_RATES)
+    finDiscountCurve = FinDiscountCurve(valuationDate, dates, discountFactors,
+                                        FinInterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
-    finDiscountCurveFlat = DiscountCurveFlat(valuation_date, 0.05)
+    finDiscountCurveFlat = FinDiscountCurveFlat(valuationDate, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = DiscountCurveNS(valuation_date, 0.0305, -0.01,
-                                         0.08, 10.0)
+    finDiscountCurveNS = FinDiscountCurveNS(valuationDate, 0.0305, -0.01,
+                                            0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = DiscountCurveNSS(valuation_date, 0.035, -0.02,
-                                           0.09, 0.1, 1.0, 2.0)
+    finDiscountCurveNSS = FinDiscountCurveNSS(valuationDate, 0.035, -0.02,
+                                              0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = DiscountCurvePoly(valuation_date, [0.05, 0.002,
-                                                              -0.00005])
+    finDiscountCurvePoly = FinDiscountCurvePoly(valuationDate, [0.05, 0.002,
+                                                                -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
-    finDiscountCurvePWF = DiscountCurvePWF(valuation_date, dates, rates)
+    finDiscountCurvePWF = FinDiscountCurvePWF(valuationDate, dates, rates)
     curvesList.append(finDiscountCurvePWF)
 
-    finDiscountCurvePWL = DiscountCurvePWL(valuation_date, dates, rates)
+    finDiscountCurvePWL = FinDiscountCurvePWL(valuationDate, dates, rates)
     curvesList.append(finDiscountCurvePWL)
 
-    finDiscountCurveZeros = DiscountCurveZeros(valuation_date, dates, rates)
+    finDiscountCurveZeros = FinDiscountCurveZeros(valuationDate, dates, rates)
     curvesList.append(finDiscountCurveZeros)
 
     curveNames = []
@@ -84,7 +84,7 @@ def test_FinDiscountCurves():
     testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
 
     years = np.linspace(1, 10, 10)
-    fwdMaturityDates = valuation_date.addYears(years)
+    fwdMaturityDates = valuationDate.addYears(years)
 
     testCases.banner("######################################################")
     testCases.banner("SINGLE CALLS")
@@ -95,8 +95,8 @@ def test_FinDiscountCurves():
             tenor = "3M"
             zeroRate = curve.zeroRate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
-            fwd_rate = curve.fwd_rate(fwdMaturityDate, tenor)
-            swap_rate = curve.swap_rate(valuation_date, fwdMaturityDate)
+            fwdRate = curve.fwdRate(fwdMaturityDate, tenor)
+            swapRate = curve.swapRate(valuationDate, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
             testCases.print("%-20s" % name,
@@ -104,8 +104,8 @@ def test_FinDiscountCurves():
                             "%7.6f" % (zeroRate),
                             "%8.7f" % (df),
                             "%7.6f" % (fwd),
-                            "%7.6f" % (fwd_rate),
-                            "%7.6f" % (swap_rate))
+                            "%7.6f" % (fwdRate),
+                            "%7.6f" % (swapRate))
 
     # Examine vectorisation
     testCases.banner("######################################################")
@@ -116,8 +116,8 @@ def test_FinDiscountCurves():
         tenor = "3M"
         zeroRate = curve.zeroRate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
-        fwd_rate = curve.fwd_rate(fwdMaturityDates, tenor)
-        swap_rate = curve.swap_rate(valuation_date, fwdMaturityDates)
+        fwdRate = curve.fwdRate(fwdMaturityDates, tenor)
+        swapRate = curve.swapRate(valuationDate, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
@@ -126,15 +126,15 @@ def test_FinDiscountCurves():
                             "%7.6f" % (zeroRate[i]),
                             "%8.7f" % (df[i]),
                             "%7.6f" % (fwd[i]),
-                            "%7.6f" % (fwd_rate[i]),
-                            "%7.6f" % (swap_rate[i]))
+                            "%7.6f" % (fwdRate[i]),
+                            "%7.6f" % (swapRate[i]))
 
     if PLOT_GRAPHS:
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
-        fwdDates = valuation_date.addYears(years)
-        fwdDates2 = valuation_date.addYears(years2)
+        fwdDates = valuationDate.addYears(years)
+        fwdDates2 = valuationDate.addYears(years2)
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
@@ -145,15 +145,15 @@ def test_FinDiscountCurves():
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
-            fwd_rates = curve.fwd(fwdDates)
-            plt.plot(years, fwd_rates, label=name)
+            fwdRates = curve.fwd(fwdDates)
+            plt.plot(years, fwdRates, label=name)
         plt.legend()
         plt.title("CC Fwd Rates")
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
-            fwd_rates = curve.fwd_rate(fwdDates, fwdDates2)
-            plt.plot(years, fwd_rates, label=name)
+            fwdRates = curve.fwdRate(fwdDates, fwdDates2)
+            plt.plot(years, fwdRates, label=name)
         plt.legend()
         plt.title("CC Fwd Rates")
 

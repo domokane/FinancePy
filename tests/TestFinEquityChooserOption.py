@@ -17,22 +17,22 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_FinEquityChooserOptionHaug():
-    """ Following example in Haug Page 130 """
+    ''' Following example in Haug Page 130 '''
 
-    valuation_date = Date(1, 1, 2015)
-    chooseDate = Date(2, 4, 2015)
-    callExpiryDate = Date(1, 7, 2015)
-    putExpiryDate = Date(2, 8, 2015)
+    valueDate = FinDate(1, 1, 2015)
+    chooseDate = FinDate(2, 4, 2015)
+    callExpiryDate = FinDate(1, 7, 2015)
+    putExpiryDate = FinDate(2, 8, 2015)
     callStrike = 55.0
     putStrike = 48.0
-    stock_price = 50.0
+    stockPrice = 50.0
     volatility = 0.35
     interestRate = 0.10
     dividendYield = 0.05
 
     model = FinModelBlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -40,15 +40,15 @@ def test_FinEquityChooserOptionHaug():
                                            callStrike,
                                            putStrike)
 
-    v = chooserOption.value(valuation_date,
-                            stock_price,
-                            discount_curve,
+    v = chooserOption.value(valueDate,
+                            stockPrice,
+                            discountCurve,
                             dividendCurve,
                             model)
 
-    v_mc = chooserOption.valueMC(valuation_date,
-                                 stock_price,
-                                 discount_curve,
+    v_mc = chooserOption.valueMC(valueDate,
+                                 stockPrice,
+                                 discountCurve,
                                  dividendCurve,
                                  model, 20000)
 
@@ -60,23 +60,23 @@ def test_FinEquityChooserOptionHaug():
 
 
 def test_FinEquityChooserOptionMatlab():
-    """https://fr.mathworks.com/help/fininst/chooserbybls.html """
+    '''https://fr.mathworks.com/help/fininst/chooserbybls.html '''
 
-    valuation_date = Date(1, 6, 2007)
-    chooseDate = Date(31, 8, 2007)
-    callExpiryDate = Date(2, 12, 2007)
-    putExpiryDate = Date(2, 12, 2007)
+    valueDate = FinDate(1, 6, 2007)
+    chooseDate = FinDate(31, 8, 2007)
+    callExpiryDate = FinDate(2, 12, 2007)
+    putExpiryDate = FinDate(2, 12, 2007)
     callStrike = 60.0
     putStrike = 60.0
-    stock_price = 50.0
+    stockPrice = 50.0
     volatility = 0.20
     interestRate = 0.10
     dividendYield = 0.05
 
     model = FinModelBlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -84,15 +84,15 @@ def test_FinEquityChooserOptionMatlab():
                                            callStrike,
                                            putStrike)
 
-    v = chooserOption.value(valuation_date,
-                            stock_price,
-                            discount_curve,
+    v = chooserOption.value(valueDate,
+                            stockPrice,
+                            discountCurve,
                             dividendCurve,
                             model)
 
-    v_mc = chooserOption.valueMC(valuation_date,
-                                 stock_price,
-                                 discount_curve,
+    v_mc = chooserOption.valueMC(valueDate,
+                                 stockPrice,
+                                 discountCurve,
                                  dividendCurve,
                                  model, 20000)
 
@@ -104,22 +104,22 @@ def test_FinEquityChooserOptionMatlab():
 
 
 def test_FinEquityChooserOptionDerivicom():
-    """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm """
+    '''http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm '''
 
-    valuation_date = Date(1, 1, 2007)
-    chooseDate = Date(1, 2, 2007)
-    callExpiryDate = Date(1, 4, 2007)
-    putExpiryDate = Date(1, 5, 2007)
+    valueDate = FinDate(1, 1, 2007)
+    chooseDate = FinDate(1, 2, 2007)
+    callExpiryDate = FinDate(1, 4, 2007)
+    putExpiryDate = FinDate(1, 5, 2007)
     callStrike = 40.0
     putStrike = 35.0
-    stock_price = 38.0
+    stockPrice = 38.0
     volatility = 0.20
     interestRate = 0.08
     dividendYield = 0.0625
 
     model = FinModelBlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
     chooserOption = FinEquityChooserOption(chooseDate,
                                            callExpiryDate,
@@ -127,15 +127,15 @@ def test_FinEquityChooserOptionDerivicom():
                                            callStrike,
                                            putStrike)
 
-    v = chooserOption.value(valuation_date,
-                            stock_price,
-                            discount_curve,
+    v = chooserOption.value(valueDate,
+                            stockPrice,
+                            discountCurve,
                             dividendCurve,
                             model)
 
-    v_mc = chooserOption.valueMC(valuation_date,
-                                 stock_price,
-                                 discount_curve,
+    v_mc = chooserOption.valueMC(valueDate,
+                                 stockPrice,
+                                 discountCurve,
                                  dividendCurve,
                                  model, 20000)
 

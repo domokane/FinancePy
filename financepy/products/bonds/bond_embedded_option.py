@@ -48,7 +48,7 @@ class BondEmbeddedOption(object):
 
     def __init__(self,
                  issue_date: Date,
-                 maturity_date: Date,  # FinDate
+                 maturity_date: Date,  # Date
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,

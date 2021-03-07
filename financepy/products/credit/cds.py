@@ -190,7 +190,7 @@ class FinCDS(object):
 
     def __init__(self,
                  step_in_date: Date,  # Date protection starts
-                 maturity_date_or_tenor: (Date, str),  # FinDate or tenor
+                 maturity_date_or_tenor: (Date, str),  # Date or tenor
                  running_coupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
@@ -297,7 +297,7 @@ class FinCDS(object):
             self._adjusted_dates.append(finalDate)
 
         else:
-            raise FinError("Unknown FinDateGenRuleType:" +
+            raise FinError("Unknown DateGenRuleType:" +
                            str(self._date_gen_rule_type))
 
     ###############################################################################
@@ -744,7 +744,7 @@ class FinCDS(object):
         accurate approximation that avoids curve building. """
 
         if type(valuation_date) is not Date:
-            raise FinError("Valuation date must be a FinDate and not " +
+            raise FinError("Valuation date must be a Date and not " +
                            str(valuation_date))
 
         t_mat = (self._maturity_date - valuation_date) / gDaysInYear

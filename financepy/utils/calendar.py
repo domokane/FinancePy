@@ -180,7 +180,7 @@ class Calendar(object):
     def addBusinessDays(self,
                         start_date: Date,
                         numDays: int):
-        """ Returns a new date that is numDays business days after FinDate. 
+        """ Returns a new date that is numDays business days after Date.
         All holidays in the chosen calendar are assumed not business days. """
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE ???

@@ -18,41 +18,41 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityForward():
 
-    valuation_date = Date(13, 2, 2018)
-    expiry_date = valuation_date.addMonths(12)
+    valueDate = FinDate(13, 2, 2018)
+    expiryDate = valueDate.addMonths(12)
 
-    stock_price = 130.0
+    stockPrice = 130.0
     forwardPrice = 125.0 # Locked
     discountRate = 0.05
     dividendRate = 0.02
 
     ###########################################################################
 
-    expiry_date = valuation_date.addMonths(12)
+    expiryDate = valueDate.addMonths(12)
     notional = 100.0
 
-    discount_curve = DiscountCurveFlat(valuation_date, discountRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, discountRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendRate)
 
-    equityForward = FinEquityForward(expiry_date,
+    equityForward = FinEquityForward(expiryDate,
                                      forwardPrice,
                                      notional,
                                      FinLongShort.LONG)
 
     testCases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwdPrice = equityForward.forward(valuation_date,
-                                     stock_price,
-                                     discount_curve, 
+    fwdPrice = equityForward.forward(valueDate,
+                                     stockPrice,
+                                     discountCurve, 
                                      dividendCurve)
 
-    fwdValue = equityForward.value(valuation_date,
-                                   stock_price,
-                                   discount_curve, 
+    fwdValue = equityForward.value(valueDate,
+                                   stockPrice,
+                                   discountCurve, 
                                    dividendCurve)
 
-#    print(stock_price, fwdPrice, fwdValue)
-    testCases.print(stock_price, fwdPrice, fwdValue)
+#    print(stockPrice, fwdPrice, fwdValue)
+    testCases.print(stockPrice, fwdPrice, fwdValue)
 
 ###############################################################################
 

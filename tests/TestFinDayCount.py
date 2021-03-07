@@ -5,9 +5,9 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCount, DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
+from financepy.finutils.FinDate import FinDate
+from financepy.finutils.FinDayCount import FinDayCount, FinDayCountTypes
+from financepy.finutils.FinFrequency import FinFrequencyTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -18,23 +18,23 @@ def test_FinDayCount():
 
     testCases.header("DAY_COUNT_METHOD", "START", "END", "ALPHA")
 
-    finFreq = FrequencyTypes.ANNUAL
+    finFreq = FinFrequencyTypes.ANNUAL
 
-    for dayCountMethod in DayCountTypes:
+    for dayCountMethod in FinDayCountTypes:
 
-        start_date = Date(1, 1, 2019)
-        next_date = start_date
+        startDate = FinDate(1, 1, 2019)
+        nextDate = startDate
         numDays = 20
-        dayCount = DayCount(dayCountMethod)
+        dayCount = FinDayCount(dayCountMethod)
 
         for _ in range(0, numDays):
-            next_date = next_date.addDays(7)
-            dcf = dayCount.year_frac(start_date, next_date, next_date, finFreq)
+            nextDate = nextDate.addDays(7)
+            dcf = dayCount.yearFrac(startDate, nextDate, nextDate, finFreq)
 
             testCases.print(
                 str(dayCountMethod),
-                str(start_date),
-                str(next_date),
+                str(startDate),
+                str(nextDate),
                 dcf[0])
 
 

@@ -20,8 +20,8 @@ pltGraph = False
 
 def test_FinMathAccdInterpolator():
 
-    coupon_times = [0.0, 4.000087613144162, 4.495649459810208, 5.002162949496498]
-    coupon_flows = [0.0, 0.0, 0.03461111111111111, 0.035194444444444445]
+    couponTimes = [0.0, 4.000087613144162, 4.495649459810208, 5.002162949496498]
+    couponFlows = [0.0, 0.0, 0.03461111111111111, 0.035194444444444445]
 
     treeTimes = [0., 0.12498563, 0.24997125, 0.37495688, 0.4999425, 0.62492813,
                  0.74991376, 0.87489938, 0.99988501, 1.12487063, 1.24985626, 1.37484189,
@@ -31,13 +31,13 @@ def test_FinMathAccdInterpolator():
                  3.74956878, 3.87455441, 3.99954003, 4.12452566, 4.24951128, 4.37449691,
                  4.49948253, 4.62446816, 4.74945379, 4.87443941, 4.99942504, 5.12441066]
 
-    coupon_times = np.array(coupon_times)
-    coupon_flows = np.array(coupon_flows)
+    couponTimes = np.array(couponTimes)
+    couponFlows = np.array(couponFlows)
 
     values = []
 
     for t in treeTimes:
-        v = accruedInterpolator(t, coupon_times, coupon_flows)
+        v = accruedInterpolator(t, couponTimes, couponFlows)
         values.append(v)
 
     testCases.header("VALUE")

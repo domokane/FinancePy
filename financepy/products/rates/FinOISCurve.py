@@ -537,9 +537,9 @@ class OISCurve(DiscountCurve):
 ###############################################################################
 
     # def overnightRate(self,
-    #                   settlement_date: FinDate,
-    #                   start_date: FinDate,
-    #                   maturity_date: (FinDate, list),
+    #                   settlement_date: Date,
+    #                   start_date: Date,
+    #                   maturity_date: (Date, list),
     #                   day_count_type: DayCountTypes=DayCountTypes.THIRTY_E_360):
     #     """ get a vector of dates and values for the overnight rate implied by
     #     the OIS rate term structure. """
@@ -548,7 +548,7 @@ class OISCurve(DiscountCurve):
     #     # calculate the swap rate since that will create a circular dependency.
     #     # I therefore recreate the actual calculation of the swap rate here.
 
-    #     if isinstance(maturity_date, FinDate):
+    #     if isinstance(maturity_date, Date):
     #         maturity_dates = [maturity_date]
     #     else:
     #         maturity_dates = maturity_date
@@ -587,7 +587,7 @@ class OISCurve(DiscountCurve):
 
     #         parRates.append(parRate)
 
-    #     if isinstance(maturity_date, FinDate):
+    #     if isinstance(maturity_date, Date):
     #         return parRates[0]
     #     else:
     #         return parRates

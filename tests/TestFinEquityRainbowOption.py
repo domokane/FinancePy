@@ -25,24 +25,24 @@ def test_FinEquityRainbowOption():
 
     #        import matplotlib.pyplot as plt
 
-    valuation_date = Date(1, 1, 2015)
-    expiry_date = Date(1, 1, 2016)
+    valueDate = FinDate(1, 1, 2015)
+    expiryDate = FinDate(1, 1, 2016)
     interestRate = 0.05
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
 
     numAssets = 2
     volatilities = np.ones(numAssets) * 0.3
 
-    dividend_yields = np.ones(numAssets) * 0.01
+    dividendYields = np.ones(numAssets) * 0.01
 
     dividendCurves = []
-    for q in dividend_yields:
-        dividendCurve = DiscountCurveFlat(valuation_date, q)
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
         dividendCurves.append(dividendCurve)
 
-    stock_prices = np.ones(numAssets) * 100
-    num_pathsList = [10000]
+    stockPrices = np.ones(numAssets) * 100
+    numPathsList = [10000]
     corrList = np.linspace(0.0, 0.999999, 6)
     strike = 100.0
 
@@ -55,7 +55,7 @@ def test_FinEquityRainbowOption():
     payoffType = FinEquityRainbowOptionTypes.CALL_ON_MAXIMUM
     payoffParams = [strike]
     rainbowOption = FinEquityRainbowOption(
-        expiry_date, payoffType, payoffParams, numAssets)
+        expiryDate, payoffType, payoffParams, numAssets)
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
@@ -67,29 +67,29 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             start = time.time()
             v = rainbowOption.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
 
             v_MC = rainbowOption.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -110,7 +110,7 @@ def test_FinEquityRainbowOption():
     payoffType = FinEquityRainbowOptionTypes.CALL_ON_MINIMUM
     payoffParams = [strike]
     rainbowOption = FinEquityRainbowOption(
-        expiry_date, payoffType, payoffParams, numAssets)
+        expiryDate, payoffType, payoffParams, numAssets)
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
@@ -122,30 +122,30 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             start = time.time()
 
             v = rainbowOption.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
 
             v_MC = rainbowOption.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -167,7 +167,7 @@ def test_FinEquityRainbowOption():
     payoffType = FinEquityRainbowOptionTypes.PUT_ON_MAXIMUM
     payoffParams = [strike]
     rainbowOption = FinEquityRainbowOption(
-        expiry_date, payoffType, payoffParams, numAssets)
+        expiryDate, payoffType, payoffParams, numAssets)
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
@@ -179,30 +179,30 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             start = time.time()
 
             v = rainbowOption.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
 
             v_MC = rainbowOption.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -223,7 +223,7 @@ def test_FinEquityRainbowOption():
     payoffType = FinEquityRainbowOptionTypes.PUT_ON_MINIMUM
     payoffParams = [strike]
     rainbowOption = FinEquityRainbowOption(
-        expiry_date, payoffType, payoffParams, numAssets)
+        expiryDate, payoffType, payoffParams, numAssets)
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
@@ -235,27 +235,27 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             start = time.time()
             v = rainbowOption.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
             v_MC = rainbowOption.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -270,8 +270,8 @@ def test_FinEquityRainbowOption():
 
     numAssets = 2
     volatilities = np.ones(numAssets) * 0.3
-    dividend_yields = np.ones(numAssets) * 0.01
-    stock_prices = np.ones(numAssets) * 100
+    dividendYields = np.ones(numAssets) * 0.01
+    stockPrices = np.ones(numAssets) * 100
     strike = 100.0
     correlation = 0.50
 
@@ -291,40 +291,40 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             payoffType1 = FinEquityRainbowOptionTypes.CALL_ON_MAXIMUM
             payoffParams1 = [strike]
             rainbowOption1 = FinEquityRainbowOption(
-                expiry_date, payoffType1, payoffParams1, numAssets)
+                expiryDate, payoffType1, payoffParams1, numAssets)
 
             payoffType2 = FinEquityRainbowOptionTypes.CALL_ON_NTH
             payoffParams2 = [1, strike]
             rainbowOption2 = FinEquityRainbowOption(
-                expiry_date, payoffType2, payoffParams2, numAssets)
+                expiryDate, payoffType2, payoffParams2, numAssets)
 
             start = time.time()
 
             v = rainbowOption1.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
 
             v_MC = rainbowOption2.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -351,40 +351,40 @@ def test_FinEquityRainbowOption():
         betas = np.ones(numAssets) * sqrt(correlation)
         corrMatrix = betaVectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for numPaths in numPathsList:
 
             payoffType1 = FinEquityRainbowOptionTypes.CALL_ON_MINIMUM
             payoffParams1 = [strike]
             rainbowOption1 = FinEquityRainbowOption(
-                expiry_date, payoffType1, payoffParams1, numAssets)
+                expiryDate, payoffType1, payoffParams1, numAssets)
 
             payoffType2 = FinEquityRainbowOptionTypes.CALL_ON_NTH
             payoffParams2 = [2, strike]
             rainbowOption2 = FinEquityRainbowOption(
-                expiry_date, payoffType2, payoffParams2, numAssets)
+                expiryDate, payoffType2, payoffParams2, numAssets)
 
             start = time.time()
 
             v = rainbowOption1.value(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix)
 
             v_MC = rainbowOption2.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, v, v_MC, duration)
+            testCases.print(numPaths, correlation, v, v_MC, duration)
 
             rainboxOptionValues.append(v)
             rainbowOptionValuesMC.append(v_MC)
@@ -403,15 +403,15 @@ def test_FinEquityRainbowOption():
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
-    num_paths = 10000
+    numPaths = 10000
     numAssets = 5
     volatilities = np.ones(numAssets) * 0.3
-    dividend_yields = np.ones(numAssets) * 0.01
-    stock_prices = np.ones(numAssets) * 100
+    dividendYields = np.ones(numAssets) * 0.01
+    stockPrices = np.ones(numAssets) * 100
 
     dividendCurves = []
-    for q in dividend_yields:
-        dividendCurve = DiscountCurveFlat(valuation_date, q)
+    for q in dividendYields:
+        dividendCurve = FinDiscountCurveFlat(valueDate, q)
         dividendCurves.append(dividendCurve)
 
 #    plt.figure(figsize=(10,8))
@@ -432,7 +432,7 @@ def test_FinEquityRainbowOption():
         payoffType2 = FinEquityRainbowOptionTypes.CALL_ON_NTH
         payoffParams2 = [n, strike]
         rainbowOption2 = FinEquityRainbowOption(
-            expiry_date, payoffType2, payoffParams2, numAssets)
+            expiryDate, payoffType2, payoffParams2, numAssets)
 
         for correlation in corrList:
 
@@ -442,17 +442,17 @@ def test_FinEquityRainbowOption():
             start = time.time()
 
             v_MC = rainbowOption2.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, n, v, v_MC, duration)
+            testCases.print(numPaths, correlation, n, v, v_MC, duration)
 
             rainbowOptionValuesMC.append(v_MC)
 
@@ -468,11 +468,11 @@ def test_FinEquityRainbowOption():
 
     rainboxOptionValues = []
     rainbowOptionValuesMC = []
-    num_paths = 10000
+    numPaths = 10000
     numAssets = 5
     volatilities = np.ones(numAssets) * 0.3
-    dividend_yields = np.ones(numAssets) * 0.01
-    stock_prices = np.ones(numAssets) * 100
+    dividendYields = np.ones(numAssets) * 0.01
+    stockPrices = np.ones(numAssets) * 100
 
 #    plt.figure(figsize=(10,8))
 
@@ -492,7 +492,7 @@ def test_FinEquityRainbowOption():
         payoffType2 = FinEquityRainbowOptionTypes.PUT_ON_NTH
         payoffParams2 = [n, strike]
         rainbowOption2 = FinEquityRainbowOption(
-            expiry_date, payoffType2, payoffParams2, numAssets)
+            expiryDate, payoffType2, payoffParams2, numAssets)
 
         for correlation in corrList:
 
@@ -502,17 +502,17 @@ def test_FinEquityRainbowOption():
             start = time.time()
 
             v_MC = rainbowOption2.valueMC(
-                valuation_date,
-                stock_prices,
-                discount_curve,
+                valueDate,
+                stockPrices,
+                discountCurve,
                 dividendCurves,
                 volatilities,
                 corrMatrix,
-                num_paths)
+                numPaths)
 
             end = time.time()
             duration = end - start
-            testCases.print(num_paths, correlation, n, v, v_MC, duration)
+            testCases.print(numPaths, correlation, n, v, v_MC, duration)
 
             rainbowOptionValuesMC.append(v_MC)
 

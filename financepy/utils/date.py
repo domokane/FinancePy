@@ -11,7 +11,7 @@ import numpy as np
 
 from enum import Enum
 
-class FinDateFormatTypes(Enum):
+class DateFormatTypes(Enum):
     BLOOMBERG = 1
     US_SHORT = 2
     US_MEDIUM = 3
@@ -25,7 +25,7 @@ class FinDateFormatTypes(Enum):
     
 
 # Set the default
-gDateFormatType = FinDateFormatTypes.UK_LONG
+gDateFormatType = DateFormatTypes.UK_LONG
 
 def setDateFormatType(formatType):
     """ Function that sets the global date format type. """
@@ -199,7 +199,7 @@ class Date():
         user can also supply an hour, minute and second for intraday work.
 
         Example Input:
-        start_date = FinDate(1, 1, 2018)
+        start_date = Date(1, 1, 2018)
         """
 
         global gStartYear
@@ -208,7 +208,7 @@ class Date():
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
-            raise FinError("Date arguments must now be in the order FinDate(dd, mm, yyyy)")
+            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
 
         if gDateCounterList is None:
             calculateList()
@@ -276,9 +276,9 @@ class Date():
 
     @classmethod
     def fromString(cls, dateString, formatString):
-        """  Create a FinDate from a date and format string.
+        """  Create a Date from a date and format string.
         Example Input:
-        start_date = FinDate('1-1-2018', '%d-%m-%Y') """
+        start_date = Date('1-1-2018', '%d-%m-%Y') """
  
         d, m, y = parse_date(dateString, formatString)
         return cls(d, m, y)
@@ -377,7 +377,7 @@ class Date():
     ###########################################################################
 
     def addHours(self, hours):
-        """ Returns a new date that is h hours after the FinDate. """
+        """ Returns a new date that is h hours after the Date. """
 
         if hours < 0:
             raise FinError("Number of hours must be positive")
@@ -398,7 +398,7 @@ class Date():
 
     def addDays(self,
                 numDays: int = 1):
-        """ Returns a new date that is numDays after the FinDate. I also make
+        """ Returns a new date that is numDays after the Date. I also make
         it possible to go backwards a number of days. """
 
         idx = dateIndex(self._d, self._m, self._y)
@@ -420,7 +420,7 @@ class Date():
 
     def addWeekDays(self,
                     numDays: int):
-        """ Returns a new date that is numDays working days after FinDate. Note
+        """ Returns a new date that is numDays working days after Date. Note
         that only weekends are taken into account. Other Holidays are not. If
         you want to include regional holidays then use addBusinessDays from
         the FinCalendar class. """
@@ -454,7 +454,7 @@ class Date():
 
     def addMonths(self,
                   mm: (list, int)):
-        """ Returns a new date that is mm months after the FinDate. If mm is an
+        """ Returns a new date that is mm months after the Date. If mm is an
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates."""
 
@@ -514,7 +514,7 @@ class Date():
 
     def addYears(self,
                  yy: (np.ndarray, float)):
-        """ Returns a new date that is yy years after the FinDate. If yy is an
+        """ Returns a new date that is yy years after the Date. If yy is an
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates."""
 
@@ -555,7 +555,7 @@ class Date():
 
     def nextCDSDate(self,
                     mm: int = 0):
-        """ Returns a CDS date that is mm months after the FinDate. If no
+        """ Returns a CDS date that is mm months after the Date. If no
         argument is supplied then the next CDS date after today is returned."""
 
         next_date = self.addMonths(mm)
@@ -653,7 +653,7 @@ class Date():
 
     def addTenor(self,
                  tenor: (list,str)):
-        """ Return the date following the FinDate by a period given by the
+        """ Return the date following the Date by a period given by the
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
         independent. For example 10Y means 10 years while 120m also means 10
@@ -775,61 +775,61 @@ class Date():
         shortYearStr = str(self._y)[2:]
         longYearStr = str(self._y)
 
-        if gDateFormatType == FinDateFormatTypes.UK_LONGEST:
+        if gDateFormatType == DateFormatTypes.UK_LONGEST:
 
             sep = " "
             dateStr = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.UK_LONG:
+        elif gDateFormatType == DateFormatTypes.UK_LONG:
 
             sep = "-"
             dateStr = dayStr + sep + longMonthStr + sep + longYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.UK_MEDIUM:
+        elif gDateFormatType == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
             dateStr = dayStr + sep + shortMonthStr + sep + longYearStr
             return dateStr
     
-        elif gDateFormatType == FinDateFormatTypes.UK_SHORT:
+        elif gDateFormatType == DateFormatTypes.UK_SHORT:
 
             sep = "/"
             dateStr = dayStr + sep + shortMonthStr + sep + shortYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.US_LONGEST:
+        elif gDateFormatType == DateFormatTypes.US_LONGEST:
 
             sep = " "
             dateStr = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.US_LONG:
+        elif gDateFormatType == DateFormatTypes.US_LONG:
 
             sep = "-"
             dateStr = longMonthStr + sep + dayStr + sep + longYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.US_MEDIUM:
+        elif gDateFormatType == DateFormatTypes.US_MEDIUM:
             
             sep = "-"
             dateStr = shortMonthStr + sep + dayStr + sep + longYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.US_SHORT:
+        elif gDateFormatType == DateFormatTypes.US_SHORT:
 
             sep = "-"
             dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.BLOOMBERG:
+        elif gDateFormatType == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
             dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
             return dateStr
 
-        elif gDateFormatType == FinDateFormatTypes.DATETIME:
+        elif gDateFormatType == DateFormatTypes.DATETIME:
 
             sep = "/"
 
@@ -899,7 +899,7 @@ def datediff(d1: Date,
 
 
 def fromDatetime(dt: Date):
-    """ Construct a FinDate from a datetime as this is often needed if we
+    """ Construct a Date from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. """
 
     finDate = Date(dt.day, dt.month, dt.year)

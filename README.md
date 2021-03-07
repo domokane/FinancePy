@@ -1,3 +1,5 @@
+[![unit test action](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml/badge.svg)](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml)
+
 # Quick Start Guide
 
 FinancePy can be installed from pip using the following command:

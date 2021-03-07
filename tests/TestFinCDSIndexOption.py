@@ -33,102 +33,102 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def buildIborCurve(tradeDate):
 
-    valuation_date = tradeDate.addDays(1)
-    dcType = DayCountTypes.ACT_360
+    valuationDate = tradeDate.addDays(1)
+    dcType = FinDayCountTypes.ACT_360
     depos = []
 
     depos = []
     fras = []
     swaps = []
 
-    dcType = DayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settlement_date = valuation_date
+    dcType = FinDayCountTypes.THIRTY_E_360_ISDA
+    fixedFreq = FinFrequencyTypes.SEMI_ANNUAL
+    settlementDate = valuationDate
 
-    maturity_date = settlement_date.addMonths(12)
+    maturityDate = settlementDate.addMonths(12)
     swap1 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.addMonths(24)
+    maturityDate = settlementDate.addMonths(24)
     swap2 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.addMonths(36)
+    maturityDate = settlementDate.addMonths(36)
     swap3 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.addMonths(48)
+    maturityDate = settlementDate.addMonths(48)
     swap4 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.addMonths(60)
+    maturityDate = settlementDate.addMonths(60)
     swap5 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
     swaps.append(swap5)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    liborCurve = FinIborSingleCurve(valuationDate, depos, fras, swaps)
 
-    return libor_curve
+    return liborCurve
 
 ##########################################################################
 
 
-def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
+def buildFlatIssuerCurve(tradeDate, liborCurve, spread, recoveryRate):
 
-    valuation_date = tradeDate.addDays(1)
+    valuationDate = tradeDate.addDays(1)
 
     cdsMarketContracts = []
 
-    maturity_date = Date(29, 6, 2010)
-    cds = FinCDS(valuation_date, maturity_date, spread)
+    maturityDate = FinDate(29, 6, 2010)
+    cds = FinCDS(valuationDate, maturityDate, spread)
     cdsMarketContracts.append(cds)
 
-    issuer_curve = FinCDSCurve(valuation_date,
+    issuerCurve = FinCDSCurve(valuationDate,
                               cdsMarketContracts,
-                              libor_curve,
-                              recovery_rate)
+                              liborCurve,
+                              recoveryRate)
 
-    return issuer_curve
+    return issuerCurve
 
 ##########################################################################
 
 
-def test_full_priceCDSIndexOption():
+def test_fullPriceCDSIndexOption():
 
-    tradeDate = Date(1, 8, 2007)
-    step_in_date = tradeDate.addDays(1)
-    valuation_date = step_in_date
+    tradeDate = FinDate(1, 8, 2007)
+    stepInDate = tradeDate.addDays(1)
+    valuationDate = stepInDate
 
-    libor_curve = buildIborCurve(tradeDate)
+    liborCurve = buildIborCurve(tradeDate)
 
     maturity3Y = tradeDate.nextCDSDate(36)
     maturity5Y = tradeDate.nextCDSDate(60)
@@ -139,7 +139,7 @@ def test_full_priceCDSIndexOption():
     f = open(path, 'r')
     data = f.readlines()
     f.close()
-    issuer_curves = []
+    issuerCurves = []
 
     for row in data[1:]:
 
@@ -149,38 +149,38 @@ def test_full_priceCDSIndexOption():
         spd5Y = float(splitRow[2]) / 10000.0
         spd7Y = float(splitRow[3]) / 10000.0
         spd10Y = float(splitRow[4]) / 10000.0
-        recovery_rate = float(splitRow[5])
+        recoveryRate = float(splitRow[5])
 
-        cds3Y = FinCDS(step_in_date, maturity3Y, spd3Y)
-        cds5Y = FinCDS(step_in_date, maturity5Y, spd5Y)
-        cds7Y = FinCDS(step_in_date, maturity7Y, spd7Y)
-        cds10Y = FinCDS(step_in_date, maturity10Y, spd10Y)
-        cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
+        cds3Y = FinCDS(stepInDate, maturity3Y, spd3Y)
+        cds5Y = FinCDS(stepInDate, maturity5Y, spd5Y)
+        cds7Y = FinCDS(stepInDate, maturity7Y, spd7Y)
+        cds10Y = FinCDS(stepInDate, maturity10Y, spd10Y)
+        cdsContracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = FinCDSCurve(valuation_date,
-                                  cds_contracts,
-                                  libor_curve,
-                                  recovery_rate)
+        issuerCurve = FinCDSCurve(valuationDate,
+                                  cdsContracts,
+                                  liborCurve,
+                                  recoveryRate)
 
-        issuer_curves.append(issuer_curve)
+        issuerCurves.append(issuerCurve)
 
     ##########################################################################
     ##########################################################################
 
     indexUpfronts = [0.0, 0.0, 0.0, 0.0]
-    indexMaturityDates = [Date(20, 12, 2009),
-                          Date(20, 12, 2011),
-                          Date(20, 12, 2013),
-                          Date(20, 12, 2016)]
+    indexMaturityDates = [FinDate(20, 12, 2009),
+                          FinDate(20, 12, 2011),
+                          FinDate(20, 12, 2013),
+                          FinDate(20, 12, 2016)]
     indexRecovery = 0.40
 
     testCases.banner(
         "======================= CDS INDEX OPTION ==========================")
 
-    index_coupon = 0.004
+    indexCoupon = 0.004
     volatility = 0.50
-    expiry_date = Date(1, 2, 2008)
-    maturity_date = Date(20, 12, 2011)
+    expiryDate = FinDate(1, 2, 2008)
+    maturityDate = FinDate(20, 12, 2011)
     notional = 10000.0
     tolerance = 1e-6
 
@@ -200,13 +200,13 @@ def test_full_priceCDSIndexOption():
 
         #######################################################################
 
-        cds_contracts = []
+        cdsContracts = []
         for dt in indexMaturityDates:
-            cds = FinCDS(valuation_date, dt, index / 10000.0)
-            cds_contracts.append(cds)
+            cds = FinCDS(valuationDate, dt, index / 10000.0)
+            cdsContracts.append(cds)
 
-        index_curve = FinCDSCurve(valuation_date, cds_contracts,
-                                 libor_curve, indexRecovery)
+        indexCurve = FinCDSCurve(valuationDate, cdsContracts,
+                                 liborCurve, indexRecovery)
 
         if 1 == 1:
 
@@ -214,8 +214,8 @@ def test_full_priceCDSIndexOption():
 
             indexPortfolio = FinCDSIndexPortfolio()
             adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
-                valuation_date,
-                issuer_curves,
+                valuationDate,
+                issuerCurves,
                 indexSpreads,
                 indexUpfronts,
                 indexMaturityDates,
@@ -224,14 +224,14 @@ def test_full_priceCDSIndexOption():
         else:
 
             indexSpread = index / 10000.0
-            issuer_curve = buildFlatIssuerCurve(tradeDate,
-                                               libor_curve,
+            issuerCurve = buildFlatIssuerCurve(tradeDate,
+                                               liborCurve,
                                                indexSpread,
                                                indexRecovery)
 
             adjustedIssuerCurves = []
             for iCredit in range(0, 125):
-                adjustedIssuerCurves.append(issuer_curve)
+                adjustedIssuerCurves.append(issuerCurve)
 
         #######################################################################
 
@@ -239,23 +239,23 @@ def test_full_priceCDSIndexOption():
 
             start = time.time()
 
-            option = FinCDSIndexOption(expiry_date,
-                                       maturity_date,
-                                       index_coupon,
+            option = FinCDSIndexOption(expiryDate,
+                                       maturityDate,
+                                       indexCoupon,
                                        strike / 10000.0,
                                        notional)
 
             v_pay_1, v_rec_1, strikeValue, mu, expH = option.valueAnderson(
-                valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
+                valuationDate, adjustedIssuerCurves, indexRecovery, volatility)
             end = time.time()
             elapsed = end - start
 
             end = time.time()
 
-            v_pay_2, v_rec_2 = option.valueAdjustedBlack(valuation_date,
-                                                         index_curve,
+            v_pay_2, v_rec_2 = option.valueAdjustedBlack(valuationDate,
+                                                         indexCurve,
                                                          indexRecovery,
-                                                         libor_curve,
+                                                         liborCurve,
                                                          volatility)
 
             elapsed = end - start
@@ -275,5 +275,5 @@ def test_full_priceCDSIndexOption():
 ##########################################################################
 
 
-test_full_priceCDSIndexOption()
+test_fullPriceCDSIndexOption()
 testCases.compareTestCases()

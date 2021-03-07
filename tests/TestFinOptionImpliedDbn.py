@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
-from financepy.models.volatility_fns import FinVolFunctionTypes
-from financepy.models.volatility_fns import volFunctionClark
+from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes
+from financepy.models.FinModelVolatilityFns import volFunctionClark
 
-from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
 
 from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
@@ -35,15 +35,15 @@ def test_FinOptionImpliedDbn():
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        valueDate = FinDate(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        domDiscountCurve = DiscountCurveFlat(valuation_date, domCCRate)
-        forDiscountCurve = DiscountCurveFlat(valuation_date, forCCRate)
+        domDiscountCurve = FinDiscountCurveFlat(valueDate, domCCRate)
+        forDiscountCurve = FinDiscountCurveFlat(valueDate, forCCRate)
 
         currencyPair = forName + domName
         spotFXRate = 1.3465
@@ -58,7 +58,7 @@ def test_FinOptionImpliedDbn():
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FinFXVolSurface(valuation_date,
+        fxMarket = FinFXVolSurface(valueDate,
                                    spotFXRate,
                                    currencyPair,
                                    notionalCurrency,
@@ -85,8 +85,8 @@ def test_FinOptionImpliedDbn():
             startFX = F * 0.05
             endFX = F * 5.0
 
-            num_steps = 10000
-            dFX = (endFX - startFX)/ num_steps
+            numSteps = 10000
+            dFX = (endFX - startFX)/ numSteps
 
             domDF = domDiscountCurve._df(texp)
             forDF = forDiscountCurve._df(texp)
@@ -99,7 +99,7 @@ def test_FinOptionImpliedDbn():
             strikes = []
             vols = []
 
-            for iK in range(0, num_steps):
+            for iK in range(0, numSteps):
                 strike = startFX + iK*dFX                
                 vol = volFunctionClark(params, F, strike, texp)
                 strikes.append(strike) 

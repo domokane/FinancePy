@@ -21,24 +21,24 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinDiscountCurveZeros():
 
-    start_date = Date(1, 1, 2018)
+    startDate = FinDate(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
-    dates = start_date.addYears(times)
+    dates = startDate.addYears(times)
     zeroRates = np.linspace(5.0, 6.0, 10)/100
-    freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
+    freqType = FinFrequencyTypes.ANNUAL
+    dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
-    curve = DiscountCurveZeros(start_date,
-                               dates,
-                               zeroRates,
-                               freq_type,
-                               day_count_type,
-                               FinInterpTypes.FLAT_FWD_RATES)
+    curve = FinDiscountCurveZeros(startDate,
+                                  dates,
+                                  zeroRates,
+                                  freqType,
+                                  dayCountType,
+                                  FinInterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF")
 
     years = np.linspace(0, 10, 21)
-    dates = start_date.addYears(years)
+    dates = startDate.addYears(years)
     for dt in dates:
         df = curve.df(dt)
         testCases.print(dt, df)
@@ -52,27 +52,27 @@ def test_FinDiscountCurveZeros():
     start = time.time()
 
     for i in range(0, numRepeats):
-        freq_type = FrequencyTypes.ANNUAL
-        day_count_type = DayCountTypes.ACT_ACT_ISDA
+        freqType = FinFrequencyTypes.ANNUAL
+        dayCountType = FinDayCountTypes.ACT_ACT_ISDA
 
-        dates = [Date(14, 6, 2016), Date(14, 9, 2016),
-                 Date(14, 12, 2016), Date(14, 6, 2017),
-                 Date(14, 6, 2019), Date(14, 6, 2021),
-                 Date(15, 6, 2026), Date(16, 6, 2031),
-                 Date(16, 6, 2036), Date(14, 6, 2046)]
+        dates = [FinDate(14, 6, 2016), FinDate(14, 9, 2016),
+                 FinDate(14, 12, 2016), FinDate(14, 6, 2017),
+                 FinDate(14, 6, 2019), FinDate(14, 6, 2021),
+                 FinDate(15, 6, 2026), FinDate(16, 6, 2031),
+                 FinDate(16, 6, 2036), FinDate(14, 6, 2046)]
 
         zeroRates = [0.000000, 0.006616, 0.007049, 0.007795,
                      0.009599, 0.011203, 0.015068, 0.017583,
                      0.018998, 0.020080]
 
-        start_date = dates[0]
+        startDate = dates[0]
 
-        curve = DiscountCurveZeros(start_date,
-                                   dates,
-                                   zeroRates,
-                                   freq_type,
-                                   day_count_type,
-                                   FinInterpTypes.FLAT_FWD_RATES)
+        curve = FinDiscountCurveZeros(startDate,
+                                      dates,
+                                      zeroRates,
+                                      freqType,
+                                      dayCountType,
+                                      FinInterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     period = end - start

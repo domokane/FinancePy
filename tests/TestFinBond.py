@@ -6,7 +6,6 @@ import os
 import datetime as dt
 
 import sys
-
 sys.path.append("..")
 
 from financepy.utils.global_types import FinSwapTypes
@@ -23,58 +22,59 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
+
 
 
 ##########################################################################
 
-def buildIborCurve(valuation_date):
-    depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
+def buildIborCurve(valuationDate):
+
+    depoDCCType = FinDayCountTypes.THIRTY_E_360_ISDA
     depos = []
-    deposit_rate = 0.050
+    depositRate = 0.050
 
     depo0 = FinIborDeposit(
-        valuation_date,
+        valuationDate,
         "1D",
-        deposit_rate,
+        depositRate,
         depoDCCType)
 
     spotDays = 2
-    settlement_date = valuation_date.addWeekDays(spotDays)
+    settlementDate = valuationDate.addWeekDays(spotDays)
 
-    maturity_date = settlement_date.addMonths(1)
-    depo1 = FinIborDeposit(settlement_date,
-                           maturity_date,
-                           deposit_rate,
-                           depoDCCType)
+    maturityDate = settlementDate.addMonths(1)
+    depo1 = FinIborDeposit(settlementDate,
+        maturityDate,
+        depositRate,
+        depoDCCType)
 
-    maturity_date = settlement_date.addMonths(3)
+    maturityDate = settlementDate.addMonths(3)
     depo2 = FinIborDeposit(
-        settlement_date,
-        maturity_date,
-        deposit_rate,
+        settlementDate,
+        maturityDate,
+        depositRate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(6)
+    maturityDate = settlementDate.addMonths(6)
     depo3 = FinIborDeposit(
-        settlement_date,
-        maturity_date,
-        deposit_rate,
+        settlementDate,
+        maturityDate,
+        depositRate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(9)
+    maturityDate = settlementDate.addMonths(9)
     depo4 = FinIborDeposit(
-        settlement_date,
-        maturity_date,
-        deposit_rate,
+        settlementDate,
+        maturityDate,
+        depositRate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(12)
+    maturityDate = settlementDate.addMonths(12)
     depo5 = FinIborDeposit(
-        settlement_date,
-        maturity_date,
-        deposit_rate,
+        settlementDate,
+        maturityDate,
+        depositRate,
         depoDCCType)
 
     depos.append(depo0)
@@ -85,436 +85,437 @@ def buildIborCurve(valuation_date):
     depos.append(depo5)
 
     fras = []
-    fixedDCCType = DayCountTypes.ACT_365F
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixedDCCType = FinDayCountTypes.ACT_365F
+    fixedFreqType = FinFrequencyTypes.SEMI_ANNUAL
 
     swaps = []
 
-    swap_rate = 0.05
-    maturity_date = settlement_date.addMonths(24)
+    swapRate = 0.05
+    maturityDate = settlementDate.addMonths(24)
     swap1 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
-
-    #    print(swap1._fixed_leg._payment_dates)
+    
+#    print(swap1._fixedLeg._paymentDates)
 
     swaps.append(swap1)
 
-    maturity_date = settlement_date.addMonths(36)
+    maturityDate = settlementDate.addMonths(36)
     swap2 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap2)
 
-    #    print(swap2._fixed_leg._payment_dates)
+#    print(swap2._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(48)
+    
+    maturityDate = settlementDate.addMonths(48)
     swap3 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap3)
 
-    #    print(swap3._fixed_leg._payment_dates)
+#    print(swap3._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(60)
+    maturityDate = settlementDate.addMonths(60)
     swap4 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap4)
 
-    #    print(swap4._fixed_leg._payment_dates)
+#    print(swap4._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(72)
+    maturityDate = settlementDate.addMonths(72)
     swap5 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap5)
 
-    #    print(swap5._fixed_leg._payment_dates)
+#    print(swap5._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(84)
+    maturityDate = settlementDate.addMonths(84)
     swap6 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap6)
 
-    #    print(swap6._fixed_leg._payment_dates)
+#    print(swap6._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(96)
+    maturityDate = settlementDate.addMonths(96)
     swap7 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap7)
 
-    #    print(swap7._fixed_leg._payment_dates)
+#    print(swap7._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(108)
+    maturityDate = settlementDate.addMonths(108)
     swap8 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap8)
 
-    #    print(swap8._fixed_leg._payment_dates)
+#    print(swap8._fixedLeg._paymentDates)
 
-    maturity_date = settlement_date.addMonths(120)
+    maturityDate = settlementDate.addMonths(120)
     swap9 = FinIborSwap(
-        settlement_date,
-        maturity_date,
+        settlementDate,
+        maturityDate,
         FinSwapTypes.PAY,
-        swap_rate,
+        swapRate,
         fixedFreqType,
         fixedDCCType)
     swaps.append(swap9)
 
-    #    print(swap9._fixed_leg._payment_dates)
+#    print(swap9._fixedLeg._paymentDates)
 
-    libor_curve = IborSingleCurve(valuation_date,
-                                  depos,
-                                  fras,
-                                  swaps)
+    liborCurve = FinIborSingleCurve(valuationDate,
+                                    depos,
+                                    fras,
+                                    swaps)
 
     if 1 == 0:
         import numpy as np
-        num_steps = 40
-        dt = 10 / num_steps
-        times = np.linspace(0.0, 10.0, num_steps + 1)
+        numSteps = 40
+        dt = 10 / numSteps
+        times = np.linspace(0.0, 10.0, numSteps + 1)
 
         df0 = 1.0
         for t in times[1:]:
-            df1 = libor_curve.df(t)
+            df1 = liborCurve.df(t)
             fwd = (df0 / df1 - 1.0) / dt
             print(t, df1, fwd)
             df0 = df1
 
-    return libor_curve
-
+    return liborCurve
 
 ##########################################################################
 
 
-def test_Bond():
+def test_FinBond():
+
     import pandas as pd
     path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
-    bondDataFrame['mid'] = 0.5 * (bondDataFrame['bid'] + bondDataFrame['ask'])
+    bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    settlement_date = Date(19, 9, 2012)
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    settlementDate = FinDate(19, 9, 2012)
     face = ONE_MILLION
 
-    for accrual_type in DayCountTypes:
+    for accrualType in FinDayCountTypes:
 
         testCases.header("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS",
                          "ACCRUED", "YTM")
 
         for _, bond in bondDataFrame.iterrows():
+
             dateString = bond['maturity']
             matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
             maturityDt = fromDatetime(matDatetime)
-            issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+            issueDt = FinDate(maturityDt._d, maturityDt._m, 2000)
 
-            coupon = bond['coupon'] / 100.0
-            clean_price = bond['mid']
-            bond = Bond(issueDt, maturityDt,
-                        coupon, freq_type, accrual_type, 100)
+            coupon = bond['coupon']/100.0
+            cleanPrice = bond['mid']
+            bond = FinBond(issueDt, maturityDt,
+                           coupon, freqType, accrualType, 100)
 
-            ytm = bond.yield_to_maturity(settlement_date, clean_price)
-            accrued_interest= bond._accruedInterest
-            accd_days = bond._accrued_days
+            ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
+            accd = bond._accruedInterest
+            accd_days = bond._accruedDays
 
             testCases.print("%18s" % maturityDt, "%8.4f" % coupon,
-                            "%10.4f" % clean_price, "%6.0f" % accd_days,
-                            "%10.4f" % accrued_interest, "%8.4f" % ytm)
+                            "%10.4f" % cleanPrice, "%6.0f" % accd_days,
+                            "%10.4f" % accd, "%8.4f" % ytm)
 
     ###########################################################################
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
 
-    accrualConvention = DayCountTypes.ACT_ACT_ICMA
+    accrualConvention = FinDayCountTypes.ACT_ACT_ICMA
     y = 0.062267
-    settlement_date = Date(19, 4, 1994)
-    issue_date = Date(15, 7, 1990)
-    maturity_date = Date(15, 7, 1997)
+    settlementDate = FinDate(19, 4, 1994)
+    issueDate = FinDate(15, 7, 1990)
+    maturityDate = FinDate(15, 7, 1997)
     coupon = 0.085
     face = ONE_MILLION
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrualConvention, face)
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    bond = FinBond(issueDate, maturityDate,
+                   coupon, freqType, accrualConvention, face)
 
     testCases.header("FIELD", "VALUE")
-    full_price = bond.full_price_from_ytm(settlement_date, y)
-    testCases.print("Full Price = ", full_price)
-    clean_price = bond.clean_price_from_ytm(settlement_date, y)
-    testCases.print("Clean Price = ", clean_price)
-    accrued_interest= bond._accruedInterest
-    testCases.print("Accrued = ", accrued_interest)
-    ytm = bond.yield_to_maturity(settlement_date, clean_price)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, y)
+    testCases.print("Full Price = ", fullPrice)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, y)
+    testCases.print("Clean Price = ", cleanPrice)
+    accd = bond._accruedInterest
+    testCases.print("Accrued = ", accd)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice)
     testCases.print("Yield to Maturity = ", ytm)
 
     bump = 1e-4
-    priceBumpedUp = bond.full_price_from_ytm(settlement_date, y + bump)
+    priceBumpedUp = bond.fullPriceFromYTM(settlementDate, y + bump)
     testCases.print("Price Bumped Up:", priceBumpedUp)
 
-    priceBumpedDn = bond.full_price_from_ytm(settlement_date, y - bump)
+    priceBumpedDn = bond.fullPriceFromYTM(settlementDate, y - bump)
     testCases.print("Price Bumped Dn:", priceBumpedDn)
 
-    durationByBump = -(priceBumpedUp - full_price) / bump
+    durationByBump = -(priceBumpedUp - fullPrice) / bump
     testCases.print("Duration by Bump = ", durationByBump)
 
-    duration = bond.dollar_duration(settlement_date, y)
+    duration = bond.dollarDuration(settlementDate, y)
     testCases.print("Dollar Duration = ", duration)
     testCases.print("Duration Difference:", duration - durationByBump)
 
-    modified_duration = bond.modified_duration(settlement_date, y)
-    testCases.print("Modified Duration = ", modified_duration)
+    modifiedDuration = bond.modifiedDuration(settlementDate, y)
+    testCases.print("Modified Duration = ", modifiedDuration)
 
-    macauley_duration = bond.macauley_duration(settlement_date, y)
-    testCases.print("Macauley Duration = ", macauley_duration)
+    macauleyDuration = bond.macauleyDuration(settlementDate, y)
+    testCases.print("Macauley Duration = ", macauleyDuration)
 
-    conv = bond.convexity_from_ytm(settlement_date, y)
+    conv = bond.convexityFromYTM(settlementDate, y)
     testCases.print("Convexity = ", conv)
 
     # ASSET SWAP SPREAD
 
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
-    flatCurve = DiscountCurveFlat(settlement_date,
-                                  ytm,
-                                  FrequencyTypes.SEMI_ANNUAL)
+    flatCurve = FinDiscountCurveFlat(settlementDate,
+                                     ytm,
+                                     FinFrequencyTypes.SEMI_ANNUAL)
 
     testCases.header("FIELD", "VALUE")
 
-    clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
-    asw = bond.asset_swap_spread(settlement_date, clean_price, flatCurve)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
+    asw = bond.assetSwapSpread(settlementDate, cleanPrice, flatCurve)
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
     # When the libor curve is the Libor curve then the ASW is positive
-    libor_curve = buildIborCurve(settlement_date)
-    asw = bond.asset_swap_spread(settlement_date, clean_price, libor_curve)
-    oas = bond.option_adjusted_spread(settlement_date, clean_price, libor_curve)
+    liborCurve = buildIborCurve(settlementDate)
+    asw = bond.assetSwapSpread(settlementDate, cleanPrice, liborCurve)
+    oas = bond.optionAdjustedSpread(settlementDate, cleanPrice, liborCurve)
     testCases.print("Discounted on LIBOR Curve ASW:", asw * 10000)
     testCases.print("Discounted on LIBOR Curve OAS:", oas * 10000)
 
     p = 90.0
-    asw = bond.asset_swap_spread(settlement_date, p, libor_curve)
-    oas = bond.option_adjusted_spread(settlement_date, p, libor_curve)
+    asw = bond.assetSwapSpread(settlementDate, p, liborCurve)
+    oas = bond.optionAdjustedSpread(settlementDate, p, liborCurve)
     testCases.print("Deep discount bond at 90 ASW:", asw * 10000)
     testCases.print("Deep discount bond at 90 OAS:", oas * 10000)
 
     p = 100.0
-    asw = bond.asset_swap_spread(settlement_date, p, libor_curve)
-    oas = bond.option_adjusted_spread(settlement_date, p, libor_curve)
+    asw = bond.assetSwapSpread(settlementDate, p, liborCurve)
+    oas = bond.optionAdjustedSpread(settlementDate, p, liborCurve)
     testCases.print("Par bond at 100 ASW:", asw * 10000)
     testCases.print("Par bond at 100 OAS:", oas * 10000)
 
     p = 120.0
-    asw = bond.asset_swap_spread(settlement_date, p, libor_curve)
-    oas = bond.option_adjusted_spread(settlement_date, p, libor_curve)
+    asw = bond.assetSwapSpread(settlementDate, p, liborCurve)
+    oas = bond.optionAdjustedSpread(settlementDate, p, liborCurve)
     testCases.print("Above par bond at 120 ASW:", asw * 10000)
     testCases.print("Above par bond at 120 OAS:", oas * 10000)
 
-    ##########################################################################
-    # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
-    # Page 10 TREASURY NOTE SCREENSHOT
-    ##########################################################################
+##########################################################################
+# https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
+# Page 10 TREASURY NOTE SCREENSHOT
+##########################################################################
 
     testCases.banner("BLOOMBERG US TREASURY EXAMPLE")
-    settlement_date = Date(21, 7, 2017)
-    issue_date = Date(15, 5, 2010)
-    maturity_date = Date(15, 5, 2027)
+    settlementDate = FinDate(21, 7, 2017)
+    issueDate = FinDate(15, 5, 2010)
+    maturityDate = FinDate(15, 5, 2027)
     coupon = 0.02375
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
 
-    bond = Bond(issue_date,
-                maturity_date,
-                coupon,
-                freq_type,
-                accrual_type,
-                face)
+    bond = FinBond(issueDate,
+                   maturityDate,
+                   coupon,
+                   freqType,
+                   accrualType,
+                   face)
 
     testCases.header("FIELD", "VALUE")
-    clean_price = 99.7808417
+    cleanPrice = 99.7808417
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield = ", yld)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.UK_DMO)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_STREET)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_TREASURY)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    testCases.print("Full Price = ", full_price)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, ytm)
+    testCases.print("Full Price = ", fullPrice)
 
-    clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
-    testCases.print("Clean Price = ", clean_price)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
+    testCases.print("Clean Price = ", cleanPrice)
 
-    accrued_interest= bond._accruedInterest
-    testCases.print("Accrued = ", accrued_interest)
+    accd = bond._accruedInterest
+    testCases.print("Accrued = ", accd)
 
-    accddays = bond._accrued_days
+    accddays = bond._accruedDays
     testCases.print("Accrued Days = ", accddays)
 
-    duration = bond.dollar_duration(settlement_date, ytm)
+    duration = bond.dollarDuration(settlementDate, ytm)
     testCases.print("Dollar Duration = ", duration)
 
-    modified_duration = bond.modified_duration(settlement_date, ytm)
-    testCases.print("Modified Duration = ", modified_duration)
+    modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
+    testCases.print("Modified Duration = ", modifiedDuration)
 
-    macauley_duration = bond.macauley_duration(settlement_date, ytm)
-    testCases.print("Macauley Duration = ", macauley_duration)
+    macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
+    testCases.print("Macauley Duration = ", macauleyDuration)
 
-    conv = bond.convexity_from_ytm(settlement_date, ytm)
+    conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity = ", conv)
 
-    ##########################################################################
-    # Page 11 APPLE NOTE SCREENSHOT
-    ##########################################################################
+##########################################################################
+# Page 11 APPLE NOTE SCREENSHOT
+##########################################################################
 
     testCases.banner("BLOOMBERG APPLE CORP BOND EXAMPLE")
-    settlement_date = Date(21, 7, 2017)
-    issue_date = Date(13, 5, 2012)
-    maturity_date = Date(13, 5, 2022)
+    settlementDate = FinDate(21, 7, 2017)
+    issueDate = FinDate(13, 5, 2012)
+    maturityDate = FinDate(13, 5, 2022)
     coupon = 0.027
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.THIRTY_E_360_ISDA
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.THIRTY_E_360_ISDA
     face = 100.0
 
-    bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrual_type, face)
+    bond = FinBond(issueDate, maturityDate,
+                   coupon, freqType, accrualType, face)
 
     testCases.header("FIELD", "VALUE")
-    clean_price = 101.581564
+    cleanPrice = 101.581564
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.currentYield(cleanPrice)
     testCases.print("Current Yield", yld)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.UK_DMO)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.UK_DMO)
     testCases.print("UK DMO Yield To Maturity", ytm)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_STREET)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.US_STREET)
     testCases.print("US STREET Yield To Maturity", ytm)
 
-    ytm = bond.yield_to_maturity(settlement_date, clean_price,
-                                 FinYTMCalcType.US_TREASURY)
+    ytm = bond.yieldToMaturity(settlementDate, cleanPrice,
+                               FinYTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    testCases.print("Full Price", full_price)
+    fullPrice = bond.fullPriceFromYTM(settlementDate, ytm)
+    testCases.print("Full Price", fullPrice)
 
-    clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
-    testCases.print("Clean Price", clean_price)
+    cleanPrice = bond.cleanPriceFromYTM(settlementDate, ytm)
+    testCases.print("Clean Price", cleanPrice)
 
-    accddays = bond._accrued_days
+    accddays = bond._accruedDays
     testCases.print("Accrued Days", accddays)
 
-    accrued_interest= bond._accruedInterest
-    testCases.print("Accrued", accrued_interest)
+    accd = bond._accruedInterest
+    testCases.print("Accrued", accd)
 
-    duration = bond.dollar_duration(settlement_date, ytm)
+    duration = bond.dollarDuration(settlementDate, ytm)
     testCases.print("Dollar Duration", duration)
 
-    modified_duration = bond.modified_duration(settlement_date, ytm)
-    testCases.print("Modified Duration", modified_duration)
+    modifiedDuration = bond.modifiedDuration(settlementDate, ytm)
+    testCases.print("Modified Duration", modifiedDuration)
 
-    macauley_duration = bond.macauley_duration(settlement_date, ytm)
-    testCases.print("Macauley Duration", macauley_duration)
+    macauleyDuration = bond.macauleyDuration(settlementDate, ytm)
+    testCases.print("Macauley Duration", macauleyDuration)
 
-    conv = bond.convexity_from_ytm(settlement_date, ytm)
+    conv = bond.convexityFromYTM(settlementDate, ytm)
     testCases.print("Convexity", conv)
-
 
 ###############################################################################
 
 
-def test_BondExDividend():
-    issue_date = Date(7, 9, 2000)
-    maturity_date = Date(7, 9, 2020)
+def test_FinBondExDividend():
+
+    issueDate = FinDate(7, 9, 2000)
+    maturityDate = FinDate(7, 9, 2020)
     coupon = 0.05
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
     exDivDays = 7
     testCases.header("LABEL", "VALUE")
 
-    calendar_type = CalendarTypes.UNITED_KINGDOM
-    bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
-    settlement_date = Date(7, 9, 2003)
-    accrued = bond.calc_accrued_interest(settlement_date, exDivDays, calendar_type)
-    testCases.print("SettlementDate:", settlement_date)
+    calendarType = FinCalendarTypes.UNITED_KINGDOM
+    bond = FinBond(issueDate, maturityDate, coupon,
+                   freqType, accrualType, face)
+    settlementDate = FinDate(7, 9, 2003)
+    accrued = bond.calcAccruedInterest(settlementDate, exDivDays, calendarType)
+    testCases.print("SettlementDate:", settlementDate)
     testCases.print("Accrued:", accrued)
 
     ###########################################################################
     testCases.banner("=======================================================")
     testCases.header("SETTLEMENT", "ACCRUED")
 
-    issue_date = Date(7, 9, 2000)
-    maturity_date = Date(7, 9, 2020)
+    issueDate = FinDate(7, 9, 2000)
+    maturityDate = FinDate(7, 9, 2020)
     coupon = 0.05
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    freqType = FinFrequencyTypes.SEMI_ANNUAL
+    accrualType = FinDayCountTypes.ACT_ACT_ICMA
     face = 100.0
     exDivDays = 7
 
-    calendar_type = CalendarTypes.UNITED_KINGDOM
-    bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+    calendarType = FinCalendarTypes.UNITED_KINGDOM
+    bond = FinBond(issueDate, maturityDate, coupon,
+                   freqType, accrualType, face)
 
-    settlement_date = Date(25, 8, 2010)
+    settlementDate = FinDate(25, 8, 2010)
 
     for _ in range(0, 13):
-        settlement_date = settlement_date.addDays(1)
-        accrued = bond.calc_accrued_interest(
-            settlement_date, exDivDays, calendar_type)
-        testCases.print(settlement_date, accrued)
-
+        settlementDate = settlementDate.addDays(1)
+        accrued = bond.calcAccruedInterest(
+            settlementDate, exDivDays, calendarType)
+        testCases.print(settlementDate, accrued)
 
 ###############################################################################
 
 
-test_Bond()
-test_BondExDividend()
+test_FinBond()
+test_FinBondExDividend()
 testCases.compareTestCases()

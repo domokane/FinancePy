@@ -20,28 +20,28 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinEquityCliquetOption():
 
-    start_date = Date(1, 1, 2014)
-    finalExpiryDate = Date(1, 1, 2017)
-    freq_type = FrequencyTypes.QUARTERLY
+    startDate = FinDate(1, 1, 2014)
+    finalExpiryDate = FinDate(1, 1, 2017)
+    freqType = FinFrequencyTypes.QUARTERLY
     optionType = FinOptionTypes.EUROPEAN_CALL
 
-    cliquetOption = FinEquityCliquetOption(start_date,
+    cliquetOption = FinEquityCliquetOption(startDate,
                                            finalExpiryDate,
                                            optionType,
-                                           freq_type)
+                                           freqType)
 
-    valuation_date = Date(1, 1, 2015)
-    stock_price = 100.0
+    valueDate = FinDate(1, 1, 2015)
+    stockPrice = 100.0
     volatility = 0.20
     interestRate = 0.05
     dividendYield = 0.02
     model = FinModelBlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
-    dividendCurve = DiscountCurveFlat(valuation_date, dividendYield)
+    discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
+    dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
-    v = cliquetOption.value(valuation_date,
-                            stock_price,
-                            discount_curve,
+    v = cliquetOption.value(valueDate,
+                            stockPrice,
+                            discountCurve,
                             dividendCurve,
                             model)
 
