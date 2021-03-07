@@ -10,15 +10,15 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.interpolator import FinInterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.fin_math import scale
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve import DiscountCurve
+from financepy.utils.math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
-# TODO: Add other discount curves
+# TODO: Add other discount discount
 ###############################################################################
 
 PLOT_GRAPHS = False

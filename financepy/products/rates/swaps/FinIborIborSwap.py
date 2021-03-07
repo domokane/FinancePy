@@ -3,7 +3,7 @@
 ##############################################################################
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, DayCountTypes
 from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
@@ -25,12 +25,12 @@ class FinIborIborSwap(object):
     from a start date to a specified maturity date.
     
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which is separate from the curves from
+    is done on a supplied discount curve which is separate from the discount from
     which the implied index rates are extracted. """
     
     def __init__(self,
-                 effective_date: FinDate,  # Date interest starts to accrue
-                 termination_date_or_tenor: (FinDate, str),  # Date contract ends
+                 effective_date: Date,  # Date interest starts to accrue
+                 termination_date_or_tenor: (Date, str),  # Date contract ends
                  payFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  payDayCountType: DayCountTypes  = DayCountTypes.THIRTY_E_360,
                  recFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -51,7 +51,7 @@ class FinIborIborSwap(object):
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == FinDate:
+        if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
             self._termination_date = effective_date.addTenor(termination_date_or_tenor)
@@ -120,7 +120,7 @@ class FinIborIborSwap(object):
               principal=0.0):
 
         """ Value the LIBOR basis swap on a value date given a single Ibor
-        discount curve and each of the index curves for the two floating legs
+        discount curve and each of the index discount for the two floating legs
         of the swap. """
 
         payFloatLegValue = self.floatLegValue(valuation_date,

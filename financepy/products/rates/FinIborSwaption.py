@@ -17,10 +17,10 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
 from ...utils.FinError import FinError
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 
 from ...products.rates.IborSwap import FinIborSwap
@@ -33,9 +33,9 @@ from ...models.rates_hull_white_tree import FinModelRatesHW
 from ...models.rates_bk_tree import FinModelRatesBK
 from ...models.rates_bdt_tree import FinModelRatesBDT
 
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...utils.FinGlobalTypes import FinExerciseTypes
+from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import FinExerciseTypes
 
 ###############################################################################
 

@@ -7,11 +7,11 @@ from scipy import optimize
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString
-from ...utils.helper_functions import check_argument_types, _funcName
-from ...utils.global_variables import gDaysInYear
-from ...market.curves.interpolator import FinInterpTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString
+from ...utils.helpers import check_argument_types, _funcName
+from ...utils.global_vars import gDaysInYear
+from ...market.discount.interpolator import FinInterpTypes
+from ...market.discount.curve import DiscountCurve
 
 swaptol = 1e-8
 

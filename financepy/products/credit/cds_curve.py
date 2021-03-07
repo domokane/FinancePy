@@ -7,13 +7,13 @@ import scipy.optimize as optimize
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.global_variables import gDaysInYear
-from ...market.curves.interpolator import _uinterpolate, FinInterpTypes
-from ...utils.helper_functions import input_time, tableToString
+from ...utils.global_vars import gDaysInYear
+from ...market.discount.interpolator import _uinterpolate, FinInterpTypes
+from ...utils.helpers import input_time, tableToString
 from ...utils.day_count import DayCount
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...utils.helper_functions import check_argument_types, _funcName
-from ...utils.helper_functions import labelToString
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.helpers import check_argument_types, _funcName
+from ...utils.helpers import labelToString
 
 
 ###############################################################################
@@ -206,7 +206,7 @@ class FinCDSCurve():
         frequency where -1 is continuous is the default. """
 
         t = input_time(dt, self)
-        f = Frequency(freq_type)
+        f = annual_frequency(freq_type)
         df = self.df(t)
         q = self.survProb(t)
         dfq = df * q

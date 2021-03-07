@@ -4,7 +4,7 @@
 
 from ...utils.FinError import FinError
 from enum import Enum
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import labelToString
 
 # Non exhaustive list of country codes and currency names
 

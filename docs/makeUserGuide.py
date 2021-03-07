@@ -824,7 +824,7 @@ buildIntro("..//README.md")
 
 if 1 == 1:
     buildChapter("..//financepy//utils")
-    buildChapter("..//financepy//market//curves")
+    buildChapter("..//financepy//market//discount")
     buildChapter("..//financepy//market//volatility")
     buildChapter("..//financepy//products//equity")
     buildChapter("..//financepy//products//credit")

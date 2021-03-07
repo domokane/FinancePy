@@ -9,14 +9,14 @@ from .interpolator import FinInterpolator, FinInterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.global_variables import gDaysInYear, gSmall
-from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.fin_math import testMonotonicity
+from ...utils.math import testMonotonicity
 from ...utils.schedule import Schedule
-from ...utils.helper_functions import check_argument_types
-from ...utils.helper_functions import timesFromDates
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import check_argument_types
+from ...utils.helpers import timesFromDates
+from ...utils.helpers import labelToString
 
 
 ###############################################################################
@@ -98,7 +98,7 @@ class DiscountCurve():
 
         t = np.maximum(times, gSmall)
 
-        f = Frequency(freq_type)
+        f = annual_frequency(freq_type)
 
         if freq_type == FrequencyTypes.CONTINUOUS:
             df = np.exp(-rates * t)
@@ -127,7 +127,7 @@ class DiscountCurve():
         frequency which are all choices of FrequencyTypes. Returns a list of
         discount factor. """
 
-        f = Frequency(freq_type)
+        f = annual_frequency(freq_type)
 
         if isinstance(maturityDts, Date):
             dateList = [maturityDts]
@@ -331,7 +331,7 @@ class DiscountCurve():
     def fwd(self,
             dts: Date):
         """ Calculate the continuously compounded forward rate at the forward
-        FinDate provided. This is done by perturbing the time by one day only
+        Date provided. This is done by perturbing the time by one day only
         and measuring the change in the log of the discount factor divided by
         the time increment dt. I am assuming continuous compounding over the
         one date. """

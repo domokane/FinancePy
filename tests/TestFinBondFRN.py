@@ -12,7 +12,7 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.finutils.FinDate import *
 from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

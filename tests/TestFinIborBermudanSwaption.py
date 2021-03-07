@@ -5,20 +5,20 @@
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.finutils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import FinExerciseTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.products.rates.FinIborSwap import FinIborSwap
+from financepy.products.rates.IborSwap import FinIborSwap
 
 from financepy.products.rates.FinIborBermudanSwaption import FinIborBermudanSwaption
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.models.FinModelRatesBK import FinModelRatesBK
-from financepy.models.FinModelRatesHW import FinModelRatesHW
-from financepy.models.FinModelRatesBDT import FinModelRatesBDT
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.black import FinModelBlack
+from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
+from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

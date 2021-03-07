@@ -7,11 +7,11 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.fx.FinFXFloatLookbackOption import FinFXFloatLookbackOption
 from financepy.products.fx.FinFXFixedLookbackOption import FinFXFixedLookbackOption
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

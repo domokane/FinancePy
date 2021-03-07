@@ -7,11 +7,11 @@ from numba import njit, float64, int64
 from math import ceil
 
 from ..utils.FinError import FinError
-from ..utils.fin_math import accruedInterpolator
-from ..market.curves.interpolator import FinInterpTypes, _uinterpolate
-from ..utils.helper_functions import labelToString
-from ..utils.FinGlobalTypes import FinExerciseTypes
-from ..utils.global_variables import gSmall
+from ..utils.math import accruedInterpolator
+from ..market.discount.interpolator import FinInterpTypes, _uinterpolate
+from ..utils.helpers import labelToString
+from ..utils.global_types import FinExerciseTypes
+from ..utils.global_vars import gSmall
 
 interp = FinInterpTypes.FLAT_FWD_RATES.value
 

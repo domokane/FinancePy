@@ -10,9 +10,9 @@
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCountTypes
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ..bonds.bond import Bond, FinYTMCalcType
 
 ###############################################################################
@@ -47,7 +47,7 @@ class FinInflationBond(Bond):
         self._coupon = coupon
         self._freq_type = freq_type
         self._accrual_type = accrual_type
-        self._frequency = Frequency(freq_type)
+        self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
         self._baseCPIValue = baseCPIValue # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted

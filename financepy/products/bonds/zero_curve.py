@@ -8,16 +8,16 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 
 from ...utils.date import Date
-from ...utils.fin_math import scale, testMonotonicity
-from ...utils.global_variables import gDaysInYear
+from ...utils.math import scale, testMonotonicity
+from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.helper_functions import input_time
-from ...utils.helper_functions import tableToString
-from ...market.curves.interpolator import FinInterpTypes, interpolate
+from ...utils.helpers import input_time
+from ...utils.helpers import tableToString
+from ...market.discount.interpolator import FinInterpTypes, interpolate
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helper_functions import labelToString
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...market.discount.curve import DiscountCurve
+from ...utils.helpers import labelToString
 
 ###############################################################################
 
@@ -97,7 +97,7 @@ class BondZeroCurve(DiscountCurve):
                  frequencyType: FrequencyTypes = FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to maturity date. """
         t = input_time(dt, self)
-        f = Frequency(frequencyType)
+        f = annual_frequency(frequencyType)
         df = self.df(t)
 
         if f == 0:  # Simple interest

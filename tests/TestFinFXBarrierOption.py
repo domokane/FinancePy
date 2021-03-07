@@ -10,8 +10,8 @@ from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierTypes
 from financepy.products.fx.FinFXBarrierOption import FinFXBarrierOption
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

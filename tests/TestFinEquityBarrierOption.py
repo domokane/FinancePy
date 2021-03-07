@@ -9,9 +9,9 @@ from financepy.models.FinProcessSimulator import FinProcessTypes
 from financepy.models.FinProcessSimulator import FinGBMNumericalScheme
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierTypes
 from financepy.products.equity.FinEquityBarrierOption import FinEquityBarrierOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

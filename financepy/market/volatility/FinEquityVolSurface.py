@@ -10,11 +10,11 @@ from numba import njit, float64, int64
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_types import FinOptionTypes
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.volatility_fns import volFunctionClark
@@ -25,15 +25,15 @@ from ...models.sabr import volFunctionSABR
 from ...models.sabr import volFunctionSABR_BETA_ONE
 from ...models.sabr import volFunctionSABR_BETA_HALF
 
-from ...utils.fin_math import norminvcdf
+from ...utils.math import norminvcdf
 
 from ...models.black_scholes_analytic import bsDelta
 
-from ...utils.FinDistribution import FinDistribution
+from ...utils.distribution import FinDistribution
 
 from ...utils.FinSolvers1D import newton_secant
 from ...utils.FinSolversNM import nelder_mead
-from ...utils.FinGlobalTypes import FinSolverTypes
+from ...utils.global_types import FinSolverTypes
 
 ###############################################################################
 # ISSUES
@@ -733,7 +733,7 @@ class FinEquityVolSurface():
 ###############################################################################
 
     def plotVolCurves(self):
-        """ Generates a plot of each of the vol curves implied by the market 
+        """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
         
         lowK = self._strikes[0] * 0.9

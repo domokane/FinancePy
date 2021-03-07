@@ -9,26 +9,26 @@ import sys
 sys.path.append("..")
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.black import FinModelBlack
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.finutils.FinHelperFunctions import checkVectorDifferences
-from financepy.models.FinModelRatesLMM import LMMSimulateFwdsNF
-from financepy.models.FinModelRatesLMM import LMMSimulateFwds1F
-from financepy.models.FinModelRatesLMM import LMMSimulateFwdsMF
-from financepy.models.FinModelRatesLMM import LMMSwaptionPricer
-from financepy.models.FinModelRatesLMM import LMMSimSwaptionVol
-from financepy.models.FinModelRatesLMM import LMMSwaptionVolApprox
-from financepy.models.FinModelRatesLMM import LMMCapFlrPricer
-from financepy.models.FinModelRatesLMM import LMMPriceCapsBlack
-from financepy.models.FinModelRatesLMM import LMMSwapPricer
-from financepy.models.FinModelRatesLMM import LMMFwdFwdCorrelation
-from financepy.models.FinModelRatesLMM import LMMRatchetCapletPricer
-from financepy.models.FinModelRatesLMM import LMMStickyCapletPricer
+from financepy.utils.helpers import checkVectorDifferences
+from financepy.models.rates_libor_market_model import LMMSimulateFwdsNF
+from financepy.models.rates_libor_market_model import LMMSimulateFwds1F
+from financepy.models.rates_libor_market_model import LMMSimulateFwdsMF
+from financepy.models.rates_libor_market_model import LMMSwaptionPricer
+from financepy.models.rates_libor_market_model import LMMSimSwaptionVol
+from financepy.models.rates_libor_market_model import LMMSwaptionVolApprox
+from financepy.models.rates_libor_market_model import LMMCapFlrPricer
+from financepy.models.rates_libor_market_model import LMMPriceCapsBlack
+from financepy.models.rates_libor_market_model import LMMSwapPricer
+from financepy.models.rates_libor_market_model import LMMFwdFwdCorrelation
+from financepy.models.rates_libor_market_model import LMMRatchetCapletPricer
+from financepy.models.rates_libor_market_model import LMMStickyCapletPricer
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

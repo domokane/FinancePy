@@ -3,7 +3,7 @@
 ##############################################################################
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, DayCountTypes
 from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
@@ -31,8 +31,8 @@ class FinSwapLeg(object):
     """ Class for managing the leg of a swap. """
     
     def __init__(self,
-                 start_date: FinDate,  # Date interest starts to accrue
-                 end_date: (FinDate, str),  # Date contract ends
+                 start_date: Date,  # Date interest starts to accrue
+                 end_date: (Date, str),  # Date contract ends
                  fixedFloatType: FinLegType,
                  couponOrSpread: (float),
                  freq_type: FrequencyTypes,
@@ -53,7 +53,7 @@ class FinSwapLeg(object):
 
         check_argument_types(self.__init__, locals())
 
-        if type(end_date) == FinDate:
+        if type(end_date) == Date:
             self._termination_date = end_date
         else:
             self._termination_date = start_date.addTenor(end_date)
@@ -136,7 +136,7 @@ class FinSwapLeg(object):
 ###############################################################################
 
     def value(self,
-              valuation_date: FinDate,
+              valuation_date: Date,
               discount_curve: FinDiscountCurve,
               index_curve: FinDiscountCurve,
               firstFixingRate=None,
@@ -224,7 +224,7 @@ class FinSwapLeg(object):
 ##########################################################################
 
     def fixed_legValue(self,
-                      valuation_date: FinDate,
+                      valuation_date: Date,
                       discount_curve: FinDiscountCurve,
                       principal: float =0.0):
 
@@ -322,7 +322,7 @@ class FinSwapLeg(object):
 ##########################################################################
 
     def floatLegValue(self,
-                      valuation_date: FinDate,  # This should be the settlement date
+                      valuation_date: Date,  # This should be the settlement date
                       discount_curve: FinDiscountCurve,
                       index_curve: FinDiscountCurve,
                       firstFixingRate: float =None,

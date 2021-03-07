@@ -16,15 +16,15 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.products.rates.FinIborFRA import FinIborFRA
 from financepy.products.rates.FinIborFuture import FinIborFuture
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.products.rates.FinIborSwap import FinIborSwap
-from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.rates.FinIborDualCurve import FinIborDualCurve
-from financepy.products.rates.FinOISCurve import FinOISCurve
+from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_types import FinSwapTypes
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.rates.FinIborDualCurve import IborDualCurve
+from financepy.products.rates.FinOISCurve import OISCurve
 from financepy.products.rates.FinOIS import FinOIS
 
 from FinTestCases import FinTestCases, globalTestCaseMode

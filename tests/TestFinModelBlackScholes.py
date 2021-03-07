@@ -9,11 +9,11 @@ from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinFrequency import FinFrequencyTypes
 from financepy.finutils.FinDayCount import FinDayCountTypes
 
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.models.FinModelBlackScholes import FinModelBlackScholesTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.models.black_scholes import FinModelBlackScholesTypes
 
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.products.equity.FinEquityAmericanOption import FinEquityAmericanOption

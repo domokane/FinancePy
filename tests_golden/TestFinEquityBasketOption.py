@@ -8,9 +8,9 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityBasketOption import FinEquityBasketOption
-from financepy.utils.FinGlobalTypes import FinOptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.helper_functions import betaVectorToCorrMatrix
+from financepy.utils.global_types import FinOptionTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.helpers import betaVectorToCorrMatrix
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode

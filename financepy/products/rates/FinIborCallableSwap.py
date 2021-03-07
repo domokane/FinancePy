@@ -12,7 +12,7 @@
 # from ...products.bonds.Bond import Bond
 
 
-# from ...utils.FinDate import FinDate
+# from ...utils.Date import Date
 # from ...utils.FinCalendar import FinCalendar, CalendarTypes
 # from ...utils.FinCalendar import BusDayAdjustTypes, DateGenRuleTypes
 # from ...utils.FinSchedule import FinSchedule

@@ -6,9 +6,9 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityChooserOption import FinEquityChooserOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

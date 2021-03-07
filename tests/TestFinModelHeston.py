@@ -8,8 +8,8 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.models.FinModelHeston import FinModelHeston, FinHestonNumericalScheme
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.models.heston import FinModelHeston, FinHestonNumericalScheme
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.finutils.FinDate import FinDate
 

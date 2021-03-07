@@ -9,9 +9,9 @@ sys.path.append("..")
 
 from financepy.products.equity.FinEquityFloatLookbackOption import FinEquityFloatLookbackOption
 from financepy.products.equity.FinEquityFixedLookbackOption import FinEquityFixedLookbackOption
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.global_types import FinOptionTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

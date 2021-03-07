@@ -8,20 +8,20 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.bonds.FinBond import FinBond
+from financepy.utils.date import Date
+from financepy.market.discount.curve import DiscountCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.models.FinModelRatesBDT import FinModelRatesBDT
-from financepy.finutils.FinHelperFunctions import printTree
-from financepy.finutils.FinGlobalTypes import FinExerciseTypes
+from financepy.models.black import FinModelBlack
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.utils.helpers import printTree
+from financepy.utils.global_types import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

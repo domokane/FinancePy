@@ -11,11 +11,11 @@ from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import FinModelBlack
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.utils.FinGlobalTypes import FinCapFloorTypes
+from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.FinIborLMMProducts import FinIborLMMProducts
 from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
 

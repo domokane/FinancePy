@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.utils.fin_math import accruedInterpolator
+from financepy.utils.math import accruedInterpolator
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

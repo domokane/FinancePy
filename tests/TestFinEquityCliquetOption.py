@@ -6,11 +6,11 @@ import sys
 sys.path.append("..")
 
 from financepy.products.equity.FinEquityCliquetOption import FinEquityCliquetOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.date import Date
+from financepy.utils.global_types import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

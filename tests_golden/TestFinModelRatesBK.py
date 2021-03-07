@@ -9,14 +9,14 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.discount.curve import DiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_variables import gDaysInYear
-from financepy.utils.helper_functions import printTree
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.helpers import printTree
 from financepy.models.rates_bk_tree import FinModelRatesBK
-from financepy.utils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.global_types import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

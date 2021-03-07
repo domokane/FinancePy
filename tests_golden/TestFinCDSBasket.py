@@ -17,10 +17,10 @@ from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.credit.cds_curve import FinCDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.fin_math import corrMatrixGenerator
+from financepy.utils.math import corrMatrixGenerator
 from financepy.utils.date import Date
 from financepy.models.gbm_process_simulator import getPathsAssets
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

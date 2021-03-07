@@ -22,13 +22,13 @@ from ...models.credit_student_t_copula import FinModelStudentTCopula
 
 from ...products.credit.cds_curve import FinCDSCurve
 
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
-from ...market.curves.interpolator import interpolate, FinInterpTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...market.discount.interpolator import interpolate, FinInterpTypes
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import labelToString
 
 ###############################################################################
 # TODO: Convert functions to use NUMBA!!
@@ -164,7 +164,7 @@ class FinCDSBasket(object):
                          num_trials,
                          seed):
         """ Value the default basket using a Gaussian copula model. This
-        depends on the issuer curves and correlation matrix. """
+        depends on the issuer discount and correlation matrix. """
 
         num_credits = len(issuer_curves)
 

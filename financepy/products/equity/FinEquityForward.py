@@ -6,10 +6,10 @@ import numpy as np
 
 
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
-from ...utils.FinGlobalTypes import FinLongShort
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_types import FinLongShort
 from ...utils.FinError import FinError
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 
 ###############################################################################
 # ADD START DATE TO CLASS ?
@@ -42,7 +42,7 @@ class FinEquityForward():
               discount_curve,
               dividendCurve):
         """ Calculate the value of an equity forward contract from the stock
-        price and discound and dividend curves. """
+        price and discound and dividend discount. """
 
         if type(valuation_date) == Date:
             t = (self._expiry_date - valuation_date) / gDaysInYear

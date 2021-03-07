@@ -10,11 +10,11 @@ from numba import njit
 from ...utils.FinSolvers1D import newton_secant, bisection, newton
 
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.global_types import FinOptionTypes
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 
 from ...models.FinModel import FinModel
 from ...models.black_scholes import FinModelBlackScholes
@@ -34,7 +34,7 @@ from ...models.black_scholes_mc import _valueMC_NUMBA_ONLY
 from ...models.black_scholes_mc import _valueMC_NUMPY_ONLY
 from ...models.black_scholes_mc import _valueMC_NUMBA_PARALLEL
 
-from ...utils.fin_math import N
+from ...utils.math import N
 
 ###############################################################################
 

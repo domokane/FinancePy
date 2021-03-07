@@ -6,12 +6,12 @@ import numpy as np
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.fin_math import testMonotonicity
-from ...utils.helper_functions import labelToString
-from ...utils.helper_functions import timesFromDates
-from ...utils.helper_functions import check_argument_types
+from ...utils.math import testMonotonicity
+from ...utils.helpers import labelToString
+from ...utils.helpers import timesFromDates
+from ...utils.helpers import check_argument_types
 from ...utils.date import daysInMonth
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 
 ###############################################################################
 

@@ -8,17 +8,17 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.models.FinModelRatesHW import FinModelRatesHW
+from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.rates_hull_white_tree import FinModelRatesHW
 
-from financepy.products.rates.FinIborSwap import FinIborSwap
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
+from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

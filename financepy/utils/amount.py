@@ -3,9 +3,9 @@
 ##############################################################################
 
 
-from .helper_functions import check_argument_types
-from .Currency import FinCurrencyTypes
-from .fin_math import ONE_MILLION
+from .helpers import check_argument_types
+from .currency import FinCurrencyTypes
+from .math import ONE_MILLION
 
 ###############################################################################
 

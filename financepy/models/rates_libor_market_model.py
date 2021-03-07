@@ -6,8 +6,8 @@ import numpy as np
 from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
 
 from ..utils.FinError import FinError
-from ..utils.fin_math import N
-from ..utils.fin_math import norminvcdf
+from ..utils.math import N
+from ..utils.math import norminvcdf
 from ..models.sobol import getUniformSobol
 
 # TO DO: SHIFTED LOGNORMAL
@@ -303,7 +303,7 @@ def CholeskyNP(rho):
                       float64[:], int64),
      cache=True, fastmath=True, parallel=useParallel)
 def LMMSimulateFwdsNF(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
-    """ Full N-Factor Arbitrage-free simulation of forward Ibor curves in the
+    """ Full N-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure given an initial forward curve, volatility term structure and
     full rank correlation structure. Cholesky decomposition is used to extract
     the factor weights. The number of forwards at time 0 is given. The 3D
@@ -409,7 +409,7 @@ def LMMSimulateFwdsNF(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
                        int64, int64), cache=True, fastmath=True, parallel=useParallel)
 def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
                       taus, useSobol, seed):
-    """ One factor Arbitrage-free simulation of forward Ibor curves in the
+    """ One factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility term structure. The 3D matrix of forward rates by path, time
     and forward point is returned. This function is kept mainly for its
@@ -512,7 +512,7 @@ def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
      cache=True, fastmath=True, parallel=useParallel)
 def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
                       lambdas, taus, useSobol, seed):
-    """ Multi-Factor Arbitrage-free simulation of forward Ibor curves in the
+    """ Multi-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility factor term structure. The 3D matrix of forward rates by path,
     time and forward point is returned. """
@@ -745,7 +745,7 @@ def LMMSwapPricer(cpn, numPeriods, num_paths, fwd0, fwds, taus):
               float64[:], int64), cache=True, fastmath=True, parallel=useParallel)
 def LMMSwaptionPricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
     """ Function to price a European swaption using the simulated forward
-    curves. """
+    discount. """
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0])

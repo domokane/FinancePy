@@ -12,12 +12,12 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.FinError import FinError
 from ...products.credit.cds import FinCDS
 from ...products.credit.cds_curve import FinCDSCurve
-from ...utils.helper_functions import check_argument_types
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import check_argument_types
+from ...utils.helpers import labelToString
 
 
 ###############################################################################
-# TODO: Move index spread details into class and then pass in issuer curves
+# TODO: Move index spread details into class and then pass in issuer discount
 #       to the function when doing the adjustment
 ###############################################################################
 
@@ -240,7 +240,7 @@ class FinCDSIndexPortfolio():
                               indexMaturityDates,
                               indexRecoveryRate,
                               tolerance=1e-6):
-        """ Adjust individual CDS curves to reprice CDS index prices.
+        """ Adjust individual CDS discount to reprice CDS index prices.
         This approach uses an iterative scheme but is slow as it has to use a
         CDS curve bootstrap required when each trial spread adjustment is made
         """
@@ -264,7 +264,7 @@ class FinCDSIndexPortfolio():
             n = len(issuer_curve._cds_contracts)
             if n != len(cdsMaturityDates):
                 raise FinError(
-                    "All issuer curves must be built from same cds maturities")
+                    "All issuer discount must be built from same cds maturities")
 
         cdsSpreadMultipliers = [1.0] * numCDSMaturityPoints
 
@@ -289,7 +289,7 @@ class FinCDSIndexPortfolio():
 
         #######################################################################
 
-        # We calibrate the individual CDS curves to fit each index maturity
+        # We calibrate the individual CDS discount to fit each index maturity
         # point
         for iMaturity in range(0, numIndexMaturityPoints):
 
@@ -349,7 +349,7 @@ class FinCDSIndexPortfolio():
                 alpha = numerator / denominator
                 cdsSpreadMultipliers[iMaturity] *= alpha
 
-        # use spread multipliers to build and store adjusted curves
+        # use spread multipliers to build and store adjusted discount
         adjustedIssuerCurves = []
 
         for iCredit in range(0, num_credits):
@@ -391,7 +391,7 @@ class FinCDSIndexPortfolio():
                                   indexRecoveryRate,
                                   tolerance=1e-6,
                                   maxIterations=100):
-        """ Adjust individual CDS curves to reprice CDS index prices.
+        """ Adjust individual CDS discount to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish
         CDS curve bootstrap required when a spread adjustment is made."""
         num_credits = len(issuer_curves)
@@ -404,7 +404,7 @@ class FinCDSIndexPortfolio():
         #        hazardRateMultipliers = [1.0] * numIndexMaturityPoints
         adjustedIssuerCurves = []
 
-        # making a copy of the issuer curves
+        # making a copy of the issuer discount
         for issuer_curve in issuer_curves:
             adjustedIssuerCurve = FinCDSCurve(valuation_date,
                                               [],

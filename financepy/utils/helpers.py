@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit, float64
 from typing import Union
 from .date import Date
-from .global_variables import gDaysInYear, gSmall
+from .global_vars import gDaysInYear, gSmall
 from .FinError import FinError
 from .day_count import DayCountTypes, DayCount
 
@@ -81,7 +81,7 @@ def timesFromDates(dt: Date,
     which has only one element if the input is only one date. """
 
     if isinstance(valuation_date, Date) is False:
-        raise FinError("Valuation date is not a FinDate")
+        raise FinError("Valuation date is not a Date")
 
     if day_count_type is None:
         dcCounter = None
@@ -140,7 +140,7 @@ def checkVectorDifferences(x: np.ndarray,
 
 
 def checkDate(d: Date):
-    """ Check that input d is a FinDate. """
+    """ Check that input d is a Date. """
 
     if isinstance(d, Date) is False:
         raise FinError("Should be a date dummy!")
@@ -202,7 +202,7 @@ def printTree(array: np.ndarray,
 def input_time(dt: Date,
               curve):
     """ Validates a time input in relation to a curve. If it is a float then
-    it returns a float as long as it is positive. If it is a FinDate then it
+    it returns a float as long as it is positive. If it is a Date then it
     converts it to a float. If it is a Numpy array then it returns the array
     as long as it is all positive. """
 

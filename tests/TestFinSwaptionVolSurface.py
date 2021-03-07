@@ -7,7 +7,7 @@ sys.path.append("..")
 
 import numpy as np
 
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.market.volatility.FinSwaptionVolSurface import FinSwaptionVolSurface
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelVolatilityFns import FinVolFunctionTypes

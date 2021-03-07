@@ -7,9 +7,9 @@ from .FinError import FinError
 from .date import Date
 from .calendar import (Calendar, CalendarTypes)
 from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
-from .Frequency import (Frequency, FrequencyTypes)
-from .helper_functions import labelToString
-from .helper_functions import check_argument_types
+from .frequency import (annual_frequency, FrequencyTypes)
+from .helpers import labelToString
+from .helpers import check_argument_types
 
 ###############################################################################
 # TODO: Start and end date to allow for long stubs
@@ -114,7 +114,7 @@ class Schedule(object):
 ###############################################################################
 
     def scheduleDates(self):
-        """ Returns a list of the schedule of FinDates. """
+        """ Returns a list of the schedule of Dates. """
 
         if self._adjusted_dates is None:
             self._generate()
@@ -129,7 +129,7 @@ class Schedule(object):
         specified business day convention and the specified calendar. """
 
         calendar = Calendar(self._calendar_type)
-        frequency = Frequency(self._freq_type)
+        frequency = annual_frequency(self._freq_type)
         numMonths = int(12 / frequency)
 
         unadjustedScheduleDates = []

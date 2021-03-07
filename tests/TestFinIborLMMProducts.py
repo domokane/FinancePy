@@ -8,14 +8,14 @@ import sys
 sys.path.append("..")
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinFrequency import FinFrequencyTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.black import FinModelBlack
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.FinIborSwaption import FinSwapTypes
 from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
+from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.FinIborLMMProducts import FinIborLMMProducts
 from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
 

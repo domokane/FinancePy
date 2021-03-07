@@ -7,7 +7,7 @@ from scipy import optimize
 import copy
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import check_argument_types, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -34,7 +34,7 @@ def _f(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valuation_date, discount_curve, curve, None)
 
@@ -55,7 +55,7 @@ def _g(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_fra = fra.value(valuation_date, discount_curve, curve)
     v_fra /= fra._notional
@@ -72,7 +72,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
 ###############################################################################
 
     def __init__(self,
-                 valuation_date: FinDate,
+                 valuation_date: Date,
                  discount_curve: FinDiscountCurve,
                  iborDeposits: list,
                  iborFRAs: list,
@@ -228,9 +228,9 @@ class FinIborDualCurveOLD(FinDiscountCurve):
         # Now we have ensure they are in order check for overlaps and the like
         #######################################################################
 
-        lastDepositMaturityDate = FinDate(1, 1, 1900)
-        firstFRAMaturityDate = FinDate(1, 1, 1900)
-        lastFRAMaturityDate = FinDate(1, 1, 1900)
+        lastDepositMaturityDate = Date(1, 1, 1900)
+        firstFRAMaturityDate = Date(1, 1, 1900)
+        lastFRAMaturityDate = Date(1, 1, 1900)
 
         if numDepos > 0:
             lastDepositMaturityDate = iborDeposits[-1]._maturity_date

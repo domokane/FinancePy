@@ -9,7 +9,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date, dateRange
-from financepy.utils.date import FinDateFormatTypes
+from financepy.utils.date import DateFormatTypes
 from financepy.utils.date import setDateFormatType
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -17,7 +17,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(DateFormatTypes.UK_LONGEST)
 
 def test_FinDate():
 
@@ -184,7 +184,7 @@ def test_FinDateFormat():
     dt = Date(20, 10, 2019)
     testCases.header("FORMAT", "DATE")
 
-    for formatType in FinDateFormatTypes:
+    for formatType in DateFormatTypes:
         setDateFormatType(formatType) 
         testCases.print(formatType.name, dt)
 
@@ -296,4 +296,4 @@ elapsed = end - start
 
 testCases.compareTestCases()
 
-setDateFormatType(FinDateFormatTypes.UK_LONG)
+setDateFormatType(DateFormatTypes.UK_LONG)

@@ -8,8 +8,8 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
 from .bond import FinYTMCalcType
 
 ###############################################################################

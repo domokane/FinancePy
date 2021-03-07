@@ -11,7 +11,7 @@ from scipy.interpolate import PchipInterpolator
 import copy
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinHelperFunctions import labelToString
 from ...finutils.FinHelperFunctions import check_argument_types, _funcName
 from ...finutils.FinGlobalVariables import gDaysInYear
@@ -37,7 +37,7 @@ def _f(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_swap = swap.value(valuation_date, curve, curve, None)
     notional = swap._notional
@@ -55,7 +55,7 @@ def _g(df, *args):
     num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
     v_fra = fra.value(valuation_date, curve)
     v_fra /= fra._notional
@@ -77,7 +77,7 @@ def _costFunction(dfs, *args):
     times = libor_curve._times
     values = -np.log(dfs)
 
-    # For curves that need a fit function, we fit it now 
+    # For discount that need a fit function, we fit it now
     curve._interpolator.fit(curve._times, curve._dfs)     
 
 
@@ -155,7 +155,7 @@ class FinOIRSwapCurve(FinDiscountCurve):
 
     def __init__(self,
 <<<<<<< HEAD:financepy/products/funding/archive/FinIborSingleCurveOLD.py
-                 valuation_date: FinDate, # This is the trade date (not T+2)
+                 valuation_date: Date, # This is the trade date (not T+2)
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
@@ -164,7 +164,7 @@ class FinOIRSwapCurve(FinDiscountCurve):
         """ Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and iborSwaps. Some of these may
 =======
-                 valuation_date: FinDate,
+                 valuation_date: Date,
                  iborDeposits: list,
                  iborFRAs: list,
                  iborSwaps: list,
@@ -368,9 +368,9 @@ class FinOIRSwapCurve(FinDiscountCurve):
         # Now we have ensure they are in order check for overlaps and the like
         #######################################################################
 
-        lastDepositMaturityDate = FinDate(1, 1, 1900)
-        firstFRAMaturityDate = FinDate(1, 1, 1900)
-        lastFRAMaturityDate = FinDate(1, 1, 1900)
+        lastDepositMaturityDate = Date(1, 1, 1900)
+        firstFRAMaturityDate = Date(1, 1, 1900)
+        lastFRAMaturityDate = Date(1, 1, 1900)
 
         if numDepos > 0:
             lastDepositMaturityDate = iborDeposits[-1]._maturity_date

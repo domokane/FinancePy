@@ -8,12 +8,12 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinMath import normcdf_integrate
-from financepy.finutils.FinMath import N
-from financepy.finutils.FinMath import normcdf_slow
+from financepy.utils.math import normcdf_integrate
+from financepy.utils.math import N
+from financepy.utils.math import normcdf_slow
 
 
-from financepy.finutils.FinMath import norminvcdf
+from financepy.utils.math import norminvcdf
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -16,10 +16,10 @@ from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from financepy.models.rates_bk_tree import FinModelRatesBK
 

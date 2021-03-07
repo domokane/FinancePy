@@ -6,8 +6,8 @@ import numpy as np
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString
-from ...utils.global_variables import gDaysInYear
+from ...utils.helpers import labelToString
+from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
 
 ##########################################################################

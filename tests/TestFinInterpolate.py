@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.market.curves.FinInterpolator import FinInterpolator, FinInterpTypes
+from financepy.market.discount.interpolator import FinInterpolator, FinInterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

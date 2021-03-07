@@ -5,16 +5,16 @@
 import numpy as np
 
 
-from ...utils.fin_math import N
-from ...utils.global_variables import gDaysInYear, gSmall
+from ...utils.math import N
+from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.FinError import FinError
 from ...utils.date import Date
 
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...utils.helper_functions import labelToString, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.helpers import labelToString, check_argument_types
+from ...market.discount.curve import DiscountCurve
+from ...utils.global_types import FinOptionTypes
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

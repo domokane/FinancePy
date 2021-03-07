@@ -8,7 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -16,7 +16,7 @@ from financepy.models.rates_hull_white_tree import FinModelRatesHW
 
 from financepy.products.rates.IborSwap import FinIborSwap
 from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
 

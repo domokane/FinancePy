@@ -7,11 +7,11 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.date import Date
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -15,11 +15,11 @@ from financepy.finutils.FinDayCount import FinDayCountTypes
 from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.bonds.FinBondEmbeddedOption import FinBondEmbeddedOption
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
+from financepy.utils.global_types import FinSwapTypes
 
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 

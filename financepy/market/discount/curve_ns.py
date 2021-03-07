@@ -5,50 +5,59 @@
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.FinError import FinError
-from ...utils.global_variables import gSmall
-from ...utils.helper_functions import labelToString
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helper_functions import check_argument_types
 from ...utils.frequency import FrequencyTypes
+from ...utils.global_vars import gSmall
+from ...utils.FinError import FinError
+from ...market.discount.curve import DiscountCurve
+from ...utils.helpers import check_argument_types
+from ...utils.helpers import labelToString
 from ...utils.day_count import DayCountTypes
-from ...utils.helper_functions import timesFromDates
+from ...utils.helpers import timesFromDates
 
 ###############################################################################
 
 
-class DiscountCurvePoly(DiscountCurve):
-    """ Zero Rate Curve of a specified frequency parametrised using a cubic
-    polynomial. The zero rate is assumed to be continuously compounded but
-    this can be amended by providing a frequency when extracting zero rates.
-    We also need to specify a Day count convention for time calculations.
-    The class inherits all of the methods from FinDiscountCurve. """
+class DiscountCurveNS(DiscountCurve):
+    """ Implementation of Nelson-Siegel parametrisation of a discount curve.
+    The internal rate is a continuously compounded rate but you can calculate
+    alternative frequencies by providing a corresponding compounding frequency.
+    A day count convention is needed to ensure that dates are converted to the
+    correct time in years. The class inherits methods from FinDiscountCurve."""
 
     def __init__(self,
                  valuation_date: Date,
-                 coefficients: (list, np.ndarray),
+                 beta0: float,
+                 beta1: float,
+                 beta2: float,
+                 tau: float,
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
-        """ Create zero rate curve parametrised using a cubic curve from
-        coefficients and specifying a compounding frequency type and day count
-        convention. """
+        """ Creation of a FinDiscountCurveNS object. Parameters are provided
+        individually for beta0, beta1, beta2 and tau. The zero rates produced
+        by this parametrisation have an implicit compounding convention that
+        defaults to continuous but which can be overridden. """
 
         check_argument_types(self.__init__, locals())
 
+        if tau <= 0:
+            raise FinError("Tau must be positive")
+
         self._valuation_date = valuation_date
-        self._coefficients = coefficients
-        self._power = len(coefficients) - 1
+        self._beta0 = beta0
+        self._beta1 = beta1
+        self._beta2 = beta2
+        self._tau = tau
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
 ###############################################################################
 
     def zeroRate(self,
-                 dts: (list, Date),
+                 dates: (list, Date),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency according to
-        polynomial parametrisation. This method overrides FinDiscountCurve.
+        NS parametrisation. This method overrides that in FinDiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
         zero rates, this function allows other compounding and day counts.
         This function returns a single or vector of zero rates given a vector
@@ -60,49 +69,6 @@ class DiscountCurvePoly(DiscountCurve):
 
         if isinstance(day_count_type, DayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
-
-        # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dts, self._valuation_date, self._day_count_type)
-
-        # We now get the discount factors using these times
-        zeroRates = self._zeroRate(dcTimes)
-
-        # Now get the discount factors using curve conventions
-        dfs = self._zeroToDf(self._valuation_date,
-                             zeroRates,
-                             dcTimes,
-                             self._freq_type,
-                             self._day_count_type)
-
-        # Convert these to zero rates in the required frequency and day count
-        zeroRates = self._dfToZero(dfs, dts, freq_type, day_count_type)
-        return zeroRates
-
-###############################################################################
-
-    def _zeroRate(self,
-                  times: (float, np.ndarray)):
-        """ Calculate the zero rate to maturity date but with times as inputs.
-        This function is used internally and should be discouraged for external
-        use. The compounding frequency defaults to that specified in the
-        constructor of the curve object. Which may be annual to continuous. """
-
-        t = np.maximum(times, gSmall)
-
-        zeroRate = 0.0
-        for n in range(0, len(self._coefficients)):
-            zeroRate += self._coefficients[n] * np.power(t, n)
-
-        return zeroRate
-
-###############################################################################
-
-    def df(self,
-           dates: (list, Date)):
-        """ Calculate the fwd rate to maturity date but with times as inputs.
-        This function is used internally and should be discouraged for external
-        use. The compounding frequency defaults to that specified in the
-        constructor of the curve object. """
 
         # Get day count times to use with curve day count convention
         dcTimes = timesFromDates(dates,
@@ -119,19 +85,67 @@ class DiscountCurvePoly(DiscountCurve):
                              self._freq_type,
                              self._day_count_type)
 
-        return dfs
+        # Convert these to zero rates in the required frequency and day count
+        zeroRates = self._dfToZero(dfs,
+                                   dates,
+                                   freq_type,
+                                   day_count_type)
+
+        return zeroRates
+
+###############################################################################
+
+    def _zeroRate(self,
+                  times: (float, np.ndarray)):
+        """ Zero rate for Nelson-Siegel curve parametrisation. This means that
+        the t vector must use the curve day count."""
+
+        t = np.maximum(times, gSmall)
+
+        theta = t / self._tau
+        e = np.exp(-theta)
+        zeroRate = self._beta0
+        zeroRate += self._beta1 * (1.0 - e) / theta
+        zeroRate += self._beta2 * ((1.0 - e) / theta - e)
+        return zeroRate
+
+###############################################################################
+
+    def df(self,
+           dates: (Date, list)):
+        """ Return discount factors given a single or vector of dates. The
+        discount factor depends on the rate and this in turn depends on its
+        compounding frequency and it defaults to continuous compounding. It
+        also depends on the day count convention. This was set in the
+        construction of the curve to be ACT_ACT_ISDA. """
+
+        # Get day count times to use with curve day count convention
+        dcTimes = timesFromDates(dates,
+                                 self._valuation_date,
+                                 self._day_count_type)
+
+        zeroRates = self._zeroRate(dcTimes)
+
+        df = self._zeroToDf(self._valuation_date,
+                            zeroRates,
+                            dcTimes,
+                            self._freq_type,
+                            self._day_count_type)
+
+        return df
 
 ###############################################################################
 
     def __repr__(self):
-        """ Display internal parameters of curve. """
 
         s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("POWER", "COEFFICIENT")
-        for i in range(0, len(self._coefficients)):
-            s += labelToString(str(i), self._coefficients[i])
+        s += labelToString("PARAMETER", "VALUE")
+        s += labelToString("BETA0", self._beta0)
+        s += labelToString("BETA1", self._beta1)
+        s += labelToString("BETA2", self._beta2)
+        s += labelToString("TAU", self._tau)
         s += labelToString("FREQUENCY", (self._freq_type))
-
+        s += labelToString("DAY_COUNT", (self._day_count_type))
         return s
 
 ###############################################################################

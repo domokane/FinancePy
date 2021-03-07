@@ -9,9 +9,9 @@ from financepy.utils.date import Date, dateRange
 
 # Not under test
 
-from financepy.utils.date import FinDateFormatTypes, setDateFormatType
+from financepy.utils.date import DateFormatTypes, setDateFormatType
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(DateFormatTypes.UK_LONGEST)
 
 # new sample tests
 

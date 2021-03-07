@@ -18,9 +18,9 @@ from financepy.products.rates.FinIborFuture import FinIborFuture
 from financepy.products.rates.FinOIS import FinOIS
 from financepy.products.rates.FinOISCurve import FinOISCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -8,11 +8,13 @@ from enum import Enum
 
 ###############################################################################
 
+
 class FinLongShort(Enum):
     LONG = 1
     SHORT = 2
 
 ###############################################################################
+
 
 class FinOptionTypes(Enum):
     EUROPEAN_CALL = 1
@@ -28,11 +30,13 @@ class FinOptionTypes(Enum):
 
 ###############################################################################
 
+
 class FinCapFloorTypes(Enum):
     CAP = 1
     FLOOR = 2
 
 ###############################################################################
+
 
 class FinSwapTypes(Enum):
     PAY = 1
@@ -40,12 +44,14 @@ class FinSwapTypes(Enum):
 
 ###############################################################################
 
+
 class FinExerciseTypes(Enum):
     EUROPEAN = 1
     BERMUDAN = 2
     AMERICAN = 3
 
 ###############################################################################
+
 
 class FinSolverTypes(Enum):
     CONJUGATE_GRADIENT = 0

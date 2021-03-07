@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.finutils.FinDate import FinDate
 from financepy.market.volatility.FinEquityVolCurve import FinEquityVolCurve
 from financepy.products.equity.FinEquityVarianceSwap import FinEquityVarianceSwap
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

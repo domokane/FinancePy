@@ -7,9 +7,9 @@ sys.path.append("..")
 
 from financepy.products.equity.FinEquityOneTouchOption import FinEquityOneTouchOption
 from financepy.products.equity.FinEquityOneTouchOption import FinTouchOptionPayoffTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.finutils.FinDate import FinDate
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

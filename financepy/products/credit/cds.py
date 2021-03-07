@@ -13,13 +13,13 @@ from ...utils.FinError import FinError
 from ...utils.calendar import Calendar, CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
-from ...utils.helper_functions import labelToString, tableToString
-from ...market.curves.interpolator import FinInterpTypes, _uinterpolate
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...utils.helpers import labelToString, tableToString
+from ...market.discount.interpolator import FinInterpTypes, _uinterpolate
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 
 useFlatHazardRateIntegral = True
 standard_recovery_rate = 0.40
@@ -190,7 +190,7 @@ class FinCDS(object):
 
     def __init__(self,
                  step_in_date: Date,  # Date protection starts
-                 maturity_date_or_tenor: (Date, str),  # FinDate or tenor
+                 maturity_date_or_tenor: (Date, str),  # Date or tenor
                  running_coupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
@@ -233,7 +233,7 @@ class FinCDS(object):
 
     def _generateAdjustedCDSPaymentDates(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
-        frequency = Frequency(self._freq_type)
+        frequency = annual_frequency(self._freq_type)
         calendar = Calendar(self._calendar_type)
         start_date = self._step_in_date
         end_date = self._maturity_date
@@ -297,7 +297,7 @@ class FinCDS(object):
             self._adjusted_dates.append(finalDate)
 
         else:
-            raise FinError("Unknown FinDateGenRuleType:" +
+            raise FinError("Unknown DateGenRuleType:" +
                            str(self._date_gen_rule_type))
 
     ###############################################################################
@@ -744,7 +744,7 @@ class FinCDS(object):
         accurate approximation that avoids curve building. """
 
         if type(valuation_date) is not Date:
-            raise FinError("Valuation date must be a FinDate and not " +
+            raise FinError("Valuation date must be a Date and not " +
                            str(valuation_date))
 
         t_mat = (self._maturity_date - valuation_date) / gDaysInYear

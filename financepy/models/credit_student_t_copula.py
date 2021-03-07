@@ -6,7 +6,7 @@ from math import sqrt
 import numpy as np
 from scipy.stats import t as student
 
-from ..utils.helper_functions import uniformToDefaultTime
+from ..utils.helpers import uniformToDefaultTime
 
 ###############################################################################
 

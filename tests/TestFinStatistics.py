@@ -7,7 +7,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinStatistics import mean, stdev, correlation
+from financepy.utils.stats import mean, stdev, correlation
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

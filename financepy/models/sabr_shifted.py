@@ -6,10 +6,10 @@ import numpy as np
 from numba import njit, float64
 from scipy.optimize import minimize
 
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.global_types import FinOptionTypes
 from ..utils.FinError import FinError
-from ..utils.fin_math import N
-from ..utils.helper_functions import labelToString
+from ..utils.math import N
+from ..utils.helpers import labelToString
 
 ###############################################################################
 # TODO: Should I merge this with SABR ?

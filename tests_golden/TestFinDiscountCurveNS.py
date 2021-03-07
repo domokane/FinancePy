@@ -9,8 +9,8 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_ns import DiscountCurveNS
-from financepy.utils.fin_math import scale
+from financepy.market.discount.curve_ns import DiscountCurveNS
+from financepy.utils.math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

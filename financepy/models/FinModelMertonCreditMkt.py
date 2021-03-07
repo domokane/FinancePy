@@ -4,11 +4,11 @@
 
 import numpy as np
 
-from ..utils.fin_math import N
+from ..utils.math import N
 
 from scipy import optimize
 
-from ..utils.helper_functions import labelToString, check_argument_types
+from ..utils.helpers import labelToString, check_argument_types
 from ..utils.FinError import FinError
 from .credit_merton import FinModelMertonCredit
 

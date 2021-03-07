@@ -4,8 +4,8 @@
 
 import numpy as np
 
-from ..utils.fin_math import N, M, phi3
-from ..utils.fin_math import norminvcdf as NormSInv
+from ..utils.math import N, M, phi3
+from ..utils.math import norminvcdf as NormSInv
 from ..utils.FinError import FinError
 
 ###############################################################################

@@ -11,19 +11,19 @@ from typing import List
 
 from ...utils.date import Date
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FrequencyTypes
-from ...utils.fin_math import testMonotonicity
-from ...utils.global_variables import gDaysInYear
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.math import testMonotonicity
+from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 
 from ...utils.schedule import Schedule
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 
-from ...market.curves.discount_curve import DiscountCurve
-from ...market.curves.interpolator import FinInterpTypes, _uinterpolate
+from ...market.discount.curve import DiscountCurve
+from ...market.discount.interpolator import FinInterpTypes, _uinterpolate
 
 
 ###############################################################################
@@ -285,7 +285,7 @@ class BondConvertible(object):
         self._maturity_date = maturity_date
         self._coupon = coupon
         self._accrual_type = accrual_type
-        self._frequency = Frequency(freq_type)
+        self._frequency = annual_frequency(freq_type)
         self._freq_type = freq_type
 
         self._call_dates = call_dates

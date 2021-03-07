@@ -10,10 +10,10 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helper_functions import check_argument_types
-from ...utils.fin_math import ONE_MILLION
-from ...utils.FinGlobalTypes import FinSwapTypes
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types
+from ...utils.math import ONE_MILLION
+from ...utils.global_types import FinSwapTypes
+from ...market.discount.curve import DiscountCurve
 
 from .FinFixedLeg import FinFixedLeg
 from .FinFloatLeg import FinFloatLeg

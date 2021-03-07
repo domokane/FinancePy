@@ -5,8 +5,8 @@
 from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
 from .date import isLeapYear
 from .FinError import FinError
-from .Frequency import FrequencyTypes, Frequency
-from .global_variables import gDaysInYear
+from .frequency import FrequencyTypes, annual_frequency
+from .global_vars import gDaysInYear
 
 from enum import Enum
 
@@ -217,7 +217,7 @@ class DayCount(object):
 
         elif self._type == DayCountTypes.ACT_ACT_ICMA:
 
-            freq = Frequency(freq_type)
+            freq = annual_frequency(freq_type)
 
             if dt3 is None or freq is None:
                 raise FinError("ACT_ACT_ICMA requires three dates and a freq")
@@ -246,7 +246,7 @@ class DayCount(object):
             # The ISDA calculator sheet appears to split this across the
             # non-leap and the leap year which I do not see in any conventions.
 
-            freq = Frequency(freq_type)
+            frequency = annual_frequency(freq_type)
 
             if dt3 is None:
                 y3 = y2
@@ -263,7 +263,7 @@ class DayCount(object):
             else:
                 feb29 = Date(1, 1, 1900)
 
-            if freq == 1:
+            if frequency == 1:
                 if feb29 > dt1 and feb29 <= dt3:
                     den = 366
             else:

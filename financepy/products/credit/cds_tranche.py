@@ -20,12 +20,12 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...products.credit.cds import FinCDS
 from ...products.credit.cds_curve import FinCDSCurve
 
-from ...utils.global_variables import gDaysInYear
-from ...utils.fin_math import ONE_MILLION
-from ...market.curves.interpolator import FinInterpTypes, interpolate
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...market.discount.interpolator import FinInterpTypes, interpolate
 from ...utils.FinError import FinError
 
-from ...utils.helper_functions import check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
 ###############################################################################

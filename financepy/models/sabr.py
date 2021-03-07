@@ -7,10 +7,10 @@ import numpy as np
 from numba import njit, float64
 from scipy.optimize import minimize
 
-from ..utils.FinGlobalTypes import FinOptionTypes
-from ..utils.fin_math import N
+from ..utils.global_types import FinOptionTypes
+from ..utils.math import N
 from ..utils.FinError import FinError
-from ..utils.helper_functions import labelToString
+from ..utils.helpers import labelToString
 
 ###############################################################################
 ###############################################################################

@@ -8,18 +8,18 @@ import datetime as dt
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
-from financepy.products.bonds.FinBond import FinYTMCalcType
-from financepy.products.bonds.FinBond import FinBond
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.utils.global_types import FinSwapTypes
+from financepy.products.bonds.bond import FinYTMCalcType
+from financepy.products.bonds.bond import Bond
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.products.rates.FinIborSwap import FinIborSwap
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.finutils.FinDate import FinDate, fromDatetime
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.utils.math import ONE_MILLION
+from financepy.utils.date import Date, fromDatetime
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

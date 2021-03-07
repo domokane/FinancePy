@@ -8,15 +8,15 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.products.bonds.FinBond import FinBond
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinGlobalVariables import gDaysInYear
-from financepy.finutils.FinHelperFunctions import printTree
-from financepy.models.FinModelRatesBK import FinModelRatesBK
-from financepy.finutils.FinGlobalTypes import FinExerciseTypes
+from financepy.utils.date import Date
+from financepy.market.discount.curve import DiscountCurve
+from financepy.products.bonds.bond import Bond
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.helpers import printTree
+from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.utils.global_types import FinExerciseTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

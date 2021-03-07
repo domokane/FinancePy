@@ -7,8 +7,8 @@ import sys
 import numpy as np
 sys.path.append("..")
 
-from financepy.models.FinModelBlack import FinModelBlack
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.models.black import FinModelBlack
+from financepy.utils.global_types import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

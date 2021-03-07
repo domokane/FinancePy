@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.helper_functions import labelToString
+from ...utils.helpers import labelToString
 
 ###############################################################################
 

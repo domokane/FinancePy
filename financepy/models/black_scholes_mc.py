@@ -7,7 +7,7 @@
 import numpy as np
 
 from numba import njit, float64, int64, prange
-from ..utils.FinGlobalTypes import FinOptionTypes
+from ..utils.global_types import FinOptionTypes
 from ..utils.FinError import FinError
 from ..models.sobol import getGaussianSobol
 from math import exp

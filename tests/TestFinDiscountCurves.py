@@ -8,27 +8,27 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import *
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.market.curves.FinDiscountCurveNS import FinDiscountCurveNS
-from financepy.market.curves.FinDiscountCurveNSS import FinDiscountCurveNSS
-from financepy.market.curves.FinDiscountCurvePWF import FinDiscountCurvePWF
-from financepy.market.curves.FinDiscountCurvePWL import FinDiscountCurvePWL
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinDiscountCurvePoly import FinDiscountCurvePoly
-from financepy.finutils.FinGlobalVariables import gDaysInYear
+from financepy.utils.date import *
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve import DiscountCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_ns import DiscountCurveNS
+from financepy.market.discount.curve_nss import DiscountCurveNSS
+from financepy.market.discount.curve_pwf import DiscountCurvePWF
+from financepy.market.discount.curve_pwl import DiscountCurvePWL
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.curve_poly import DiscountCurvePoly
+from financepy.utils.global_vars import gDaysInYear
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-setDateFormatType(FinDateFormatTypes.UK_LONG)
+setDateFormatType(DateFormatTypes.UK_LONG)
 
 PLOT_GRAPHS = False
 
 ###############################################################################
-# TODO: Add other discount curves
+# TODO: Add other discount discount
 ###############################################################################
 
 

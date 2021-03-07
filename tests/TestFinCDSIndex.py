@@ -5,15 +5,15 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.FinCDS import FinCDS
-from financepy.finutils.FinMath import ONE_MILLION
-from financepy.products.rates.FinIborSwap import FinIborSwap
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.products.credit.FinCDSCurve import FinCDSCurve
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.products.credit.cds import FinCDS
+from financepy.utils.math import ONE_MILLION
+from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.credit.cds_curve import FinCDSCurve
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

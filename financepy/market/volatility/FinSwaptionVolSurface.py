@@ -10,14 +10,14 @@ from numba import jit, njit, float64, int64
 
 from ...utils.FinError import FinError
 from ...utils.date import Date
-from ...utils.global_variables import gDaysInYear
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_vars import gDaysInYear
+from ...utils.global_types import FinOptionTypes
 from ...products.fx.FinFXVanillaOption import FinFXVanillaOption
 from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
 from ...products.fx.FinFXMktConventions import FinFXATMMethod
 from ...products.fx.FinFXMktConventions import FinFXDeltaMethod
-from ...utils.helper_functions import check_argument_types, labelToString
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, labelToString
+from ...market.discount.curve import DiscountCurve
 
 from ...models.black_scholes import FinModelBlackScholes
 
@@ -32,19 +32,19 @@ from ...models.sabr import volFunctionSABR_BETA_ONE
 
 from ...models.volatility_fns import FinVolFunctionTypes
 
-from ...utils.fin_math import norminvcdf
+from ...utils.math import norminvcdf
 
 from ...models.black_scholes_analytic import bsValue
 from ...products.fx.FinFXVanillaOption import fastDelta
-from ...utils.FinDistribution import FinDistribution
+from ...utils.distribution import FinDistribution
 
 from ...utils.FinSolvers1D import newton_secant
 from ...utils.FinSolversNM import nelder_mead
-from ...utils.FinGlobalTypes import FinSolverTypes
+from ...utils.global_types import FinSolverTypes
 
 ###############################################################################
 # ISSUES
-# sabr does not fit inverted skew curves like eurjpy 
+# sabr does not fit inverted skew discount like eurjpy
 # problem with initial values ? optimiser can drive vol negative
 #
 # tried adding a function called gap but it screws up the pdf. Need it to 
@@ -881,7 +881,7 @@ class FinSwaptionVolSurface():
 ###############################################################################
 
     def plotVolCurves(self):
-        """ Generates a plot of each of the vol curves implied by the market 
+        """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
         
         volTypeVal = self._volatilityFunctionType.value

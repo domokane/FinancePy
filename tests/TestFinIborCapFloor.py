@@ -9,7 +9,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinCapFloorTypes
+from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
 from financepy.products.rates.FinIborSwap import FinIborSwap
 from financepy.products.rates.FinIborSwap import FinSwapTypes
@@ -24,11 +24,11 @@ from financepy.finutils.FinCalendar import FinCalendarTypes
 from financepy.finutils.FinCalendar import FinBusDayAdjustTypes
 from financepy.finutils.FinCalendar import FinDateGenRuleTypes
 
-from financepy.finutils.FinGlobalTypes import FinSwapTypes
+from financepy.utils.global_types import FinSwapTypes
 
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from financepy.models.FinModelBlack import FinModelBlack
 from financepy.models.FinModelBachelier import FinModelBachelier
@@ -37,7 +37,11 @@ from financepy.models.FinModelSABR import FinModelSABR
 from financepy.models.FinModelSABRShifted import FinModelSABRShifted
 from financepy.models.FinModelRatesHW import FinModelRatesHW
 
+<<<<<<< HEAD
+from financepy.utils.global_vars import gDaysInYear
+=======
 from financepy.finutils.FinGlobalVariables import gDaysInYear
+>>>>>>> 019b440a749b7ae4da4b786f6dd9c2bb01bd6529
 
 from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
 from financepy.finutils.FinSchedule import FinSchedule

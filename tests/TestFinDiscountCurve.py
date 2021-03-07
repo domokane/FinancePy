@@ -8,17 +8,17 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinDate import FinDate
-from financepy.finutils.FinFrequency import FinFrequencyTypes
-from financepy.market.curves.FinInterpolator import FinInterpTypes
-from financepy.market.curves.FinDiscountCurve import FinDiscountCurve
-from financepy.finutils.FinMath import scale
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve import DiscountCurve
+from financepy.utils.math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
-# TODO: Add other discount curves
+# TODO: Add other discount discount
 ###############################################################################
 
 PLOT_GRAPHS = False

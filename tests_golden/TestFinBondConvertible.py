@@ -13,7 +13,7 @@ from financepy.products.bonds.convertible import BondConvertible
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

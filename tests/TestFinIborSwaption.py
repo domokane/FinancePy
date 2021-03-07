@@ -24,10 +24,10 @@ from financepy.models.FinModelRatesHW import FinModelRatesHW
 from financepy.models.FinModelRatesBK import FinModelRatesBK
 from financepy.models.FinModelRatesBDT import FinModelRatesBDT
 
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinInterpolator import FinInterpTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.interpolator import FinInterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

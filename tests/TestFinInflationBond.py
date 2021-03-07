@@ -13,8 +13,8 @@ from financepy.finutils.FinDate import FinDate
 from financepy.products.inflation.FinInflationBond import FinInflationBond
 from financepy.products.bonds import FinYTMCalcType
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
-from financepy.market.curves.FinDiscountCurveZeros import FinDiscountCurveZeros
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

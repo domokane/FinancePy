@@ -6,18 +6,18 @@
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_variables import gDaysInYear
+from ...utils.global_vars import gDaysInYear
 from ...utils.FinError import FinError
-from ...utils.FinGlobalTypes import FinOptionTypes
+from ...utils.global_types import FinOptionTypes
 
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.schedule import Schedule
 from ...products.equity.FinEquityOption import FinEquityOption
-from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.discount.curve_flat import DiscountCurve
 
 from ...models.black_scholes import bsValue, FinModelBlackScholes
 from ...models.FinModel import FinModel

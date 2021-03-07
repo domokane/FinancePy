@@ -11,9 +11,9 @@ sys.path.append("..")
 
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOption
 from financepy.products.equity.FinEquityRainbowOption import FinEquityRainbowOptionTypes
-from financepy.finutils.FinHelperFunctions import betaVectorToCorrMatrix
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.helpers import betaVectorToCorrMatrix
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

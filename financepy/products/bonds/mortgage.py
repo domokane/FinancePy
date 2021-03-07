@@ -4,14 +4,14 @@
 
 
 from ...utils.FinError import FinError
-from ...utils.frequency import Frequency, FrequencyTypes
+from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.date import Date
-from ...utils.helper_functions import labelToString, check_argument_types
+from ...utils.helpers import labelToString, check_argument_types
 
 ###############################################################################
 
@@ -69,7 +69,7 @@ class Mortgage(object):
                         zeroRate: float):
         """ Determine monthly repayment amount based on current zero rate. """
 
-        frequency = Frequency(self._freq_type)
+        frequency = annual_frequency(self._freq_type)
 
         num_flows = len(self._schedule._adjusted_dates)
         p = (1.0 + zeroRate/frequency) ** (num_flows-1)
@@ -92,7 +92,7 @@ class Mortgage(object):
 
         num_flows = len(self._schedule._adjusted_dates)
         principal = self._principal
-        frequency = Frequency(self._freq_type)
+        frequency = annual_frequency(self._freq_type)
 
         if mortgageType == BondMortgageTypes.REPAYMENT:
             monthlyFlow = self.repaymentAmount(zeroRate)

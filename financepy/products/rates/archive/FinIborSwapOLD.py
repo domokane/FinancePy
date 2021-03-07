@@ -3,7 +3,7 @@
 ##############################################################################
 
 from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
+from ...finutils.Date import Date
 from ...finutils.FinGlobalVariables import gSmall
 from ...finutils.FinDayCount import FinDayCount, DayCountTypes
 from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
@@ -33,8 +33,8 @@ class FinIborSwapOLD(object):
     which the implied index rates are extracted. """
     
     def __init__(self,
-                 effective_date: FinDate,  # Date interest starts to accrue
-                 termination_date_or_tenor: (FinDate, str),  # Date contract ends
+                 effective_date: Date,  # Date interest starts to accrue
+                 termination_date_or_tenor: (Date, str),  # Date contract ends
                  fixed_legType: FinSwapTypes,
                  fixedCoupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FrequencyTypes,
@@ -57,7 +57,7 @@ class FinIborSwapOLD(object):
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == FinDate:
+        if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
             self._termination_date = effective_date.addTenor(termination_date_or_tenor)
@@ -142,7 +142,7 @@ class FinIborSwapOLD(object):
 ###############################################################################
 
     def value(self,
-              valuation_date: FinDate,
+              valuation_date: Date,
               discount_curve: FinDiscountCurve,
               index_curve: FinDiscountCurve=None,
               firstFixingRate=None,
@@ -208,7 +208,7 @@ class FinIborSwapOLD(object):
 ##########################################################################
 
     def swap_rate(self,
-                 valuation_date:FinDate,
+                 valuation_date:Date,
                  discount_curve: FinDiscountCurve,
                  index_curve: FinDiscountCurve = None,
                  firstFixing: float = None):
@@ -249,7 +249,7 @@ class FinIborSwapOLD(object):
 ##########################################################################
 
     def fixed_legValue(self,
-                      valuation_date: FinDate,
+                      valuation_date: Date,
                       discount_curve: FinDiscountCurve,
                       principal: float =0.0):
 
@@ -347,7 +347,7 @@ class FinIborSwapOLD(object):
 ##########################################################################
 
     def floatLegValue(self,
-                      valuation_date: FinDate,  # This should be the settlement date
+                      valuation_date: Date,  # This should be the settlement date
                       discount_curve: FinDiscountCurve,
                       index_curve: FinDiscountCurve,
                       firstFixingRate: float=None,

@@ -7,13 +7,13 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
-from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.finutils.FinDayCount import FinDayCountTypes
-from financepy.finutils.FinCalendar import FinCalendarTypes
-from financepy.products.rates.FinIborSingleCurve import FinIborSingleCurve
+from financepy.models.black_scholes import FinModelBlackScholes
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
 from financepy.products.rates.FinIborDeposit import FinIborDeposit
 from financepy.finutils.FinDate import FinDate
 

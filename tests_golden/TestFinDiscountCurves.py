@@ -9,26 +9,26 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import *
-from financepy.market.curves.interpolator import FinInterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve_ns import DiscountCurveNS
-from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
-from financepy.market.curves.discount_curve_pwf import DiscountCurvePWF
-from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
-from financepy.utils.global_variables import gDaysInYear
+from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.curve import DiscountCurve
+from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.discount.curve_ns import DiscountCurveNS
+from financepy.market.discount.curve_nss import DiscountCurveNSS
+from financepy.market.discount.curve_pwf import DiscountCurvePWF
+from financepy.market.discount.curve_pwl import DiscountCurvePWL
+from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.discount.curve_poly import DiscountCurvePoly
+from financepy.utils.global_vars import gDaysInYear
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-setDateFormatType(FinDateFormatTypes.UK_LONG)
+setDateFormatType(DateFormatTypes.UK_LONG)
 
 PLOT_GRAPHS = False
 
 ###############################################################################
-# TODO: Add other discount curves
+# TODO: Add other discount discount
 ###############################################################################
 
 
