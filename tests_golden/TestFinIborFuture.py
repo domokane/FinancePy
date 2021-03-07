@@ -11,7 +11,7 @@ from financepy.utils.date import *
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-setDateFormatType(FinDateFormatTypes.UK_LONG)
+setDateFormatType(DateFormatTypes.UK_LONG)
 
 ###############################################################################
 

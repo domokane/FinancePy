@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.utils.date import setDateFormatType, FinDateFormatTypes
+from financepy.utils.date import setDateFormatType, DateFormatTypes
 from financepy.utils.calendar import Calendar, CalendarTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -17,7 +17,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_Calendar():
 
-    setDateFormatType(FinDateFormatTypes.US_LONGEST)
+    setDateFormatType(DateFormatTypes.US_LONGEST)
     end_date = Date(31, 12, 2030)
 
     for calendar_type in CalendarTypes:
@@ -43,7 +43,7 @@ def test_Calendar():
                 testCases.print(cal, next_date)
 #                print(cal, next_date)
 
-    setDateFormatType(FinDateFormatTypes.US_LONG)
+    setDateFormatType(DateFormatTypes.US_LONG)
 
 ###############################################################################
 

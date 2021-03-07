@@ -23,7 +23,7 @@ from financepy.utils.global_vars import gDaysInYear
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
-setDateFormatType(FinDateFormatTypes.UK_LONG)
+setDateFormatType(DateFormatTypes.UK_LONG)
 
 PLOT_GRAPHS = False
 

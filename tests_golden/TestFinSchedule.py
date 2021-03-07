@@ -10,14 +10,14 @@ from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
-from financepy.utils.date import Date, setDateFormatType, FinDateFormatTypes
+from financepy.utils.date import Date, setDateFormatType, DateFormatTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(DateFormatTypes.UK_LONGEST)
 
 def dumpSchedule(desc, schedule):
 
@@ -489,4 +489,4 @@ test_FinScheduleAlignmentEff31()
 
 testCases.compareTestCases()
 
-setDateFormatType(FinDateFormatTypes.UK_LONGEST)
+setDateFormatType(DateFormatTypes.UK_LONGEST)
