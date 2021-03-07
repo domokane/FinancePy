@@ -1,4 +1,4 @@
-name: test_action
+name: golden tests
 
 on: [push, pull_request]
 
