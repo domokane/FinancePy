@@ -157,7 +157,7 @@ def test_DateFormat():
 
     dt = Date(20, 10, 2019)
 
-    for formatType in FinDateFormatTypes:
+    for formatType in DateFormatTypes:
         setDateFormatType(formatType)
         print(formatType.name, dt)
 
