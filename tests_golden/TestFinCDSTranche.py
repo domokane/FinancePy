@@ -12,8 +12,8 @@ from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds import CDS
-from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -44,7 +44,7 @@ def buildIborCurve(tradeDate):
     settlement_date = valuation_date
 
     maturity_date = settlement_date.addMonths(12)
-    swap1 = FinIborSwap(
+    swap1 = IborSwap(
         settlement_date,
         maturity_date,
         FinSwapTypes.PAY,
@@ -54,7 +54,7 @@ def buildIborCurve(tradeDate):
     swaps.append(swap1)
 
     maturity_date = settlement_date.addMonths(24)
-    swap2 = FinIborSwap(
+    swap2 = IborSwap(
         settlement_date,
         maturity_date,
         FinSwapTypes.PAY,
@@ -64,7 +64,7 @@ def buildIborCurve(tradeDate):
     swaps.append(swap2)
 
     maturity_date = settlement_date.addMonths(36)
-    swap3 = FinIborSwap(
+    swap3 = IborSwap(
         settlement_date,
         maturity_date,
         FinSwapTypes.PAY,
@@ -74,7 +74,7 @@ def buildIborCurve(tradeDate):
     swaps.append(swap3)
 
     maturity_date = settlement_date.addMonths(48)
-    swap4 = FinIborSwap(
+    swap4 = IborSwap(
         settlement_date,
         maturity_date,
         FinSwapTypes.PAY,
@@ -84,7 +84,7 @@ def buildIborCurve(tradeDate):
     swaps.append(swap4)
 
     maturity_date = settlement_date.addMonths(60)
-    swap5 = FinIborSwap(
+    swap5 = IborSwap(
         settlement_date,
         maturity_date,
         FinSwapTypes.PAY,

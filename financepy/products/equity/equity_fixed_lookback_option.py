@@ -12,7 +12,7 @@ from ...utils.date import Date
 
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.equity_option import EquityOption
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 from ...utils.global_types import FinOptionTypes
 
@@ -239,10 +239,10 @@ class EquityFixedLookbackOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE PRICE", self._strike_price)
-        s += labelToString("OPTION TYPE", self._option_type, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE PRICE", self._strike_price)
+        s += label_to_string("OPTION TYPE", self._option_type, "")
         return s
 
 ###############################################################################

@@ -8,17 +8,17 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinSwapTypes
 from ...market.discount.curve import DiscountCurve
 
-from .FinFloatLeg import FinFloatLeg
+from .swap_float_leg import SwapFloatLeg
 
 ###############################################################################
 
 
-class FinIborBasisSwap
+class IborBasisSwap:
     """ Class for managing an Ibor-Ibor basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment in a different LIBOR tenor. There is no exchange of
@@ -73,31 +73,31 @@ class FinIborBasisSwap
         payment_lag = 0
         principal = 0.0
 
-        self._floatLeg1 = FinFloatLeg(effective_date,
-                                     self._termination_date,
-                                     leg1Type,
-                                     leg1Spread,
-                                     leg1FreqType,
-                                     leg1DayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
+        self._floatLeg1 = SwapFloatLeg(effective_date,
+                                       self._termination_date,
+                                       leg1Type,
+                                       leg1Spread,
+                                       leg1FreqType,
+                                       leg1DayCountType,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
-        self._floatLeg2 = FinFloatLeg(effective_date,
-                                     self._termination_date,
-                                     leg2Type,
-                                     leg2Spread,
-                                     leg2FreqType,
-                                     leg2DayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
+        self._floatLeg2 = SwapFloatLeg(effective_date,
+                                       self._termination_date,
+                                       leg2Type,
+                                       leg2Spread,
+                                       leg2FreqType,
+                                       leg2DayCountType,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
 ###############################################################################
 
@@ -158,7 +158,7 @@ class FinIborBasisSwap
 ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._floatLeg1.__repr__()
         s += "\n"
         s += self._floatLeg2.__repr__()

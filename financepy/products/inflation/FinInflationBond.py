@@ -12,7 +12,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCountTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ..bonds.bond import Bond, YTMCalcType
 
 ###############################################################################
@@ -116,14 +116,14 @@ class FinInflationBond(Bond):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ISSUE DATE", self._issue_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("FACE AMOUNT", self._face_amount)
-        s += labelToString("BASE CPI VALUE", self._baseCPIValue, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ISSUE DATE", self._issue_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount)
+        s += label_to_string("BASE CPI VALUE", self._baseCPIValue, "")
         return s
 
 ###############################################################################

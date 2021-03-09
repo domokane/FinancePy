@@ -9,11 +9,12 @@ from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 from ...utils.math import testMonotonicity
 from ...utils.frequency import FrequencyTypes
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import timesFromDates
 from ...market.discount.curve import DiscountCurve
+
 
 ###############################################################################
 
@@ -25,8 +26,8 @@ class DiscountCurvePWF(DiscountCurve):
 
     def __init__(self,
                  valuation_date: Date,
-                 zeroDates: list,
-                 zeroRates: (list, np.ndarray),
+                 zero_dates: list,
+                 zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Creates a discount curve using a vector of times and zero rates
@@ -36,30 +37,30 @@ class DiscountCurvePWF(DiscountCurve):
 
         self._valuation_date = valuation_date
 
-        if len(zeroDates) != len(zeroRates):
+        if len(zero_dates) != len(zero_rates):
             raise FinError("Dates and rates vectors must have same length")
 
-        if len(zeroDates) == 0:
+        if len(zero_dates) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._zeroDates = zeroDates
-        self._zeroRates = np.array(zeroRates)
+        self._zero_dates = zero_dates
+        self._zero_rates = np.array(zero_rates)
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
-        dcTimes = timesFromDates(zeroDates,
+        dc_times = timesFromDates(zero_dates,
                                  self._valuation_date,
                                  self._day_count_type)
 
-        self._times = np.array(dcTimes)
+        self._times = np.array(dc_times)
 
         if testMonotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-###############################################################################
+    ###############################################################################
 
-    def _zeroRate(self,
-                  times: (float, np.ndarray, list)):
+    def _zero_rate(self,
+                   times: (float, np.ndarray, list)):
         """ The piecewise flat zero rate is selected and returned. """
 
         if isinstance(times, float):
@@ -70,31 +71,31 @@ class DiscountCurvePWF(DiscountCurve):
 
         times = np.maximum(times, gSmall)
 
-        zeroRates = []
+        zero_rates = []
 
         for t in times:
             l_index = 0
             found = 0
 
-            numTimes = len(self._times)
-            for i in range(1, numTimes):
+            num_times = len(self._times)
+            for i in range(1, num_times):
                 if self._times[i] > t:
                     l_index = i - 1
                     found = 1
                     break
 
-            r0 = self._zeroRates[l_index]
+            r0 = self._zero_rates[l_index]
 
             if found == 1:
-                zeroRate = r0
+                zero_rate = r0
             else:
-                zeroRate = self._zeroRates[-1]
+                zero_rate = self._zero_rates[-1]
 
-            zeroRates.append(zeroRate)
+            zero_rates.append(zero_rate)
 
-        return np.array(zeroRates)
+        return np.array(zero_rates)
 
-###############################################################################
+    ###############################################################################
 
     def _fwd(self,
              times: (np.ndarray, list)):
@@ -106,18 +107,18 @@ class DiscountCurvePWF(DiscountCurve):
         dt = 1e-6
         times = np.maximum(times, dt)
 
-        df1 = self._df(times-dt)
-        df2 = self._df(times+dt)
-        fwd = np.log(df1/df2)/(2.0*dt)
+        df1 = self._df(times - dt)
+        df2 = self._df(times + dt)
+        fwd = np.log(df1 / df2) / (2.0 * dt)
 
         # Prevent the discontinuous spikes by capping them at the sum of short
         # plus the long end zero rate !
-        cap = (self._zeroRates[0] + self._zeroRates[-1])
+        cap = (self._zero_rates[0] + self._zero_rates[-1])
         fwd = np.minimum(fwd, cap)
 
         return fwd
 
-###############################################################################
+    ###############################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -128,32 +129,32 @@ class DiscountCurvePWF(DiscountCurve):
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dates,
+        dc_times = timesFromDates(dates,
                                  self._valuation_date,
                                  self._day_count_type)
 
-        zeroRates = self._zeroRate(dcTimes)
+        zero_rates = self._zero_rate(dc_times)
 
         df = self._zeroToDf(self._valuation_date,
-                            zeroRates,
-                            dcTimes,
+                            zero_rates,
+                            dc_times,
                             self._freq_type,
                             self._day_count_type)
 
         return df
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("DATE", "ZERO RATE")
-        for i in range(0, len(self._zeroDates)):
-            s += labelToString(self._zeroDates[i], self._zeroRates[i])
-        s += labelToString("FREQUENCY", (self._freq_type))
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("DATE", "ZERO RATE")
+        for i in range(0, len(self._zero_dates)):
+            s += label_to_string(self._zero_dates[i], self._zero_rates[i])
+        s += label_to_string("FREQUENCY", (self._freq_type))
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

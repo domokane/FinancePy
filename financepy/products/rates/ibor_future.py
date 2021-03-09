@@ -14,13 +14,13 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...utils.date import Date
 
-from ...utils.helpers import labelToString, check_argument_types
-from ...products.rates.FinIborFRA import FinIborFRA
+from ...utils.helpers import label_to_string, check_argument_types
+from ...products.rates.ibor_fra import IborFRA
 
 ###############################################################################
 
 
-class FinIborFuture:
+class IborFuture:
     """ Class for managing short term interest rate futures contracts. """
 
     # Reference
@@ -65,12 +65,12 @@ class FinIborFuture:
 
         fraRate = self.FRARate(futures_price, convexity)
 
-        fra = FinIborFRA(self._delivery_date,
-                          self._endOfInterestPeriod,
-                          fraRate,
-                          self._accrual_type,
-                          notional=self._contractSize,
-                          payFixedRate=False)
+        fra = IborFRA(self._delivery_date,
+                      self._endOfInterestPeriod,
+                      fraRate,
+                      self._accrual_type,
+                      notional=self._contractSize,
+                      payFixedRate=False)
 
         return fra
 
@@ -134,12 +134,12 @@ class FinIborFuture:
     def __repr__(self):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("LAST TRADING DATE", self._lastTradingDate)
-        s += labelToString("DELIVERY DATE", self._delivery_date)
-        s += labelToString("END INTEREST PERIOD", self._endOfInterestPeriod)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("CONTRACT SIZE", self._contractSize)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("LAST TRADING DATE", self._lastTradingDate)
+        s += label_to_string("DELIVERY DATE", self._delivery_date)
+        s += label_to_string("END INTEREST PERIOD", self._endOfInterestPeriod)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("CONTRACT SIZE", self._contractSize)
         return s
 
 ##########################################################################

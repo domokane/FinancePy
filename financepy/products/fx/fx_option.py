@@ -5,7 +5,7 @@
 
 from ...models.black_scholes import BlackScholes
 from ...utils.global_vars import gDaysInYear
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 ##########################################################################
 

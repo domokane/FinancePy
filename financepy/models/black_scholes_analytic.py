@@ -10,7 +10,7 @@ from ..utils.global_types import FinOptionTypes
 from ..utils.global_vars import gSmall
 from ..utils.math import NVect, NPrimeVect
 from ..utils.error import FinError
-from ..utils.FinSolvers1D import bisection, newton, newton_secant
+from ..utils.solver_1d import bisection, newton, newton_secant
 
 ###############################################################################
 # Analytical Black Scholes model implementation and approximations

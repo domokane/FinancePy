@@ -14,8 +14,8 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import FinModelBlack
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.FinIborSwaption import FinSwapTypes
-from financepy.products.rates.FinIborSwaption import FinIborSwaption
+from financepy.products.rates.swaption import FinSwapTypes
+from financepy.products.rates.swaption import IborSwaption
 from financepy.utils.helpers import checkVectorDifferences
 from financepy.models.rates_libor_market_model import LMMSimulateFwdsNF
 from financepy.models.rates_libor_market_model import LMMSimulateFwds1F
@@ -137,10 +137,10 @@ def getForwardCurve(numFwds, r):
 #         a = int(2*texp)
 #         print(a, b)
 
-#         swaptionPrice1F = LMMSwaptionPricer(strike, a, b, num_paths,
+#         swaption_price1F = LMMSwaptionPricer(strike, a, b, num_paths,
 #                                             fwd0, fwds1F, taus, PAYSwaption)
 
-#         swaptionPriceNF = LMMSwaptionPricer(strike, a, b, num_paths,
+#         swaption_priceNF = LMMSwaptionPricer(strike, a, b, num_paths,
 #                                             fwd0, fwdsNF, taus, PAYSwaption)
 
 #         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
@@ -153,35 +153,35 @@ def getForwardCurve(numFwds, r):
 #                                           FrequencyTypes.QUARTERLY)
 
 #         settlement_date = valuation_date
-#         exerciseDate = settlement_date.addMonths(a*3)
+#         exercise_date = settlement_date.addMonths(a*3)
 #         maturity_date = settlement_date.addMonths(b*3)
 
-#         fixedCoupon = strike
-#         fixedFrequencyType = FrequencyTypes.QUARTERLY
-#         fixedDayCountType = DayCountTypes.ACT_ACT_ISDA
-#         floatFrequencyType = FrequencyTypes.QUARTERLY
-#         floatDayCountType = DayCountTypes.ACT_ACT_ISDA
+#         fixed_coupon = strike
+#         fixed_frequency_type = FrequencyTypes.QUARTERLY
+#         fixed_day_count_type = DayCountTypes.ACT_ACT_ISDA
+#         float_frequency_type = FrequencyTypes.QUARTERLY
+#         float_day_count_type = DayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
 #         # Pricing a PAY
 #         swaptionType = FinIborSwaptionTypes.PAY
 #         swaption = FinIborSwaption(settlement_date,
-#                                     exerciseDate,
+#                                     exercise_date,
 #                                     maturity_date,
 #                                     swaptionType,
-#                                     fixedCoupon,
-#                                     fixedFrequencyType,
-#                                     fixedDayCountType,
+#                                     fixed_coupon,
+#                                     fixed_frequency_type,
+#                                     fixed_day_count_type,
 #                                     notional,
-#                                     floatFrequencyType,
-#                                     floatDayCountType)
+#                                     float_frequency_type,
+#                                     float_day_count_type)
 
 #         model = FinModelBlack(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
 #         print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
 #               % (strike, texp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaptionVol,
-#                  swaptionPrice1F, swaptionPriceNF, blackSwaptionPrice))
+#                  swaption_price1F, swaption_priceNF, blackSwaptionPrice))
 
 # #        print(swaption)
 

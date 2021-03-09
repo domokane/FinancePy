@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from .interpolator import FinInterpolator, FinInterpTypes, interpolate
+from .interpolator import FinInterpolator, InterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -16,13 +16,13 @@ from ...utils.math import testMonotonicity
 from ...utils.schedule import Schedule
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import timesFromDates
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 
 ###############################################################################
 
 
-class DiscountCurve():
+class DiscountCurve:
     """ This is a base discount curve which has an internal representation of
     a vector of times and discount factors and an interpolation scheme for
     interpolating between these fixed points. """
@@ -33,7 +33,7 @@ class DiscountCurve():
                  valuation_date: Date,
                  df_dates: list,
                  df_values: np.ndarray,
-                 interp_type: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
+                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
         are explicitly linking dates and discount factors, we do not need to
@@ -143,7 +143,7 @@ class DiscountCurve():
             raise FinError("Date list and df list do not have same length")
 
         num_dates = len(dateList)
-        zeroRates = []
+        zero_rates = []
 
         times = timesFromDates(dateList, self._valuation_date, day_count_type)
 
@@ -160,13 +160,13 @@ class DiscountCurve():
             else:
                 r = (np.power(df, -1.0 / (t * f)) - 1.0) * f
 
-            zeroRates.append(r)
+            zero_rates.append(r)
 
-        return np.array(zeroRates)
+        return np.array(zero_rates)
 
     ###############################################################################
 
-    def zeroRate(self,
+    def zero_rate(self,
                  dts: (list, Date),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_360):
@@ -182,14 +182,14 @@ class DiscountCurve():
             raise FinError("Invalid Day Count type.")
 
         dfs = self.df(dts)
-        zeroRates = self._dfToZero(dfs, dts, freq_type, day_count_type)
+        zero_rates = self._dfToZero(dfs, dts, freq_type, day_count_type)
 
         if isinstance(dts, Date):
-            return zeroRates[0]
+            return zero_rates[0]
         else:
-            return np.array(zeroRates)
+            return np.array(zero_rates)
 
-        return zeroRates
+        return zero_rates
 
     ###############################################################################
 
@@ -200,7 +200,7 @@ class DiscountCurve():
         function can return a vector of cc rates given a vector of
         dates so must use Numpy functions. """
 
-        ccRates = self.zeroRate(dts, FrequencyTypes.CONTINUOUS, day_count_type)
+        ccRates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, day_count_type)
         return ccRates
 
     ###############################################################################
@@ -252,15 +252,15 @@ class DiscountCurve():
             flow_dates[0] = effective_date
 
             day_counter = DayCount(day_count_type)
-            prevDt = flow_dates[0]
+            prev_dt = flow_dates[0]
             pv01 = 0.0
             df = 1.0
 
             for nextDt in flow_dates[1:]:
                 df = self.df(nextDt)
-                alpha = day_counter.year_frac(prevDt, nextDt)[0]
+                alpha = day_counter.year_frac(prev_dt, nextDt)[0]
                 pv01 += alpha * df
-                prevDt = nextDt
+                prev_dt = nextDt
 
             if abs(pv01) < gSmall:
                 parRate = 0.0
@@ -299,9 +299,9 @@ class DiscountCurve():
         """ Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. """
 
-        if self._interp_type is FinInterpTypes.FLAT_FWD_RATES or \
-                self._interp_type is FinInterpTypes.LINEAR_ZERO_RATES or \
-                self._interp_type is FinInterpTypes.LINEAR_FWD_RATES:
+        if self._interp_type is InterpTypes.FLAT_FWD_RATES or \
+                self._interp_type is InterpTypes.LINEAR_ZERO_RATES or \
+                self._interp_type is InterpTypes.LINEAR_FWD_RATES:
 
             df = interpolate(t,
                              self._times,
@@ -353,8 +353,6 @@ class DiscountCurve():
             return fwd[0]
         else:
             return np.array(fwd)
-
-        return fwd
 
     ###############################################################################
 
@@ -415,7 +413,7 @@ class DiscountCurve():
         else:
             raise FinError("Start date and end date must be same types.")
 
-        dayCount = DayCount(day_count_type)
+        day_count = DayCount(day_count_type)
 
         num_dates = len(start_dates)
         fwd_rates = []
@@ -429,7 +427,7 @@ class DiscountCurve():
             elif isinstance(date_or_tenor, list):
                 dt2 = date_or_tenor[i]
 
-            year_frac = dayCount.year_frac(dt1, dt2)[0]
+            year_frac = day_count.year_frac(dt1, dt2)[0]
             df1 = self.df(dt1)
             df2 = self.df(dt2)
             fwd_rate = (df1 / df2 - 1.0) / year_frac
@@ -444,11 +442,11 @@ class DiscountCurve():
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         num_points = len(self._df_dates)
-        s += labelToString("DATES", "DISCOUNT FACTORS")
+        s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += labelToString("%12s" % self._df_dates[i],
+            s += label_to_string("%12s" % self._df_dates[i],
                                "%12.8f" % self._dfs[i])
 
         return s

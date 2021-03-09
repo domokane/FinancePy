@@ -10,7 +10,7 @@ from numba import njit, float64, float64
 
 from ..utils.math import NVect, NPrimeVect
 from ..utils.global_vars import gSmall
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 from ..utils.global_types import FinOptionTypes
 from ..utils.error import FinError
 
@@ -195,10 +195,10 @@ class FinModelBlack():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VOLATILITY", self._volatility)
-        s += labelToString("IMPLEMENTATION", self._implementation)
-        s += labelToString("NUMSTEPS", self._num_steps)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VOLATILITY", self._volatility)
+        s += label_to_string("IMPLEMENTATION", self._implementation)
+        s += label_to_string("NUMSTEPS", self._num_steps)
         return s
 
 ###############################################################################

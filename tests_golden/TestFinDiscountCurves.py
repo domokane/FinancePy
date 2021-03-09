@@ -8,8 +8,8 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import *
-from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.utils.date import Date, setDateFormatType, DateFormatTypes
+from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve import DiscountCurve
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.market.discount.curve_ns import DiscountCurveNS
@@ -49,7 +49,7 @@ def test_FinDiscountCurves():
     curvesList = []
 
     finDiscountCurve = DiscountCurve(valuation_date, dates, discount_factors,
-                                     FinInterpTypes.FLAT_FWD_RATES)
+                                     InterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
     finDiscountCurveFlat = DiscountCurveFlat(valuation_date, 0.05)
@@ -93,7 +93,7 @@ def test_FinDiscountCurves():
     for name, curve in zip(curveNames, curvesList):
         for fwdMaturityDate in fwdMaturityDates:
             tenor = "3M"
-            zeroRate = curve.zeroRate(fwdMaturityDate)
+            zero_rate = curve.zero_rate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwd_rate = curve.fwd_rate(fwdMaturityDate, tenor)
             swap_rate = curve.swap_rate(valuation_date, fwdMaturityDate)
@@ -101,7 +101,7 @@ def test_FinDiscountCurves():
 
             testCases.print("%-20s" % name,
                             "%-12s" % fwdMaturityDate,
-                            "%7.6f" % (zeroRate),
+                            "%7.6f" % (zero_rate),
                             "%8.7f" % (df),
                             "%7.6f" % (fwd),
                             "%7.6f" % (fwd_rate),
@@ -114,7 +114,7 @@ def test_FinDiscountCurves():
 
     for name, curve in zip(curveNames, curvesList):
         tenor = "3M"
-        zeroRate = curve.zeroRate(fwdMaturityDates)
+        zero_rate = curve.zero_rate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwd_rate = curve.fwd_rate(fwdMaturityDates, tenor)
         swap_rate = curve.swap_rate(valuation_date, fwdMaturityDates)
@@ -123,7 +123,7 @@ def test_FinDiscountCurves():
         for i in range(0, len(fwdMaturityDates)):
             testCases.print("%-20s" % name,
                             "%-12s" % fwdMaturityDate,
-                            "%7.6f" % (zeroRate[i]),
+                            "%7.6f" % (zero_rate[i]),
                             "%8.7f" % (df[i]),
                             "%7.6f" % (fwd[i]),
                             "%7.6f" % (fwd_rate[i]),
@@ -138,8 +138,8 @@ def test_FinDiscountCurves():
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
-            zeroRates = curve.zeroRate(fwdDates)
-            plt.plot(years, zeroRates, label=name)
+            zero_rates = curve.zero_rate(fwdDates)
+            plt.plot(years, zero_rates, label=name)
         plt.legend()
         plt.title("Zero Rates")
 

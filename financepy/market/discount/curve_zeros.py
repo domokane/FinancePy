@@ -9,11 +9,11 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.math import testMonotonicity
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.helpers import timesFromDates
 from ...market.discount.curve import DiscountCurve
 from ...utils.helpers import check_argument_types
-from .interpolator import FinInterpTypes, FinInterpolator
+from .interpolator import InterpTypes, FinInterpolator
 
 
 ###############################################################################
@@ -33,11 +33,11 @@ class DiscountCurveZeros(DiscountCurve):
 
     def __init__(self,
                  valuation_date: Date,
-                 zeroDates: list,
-                 zeroRates: (list, np.ndarray),
+                 zero_dates: list,
+                 zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
-                 interp_type: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
+                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
         dates and then another same-length vector of rates. The rate is to the
@@ -49,10 +49,10 @@ class DiscountCurveZeros(DiscountCurve):
         check_argument_types(self.__init__, locals())
 
         # Validate curve
-        if len(zeroDates) == 0:
+        if len(zero_dates) == 0:
             raise FinError("Dates has zero length")
 
-        if len(zeroDates) != len(zeroRates):
+        if len(zero_dates) != len(zero_rates):
             raise FinError("Dates and Rates are not the same length")
 
         if freq_type not in FrequencyTypes:
@@ -67,16 +67,16 @@ class DiscountCurveZeros(DiscountCurve):
         self._day_count_type = day_count_type
         self._interp_type = interp_type
 
-        self._zeroRates = np.array(zeroRates)
-        self._zeroDates = zeroDates
+        self._zero_rates = np.array(zero_rates)
+        self._zero_dates = zero_dates
 
-        self._times = timesFromDates(zeroDates, valuation_date, day_count_type)
+        self._times = timesFromDates(zero_dates, valuation_date, day_count_type)
 
         if testMonotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
         dfs = self._zeroToDf(self._valuation_date,
-                             self._zeroRates,
+                             self._zero_rates,
                              self._times,
                              self._freq_type,
                              self._day_count_type)
@@ -108,17 +108,17 @@ class DiscountCurveZeros(DiscountCurve):
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VALUATION DATE", self._valuation_date)
-        s += labelToString("FREQUENCY TYPE", (self._freq_type))
-        s += labelToString("DAY COUNT TYPE", (self._day_count_type))
-        s += labelToString("INTERP TYPE", (self._interp_type))
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VALUATION DATE", self._valuation_date)
+        s += label_to_string("FREQUENCY TYPE", (self._freq_type))
+        s += label_to_string("DAY COUNT TYPE", (self._day_count_type))
+        s += label_to_string("INTERP TYPE", (self._interp_type))
 
-        s += labelToString("DATES", "ZERO RATES")
+        s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._times)
         for i in range(0, num_points):
-            s += labelToString("%12s" % self._zeroDates[i],
-                               "%10.7f" % self._zeroRates[i])
+            s += label_to_string("%12s" % self._zero_dates[i],
+                               "%10.7f" % self._zero_rates[i])
 
         return s
 

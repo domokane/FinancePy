@@ -5,8 +5,8 @@
 import sys
 sys.path.append("..")
 
-from financepy.products.rates.FinIborFuture import FinIborFuture
-from financepy.utils.date import *
+from financepy.products.rates.ibor_future import IborFuture
+from financepy.utils.date import Date, setDateFormatType, DateFormatTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -23,7 +23,7 @@ def test_FinIborFuture():
     testCases.header("VALUES")
 
     for i in range(1, 12):
-        fut = FinIborFuture(todayDate, i, "3M")
+        fut = IborFuture(todayDate, i, "3M")
         testCases.print(fut)
 
         fra = fut.toFRA(0.020, 0.0)

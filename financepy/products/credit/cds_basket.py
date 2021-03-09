@@ -24,11 +24,11 @@ from ...products.credit.cds_curve import CDSCurve
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...market.discount.interpolator import interpolate, FinInterpTypes
+from ...market.discount.interpolator import interpolate, InterpTypes
 
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 ###############################################################################
 # TODO: Convert functions to use NUMBA!!
@@ -91,7 +91,7 @@ class CDSBasket:
 
         adjusted_dates = self._cds_contract._adjusted_dates
         num_flows = len(adjusted_dates)
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
 
         averageAccrualFactor = 0.0
 
@@ -100,7 +100,7 @@ class CDSBasket:
             t = (adjusted_dates[iTime] - valuation_date) / gDaysInYear
             dt0 = adjusted_dates[iTime - 1]
             dt1 = adjusted_dates[iTime]
-            accrual_factor = dayCount.year_frac(dt0, dt1)[0]
+            accrual_factor = day_count.year_frac(dt0, dt1)[0]
             averageAccrualFactor += accrual_factor
             rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
                 accrual_factor * libor_curve._df(t)
@@ -256,17 +256,17 @@ class CDSBasket:
             raise FinError("Value date is after maturity date")
 
         payment_dates = self._cds_contract._adjusted_dates
-        numTimes = len(payment_dates)
+        num_times = len(payment_dates)
 
         issuerSurvivalProbabilities = np.zeros(num_credits)
         recovery_rates = np.zeros(num_credits)
-        basketTimes = np.zeros(numTimes)
-        basketSurvivalCurve = np.zeros(numTimes)
+        basketTimes = np.zeros(num_times)
+        basketSurvivalCurve = np.zeros(num_times)
 
         basketTimes[0] = 0.0
         basketSurvivalCurve[0] = 1.0
 
-        for iTime in range(1, numTimes):
+        for iTime in range(1, num_times):
 
             t = (payment_dates[iTime] - valuation_date) / gDaysInYear
 
@@ -275,7 +275,7 @@ class CDSBasket:
                 recovery_rates[iCredit] = issuer_curve._recovery_rate
                 issuerSurvivalProbabilities[iCredit] = interpolate(
                     t, issuer_curve._times, issuer_curve._values,
-                    FinInterpTypes.FLAT_FWD_RATES.value)
+                    InterpTypes.FLAT_FWD_RATES.value)
 
             lossDbn = homogeneousBasketLossDbn(issuerSurvivalProbabilities,
                                                recovery_rates,
@@ -317,16 +317,16 @@ class CDSBasket:
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
         cash flows """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("STEP-IN DATE", self._step_in_date)
-        s += labelToString("MATURITY", self._maturity_date)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("RUNNING COUPON", self._running_coupon*10000, "bp\n")
-        s += labelToString("DAYCOUNT", self._day_count_type)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("STEP-IN DATE", self._step_in_date)
+        s += label_to_string("MATURITY", self._maturity_date)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("RUNNING COUPON", self._running_coupon*10000, "bp\n")
+        s += label_to_string("DAYCOUNT", self._day_count_type)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
 
 #        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
 #        valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]

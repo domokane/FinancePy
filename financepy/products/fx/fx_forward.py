@@ -8,7 +8,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -149,13 +149,13 @@ class FXForward:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE FX RATE", self._strike_fx_rate)
-        s += labelToString("CURRENCY PAIR", self._currency_pair)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("NOTIONAL CCY", self._notional_currency)
-        s += labelToString("SPOT DAYS", self._spot_days, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
+        s += label_to_string("CURRENCY PAIR", self._currency_pair)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("NOTIONAL CCY", self._notional_currency)
+        s += label_to_string("SPOT DAYS", self._spot_days, "")
         return s
 
 ###############################################################################

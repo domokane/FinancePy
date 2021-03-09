@@ -5,7 +5,7 @@
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 from ...utils.global_types import FinOptionTypes, FinExerciseTypes
 from ...products.bonds.bond import Bond
@@ -105,17 +105,17 @@ class BondOption():
         coupon_times = np.array(coupon_times)
         coupon_flows = np.array(coupon_flows)
 
-        exerciseType = FinExerciseTypes.AMERICAN
+        exercise_type = FinExerciseTypes.AMERICAN
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL \
             or self._option_type == FinOptionTypes.EUROPEAN_PUT:
-                exerciseType = FinExerciseTypes.EUROPEAN                
+                exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if the model is Jamshidian but how to do neat design ?
         model.buildTree(tmat, df_times, df_values)
 
         v = model.bondOption(texp, self._strike_price, self._face_amount,
-                             coupon_times, coupon_flows, exerciseType)
+                             coupon_times, coupon_flows, exercise_type)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL \
             or self._option_type == FinOptionTypes.AMERICAN_CALL:
@@ -130,11 +130,11 @@ class BondOption():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE", self._strike_price)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("FACE AMOUNT", self._face_amount, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE", self._strike_price)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         s += "Underlying Bond\n"
         s += str(self._bond)
         return s

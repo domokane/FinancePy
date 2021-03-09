@@ -2,10 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import datetime
-from .error import FinError
-from numba import njit, boolean, int64
+from numba import njit
 import numpy as np
+import datetime
+
+from financepy.utils.error import FinError
 
 ###############################################################################    
 
@@ -170,8 +171,8 @@ def dateFromIndex(idx):
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
-def weekDay(dayCount):
-    weekday = (dayCount+5) % 7
+def weekDay(day_count):
+    weekday = (day_count+5) % 7
     return weekday
 
 ###############################################################################
@@ -458,7 +459,7 @@ class Date():
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates."""
 
-        numMonths = 1
+        num_months = 1
         scalarFlag = False
 
         if isinstance(mm, int) or isinstance(mm, float):
@@ -467,11 +468,11 @@ class Date():
         else:
             mmVector = mm
 
-        numMonths = len(mmVector)
+        num_months = len(mmVector)
 
         dateList = []
 
-        for i in range(0, numMonths):
+        for i in range(0, num_months):
 
             mmi = mmVector[i]
 

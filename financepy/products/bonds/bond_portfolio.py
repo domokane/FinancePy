@@ -8,7 +8,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 from .bond import YTMCalcType
 
@@ -255,13 +255,13 @@ class BondPortfolio:
 
     def __repr__(self):
         
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ISSUE DATE", self._issue_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("FACE AMOUNT", self._face_amount, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ISSUE DATE", self._issue_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         return s
 
 ###############################################################################

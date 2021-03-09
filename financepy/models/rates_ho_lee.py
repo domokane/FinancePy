@@ -7,10 +7,10 @@ from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import N
-from ..market.discount.interpolator import FinInterpTypes, _uinterpolate
-from ..utils.helpers import labelToString
+from ..market.discount.interpolator import InterpTypes, _uinterpolate
+from ..utils.helpers import label_to_string
 
-interp = FinInterpTypes.FLAT_FWD_RATES.value
+interp = InterpTypes.FLAT_FWD_RATES.value
 
 ###############################################################################
 # dr = theta(t) dt + sigma * dW
@@ -38,7 +38,7 @@ def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
 ###############################################################################
 
 
-class FinModelRatesHL():
+class ModelRatesHoLee:
 
     def __init__(self, sigma):
         """ Construct Ho-Lee model using single parameter of volatility. The
@@ -96,8 +96,8 @@ class FinModelRatesHL():
     def __repr__(self):
         """ Return string with class details. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("Sigma", self._sigma)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("Sigma", self._sigma)
         return s
 
 ###############################################################################

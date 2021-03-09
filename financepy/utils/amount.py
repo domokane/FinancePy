@@ -4,7 +4,7 @@
 
 
 from .helpers import check_argument_types
-from .currency import FinCurrencyTypes
+from .currency import CurrencyTypes
 from .math import ONE_MILLION
 
 ###############################################################################
@@ -15,7 +15,7 @@ class FinAmount:
 
     def __init__(self,
                  notional: float = ONE_MILLION,
-                 currencyType: FinCurrencyTypes = FinCurrencyTypes.NONE):
+                 currencyType: CurrencyTypes = CurrencyTypes.NONE):
         """ Create FinAmount object. """
 
         check_argument_types(self.__init__, locals())
@@ -29,7 +29,7 @@ class FinAmount:
         can be used for providing transparency on schedule calculations. """
 
         s = ""
-        if self._currencyType != FinCurrencyTypes.NONE:
+        if self._currencyType != CurrencyTypes.NONE:
             s += self._currencyType.name
             s += " "
 

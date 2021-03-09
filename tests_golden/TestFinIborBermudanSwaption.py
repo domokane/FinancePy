@@ -10,10 +10,10 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_types import FinSwapTypes
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.products.rates.swaption import IborSwaption
+from financepy.products.rates.ibor_swap import IborSwap
 
-from financepy.products.rates.FinIborBermudanSwaption import FinIborBermudanSwaption
+from financepy.products.rates.bermudan_swaption import FinIborBermudanSwaption
 from financepy.models.black import FinModelBlack
 from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
@@ -32,7 +32,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     valuation_date = Date(1, 1, 2011)
     settlement_date = valuation_date
-    exerciseDate = settlement_date.addYears(1)
+    exercise_date = settlement_date.addYears(1)
     swapMaturityDate = settlement_date.addYears(4)
 
     swapFixedCoupon = 0.060
@@ -44,38 +44,38 @@ def test_FinIborBermudanSwaptionBKModel():
                                     FrequencyTypes.SEMI_ANNUAL,
                                     DayCountTypes.ACT_365F)
 
-    fwdPAYSwap = FinIborSwap(exerciseDate,
-                                swapMaturityDate,
-                                FinSwapTypes.PAY,
-                                swapFixedCoupon,
-                                swapFixedFrequencyType,
-                                swapFixedDayCountType)
+    fwdPAYSwap = IborSwap(exercise_date,
+                          swapMaturityDate,
+                          FinSwapTypes.PAY,
+                          swapFixedCoupon,
+                          swapFixedFrequencyType,
+                          swapFixedDayCountType)
 
     fwdSwapValue = fwdPAYSwap.value(settlement_date, libor_curve, libor_curve)
 
     testCases.header("LABEL", "VALUE")
     testCases.print("FWD SWAP VALUE", fwdSwapValue)
 
-    # fwdPAYSwap.printFixedLegPV()
+    # fwdPAYSwap.print_fixed_leg_pv()
 
     # Now we create the European swaptions
-    fixed_legType = FinSwapTypes.PAY
-    europeanSwaptionPay = FinIborSwaption(settlement_date,
-                                           exerciseDate,
-                                           swapMaturityDate,
-                                           fixed_legType,
-                                           swapFixedCoupon,
-                                           swapFixedFrequencyType,
-                                           swapFixedDayCountType)
+    fixed_leg_type = FinSwapTypes.PAY
+    europeanSwaptionPay = IborSwaption(settlement_date,
+                                       exercise_date,
+                                       swapMaturityDate,
+                                       fixed_leg_type,
+                                       swapFixedCoupon,
+                                       swapFixedFrequencyType,
+                                       swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
-    europeanSwaptionRec = FinIborSwaption(settlement_date,
-                                           exerciseDate,
-                                           swapMaturityDate,
-                                           fixed_legType,
-                                           swapFixedCoupon,
-                                           swapFixedFrequencyType,
-                                           swapFixedDayCountType)
+    fixed_leg_type = FinSwapTypes.RECEIVE
+    europeanSwaptionRec = IborSwaption(settlement_date,
+                                       exercise_date,
+                                       swapMaturityDate,
+                                       fixed_leg_type,
+                                       swapFixedCoupon,
+                                       swapFixedFrequencyType,
+                                       swapFixedDayCountType)
     
     ###########################################################################
     ###########################################################################
@@ -165,26 +165,26 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.EUROPEAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
-    exerciseType = FinExerciseTypes.EUROPEAN
+    fixed_leg_type = FinSwapTypes.RECEIVE
+    exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
@@ -227,26 +227,26 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.BERMUDAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
-    exerciseType = FinExerciseTypes.BERMUDAN
+    fixed_leg_type = FinSwapTypes.RECEIVE
+    exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
@@ -336,24 +336,24 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.EUROPEAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
+    fixed_leg_type = FinSwapTypes.RECEIVE
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
@@ -394,24 +394,24 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.BERMUDAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
+    fixed_leg_type = FinSwapTypes.RECEIVE
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
@@ -501,24 +501,24 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.EUROPEAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
+    fixed_leg_type = FinSwapTypes.RECEIVE
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
@@ -558,24 +558,24 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_legType = FinSwapTypes.PAY
-    exerciseType = FinExerciseTypes.BERMUDAN
+    fixed_leg_type = FinSwapTypes.PAY
+    exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_legType = FinSwapTypes.RECEIVE
+    fixed_leg_type = FinSwapTypes.RECEIVE
     bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
-                                                   exerciseDate,
+                                                   exercise_date,
                                                    swapMaturityDate,
-                                                   fixed_legType,
-                                                   exerciseType,
+                                                   fixed_leg_type,
+                                                   exercise_type,
                                                    swapFixedCoupon,
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)

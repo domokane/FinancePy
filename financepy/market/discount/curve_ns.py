@@ -10,9 +10,10 @@ from ...utils.global_vars import gSmall
 from ...utils.error import FinError
 from ...market.discount.curve import DiscountCurve
 from ...utils.helpers import check_argument_types
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import timesFromDates
+
 
 ###############################################################################
 
@@ -50,12 +51,12 @@ class DiscountCurveNS(DiscountCurve):
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
-###############################################################################
+    ###############################################################################
 
-    def zeroRate(self,
-                 dates: (list, Date),
-                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_360):
+    def zero_rate(self,
+                  dates: (list, Date),
+                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                  day_count_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency according to
         NS parametrisation. This method overrides that in FinDiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
@@ -71,32 +72,32 @@ class DiscountCurveNS(DiscountCurve):
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dates,
+        dc_times = timesFromDates(dates,
                                  self._valuation_date,
                                  self._day_count_type)
 
         # We now get the discount factors using these times
-        zeroRates = self._zeroRate(dcTimes)
+        zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
         dfs = self._zeroToDf(self._valuation_date,
-                             zeroRates,
-                             dcTimes,
+                             zero_rates,
+                             dc_times,
                              self._freq_type,
                              self._day_count_type)
 
         # Convert these to zero rates in the required frequency and day count
-        zeroRates = self._dfToZero(dfs,
-                                   dates,
-                                   freq_type,
-                                   day_count_type)
+        zero_rates = self._dfToZero(dfs,
+                                    dates,
+                                    freq_type,
+                                    day_count_type)
 
-        return zeroRates
+        return zero_rates
 
-###############################################################################
+    ###############################################################################
 
-    def _zeroRate(self,
-                  times: (float, np.ndarray)):
+    def _zero_rate(self,
+                   times: (float, np.ndarray)):
         """ Zero rate for Nelson-Siegel curve parametrisation. This means that
         the t vector must use the curve day count."""
 
@@ -104,12 +105,12 @@ class DiscountCurveNS(DiscountCurve):
 
         theta = t / self._tau
         e = np.exp(-theta)
-        zeroRate = self._beta0
-        zeroRate += self._beta1 * (1.0 - e) / theta
-        zeroRate += self._beta2 * ((1.0 - e) / theta - e)
-        return zeroRate
+        zero_rate = self._beta0
+        zero_rate += self._beta1 * (1.0 - e) / theta
+        zero_rate += self._beta2 * ((1.0 - e) / theta - e)
+        return zero_rate
 
-###############################################################################
+    ###############################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -120,35 +121,35 @@ class DiscountCurveNS(DiscountCurve):
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dates,
+        dc_times = timesFromDates(dates,
                                  self._valuation_date,
                                  self._day_count_type)
 
-        zeroRates = self._zeroRate(dcTimes)
+        zero_rates = self._zero_rate(dc_times)
 
         df = self._zeroToDf(self._valuation_date,
-                            zeroRates,
-                            dcTimes,
+                            zero_rates,
+                            dc_times,
                             self._freq_type,
                             self._day_count_type)
 
         return df
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("PARAMETER", "VALUE")
-        s += labelToString("BETA0", self._beta0)
-        s += labelToString("BETA1", self._beta1)
-        s += labelToString("BETA2", self._beta2)
-        s += labelToString("TAU", self._tau)
-        s += labelToString("FREQUENCY", (self._freq_type))
-        s += labelToString("DAY_COUNT", (self._day_count_type))
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("PARAMETER", "VALUE")
+        s += label_to_string("BETA0", self._beta0)
+        s += label_to_string("BETA1", self._beta1)
+        s += label_to_string("BETA2", self._beta2)
+        s += label_to_string("TAU", self._tau)
+        s += label_to_string("FREQUENCY", (self._freq_type))
+        s += label_to_string("DAY_COUNT", (self._day_count_type))
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

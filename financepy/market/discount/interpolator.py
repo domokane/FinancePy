@@ -7,7 +7,6 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 
-
 from scipy.interpolate import PchipInterpolator
 from scipy.interpolate import interp1d
 from scipy.interpolate import CubicSpline
@@ -17,15 +16,16 @@ from scipy.interpolate import CubicSpline
 from enum import Enum
 
 
-class FinInterpTypes(Enum):
-                FLAT_FWD_RATES = 1
-                LINEAR_FWD_RATES = 2
-                LINEAR_ZERO_RATES = 4
-                FINCUBIC_ZERO_RATES = 7
-                NATCUBIC_LOG_DISCOUNT = 8
-                NATCUBIC_ZERO_RATES = 9
-                PCHIP_ZERO_RATES = 10
-                PCHIP_LOG_DISCOUNT = 11
+class InterpTypes(Enum):
+    FLAT_FWD_RATES = 1
+    LINEAR_FWD_RATES = 2
+    LINEAR_ZERO_RATES = 4
+    FINCUBIC_ZERO_RATES = 7
+    NATCUBIC_LOG_DISCOUNT = 8
+    NATCUBIC_ZERO_RATES = 9
+    PCHIP_ZERO_RATES = 10
+    PCHIP_LOG_DISCOUNT = 11
+
 
 # LINEAR_SWAP_RATES = 3
 
@@ -42,7 +42,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
     value of x can be an array so that the function is vectorised. """
 
     if type(t) is float or type(t) is np.float64:
-        
+
         if t < 0.0:
             print(t)
             raise FinError("Interpolate times must all be >= 0")
@@ -61,9 +61,10 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
     else:
         raise FinError("Unknown input type" + type(t))
 
+
 ###############################################################################
 
-        
+
 @njit(float64(float64, float64[:], float64[:], int64),
       fastmath=True, cache=True, nogil=True)
 def _uinterpolate(t, times, dfs, method):
@@ -71,7 +72,7 @@ def _uinterpolate(t, times, dfs, method):
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
     piecewise flat in the continuously compounded forward y rate. """
-    
+
     small = 1e-10
     num_points = times.size
 
@@ -91,26 +92,26 @@ def _uinterpolate(t, times, dfs, method):
     # linear interpolation of y(x)
     ###########################################################################
 
-    if method == FinInterpTypes.LINEAR_ZERO_RATES.value:
+    if method == InterpTypes.LINEAR_ZERO_RATES.value:
 
         if i == 1:
-            r1 = -np.log(dfs[i])/times[i]
-            r2 = -np.log(dfs[i])/times[i]
-            dt = times[i] - times[i-1]
-            rvalue = ((times[i]-t)*r1 + (t-times[i-1])*r2)/dt
-            yvalue = np.exp(-rvalue*t)
+            r1 = -np.log(dfs[i]) / times[i]
+            r2 = -np.log(dfs[i]) / times[i]
+            dt = times[i] - times[i - 1]
+            rvalue = ((times[i] - t) * r1 + (t - times[i - 1]) * r2) / dt
+            yvalue = np.exp(-rvalue * t)
         elif i < num_points:
-            r1 = -np.log(dfs[i-1])/times[i-1]
-            r2 = -np.log(dfs[i])/times[i]
-            dt = times[i] - times[i-1]
-            rvalue = ((times[i]-t)*r1 + (t-times[i-1])*r2)/dt
-            yvalue = np.exp(-rvalue*t)
+            r1 = -np.log(dfs[i - 1]) / times[i - 1]
+            r2 = -np.log(dfs[i]) / times[i]
+            dt = times[i] - times[i - 1]
+            rvalue = ((times[i] - t) * r1 + (t - times[i - 1]) * r2) / dt
+            yvalue = np.exp(-rvalue * t)
         else:
-            r1 = -np.log(dfs[i-1])/times[i-1]
-            r2 = -np.log(dfs[i-1])/times[i-1]
-            dt = times[i-1] - times[i-2]
-            rvalue = ((times[i-1]-t)*r1 + (t-times[i-2])*r2)/dt
-            yvalue = np.exp(-rvalue*t)
+            r1 = -np.log(dfs[i - 1]) / times[i - 1]
+            r2 = -np.log(dfs[i - 1]) / times[i - 1]
+            dt = times[i - 1] - times[i - 2]
+            rvalue = ((times[i - 1] - t) * r1 + (t - times[i - 2]) * r2) / dt
+            yvalue = np.exp(-rvalue * t)
 
         return yvalue
 
@@ -120,30 +121,30 @@ def _uinterpolate(t, times, dfs, method):
     # This is also FLAT FORWARDS
     ###########################################################################
 
-    elif method == FinInterpTypes.FLAT_FWD_RATES.value:
+    elif method == InterpTypes.FLAT_FWD_RATES.value:
 
         if i == 1:
-            rt1 = -np.log(dfs[i-1])
+            rt1 = -np.log(dfs[i - 1])
             rt2 = -np.log(dfs[i])
-            dt = times[i] - times[i-1]
-            rtvalue = ((times[i]-t)*rt1 + (t-times[i-1])*rt2)/dt
+            dt = times[i] - times[i - 1]
+            rtvalue = ((times[i] - t) * rt1 + (t - times[i - 1]) * rt2) / dt
             yvalue = np.exp(-rtvalue)
         elif i < num_points:
             rt1 = -np.log(dfs[i - 1])
             rt2 = -np.log(dfs[i])
-            dt = times[i] - times[i-1]
-            rtvalue = ((times[i]-t)*rt1 + (t-times[i-1])*rt2)/dt
+            dt = times[i] - times[i - 1]
+            rtvalue = ((times[i] - t) * rt1 + (t - times[i - 1]) * rt2) / dt
             yvalue = np.exp(-rtvalue)
         else:
-            rt1 = -np.log(dfs[i-2])
-            rt2 = -np.log(dfs[i-1])
-            dt = times[i-1] - times[i-2]
-            rtvalue = ((times[i-1]-t)*rt1 + (t-times[i-2])*rt2)/dt
+            rt1 = -np.log(dfs[i - 2])
+            rt2 = -np.log(dfs[i - 1])
+            dt = times[i - 1] - times[i - 2]
+            rtvalue = ((times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2) / dt
             yvalue = np.exp(-rtvalue)
 
         return yvalue
 
-    elif method == FinInterpTypes.LINEAR_FWD_RATES.value:
+    elif method == InterpTypes.LINEAR_FWD_RATES.value:
 
         if i == 1:
             y2 = -np.log(dfs[i] + small)
@@ -151,20 +152,21 @@ def _uinterpolate(t, times, dfs, method):
             yvalue = np.exp(-yvalue)
         elif i < num_points:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -np.log(dfs[i-1]/dfs[i-2])/(times[i-1]-times[i-2])
-            fwd2 = -np.log(dfs[i]/dfs[i-1])/(times[i]-times[i-1])
-            dt = times[i] - times[i-1]
-            fwd = ((times[i]-t)*fwd1 + (t-times[i-1])*fwd2)/dt
+            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
+            dt = times[i] - times[i - 1]
+            fwd = ((times[i] - t) * fwd1 + (t - times[i - 1]) * fwd2) / dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
         else:
-            fwd = -np.log(dfs[i-1]/dfs[i-2])/(times[i-1]-times[i-2])
-            yvalue = dfs[i-1] * np.exp(-fwd * (t - times[i-1]))
+            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
 
         return yvalue
 
     else:
         print(method)
         raise FinError("Invalid interpolation scheme.")
+
 
 ###############################################################################
 
@@ -186,22 +188,23 @@ def _vinterpolate(xValues,
 
     return yvalues
 
+
 ###############################################################################
 
 
 class FinInterpolator():
 
     def __init__(self,
-                 interpolatorType: FinInterpTypes):
-        
+                 interpolatorType: InterpTypes):
+
         self._interp_type = interpolatorType
         self._interpFn = None
         self._times = None
         self._dfs = None
         self._refitCurve = False
-        
+
     ###########################################################################
-    
+
     def fit(self,
             times: np.ndarray,
             dfs: np.ndarray):
@@ -212,20 +215,20 @@ class FinInterpolator():
         if len(times) == 1:
             return
 
-        if self._interp_type == FinInterpTypes.PCHIP_LOG_DISCOUNT:
+        if self._interp_type == InterpTypes.PCHIP_LOG_DISCOUNT:
 
-             logDfs = np.log(self._dfs)
-             self._interpFn = PchipInterpolator(self._times, logDfs)
+            logDfs = np.log(self._dfs)
+            self._interpFn = PchipInterpolator(self._times, logDfs)
 
-        elif self._interp_type  == FinInterpTypes.PCHIP_ZERO_RATES:
+        elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
-             gSmallVector = np.ones(len(self._times)) * gSmall
-             zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
+            gSmallVector = np.ones(len(self._times)) * gSmall
+            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
 
-             if self._times[0] == 0.0:
-                 zeroRates[0] = zeroRates[1]
+            if self._times[0] == 0.0:
+                zero_rates[0] = zero_rates[1]
 
-             self._interpFn = PchipInterpolator(self._times, zeroRates)
+            self._interpFn = PchipInterpolator(self._times, zero_rates)
 
         # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
 
@@ -235,45 +238,44 @@ class FinInterpolator():
         #     self._interpFn = CubicSpline(self._times, logDfs,
         #                                  bc_type=((2, 0.0), (1, 0.0)))
 
-        elif self._interp_type == FinInterpTypes.FINCUBIC_ZERO_RATES:
+        elif self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
 
             """ Second derivatives at left is zero and first derivative at
             right is clamped to zero. """
             gSmallVector = np.ones(len(self._times)) * gSmall
-            zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
+            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
 
             if self._times[0] == 0.0:
-                zeroRates[0] = zeroRates[1]
+                zero_rates[0] = zero_rates[1]
 
-            self._interpFn = CubicSpline(self._times, zeroRates,
+            self._interpFn = CubicSpline(self._times, zero_rates,
                                          bc_type=((2, 0.0), (1, 0.0)))
 
-        elif self._interp_type == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
+        elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
 
             """ Second derivatives are clamped to zero at end points """
             logDfs = np.log(self._dfs)
             self._interpFn = CubicSpline(self._times, logDfs,
-                                         bc_type = 'natural')
-    
-        elif self._interp_type == FinInterpTypes.NATCUBIC_ZERO_RATES:
+                                         bc_type='natural')
+
+        elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
             """ Second derivatives are clamped to zero at end points """
             gSmallVector = np.ones(len(self._times)) * gSmall
-            zeroRates = -np.log(self._dfs)/(self._times + gSmallVector)
+            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
 
             if self._times[0] == 0.0:
-                zeroRates[0] = zeroRates[1]
+                zero_rates[0] = zero_rates[1]
 
-            self._interpFn = CubicSpline(self._times, zeroRates,
-                                         bc_type = 'natural')
+            self._interpFn = CubicSpline(self._times, zero_rates,
+                                         bc_type='natural')
 
-#        elif self._interp_type  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
-#
-#            logDfs = np.log(self._dfs)
-#            self._interpFn = interp1d(self._times, logDfs, 
-#                                      fill_value="extrapolate")
+    #        elif self._interp_type  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+    #
+    #            logDfs = np.log(self._dfs)
+    #            self._interpFn = interp1d(self._times, logDfs,
+    #                                      fill_value="extrapolate")
 
-            
     ###########################################################################
 
     def interpolate(self,
@@ -306,34 +308,34 @@ class FinInterpolator():
 
         else:
             raise FinError("t is not a recognized type")
-        
-        if self._interp_type == FinInterpTypes.PCHIP_LOG_DISCOUNT:
-        
+
+        if self._interp_type == InterpTypes.PCHIP_LOG_DISCOUNT:
+
             out = np.exp(self._interpFn(tvec))
 
-        elif self._interp_type == FinInterpTypes.PCHIP_ZERO_RATES:
-    
+        elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
+
             out = np.exp(-tvec * self._interpFn(tvec))
 
         # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
-        
+
         #     out = np.exp(self._interpFn(tvec))
 
-        elif self._interp_type == FinInterpTypes.FINCUBIC_ZERO_RATES:
-        
+        elif self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
+
             out = np.exp(-tvec * self._interpFn(tvec))
 
-        elif self._interp_type == FinInterpTypes.NATCUBIC_LOG_DISCOUNT:
-        
+        elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
+
             out = np.exp(self._interpFn(tvec))
 
-        elif self._interp_type == FinInterpTypes.NATCUBIC_ZERO_RATES:
-        
+        elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
+
             out = np.exp(-tvec * self._interpFn(tvec))
-    
-#        elif self._interp_type == FinInterpTypes.LINEAR_LOG_DISCOUNT:
-#    
-#            out = np.exp(self._interpFn(tvec))
+
+        #        elif self._interp_type == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+        #
+        #            out = np.exp(self._interpFn(tvec))
 
         else:
 

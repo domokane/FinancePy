@@ -9,7 +9,7 @@ from scipy.optimize import minimize
 from ..utils.global_types import FinOptionTypes
 from ..utils.error import FinError
 from ..utils.math import N
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 
 ###############################################################################
 # TODO: Should I merge this with SABR ?
@@ -218,12 +218,12 @@ class FinModelSABRShifted():
     def __repr__(self):
         """ Return string with class details. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("Alpha", self._alpha)
-        s += labelToString("Beta", self._beta)
-        s += labelToString("Nu", self._nu)
-        s += labelToString("Rho", self._rho)
-        s += labelToString("Shift", self._shift)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("Alpha", self._alpha)
+        s += label_to_string("Beta", self._beta)
+        s += label_to_string("Nu", self._nu)
+        s += label_to_string("Rho", self._rho)
+        s += label_to_string("Shift", self._shift)
         return s
 
 ###############################################################################

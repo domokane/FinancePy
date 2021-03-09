@@ -12,10 +12,10 @@ from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
 from financepy.models.volatility_fns import FinVolFunctionTypes
-from financepy.models.volatility_fns import volFunctionClark
+from financepy.models.volatility_fns import vol_function_clark
 
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.FinModelOptionImpliedDbn import optionImpliedDbn
+from financepy.models.option_implied_dbn import optionImpliedDbn
 
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
@@ -101,7 +101,7 @@ def test_FinOptionImpliedDbn():
 
             for iK in range(0, num_steps):
                 strike = startFX + iK*dFX                
-                vol = volFunctionClark(params, F, strike, texp)
+                vol = vol_function_clark(params, F, strike, texp)
                 strikes.append(strike) 
                 vols.append(vol)
             

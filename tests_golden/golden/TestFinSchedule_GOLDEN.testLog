@@ -1,9 +1,9 @@
-File Created on:20210208_134637
+File Created on:20210309_111704
 BANNER,=======================================================
 BANNER,BACKWARD SEMI-ANNUAL FREQUENCY
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL
@@ -22,7 +22,7 @@ BANNER,=======================================================
 BANNER,BACKWARD QUARTERLY FREQUENCY
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.QUARTERLY
@@ -45,7 +45,7 @@ BANNER,=======================================================
 BANNER,BACKWARD MONTHLY FREQUENCY
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.MONTHLY
@@ -84,7 +84,7 @@ BANNER,=======================================================
 BANNER,FORWARD ANNUAL
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.ANNUAL
@@ -101,7 +101,7 @@ BANNER,=======================================================
 BANNER,FORWARD SEMI-ANNUAL
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL
@@ -120,7 +120,7 @@ BANNER,=======================================================
 BANNER,FORWARD MONTHLY
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.MONTHLY
@@ -159,7 +159,7 @@ BANNER,=======================================================
 BANNER,BACKWARD GEN WITH SHORT END STUB
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: MON 20 AUG 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.QUARTERLY
@@ -182,7 +182,7 @@ BANNER,=======================================================
 BANNER,BACKWARD GEN WITH VERY SHORT END STUB
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 19 SEP 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.QUARTERLY
@@ -205,7 +205,7 @@ BANNER,=======================================================
 BANNER,FORWARD GEN WITH END STUB
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: MON 20 AUG 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL
@@ -224,7 +224,7 @@ BANNER,=======================================================
 BANNER,FORWARD GEN WITH VERY SHORT END STUB
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 19 SEP 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.QUARTERLY
@@ -247,7 +247,7 @@ BANNER,=======================================================
 BANNER,TERMINATION DATE ADJUSTED
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL
@@ -266,7 +266,7 @@ BANNER,=======================================================
 BANNER,END OF MONTH - NOT EOM TERM DATE - USING MOD FOLL
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: WED 20 JUN 2018
 END DATE: MON 22 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL
@@ -286,7 +286,7 @@ BANNER,=======================================================
 BANNER,END OF MONTH - EOM TERM DATE - USING MOD FOLL
 BANNER,=======================================================
 HEADER,OBJ,
-RESULTS,OBJECT TYPE: FinSchedule
+RESULTS,OBJECT TYPE: Schedule
 EFFECTIVE DATE: SAT 30 JUN 2018
 END DATE: TUE 30 JUN 2020
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL

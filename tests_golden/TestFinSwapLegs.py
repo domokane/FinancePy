@@ -14,8 +14,8 @@ from financepy.utils.amount import FinAmount
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
-from financepy.products.rates.FinFixedLeg import FinFixedLeg
-from financepy.products.rates.FinFloatLeg import FinFloatLeg
+from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
+from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -40,18 +40,18 @@ def test_FinFixedIborSwapLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFixedLeg = FinFixedLeg(effective_date,
-                               maturity_date,
-                               legPayRecType,
-                               coupon,
-                               freq_type,
-                               day_count_type,
-                               notional,
-                               principal,
-                               payment_lag,
-                               calendar_type,
-                               bus_day_adjust_type,
-                               date_gen_rule_type)
+    swapFixedLeg = SwapFixedLeg(effective_date,
+                                maturity_date,
+                                legPayRecType,
+                                coupon,
+                                freq_type,
+                                day_count_type,
+                                notional,
+                                principal,
+                                payment_lag,
+                                calendar_type,
+                                bus_day_adjust_type,
+                                date_gen_rule_type)
 
 ###############################################################################
 
@@ -71,18 +71,18 @@ def test_FinFixedOISSwapLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFixedLeg = FinFixedLeg(effective_date,
-                                  maturity_date,
-                                  legPayRecType,
-                                  coupon,
-                                  freq_type,
-                                  day_count_type,
-                                  notional,
-                                  principal,
-                                  payment_lag,
-                                  calendar_type,
-                                  bus_day_adjust_type,
-                                  date_gen_rule_type)
+    swapFixedLeg = SwapFixedLeg(effective_date,
+                                maturity_date,
+                                legPayRecType,
+                                coupon,
+                                freq_type,
+                                day_count_type,
+                                notional,
+                                principal,
+                                payment_lag,
+                                calendar_type,
+                                bus_day_adjust_type,
+                                date_gen_rule_type)
 
 ###############################################################################
 
@@ -102,18 +102,18 @@ def test_FinFloatIborLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFloatLeg = FinFloatLeg(effective_date,
-                               maturity_date,
-                               legPayRecType,
-                               spread,
-                               freq_type,
-                               day_count_type,
-                               notional,
-                               principal,
-                               payment_lag,
-                               calendar_type,
-                               bus_day_adjust_type,
-                               date_gen_rule_type)
+    swapFloatLeg = SwapFloatLeg(effective_date,
+                                maturity_date,
+                                legPayRecType,
+                                spread,
+                                freq_type,
+                                day_count_type,
+                                notional,
+                                principal,
+                                payment_lag,
+                                calendar_type,
+                                bus_day_adjust_type,
+                                date_gen_rule_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -141,18 +141,18 @@ def test_FinFloatOISLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFloatLeg = FinFloatLeg(effective_date,
-                                  maturity_date,
-                                  legPayRecType,
-                                  spread,
-                                  freq_type,
-                                  day_count_type,
-                                  notional,
-                                  principal,
-                                  payment_lag,
-                                  calendar_type,
-                                  bus_day_adjust_type,
-                                  date_gen_rule_type)
+    swapFloatLeg = SwapFloatLeg(effective_date,
+                                maturity_date,
+                                legPayRecType,
+                                spread,
+                                freq_type,
+                                day_count_type,
+                                notional,
+                                principal,
+                                payment_lag,
+                                calendar_type,
+                                bus_day_adjust_type,
+                                date_gen_rule_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 

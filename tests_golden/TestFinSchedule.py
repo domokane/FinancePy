@@ -309,7 +309,7 @@ def test_FinScheduleAlignment(eomFlag):
     bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     calendar_type = CalendarTypes.UNITED_STATES
-    adjustTerminationDate = False
+    adjust_termination_date = False
 
     matDate1 = effDate.addTenor("4Y")
     matDate2 = effDate.addTenor("50Y")
@@ -331,7 +331,7 @@ def test_FinScheduleAlignment(eomFlag):
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
     
 #    print(sched1)
@@ -342,7 +342,7 @@ def test_FinScheduleAlignment(eomFlag):
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
 
     compare = (sched1._adjusted_dates[-1] == sched2._adjusted_dates[len(sched1._adjusted_dates)-1])
@@ -359,7 +359,7 @@ def test_FinScheduleAlignmentLeapYearEOM():
     bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     calendar_type = CalendarTypes.UNITED_STATES
-    adjustTerminationDate = True
+    adjust_termination_date = True
 
     matDate1 = effDate.addTenor("4Y")
     matDate2 = effDate.addTenor("50Y")
@@ -371,7 +371,7 @@ def test_FinScheduleAlignmentLeapYearEOM():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
         
     sched2 = Schedule(effDate,
@@ -380,7 +380,7 @@ def test_FinScheduleAlignmentLeapYearEOM():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
 
 #    print(sched1._adjusted_dates)
@@ -402,7 +402,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
     bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     calendar_type = CalendarTypes.UNITED_STATES
-    adjustTerminationDate = True
+    adjust_termination_date = True
 
     matDate1 = effDate.addTenor("4Y")
     matDate2 = effDate.addTenor("50Y")
@@ -415,7 +415,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
         
     sched2 = Schedule(effDate,
@@ -424,7 +424,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
 
 #    print(sched1._adjusted_dates)
@@ -445,7 +445,7 @@ def test_FinScheduleAlignmentEff31():
     bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     calendar_type = CalendarTypes.UNITED_STATES
-    adjustTerminationDate = True
+    adjust_termination_date = True
 
     matDate1 = effDate.addTenor("4Y")
     matDate2 = effDate.addTenor("50Y")
@@ -458,7 +458,7 @@ def test_FinScheduleAlignmentEff31():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
         
     sched2 = Schedule(effDate,
@@ -467,7 +467,7 @@ def test_FinScheduleAlignmentEff31():
                       calendar_type,
                       bus_day_adjust_type,
                       date_gen_rule_type,
-                      adjustTerminationDate,
+                      adjust_termination_date,
                       eomFlag)
 
 #    print(sched1._adjusted_dates)

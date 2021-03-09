@@ -13,7 +13,7 @@ from ...utils.global_vars import gDaysInYear
 from ...models.black_scholes import BlackScholes
 from ...utils.global_types import FinOptionTypes
 from .equity_vanilla_option import EquityVanillaOption
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
 
@@ -271,12 +271,12 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("STRIKE VARIANCE", self._strikeVariance)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("PAY STRIKE FLAG", self._payStrikeFlag, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("STRIKE VARIANCE", self._strikeVariance)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("PAY STRIKE FLAG", self._payStrikeFlag, "")
         return s
 
 ###############################################################################

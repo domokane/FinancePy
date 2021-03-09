@@ -11,7 +11,7 @@ from ...utils.math import N
 from ...utils.global_vars import gDaysInYear
 from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import FinProcessSimulator
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
 
@@ -360,15 +360,15 @@ class FXBarrierOption(FXOption):
     ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE FX RATE", self._strike_fx_rate)
-        s += labelToString("CURRENCY PAIR", self._currency_pair)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("BARRIER LEVEL", self._barrier_level)
-        s += labelToString("NUM OBSERVATIONS", self._num_observations_per_year)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("NOTIONAL CURRENCY", self._notional_currency, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
+        s += label_to_string("CURRENCY PAIR", self._currency_pair)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("BARRIER LEVEL", self._barrier_level)
+        s += label_to_string("NUM OBSERVATIONS", self._num_observations_per_year)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("NOTIONAL CURRENCY", self._notional_currency, "")
         return s
 
     ###############################################################################

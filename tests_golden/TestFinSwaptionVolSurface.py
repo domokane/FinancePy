@@ -36,7 +36,7 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         valuation_date = Date(12, 6, 2013)
 
         # These are 3M, 1Y, 2Y, 3Y, 4Y, 5Y, 7Y, 10Y
-        exerciseDates = [Date(12, 9, 2013), Date(12, 6, 2014),
+        exercise_dates = [Date(12, 9, 2013), Date(12, 6, 2014),
                          Date(12, 6, 2015), Date(12, 6, 2016),
                          Date(12, 6, 2017), Date(12, 6, 2018),
                          Date(12, 6, 2020), Date(12, 6, 2023)]
@@ -75,7 +75,7 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         volFunctionType = FinVolFunctionTypes.SABR_BETA_HALF
 
         swaptionSurface = SwaptionVolSurface(valuation_date,
-                                             exerciseDates,
+                                             exercise_dates,
                                              fwd_swap_rates,
                                              marketStrikes,
                                              marketVolatilities,

@@ -20,19 +20,19 @@ def test_FinDayCount():
 
     finFreq = FrequencyTypes.ANNUAL
 
-    for dayCountMethod in DayCountTypes:
+    for day_count_method in DayCountTypes:
 
         start_date = Date(1, 1, 2019)
         next_date = start_date
         numDays = 20
-        dayCount = DayCount(dayCountMethod)
+        day_count = DayCount(day_count_method)
 
         for _ in range(0, numDays):
             next_date = next_date.addDays(7)
-            dcf = dayCount.year_frac(start_date, next_date, next_date, finFreq)
+            dcf = day_count.year_frac(start_date, next_date, next_date, finFreq)
 
             testCases.print(
-                str(dayCountMethod),
+                str(day_count_method),
                 str(start_date),
                 str(next_date),
                 dcf[0])

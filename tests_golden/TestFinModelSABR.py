@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 import numpy as np
-from financepy.models.sabr import volFunctionSABR
+from financepy.models.sabr import vol_function_sabr
 from financepy.models.sabr import FinModelSABR
 from financepy.utils.global_types import FinOptionTypes
 
@@ -35,7 +35,7 @@ def test_SABR():
         for beta in [0.5, 1.0, 2.0]:
             for rho in [-0.8, 0.0, 0.8]:
                 params = np.array([alpha, beta, rho, nu])
-                vol = volFunctionSABR(params, f, k, t)
+                vol = vol_function_sabr(params, f, k, t)
                 testCases.print(alpha, beta, rho, vol)
 
 ###############################################################################

@@ -22,7 +22,7 @@ from ...products.credit.cds_curve import CDSCurve
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...market.discount.interpolator import FinInterpTypes, interpolate
+from ...market.discount.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 
 from ...utils.helpers import check_argument_types
@@ -127,7 +127,7 @@ class CDSTranche:
         recovery_rates = np.zeros(num_credits)
 
         payment_dates = self._cds_contract._adjusted_dates
-        numTimes = len(payment_dates)
+        num_times = len(payment_dates)
 
         beta1 = sqrt(corr1)
         beta2 = sqrt(corr2)
@@ -140,17 +140,17 @@ class CDSTranche:
             betaVector2[bb] = beta2
 
         qVector = np.zeros(num_credits)
-        qt1 = np.zeros(numTimes)
-        qt2 = np.zeros(numTimes)
-        trancheTimes = np.zeros(numTimes)
-        trancheSurvivalCurve = np.zeros(numTimes)
+        qt1 = np.zeros(num_times)
+        qt2 = np.zeros(num_times)
+        trancheTimes = np.zeros(num_times)
+        trancheSurvivalCurve = np.zeros(num_times)
 
         trancheTimes[0] = 0
         trancheSurvivalCurve[0] = 1.0
         qt1[0] = 1.0
         qt2[0] = 1.0
 
-        for i in range(1, numTimes):
+        for i in range(1, num_times):
 
             t = (payment_dates[i] - valuation_date) / gDaysInYear
 
@@ -160,7 +160,7 @@ class CDSTranche:
                 qRow = issuer_curve._values
                 recovery_rates[j] = issuer_curve._recovery_rate
                 qVector[j] = interpolate(
-                    t, vTimes, qRow, FinInterpTypes.FLAT_FWD_RATES.value)
+                    t, vTimes, qRow, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
                 qt1[i] = trSurvProbRecursion(

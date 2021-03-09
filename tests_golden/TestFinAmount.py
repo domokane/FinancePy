@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.amount import FinAmount
-from financepy.utils.currency import FinCurrencyTypes
+from financepy.utils.currency import CurrencyTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -20,7 +20,7 @@ def test_FinAmount():
 
     testCases.print("Amount", x)
 
-    x = FinAmount(101000.232, FinCurrencyTypes.CAD)
+    x = FinAmount(101000.232, CurrencyTypes.CAD)
 
     testCases.print("Amount", x)
 

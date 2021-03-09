@@ -58,8 +58,8 @@ def test_BondZeroCurve():
         dateString = bond['maturity']
         matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
         maturityDt = fromDatetime(matDatetime)
-        zeroRate = bondCurve.zeroRate(maturityDt)
-        testCases.print(maturityDt, zeroRate)
+        zero_rate = bondCurve.zero_rate(maturityDt)
+        testCases.print(maturityDt, zero_rate)
 
     if plotGraphs:
         bondCurve.plot("BOND CURVE")

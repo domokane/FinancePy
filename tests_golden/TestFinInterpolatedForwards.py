@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve import DiscountCurve
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -33,12 +33,12 @@ def test_FinInterpolatedForwards():
     tDates = curve_date.addYears(tValues)
     tInterpDates = curve_date.addYears(tInterpValues)
 
-    for interp_type in FinInterpTypes:
+    for interp_type in InterpTypes:
 
         discount_curve = DiscountCurve(curve_date, tDates, df_values, interp_type)
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
-        zeroInterpValues = discount_curve.zeroRate(tInterpDates)
+        zeroInterpValues = discount_curve.zero_rate(tInterpDates)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(8, 6))

@@ -13,8 +13,8 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
-from financepy.products.rates.FinIborDeposit import FinIborDeposit
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -185,16 +185,16 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = FinIborDeposit(settlement_date, maturity_date, domDepoRate,
-                           DayCountTypes.ACT_360, notional, calendar_type)
+    depo = IborDeposit(settlement_date, maturity_date, domDepoRate,
+                       DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     dom_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 
     depos = []
     fras = []
     swaps = []
-    depo = FinIborDeposit(settlement_date, maturity_date, forDepoRate,
-                           DayCountTypes.ACT_360, notional, calendar_type)
+    depo = IborDeposit(settlement_date, maturity_date, forDepoRate,
+                       DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     for_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
 

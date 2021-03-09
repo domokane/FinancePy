@@ -16,8 +16,8 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...utils.helpers import labelToString, tableToString
-from ...market.discount.interpolator import FinInterpTypes, _uinterpolate
+from ...utils.helpers import label_to_string, tableToString
+from ...market.discount.interpolator import InterpTypes, _uinterpolate
 
 from ...utils.helpers import check_argument_types
 
@@ -48,7 +48,7 @@ def _risky_pv01_NUMBA(teff,
     """ Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01."""
 
-    method = FinInterpTypes.FLAT_FWD_RATES.value
+    method = InterpTypes.FLAT_FWD_RATES.value
 
     couponAccruedIndicator = 1
 
@@ -65,7 +65,7 @@ def _risky_pv01_NUMBA(teff,
     z1 = _uinterpolate(tncd, npIborTimes, npIborValues, method)
 
     # this is the part of the coupon accrued from previous coupon date to now
-    # accrual_factorPCDToNow = dayCount.year_frac(pcd,teff)
+    # accrual_factorPCDToNow = day_count.year_frac(pcd,teff)
 
     # reference credit survives to the premium payment date
     fullRPV01 = q1 * z1 * year_fracs[1]
@@ -138,7 +138,7 @@ def _protection_leg_pv_NUMBA(teff,
     """ Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. """
 
-    method = FinInterpTypes.FLAT_FWD_RATES.value
+    method = InterpTypes.FLAT_FWD_RATES.value
     dt = (tmat - teff) / num_steps_per_year
     t = teff
     z1 = _uinterpolate(t, npIborTimes, npIborValues, method)
@@ -239,56 +239,56 @@ class CDS:
         end_date = self._maturity_date
 
         self._adjusted_dates = []
-        numMonths = int(12.0 / frequency)
+        num_months = int(12.0 / frequency)
 
-        unadjustedScheduleDates = []
+        unadjusted_schedule_dates = []
 
         if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
             next_date = end_date
-            flowNum = 0
+            flow_num = 0
 
             while next_date > start_date:
-                unadjustedScheduleDates.append(next_date)
-                next_date = next_date.addMonths(-numMonths)
-                flowNum += 1
+                unadjusted_schedule_dates.append(next_date)
+                next_date = next_date.addMonths(-num_months)
+                flow_num += 1
 
             # Add on the Previous Coupon Date
-            unadjustedScheduleDates.append(next_date)
-            flowNum += 1
+            unadjusted_schedule_dates.append(next_date)
+            flow_num += 1
 
             # reverse order
-            for i in range(0, flowNum):
-                dt = unadjustedScheduleDates[flowNum - i - 1]
+            for i in range(0, flow_num):
+                dt = unadjusted_schedule_dates[flow_num - i - 1]
                 self._adjusted_dates.append(dt)
 
             # holiday adjust dates except last one
-            for i in range(0, flowNum - 1):
+            for i in range(0, flow_num - 1):
                 dt = calendar.adjust(self._adjusted_dates[i],
                                      self._bus_day_adjust_type)
 
                 self._adjusted_dates[i] = dt
 
-            finalDate = self._adjusted_dates[flowNum - 1]
+            finalDate = self._adjusted_dates[flow_num - 1]
 
             # Final date is moved forward by one day
-            self._adjusted_dates[flowNum - 1] = finalDate.addDays(1)
+            self._adjusted_dates[flow_num - 1] = finalDate.addDays(1)
 
         elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             next_date = start_date
-            flowNum = 0
+            flow_num = 0
 
-            unadjustedScheduleDates.append(next_date)
-            flowNum = 1
+            unadjusted_schedule_dates.append(next_date)
+            flow_num = 1
 
             while next_date < end_date:
-                unadjustedScheduleDates.append(next_date)
-                next_date = next_date.addMonths(numMonths)
-                flowNum = flowNum + 1
+                unadjusted_schedule_dates.append(next_date)
+                next_date = next_date.addMonths(num_months)
+                flow_num = flow_num + 1
 
-            for i in range(1, flowNum):
-                dt = calendar.adjust(unadjustedScheduleDates[i],
+            for i in range(1, flow_num):
+                dt = calendar.adjust(unadjusted_schedule_dates[i],
                                      self._bus_day_adjust_type)
 
                 self._adjusted_dates.append(dt)
@@ -305,7 +305,7 @@ class CDS:
     def _calcFlows(self):
         """ Calculate cash flow amounts on premium leg. """
         payment_dates = self._adjusted_dates
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
 
         self._accrual_factors = []
         self._flows = []
@@ -318,7 +318,7 @@ class CDS:
         for it in range(1, num_flows):
             t0 = payment_dates[it - 1]
             t1 = payment_dates[it]
-            accrual_factor = dayCount.year_frac(t0, t1)[0]
+            accrual_factor = day_count.year_frac(t0, t1)[0]
             flow = accrual_factor * self._running_coupon * self._notional
 
             self._accrual_factors.append(accrual_factor)
@@ -510,7 +510,7 @@ class CDS:
         """ RiskyPV01 of the contract using the OLD method. """
 
         payment_dates = self._adjusted_dates
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
 
         couponAccruedIndicator = 1
 
@@ -530,10 +530,10 @@ class CDS:
 
         # this is the part of the coupon accrued from the previous coupon date
         # to now
-        accrual_factorPCDToNow = dayCount.year_frac(pcd, teff)[0]
+        accrual_factorPCDToNow = day_count.year_frac(pcd, teff)[0]
 
         # full first coupon is paid at the end of the current period if the
-        year_frac = dayCount.year_frac(pcd, ncd)[0]
+        year_frac = day_count.year_frac(pcd, ncd)[0]
 
         # reference credit survives to the premium payment date
         fullRPV01 = q1 * z1 * year_frac
@@ -556,7 +556,7 @@ class CDS:
             q2 = issuer_curve.survivalProbability(t2)
             z2 = issuer_curve.df(t2)
 
-            accrual_factor = dayCount.year_frac(t1, t2)[0]
+            accrual_factor = day_count.year_frac(t1, t2)[0]
 
             # full coupon is paid at the end of the current period if survives
             # to payment date
@@ -609,10 +609,10 @@ class CDS:
         """ Calculate the amount of accrued interest that has accrued from the
         previous coupon date (PCD) to the step_in_date of the CDS contract. """
 
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
         payment_dates = self._adjusted_dates
         pcd = payment_dates[0]
-        accrual_factor = dayCount.year_frac(pcd, self._step_in_date)[0]
+        accrual_factor = day_count.year_frac(pcd, self._step_in_date)[0]
         accrued_interest = accrual_factor * self._notional * self._running_coupon
 
         if self._long_protection:
@@ -668,9 +668,9 @@ class CDS:
         # to now
         pcd = self._adjusted_dates[0]
         eff = self._step_in_date
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
 
-        accrual_factorPCDToNow = dayCount.year_frac(pcd, eff)[0]
+        accrual_factorPCDToNow = day_count.year_frac(pcd, eff)[0]
 
         year_fracs = self._accrual_factors
         teff = (eff - valuation_date) / gDaysInYear
@@ -831,17 +831,17 @@ class CDS:
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
         cash flows """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("STEP-IN DATE", self._step_in_date)
-        s += labelToString("MATURITY", self._maturity_date)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("RUNNING COUPON", self._running_coupon * 10000, "bp\n")
-        s += labelToString("DAYCOUNT", self._day_count_type)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
-        s += labelToString("ACCRUED DAYS", self.accrued_days())
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("STEP-IN DATE", self._step_in_date)
+        s += label_to_string("MATURITY", self._maturity_date)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("RUNNING COUPON", self._running_coupon * 10000, "bp\n")
+        s += label_to_string("DAYCOUNT", self._day_count_type)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
         valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]

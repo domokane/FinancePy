@@ -6,14 +6,14 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import gSmall
 from ...utils.math import testMonotonicity
 from ...utils.frequency import FrequencyTypes
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import timesFromDates
 from ...market.discount.curve import DiscountCurve
+
 
 ###############################################################################
 
@@ -26,8 +26,8 @@ class DiscountCurvePWL(DiscountCurve):
 
     def __init__(self,
                  valuation_date: Date,
-                 zeroDates: list,
-                 zeroRates: (list, np.ndarray),
+                 zero_dates: (Date, list),
+                 zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Curve is defined by a vector of increasing times and zero rates."""
@@ -36,30 +36,30 @@ class DiscountCurvePWL(DiscountCurve):
 
         self._valuation_date = valuation_date
 
-        if len(zeroDates) != len(zeroRates):
+        if len(zero_dates) != len(zero_rates):
             raise FinError("Dates and rates vectors must have same length")
 
-        if len(zeroDates) == 0:
+        if len(zero_dates) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._zeroRates = np.array(zeroRates)
-        self._zeroDates = zeroDates
+        self._zero_rates = np.array(zero_rates)
+        self._zero_dates = zero_dates
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
-        dcTimes = timesFromDates(zeroDates,
-                                 self._valuation_date,
-                                 self._day_count_type)
+        dc_times = timesFromDates(zero_dates,
+                                  self._valuation_date,
+                                  self._day_count_type)
 
-        self._times = np.array(dcTimes)
+        self._times = np.array(dc_times)
 
         if testMonotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-###############################################################################
+    ###############################################################################
 
-    def _zeroRate(self,
-                  times: (list, np.ndarray)):
+    def _zero_rate(self,
+                   times: (list, np.ndarray)):
         """ Calculate the piecewise linear zero rate. This is taken from the
         initial inputs. A simple linear interpolation scheme is used. If the
         user supplies a frequency type then a conversion is done. """
@@ -72,34 +72,34 @@ class DiscountCurvePWL(DiscountCurve):
 
         times = np.maximum(times, 1e-6)
 
-        zeroRates = []
+        zero_rates = []
 
         for t in times:
             l_index = 0
             found = 0
 
-            numTimes = len(self._times)
-            for i in range(1, numTimes):
+            num_times = len(self._times)
+            for i in range(1, num_times):
                 if self._times[i] > t:
                     l_index = i - 1
                     found = 1
                     break
 
             t0 = self._times[l_index]
-            r0 = self._zeroRates[l_index]
-            t1 = self._times[l_index+1]
-            r1 = self._zeroRates[l_index+1]
+            r0 = self._zero_rates[l_index]
+            t1 = self._times[l_index + 1]
+            r1 = self._zero_rates[l_index + 1]
 
             if found == 1:
-                zeroRate = ((t1 - t) * r0 + (t - t0) * r1)/(t1 - t0)
+                zero_rate = ((t1 - t) * r0 + (t - t0) * r1) / (t1 - t0)
             else:
-                zeroRate = self._zeroRates[-1]
+                zero_rate = self._zero_rates[-1]
 
-            zeroRates.append(zeroRate)
+            zero_rates.append(zero_rate)
 
-        return np.array(zeroRates)
+        return np.array(zero_rates)
 
-###############################################################################
+    ###############################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -110,43 +110,43 @@ class DiscountCurvePWL(DiscountCurve):
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dcTimes = timesFromDates(dates,
-                                 self._valuation_date,
-                                 self._day_count_type)
+        dc_times = timesFromDates(dates,
+                                  self._valuation_date,
+                                  self._day_count_type)
 
-        zeroRates = self._zeroRate(dcTimes)
+        zero_rates = self._zero_rate(dc_times)
 
         df = self._zeroToDf(self._valuation_date,
-                            zeroRates,
-                            dcTimes,
+                            zero_rates,
+                            dc_times,
                             self._freq_type,
                             self._day_count_type)
 
         return df
 
-###############################################################################
+    ###############################################################################
 
     # def _df(self,
     #         t: (float, np.ndarray)):
     #     """ Returns the discount factor at time t taking into account the
     #     piecewise flat zero rate curve and the compunding frequency. """
 
-    #     r = self._zeroRate(t, self._freq_type)
+    #     r = self._zero_rate(t, self._freq_type)
     #     df = zeroToDf(r, t, self._freq_type)
     #     return df
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("DATE", "ZERO RATE")
-        for i in range(0, len(self._zeroDates)):
-            s += labelToString(self._zeroDates[i], self._zeroRates[i])
-        s += labelToString("FREQUENCY", (self._freq_type))
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("DATE", "ZERO RATE")
+        for i in range(0, len(self._zero_dates)):
+            s += label_to_string(self._zero_dates[i], self._zero_rates[i])
+        s += label_to_string("FREQUENCY", self._freq_type)
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

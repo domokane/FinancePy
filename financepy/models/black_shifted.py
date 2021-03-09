@@ -7,7 +7,7 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 from ..utils.global_types import FinOptionTypes
 
 from ..utils.math import N
@@ -66,11 +66,11 @@ class FinModelBlackShifted():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VOLATILITY", self._volatility)
-        s += labelToString("SHIFT", self._shift)
-        s += labelToString("IMPLEMENTATION", self._implementation)
-        s += labelToString("NUMSTEPS", self._num_steps)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VOLATILITY", self._volatility)
+        s += label_to_string("SHIFT", self._shift)
+        s += label_to_string("IMPLEMENTATION", self._implementation)
+        s += label_to_string("NUMSTEPS", self._num_steps)
         return s
 
 ###############################################################################

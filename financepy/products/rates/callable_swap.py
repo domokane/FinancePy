@@ -18,7 +18,7 @@
 # from ...utils.FinSchedule import FinSchedule
 # from ...utils.FinMath import ONE_MILLION
 
-# from ...utils.FinHelperFunctions import labelToString
+# from ...utils.FinHelperFunctions import label_to_string
 
 # from enum import Enum
 # import numpy as np
@@ -55,16 +55,16 @@
 #     """ Class for fixed coupon bonds with embedded call or put optionality. """
 
 #     def __init__(self,
-#                  exerciseDate,
-#                  exerciseType,
+#                  exercise_date,
+#                  exercise_type,
 #                  maturity_date,
 #                  swaptionType,
-#                  fixedCoupon,
-#                  fixedFrequencyType,
-#                  fixedDayCountType,
+#                  fixed_coupon,
+#                  fixed_frequency_type,
+#                  fixed_day_count_type,
 #                  notional=ONE_MILLION,
-#                  floatFrequencyType=FrequencyTypes.QUARTERLY,
-#                  floatDayCountType=DayCountTypes.THIRTY_E_360,
+#                  float_frequency_type=FrequencyTypes.QUARTERLY,
+#                  float_day_count_type=DayCountTypes.THIRTY_E_360,
 #                  calendar_type=CalendarTypes.WEEKEND,
 #                  bus_day_adjust_type=BusDayAdjustTypes.FOLLOWING,
 #                  date_gen_rule_type=DateGenRuleTypes.BACKWARD):
@@ -72,31 +72,31 @@
 #         into a swap at a fixed coupon on all of the fixed leg coupon dates
 #         until the exercise date. """
 
-#         if exerciseDate > maturity_date:
+#         if exercise_date > maturity_date:
 #             raise FinError("Exercise date must be before swap maturity date")
 
-#         if exerciseType not in FinSwaptionExerciseTypes:
+#         if exercise_type not in FinSwaptionExerciseTypes:
 #             raise FinError("Exercise type must be a FinSwaptionExerciseTypes")
 
-#         if fixedDayCountType not in DayCountTypes:
+#         if fixed_day_count_type not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Fixed Day Count Rule type " +
-#                 str(fixedDayCountType))
+#                 str(fixed_day_count_type))
 
-#         if fixedFrequencyType not in FrequencyTypes:
+#         if fixed_frequency_type not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Fixed Frequency type " +
-#                 str(fixedFrequencyType))
+#                 str(fixed_frequency_type))
 
-#         if floatDayCountType not in DayCountTypes:
+#         if float_day_count_type not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Float Day Count Rule type " +
-#                 str(floatDayCountType))
+#                 str(float_day_count_type))
 
-#         if floatFrequencyType not in FrequencyTypes:
+#         if float_frequency_type not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Float Frequency type " +
-#                 str(fixedFrequencyType))
+#                 str(fixed_frequency_type))
 
 #         if calendar_type not in CalendarTypes:
 #             raise FinError("Unknown Calendar type " + str(calendar_type))
@@ -111,14 +111,14 @@
 #                 "Unknown Date Gen Rule type " +
 #                 str(date_gen_rule_type))
 
-#         self._exerciseDate = exerciseDate
+#         self._exercise_date = exercise_date
 #         self._maturity_date = maturity_date
-#         self._fixedCoupon = fixedCoupon
-#         self._fixedFrequencyType = fixedFrequencyType
-#         self._fixedDayCountType = fixedDayCountType
+#         self._fixed_coupon = fixed_coupon
+#         self._fixed_frequency_type = fixed_frequency_type
+#         self._fixed_day_count_type = fixed_day_count_type
 #         self._notional = notional
-#         self._floatFrequencyType = floatFrequencyType
-#         self._floatDayCountType = floatDayCountType
+#         self._float_frequency_type = float_frequency_type
+#         self._float_day_count_type = float_day_count_type
 
 #         self._calendar_type = calendar_type
 #         self._bus_day_adjust_type = bus_day_adjust_type
@@ -138,19 +138,19 @@
 #         """ Value the bermuda swaption. This is done using the specified
 #         model and a discount curve. """
 
-#         floatSpread = 0.0
+#         float_spread = 0.0
 #         payFixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
-#         swap = FinIborSwap(self._exerciseDate,
+#         swap = FinIborSwap(self._exercise_date,
 #                             self._maturity_date,
-#                             self._fixedCoupon,
-#                             self._fixedFrequencyType,
-#                             self._fixedDayCountType,
+#                             self._fixed_coupon,
+#                             self._fixed_frequency_type,
+#                             self._fixed_day_count_type,
 #                             self._notional,
-#                             floatSpread,
-#                             self._floatFrequencyType,
-#                             self._floatDayCountType,
+#                             float_spread,
+#                             self._float_frequency_type,
+#                             self._float_day_count_type,
 #                             payFixedFlag,
 #                             self._calendar_type,
 #                             self._bus_day_adjust_type,
@@ -161,11 +161,11 @@
 #         cpn_amounts = []
 
 #         for iFlow in range(1, len(self._swap._adjustedFixedDates)):
-#             flowDate= swap._adjustedFixedDates[iFlow]
-#             cpn_time = (flowDate - settlement_date) / gDaysInYear
-#             cpnFlow = swap._fixedFlows[iFlow-1] / self._notional
+#             flow_date= swap._adjustedFixedDates[iFlow]
+#             cpn_time = (flow_date - settlement_date) / gDaysInYear
+#             cpn_flow = swap._fixedFlows[iFlow-1] / self._notional
 #             cpn_times.append(cpn_time)
-#             cpn_amounts.append(cpnFlow)
+#             cpn_amounts.append(cpn_flow)
 
 #         cpn_times = np.array(cpn_times)
 #         cpn_amounts = np.array(cpn_amounts)
@@ -188,7 +188,7 @@
 
 #         put_times = []
 #         for putDate in swap._adjustedFixedDates[1:]:
-#             if putDate <= self._exerciseDate: 
+#             if putDate <= self._exercise_date:
 #                 put_time = (putDate - settlement_date) / gDaysInYear
 #                 put_times.append(put_time)
 
@@ -253,21 +253,21 @@
 
 #     def __repr__(self):
 
-#         s = labelToString("MATURITY DATE", self._maturity_date)
-#         s += labelToString("EXERCISE DATE", self._exerciseDate)
-#         s += labelToString("COUPON", self._coupon)
-#         s += labelToString("FREQUENCY", self._freq_type)
-#         s += labelToString("ACCRUAL TYPE", self._accrual_type)
-#         s += labelToString("FACE AMOUNT", self._face)
-#         s += labelToString("CONVERSION RATIO", self._conversionRatio)
-#         s += labelToString("START CONVERT DATE", self._startConvertDate)
+#         s = label_to_string("MATURITY DATE", self._maturity_date)
+#         s += label_to_string("EXERCISE DATE", self._exercise_date)
+#         s += label_to_string("COUPON", self._coupon)
+#         s += label_to_string("FREQUENCY", self._freq_type)
+#         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+#         s += label_to_string("FACE AMOUNT", self._face)
+#         s += label_to_string("CONVERSION RATIO", self._conversionRatio)
+#         s += label_to_string("START CONVERT DATE", self._startConvertDate)
 
 #         for i in range(0, len(self._call_dates)):
-#             s += labelToString("CALL DATE AND PRICE", self._call_dates[i],
+#             s += label_to_string("CALL DATE AND PRICE", self._call_dates[i],
 #                                self._call_prices[i])
 
 #         for i in range(0, len(self._put_dates)):
-#             s += labelToString("PUT DATE AND PRICE", self._put_dates[i],
+#             s += label_to_string("PUT DATE AND PRICE", self._put_dates[i],
 #                                self._put_prices[i])
 
 #         return s

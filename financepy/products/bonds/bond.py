@@ -33,7 +33,7 @@ from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 
 from scipy import optimize
@@ -499,13 +499,13 @@ class Bond:
                             swapFloatBusDayAdjustRuleType,
                             swapFloatDateGenRuleType)
 
-        dayCount = DayCount(swapFloatDayCountConventionType)
+        day_count = DayCount(swapFloatDayCountConventionType)
 
         prev_date = self._pcd
         pv01 = 0.0
         for dt in schedule._adjusted_dates[1:]:
             df = discount_curve.df(dt)
-            year_frac = dayCount.year_frac(prev_date, dt)[0]
+            year_frac = day_count.year_frac(prev_date, dt)[0]
             pv01 = pv01 + year_frac * df
             prev_date = dt
 
@@ -681,13 +681,13 @@ class Bond:
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ISSUE DATE", self._issue_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("FACE AMOUNT", self._face_amount, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ISSUE DATE", self._issue_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         return s
 
     ###############################################################################

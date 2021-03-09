@@ -27,18 +27,18 @@ def test_FinDate():
 
     testCases.header("DATE", "MONTHS", "CDS DATE")
 
-    for num_months in range(0, 120):
-        nextCDSDate = start_date.nextCDSDate(num_months)
-        testCases.print(str(start_date), num_months, str(nextCDSDate))
+    for numMonths in range(0, 120):
+        nextCDSDate = start_date.nextCDSDate(numMonths)
+        testCases.print(str(start_date), numMonths, str(nextCDSDate))
 
     start_date = Date(1, 1, 2018)
 
     testCases.header("STARTDATE", "MONTHS", "CDS DATE")
 
-    for num_months in range(0, 365):
+    for numMonths in range(0, 365):
         start_date = start_date.addDays(1)
         nextIMMDate = start_date.nextIMMDate()
-        testCases.print(num_months, str(start_date), str(nextIMMDate))
+        testCases.print(numMonths, str(start_date), str(nextIMMDate))
 
 ###############################################################################
 

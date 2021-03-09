@@ -9,7 +9,7 @@ from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
 
@@ -101,7 +101,7 @@ class FinInflationSwap
 
     ##########################################################################
 
-    def maturityDf(self, libor_curve):
+    def maturity_df(self, libor_curve):
         """ Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate. """
 
@@ -131,15 +131,15 @@ class FinInflationSwap
     ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START ACCD DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("FRA RATE", self._fraRate)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("PAY FIXED RATE", self._payFixedRate)
-        s += labelToString("DAY COUNT TYPE", self._day_count_type)
-        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
-        s += labelToString("CALENDAR", self._calendar_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START ACCD DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("FRA RATE", self._fraRate)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("PAY FIXED RATE", self._payFixedRate)
+        s += label_to_string("DAY COUNT TYPE", self._day_count_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
         return s
 
     ###########################################################################

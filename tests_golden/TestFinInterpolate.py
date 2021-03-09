@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.market.discount.interpolator import FinInterpolator, FinInterpTypes
+from financepy.market.discount.interpolator import FinInterpolator, InterpTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -38,7 +38,7 @@ def test_FinInterpolate():
 
     testCases.header("METHOD", "X", "Y_INTERPOLATED")
 
-    for interp_type in FinInterpTypes:
+    for interp_type in InterpTypes:
 
         yInterpValues = []
         start = time.time()

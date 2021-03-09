@@ -10,7 +10,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.error import FinError
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...market.discount.curve import DiscountCurve
 
 
@@ -121,13 +121,13 @@ class BondAnnuity:
         self._flow_amounts = [0.0]
         basis = DayCount(self._day_count_convention_type)
 
-        prevDt = self._pcd
+        prev_dt = self._pcd
 
         for nextDt in self._flow_dates[1:]:
-            alpha = basis.year_frac(prevDt, nextDt)[0]
+            alpha = basis.year_frac(prev_dt, nextDt)[0]
             flow = self._coupon * alpha * self._face
             self._flow_amounts.append(flow)
-            prevDt = nextDt
+            prev_dt = nextDt
 
     ###############################################################################
 
@@ -176,12 +176,12 @@ class BondAnnuity:
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUS_DAY_RULE", self._bus_day_adjust_type)
-        s += labelToString("DATE_GEN_RULE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUS_DAY_RULE", self._bus_day_adjust_type)
+        s += label_to_string("DATE_GEN_RULE", self._date_gen_rule_type)
 
         return s
 

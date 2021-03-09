@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
 
@@ -38,13 +38,13 @@ class IborCapVolCurve():
         floor volatilities are the same for the same strike and tenor, I just
         refer to cap volatilities in the code for code simplicity. """
 
-        numTimes = len(capMaturityDates)
+        num_times = len(capMaturityDates)
         numVols = len(capSigmas)
 
-        if numTimes != numVols:
+        if num_times != numVols:
             raise FinError("Date and volatility vectors not same length.")
 
-        if numTimes < 2:
+        if num_times < 2:
             raise FinError("FinCapVolCurve requires at least two dates/vols")
 
         if curve_date != capMaturityDates[0]:
@@ -59,15 +59,15 @@ class IborCapVolCurve():
         self._capletGammas = []
 
         # Basic validation of dates
-        prevDt = self._curve_date
+        prev_dt = self._curve_date
         for dt in capMaturityDates[1:]:
-            if dt < prevDt:
+            if dt < prev_dt:
                 raise FinError("CapFloorLet Dates not in increasing order")
 
-            if dt == prevDt:
+            if dt == prev_dt:
                 raise FinError("Two successive dates are identical")
 
-            prevDt = dt
+            prev_dt = dt
 
         self._capMaturityDates = capMaturityDates
 
@@ -89,15 +89,15 @@ class IborCapVolCurve():
         self._taus = []
 
         day_counter = DayCount(self._day_count_type)
-        prevDt = self._curve_date
+        prev_dt = self._curve_date
         numCaps = len(self._capMaturityDates)
 
         for dt in self._capMaturityDates:
             t = (dt - self._curve_date) / gDaysInYear
             self._times.append(t)
-            tau = day_counter.year_frac(prevDt, dt)[0]
+            tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
-            prevDt = dt
+            prev_dt = dt
 
         fwd_rateVol = self._capSigmas[0]
         self._capletGammas = np.zeros(numCaps)
@@ -182,15 +182,15 @@ class IborCapVolCurve():
     def __repr__(self):
         """ Output the contents of the FinCapVolCurve class object. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        numTimes = len(self._times)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        num_times = len(self._times)
         s += " TIME     TAU    CAP VOL    CAPLET VOL"
-        for i in range(0, numTimes):
+        for i in range(0, num_times):
             t = self._times[i]
             tau = self._taus[i]
             volCap = self._capSigmas[i]
             fwdIborVol = self._capletVols[i]
-            s += labelToString("%7.4f  %6.4f  %9.4f  %9.4f"
+            s += label_to_string("%7.4f  %6.4f  %9.4f  %9.4f"
                                % (t, tau, volCap*100.0, fwdIborVol*100.0))
 
         return s

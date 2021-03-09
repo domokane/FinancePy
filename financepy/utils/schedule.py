@@ -8,8 +8,9 @@ from .date import Date
 from .calendar import (Calendar, CalendarTypes)
 from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
 from .frequency import (annual_frequency, FrequencyTypes)
-from .helpers import labelToString
+from .helpers import label_to_string
 from .helpers import check_argument_types
+
 
 ###############################################################################
 # TODO: Start and end date to allow for long stubs
@@ -30,10 +31,10 @@ class Schedule:
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 adjustTerminationDate:bool = True,  # Default is to adjust
-                 endOfMonthFlag:bool = False,  # All flow dates are EOM if True
-                 firstDate = None,  # First coupon date
-                 nextToLastDate = None): # Penultimate coupon date
+                 adjust_termination_date: bool = True,  # Default is to adjust
+                 end_of_month_flag: bool = False,  # All flow dates are EOM if True
+                 first_date=None,  # First coupon date
+                 next_to_last_date=None):  # Penultimate coupon date
         """ Create FinSchedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps. 
 
@@ -63,7 +64,7 @@ class Schedule:
         swap - assuming it is a holiday date. This must be explicitly stated in
         the trade confirm. However, it is adjusted in a CDS contract as standard. 
 
-        Inputs firstDate and nextToLastDate are for managing long payment stubs
+        Inputs first_date and next_to_last_date are for managing long payment stubs
         at the start and end of the swap but *have not yet been implemented*. All
         stubs are currently short, either at the start or end of swap. """
 
@@ -75,22 +76,22 @@ class Schedule:
         self._effective_date = effective_date
         self._termination_date = termination_date
 
-        if firstDate is None:
-            self._firstDate  = effective_date
-        else:            
-            if firstDate > effective_date and firstDate < termination_date:
-                self._firstDate = firstDate
-                print("FIRST DATE NOT IMPLEMENTED") # TODO
+        if first_date is None:
+            self._first_date = effective_date
+        else:
+            if first_date > effective_date and first_date < termination_date:
+                self._first_date = first_date
+                print("FIRST DATE NOT IMPLEMENTED")  # TODO
             else:
                 raise FinError("First date must be after effective date and" +
                                " before termination date")
-        
-        if nextToLastDate is None:
-            self._nextToLastDate = termination_date
+
+        if next_to_last_date is None:
+            self._next_to_last_date = termination_date
         else:
-            if nextToLastDate > effective_date and nextToLastDate < termination_date:
-                self._nextToLastDate = nextToLastDate
-                print("NEXT TO LAST DATE NOT IMPLEMENTED") # TODO
+            if next_to_last_date > effective_date and next_to_last_date < termination_date:
+                self._next_to_last_date = next_to_last_date
+                print("NEXT TO LAST DATE NOT IMPLEMENTED")  # TODO
             else:
                 raise FinError("Next to last date must be after effective date and" +
                                " before termination date")
@@ -99,19 +100,19 @@ class Schedule:
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
         self._date_gen_rule_type = date_gen_rule_type
-        
-        self._adjustTerminationDate = adjustTerminationDate
 
-        if endOfMonthFlag is True:
-            self._endOfMonthFlag = True
+        self._adjust_termination_date = adjust_termination_date
+
+        if end_of_month_flag is True:
+            self._end_of_month_flag = True
         else:
-            self._endOfMonthFlag = False
+            self._end_of_month_flag = False
 
         self._adjusted_dates = None
 
         self._generate()
 
-###############################################################################
+    ###############################################################################
 
     def scheduleDates(self):
         """ Returns a list of the schedule of Dates. """
@@ -121,7 +122,7 @@ class Schedule:
 
         return self._adjusted_dates
 
-###############################################################################
+    ###############################################################################
 
     def _generate(self):
         """ Generate schedule of dates according to specified date generation
@@ -130,40 +131,39 @@ class Schedule:
 
         calendar = Calendar(self._calendar_type)
         frequency = annual_frequency(self._freq_type)
-        numMonths = int(12 / frequency)
+        num_months = int(12 / frequency)
 
-        unadjustedScheduleDates = []
+        unadjusted_schedule_dates = []
         self._adjusted_dates = []
 
         if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
             next_date = self._termination_date
-            flowNum = 0
+            flow_num = 0
 
             while next_date > self._effective_date:
 
-                unadjustedScheduleDates.append(next_date)
-                next_date = next_date.addMonths(-numMonths)
-                
-                if self._endOfMonthFlag is True:
+                unadjusted_schedule_dates.append(next_date)
+                next_date = next_date.addMonths(-num_months)
+
+                if self._end_of_month_flag is True:
                     next_date = next_date.EOM()
 
-                flowNum += 1
+                flow_num += 1
 
             # Add on the Previous Coupon Date
-            unadjustedScheduleDates.append(next_date)
-            flowNum += 1
+            unadjusted_schedule_dates.append(next_date)
+            flow_num += 1
 
             # reverse order and holiday adjust dates
             # the first date is not adjusted as this was provided
-            dt = unadjustedScheduleDates[flowNum - 1]
+            dt = unadjusted_schedule_dates[flow_num - 1]
             self._adjusted_dates.append(dt)
 
             # We adjust all flows after the effective date and before the
             # termination date to fall on business days according to their cal
-            for i in range(1, flowNum-1):
-
-                dt = calendar.adjust(unadjustedScheduleDates[flowNum - i - 1],
+            for i in range(1, flow_num - 1):
+                dt = calendar.adjust(unadjusted_schedule_dates[flow_num - i - 1],
                                      self._bus_day_adjust_type)
 
                 self._adjusted_dates.append(dt)
@@ -174,20 +174,19 @@ class Schedule:
 
             # This needs checking
             next_date = self._effective_date
-            flowNum = 0
+            flow_num = 0
 
-            unadjustedScheduleDates.append(next_date)
-            flowNum = 1
+            unadjusted_schedule_dates.append(next_date)
+            flow_num = 1
 
             while next_date < self._termination_date:
-                unadjustedScheduleDates.append(next_date)
-                next_date = next_date.addMonths(numMonths)
-                flowNum = flowNum + 1
+                unadjusted_schedule_dates.append(next_date)
+                next_date = next_date.addMonths(num_months)
+                flow_num = flow_num + 1
 
             # The effective date is not adjusted as it is given
-            for i in range(1, flowNum):
-
-                dt = calendar.adjust(unadjustedScheduleDates[i],
+            for i in range(1, flow_num):
+                dt = calendar.adjust(unadjusted_schedule_dates[i],
                                      self._bus_day_adjust_type)
 
                 self._adjusted_dates.append(dt)
@@ -199,12 +198,11 @@ class Schedule:
 
         # The market standard for swaps is not to adjust the termination date 
         # unless it is specified in the contract. It is standard for CDS. 
-        # We change it if the adjustTerminationDate flag is True.
-        if self._adjustTerminationDate is True:
-
+        # We change it if the adjust_termination_date flag is True.
+        if self._adjust_termination_date is True:
             self._termination_date = calendar.adjust(self._termination_date,
-                                                    self._bus_day_adjust_type)
-        
+                                                     self._bus_day_adjust_type)
+
             self._adjusted_dates[-1] = self._termination_date
 
         #######################################################################
@@ -215,50 +213,50 @@ class Schedule:
         if len(self._adjusted_dates) < 2:
             raise FinError("Schedule has two dates only.")
 
-        prevDt = self._adjusted_dates[0]
+        prev_dt = self._adjusted_dates[0]
         for dt in self._adjusted_dates[1:]:
- 
-            if dt == prevDt:
+
+            if dt == prev_dt:
                 raise FinError("Two matching dates in schedule")
 
-            if dt < prevDt: # Dates must be ordered
+            if dt < prev_dt:  # Dates must be ordered
                 raise FinError("Dates are not monotonic")
 
-            prevDt = dt           
+            prev_dt = dt
 
         #######################################################################
 
         return self._adjusted_dates
 
-##############################################################################
+    ##############################################################################
 
     def __repr__(self):
         """ Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EFFECTIVE DATE", self._effective_date)
-        s += labelToString("END DATE", self._termination_date)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
-        s += labelToString("ADJUST TERM DATE", self._adjustTerminationDate)
-        s += labelToString("END OF MONTH", self._endOfMonthFlag, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EFFECTIVE DATE", self._effective_date)
+        s += label_to_string("END DATE", self._termination_date)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("ADJUST TERM DATE", self._adjust_termination_date)
+        s += label_to_string("END OF MONTH", self._end_of_month_flag, "")
 
-        if 1==0:
+        if 1 == 0:
             if len(self._adjusted_dates) > 0:
                 s += "\n\n"
-                s += labelToString("EFF", self._adjusted_dates[0], "")
-    
+                s += label_to_string("EFF", self._adjusted_dates[0], "")
+
             if len(self._adjusted_dates) > 1:
                 s += "\n"
-                s += labelToString("FLW", self._adjusted_dates[1:], "",
+                s += label_to_string("FLW", self._adjusted_dates[1:], "",
                                    listFormat=True)
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Print out the details of the schedule and the actual dates. This

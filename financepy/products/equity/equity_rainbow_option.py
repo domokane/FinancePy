@@ -13,7 +13,7 @@ from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.equity_option import EquityOption
 from ...market.discount.curve import DiscountCurve
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
 from enum import Enum
@@ -211,10 +211,10 @@ class EquityRainbowOption(EquityOption):
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiry_date - valuation_date) / gDaysInYear
-        r = discount_curve.zeroRate(self._expiry_date)
+        r = discount_curve.zero_rate(self._expiry_date)
 
-        q1 = dividend_curves[0].zeroRate(self._expiry_date)
-        q2 = dividend_curves[1].zeroRate(self._expiry_date)
+        q1 = dividend_curves[0].zero_rate(self._expiry_date)
+        q2 = dividend_curves[1].zero_rate(self._expiry_date)
 
         dividend_yields = [q1, q2]
 
@@ -306,11 +306,11 @@ class EquityRainbowOption(EquityOption):
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("PAYOFF TYPE", self._payoff_type)
-        s += labelToString("PAYOFF PARAMS", self._payoff_params)
-        s += labelToString("NUM ASSETS TYPE", self._num_assets, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("PAYOFF TYPE", self._payoff_type)
+        s += label_to_string("PAYOFF PARAMS", self._payoff_params)
+        s += label_to_string("NUM ASSETS TYPE", self._num_assets, "")
         return s
 
 ###############################################################################

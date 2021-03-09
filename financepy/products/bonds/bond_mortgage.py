@@ -11,7 +11,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.date import Date
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
 
@@ -66,21 +66,21 @@ class BondMortgage:
 ###############################################################################
 
     def repaymentAmount(self,
-                        zeroRate: float):
+                        zero_rate: float):
         """ Determine monthly repayment amount based on current zero rate. """
 
         frequency = annual_frequency(self._freq_type)
 
         num_flows = len(self._schedule._adjusted_dates)
-        p = (1.0 + zeroRate/frequency) ** (num_flows-1)
-        m = zeroRate * p / (p - 1.0) / frequency
+        p = (1.0 + zero_rate/frequency) ** (num_flows-1)
+        m = zero_rate * p / (p - 1.0) / frequency
         m = m * self._principal
         return m
 
 ###############################################################################
 
     def generateFlows(self,
-                      zeroRate: float,
+                      zero_rate: float,
                       mortgageType: BondMortgageTypes):
         """ Generate the bond flow amounts. """
 
@@ -95,14 +95,14 @@ class BondMortgage:
         frequency = annual_frequency(self._freq_type)
 
         if mortgageType == BondMortgageTypes.REPAYMENT:
-            monthlyFlow = self.repaymentAmount(zeroRate)
+            monthlyFlow = self.repaymentAmount(zero_rate)
         elif mortgageType == BondMortgageTypes.INTEREST_ONLY:
-            monthlyFlow = zeroRate * self._principal / frequency
+            monthlyFlow = zero_rate * self._principal / frequency
         else:
             raise FinError("Unknown Mortgage type.")
 
         for i in range(1, num_flows):
-            interestFlow = principal * zeroRate / frequency
+            interestFlow = principal * zero_rate / frequency
             principalFlow = monthlyFlow - interestFlow
             principal = principal - principalFlow
             self._interestFlows.append(interestFlow)
@@ -139,14 +139,14 @@ class BondMortgage:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._end_date)
-        s += labelToString("MORTGAGE TYPE", self._mortgageType)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._end_date)
+        s += label_to_string("MORTGAGE TYPE", self._mortgageType)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
         return s
 
 ###############################################################################

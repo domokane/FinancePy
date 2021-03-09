@@ -11,7 +11,7 @@ sys.path.append("..")
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
-from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve_zeros import DiscountCurveZeros
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -24,16 +24,16 @@ def test_FinDiscountCurveZeros():
     start_date = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
     dates = start_date.addYears(times)
-    zeroRates = np.linspace(5.0, 6.0, 10)/100
+    zero_rates = np.linspace(5.0, 6.0, 10)/100
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.ACT_ACT_ISDA
 
     curve = DiscountCurveZeros(start_date,
                                dates,
-                               zeroRates,
+                               zero_rates,
                                freq_type,
                                day_count_type,
-                               FinInterpTypes.FLAT_FWD_RATES)
+                               InterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF")
 
@@ -61,7 +61,7 @@ def test_FinDiscountCurveZeros():
                  Date(15, 6, 2026), Date(16, 6, 2031),
                  Date(16, 6, 2036), Date(14, 6, 2046)]
 
-        zeroRates = [0.000000, 0.006616, 0.007049, 0.007795,
+        zero_rates = [0.000000, 0.006616, 0.007049, 0.007795,
                      0.009599, 0.011203, 0.015068, 0.017583,
                      0.018998, 0.020080]
 
@@ -69,10 +69,10 @@ def test_FinDiscountCurveZeros():
 
         curve = DiscountCurveZeros(start_date,
                                    dates,
-                                   zeroRates,
+                                   zero_rates,
                                    freq_type,
                                    day_count_type,
-                                   FinInterpTypes.FLAT_FWD_RATES)
+                                   InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
     period = end - start

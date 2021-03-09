@@ -8,17 +8,17 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinSwapTypes
 from ...market.discount.curve import DiscountCurve
 
-from .FinFloatLeg import FinFloatLeg
+from .swap_float_leg import SwapFloatLeg
 
 ###############################################################################
 
 
-class FinIborOIS
+class OISBasisSwap:
     """ Class for managing an Ibor-OIS basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a 
     floating leg payment of an overnight index swap. There is no exchange of
@@ -73,31 +73,31 @@ class FinIborOIS
         
         principal = 0.0
 
-        self._floatIborLeg = FinFloatLeg(effective_date,
+        self._floatIborLeg = SwapFloatLeg(effective_date,
+                                          self._termination_date,
+                                          iborType,
+                                          iborSpread,
+                                          iborFreqType,
+                                          iborDayCountType,
+                                          notional,
+                                          principal,
+                                          0,
+                                          calendar_type,
+                                          bus_day_adjust_type,
+                                          date_gen_rule_type)
+
+        self._floatOISLeg = SwapFloatLeg(effective_date,
                                          self._termination_date,
-                                         iborType,
-                                         iborSpread,
-                                         iborFreqType,
-                                         iborDayCountType,
+                                         oisType,
+                                         oisSpread,
+                                         oisFreqType,
+                                         oisDayCountType,
                                          notional,
                                          principal,
-                                         0,
+                                         oisPaymentLag,
                                          calendar_type,
                                          bus_day_adjust_type,
                                          date_gen_rule_type)
-
-        self._floatOISLeg = FinFloatLeg(effective_date,
-                                        self._termination_date,
-                                        oisType,
-                                        oisSpread,
-                                        oisFreqType,
-                                        oisDayCountType,
-                                        notional,
-                                        principal,
-                                        oisPaymentLag,
-                                        calendar_type,
-                                        bus_day_adjust_type,
-                                        date_gen_rule_type)
 
 ###############################################################################
 
@@ -142,7 +142,7 @@ class FinIborOIS
 ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._floatIborLeg.__repr__()
         s += "\n"
         s += self._floatOISLeg.__repr__()

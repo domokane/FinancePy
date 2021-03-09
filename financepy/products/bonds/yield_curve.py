@@ -10,7 +10,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import scale
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 from .yield_curve_model import CurveFitPolynomial
 from .yield_curve_model import CurveFitNelsonSiegel
@@ -168,11 +168,11 @@ class BondYieldCurve():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("SETTLEMENT DATE", self._settlement_date)
-        s += labelToString("BOND", self._bonds)
-        s += labelToString("YIELDS", self._ylds)
-        s += labelToString("CURVE FIT", self._curveFit)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("SETTLEMENT DATE", self._settlement_date)
+        s += label_to_string("BOND", self._bonds)
+        s += label_to_string("YIELDS", self._ylds)
+        s += label_to_string("CURVE FIT", self._curveFit)
         return s
 
 ###############################################################################

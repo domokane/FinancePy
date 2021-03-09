@@ -13,7 +13,7 @@ from ...utils.error import FinError
 from ...products.credit.cds import CDS
 from ...products.credit.cds_curve import CDSCurve
 from ...utils.helpers import check_argument_types
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 
 ###############################################################################
@@ -474,12 +474,12 @@ class CDSIndexPortfolio:
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("DAYCOUNT", self._day_count_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("DAYCOUNT", self._day_count_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
         return s
 
     ###############################################################################

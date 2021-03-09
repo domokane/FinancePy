@@ -14,7 +14,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 
 from ...utils.global_types import FinOptionTypes
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.discount.curve import DiscountCurve
 
@@ -773,12 +773,12 @@ class EquityAsianOption:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START AVERAGING DATE", self._startAveragingDate)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE PRICE", self._strike_price)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("NUM OBSERVATIONS", self._num_observations, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START AVERAGING DATE", self._startAveragingDate)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE PRICE", self._strike_price)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("NUM OBSERVATIONS", self._num_observations, "")
         return s
 
 ###############################################################################

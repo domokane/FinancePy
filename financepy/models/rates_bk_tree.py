@@ -8,12 +8,12 @@ from math import ceil
 
 from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
-from ..market.discount.interpolator import FinInterpTypes, _uinterpolate
-from ..utils.helpers import labelToString
+from ..market.discount.interpolator import InterpTypes, _uinterpolate
+from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
 from ..utils.global_vars import gSmall
 
-interp = FinInterpTypes.FLAT_FWD_RATES.value
+interp = InterpTypes.FLAT_FWD_RATES.value
 
 ###############################################################################
 # TODO : Calculate accrued in bond option according to accrual convention
@@ -143,7 +143,7 @@ def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
 def bermudanSwaption_Tree_Fast(texp, tmat,
                                strike_price, face_amount,
                                coupon_times, coupon_flows,
-                               exerciseTypeInt,
+                               exercise_typeInt,
                                _df_times, _df_values,
                                _treeTimes, _Q,
                                _pu, _pm, _pd,
@@ -346,12 +346,12 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
                 payValues[m, kN] = max(payExercise, holdPay)
                 recValues[m, kN] = max(recExercise, holdRec)
 
-            elif exerciseTypeInt == 2 and flow > gSmall and m > expiryStep:
+            elif exercise_typeInt == 2 and flow > gSmall and m > expiryStep:
 
                 payValues[m, kN] = max(payExercise, holdPay)
                 recValues[m, kN] = max(recExercise, holdRec)
 
-            elif exerciseTypeInt == 3 and m > expiryStep:
+            elif exercise_typeInt == 3 and m > expiryStep:
 
                 raise FinError("American optionality not allowed.")
 
@@ -369,7 +369,7 @@ def bermudanSwaption_Tree_Fast(texp, tmat,
 def americanBondOption_Tree_Fast(texp, tmat,
                                  strike_price, face_amount,
                                  coupon_times, coupon_flows,
-                                 exerciseTypeInt,
+                                 exercise_typeInt,
                                  _df_times, _df_values,
                                  _treeTimes, _Q,
                                  _pu, _pm, _pd,
@@ -575,7 +575,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
                 callOptionValues[m, kN] = max(callExercise, holdCall)
                 putOptionValues[m, kN] = max(putExercise, holdPut)
 
-            elif exerciseTypeInt == 3 and m < expiryStep:  # AMERICAN
+            elif exercise_typeInt == 3 and m < expiryStep:  # AMERICAN
 
                 callOptionValues[m, kN] = max(callExercise, holdCall)
                 putOptionValues[m, kN] = max(putExercise, holdPut)
@@ -653,12 +653,12 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
     # map call onto tree - must have no calls at high value
     ###########################################################################
 
-    treeCallValue = np.ones(num_time_steps) * face_amount * 1000.0
-    numCalls = len(call_times)
-    for i in range(0, numCalls):
+    tree_call_value = np.ones(num_time_steps) * face_amount * 1000.0
+    num_calls = len(call_times)
+    for i in range(0, num_calls):
         call_time = call_times[i]
         n = int(call_time/dt + 0.50)
-        treeCallValue[n] = call_prices[i]
+        tree_call_value[n] = call_prices[i]
 
     # map puts onto tree
     treePutValue = np.zeros(num_time_steps)
@@ -692,7 +692,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
 
     m = maturityStep
     nm = min(maturityStep, jmax)
-    vcall = treeCallValue[m]
+    vcall = tree_call_value[m]
     vput = treePutValue[m]
     vhold = (1.0 + treeFlows[m]) * face_amount
     vclean = vhold - accrued[m]
@@ -706,7 +706,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
     for m in range(maturityStep-1, -1, -1):
         nm = min(m, jmax)
         flow = treeFlows[m] * face_amount
-        vcall = treeCallValue[m]
+        vcall = tree_call_value[m]
         vput = treePutValue[m]
 
         for k in range(-nm, nm+1):
@@ -906,7 +906,7 @@ class FinModelRatesBK():
         if isinstance(df_values, np.ndarray) is False:
             raise FinError("DF VALUES must be a numpy vector")
 
-        interp = FinInterpTypes.FLAT_FWD_RATES.value
+        interp = InterpTypes.FLAT_FWD_RATES.value
 
         treeMaturity = tmat * (self._num_time_steps+1)/self._num_time_steps
         treeTimes = np.linspace(0.0, treeMaturity, self._num_time_steps + 2)
@@ -931,11 +931,11 @@ class FinModelRatesBK():
 ###############################################################################
 
     def bondOption(self, texp, strike_price, face_amount,
-                   coupon_times, coupon_flows, exerciseType):
+                   coupon_times, coupon_flows, exercise_type):
         """ Value a bond option that has European or American exercise using
         the Black-Karasinski model. The model uses a trinomial tree. """
 
-        exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
+        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
 
         tmat = coupon_times[-1]
 
@@ -951,7 +951,7 @@ class FinModelRatesBK():
             = americanBondOption_Tree_Fast(texp, tmat,
                                            strike_price, face_amount,
                                            coupon_times, coupon_flows,
-                                           exerciseTypeInt,
+                                           exercise_typeInt,
                                            self._df_times, self._dfs,
                                            self._treeTimes, self._Q,
                                            self._pu, self._pm, self._pd,
@@ -963,12 +963,12 @@ class FinModelRatesBK():
 ###############################################################################
 
     def bermudanSwaption(self, texp, tmat, strike_price, face_amount,
-                         coupon_times, coupon_flows, exerciseType):
+                         coupon_times, coupon_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
         
-        exerciseTypeInt = optionExerciseTypesToInt(exerciseType)
+        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
 
         tmat = coupon_times[-1]
 
@@ -984,7 +984,7 @@ class FinModelRatesBK():
             = bermudanSwaption_Tree_Fast(texp, tmat,
                                          strike_price, face_amount,
                                          coupon_times, coupon_flows,
-                                         exerciseTypeInt,
+                                         exercise_typeInt,
                                          self._df_times, self._dfs,
                                          self._treeTimes, self._Q,
                                          self._pu, self._pm, self._pd,
@@ -1029,9 +1029,9 @@ class FinModelRatesBK():
         """ Return string with class details. """
 
         s = "Black-Karasinski Model\n"
-        s += labelToString("Sigma", self._sigma)
-        s += labelToString("a", self._a)
-        s += labelToString("num_time_steps", self._num_time_steps)
+        s += label_to_string("Sigma", self._sigma)
+        s += label_to_string("a", self._a)
+        s += label_to_string("num_time_steps", self._num_time_steps)
         return s
 
 ###############################################################################

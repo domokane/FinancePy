@@ -11,7 +11,7 @@ from ...utils.day_count import DayCountTypes
 from ...products.bonds.bond import Bond
 
 from ...utils.date import Date
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 
 from enum import Enum
@@ -136,9 +136,9 @@ class BondEmbeddedOption:
         cpn_times = []
         cpn_amounts = []
 
-        for flowDate in self._bond._flow_dates[1:]:
-            if flowDate > settlement_date:
-                cpn_time = (flowDate - settlement_date) / gDaysInYear
+        for flow_date in self._bond._flow_dates[1:]:
+            if flow_date > settlement_date:
+                cpn_time = (flow_date - settlement_date) / gDaysInYear
                 cpn_times.append(cpn_time)
                 cpn_amounts.append(cpn)
 
@@ -222,19 +222,19 @@ class BondEmbeddedOption:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ISSUE DATE", self._issue_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("FACE AMOUNT", self._face_amount)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ISSUE DATE", self._issue_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount)
 
-        s += labelToString("NUM CALL DATES", len(self._call_dates))
+        s += label_to_string("NUM CALL DATES", len(self._call_dates))
         for i in range(0, len(self._call_dates)):
             s += "%12s %12.6f\n" % (self._call_dates[i], self._call_prices[i])
 
-        s += labelToString("NUM PUT DATES", len(self._put_dates))
+        s += label_to_string("NUM PUT DATES", len(self._put_dates))
         for i in range(0, len(self._put_dates)):
             s += "%12s %12.6f\n" % (self._put_dates[i], self._put_prices[i])
 

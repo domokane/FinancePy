@@ -10,7 +10,7 @@ from ...utils.global_vars import gDaysInYear
 from ...products.equity.equity_option import EquityOption
 from ...models.process_simulator import FinProcessSimulator
 from ...market.discount.curve import DiscountCurve
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
 
@@ -303,7 +303,7 @@ class EquityBarrierOption(EquityOption):
 
         process = FinProcessSimulator()
 
-        r = discount_curve.zeroRate(self._expiry_date)
+        r = discount_curve.zero_rate(self._expiry_date)
         
         # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
 
@@ -408,13 +408,13 @@ class EquityBarrierOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE PRICE", self._strike_price)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("BARRIER LEVEL", self._barrier_level)
-        s += labelToString("NUM OBSERVATIONS", self._num_observations_per_year)
-        s += labelToString("NOTIONAL", self._notional, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE PRICE", self._strike_price)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("BARRIER LEVEL", self._barrier_level)
+        s += label_to_string("NUM OBSERVATIONS", self._num_observations_per_year)
+        s += label_to_string("NOTIONAL", self._notional, "")
         return s
 
 ###############################################################################

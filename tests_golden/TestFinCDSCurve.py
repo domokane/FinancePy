@@ -8,9 +8,9 @@ import sys
 sys.path.append("..")
 
 from financepy.products.credit.cds import CDS
-from financepy.products.rates.IborSwap import FinIborSwap
+from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -32,17 +32,17 @@ def test_FinCDSCurve():
 
     fixedDCC = DayCountTypes.ACT_365F
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    fixedCoupon = 0.05
+    fixed_coupon = 0.05
 
     for i in range(1, 11):
 
         maturity_date = curve_date.addMonths(12 * i)
-        swap = FinIborSwap(curve_date,
-                           maturity_date,
-                           FinSwapTypes.PAY,
-                           fixedCoupon,
-                           fixedFreq,
-                           fixedDCC)
+        swap = IborSwap(curve_date,
+                        maturity_date,
+                        FinSwapTypes.PAY,
+                        fixed_coupon,
+                        fixedFreq,
+                        fixedDCC)
         swaps.append(swap)
 
     libor_curve = IborSingleCurve(curve_date, depos, fras, swaps)

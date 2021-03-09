@@ -11,10 +11,11 @@ from .global_vars import gDaysInYear, gSmall
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
+
 ###############################################################################
 
 
-def _funcName():
+def _func_name():
     """ Extract calling function name - using a protected method is not that
     advisable but calling inspect.stack is so slow it must be avoided. """
     ff = sys._getframe().f_back.f_code.co_name
@@ -23,15 +24,15 @@ def _funcName():
 ###############################################################################
 
 def gridIndex(t, gridTimes):
-    
-    n = len(gridTimes)    
+    n = len(gridTimes)
     for i in range(0, n):
         gridTime = gridTimes[i]
         if abs(gridTime - t) < gSmall:
-            print(t, gridTimes, i) 
+            print(t, gridTimes, i)
             return i
 
     raise FinError("Grid index not found")
+
 
 ###############################################################################
 
@@ -49,6 +50,7 @@ def betaVectorToCorrMatrix(betas):
             correlation[j, i] = c
 
     return np.array(correlation)
+
 
 ###############################################################################
 
@@ -69,10 +71,11 @@ def pv01Times(t: float,
 
     return pv01Times
 
+
 ###############################################################################
 
 
-def timesFromDates(dt: Date,
+def timesFromDates(dt: (Date, list),
                    valuation_date: Date,
                    day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date
@@ -136,6 +139,7 @@ def checkVectorDifferences(x: np.ndarray,
         if abs(diff) > tol:
             print("Vector difference of:", diff, " at index: ", i)
 
+
 ###############################################################################
 
 
@@ -144,6 +148,7 @@ def checkDate(d: Date):
 
     if isinstance(d, Date) is False:
         raise FinError("Should be a date dummy!")
+
 
 ###############################################################################
 
@@ -175,11 +180,12 @@ def dump(obj):
         x = getattr(obj, attr)
         print(attr, x)
 
+
 ###############################################################################
 
 
 def print_tree(array: np.ndarray,
-              depth: int = None):
+               depth: int = None):
     """ Function that prints a binomial or trinonial tree to screen for the
     purpose of debugging. """
     n1, n2 = array.shape
@@ -189,18 +195,19 @@ def print_tree(array: np.ndarray,
 
     for j in range(0, n2):
         for i in range(0, n1):
-            x = array[i, n2-j-1]
+            x = array[i, n2 - j - 1]
             if x != 0.0:
                 print("%10.5f" % x, end="")
             else:
                 print("%10s" % '-', end="")
         print("")
 
+
 ###############################################################################
 
 
 def input_time(dt: Date,
-              curve):
+               curve):
     """ Validates a time input in relation to a curve. If it is a float then
     it returns a float as long as it is positive. If it is a Date then it
     converts it to a float. If it is a Numpy array then it returns the array
@@ -231,6 +238,7 @@ def input_time(dt: Date,
     else:
         raise FinError("Unknown type.")
 
+
 ###############################################################################
 
 
@@ -248,6 +256,7 @@ def listdiff(a: np.ndarray,
 
     return diff
 
+
 ###############################################################################
 
 
@@ -261,6 +270,7 @@ def dotproduct(xVector: np.ndarray,
     for i in range(0, n):
         dotprod += xVector[i] * yVector[i]
     return dotprod
+
 
 ###############################################################################
 
@@ -277,6 +287,7 @@ def frange(start: int,
 
     return x
 
+
 ###############################################################################
 
 
@@ -289,16 +300,17 @@ def normaliseWeights(wtVector: np.ndarray):
     for i in range(0, n):
         sumWts += wtVector[i]
     for i in range(0, n):
-        wtVector[i] = wtVector[i]/sumWts
+        wtVector[i] = wtVector[i] / sumWts
     return wtVector
+
 
 ###############################################################################
 
 
-def labelToString(label: str,
-                  value: float,
-                  separator: str = "\n",
-                  listFormat: bool = False):
+def label_to_string(label: str,
+                    value: (float, str),
+                    separator: str = "\n",
+                    listFormat: bool = False):
     """ Format label/value pairs for a unified formatting. """
     # Format option for lists such that all values are aligned:
     # Label: value1
@@ -344,6 +356,7 @@ def tableToString(header: str,
 
     return s[:-1]
 
+
 ###############################################################################
 
 
@@ -365,6 +378,7 @@ def toUsableType(t):
             return tuple(toUsableType(tp) for tp in t)
 
     return t
+
 
 ###############################################################################
 
@@ -404,6 +418,7 @@ def uniformToDefaultTime(u, t, v):
 
     return tau
 
+
 ###############################################################################
 # THIS IS NOT USED
 
@@ -429,25 +444,26 @@ def accruedTree(gridTimes: np.ndarray,
     for iGrid in range(1, numGridTimes):
 
         cpn_time = gridTimes[iGrid]
-        cpnFlow = gridFlows[iGrid]
+        cpn_flow = gridFlows[iGrid]
 
         if gridFlows[iGrid] > gSmall:
             coupon_times = np.append(coupon_times, cpn_time)
-            coupon_flows = np.append(coupon_flows, cpnFlow)
+            coupon_flows = np.append(coupon_flows, cpn_flow)
 
     numCoupons = len(coupon_times)
 
     # interpolate between coupons
     for iGrid in range(0, numGridTimes):
-        t = gridTimes[iGrid]            
+        t = gridTimes[iGrid]
         for i in range(0, numCoupons):
-            if t > coupon_times[i-1] and t <= coupon_times[i]:
-                den = coupon_times[i] - coupon_times[i-1]
-                num = (t - coupon_times[i-1])
+            if t > coupon_times[i - 1] and t <= coupon_times[i]:
+                den = coupon_times[i] - coupon_times[i - 1]
+                num = (t - coupon_times[i - 1])
                 accrued[iGrid] = face * num * coupon_flows[i] / den
                 break
-     
+
     return accrued
+
 
 ###############################################################################
 
@@ -459,18 +475,17 @@ def check_argument_types(func, values):
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
         usableType = toUsableType(annotationType)
-        if(not isinstance(value, usableType)):
-
+        if (not isinstance(value, usableType)):
             print("ERROR with function arguments for", func.__name__)
             print("This is in module", func.__module__)
             print("Please check inputs for argument >>", valueName, "<<")
             print("You have input an argument", value, "of type", type(value))
             print("The allowed types are", usableType)
             print("It is none of these so FAILS. Please amend.")
-#            s = f"In {func.__module__}.{func.__name__}:\n"
-#            s += f"Mismatched Types: expected a "
-#            s += f"{valueName} of type '{usableType.__name__}', however"
-#            s += f" a value of type '{type(value).__name__}' was given."
+            #            s = f"In {func.__module__}.{func.__name__}:\n"
+            #            s += f"Mismatched Types: expected a "
+            #            s += f"{valueName} of type '{usableType.__name__}', however"
+            #            s += f" a value of type '{type(value).__name__}' was given."
             raise FinError("Argument Type Error")
 
 ###############################################################################

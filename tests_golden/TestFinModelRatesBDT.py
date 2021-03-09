@@ -12,8 +12,8 @@ from financepy.utils.date import Date
 from financepy.market.discount.curve import DiscountCurve
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
-from financepy.products.rates.FinIborSwaption import FinIborSwaption
-from financepy.products.rates.FinIborSwaption import FinSwapTypes
+from financepy.products.rates.swaption import IborSwaption
+from financepy.products.rates.swaption import FinSwapTypes
 from financepy.models.black import FinModelBlack
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -41,24 +41,24 @@ def testBlackModelCheck():
                                     FrequencyTypes.SEMI_ANNUAL)
 
     settlement_date = Date(1, 1, 2020)
-    exerciseDate = Date(1, 1, 2021)
+    exercise_date = Date(1, 1, 2021)
     maturity_date = Date(1, 1, 2024)
 
-    fixedCoupon = 0.06
-    fixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
-    fixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_coupon = 0.06
+    fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
+    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     # Pricing a PAY
     swaptionType = FinSwapTypes.PAY
-    swaption = FinIborSwaption(settlement_date,
-                                exerciseDate,
-                                maturity_date,
-                                swaptionType,
-                                fixedCoupon,
-                                fixedFrequencyType,
-                                fixedDayCountType,
-                                notional)
+    swaption = IborSwaption(settlement_date,
+                            exercise_date,
+                            maturity_date,
+                            swaptionType,
+                            fixed_coupon,
+                            fixed_frequency_type,
+                            fixed_day_count_type,
+                            notional)
 
     model = FinModelBlack(0.20)
     v = swaption.value(valuation_date, libor_curve, model)
@@ -74,25 +74,25 @@ def test_BDTExampleOne():
 
     valuation_date = Date(1, 1, 2020)
     years = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-    zeroDates = valuation_date.addYears(years)
-    zeroRates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
+    zero_dates = valuation_date.addYears(years)
+    zero_rates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
 
     testCases.header("DATES")
-    testCases.print(zeroDates)
+    testCases.print(zero_dates)
 
     testCases.header("RATES")
-    testCases.print(zeroRates)
+    testCases.print(zero_rates)
 
     curve = DiscountCurveZeros(valuation_date,
-                               zeroDates,
-                               zeroRates,
+                               zero_dates,
+                               zero_rates,
                                FrequencyTypes.ANNUAL)
 
     yieldVol = 0.16
 
     num_time_steps = 5
     tmat = years[-1]
-    dfs = curve.df(zeroDates)
+    dfs = curve.df(zero_dates)
 
     testCases.print("DFS")
     testCases.print(dfs)
@@ -135,9 +135,9 @@ def test_BDTExampleTwo():
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
-    for flowDate in bond._flow_dates:
-        if flowDate > settlement_date:
-            flow_time = (flowDate - settlement_date) / gDaysInYear
+    for flow_date in bond._flow_dates:
+        if flow_date > settlement_date:
+            flow_time = (flow_date - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
@@ -165,7 +165,7 @@ def test_BDTExampleTwo():
 
     # Test convergence
     num_stepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    exerciseType = FinExerciseTypes.AMERICAN
+    exercise_type = FinExerciseTypes.AMERICAN
 
     testCases.header("Values")
     treeVector = []
@@ -173,7 +173,7 @@ def test_BDTExampleTwo():
         model = FinModelRatesBDT(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strike_price,
-                             face, coupon_times, coupon_flows, exerciseType)
+                             face, coupon_times, coupon_flows, exercise_type)
 
         testCases.print(v)
         treeVector.append(v['call'])
@@ -219,7 +219,7 @@ def test_BDTExampleThree():
     testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", 
                      "V_Fixed", "V_pay", "V_rec")
 
-    for exerciseType in [FinExerciseTypes.EUROPEAN,
+    for exercise_type in [FinExerciseTypes.EUROPEAN,
                          FinExerciseTypes.BERMUDAN]:
 
         for maturityYears in [4.0, 5.0, 10.0, 20.0]:
@@ -246,9 +246,9 @@ def test_BDTExampleThree():
                 coupon_times = []
                 coupon_flows = []
                 cpn = bond._coupon/bond._frequency
-                for flowDate in bond._flow_dates:
-                    if flowDate > expiry_date:
-                        flow_time = (flowDate - settlement_date) / gDaysInYear
+                for flow_date in bond._flow_dates:
+                    if flow_date > expiry_date:
+                        flow_time = (flow_date - settlement_date) / gDaysInYear
                         coupon_times.append(flow_time)
                         coupon_flows.append(cpn)
 
@@ -266,9 +266,9 @@ def test_BDTExampleThree():
                                            face,
                                            coupon_times,
                                            coupon_flows,
-                                           exerciseType)
+                                           exercise_type)
 
-                testCases.print("%s" % exerciseType,
+                testCases.print("%s" % exercise_type,
                                 "%9.5f" % sigma,
                                 "%9.5f" % num_time_steps,
                                 "%9.5f" % expiryYears,

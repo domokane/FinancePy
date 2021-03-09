@@ -82,9 +82,9 @@ def test_BKExampleTwo():
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
-    for flowDate in bond._flow_dates:
-        if flowDate > settlement_date:
-            flow_time = (flowDate - settlement_date) / gDaysInYear
+    for flow_date in bond._flow_dates:
+        if flow_date > settlement_date:
+            flow_time = (flow_date - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
@@ -111,13 +111,13 @@ def test_BKExampleTwo():
 
     model = FinModelRatesBK(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
-    exerciseType = FinExerciseTypes.AMERICAN
+    exercise_type = FinExerciseTypes.AMERICAN
     v = model.bondOption(texp, strike_price, face, coupon_times,
-                         coupon_flows, exerciseType)
+                         coupon_flows, exercise_type)
 
     # Test convergence
     num_stepsList = [100, 200, 300, 500, 1000]
-    exerciseType = FinExerciseTypes.AMERICAN
+    exercise_type = FinExerciseTypes.AMERICAN
 
     testCases.header("TIMESTEPS", "TIME", "VALUE")
     treeVector = []
@@ -126,7 +126,7 @@ def test_BKExampleTwo():
         model = FinModelRatesBK(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bondOption(texp, strike_price,
-                             face, coupon_times, coupon_flows, exerciseType)
+                             face, coupon_times, coupon_flows, exercise_type)
         end = time.time()
         period = end-start
         treeVector.append(v)

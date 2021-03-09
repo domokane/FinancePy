@@ -19,7 +19,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.schedule import Schedule
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...models.black import FinModelBlack
 from ...models.black_shifted import FinModelBlackShifted
 from ...models.bachelier import FinModelBachelier
@@ -40,7 +40,7 @@ class FinIborCapFloorModelTypes(Enum):
 ##########################################################################
 
 
-class FinIborCapFloor():
+class IborCapFloor():
     """ Class for Caps and Floors. These are contracts which observe a Ibor
     reset L on a future start date and then make a payoff at the end of the
     Ibor period which is Max[L-K,0] for a cap and Max[K-L,0] for a floor.
@@ -345,13 +345,13 @@ class FinIborCapFloor():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("STRIKE COUPON", self._strikeRate * 100)
-        s += labelToString("OPTION TYPE", str(self._option_type))
-        s += labelToString("FREQUENCY", str(self._freq_type))
-        s += labelToString("DAY COUNT", str(self._day_count_type), "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("STRIKE COUPON", self._strikeRate * 100)
+        s += label_to_string("OPTION TYPE", str(self._option_type))
+        s += label_to_string("FREQUENCY", str(self._freq_type))
+        s += label_to_string("DAY COUNT", str(self._day_count_type), "")
         return s
 
 ###############################################################################

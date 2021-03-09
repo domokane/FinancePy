@@ -9,7 +9,7 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...utils.global_types import FinOptionTypes
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...market.discount.curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 
@@ -93,11 +93,11 @@ class EquityAmericanOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("STRIKE PRICE", self._strike_price)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("NUMBER", self._numOptions, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("STRIKE PRICE", self._strike_price)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("NUMBER", self._numOptions, "")
         return s
 
 ###############################################################################

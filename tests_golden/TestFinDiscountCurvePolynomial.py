@@ -29,7 +29,7 @@ def test_FinDiscountCurvePolynomial():
     dates = curve_date.addYears(times)
     coeffs = [0.0004, -0.0001, 0.00000010]
     curve1 = DiscountCurvePoly(curve_date, coeffs)
-    zeros = curve1.zeroRate(dates)
+    zeros = curve1.zero_rate(dates)
     fwds = curve1.fwd(dates)
 
     if PLOT_GRAPHS:

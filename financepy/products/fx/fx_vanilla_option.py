@@ -17,13 +17,13 @@ from ...utils.global_types import FinOptionTypes
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 
 from ...models.equity_crr_tree import crrTreeValAvg
-from ...models.sabr import volFunctionSABR
+from ...models.sabr import vol_function_sabr
 from ...models.sabr import FinModelSABR
 from ...models.black_scholes import BlackScholes
 
 from ...models.black_scholes_analytic import bs_value, bs_delta
 
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 
 from ...utils.math import N
 
@@ -282,7 +282,7 @@ class FXVanillaOption():
             if type(model) == BlackScholes:
                 volatility = model._volatility
             elif type(model) == FinModelSABR:
-                volatility = volFunctionSABR(model.alpha,
+                volatility = vol_function_sabr(model.alpha,
                                              model.beta,
                                              model.rho,
                                              model.nu,
@@ -729,14 +729,14 @@ class FXVanillaOption():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("CURRENCY PAIR", self._currency_pair)
-        s += labelToString("PREMIUM CCY", self._premCurrency)
-        s += labelToString("STRIKE FX RATE", self._strike_fx_rate)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("SPOT DAYS", self._spot_days)
-        s += labelToString("NOTIONAL", self._notional, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("CURRENCY PAIR", self._currency_pair)
+        s += label_to_string("PREMIUM CCY", self._premCurrency)
+        s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("SPOT DAYS", self._spot_days)
+        s += label_to_string("NOTIONAL", self._notional, "")
         return s
 
 ###############################################################################

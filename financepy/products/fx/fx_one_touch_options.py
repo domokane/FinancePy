@@ -10,7 +10,7 @@ from enum import Enum
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.discount.curve import DiscountCurve
 from ...models.gbm_process_simulator import getPaths
@@ -555,11 +555,11 @@ class FXOneTouchOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("BARRIER LEVEL", self._barrierPrice)
-        s += labelToString("PAYMENT SIZE", self._paymentSize, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("BARRIER LEVEL", self._barrierPrice)
+        s += label_to_string("PAYMENT SIZE", self._paymentSize, "")
         return s
 
 ###############################################################################

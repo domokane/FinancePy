@@ -644,9 +644,9 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
     ls_failed = 0  # no previous line search has failed
     f0, df0 = f(X, fargs)  # get initial function value and gradient
     df0 = df0.reshape(-1, 1)
-    fX = [];
+    fX = []
     fX.append(f0)
-    Xd = [];
+    Xd = []
     Xd.append(X)
     i += (length < 0)  # count epochs
     s = -df0  # get column vec
@@ -662,16 +662,16 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
         M = MAX if length > 0 else min(MAX, -length - i)
 
         while 1:  # extrapolate as long as necessary
-            x2 = 0;
-            f2 = f0;
-            d2 = d0;
-            f3 = f0;
+            x2 = 0
+            f2 = f0
+            d2 = d0
+            f3 = f0
             df3 = df0
             success = False
 
             while not success and M > 0:
                 try:
-                    M -= 1;
+                    M -= 1
                     i += (length < 0)  # count epochs
                     f3, df3 = f(X + x3 * s, *list(*fargs))
                     df3 = df3.reshape(-1, 1)
@@ -682,19 +682,19 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
                     x3 = (x2 + x3) / 2  # bisect and try again
 
             if f3 < F0:
-                X0 = X + x3 * s;
-                F0 = f3;
+                X0 = X + x3 * s
+                F0 = f3
                 dF0 = df3  # keep best values
 
             d3 = df3.T @ s  # new slope
             if d3 > SIG * d0 or f3 > f0 + x3 * RHO * d0 or M == 0:
                 break  # finished extrapolating
 
-            x1 = x2;
-            f1 = f2;
+            x1 = x2
+            f1 = f2
             d1 = d2  # move point 2 to point 1
-            x2 = x3;
-            f2 = f3;
+            x2 = x3
+            f2 = f3
             d2 = d3  # move point 3 to point 2
             A = 6 * (f1 - f2) + 3 * (d2 + d1) * (x2 - x1)  # make cubic extrapolation
             B = 3 * (f2 - f1) - (2 * d1 + d2) * (x2 - x1)
@@ -710,12 +710,12 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
         while (abs(d3) > -SIG * d0 or f3 > f0 + x3 * RHO * d0) and M > 0:  # keep interpolating
 
             if d3 > 0 or f3 > f0 + x3 * RHO * d0:  # choose subinterval
-                x4 = x3;
-                f4 = f3;
+                x4 = x3
+                f4 = f3
                 d4 = d3  # move point 3 to point 4
             else:
-                x2 = x3;
-                f2 = f3;
+                x2 = x3
+                f2 = f3
                 d2 = d3  # move point 3 to point 2
 
             if f4 > f0:
@@ -733,24 +733,24 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
             df3 = df3.reshape(-1, 1)
 
             if f3 < F0:
-                X0 = X + x3 * s;
-                F0 = f3;
+                X0 = X + x3 * s
+                F0 = f3
                 dF0 = df3  # keep best values
 
-            M -= 1;
+            M -= 1
             i += (length < 0)  # count epochs?!
             d3 = df3.T @ s  # new slope
 
         if abs(d3) < -SIG * d0 and f3 < f0 + x3 * RHO * d0:  # if line search succeeded
-            X = X + x3 * s;
-            f0 = f3;
-            fX.append(f0);
+            X = X + x3 * s
+            f0 = f3
+            fX.append(f0)
             Xd.append(X)  # update variables
             if verbose:
                 print('%s %6i;  Value %4.6e\r' % (S, i, f0))
             s = (df3.T @ df3 - df0.T @ df3) / (df0.T @ df0) * s - df3  # Polack-Ribiere CG direction
             df0 = df3  # swap derivatives
-            d3 = d0;
+            d3 = d0
             d0 = df0.T @ s
             if d0 > 0:  # new slope must be negative
                 s = -df0.reshape(-1, 1);
@@ -758,12 +758,12 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
             x3 = x3 * min(RATIO, d3 / (d0 - np.finfo(np.double).tiny))  # slope ratio but max RATIO
             ls_failed = False  # this line search did not fail
         else:
-            X = X0;
-            f0 = F0;
+            X = X0
+            f0 = F0
             df0 = dF0  # restore best point so far
             if ls_failed or i > abs(length):  # line search failed twice in a row
                 break  # or we ran out of time, so we give up
-            s = -df0.reshape(-1, 1);
+            s = -df0.reshape(-1, 1)
             d0 = -s.T @ s  # try steepest
             x3 = 1 / (1 - d0)
             ls_failed = True  # this line search failed

@@ -5,7 +5,7 @@
 from ...utils.global_vars import gDaysInYear
 from ...products.bonds.bond import Bond
 from ...utils.date import Date
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 
 # TODO: Examine other exchange conventions.
@@ -132,12 +132,12 @@ class BondFuture:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("TICKER NAME", self._tickerName)
-        s += labelToString("FIRST DELIVERY DATE", self._firstDeliveryDate)
-        s += labelToString("LAST DELIVERY DATE", self._lastDeliveryDate)
-        s += labelToString("CONTRACT SIZE", self._contractSize)
-        s += labelToString("COUPON", self._coupon)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("TICKER NAME", self._tickerName)
+        s += label_to_string("FIRST DELIVERY DATE", self._firstDeliveryDate)
+        s += label_to_string("LAST DELIVERY DATE", self._lastDeliveryDate)
+        s += label_to_string("CONTRACT SIZE", self._contractSize)
+        s += label_to_string("COUPON", self._coupon)
         return s
 
 ###############################################################################

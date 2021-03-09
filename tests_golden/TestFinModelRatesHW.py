@@ -57,12 +57,12 @@ def test_HullWhiteExampleTwo():
     zeroDays = [0, 3, 31, 62, 94, 185, 367, 731, 1096, 1461,
                 1826, 2194, 2558, 2922, 3287, 3653]
 
-    zeroRates = [5.0, 5.01772, 4.98282, 4.97234, 4.96157, 4.99058, 5.09389,
+    zero_rates = [5.0, 5.01772, 4.98282, 4.97234, 4.96157, 4.99058, 5.09389,
                  5.79733, 6.30595, 6.73464, 6.94816, 7.08807, 7.27527,
                  7.30852, 7.39790, 7.49015]
 
     times = np.array(zeroDays) / 365.0
-    zeros = np.array(zeroRates) / 100.0
+    zeros = np.array(zero_rates) / 100.0
     dfs = np.exp(-zeros*times)
 
     start_date = Date(1, 12, 2019)
@@ -185,16 +185,16 @@ def test_HullWhiteBondOption():
         model = FinModelRatesHW(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
         model.buildTree(texp, times, dfs)
 
-        exerciseType = FinExerciseTypes.EUROPEAN
+        exercise_type = FinExerciseTypes.EUROPEAN
 
         v1 = model.bondOption(texp, strike_price, face,
-                              coupon_times, coupon_flows, exerciseType)
+                              coupon_times, coupon_flows, exercise_type)
 
         model = FinModelRatesHW(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
         model.buildTree(texp, times, dfs)
 
         v2 = model.bondOption(texp, strike_price, face,
-                              coupon_times, coupon_flows, exerciseType)
+                              coupon_times, coupon_flows, exercise_type)
 
         end = time.time()
         period = end-start
@@ -230,10 +230,10 @@ def test_HullWhiteCallableBond():
     coupon_flows = []
     cpn = bond._coupon/bond._frequency
 
-    for flowDate in bond._flow_dates[1:]:
+    for flow_date in bond._flow_dates[1:]:
         
-        if flowDate > settlement_date:
-            flow_time = (flowDate - settlement_date) / gDaysInYear
+        if flow_date > settlement_date:
+            flow_time = (flow_date - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 

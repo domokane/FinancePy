@@ -8,7 +8,7 @@ from ..utils.math import N
 
 from scipy import optimize
 
-from ..utils.helpers import labelToString, check_argument_types
+from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
 from .credit_merton import FinModelMertonCredit
 
@@ -165,12 +165,12 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EQUITY VALUE", self._E)
-        s += labelToString("BOND FACE", self._L)
-        s += labelToString("YEARS TO MATURITY", self._t)
-        s += labelToString("ASSET GROWTH", self._mu)
-        s += labelToString("EQUITY VOLATILITY", self._vE)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EQUITY VALUE", self._E)
+        s += label_to_string("BOND FACE", self._L)
+        s += label_to_string("YEARS TO MATURITY", self._t)
+        s += label_to_string("ASSET GROWTH", self._mu)
+        s += label_to_string("EQUITY VOLATILITY", self._vE)
         return s
 
 ###############################################################################

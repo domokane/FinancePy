@@ -9,13 +9,13 @@ from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...market.discount.curve import DiscountCurve
 
 ###############################################################################
 
 
-class FinIborFRA:
+class IborFRA:
     """ Class for managing LIBOR forward rate agreements. A forward rate
     agreement is an agreement to exchange a fixed pre-agreed rate for a
     floating rate linked to LIBOR that is not known until some specified
@@ -112,7 +112,7 @@ class FinIborFRA:
 
     ##########################################################################
 
-    def maturityDf(self, index_curve):
+    def maturity_df(self, index_curve):
         """ Determine the maturity date index discount factor needed to refit
         the market FRA rate. In a dual-curve world, this is not the discount
         rate discount factor but the index curve discount factor. """
@@ -143,15 +143,15 @@ class FinIborFRA:
     ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START ACCD DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("FRA RATE", self._fraRate)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("PAY FIXED RATE", self._payFixedRate)
-        s += labelToString("DAY COUNT TYPE", self._day_count_type)
-        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
-        s += labelToString("CALENDAR", self._calendar_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START ACCD DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("FRA RATE", self._fraRate)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("PAY FIXED RATE", self._payFixedRate)
+        s += label_to_string("DAY COUNT TYPE", self._day_count_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
         return s
 
     ###########################################################################

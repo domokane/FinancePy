@@ -9,20 +9,21 @@ from ...utils.date import Date
 from ...utils.global_vars import gSmall
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes, annual_frequency
-from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
+from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinSwapTypes
 from ...market.discount.curve import DiscountCurve
 
-from .FinFixedLeg import FinFixedLeg
-from .FinFloatLeg import FinFloatLeg
+from .swap_fixed_leg import SwapFixedLeg
+from .swap_float_leg import SwapFloatLeg
+
 
 ##########################################################################
 
 
-class FinIborSwap:
+class IborSwap:
     """ Class for managing a standard Fixed vs IBOR swap. This is a contract
     in which a fixed payment leg is exchanged for a series of floating rates
     payments linked to some IBOR index rate. There is no exchange of principal.
@@ -35,18 +36,18 @@ class FinIborSwap:
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
     which the implied index rates are extracted. """
-    
+
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 fixed_legType: FinSwapTypes,
-                 fixedCoupon: float,  # Fixed coupon (annualised)
-                 fixedFreqType: FrequencyTypes,
-                 fixedDayCountType: DayCountTypes,
+                 fixed_leg_type: FinSwapTypes,
+                 fixed_coupon: float,  # Fixed coupon (annualised)
+                 fixed_freq_type: FrequencyTypes,
+                 fixed_day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
-                 floatSpread: float = 0.0,
-                 floatFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 floatDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 float_spread: float = 0.0,
+                 float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
@@ -68,52 +69,52 @@ class FinIborSwap:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
 
         self._effective_date = effective_date
 
-        floatLegType = FinSwapTypes.PAY
-        if fixed_legType == FinSwapTypes.PAY:
-            floatLegType = FinSwapTypes.RECEIVE
-        
+        float_leg_type = FinSwapTypes.PAY
+        if fixed_leg_type == FinSwapTypes.PAY:
+            float_leg_type = FinSwapTypes.RECEIVE
+
         payment_lag = 0
         principal = 0.0
 
-        self._fixed_leg = FinFixedLeg(effective_date,
-                                     self._termination_date,
-                                     fixed_legType,
-                                     fixedCoupon,
-                                     fixedFreqType,
-                                     fixedDayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
+        self._fixed_leg = SwapFixedLeg(effective_date,
+                                       self._termination_date,
+                                       fixed_leg_type,
+                                       fixed_coupon,
+                                       fixed_freq_type,
+                                       fixed_day_count_type,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
-        self._floatLeg = FinFloatLeg(effective_date,
-                                     self._termination_date,
-                                     floatLegType,
-                                     floatSpread,
-                                     floatFreqType,
-                                     floatDayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
-            
-###############################################################################
+        self._floatLeg = SwapFloatLeg(effective_date,
+                                      self._termination_date,
+                                      float_leg_type,
+                                      float_spread,
+                                      float_freq_type,
+                                      float_day_count_type,
+                                      notional,
+                                      principal,
+                                      payment_lag,
+                                      calendar_type,
+                                      bus_day_adjust_type,
+                                      date_gen_rule_type)
+
+    ###############################################################################
 
     def value(self,
               valuation_date: Date,
               discount_curve: DiscountCurve,
-              index_curve: DiscountCurve=None,
+              index_curve: DiscountCurve = None,
               firstFixingRate=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
@@ -121,36 +122,36 @@ class FinIborSwap:
         if index_curve is None:
             index_curve = discount_curve
 
-        fixed_legValue = self._fixed_leg.value(valuation_date,
-                                             discount_curve)
+        fixed_leg_value = self._fixed_leg.value(valuation_date,
+                                                discount_curve)
 
-        floatLegValue = self._floatLeg.value(valuation_date,
-                                             discount_curve,
-                                             index_curve,
-                                             firstFixingRate)
+        float_leg_value = self._floatLeg.value(valuation_date,
+                                               discount_curve,
+                                               index_curve,
+                                               firstFixingRate)
 
-        value = fixed_legValue + floatLegValue
+        value = fixed_leg_value + float_leg_value
         return value
 
-###############################################################################
+    ###############################################################################
 
     def pv01(self, valuation_date, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
         pv = self._fixed_leg.value(valuation_date, discount_curve)
-        
+
         # Needs to be positive even if it is a payer leg
         pv = np.abs(pv)
         pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
         return pv01
 
-###############################################################################
+    ###############################################################################
 
     def swap_rate(self,
-                 valuation_date:Date,
-                 discount_curve: DiscountCurve,
-                 index_curve: DiscountCurve = None,
-                 firstFixing: float = None):
+                  valuation_date: Date,
+                  discount_curve: DiscountCurve,
+                  index_curve: DiscountCurve = None,
+                  first_fixing: float = None):
         """ Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -170,34 +171,34 @@ class FinIborSwap:
         else:
             df0 = discount_curve.df(valuation_date)
 
-        floatLegPV = 0.0
+        float_leg_pv = 0.0
 
         if index_curve is None:
-            dfT = discount_curve.df(self._maturity_date)
-            floatLegPV = (df0 - dfT) 
+            df_t = discount_curve.df(self._maturity_date)
+            float_leg_pv = (df0 - df_t)
         else:
-            floatLegPV = self._floatLeg.value(valuation_date,
-                                              discount_curve,
-                                              index_curve,
-                                              firstFixing)
+            float_leg_pv = self._floatLeg.value(valuation_date,
+                                                discount_curve,
+                                                index_curve,
+                                                first_fixing)
 
-            floatLegPV /= self._fixed_leg._notional
+            float_leg_pv /= self._fixed_leg._notional
 
-        cpn = floatLegPV / pv01           
+        cpn = float_leg_pv / pv01
         return cpn
-    
-##########################################################################
 
-    def cashSettledPV01(self,
-                        valuation_date,
-                        flatSwapRate,
-                        frequencyType):
+    ##########################################################################
+
+    def cash_settled_pv01(self,
+                          valuation_date,
+                          flat_swap_rate,
+                          frequency_type):
         """ Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
         used in the pricing of a cash-settled swaption in the FinIborSwaption
         class. This method does not affect the standard valuation methods."""
 
-        m = annual_frequency(frequencyType)
+        m = annual_frequency(frequency_type)
 
         if m == 0:
             raise FinError("Frequency cannot be zero.")
@@ -219,28 +220,28 @@ class FinIborSwap:
         alpha = 1.0 / m
 
         for _ in self._fixed_leg._payment_dates[start_index:]:
-            df = df / (1.0 + alpha * flatSwapRate)
+            df = df / (1.0 + alpha * flat_swap_rate)
             flatPV01 += df * alpha
 
         return flatPV01
 
-###############################################################################
+    ###############################################################################
 
-    def printFixedLegPV(self):
+    def print_fixed_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
         self._fixed_leg.printValuation()
 
-###############################################################################
+    ###############################################################################
 
-    def printFloatLegPV(self):
+    def print_float_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
         self._floatLeg.printValuation()
 
-###############################################################################
+    ###############################################################################
 
     def print_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
@@ -249,17 +250,17 @@ class FinIborSwap:
         self._fixed_leg.printPayments()
         self._floatLeg.printPayments()
 
-##########################################################################
+    ##########################################################################
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._fixed_leg.__repr__()
         s += "\n"
         s += self._floatLeg.__repr__()
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         """ Print a list of the unadjusted coupon payment dates used in

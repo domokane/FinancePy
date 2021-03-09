@@ -12,7 +12,7 @@ from numba import jit, njit, float64, int64
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import heaviside
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 ###############################################################################
 
@@ -103,7 +103,7 @@ def _valueOnce(stock_price,
                num_steps,
                time_to_expiry,
                payoff_type,
-               exerciseType,
+               exercise_type,
                payoff_params):
 
     if num_steps < 3:
@@ -167,9 +167,9 @@ def _valueOnce(stock_price,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            if exerciseType == EquityTreeExerciseTypes.EUROPEAN:
+            if exercise_type == EquityTreeExerciseTypes.EUROPEAN:
                 option_values[index + iNode] = holdValue
-            elif exerciseType == EquityTreeExerciseTypes.AMERICAN:
+            elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + iNode]
                 exerciseValue = _payoff_value(s, payoff_typeValue, payoff_params)
                 option_values[index + iNode] = max(exerciseValue, holdValue)
@@ -212,12 +212,12 @@ class EquityBinomialTree():
               payoff,
               expiry_date,
               payoff_type,
-              exerciseType,
+              exercise_type,
               payoff_params):
 
         # do some validation
         texp = (expiry_date - valuation_date) / gDaysInYear
-        r = discount_curve.zeroRate(expiry_date)
+        r = discount_curve.zero_rate(expiry_date)
 
         dq = dividend_curve.df(expiry_date)
         q = -np.log(dq)/texp
@@ -229,7 +229,7 @@ class EquityBinomialTree():
                             num_steps,
                             texp,
                             payoff_type,
-                            exerciseType,
+                            exercise_type,
                             payoff_params)
 
         # Can I reuse the same tree ?
@@ -240,7 +240,7 @@ class EquityBinomialTree():
                             num_steps + 1,
                             texp,
                             payoff_type,
-                            exerciseType,
+                            exercise_type,
                             payoff_params)
 
         price = (price1 + price2) / 2.0

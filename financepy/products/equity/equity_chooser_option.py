@@ -14,7 +14,7 @@ from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption
 from ...utils.global_types import FinOptionTypes
 from ...market.discount.curve_flat import DiscountCurve
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...models.black_scholes import bs_value
 
@@ -229,12 +229,12 @@ class EquityChooserOption(EquityOption):
     ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("CHOOSER DATE", self._chooseDate)
-        s += labelToString("CALL EXPIRY DATE", self._callExpiryDate)
-        s += labelToString("CALL STRIKE PRICE", self._callStrike)
-        s += labelToString("PUT EXPIRY DATE", self._putExpiryDate)
-        s += labelToString("PUT STRIKE PRICE", self._putStrike, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("CHOOSER DATE", self._chooseDate)
+        s += label_to_string("CALL EXPIRY DATE", self._callExpiryDate)
+        s += label_to_string("CALL STRIKE PRICE", self._callStrike)
+        s += label_to_string("PUT EXPIRY DATE", self._putExpiryDate)
+        s += label_to_string("PUT STRIKE PRICE", self._putStrike, "")
         return s
 
     ###############################################################################

@@ -10,7 +10,7 @@ from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
 from ...finutils.FinCalendar import CalendarTypes,  DateGenRuleTypes
 from ...finutils.FinCalendar import FinCalendar, BusDayAdjustTypes
 from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import labelToString, check_argument_types
+from ...finutils.FinHelperFunctions import label_to_string, check_argument_types
 from ...finutils.FinMath import ONE_MILLION
 from ...finutils.FinGlobalTypes import FinSwapTypes
 
@@ -162,7 +162,7 @@ class FinIborIborSwap
         self._floatTotalPV = []
         self._firstFixingRate = firstFixingRate
 
-        basis = FinDayCount(self._floatDayCountType)
+        basis = FinDayCount(self._float_day_count_type)
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
@@ -182,9 +182,9 @@ class FinIborIborSwap
 
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
-        prevDt = self._adjustedFloatDates[start_index - 1]
+        prev_dt = self._adjustedFloatDates[start_index - 1]
         nextDt = self._adjustedFloatDates[start_index]
-        alpha = basis.year_frac(prevDt, nextDt)[0]
+        alpha = basis.year_frac(prev_dt, nextDt)[0]
         df1_index = index_curve.df(self._effective_date)  # Cannot be pcd as has past
         df2_index = index_curve.df(nextDt)
 
@@ -192,7 +192,7 @@ class FinIborIborSwap
 
         if self._firstFixingRate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self._floatSpread) * alpha * self._notional
+            flow = (fwd_rate + self._float_spread) * alpha * self._notional
             floatRate = fwd_rate
         else:
             flow = self._firstFixingRate * alpha * self._notional
@@ -210,22 +210,22 @@ class FinIborIborSwap
         self._floatFlowPVs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
 
-        prevDt = nextDt
-        df1_index = index_curve.df(prevDt)
+        prev_dt = nextDt
+        df1_index = index_curve.df(prev_dt)
 
         for nextDt in self._adjustedFloatDates[start_index + 1:]:
-            alpha = basis.year_frac(prevDt, nextDt)[0]
+            alpha = basis.year_frac(prev_dt, nextDt)[0]
             df2_index = index_curve.df(nextDt)
             # The accrual factors cancel
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self._floatSpread) * alpha * self._notional
+            flow = (fwd_rate + self._float_spread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
             df_discount = discount_curve.df(nextDt) / self._dfValuationDate
 
             pv += flow * df_discount
             df1_index = df2_index
-            prevDt = nextDt
+            prev_dt = nextDt
 
             self._floatFlows.append(flow)
             self._floatYearFracs.append(alpha)
@@ -244,16 +244,16 @@ class FinIborIborSwap
 
 ##########################################################################
 
-    def printFloatLegPV(self):
+    def print_float_leg_pv(self):
         """ Prints the floating leg dates, accrual factors, discount factors,
         forward libor rates, implied cash amounts, their present value and
         their cumulative PV using the last valuation performed. """
 
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
-        print("SPREAD COUPON (%):", self._floatSpread * 100)
-        print("FLOAT LEG FREQUENCY:", str(self._floatFrequencyType))
-        print("FLOAT LEG DAY COUNT:", str(self._floatDayCountType))
+        print("SPREAD COUPON (%):", self._float_spread * 100)
+        print("FLOAT LEG FREQUENCY:", str(self._float_frequency_type))
+        print("FLOAT LEG DAY COUNT:", str(self._float_day_count_type))
         print("VALUATION DATE", self._valuation_date)
 
         if len(self._floatFlows) == 0:
@@ -296,21 +296,21 @@ class FinIborIborSwap
 ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._effective_date)
-        s += labelToString("TERMINATION DATE", self._termination_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("SWAP TYPE", self._swapType)
-        s += labelToString("FIXED COUPON", self._fixedCoupon)
-        s += labelToString("FLOAT SPREAD", self._floatSpread)
-        s += labelToString("FIXED FREQUENCY", self._fixedFrequencyType)
-        s += labelToString("FLOAT FREQUENCY", self._floatFrequencyType)
-        s += labelToString("FIXED DAY COUNT", self._fixedDayCountType)
-        s += labelToString("FLOAT DAY COUNT", self._floatDayCountType)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUS DAY ADJUST", self._bus_day_adjust_type)
-        s += labelToString("DATE GEN TYPE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._effective_date)
+        s += label_to_string("TERMINATION DATE", self._termination_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("SWAP TYPE", self._swapType)
+        s += label_to_string("FIXED COUPON", self._fixed_coupon)
+        s += label_to_string("FLOAT SPREAD", self._float_spread)
+        s += label_to_string("FIXED FREQUENCY", self._fixed_frequency_type)
+        s += label_to_string("FLOAT FREQUENCY", self._float_frequency_type)
+        s += label_to_string("FIXED DAY COUNT", self._fixed_day_count_type)
+        s += label_to_string("FLOAT DAY COUNT", self._float_day_count_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUS DAY ADJUST", self._bus_day_adjust_type)
+        s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
         return s
 
 ###############################################################################

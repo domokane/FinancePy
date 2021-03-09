@@ -10,7 +10,7 @@ from ...utils.math import N
 from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...utils.global_types import FinOptionTypes
 from ...market.discount.curve import DiscountCurve

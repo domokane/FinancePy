@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import testMonotonicity
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 from ...utils.helpers import timesFromDates
 from ...utils.helpers import check_argument_types
 from ...utils.date import daysInMonth
@@ -95,14 +95,14 @@ class FinInflationIndexCurve():
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("BASE DATE", self._baseDate)
-        s += labelToString("INDEX LAG", self._lagInMonths)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("BASE DATE", self._baseDate)
+        s += label_to_string("INDEX LAG", self._lagInMonths)
 
-        s += labelToString("DATES", "ZERO RATES")
+        s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._indexValues)
         for i in range(0, num_points):
-            s += labelToString("%12s" % self._indexDates[i],
+            s += label_to_string("%12s" % self._indexDates[i],
                                "%10.7f" % self._indexValues[i])
 
         return s

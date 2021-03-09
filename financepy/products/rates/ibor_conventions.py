@@ -16,7 +16,7 @@ from ...utils.calendar import BusDayAdjustTypes
 ##########################################################################
 
 
-class FinIborConventions():
+class IborConventions():
 
     def __init__(self,
                  currencyName: str,

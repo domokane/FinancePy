@@ -7,7 +7,7 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 from ..utils.global_types import FinOptionTypes
 
 ###############################################################################
@@ -53,8 +53,8 @@ class FinModelBachelier():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VOLATILITY", self._volatility)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VOLATILITY", self._volatility)
         return s
 
 ###############################################################################

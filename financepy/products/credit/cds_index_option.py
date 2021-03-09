@@ -17,7 +17,7 @@ from ...products.credit.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.helpers import labelToString
+from ...utils.helpers import label_to_string
 
 RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
 
@@ -306,10 +306,10 @@ class CDSIndexOption:
         intH = 0.0
         intMaxH = 0.0
 
-        dayCount = DayCount(self._day_count_type)
+        day_count = DayCount(self._day_count_type)
         pcd = flow_dates[0]  # PCD
         eff = self._expiry_date
-        accrual_factorPCDToExpiry = dayCount.year_frac(pcd, eff)[0]
+        accrual_factorPCDToExpiry = day_count.year_frac(pcd, eff)[0]
 
         s0 = exp(-0.5 * sigma * sigma * texp)
 
@@ -340,17 +340,17 @@ class CDSIndexOption:
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
         cash flows """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("INDEX COUPON", self._index_coupon*10000, "bp\n")
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("LONG PROTECTION", self._long_protection)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("DAYCOUNT", self._day_count_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUSDAYRULE", self._bus_day_adjust_type)
-        s += labelToString("DATEGENRULE", self._date_gen_rule_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("INDEX COUPON", self._index_coupon*10000, "bp\n")
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("LONG PROTECTION", self._long_protection)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("DAYCOUNT", self._day_count_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
+        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
         return s
 
 ###############################################################################

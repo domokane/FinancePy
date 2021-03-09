@@ -13,20 +13,20 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
-from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
+from ...models.option_implied_dbn import optionImpliedDbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
-from ...utils.helpers import check_argument_types, labelToString
+from ...utils.helpers import check_argument_types, label_to_string
 from ...market.discount.curve import DiscountCurve
 
 from ...models.black_scholes import BlackScholes
 
-from ...models.volatility_fns import volFunctionClark
-from ...models.volatility_fns import volFunctionBloomberg
+from ...models.volatility_fns import vol_function_clark
+from ...models.volatility_fns import vol_Function_bloomberg
 from ...models.volatility_fns import FinVolFunctionTypes
-from ...models.sabr import volFunctionSABR
-from ...models.sabr import volFunctionSABR_BETA_ONE
-from ...models.sabr import volFunctionSABR_BETA_HALF
+from ...models.sabr import vol_function_sabr
+from ...models.sabr import vol_function_sabr_BETA_ONE
+from ...models.sabr import vol_function_sabr_BETA_HALF
 
 from ...utils.math import norminvcdf
 
@@ -34,7 +34,7 @@ from ...models.black_scholes_analytic import bs_value
 from ...products.fx.fx_vanilla_option import fastDelta
 from ...utils.distribution import FinDistribution
 
-from ...utils.FinSolvers1D import newton_secant
+from ...utils.solver_1d import newton_secant
 
 ###############################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
@@ -210,27 +210,27 @@ def solveToHorizonFAST(s, t,
 
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
-def volFunction(volFunctionTypeValue, params, f, k, t):
+def volFunction(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
     
-    if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
-        vol = volFunctionClark(params, f, k, t)
+    if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
+        vol = vol_function_clark(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
-        vol = volFunctionSABR(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
+        vol = vol_function_sabr(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = volFunctionSABR_BETA_ONE(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
+        vol = vol_function_sabr_BETA_ONE(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = volFunctionSABR_BETA_HALF(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
+        vol = vol_function_sabr_BETA_HALF(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
-        vol = volFunctionBloomberg(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
+        vol = vol_Function_bloomberg(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.CLARK5.value:
-        vol = volFunctionClark(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
+        vol = vol_function_clark(params, f, k, t)
         return vol
     else:
         raise FinError("Unknown Model Type")
@@ -1117,38 +1117,38 @@ class FXVolSurface():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VALUE DATE", self._valuation_date)
-        s += labelToString("FX RATE", self._spot_fx_rate)
-        s += labelToString("CCY PAIR", self._currency_pair)
-        s += labelToString("NOTIONAL CCY", self._notional_currency)
-        s += labelToString("NUM TENORS", self._numVolCurves)
-        s += labelToString("ATM METHOD", self._atmMethod)
-        s += labelToString("DELTA METHOD", self._deltaMethod)
-        s += labelToString("VOL FUNCTION", self._volatilityFunctionType)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VALUE DATE", self._valuation_date)
+        s += label_to_string("FX RATE", self._spot_fx_rate)
+        s += label_to_string("CCY PAIR", self._currency_pair)
+        s += label_to_string("NOTIONAL CCY", self._notional_currency)
+        s += label_to_string("NUM TENORS", self._numVolCurves)
+        s += label_to_string("ATM METHOD", self._atmMethod)
+        s += label_to_string("DELTA METHOD", self._deltaMethod)
+        s += label_to_string("VOL FUNCTION", self._volatilityFunctionType)
 
         for i in range(0, self._numVolCurves):
 
             s += "\n"
 
-            s += labelToString("TENOR", self._tenors[i])
-            s += labelToString("EXPIRY DATE", self._expiry_dates[i])
-            s += labelToString("TIME (YRS)", self._texp[i])
-            s += labelToString("FWD FX", self._F0T[i])
+            s += label_to_string("TENOR", self._tenors[i])
+            s += label_to_string("EXPIRY DATE", self._expiry_dates[i])
+            s += label_to_string("TIME (YRS)", self._texp[i])
+            s += label_to_string("FWD FX", self._F0T[i])
 
-            s += labelToString("ATM VOLS", self._atmVols[i]*100.0)
-            s += labelToString("MS VOLS", self._mktStrangle25DeltaVols[i]*100.0)
-            s += labelToString("RR VOLS", self._riskReversal25DeltaVols[i]*100.0)
+            s += label_to_string("ATM VOLS", self._atmVols[i]*100.0)
+            s += label_to_string("MS VOLS", self._mktStrangle25DeltaVols[i]*100.0)
+            s += label_to_string("RR VOLS", self._riskReversal25DeltaVols[i]*100.0)
 
-            s += labelToString("ATM Strike", self._K_ATM[i])
-            s += labelToString("ATM Delta", self._deltaATM[i])
+            s += label_to_string("ATM Strike", self._K_ATM[i])
+            s += label_to_string("ATM Delta", self._deltaATM[i])
  
-            s += labelToString("K_ATM", self._K_ATM[i])
-            s += labelToString("MS 25D Call Strike", self._K_25D_C_MS[i])
-            s += labelToString("MS 25D Put Strike", self._K_25D_P_MS[i])
-            s += labelToString("SKEW 25D CALL STRIKE", self._K_25D_C[i])
-            s += labelToString("SKEW 25D PUT STRIKE", self._K_25D_P[i])
-            s += labelToString("PARAMS", self._parameters[i])
+            s += label_to_string("K_ATM", self._K_ATM[i])
+            s += label_to_string("MS 25D Call Strike", self._K_25D_C_MS[i])
+            s += label_to_string("MS 25D Put Strike", self._K_25D_P_MS[i])
+            s += label_to_string("SKEW 25D CALL STRIKE", self._K_25D_C[i])
+            s += label_to_string("SKEW 25D PUT STRIKE", self._K_25D_P[i])
+            s += label_to_string("PARAMS", self._parameters[i])
 
         return s
 

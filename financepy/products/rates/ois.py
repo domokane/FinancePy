@@ -15,8 +15,8 @@ from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinSwapTypes
 from ...market.discount.curve import DiscountCurve
 
-from .FinFixedLeg import FinFixedLeg
-from .FinFloatLeg import FinFloatLeg
+from .swap_fixed_leg import SwapFixedLeg
+from .swap_float_leg import SwapFloatLeg
 
 ###############################################################################
 
@@ -31,7 +31,7 @@ class FinCompoundingTypes(Enum):
 
 ###############################################################################
 
-class FinOIS:
+class OIS:
     """ Class for managing overnight index rate swaps (OIS) and Fed Fund swaps. 
     This is a contract in which a fixed payment leg is exchanged for a payment
     which pays the rolled-up overnight index rate (OIR). There is no exchange
@@ -63,15 +63,15 @@ class FinOIS:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 fixed_legType: FinSwapTypes,
-                 fixedCoupon: float,  # Fixed coupon (annualised)
+                 fixed_leg_type: FinSwapTypes,
+                 fixed_coupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FrequencyTypes,
-                 fixedDayCountType: DayCountTypes,
+                 fixed_day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  payment_lag: int = 0,  # Number of days after period payment occurs
-                 floatSpread: float = 0.0,
+                 float_spread: float = 0.0,
                  floatFreqType: FrequencyTypes = FrequencyTypes.ANNUAL,
-                 floatDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
@@ -101,36 +101,36 @@ class FinOIS:
         self._effective_date = effective_date
 
         floatLegType = FinSwapTypes.PAY
-        if fixed_legType == FinSwapTypes.PAY:
+        if fixed_leg_type == FinSwapTypes.PAY:
             floatLegType = FinSwapTypes.RECEIVE
 
         principal = 0.0
 
-        self._fixed_leg = FinFixedLeg(effective_date,
-                                     self._termination_date,
-                                     fixed_legType,
-                                     fixedCoupon,
-                                     fixedFreqType,
-                                     fixedDayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
+        self._fixed_leg = SwapFixedLeg(effective_date,
+                                       self._termination_date,
+                                       fixed_leg_type,
+                                       fixed_coupon,
+                                       fixedFreqType,
+                                       fixed_day_count_type,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
-        self._floatLeg = FinFloatLeg(effective_date,
-                                     self._termination_date,
-                                     floatLegType,
-                                     floatSpread,
-                                     floatFreqType,
-                                     floatDayCountType,
-                                     notional,
-                                     principal,
-                                     payment_lag,
-                                     calendar_type,
-                                     bus_day_adjust_type,
-                                     date_gen_rule_type)
+        self._floatLeg = SwapFloatLeg(effective_date,
+                                      self._termination_date,
+                                      floatLegType,
+                                      float_spread,
+                                      floatFreqType,
+                                      float_day_count_type,
+                                      notional,
+                                      principal,
+                                      payment_lag,
+                                      calendar_type,
+                                      bus_day_adjust_type,
+                                      date_gen_rule_type)
 
 ###############################################################################
 
@@ -191,7 +191,7 @@ class FinOIS:
 
 ###############################################################################
 
-    def printFixedLegPV(self):
+    def print_fixed_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
@@ -199,7 +199,7 @@ class FinOIS:
 
 ###############################################################################
 
-    def printFloatLegPV(self):
+    def print_float_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
@@ -218,7 +218,7 @@ class FinOIS:
 ##########################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._fixed_leg.__repr__()
         s += "\n"
         s += self._floatLeg.__repr__()

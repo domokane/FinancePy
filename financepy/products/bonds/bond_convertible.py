@@ -15,7 +15,7 @@ from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.math import testMonotonicity
 from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 from ...utils.schedule import Schedule
 from ...utils.calendar import CalendarTypes
@@ -23,7 +23,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 
 from ...market.discount.curve import DiscountCurve
-from ...market.discount.interpolator import FinInterpTypes, _uinterpolate
+from ...market.discount.interpolator import InterpTypes, _uinterpolate
 
 
 ###############################################################################
@@ -51,7 +51,7 @@ def _value_convertible(tmat,
                        recRate,
                        # Tree details
                        num_steps_per_year):
-    interp = FinInterpTypes.FLAT_FWD_RATES.value
+    interp = InterpTypes.FLAT_FWD_RATES.value
 
     if len(coupon_times) > 0:
         if coupon_times[-1] > tmat:
@@ -92,20 +92,20 @@ def _value_convertible(tmat,
     if recRate > 0.999 or recRate < 0.0:
         raise FinError("Recovery rate must be between 0 and 0.999.")
 
-    numTimes = int(num_steps_per_year * tmat) + 1  # add one for today time 0
-    numTimes = num_steps_per_year  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
+    num_times = int(num_steps_per_year * tmat) + 1  # add one for today time 0
+    num_times = num_steps_per_year  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
 
-    if numTimes < 5:
+    if num_times < 5:
         raise FinError("Numsteps must be greater than 5.")
 
-    numLevels = numTimes
+    numLevels = num_times
 
     # this is the size of the step
-    dt = tmat / (numTimes - 1)
+    dt = tmat / (num_times - 1)
 
-    treeTimes = np.linspace(0.0, tmat, numTimes)
-    treeDfs = np.zeros(numTimes)
-    for i in range(0, numTimes):
+    treeTimes = np.linspace(0.0, tmat, num_times)
+    treeDfs = np.zeros(num_times)
+    for i in range(0, num_times):
         df = _uinterpolate(treeTimes[i], df_times, df_values, interp)
         treeDfs[i] = df
 
@@ -113,7 +113,7 @@ def _value_convertible(tmat,
     survProb = exp(-h * dt)
 
     # map coupons onto tree but preserve their present value using risky dfs
-    treeFlows = np.zeros(numTimes)
+    treeFlows = np.zeros(num_times)
     numCoupons = len(coupon_times)
     for i in range(0, numCoupons):
         flow_time = coupon_times[i]
@@ -126,15 +126,15 @@ def _value_convertible(tmat,
         treeFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
-    treeCallValue = np.ones(numTimes) * face_amount * 1000.0
+    tree_call_value = np.ones(num_times) * face_amount * 1000.0
     numCalls = len(call_times)
     for i in range(0, numCalls):
         call_time = call_times[i]
         n = int(round(call_time / dt, 0))
-        treeCallValue[n] = call_prices[i]
+        tree_call_value[n] = call_prices[i]
 
     # map puts onto tree
-    treePutValue = np.zeros(numTimes)
+    treePutValue = np.zeros(num_times)
     numPuts = len(put_times)
     for i in range(0, numPuts):
         put_time = put_times[i]
@@ -142,7 +142,7 @@ def _value_convertible(tmat,
         treePutValue[n] = put_prices[i]
 
     # map discrete dividend yields onto tree dates when they are made
-    treeDividendYield = np.zeros(numTimes)
+    treeDividendYield = np.zeros(num_times)
     numDividends = len(dividend_times)
     for i in range(0, numDividends):
         dividend_time = dividend_times[i]
@@ -151,7 +151,7 @@ def _value_convertible(tmat,
 
     # Set up the tree of stock prices using a 2D matrix (half the matrix is
     # unused but this may be a cost worth bearing for simpler code. Review.
-    treeStockValue = np.zeros(shape=(numTimes, numLevels))
+    treeStockValue = np.zeros(shape=(num_times, numLevels))
     e = stock_volatility ** 2 - h
     if e < 0.0:
         raise FinError("Volatility squared minus the hazard rate is negative.")
@@ -160,7 +160,7 @@ def _value_convertible(tmat,
     d = 1.0 / u
     u2 = u * u
     treeStockValue[0, 0] = stock_price
-    for iTime in range(1, numTimes):
+    for iTime in range(1, num_times):
         s = treeStockValue[iTime - 1, 0] * d
         treeStockValue[iTime, 0] = s
 
@@ -176,8 +176,8 @@ def _value_convertible(tmat,
     # set up the tree of conversion values. Before allowed to convert the
     # conversion value must be set equal to zero
 
-    treeConvertValue = np.zeros(shape=(numTimes, numLevels))
-    for iTime in range(0, numTimes):
+    treeConvertValue = np.zeros(shape=(num_times, numLevels))
+    for iTime in range(0, num_times):
         if treeTimes[iTime] >= startConvertTime:
             for iNode in range(0, iTime + 1):
                 s = treeStockValue[iTime, iNode]
@@ -185,13 +185,13 @@ def _value_convertible(tmat,
 
     #    print_tree(treeConvertValue)
 
-    treeConvBondValue = np.zeros(shape=(numTimes, numLevels))
+    treeConvBondValue = np.zeros(shape=(num_times, numLevels))
 
     # store probability of up move as a function of time on the tree
-    treeProbsUp = np.zeros(numTimes)
-    treeProbsDn = np.zeros(numTimes)
+    treeProbsUp = np.zeros(num_times)
+    treeProbsDn = np.zeros(num_times)
     q = 0.0  # we have discrete dividends paid as dividend yields only
-    for iTime in range(1, numTimes):
+    for iTime in range(1, num_times):
         a = treeDfs[iTime - 1] / treeDfs[iTime] * exp(-q * dt)
         treeProbsUp[iTime] = (a - d * survProb) / (u - d)
         treeProbsDn[iTime] = (u * survProb - a) / (u - d)
@@ -205,20 +205,20 @@ def _value_convertible(tmat,
     # work backwards by first setting values at bond maturity date
     ###########################################################################
 
-    flow = treeFlows[numTimes - 1]
+    flow = treeFlows[num_times - 1]
     bulletPV = (1.0 + flow) * face_amount
     for iNode in range(0, numLevels):
-        convValue = treeConvertValue[numTimes - 1, iNode]
-        treeConvBondValue[numTimes - 1, iNode] = max(bulletPV, convValue)
+        convValue = treeConvertValue[num_times - 1, iNode]
+        treeConvBondValue[num_times - 1, iNode] = max(bulletPV, convValue)
 
     #  begin backward steps from expiry
-    for iTime in range(numTimes - 2, -1, -1):
+    for iTime in range(num_times - 2, -1, -1):
 
         pUp = treeProbsUp[iTime + 1]
         pDn = treeProbsDn[iTime + 1]
         pDef = 1.0 - survProb
         df = treeDfs[iTime + 1] / treeDfs[iTime]
-        call = treeCallValue[iTime]
+        call = tree_call_value[iTime]
         put = treePutValue[iTime]
         flow = treeFlows[iTime]
 
@@ -584,24 +584,24 @@ class BondConvertible:
     def __repr__(self):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("COUPON", self._coupon)
-        s += labelToString("FREQUENCY", self._freq_type)
-        s += labelToString("ACCRUAL TYPE", self._accrual_type)
-        s += labelToString("FACE AMOUNT", self._face_amount)
-        s += labelToString("CONVERSION RATIO", self._conversionRatio)
-        s += labelToString("START CONVERT DATE", self._startConvertDate)
-        s += labelToString("CALL", "DATES")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("FACE AMOUNT", self._face_amount)
+        s += label_to_string("CONVERSION RATIO", self._conversionRatio)
+        s += label_to_string("START CONVERT DATE", self._startConvertDate)
+        s += label_to_string("CALL", "DATES")
 
         for i in range(0, len(self._call_dates)):
-            s += labelToString(self._call_dates[i],
+            s += label_to_string(self._call_dates[i],
                                self._call_prices[i])
 
-        s += labelToString("PUT", "DATES")
+        s += label_to_string("PUT", "DATES")
 
         for i in range(0, len(self._put_dates)):
-            s += labelToString(self._put_dates[i],
+            s += label_to_string(self._put_dates[i],
                                self._put_prices[i])
 
         return s
@@ -630,7 +630,7 @@ class BondConvertible:
 #        print("ACTUAL PV",pv)
 #
 #        pv = 0.0
-#        for i in range(0, numTimes):
+#        for i in range(0, num_times):
 #            t = treeTimes[i]
 #            df = uinterpolate(t, discount_times, discount_factors, interp)
 #            pv += df * treeFlows[i]

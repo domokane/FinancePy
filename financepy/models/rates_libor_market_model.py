@@ -30,7 +30,7 @@ useParallel = False
 from enum import Enum
 
 
-class FinRateModelLMMModelTypes(Enum):
+class ModelLMMModelTypes(Enum):
     LMM_ONE_FACTOR = 1
     LMM_HW_M_FACTOR = 2
     LMM_FULL_N_FACTOR = 3
@@ -42,14 +42,14 @@ def LMMPrintForwards(fwds):
     """ Helper function to display the simulated Ibor rates. """
 
     num_paths = len(fwds)
-    numTimes = len(fwds[0])
+    num_times = len(fwds[0])
     numFwds = len(fwds[0][0])
 
     if num_paths > 10:
         return
 
     for ip in range(0, num_paths):
-        for it in range(0, numTimes):
+        for it in range(0, num_times):
 
             print("Path: %3d Time: %3d" % (ip, it), end=""),
 
@@ -444,22 +444,22 @@ def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
     fwd = np.empty((num_paths, numForwards, numForwards))
     fwdB = np.zeros(numForwards)
 
-    numTimes = numForwards
+    num_times = numForwards
 
     if useSobol == 1:
-        numDimensions = numTimes
+        numDimensions = num_times
         rands = getUniformSobol(halfNumPaths, numDimensions)
-        gMatrix = np.empty((num_paths, numTimes))
+        gMatrix = np.empty((num_paths, num_times))
         for iPath in range(0, halfNumPaths):
-            for j in range(0, numTimes):
+            for j in range(0, num_times):
                 u = rands[iPath, j]
                 g = norminvcdf(u)
                 gMatrix[iPath, j] = g
                 gMatrix[iPath + halfNumPaths, j] = -g
     elif useSobol == 0:
-        gMatrix = np.empty((num_paths, numTimes))
+        gMatrix = np.empty((num_paths, num_times))
         for iPath in range(0, halfNumPaths):
-            for j in range(0, numTimes):
+            for j in range(0, num_times):
                 g = np.random.normal()
                 gMatrix[iPath, j] = g
                 gMatrix[iPath + halfNumPaths, j] = -g
@@ -531,14 +531,14 @@ def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
     fwd = np.empty((num_paths, numForwards, numForwards))
     fwdB = np.zeros(numForwards)
 
-    numTimes = numForwards
+    num_times = numForwards
 
     if useSobol == 1:
-        numDimensions = numTimes * numFactors
+        numDimensions = num_times * numFactors
         rands = getUniformSobol(halfNumPaths, numDimensions)
-        gMatrix = np.empty((num_paths, numTimes, numFactors))
+        gMatrix = np.empty((num_paths, num_times, numFactors))
         for iPath in range(0, halfNumPaths):
-            for j in range(0, numTimes):
+            for j in range(0, num_times):
                 for q in range(0, numFactors):
                     col = j*numFactors + q
                     u = rands[iPath, col]
@@ -546,9 +546,9 @@ def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
                     gMatrix[iPath, j, q] = g
                     gMatrix[iPath + halfNumPaths, j, q] = -g
     elif useSobol == 0:
-        gMatrix = np.empty((num_paths, numTimes, numFactors))
+        gMatrix = np.empty((num_paths, num_times, numFactors))
         for iPath in range(0, halfNumPaths):
-            for j in range(0, numTimes):
+            for j in range(0, num_times):
                 for q in range(0, numFactors):
                     g = np.random.normal()
                     gMatrix[iPath, j, q] = g

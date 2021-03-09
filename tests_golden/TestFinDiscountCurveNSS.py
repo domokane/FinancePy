@@ -29,13 +29,13 @@ def test_FinNelsonSiegelSvenssonCurve():
     dates = start_date.addYears(times)
 
     curve1 = DiscountCurveNSS(start_date, 1., 0., 0., 0., tau1, tau2)
-    factor1loading = curve1.zeroRate(dates)
+    factor1loading = curve1.zero_rate(dates)
     curve2 = DiscountCurveNSS(start_date, 0., 1., 0., 0., tau1, tau2)
-    factor2loading = curve2.zeroRate(dates)
+    factor2loading = curve2.zero_rate(dates)
     curve3 = DiscountCurveNSS(start_date, 0., 0., 1., 0., tau1, tau2)
-    factor3loading = curve3.zeroRate(dates)
+    factor3loading = curve3.zero_rate(dates)
     curve4 = DiscountCurveNSS(start_date, 0., 0., 0., 1., tau1, tau2)
-    factor4loading = curve4.zeroRate(dates)
+    factor4loading = curve4.zero_rate(dates)
 
     testCases.header("FACTOR LOADING ON ZERO RATES")
     testCases.print(factor1loading)
@@ -64,8 +64,8 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta4 = 0.08
     curve1 = DiscountCurveNSS(start_date,
                               beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates1 = curve1.zeroRate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zeroRates1)
+    zero_rates1 = curve1.zero_rate(dates)
+    testCases.print(beta1, beta2, beta3, beta4, zero_rates1)
 
     beta1 = 0.04
     beta2 = -0.02
@@ -73,8 +73,8 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta4 = 0.08
     curve2 = DiscountCurveNSS(start_date,
                               beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates2 = curve2.zeroRate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zeroRates2)
+    zero_rates2 = curve2.zero_rate(dates)
+    testCases.print(beta1, beta2, beta3, beta4, zero_rates2)
 
     beta1 = 0.05
     beta2 = -0.02
@@ -82,8 +82,8 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta4 = 0.08
     curve3 = DiscountCurveNSS(start_date,
                               beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates3 = curve3.zeroRate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zeroRates3)
+    zero_rates3 = curve3.zero_rate(dates)
+    testCases.print(beta1, beta2, beta3, beta4, zero_rates3)
 
     beta1 = 0.06
     beta2 = -0.02
@@ -91,8 +91,8 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta4 = 0.08
     curve4 = DiscountCurveNSS(start_date,
                               beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates4 = curve4.zeroRate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zeroRates4)
+    zero_rates4 = curve4.zero_rate(dates)
+    testCases.print(beta1, beta2, beta3, beta4, zero_rates4)
 
     beta1 = 0.07
     beta2 = -0.02
@@ -100,16 +100,16 @@ def test_FinNelsonSiegelSvenssonCurve():
     beta4 = 0.08
     curve5 = DiscountCurveNSS(start_date,
                               beta1, beta2, beta3, beta4, tau1, tau2)
-    zeroRates5 = curve5.zeroRate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zeroRates5)
+    zero_rates5 = curve5.zero_rate(dates)
+    testCases.print(beta1, beta2, beta3, beta4, zero_rates5)
 
     if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
-        plt.plot(times, scale(zeroRates1, 100), label='beta1=3%')
-        plt.plot(times, scale(zeroRates2, 100), label='beta1=4%')
-        plt.plot(times, scale(zeroRates3, 100), label='beta1=5%')
-        plt.plot(times, scale(zeroRates4, 100), label='beta1=6%')
-        plt.plot(times, scale(zeroRates5, 100), label='beta1=7%')
+        plt.plot(times, scale(zero_rates1, 100), label='beta1=3%')
+        plt.plot(times, scale(zero_rates2, 100), label='beta1=4%')
+        plt.plot(times, scale(zero_rates3, 100), label='beta1=5%')
+        plt.plot(times, scale(zero_rates4, 100), label='beta1=6%')
+        plt.plot(times, scale(zero_rates5, 100), label='beta1=7%')
         plt.ylim((0, 7.5))
 
         plt.title('Nelson-Siegel Zero Rate Curves')

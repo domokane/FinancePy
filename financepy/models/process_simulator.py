@@ -10,7 +10,7 @@ import numpy as np
 
 from ..utils.error import FinError
 from ..utils.math import norminvcdf
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 
 ###############################################################################
 

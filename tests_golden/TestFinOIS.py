@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.math import ONE_MILLION
-from financepy.products.rates.FinOIS import FinOIS
+from financepy.products.rates.ois import OIS
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -28,26 +28,26 @@ def test_FinFixedOIS():
 
     end_date = effective_date.addMonths(60)
     oisRate = 0.04
-    fixed_legType = FinSwapTypes.PAY
+    fixed_leg_type = FinSwapTypes.PAY
     fixedFreqType = FrequencyTypes.ANNUAL
     fixedDayCount = DayCountTypes.ACT_360
     floatFreqType = FrequencyTypes.ANNUAL
     floatDayCount = DayCountTypes.ACT_360
-    floatSpread = 0.0
+    float_spread = 0.0
     notional = ONE_MILLION
     payment_lag = 1
     
-    ois = FinOIS(effective_date,
-                 end_date,
-                 fixed_legType,
-                 oisRate,
-                 fixedFreqType,
-                 fixedDayCount,
-                 notional,
-                 payment_lag,
-                 floatSpread,
-                 floatFreqType,
-                 floatDayCount)
+    ois = OIS(effective_date,
+              end_date,
+              fixed_leg_type,
+              oisRate,
+              fixedFreqType,
+              fixedDayCount,
+              notional,
+              payment_lag,
+              float_spread,
+              floatFreqType,
+              floatDayCount)
 
 #    print(ois)
 

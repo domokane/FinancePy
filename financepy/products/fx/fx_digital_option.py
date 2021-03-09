@@ -13,7 +13,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 #from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_types import FinOptionTypes
 
 ###############################################################################

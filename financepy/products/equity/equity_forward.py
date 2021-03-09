@@ -9,7 +9,7 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinLongShort
 from ...utils.error import FinError
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
 # ADD START DATE TO CLASS ?
@@ -103,11 +103,11 @@ class EquityForward():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("FORWARD PRICE", self._forwardPrice)
-        s += labelToString("LONG OR SHORT", self._longShort)
-        s += labelToString("NOTIONAL", self._notional, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("FORWARD PRICE", self._forwardPrice)
+        s += label_to_string("LONG OR SHORT", self._longShort)
+        s += label_to_string("NOTIONAL", self._notional, "")
         return s
 
 ###############################################################################

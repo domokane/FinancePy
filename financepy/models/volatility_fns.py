@@ -30,7 +30,7 @@ class FinVolFunctionTypes(Enum):
 
 @njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
-def volFunctionClark(params, f, k, t):
+def vol_function_clark(params, f, k, t):
     """ Volatility Function in book by Iain Clark generalised to allow for 
     higher than quadratic power. Care needs to be taken to avoid overfitting. 
     The exact reference is Clark Page 59. """
@@ -58,7 +58,7 @@ def volFunctionClark(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionBloomberg(params, f, k, t):
+def vol_Function_bloomberg(params, f, k, t):
     """ Volatility Function similar to the one used by Bloomberg. It is 
     a quadratic function in the spot delta of the option. It can therefore 
     go negative so it requires a good initial guess when performing the 
@@ -93,7 +93,7 @@ def volFunctionBloomberg(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
            fastmath=True, cache=True)
-def volFunctionSVI(params, f, k, t):
+def vol_function_svi(params, f, k, t):
     """ Volatility Function proposed by Gatheral in 2004. Increasing a results 
     in a vertical translation of the smile in the positive direction. 
     Increasing b decreases the angle between the put and call wing, i.e. 
@@ -206,7 +206,7 @@ def SSVI_LocalVarg(x, gamma, sigma, rho, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSSVI(params, f, k, t):
+def vol_function_ssvi(params, f, k, t):
     """ Volatility Function proposed by Gatheral in 2004."""
  
     gamma = params[0]

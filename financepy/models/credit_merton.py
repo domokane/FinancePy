@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import norm
 N = norm.cdf
 
-from ..utils.helpers import labelToString, check_argument_types
+from ..utils.helpers import label_to_string, check_argument_types
 
 # TODO: Redesign this class
 
@@ -140,12 +140,12 @@ class FinModelMertonCredit():
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("ASSET VALUE", self._A)
-        s += labelToString("BOND FACE", self._L)
-        s += labelToString("YEARS TO MATURITY", self._t)
-        s += labelToString("ASSET GROWTH", self._mu)
-        s += labelToString("ASSET VOLATILITY", self._vA)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ASSET VALUE", self._A)
+        s += label_to_string("BOND FACE", self._L)
+        s += label_to_string("YEARS TO MATURITY", self._t)
+        s += label_to_string("ASSET GROWTH", self._mu)
+        s += label_to_string("ASSET VOLATILITY", self._vA)
         return s
 
 ###############################################################################

@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 from ..utils.global_types import FinOptionTypes
 from ..utils.math import N
 from ..utils.error import FinError
-from ..utils.helpers import labelToString
+from ..utils.helpers import label_to_string
 
 ###############################################################################
 ###############################################################################
@@ -24,7 +24,7 @@ def _x(rho, z):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSABR(params, f, k, t):
+def vol_function_sabr(params, f, k, t):
     """ Black volatility implied by SABR model. """
 
     alpha = params[0]
@@ -66,7 +66,7 @@ def volFunctionSABR(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSABR_BETA_ONE(params, f, k, t):
+def vol_function_sabr_BETA_ONE(params, f, k, t):
     """ This is the SABR function with the exponent beta set equal to 1 so only
     3 parameters are free. The first parameter is alpha, then nu and the third 
     parameter is rho. Check the order as it is not the same as main SABR fn"""
@@ -111,7 +111,7 @@ def volFunctionSABR_BETA_ONE(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSABR_BETA_HALF(params, f, k, t):
+def vol_function_sabr_BETA_HALF(params, f, k, t):
     """ Black volatility implied by SABR model. """
 
     alpha = params[0]
@@ -181,25 +181,25 @@ class FinModelSABR():
         if isinstance(f, np.ndarray):
             vols = []
             for x in f:
-                v = volFunctionSABR(params, x, k, t)
+                v = vol_function_sabr(params, x, k, t)
                 vols.append(v)
             return np.array(vols)
 
         elif isinstance(k, np.ndarray):
             vols = []
             for x in k:
-                v = volFunctionSABR(params, f, x, t)
+                v = vol_function_sabr(params, f, x, t)
                 vols.append(v)
             return np.array(vols)
 
         elif isinstance(t, np.ndarray):
             vols = []
             for x in t:
-                v = volFunctionSABR(params, f, k, x)
+                v = vol_function_sabr(params, f, k, x)
                 vols.append(v)
             return np.array(vols)
         else:
-            v = volFunctionSABR(params, f, k, t)
+            v = vol_function_sabr(params, f, k, t)
             return v
 
 ###############################################################################
@@ -297,11 +297,11 @@ class FinModelSABR():
     def __repr__(self):
         """ Return string with class details. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("Alpha", self._alpha)
-        s += labelToString("Beta", self._beta)
-        s += labelToString("Nu", self._nu)
-        s += labelToString("Rho", self._rho)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("Alpha", self._alpha)
+        s += label_to_string("Beta", self._beta)
+        s += label_to_string("Nu", self._nu)
+        s += label_to_string("Rho", self._rho)
         return s
 
 ###############################################################################

@@ -10,7 +10,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...utils.global_types import FinOptionTypes
 
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.calendar import BusDayAdjustTypes
@@ -149,15 +149,15 @@ class EquityCliquetOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._start_date)
-        s += labelToString("FINAL EXPIRY DATE", self._finalExpiryDate)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("FREQUENCY TYPE", self._freq_type)
-        s += labelToString("DAY COUNT TYPE", self._day_count_type)
-        s += labelToString("CALENDAR TYPE", self._calendar_type)
-        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
-        s += labelToString("DATE GEN RULE TYPE", self._date_gen_rule_type, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._start_date)
+        s += label_to_string("FINAL EXPIRY DATE", self._finalExpiryDate)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("FREQUENCY TYPE", self._freq_type)
+        s += label_to_string("DAY COUNT TYPE", self._day_count_type)
+        s += label_to_string("CALENDAR TYPE", self._calendar_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
+        s += label_to_string("DATE GEN RULE TYPE", self._date_gen_rule_type, "")
         return s
 
 ###############################################################################

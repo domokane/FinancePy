@@ -8,8 +8,8 @@ import copy
 
 from ...finutils.FinError import FinError
 from ...finutils.Date import Date
-from ...finutils.FinHelperFunctions import labelToString
-from ...finutils.FinHelperFunctions import check_argument_types, _funcName
+from ...finutils.FinHelperFunctions import label_to_string
+from ...finutils.FinHelperFunctions import check_argument_types, _func_name
 from ...finutils.FinGlobalVariables import gDaysInYear
 from ...market.curves.FinInterpolator import FinInterpTypes, FinInterpolator
 from ...market.curves.FinDiscountCurve import FinDiscountCurve
@@ -89,7 +89,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
         The curve will assign a discount factor of 1.0 to the valuation date.
         """
 
-        check_argument_types(getattr(self, _funcName(), None), locals())
+        check_argument_types(getattr(self, _func_name(), None), locals())
 
         self._valuation_date = valuation_date
         self._discount_curve = discount_curve
@@ -150,12 +150,12 @@ class FinIborDualCurveOLD(FinDiscountCurve):
         # Ensure order of depos
         if numDepos > 1:
 
-            prevDt = iborDeposits[0]._maturity_date
+            prev_dt = iborDeposits[0]._maturity_date
             for depo in iborDeposits[1:]:
                 nextDt = depo._maturity_date
-                if nextDt <= prevDt:
+                if nextDt <= prev_dt:
                     raise FinError("Deposits must be in increasing maturity")
-                prevDt = nextDt
+                prev_dt = nextDt
 
         # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
         # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
@@ -174,12 +174,12 @@ class FinIborDualCurveOLD(FinDiscountCurve):
                     raise FinError("FRAs starts before valuation date")
 
         if numFRAs > 1:
-            prevDt = iborFRAs[0]._maturity_date
+            prev_dt = iborFRAs[0]._maturity_date
             for fra in iborFRAs[1:]:
                 nextDt = fra._maturity_date
-                if nextDt <= prevDt:
+                if nextDt <= prev_dt:
                     raise FinError("FRAs must be in increasing maturity")
-                prevDt = nextDt
+                prev_dt = nextDt
 
         if numSwaps > 0:
 
@@ -207,12 +207,12 @@ class FinIborDualCurveOLD(FinDiscountCurve):
                     raise FinError("Swaps must all have same start date.")
 
             # Swaps must be increasing in tenor/maturity
-            prevDt = iborSwaps[0]._maturity_date
+            prev_dt = iborSwaps[0]._maturity_date
             for swap in iborSwaps[1:]:
                 nextDt = swap._maturity_date
-                if nextDt <= prevDt:
+                if nextDt <= prev_dt:
                     raise FinError("Swaps must be in increasing maturity")
-                prevDt = nextDt
+                prev_dt = nextDt
 
             # Swaps must have same cash flows for bootstrap to work
             longestSwap = iborSwaps[-1]
@@ -300,7 +300,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
         # probably not be used to build an indexed Libor curve from
         for depo in self._usedDeposits:
             dfSettle = self.df(depo._start_date)
-            dfMat = depo._maturityDf() * dfSettle
+            dfMat = depo._maturity_df() * dfSettle
             tmat = (depo._maturity_date - self._valuation_date) / gDaysInYear
             self._times = np.append(self._times, tmat)
             self._dfs = np.append(self._dfs, dfMat)
@@ -317,7 +317,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
             # solve for 2 discount factors simultaneously using root search
 
             if tset < oldtmat and tmat > oldtmat:
-                dfMat = fra.maturityDf(self)
+                dfMat = fra.maturity_df(self)
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
             else:
@@ -367,7 +367,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
 
     #     for depo in self._usedDeposits:
     #         dfSettle = self.df(depo._effective_date)
-    #         dfMat = depo._maturityDf() * dfSettle
+    #         dfMat = depo._maturity_df() * dfSettle
     #         tmat = (depo._maturity_date - self._valuation_date) / gDaysInYear
     #         self._times = np.append(self._times, tmat)
     #         self._dfs = np.append(self._dfs, dfMat)
@@ -384,7 +384,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
     #         # solve for 2 discount factors simultaneously using root search
 
     #         if tset < oldtmat and tmat > oldtmat:
-    #             dfMat = fra.maturityDf(self)
+    #             dfMat = fra.maturity_df(self)
     #             self._times = np.append(self._times, tmat)
     #             self._dfs = np.append(self._dfs, dfMat)
     #             self._interpolator.fit(self._times, self._dfs)
@@ -440,7 +440,7 @@ class FinIborDualCurveOLD(FinDiscountCurve):
     #     # may be different from the maturity date due to a holiday adjustment
     #     # and the swap rates need to align with the coupon payment dates
     #     for swap in self._usedSwaps:
-    #         swap_rate = swap._fixedCoupon
+    #         swap_rate = swap._fixed_coupon
     #         maturity_date = swap._adjustedFixedDates[-1]
     #         tswap = (maturity_date - self._valuation_date) / gDaysInYear
     #         swapTimes.append(tswap)
@@ -514,8 +514,8 @@ class FinIborDualCurveOLD(FinDiscountCurve):
             if abs(v) > swapTol:
                 print("Swap with maturity " + str(swap._maturity_date)
                       + " Not Repriced. Has Value", v)
-                swap.printFixedLegPV()
-                swap.printFloatLegPV()
+                swap.print_fixed_leg_pv()
+                swap.print_float_leg_pv()
                 raise FinError("Swap not repriced.")
 
 ###############################################################################
@@ -523,28 +523,28 @@ class FinIborDualCurveOLD(FinDiscountCurve):
     def __repr__(self):
         """ Print out the details of the Ibor curve. """
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VALUATION DATE", self._valuation_date)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VALUATION DATE", self._valuation_date)
 
         for depo in self._usedDeposits:
-            s += labelToString("DEPOSIT", "")
+            s += label_to_string("DEPOSIT", "")
             s += depo.__repr__()
 
         for fra in self._usedFRAs:
-            s += labelToString("FRA", "")
+            s += label_to_string("FRA", "")
             s += fra.__repr__()
 
         for swap in self._usedSwaps:
-            s += labelToString("SWAP", "")
+            s += label_to_string("SWAP", "")
             s += swap.__repr__()
 
         num_points = len(self._times)
 
-        s += labelToString("INTERP TYPE", self._interp_type)
-        s += labelToString("GRID TIMES", "GRID DFS")
+        s += label_to_string("INTERP TYPE", self._interp_type)
+        s += label_to_string("GRID TIMES", "GRID DFS")
 
         for i in range(0, num_points):
-            s += labelToString("% 10.6f" % self._times[i],
+            s += label_to_string("% 10.6f" % self._times[i],
                                "%12.10f" % self._dfs[i])
         return s
 

@@ -11,7 +11,7 @@ from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.error import FinError
 from ...utils.global_types import FinOptionTypes
 from ...products.equity.equity_option import EquityOption
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.discount.curve import DiscountCurve
 
@@ -166,11 +166,11 @@ class EquityDigitalOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("EXPIRY DATE", self._expiry_date)
-        s += labelToString("BARRIER LEVEL", self._barrierPrice)
-        s += labelToString("OPTION TYPE", self._option_type)
-        s += labelToString("UNDERLYING TYPE", self._underlyingType, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("BARRIER LEVEL", self._barrierPrice)
+        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("UNDERLYING TYPE", self._underlyingType, "")
         return s
 
 ###############################################################################

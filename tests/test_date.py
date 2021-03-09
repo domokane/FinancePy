@@ -43,16 +43,16 @@ def test_Date():
 
     startDate = Date(1, 1, 2018)
 
-    for numMonths in range(0, 120):
-        nextCDSDate = startDate.nextCDSDate(numMonths)
-        print(str(startDate), numMonths, str(nextCDSDate))
+    for num_months in range(0, 120):
+        nextCDSDate = startDate.nextCDSDate(num_months)
+        print(str(startDate), num_months, str(nextCDSDate))
 
     startDate = Date(1, 1, 2018)
 
-    for numMonths in range(0, 365):
+    for num_months in range(0, 365):
         startDate = startDate.addDays(1)
         nextIMMDate = startDate.nextIMMDate()
-        print(numMonths, str(startDate), str(nextIMMDate))
+        print(num_months, str(startDate), str(nextIMMDate))
 
 
 def test_DateTenors():

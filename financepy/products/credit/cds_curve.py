@@ -8,12 +8,12 @@ import scipy.optimize as optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
-from ...market.discount.interpolator import _uinterpolate, FinInterpTypes
+from ...market.discount.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, tableToString
 from ...utils.day_count import DayCount
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.helpers import check_argument_types, _funcName
-from ...utils.helpers import labelToString
+from ...utils.helpers import check_argument_types, _func_name
+from ...utils.helpers import label_to_string
 
 
 ###############################################################################
@@ -47,12 +47,12 @@ class CDSCurve:
                  libor_curve,
                  recovery_rate: float = 0.40,
                  use_cache: bool = False,
-                 interpolation_method: FinInterpTypes = FinInterpTypes.FLAT_FWD_RATES):
+                 interpolation_method: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method. """
 
-        check_argument_types(getattr(self, _funcName(), None), locals())
+        check_argument_types(getattr(self, _func_name(), None), locals())
 
         if valuation_date != libor_curve._valuation_date:
             raise FinError("Ibor curve does not have same valuation date as Issuer curve.")
@@ -145,13 +145,13 @@ class CDSCurve:
         """ Construct the CDS survival curve from a set of CDS contracts """
 
         self._validate(self._cds_contracts)
-        numTimes = len(self._cds_contracts)
+        num_times = len(self._cds_contracts)
 
         # we size the vectors to include time zero
         self._times = np.array([0.0])
         self._values = np.array([1.0])
 
-        for i in range(0, numTimes):
+        for i in range(0, num_times):
 
             maturity_date = self._cds_contracts[i]._maturity_date
 
@@ -190,8 +190,8 @@ class CDSCurve:
         if date2 < date1:
             raise FinError("Date2 must not be before Date1")
 
-        dayCount = DayCount(day_count_type)
-        year_frac = dayCount.year_frac(date1, date2)[0]
+        day_count = DayCount(day_count_type)
+        year_frac = day_count.year_frac(date1, date2)[0]
         df1 = self.df(date1)
         df2 = self.df(date2)
         fwd = (df1 / df2 - 1.0) / year_frac
@@ -199,7 +199,7 @@ class CDSCurve:
 
 ##############################################################################
 
-    def zeroRate(self,
+    def zero_rate(self,
                  dt,
                  freq_type=FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to date dt in the chosen compounding
@@ -212,18 +212,18 @@ class CDSCurve:
         dfq = df * q
 
         if f == 0:  # Simple interest
-            zeroRate = (1.0/dfq-1.0)/t
+            zero_rate = (1.0/dfq-1.0)/t
         if f == -1:  # Continuous
-            zeroRate = -np.log(dfq) / t
+            zero_rate = -np.log(dfq) / t
         else:
-            zeroRate = (dfq**(-1.0/t) - 1) * f
-        return zeroRate
+            zero_rate = (dfq**(-1.0/t) - 1) * f
+        return zero_rate
 
 ##############################################################################
 
     def __repr__(self):
         """ Print out the details of the survival probability curve. """
-        s = labelToString("OBJECT TYPE", type(self).__name__)    
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
         valueTable = [self._times, self._values]
         precision = "10.7f"

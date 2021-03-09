@@ -9,12 +9,13 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount
 from ...utils.day_count import DayCountTypes
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
+
 
 ###############################################################################
 
 
-class FinIborDeposit:
+class IborDeposit:
     """ An Ibor deposit is an agreement to borrow money interbank at the Ibor
     fixing rate starting on the start date and repaid on the maturity date
     with the interest amount calculated according to a day count convention and
@@ -35,12 +36,12 @@ class FinIborDeposit:
     deposit contract. """
 
     def __init__(self,
-                 start_date: Date,  #  When the interest starts to accrue
+                 start_date: Date,  # When the interest starts to accrue
                  maturity_date_or_tenor: (Date, str),  # Repayment of interest
                  deposit_rate: float,  # MM rate using simple interest
                  day_count_type: DayCountTypes,  # How year fraction is calculated
                  notional: float = 100.0,  # Amount borrowed
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,  #  Holidays for maturity date
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,  # Holidays for maturity date
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
@@ -63,7 +64,7 @@ class FinIborDeposit:
         calendar = Calendar(self._calendar_type)
 
         maturity_date = calendar.adjust(maturity_date,
-                                       self._bus_day_adjust_type)
+                                        self._bus_day_adjust_type)
         if start_date > maturity_date:
             raise FinError("Start date cannot be after maturity date")
 
@@ -75,15 +76,15 @@ class FinIborDeposit:
 
     ###########################################################################
 
-    def _maturityDf(self):
+    def _maturity_df(self):
         """ Returns the maturity date discount factor that would allow the
         Libor curve to reprice the contractual market deposit rate. Note that
         this is a forward discount factor that starts on settlement date."""
 
         dc = DayCount(self._day_count_type)
         acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        discountFactor = 1.0 / (1.0 + acc_factor * self._deposit_rate)
-        return discountFactor
+        df = 1.0 / (1.0 + acc_factor * self._deposit_rate)
+        return df
 
     ###########################################################################
 
@@ -112,7 +113,7 @@ class FinIborDeposit:
     ###########################################################################
 
     def print_flows(self,
-                   valuation_date: Date):
+                    valuation_date: Date):
         """ Print the date and size of the future repayment. """
 
         dc = DayCount(self._day_count_type)
@@ -124,14 +125,14 @@ class FinIborDeposit:
 
     def __repr__(self):
         """ Print the contractual details of the Libor deposit. """
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("START DATE", self._start_date)
-        s += labelToString("MATURITY DATE", self._maturity_date)
-        s += labelToString("NOTIONAL", self._notional)
-        s += labelToString("DEPOSIT RATE", self._deposit_rate)
-        s += labelToString("DAY COUNT TYPE", self._day_count_type)
-        s += labelToString("CALENDAR", self._calendar_type)
-        s += labelToString("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self._start_date)
+        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("DEPOSIT RATE", self._deposit_rate)
+        s += label_to_string("DAY COUNT TYPE", self._day_count_type)
+        s += label_to_string("CALENDAR", self._calendar_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
         return s
 
     ###########################################################################

@@ -10,7 +10,7 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve import DiscountCurve
 from financepy.utils.math import scale
 
@@ -33,7 +33,7 @@ def test_FinDiscountCurve():
     dfs = np.exp(-rate * years)
     dates = start_date.addYears(years)
 
-    curve = DiscountCurve(start_date, dates, dfs, FinInterpTypes.FLAT_FWD_RATES)
+    curve = DiscountCurve(start_date, dates, dfs, InterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
@@ -41,19 +41,19 @@ def test_FinDiscountCurve():
     plotDates = start_date.addYears(plotYears)
 
     # Examine dependency of curve on compounding rate
-    zeroRates_A = curve.zeroRate(plotDates, FrequencyTypes.ANNUAL)
-    zeroRates_S = curve.zeroRate(plotDates, FrequencyTypes.SEMI_ANNUAL)
-    zeroRates_Q = curve.zeroRate(plotDates, FrequencyTypes.QUARTERLY)
-    zeroRates_M = curve.zeroRate(plotDates, FrequencyTypes.MONTHLY)
-    zeroRates_C = curve.zeroRate(plotDates, FrequencyTypes.CONTINUOUS)
+    zero_rates_A = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
+    zero_rates_S = curve.zero_rate(plotDates, FrequencyTypes.SEMI_ANNUAL)
+    zero_rates_Q = curve.zero_rate(plotDates, FrequencyTypes.QUARTERLY)
+    zero_rates_M = curve.zero_rate(plotDates, FrequencyTypes.MONTHLY)
+    zero_rates_C = curve.zero_rate(plotDates, FrequencyTypes.CONTINUOUS)
 
     if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
-        plt.plot(plotYears, scale(zeroRates_A, 100), label='A')
-        plt.plot(plotYears, scale(zeroRates_S, 100), label='S')
-        plt.plot(plotYears, scale(zeroRates_Q, 100), label='Q')
-        plt.plot(plotYears, scale(zeroRates_M, 100), label='M')
-        plt.plot(plotYears, scale(zeroRates_C, 100), label='C')
+        plt.plot(plotYears, scale(zero_rates_A, 100), label='A')
+        plt.plot(plotYears, scale(zero_rates_S, 100), label='S')
+        plt.plot(plotYears, scale(zero_rates_Q, 100), label='Q')
+        plt.plot(plotYears, scale(zero_rates_M, 100), label='M')
+        plt.plot(plotYears, scale(zero_rates_C, 100), label='C')
         plt.ylim((5, 8))
 
         plt.title('Discount Curves')
@@ -63,17 +63,17 @@ def test_FinDiscountCurve():
 
     # Examine dependency of fwd curve on the interpolation scheme
 
-    for interp in FinInterpTypes:
+    for interp in InterpTypes:
 
         curve = DiscountCurve(start_date, dates, dfs, interp)
         fwd_rates = curve.fwd(plotDates)
-        zeroRates = curve.zeroRate(plotDates, FrequencyTypes.ANNUAL)
+        zero_rates = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
         parRates = curve.swap_rate(start_date, plotDates, FrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))
             plt.plot(plotYears, scale(fwd_rates, 100), label='FWD RATES')
-            plt.plot(plotYears, scale(zeroRates, 100), label='ZERO RATES')
+            plt.plot(plotYears, scale(zero_rates, 100), label='ZERO RATES')
             plt.plot(plotYears, scale(parRates, 100), label='PAR RATES')
             plt.ylim((3.0, 8.5))
 

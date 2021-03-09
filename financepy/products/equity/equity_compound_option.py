@@ -19,7 +19,7 @@ from ...products.equity.equity_option import EquityOption
 from ...products.equity.equity_vanilla_option import EquityVanillaOption
 from ...market.discount.curve_flat import DiscountCurve
 from ...market.discount.curve_flat import DiscountCurveFlat
-from ...utils.helpers import labelToString, check_argument_types
+from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
 ###############################################################################
@@ -378,7 +378,7 @@ class EquityCompoundOption(EquityOption):
         dq = dividend_curve.df(self._uExpiryDate)
         q = -np.log(dq)/tu
 
-        r = discount_curve.zeroRate(self._uExpiryDate)
+        r = discount_curve.zero_rate(self._uExpiryDate)
 
         volatility = model._volatility
 
@@ -423,13 +423,13 @@ class EquityCompoundOption(EquityOption):
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("CPD EXPIRY DATE", self._cExpiryDate)
-        s += labelToString("CPD STRIKE PRICE", self._cStrikePrice)
-        s += labelToString("CPD OPTION TYPE", self._cOptionType)
-        s += labelToString("UND EXPIRY DATE", self._uExpiryDate)
-        s += labelToString("UND STRIKE PRICE", self._uStrikePrice)
-        s += labelToString("UND OPTION TYPE", self._uOptionType)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("CPD EXPIRY DATE", self._cExpiryDate)
+        s += label_to_string("CPD STRIKE PRICE", self._cStrikePrice)
+        s += label_to_string("CPD OPTION TYPE", self._cOptionType)
+        s += label_to_string("UND EXPIRY DATE", self._uExpiryDate)
+        s += label_to_string("UND STRIKE PRICE", self._uStrikePrice)
+        s += label_to_string("UND OPTION TYPE", self._uOptionType)
         return s
 
 ###############################################################################

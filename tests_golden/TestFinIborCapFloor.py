@@ -10,11 +10,11 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import FinCapFloorTypes
-from financepy.products.rates.FinIborCapFloor import FinIborCapFloor
-from financepy.products.rates.IborSwap import FinIborSwap
-from financepy.products.rates.IborSwap import FinSwapTypes
-from financepy.products.rates.FinIborDeposit import FinIborDeposit
-from financepy.products.rates.FinIborSingleCurve import IborSingleCurve
+from financepy.products.rates.ibor_cap_floor import IborCapFloor
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_swap import FinSwapTypes
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -27,7 +27,7 @@ from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.global_types import FinSwapTypes
 
 from financepy.market.discount.curve_zeros import DiscountCurveZeros
-from financepy.market.discount.interpolator import FinInterpTypes
+from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
 from financepy.models.black import FinModelBlack
@@ -56,9 +56,9 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     settlement_date = valuation_date.addWeekDays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = FinIborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
-    depo2 = FinIborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
-    depo3 = FinIborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -69,12 +69,12 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     swaps = []
     fixedBasis = DayCountTypes.ACT_365F
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    fixed_legType = FinSwapTypes.PAY
+    fixed_leg_type = FinSwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = FinIborSwap(settlement_date, "1Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
-    swap2 = FinIborSwap(settlement_date, "3Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
-    swap3 = FinIborSwap(settlement_date, "5Y", fixed_legType, swap_rate, fixedFreq, fixedBasis)
+    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
+    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
+    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -116,7 +116,7 @@ def test_FinIborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
-        capfloor = FinIborCapFloor(start_date, maturity_date, capFloorType, k)
+        capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
         cvalue1 = capfloor.value(valuation_date, libor_curve, model1)
         cvalue2 = capfloor.value(valuation_date, libor_curve, model2)
         cvalue3 = capfloor.value(valuation_date, libor_curve, model3)
@@ -130,7 +130,7 @@ def test_FinIborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = FinIborCapFloor(start_date, maturity_date, capFloorType, k)
+        capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
         fvalue1 = capfloor.value(valuation_date, libor_curve, model1)
         fvalue2 = capfloor.value(valuation_date, libor_curve, model2)
         fvalue3 = capfloor.value(valuation_date, libor_curve, model3)
@@ -148,7 +148,7 @@ def test_FinIborCapFloor():
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
-        capfloor = FinIborCapFloor(start_date, maturity_date, capFloorType, k)
+        capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
         cvalue1 = capfloor.value(valuation_date, libor_curve, model1)
         cvalue2 = capfloor.value(valuation_date, libor_curve, model2)
         cvalue3 = capfloor.value(valuation_date, libor_curve, model3)
@@ -157,7 +157,7 @@ def test_FinIborCapFloor():
         cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
 
         capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = FinIborCapFloor(start_date, maturity_date, capFloorType, k)
+        capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
         fvalue1 = capfloor.value(valuation_date, libor_curve, model1)
         fvalue2 = capfloor.value(valuation_date, libor_curve, model2)
         fvalue3 = capfloor.value(valuation_date, libor_curve, model3)
@@ -191,21 +191,21 @@ def test_FinIborCapFloorVolCurve():
 
     k = 0.04
     capFloorType = FinCapFloorTypes.CAP
-    capFloor = FinIborCapFloor(valuation_date,
-                                maturity_date,
-                                capFloorType,
-                                k,
-                                None,
-                                frequency,
-                                day_count_type)
+    capFloor = IborCapFloor(valuation_date,
+                            maturity_date,
+                            capFloorType,
+                            k,
+                            None,
+                            frequency,
+                            day_count_type)
 
     capVolDates = Schedule(valuation_date,
                            valuation_date.addTenor("10Y"),
                            frequency)._generate()
 
-    flatRate = 0.04
+    flat_rate = 0.04
     libor_curve = DiscountCurveFlat(valuation_date,
-                                    flatRate,
+                                    flat_rate,
                                     frequency,
                                     day_count_type)
 
@@ -275,13 +275,13 @@ def test_FinIborCapletHull():
 
     k = 0.08
     capFloorType = FinCapFloorTypes.CAP
-    capFloor = FinIborCapFloor(valuation_date,
-                                maturity_date,
-                                capFloorType,
-                                k,
-                                None,
-                                FrequencyTypes.QUARTERLY,
-                                DayCountTypes.THIRTY_E_360)
+    capFloor = IborCapFloor(valuation_date,
+                            maturity_date,
+                            capFloorType,
+                            k,
+                            None,
+                            FrequencyTypes.QUARTERLY,
+                            DayCountTypes.THIRTY_E_360)
 
     # Value cap using a single flat cap volatility
     model = FinModelBlack(0.20)
@@ -326,7 +326,7 @@ def test_FinIborCapFloorQLExample():
                                         rates,
                                         freq_type,
                                         day_count_type,
-                                        FinInterpTypes.LINEAR_ZERO_RATES)
+                                        InterpTypes.LINEAR_ZERO_RATES)
 
     start_date = Date(14, 6, 2016)
     end_date = Date(14, 6, 2026)
@@ -340,9 +340,9 @@ def test_FinIborCapFloorQLExample():
     option_type = FinCapFloorTypes.CAP
     strikeRate = 0.02
 
-    cap = FinIborCapFloor(start_date, end_date, option_type, strikeRate,
-                           lastFixing, freq_type,  day_count_type, notional,
-                           calendar_type, bus_day_adjust_type, date_gen_rule_type)
+    cap = IborCapFloor(start_date, end_date, option_type, strikeRate,
+                       lastFixing, freq_type, day_count_type, notional,
+                       calendar_type, bus_day_adjust_type, date_gen_rule_type)
 
     blackVol = 0.547295
     model = FinModelBlack(blackVol)

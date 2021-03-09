@@ -12,18 +12,18 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
-from ...models.FinModelOptionImpliedDbn import optionImpliedDbn
-from ...utils.helpers import check_argument_types, labelToString
+from ...models.option_implied_dbn import optionImpliedDbn
+from ...utils.helpers import check_argument_types, label_to_string
 from ...market.discount.curve import DiscountCurve
 
 from ...models.volatility_fns import FinVolFunctionTypes
-from ...models.volatility_fns import volFunctionClark
-from ...models.volatility_fns import volFunctionBloomberg
-from ...models.volatility_fns import volFunctionSVI
-from ...models.volatility_fns import volFunctionSSVI
-from ...models.sabr import volFunctionSABR
-from ...models.sabr import volFunctionSABR_BETA_ONE
-from ...models.sabr import volFunctionSABR_BETA_HALF
+from ...models.volatility_fns import vol_function_clark
+from ...models.volatility_fns import vol_Function_bloomberg
+from ...models.volatility_fns import vol_function_svi
+from ...models.volatility_fns import vol_function_ssvi
+from ...models.sabr import vol_function_sabr
+from ...models.sabr import vol_function_sabr_BETA_ONE
+from ...models.sabr import vol_function_sabr_BETA_HALF
 
 from ...utils.math import norminvcdf
 
@@ -31,8 +31,8 @@ from ...models.black_scholes_analytic import bs_delta
 
 from ...utils.distribution import FinDistribution
 
-from ...utils.FinSolvers1D import newton_secant
-from ...utils.FinSolversNM import nelder_mead
+from ...utils.solver_1d import newton_secant
+from ...utils.solver_nm import nelder_mead
 from ...utils.global_types import FinSolverTypes
 
 ###############################################################################
@@ -129,33 +129,33 @@ def _solveToHorizon(s, t, r, q,
 
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
-def volFunction(volFunctionTypeValue, params, f, k, t):
+def volFunction(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
 
-    if volFunctionTypeValue == FinVolFunctionTypes.CLARK.value:
-        vol = volFunctionClark(params, f, k, t)
+    if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
+        vol = vol_function_clark(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = volFunctionSABR_BETA_ONE(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
+        vol = vol_function_sabr_BETA_ONE(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = volFunctionSABR_BETA_HALF(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
+        vol = vol_function_sabr_BETA_HALF(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.BBG.value:
-        vol = volFunctionBloomberg(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
+        vol = vol_Function_bloomberg(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SABR.value:
-        vol = volFunctionSABR(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
+        vol = vol_function_sabr(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.CLARK5.value:
-        vol = volFunctionClark(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
+        vol = vol_function_clark(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SVI.value:
-        vol = volFunctionSVI(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SVI.value:
+        vol = vol_function_svi(params, f, k, t)
         return vol
-    elif volFunctionTypeValue == FinVolFunctionTypes.SSVI.value:
-        vol = volFunctionSSVI(params, f, k, t)
+    elif vol_function_type_value == FinVolFunctionTypes.SSVI.value:
+        vol = vol_function_ssvi(params, f, k, t)
         return vol
     else:
         raise FinError("Unknown Model Type")
@@ -771,18 +771,18 @@ class EquityVolSurface:
 ###############################################################################
 
     def __repr__(self):
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("VALUE DATE", self._valuation_date)
-        s += labelToString("STOCK PRICE", self._stock_price)
-        s += labelToString("VOL FUNCTION", self._volatilityFunctionType)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("VALUE DATE", self._valuation_date)
+        s += label_to_string("STOCK PRICE", self._stock_price)
+        s += label_to_string("VOL FUNCTION", self._volatilityFunctionType)
 
         for i in range(0, self._numExpiryDates):
-            s += labelToString("EXPIRY DATE", self._expiry_dates[i])
+            s += label_to_string("EXPIRY DATE", self._expiry_dates[i])
 
         for i in range(0, self._numStrikes):
-            s += labelToString("STRIKE", self._strikes[i])
+            s += label_to_string("STRIKE", self._strikes[i])
 
-        s += labelToString("EQUITY VOL GRID", self._volatility_grid)
+        s += label_to_string("EQUITY VOL GRID", self._volatility_grid)
  
         return s
 
