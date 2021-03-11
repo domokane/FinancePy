@@ -245,3 +245,7 @@ def test_DateEOM():
     dt = Date(7, 12, 2010)
     assert dt.EOM().isEOM() == True
 
+def test_datetime():
+    
+    dt = Date(30, 12, 2021)
+    assert dt.datetime()

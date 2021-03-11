@@ -730,7 +730,7 @@ def extractParams(functionSignature):
 
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
-        # This allows us to parse 'Union[FinDate, str]' for maturity_date_or_tenor.
+        # This allows us to parse 'Union[Date, str]' for maturity_date_or_tenor.
         if line.find("[") != -1 or line.find("(") != -1:
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []

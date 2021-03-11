@@ -340,7 +340,7 @@ def test_BondOptionZEROVOLConvergence():
     bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
     # Option Details
-    expiry_date = settlement_date.addTenor("18m") # FinDate(1, 12, 2021)
+    expiry_date = settlement_date.addTenor("18m") # Date(1, 12, 2021)
 #    print("EXPIRY:", expiry_date)
     face = 100.0
 

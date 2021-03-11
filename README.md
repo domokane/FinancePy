@@ -63,7 +63,7 @@ Contact me at quant@financepy.com.
 
 The underlying Python library is split into a number of major modules:
 
-* Finutils - These are utility functions used to assist you with modelling a security. These include dates (FinDate), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
+* Finutils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
 * Market - These are modules that capture the market information used to value a security. These include interest rate and credit curves, volatility surfaces and prices.
 * Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models.
 * Products - These are the actual securities and range from Government bonds to Bermudan swaptions.

@@ -32,10 +32,10 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     startYear = 2020
 #     endYear = 2030
-#     valuation_date = FinDate(1, 1, startYear)
-#     exercise_date = FinDate(1, 1, 2023)
+#     valuation_date = Date(1, 1, startYear)
+#     exercise_date = Date(1, 1, 2023)
 #     settlement_date = valuation_date
-#     maturity_date = FinDate(1, 1, endYear)
+#     maturity_date = Date(1, 1, endYear)
 #     fixed_coupon = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
@@ -100,7 +100,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         valuation_date = FinDate(1, 1, 2010)
+#         valuation_date = Date(1, 1, 2010)
 #         libor_curve = FinDiscountCurveFlat(valuation_date, r,
 #                                           FrequencyTypes.QUARTERLY)
 #         settlement_date = valuation_date
@@ -146,9 +146,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # years which in our convention means we are modelling 10 forwards
 #     startYear = 2020
 #     endYear = 2030
-#     valuation_date = FinDate(1, 1, startYear)
+#     valuation_date = Date(1, 1, startYear)
 #     settlement_date = valuation_date
-#     capMaturityDate = FinDate(1, 1, endYear)
+#     capMaturityDate = Date(1, 1, endYear)
 #     freq_type = FrequencyTypes.ANNUAL
 #     day_count_type = DayCountTypes.ACT_360
 #     capFloorRate = 0.04

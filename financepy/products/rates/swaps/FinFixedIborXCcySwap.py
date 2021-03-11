@@ -2,22 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...finutils.FinError import FinError
-from ...finutils.Date import Date
-from ...finutils.FinGlobalVariables import gSmall
-from ...finutils.FinDayCount import FinDayCount, DayCountTypes
-from ...finutils.FinFrequency import FrequencyTypes, FinFrequency
-from ...finutils.FinCalendar import CalendarTypes,  DateGenRuleTypes
-from ...finutils.FinCalendar import FinCalendar, BusDayAdjustTypes
-from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinHelperFunctions import label_to_string, check_argument_types
-from ...finutils.FinMath import ONE_MILLION
-from ...finutils.FinGlobalTypes import FinSwapTypes
+from ...utils.FinError import FinError
+from ...utils.Date import Date
+from ...utils.FinGlobalVariables import gSmall
+from ...utils.FinDayCount import FinDayCount, DayCountTypes
+from ...utils.FinFrequency import FrequencyTypes, FinFrequency
+from ...utils.FinCalendar import CalendarTypes,  DateGenRuleTypes
+from ...utils.FinCalendar import FinCalendar, BusDayAdjustTypes
+from ...utils.FinSchedule import FinSchedule
+from ...utils.FinHelperFunctions import label_to_string, check_argument_types
+from ...utils.FinMath import ONE_MILLION
+from ...utils.FinGlobalTypes import FinSwapTypes
 
 ##########################################################################
 
 
-class FinFixedIborXCcySwap
+class FinFixedIborXCcySwap:
     """ Class for managing a cross currency swap contract. This is a contract
     in which a fixed payment leg in one currency is exchanged for floating
     payments in a second currency. There is an exchange of par at maturity.

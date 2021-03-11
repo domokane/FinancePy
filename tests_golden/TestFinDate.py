@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 setDateFormatType(DateFormatTypes.UK_LONGEST)
 
-def test_FinDate():
+def test_Date():
 
     start_date = Date(1, 1, 2018)
 
@@ -43,7 +43,7 @@ def test_FinDate():
 ###############################################################################
 
 
-def test_FinDateTenors():
+def test_DateTenors():
 
     start_date = Date(23, 2, 2018)
 
@@ -81,7 +81,7 @@ def test_FinDateTenors():
 ###############################################################################
 
 
-def test_FinDateRange():
+def test_DateRange():
 
     start_date = Date(1, 1, 2010)
 
@@ -108,7 +108,7 @@ def test_FinDateRange():
 ###############################################################################
 
 
-def test_FinDateAddMonths():
+def test_DateAddMonths():
 
     start_date = Date(1, 1, 2010)
 
@@ -126,7 +126,7 @@ def test_FinDateAddMonths():
 ###############################################################################
 
 
-def test_FinDateAddYears():
+def test_DateAddYears():
 
     start_date = Date(1, 1, 2010)
 
@@ -158,7 +158,7 @@ def test_FinDateAddYears():
 ###############################################################################
 
 
-def test_FinDateSpeed():
+def test_DateSpeed():
 
     num_steps = 100
     start = time.time()
@@ -179,7 +179,7 @@ def test_FinDateSpeed():
 ###############################################################################
 
 
-def test_FinDateFormat():
+def test_DateFormat():
 
     dt = Date(20, 10, 2019)
     testCases.header("FORMAT", "DATE")
@@ -226,7 +226,7 @@ def test_IntraDay():
 
 ###############################################################################
 
-def test_FinDateEOM():
+def test_DateEOM():
 
     dt = Date(29, 2, 2000)
     assert(dt.isEOM() == True)
@@ -280,15 +280,15 @@ def test_FinDateEOM():
     
 start = time.time()
 
-test_FinDate()
-test_FinDateTenors()
-test_FinDateRange()
-test_FinDateAddMonths()
-test_FinDateAddYears()
-test_FinDateSpeed()
-test_FinDateFormat()
+test_Date()
+test_DateTenors()
+test_DateRange()
+test_DateAddMonths()
+test_DateAddYears()
+test_DateSpeed()
+test_DateFormat()
 test_IntraDay()
-test_FinDateEOM()
+test_DateEOM()
 
 end = time.time()
 elapsed = end - start

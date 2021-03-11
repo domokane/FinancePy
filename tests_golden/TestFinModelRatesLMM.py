@@ -51,7 +51,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
 
 """ def getVolCurve(numFwds, dt, flatVol=None):
 
-    valuation_date = FinDate(1, 1, 2020)
+    valuation_date = Date(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
@@ -148,7 +148,7 @@ def getForwardCurve(numFwds, r):
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         valuation_date = FinDate(1, 1, 2010)
+#         valuation_date = Date(1, 1, 2010)
 #         libor_curve = FinDiscountCurveFlat(valuation_date, r,
 #                                           FrequencyTypes.QUARTERLY)
 
