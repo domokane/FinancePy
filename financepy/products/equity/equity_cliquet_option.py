@@ -34,7 +34,7 @@ class EquityCliquetOption(EquityOption):
 
     def __init__(self,
                  start_date: Date,
-                 finalExpiryDate: Date,
+                 final_expiry_date: Date,
                  option_type: FinOptionTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
@@ -51,11 +51,11 @@ class EquityCliquetOption(EquityOption):
            option_type != FinOptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
-        if finalExpiryDate < start_date:
+        if final_expiry_date < start_date:
             raise FinError("Expiry date precedes start date")
 
         self._start_date = start_date
-        self._finalExpiryDate = finalExpiryDate
+        self._final_expiry_date = final_expiry_date
         self._option_type = option_type
         self._freq_type = freq_type
         self._day_count_type = day_count_type
@@ -64,7 +64,7 @@ class EquityCliquetOption(EquityOption):
         self._date_gen_rule_type = date_gen_rule_type
 
         self._expiry_dates = Schedule(self._start_date,
-                                     self._finalExpiryDate,
+                                     self._final_expiry_date,
                                      self._freq_type,
                                      self._calendar_type,
                                      self._bus_day_adjust_type,
@@ -81,7 +81,7 @@ class EquityCliquetOption(EquityOption):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
 
-        if valuation_date > self._finalExpiryDate:
+        if valuation_date > self._final_expiry_date:
             raise FinError("Value date after final expiry date.")
 
         s = stock_price
@@ -142,8 +142,8 @@ class EquityCliquetOption(EquityOption):
 ###############################################################################
 
     def print_flows(self):
-        numOptions = len(self._v_options)
-        for i in range(0, numOptions):
+        num_options = len(self._v_options)
+        for i in range(0, num_options):
             print(self._actualDates[i], self._dfs[i], self._v_options[i])
 
 ###############################################################################
@@ -151,7 +151,7 @@ class EquityCliquetOption(EquityOption):
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START DATE", self._start_date)
-        s += label_to_string("FINAL EXPIRY DATE", self._finalExpiryDate)
+        s += label_to_string("FINAL EXPIRY DATE", self._final_expiry_date)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("FREQUENCY TYPE", self._freq_type)
         s += label_to_string("DAY COUNT TYPE", self._day_count_type)

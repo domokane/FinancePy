@@ -31,7 +31,7 @@ class IborFuture:
                  futureNumber: int,  # The number of the future after todayDate
                  futureTenor: str = "3M",  # '1M', '2M', '3M'
                  accrual_type: DayCountTypes = DayCountTypes.ACT_360,
-                 contractSize: float = ONE_MILLION):
+                 contract_size: float = ONE_MILLION):
         """ Create an interest rate futures contract which has the same
         conventions as those traded on the CME. The current date, the tenor of
         the future, the number of the future and the accrual convention and
@@ -54,7 +54,7 @@ class IborFuture:
 
         self._lastTradingDate = self._delivery_date.addDays(-2)
         self._accrual_type = accrual_type
-        self._contractSize = contractSize
+        self._contract_size = contract_size
 
 ###############################################################################
 
@@ -69,7 +69,7 @@ class IborFuture:
                       self._endOfInterestPeriod,
                       fraRate,
                       self._accrual_type,
-                      notional=self._contractSize,
+                      notional=self._contract_size,
                       payFixedRate=False)
 
         return fra
@@ -139,7 +139,7 @@ class IborFuture:
         s += label_to_string("DELIVERY DATE", self._delivery_date)
         s += label_to_string("END INTEREST PERIOD", self._endOfInterestPeriod)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("CONTRACT SIZE", self._contractSize)
+        s += label_to_string("CONTRACT SIZE", self._contract_size)
         return s
 
 ##########################################################################

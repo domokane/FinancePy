@@ -25,9 +25,9 @@ def test_EquityDigitalOption():
     expiry_date = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.30
-    interestRate = 0.05
+    interest_rate = 0.05
     dividendYield = 0.01
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
     
     model = BlackScholes(volatility)

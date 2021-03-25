@@ -394,7 +394,7 @@ class FXVolSurface():
                  riskReversal25DeltaVols: (list, np.ndarray),
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
-                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
+                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
         """ Create the FinFXVolSurface object by passing in market vol data
         for ATM and 25 Delta Market Strangles and Risk Reversals. """
 
@@ -446,7 +446,7 @@ class FXVolSurface():
         else:
             raise FinError("Unknown Delta Type")
 
-        self._volatilityFunctionType = volatilityFunctionType
+        self._volatility_function_type = volatility_function_type
         self._tenorIndex = 0
 
         self._expiry_dates = []
@@ -463,7 +463,7 @@ class FXVolSurface():
         surface given the option strike and expiry date. Linear interpolation
         is done in variance x time. """
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         index0 = 0
         index1 = 0
@@ -533,20 +533,20 @@ class FXVolSurface():
         s = self._spot_fx_rate
         numVolCurves = self._numVolCurves
 
-        if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
             num_parameters = 5
         else:
-            print(self._volatilityFunctionType)
+            print(self._volatility_function_type)
             raise FinError("Unknown Model Type")
 
         self._parameters = np.zeros([numVolCurves, num_parameters])
@@ -611,7 +611,7 @@ class FXVolSurface():
             s50 = atmVol
             s75 = atmVol + ms25 - rr25/2.0
 
-            if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+            if self._volatility_function_type == FinVolFunctionTypes.CLARK:
 
                 # Fit to 25D
                 c0 = np.log(atmVol)
@@ -619,7 +619,7 @@ class FXVolSurface():
                 c2 = 8.0 * np.log(s25*s75/atmVol/atmVol)
                 xinit = [c0, c1, c2]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            elif self._volatility_function_type == FinVolFunctionTypes.SABR:
                 # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
@@ -629,21 +629,21 @@ class FXVolSurface():
 
                 xinit = [alpha, beta, rho, nu]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 xinit = [alpha, nu, rho]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 xinit = [alpha, rho, nu]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+            elif self._volatility_function_type == FinVolFunctionTypes.BBG:
 
                 # BBG Params if we fit to 25D
                 a = 8.0*s75-16.0*s50+8.0*s25
@@ -652,7 +652,7 @@ class FXVolSurface():
 
                 xinit = [a, b, c]
 
-            elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+            elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
 
                 # Fit to 25D
                 c0 = np.log(atmVol)
@@ -667,7 +667,7 @@ class FXVolSurface():
             xinits.append(xinit)
 
         deltaMethodValue = self._deltaMethod.value
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         for i in range(0, numVolCurves):
             
@@ -710,7 +710,7 @@ class FXVolSurface():
         argtuple = (self, s0, tdel, rd, rf, option_type_value,
                     inverseDeltaTarget, tenorIndex)
         
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         argtuple = (volTypeValue, s0, tdel, rd, rf, option_type_value,
                     self._deltaMethod.value, 
@@ -773,7 +773,7 @@ class FXVolSurface():
                 print("CNT_CPD_RF:%9.6f %%"% (self._rf[i]*100))
                 print("FWD_RATE:  %9.6f"% (self._F0T[i]))
  
-            sigma_ATM_out = volFunction(self._volatilityFunctionType.value,
+            sigma_ATM_out = volFunction(self._volatility_function_type.value,
                                         self._parameters[i],
                                         self._F0T[i],
                                         self._K_ATM[i],
@@ -781,7 +781,7 @@ class FXVolSurface():
 
             if verbose:
                 print("==========================================================")
-                print("VOL FUNCTION", self._volatilityFunctionType)
+                print("VOL FUNCTION", self._volatility_function_type)
                 print("VOL_PARAMETERS:", self._parameters[i])
                 print("==========================================================")
                 print("OUT_K_ATM:  %9.6f" % (self._K_ATM[i]))
@@ -878,7 +878,7 @@ class FXVolSurface():
             ###################################################################
 
             # CALL
-            sigma_K_25D_C_MS = volFunction(self._volatilityFunctionType.value,
+            sigma_K_25D_C_MS = volFunction(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C_MS[i],
@@ -899,7 +899,7 @@ class FXVolSurface():
                                     model)[self._deltaMethodString]
 
             # PUT
-            sigma_K_25D_P_MS = volFunction(self._volatilityFunctionType.value,
+            sigma_K_25D_P_MS = volFunction(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P_MS[i],
@@ -944,7 +944,7 @@ class FXVolSurface():
             call._strike_fx_rate = self._K_25D_C[i]
             put._strike_fx_rate = self._K_25D_P[i]
 
-            sigma_K_25D_C = volFunction(self._volatilityFunctionType.value,
+            sigma_K_25D_C = volFunction(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C[i],
@@ -959,7 +959,7 @@ class FXVolSurface():
                                     self._for_discount_curve,
                                     model)[self._deltaMethodString]
 
-            sigma_K_25D_P = volFunction(self._volatilityFunctionType.value,
+            sigma_K_25D_P = volFunction(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P[i],
@@ -1026,7 +1026,7 @@ class FXVolSurface():
 
                 k = lowFX + iK*dFX                
 
-                vol = volFunction(self._volatilityFunctionType.value, 
+                vol = volFunction(self._volatility_function_type.value,
                                       self._parameters[iTenor], 
                                       f, k, texp)
 
@@ -1050,7 +1050,7 @@ class FXVolSurface():
 
         plt.figure()
 
-        volTypeVal = self._volatilityFunctionType.value
+        volTypeVal = self._volatility_function_type.value
 
         for tenorIndex in range(0, self._numVolCurves):
 
@@ -1085,7 +1085,7 @@ class FXVolSurface():
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = "25D FIT:" + self._currency_pair + " " + str(self._volatilityFunctionType)
+            title = "25D FIT:" + self._currency_pair + " " + str(self._volatility_function_type)
 
             keyStrikes = []
             keyStrikes.append(self._K_ATM[tenorIndex])
@@ -1125,7 +1125,7 @@ class FXVolSurface():
         s += label_to_string("NUM TENORS", self._numVolCurves)
         s += label_to_string("ATM METHOD", self._atmMethod)
         s += label_to_string("DELTA METHOD", self._deltaMethod)
-        s += label_to_string("VOL FUNCTION", self._volatilityFunctionType)
+        s += label_to_string("VOL FUNCTION", self._volatility_function_type)
 
         for i in range(0, self._numVolCurves):
 

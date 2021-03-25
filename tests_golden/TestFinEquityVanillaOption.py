@@ -28,10 +28,10 @@ def test_EquityVanillaOption():
     expiry_date = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
-    interestRate = 0.05
+    interest_rate = 0.05
     dividendYield = 0.01
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     num_pathsList = [10000, 20000, 40000, 80000, 160000, 320000]
@@ -163,9 +163,9 @@ def testImpliedVolatility_NEW():
 
     valuation_date = Date(1, 1, 2015)
     stock_price = 100.0
-    interestRate = 0.05
+    interest_rate = 0.05
     dividendYield = 0.03
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     strikes = np.linspace(50, 150, 11)

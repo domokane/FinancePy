@@ -27,9 +27,9 @@ def test_EquityRainbowOption():
 
     valuation_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
-    interestRate = 0.05
+    interest_rate = 0.05
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
 
     num_assets = 2
     volatilities = np.ones(num_assets) * 0.3

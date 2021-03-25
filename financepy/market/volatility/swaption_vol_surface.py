@@ -394,7 +394,7 @@ class SwaptionVolSurface():
                  fwd_swap_rates: (list, np.ndarray),
                  strike_grid: (np.ndarray),
                  volatility_grid: (np.ndarray),
-                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.SABR,
+                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.SABR,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
         """ Create the FinSwaptionVolSurface object by passing in market vol 
         data for a list of strikes and expiry dates. """
@@ -425,7 +425,7 @@ class SwaptionVolSurface():
         self._volatility_grid = volatility_grid
 
         self._expiry_dates = expiry_dates
-        self._volatilityFunctionType = volatilityFunctionType
+        self._volatility_function_type = volatility_function_type
 
         self._fwd_swap_rates = fwd_swap_rates
 
@@ -446,7 +446,7 @@ class SwaptionVolSurface():
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         index0 = 0 # lower index in bracket
         index1 = 0 # upper index in bracket
@@ -523,7 +523,7 @@ class SwaptionVolSurface():
 
     #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-    #     volTypeValue = self._volatilityFunctionType.value
+    #     volTypeValue = self._volatility_function_type.value
 
     #     s = self._spot_fx_rate
 
@@ -625,7 +625,7 @@ class SwaptionVolSurface():
 
     #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-    #     volTypeValue = self._volatilityFunctionType.value
+    #     volTypeValue = self._volatility_function_type.value
 
     #     s = self._spot_fx_rate
 
@@ -733,24 +733,24 @@ class SwaptionVolSurface():
     def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
-        if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
             num_parameters = 5
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SVI:
+        elif self._volatility_function_type == FinVolFunctionTypes.SVI:
             num_parameters = 5
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SSVI:
+        elif self._volatility_function_type == FinVolFunctionTypes.SSVI:
             num_parameters = 5
         else:
-            print(self._volatilityFunctionType)
+            print(self._volatility_function_type)
             raise FinError("Unknown Model Type")
 
         numExpiryDates = self._numExpiryDates
@@ -772,7 +772,7 @@ class SwaptionVolSurface():
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         xinits = []
         xinit = np.zeros(num_parameters)
@@ -861,7 +861,7 @@ class SwaptionVolSurface():
 
     #             k = lowS + iK*dS
 
-    #             vol = volFunction(self._volatilityFunctionType.value, 
+    #             vol = volFunction(self._volatility_function_type.value,
     #                               self._parameters[iTenor], 
     #                               f, k, t)
 
@@ -884,7 +884,7 @@ class SwaptionVolSurface():
         """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
         
-        volTypeVal = self._volatilityFunctionType.value
+        volTypeVal = self._volatility_function_type.value
 
         for tenorIndex in range(0, self._numExpiryDates):
 
@@ -921,7 +921,7 @@ class SwaptionVolSurface():
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = str(self._volatilityFunctionType)
+            title = str(self._volatility_function_type)
             plt.title(title)
             plt.legend()
 
@@ -933,7 +933,7 @@ class SwaptionVolSurface():
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("ATM METHOD", self._atmMethod)
         s += label_to_string("DELTA METHOD", self._deltaMethod)
-        s += label_to_string("VOL FUNCTION", self._volatilityFunctionType)
+        s += label_to_string("VOL FUNCTION", self._volatility_function_type)
 
         for i in range(0, self._numExpiryDates):
 

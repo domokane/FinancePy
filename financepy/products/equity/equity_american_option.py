@@ -30,7 +30,7 @@ class EquityAmericanOption(EquityOption):
                  expiry_date: Date,
                  strike_price: float,
                  option_type: FinOptionTypes,
-                 numOptions: float = 1.0):
+                 num_options: float = 1.0):
         """ Class for American style options on simple vanilla calls and puts.
         Specify the expiry date, strike price, whether the option is a call or
         put and the number of options. """
@@ -46,7 +46,7 @@ class EquityAmericanOption(EquityOption):
         self._expiry_date = expiry_date
         self._strike_price = strike_price
         self._option_type = option_type
-        self._numOptions = numOptions
+        self._num_options = num_options
 
 ###############################################################################
 
@@ -83,7 +83,7 @@ class EquityAmericanOption(EquityOption):
 
         v = model.value(s, texp, k, r, q, self._option_type)
                     
-        v = v * self._numOptions
+        v = v * self._num_options
 
         if isinstance(s, float):
             return v
@@ -97,7 +97,7 @@ class EquityAmericanOption(EquityOption):
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("NUMBER", self._numOptions, "")
+        s += label_to_string("NUMBER", self._num_options, "")
         return s
 
 ###############################################################################

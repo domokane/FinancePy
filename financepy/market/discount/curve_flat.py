@@ -89,7 +89,7 @@ class DiscountCurveFlat(DiscountCurve):
                                  self._valuation_date,
                                  self._day_count_type)
 
-        dfs = self._zeroToDf(self._valuation_date,
+        dfs = self._zero_to_df(self._valuation_date,
                              self._flat_rate,
                              dc_times,
                              self._freq_type,

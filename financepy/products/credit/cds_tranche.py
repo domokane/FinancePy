@@ -93,15 +93,15 @@ class CDSTranche:
 
     ###############################################################################
 
-    def valueBC(self,
-                valuation_date,
-                issuer_curves,
-                upfront,
-                running_coupon,
-                corr1,
-                corr2,
-                num_points=50,
-                model=FinLossDistributionBuilder.RECURSION):
+    def value_bc(self,
+                 valuation_date,
+                 issuer_curves,
+                 upfront,
+                 running_coupon,
+                 corr1,
+                 corr2,
+                 num_points=50,
+                 model=FinLossDistributionBuilder.RECURSION):
 
         num_credits = len(issuer_curves)
         k1 = self._k1

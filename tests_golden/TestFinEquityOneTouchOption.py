@@ -23,7 +23,7 @@ def test_EquityOneTouchOption():
 
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(2, 7, 2016)
-    interestRate = 0.10
+    interest_rate = 0.10
     volatility = 0.20
     barrier_level = 100.0  # H
     model = BlackScholes(volatility)
@@ -31,7 +31,7 @@ def test_EquityOneTouchOption():
     num_paths = 10000
     num_steps_per_year = 252
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     stock_price = 105.0

@@ -21,24 +21,24 @@ def test_EquityChooserOptionHaug():
 
     valuation_date = Date(1, 1, 2015)
     chooseDate = Date(2, 4, 2015)
-    callExpiryDate = Date(1, 7, 2015)
-    putExpiryDate = Date(2, 8, 2015)
-    callStrike = 55.0
-    putStrike = 48.0
+    call_expiry_date = Date(1, 7, 2015)
+    put_expiry_date = Date(2, 8, 2015)
+    call_strike = 55.0
+    put_strike = 48.0
     stock_price = 50.0
     volatility = 0.35
-    interestRate = 0.10
+    interest_rate = 0.10
     dividendYield = 0.05
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           callExpiryDate,
-                                           putExpiryDate,
-                                           callStrike,
-                                           putStrike)
+                                           call_expiry_date,
+                                           put_expiry_date,
+                                           call_strike,
+                                           put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,
@@ -64,25 +64,25 @@ def test_EquityChooserOptionMatlab():
 
     valuation_date = Date(1, 6, 2007)
     chooseDate = Date(31, 8, 2007)
-    callExpiryDate = Date(2, 12, 2007)
-    putExpiryDate = Date(2, 12, 2007)
-    callStrike = 60.0
-    putStrike = 60.0
+    call_expiry_date = Date(2, 12, 2007)
+    put_expiry_date = Date(2, 12, 2007)
+    call_strike = 60.0
+    put_strike = 60.0
     stock_price = 50.0
     volatility = 0.20
-    interestRate = 0.10
+    interest_rate = 0.10
     dividendYield = 0.05
 
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           callExpiryDate,
-                                           putExpiryDate,
-                                           callStrike,
-                                           putStrike)
+                                           call_expiry_date,
+                                           put_expiry_date,
+                                           call_strike,
+                                           put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,
@@ -108,24 +108,24 @@ def test_EquityChooserOptionDerivicom():
 
     valuation_date = Date(1, 1, 2007)
     chooseDate = Date(1, 2, 2007)
-    callExpiryDate = Date(1, 4, 2007)
-    putExpiryDate = Date(1, 5, 2007)
-    callStrike = 40.0
-    putStrike = 35.0
+    call_expiry_date = Date(1, 4, 2007)
+    put_expiry_date = Date(1, 5, 2007)
+    call_strike = 40.0
+    put_strike = 35.0
     stock_price = 38.0
     volatility = 0.20
-    interestRate = 0.08
+    interest_rate = 0.08
     dividendYield = 0.0625
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           callExpiryDate,
-                                           putExpiryDate,
-                                           callStrike,
-                                           putStrike)
+                                           call_expiry_date,
+                                           put_expiry_date,
+                                           call_strike,
+                                           put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,

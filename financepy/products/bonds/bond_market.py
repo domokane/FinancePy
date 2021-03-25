@@ -55,7 +55,7 @@ class BondMarkets(Enum):
 
 ###############################################################################
     
-def getTreasuryBondMarketConventions(country):
+def get_bond_market_conventions(country):
     """ Returns the day count convention for accrued interest, the frequency
     and the number of days from trade date to settlement date.
     This is for Treasury markets. And for secondary bond markets. """

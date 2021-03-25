@@ -73,7 +73,7 @@ def _value_mc_NUMBA(t0,
                    n,
                    option_type,
                    stock_price,
-                   interestRate,
+                   interest_rate,
                    dividendYield,
                    volatility,
                    num_paths,
@@ -98,7 +98,7 @@ def _value_mc_NUMBA(t0,
         # the number of observations is scaled and floored at 1
         n = int(n * t / tau + 0.5) + 1
 
-    mu = interestRate - dividendYield
+    mu = interest_rate - dividendYield
     v2 = volatility**2
     dt = (t - t0) / n
 
@@ -142,7 +142,7 @@ def _value_mc_NUMBA(t0,
         else:
             return None
 
-    v_a = payoff_a * np.exp(-interestRate * t) / num_paths / 2.0
+    v_a = payoff_a * np.exp(-interest_rate * t) / num_paths / 2.0
     v_a = v_a * multiplier
     return v_a
 
@@ -157,7 +157,7 @@ def _value_mc_fast_NUMBA(t0: float,
                         n: int,
                         option_type: FinOptionTypes,
                         stock_price: float,
-                        interestRate: float,
+                        interest_rate: float,
                         dividendYield: float,
                         volatility: float,
                         num_paths: int,
@@ -165,10 +165,10 @@ def _value_mc_fast_NUMBA(t0: float,
                         accruedAverage: float):
 
     np.random.seed(seed)
-    mu = interestRate - dividendYield
+    mu = interest_rate - dividendYield
     v2 = volatility**2
     dt = (t - t0) / n
-    r = interestRate
+    r = interest_rate
     num_paths = int(num_paths)
 
     multiplier = 1.0
@@ -239,14 +239,14 @@ def _value_mc_fast_NUMBA(t0: float,
 
 @njit(cache=True, fastmath=True)
 def _value_mc_fast_CV_NUMBA(t0, t, tau, K, n, option_type, stock_price,
-                           interestRate, dividendYield, volatility, num_paths,
+                           interest_rate, dividendYield, volatility, num_paths,
                            seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
-    mu = interestRate - dividendYield
+    mu = interest_rate - dividendYield
     v2 = volatility**2
     dt = (t - t0) / n
-    r = interestRate
+    r = interest_rate
 
     multiplier = 1.0
 

@@ -387,7 +387,7 @@ def test_FinFXVanillaOptionHullExample():
             dom_discount_curve,
             for_discount_curve,
             model)
-        #  callOption.rho(valuation_date,stock_price, interestRate,
+        #  callOption.rho(valuation_date,stock_price, interest_rate,
         #  dividendYield, modelType, model_params)
         rho = 999
         testCases.print(spot_fx_rate, value, delta, vega, theta, rho)
@@ -432,7 +432,7 @@ def test_FinFXVanillaOptionHullExample():
             dom_discount_curve,
             for_discount_curve,
             model)
-        # putOption.rho(valuation_date,stock_price, interestRate, dividendYield,
+        # putOption.rho(valuation_date,stock_price, interest_rate, dividendYield,
         # modelType, model_params)
         rho = 999
         testCases.print(spot_fx_rate, value, delta, vega, theta, rho)

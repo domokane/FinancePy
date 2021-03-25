@@ -237,7 +237,7 @@ class EquityVolSurface:
                  expiry_dates: (list),
                  strikes: (list, np.ndarray),
                  volatility_grid: (list, np.ndarray),
-                 volatilityFunctionType:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
+                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
         """ Create the EquitySurface object by passing in market vol data
         for a list of strikes and expiry dates. """
@@ -268,7 +268,7 @@ class EquityVolSurface:
         self._numExpiryDates = len(expiry_dates)
 
         self._volatility_grid = volatility_grid
-        self._volatilityFunctionType = volatilityFunctionType
+        self._volatility_function_type = volatility_function_type
 
         self._buildVolSurface(finSolverType=finSolverType)
 
@@ -287,7 +287,7 @@ class EquityVolSurface:
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         index0 = 0 # lower index in bracket
         index1 = 0 # upper index in bracket
@@ -364,7 +364,7 @@ class EquityVolSurface:
 
     #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-    #     volTypeValue = self._volatilityFunctionType.value
+    #     volTypeValue = self._volatility_function_type.value
 
     #     s = self._spot_fx_rate
 
@@ -466,7 +466,7 @@ class EquityVolSurface:
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         s = self._stock_price
 
@@ -566,24 +566,24 @@ class EquityVolSurface:
 
         s = self._stock_price
 
-        if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
             num_parameters = 5
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SVI:
+        elif self._volatility_function_type == FinVolFunctionTypes.SVI:
             num_parameters = 5
-        elif self._volatilityFunctionType == FinVolFunctionTypes.SSVI:
+        elif self._volatility_function_type == FinVolFunctionTypes.SSVI:
             num_parameters = 5
         else:
-            print(self._volatilityFunctionType)
+            print(self._volatility_function_type)
             raise FinError("Unknown Model Type")
 
         numExpiryDates = self._numExpiryDates
@@ -619,7 +619,7 @@ class EquityVolSurface:
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
 
-        volTypeValue = self._volatilityFunctionType.value
+        volTypeValue = self._volatility_function_type.value
 
         xinits = []
         xinit = np.zeros(num_parameters)
@@ -709,7 +709,7 @@ class EquityVolSurface:
 
                 k = lowS + iK*dS
 
-                vol = volFunction(self._volatilityFunctionType.value, 
+                vol = volFunction(self._volatility_function_type.value,
                                   self._parameters[iTenor], 
                                   f, k, t)
 
@@ -764,7 +764,7 @@ class EquityVolSurface:
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = str(self._volatilityFunctionType)
+            title = str(self._volatility_function_type)
             plt.title(title)
             plt.legend()
 
@@ -774,7 +774,7 @@ class EquityVolSurface:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self._valuation_date)
         s += label_to_string("STOCK PRICE", self._stock_price)
-        s += label_to_string("VOL FUNCTION", self._volatilityFunctionType)
+        s += label_to_string("VOL FUNCTION", self._volatility_function_type)
 
         for i in range(0, self._numExpiryDates):
             s += label_to_string("EXPIRY DATE", self._expiry_dates[i])

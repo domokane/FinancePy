@@ -65,8 +65,8 @@ class BondMortgage:
 
 ###############################################################################
 
-    def repaymentAmount(self,
-                        zero_rate: float):
+    def repayment_amount(self,
+                         zero_rate: float):
         """ Determine monthly repayment amount based on current zero rate. """
 
         frequency = annual_frequency(self._freq_type)
@@ -79,13 +79,13 @@ class BondMortgage:
 
 ###############################################################################
 
-    def generateFlows(self,
-                      zero_rate: float,
-                      mortgageType: BondMortgageTypes):
+    def generate_flows(self,
+                       zero_rate: float,
+                       mortgage_type: BondMortgageTypes):
         """ Generate the bond flow amounts. """
 
-        self._mortgageType = mortgageType
-        self._interestFlows = [0]
+        self._mortgage_type = mortgage_type
+        self._interest_flows = [0]
         self._principalFlows = [0]
         self._principalRemaining = [self._principal]
         self._totalFlows = [0]
@@ -94,28 +94,28 @@ class BondMortgage:
         principal = self._principal
         frequency = annual_frequency(self._freq_type)
 
-        if mortgageType == BondMortgageTypes.REPAYMENT:
-            monthlyFlow = self.repaymentAmount(zero_rate)
-        elif mortgageType == BondMortgageTypes.INTEREST_ONLY:
-            monthlyFlow = zero_rate * self._principal / frequency
+        if mortgage_type == BondMortgageTypes.REPAYMENT:
+            monthly_flow = self.repayment_amount(zero_rate)
+        elif mortgage_type == BondMortgageTypes.INTEREST_ONLY:
+            monthly_flow = zero_rate * self._principal / frequency
         else:
             raise FinError("Unknown Mortgage type.")
 
         for i in range(1, num_flows):
             interestFlow = principal * zero_rate / frequency
-            principalFlow = monthlyFlow - interestFlow
+            principalFlow = monthly_flow - interestFlow
             principal = principal - principalFlow
-            self._interestFlows.append(interestFlow)
+            self._interest_flows.append(interestFlow)
             self._principalFlows.append(principalFlow)
             self._principalRemaining.append(principal)
-            self._totalFlows.append(monthlyFlow)
+            self._totalFlows.append(monthly_flow)
 
 ###############################################################################
 
     def printLeg(self):
         print("START DATE:", self._start_date)
         print("MATURITY DATE:", self._end_date)
-        print("MORTGAGE TYPE:", self._mortgageType)
+        print("MORTGAGE TYPE:", self._mortgage_type)
         print("FREQUENCY:", self._freq_type)
         print("CALENDAR:", self._calendar_type)
         print("BUSDAYRULE:", self._bus_day_adjust_type)
@@ -131,7 +131,7 @@ class BondMortgage:
         for i in range(0, num_flows):
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
                   (self._schedule._adjusted_dates[i],
-                   self._interestFlows[i],
+                   self._interest_flows[i],
                    self._principalFlows[i],
                    self._principalRemaining[i],
                    self._totalFlows[i]))
@@ -142,7 +142,7 @@ class BondMortgage:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START DATE", self._start_date)
         s += label_to_string("MATURITY DATE", self._end_date)
-        s += label_to_string("MORTGAGE TYPE", self._mortgageType)
+        s += label_to_string("MORTGAGE TYPE", self._mortgage_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._calendar_type)
         s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)

@@ -92,7 +92,7 @@ class EquityVanillaOption():
         self._expiry_date = expiry_date
         self._strike_price = strike_price
         self._option_type = option_type
-        self._numOptions = numOptions
+        self._num_options = numOptions
         self._texp = None
 
 ###############################################################################
@@ -125,7 +125,7 @@ class EquityVanillaOption():
         intrinsicValue = bsIntrinsic(s0, texp, k, r, q,
                                      self._option_type.value)
 
-        intrinsicValue = intrinsicValue * self._numOptions
+        intrinsicValue = intrinsicValue * self._num_options
         return intrinsicValue
 
 ###############################################################################
@@ -171,7 +171,7 @@ class EquityVanillaOption():
         else:
             raise FinError("Unknown Model Type")
 
-        value = value * self._numOptions
+        value = value * self._num_options
         return value
 
 ###############################################################################
@@ -639,7 +639,7 @@ class EquityVanillaOption():
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("NUMBER", self._numOptions, "")
+        s += label_to_string("NUMBER", self._num_options, "")
         return s
 
 ###############################################################################

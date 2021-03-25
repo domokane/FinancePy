@@ -26,8 +26,8 @@ def test_EquityBasketOption():
     valuation_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     volatility = 0.30
-    interestRate = 0.05
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    interest_rate = 0.05
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
 
     ##########################################################################
     # Homogeneous Basket

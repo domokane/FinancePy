@@ -87,7 +87,7 @@ class DiscountCurveNSS(DiscountCurve):
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
-        dfs = self._zeroToDf(self._valuation_date,
+        dfs = self._zero_to_df(self._valuation_date,
                              zero_rates,
                              dc_times,
                              self._freq_type,
@@ -141,7 +141,7 @@ class DiscountCurveNSS(DiscountCurve):
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zeroToDf(self._valuation_date,
+        df = self._zero_to_df(self._valuation_date,
                             zero_rates,
                             dc_times,
                             self._freq_type,

@@ -19,10 +19,10 @@ put_option = EquityVanillaOption(expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT)
 valueDate = Date(1, 1, 2015)
 stockPrice = 100
 volatility = 0.30
-interestRate = 0.05
+interest_rate = 0.05
 dividendYield = 0.01
 model = BlackScholes(volatility)
-discountCurve = DiscountCurveFlat(valueDate, interestRate)
+discountCurve = DiscountCurveFlat(valueDate, interest_rate)
 dividendCurve = DiscountCurveFlat(valueDate, dividendYield)
 
 def test_call_option():

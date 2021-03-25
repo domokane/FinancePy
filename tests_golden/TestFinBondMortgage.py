@@ -26,7 +26,7 @@ def test_BondMortgage():
     mortgage = BondMortgage(start_date, end_date, principal)
 
     rate = 0.035
-    mortgage.generateFlows(rate, BondMortgageTypes.REPAYMENT)
+    mortgage.generate_flows(rate, BondMortgageTypes.REPAYMENT)
 
     num_flows = len(mortgage._schedule._adjusted_dates)
 
@@ -35,19 +35,19 @@ def test_BondMortgage():
 
     for i in range(0, num_flows):
         testCases.print(mortgage._schedule._adjusted_dates[i],
-                        mortgage._interestFlows[i],
+                        mortgage._interest_flows[i],
                         mortgage._principalFlows[i],
                         mortgage._principalRemaining[i],
                         mortgage._totalFlows[i])
 
-    mortgage.generateFlows(rate, BondMortgageTypes.INTEREST_ONLY)
+    mortgage.generate_flows(rate, BondMortgageTypes.INTEREST_ONLY)
 
     testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
                      "TOTAL")
 
     for i in range(0, num_flows):
         testCases.print(mortgage._schedule._adjusted_dates[i],
-                        mortgage._interestFlows[i],
+                        mortgage._interest_flows[i],
                         mortgage._principalFlows[i],
                         mortgage._principalRemaining[i],
                         mortgage._totalFlows[i])

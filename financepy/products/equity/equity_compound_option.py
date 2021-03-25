@@ -404,13 +404,13 @@ class EquityCompoundOption(EquityOption):
                            strike_price1,
                            strike_price2,
                            option_type2,
-                           interestRate,
+                           interest_rate,
                            dividendYield,
                            model):
 
         option = EquityVanillaOption(expiry_date2, strike_price2, option_type2)
 
-        discount_curve = DiscountCurveFlat(expiry_date1, interestRate)
+        discount_curve = DiscountCurveFlat(expiry_date1, interest_rate)
         dividend_curve = DiscountCurveFlat(expiry_date1, dividendYield)
 
         argtuple = (option, expiry_date1, discount_curve, dividend_curve,

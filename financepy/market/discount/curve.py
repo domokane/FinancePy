@@ -83,7 +83,7 @@ class DiscountCurve:
 
     ###############################################################################
 
-    def _zeroToDf(self,
+    def _zero_to_df(self,
                   valuation_date: Date,
                   rates: (float, np.ndarray),
                   times: (float, np.ndarray),

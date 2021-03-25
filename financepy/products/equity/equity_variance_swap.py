@@ -49,9 +49,9 @@ class EquityVarianceSwap:
         self._numPutOptions = 0
         self._numCallOptions = 0
         self._putWts = []
-        self._putStrikes = []
+        self._put_strikes = []
         self._callWts = []
-        self._callStrikes = []
+        self._call_strikes = []
 
 ###############################################################################
 
@@ -150,9 +150,9 @@ class EquityVarianceSwap:
         minStrike = sstar - (numPutOptions+1) * strikeSpacing
 
         self._putWts = []
-        self._putStrikes = []
+        self._put_strikes = []
         self._callWts = []
-        self._callStrikes = []
+        self._call_strikes = []
 
         # if the lower strike is < 0 we go to as low as the strike spacing
         if minStrike < strikeSpacing:
@@ -166,12 +166,12 @@ class EquityVarianceSwap:
         else:
             putK = np.linspace(sstar, minStrike, numPutOptions+2)
 
-        self._putStrikes = putK
+        self._put_strikes = putK
 
         maxStrike = sstar + (numCallOptions+1) * strikeSpacing
         callK = np.linspace(sstar, maxStrike, numCallOptions+2)
 
-        self._callStrikes = callK
+        self._call_strikes = callK
 
         optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - log(sstar/s0))/tmat
 
@@ -259,12 +259,12 @@ class EquityVarianceSwap:
 
         print("TYPE", "STRIKE", "WEIGHT")
         for n in range(self._numPutOptions-1, -1, -1):
-            k = self._putStrikes[n]
+            k = self._put_strikes[n]
             wt = self._putWts[n]*self._notional
             print("PUT %7.2f %10.3f" % (k, wt))
 
         for n in range(0, self._numCallOptions):
-            k = self._callStrikes[n]
+            k = self._call_strikes[n]
             wt = self._callWts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))
 

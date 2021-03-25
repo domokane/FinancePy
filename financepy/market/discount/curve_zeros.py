@@ -75,7 +75,7 @@ class DiscountCurveZeros(DiscountCurve):
         if testMonotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        dfs = self._zeroToDf(self._valuation_date,
+        dfs = self._zero_to_df(self._valuation_date,
                              self._zero_rates,
                              self._times,
                              self._freq_type,

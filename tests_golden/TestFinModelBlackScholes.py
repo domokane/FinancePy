@@ -33,7 +33,7 @@ def testFinModelBlackScholes():
     strike_price = 130.0
     stock_price = 127.62
     volatility = 0.20
-    interestRate = 0.001
+    interest_rate = 0.001
     dividendYield = 0.0163
 
     option_type = FinOptionTypes.AMERICAN_CALL
@@ -48,7 +48,7 @@ def testFinModelBlackScholes():
     euOption = EquityVanillaOption(expiry_date, strike_price,
                                       euOptionType)
     
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate,
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 

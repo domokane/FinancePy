@@ -39,15 +39,15 @@ def test_BondFuture():
     bonds.append(bond6)
     bonds.append(bond7)
 
-    firstDeliveryDate = Date(1, 3, 2002)
-    lastDeliveryDate = Date(28, 3, 2002)
-    contractSize = 100000
+    first_delivery_date = Date(1, 3, 2002)
+    last_delivery_date = Date(28, 3, 2002)
+    contract_size = 100000
     contractCoupon = 0.06
 
     bondFutureContract = BondFuture("TYH2",
-                                    firstDeliveryDate,
-                                    lastDeliveryDate,
-                                    contractSize,
+                                    first_delivery_date,
+                                    last_delivery_date,
+                                    contract_size,
                                     contractCoupon)
 
     settlement_date = Date(10, 12, 2001)
@@ -116,16 +116,16 @@ def test_BondFuture():
         yld = bond.yield_to_maturity(settlement_date, clean_price)
         testCases.print(str(bond._maturity_date), yld)
 
-    firstDeliveryDate = Date(1, 12, 2017)
-    lastDeliveryDate = Date(28, 12, 2017)
+    first_delivery_date = Date(1, 12, 2017)
+    last_delivery_date = Date(28, 12, 2017)
 
-    contractSize = 100000
+    contract_size = 100000
     contractCoupon = 0.06
 
     bondFutureContract = BondFuture("TYZ7",
-                                    firstDeliveryDate,
-                                    lastDeliveryDate,
-                                    contractSize,
+                                    first_delivery_date,
+                                    last_delivery_date,
+                                    contract_size,
                                     contractCoupon)
 
     testCases.header("BOND MATURITY", "CF")
@@ -138,18 +138,18 @@ def test_BondFuture():
 
     testCases.header("BOND MATURITY", "PRINCIPAL INVOICE PRICE")
     for bond in bonds:
-        pip = bondFutureContract.principalInvoicePrice(bond, futures_price)
+        pip = bondFutureContract.principal_invoice_price(bond, futures_price)
         testCases.print(str(bond._maturity_date), pip)
 
     testCases.header("BOND MATURITY", "TOTAL INVOICE AMOUNT")
     for bond in bonds:
-        tia = bondFutureContract.totalInvoiceAmount(
+        tia = bondFutureContract.total_invoice_amount(
             settlement_date, bond, futures_price)
         testCases.print(str(bond._maturity_date), tia)
 
-    ctd = bondFutureContract.cheapestToDeliver(bonds,
-                                               prices,
-                                               futures_price)
+    ctd = bondFutureContract.cheapest_to_deliver(bonds,
+                                                 prices,
+                                                 futures_price)
 
     testCases.header("CTD MATURITY", "CTD COUPON")
     testCases.print(str(ctd._maturity_date), ctd._coupon)

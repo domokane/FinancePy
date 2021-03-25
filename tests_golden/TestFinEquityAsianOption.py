@@ -33,7 +33,7 @@ def testConvergence():
     expiry_date = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
-    interestRate = 0.30
+    interest_rate = 0.30
     dividendYield = 0.10
     num_observations = 120  # daily as we have a half year
     accruedAverage = None
@@ -41,7 +41,7 @@ def testConvergence():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     asianOption = EquityAsianOption(startAveragingDate,
@@ -147,7 +147,7 @@ def testTimeEvolution():
     expiry_date = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.20
-    interestRate = 0.30
+    interest_rate = 0.30
     dividendYield = 0.10
     num_observations = 100  # weekly as we have a year
     accruedAverage = None
@@ -191,7 +191,7 @@ def testTimeEvolution():
 
         accruedAverage = stock_price * 0.9
 
-        discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+        discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
         dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
         value_mc_fast = asianOption._value_mc_fast(valuation_date,
@@ -273,7 +273,7 @@ def testMCTimings():
     expiry_date = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
-    interestRate = 0.30
+    interest_rate = 0.30
     dividendYield = 0.10
     num_observations = 120  # daily as we have a half year
     accruedAverage = None
@@ -281,7 +281,7 @@ def testMCTimings():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     asianOption = EquityAsianOption(startAveragingDate,

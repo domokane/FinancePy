@@ -248,7 +248,7 @@ def test_FinCDSTranche():
         for tranche in tranches:
             for num_points in [40]:
                 start = time.time()
-                v = tranche.valueBC(
+                v = tranche.value_bc(
                     valuation_date,
                     issuer_curves,
                     upfront,
@@ -295,7 +295,7 @@ def test_FinCDSTranche():
         for tranche in tranches:
             for num_points in [40]:
                 start = time.time()
-                v = tranche.valueBC(
+                v = tranche.value_bc(
                     valuation_date,
                     issuer_curves,
                     upfront,

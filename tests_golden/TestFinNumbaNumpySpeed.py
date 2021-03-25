@@ -27,12 +27,12 @@ def test_FinNumbaNumpySpeed(useSobol):
     expiry_date = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
-    interestRate = 0.05
+    interest_rate = 0.05
     dividendYield = 0.01
     seed = 1999
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
 
     useSobolInt = int(useSobol)
     
@@ -257,12 +257,12 @@ def test_FinNumbaNumbaParallel(useSobol):
     expiry_date = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
-    interestRate = 0.05
+    interest_rate = 0.05
     dividendYield = 0.01
     seed = 2021
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
 
     useSobolInt = int(useSobol)
     

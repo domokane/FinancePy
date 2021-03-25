@@ -23,12 +23,12 @@ def testEquityAmericanOption():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2017)
     stock_price = 50.0
-    interestRate = 0.06
+    interest_rate = 0.06
     dividendYield = 0.04
     volatility = 0.40
     strike_price = 50.0
 
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     testCases.banner("================== EUROPEAN PUT =======================")

@@ -26,11 +26,11 @@ def test_EquityCompoundOption():
     k2 = 95.0
     stock_price = 85.0
     volatility = 0.15
-    interestRate = 0.035
+    interest_rate = 0.035
     dividendYield = 0.01
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interestRate)
+    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
 
     num_stepsList = [100, 200, 500, 1000, 2000, 5000]
