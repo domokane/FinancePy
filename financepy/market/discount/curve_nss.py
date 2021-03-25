@@ -94,7 +94,7 @@ class DiscountCurveNSS(DiscountCurve):
                              self._day_count_type)
 
         # Convert these to zero rates in the required frequency and day count
-        zero_rates = self._dfToZero(dfs,
+        zero_rates = self._df_to_zero(dfs,
                                     dates,
                                     freq_type,
                                     day_count_type)

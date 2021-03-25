@@ -94,7 +94,7 @@ def value_mcFast(t,
     model = FinGBMProcess()
 
     num_time_steps = 2
-    Sall = model.getPathsAssets(num_assets, num_paths, num_time_steps,
+    Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
                                 t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoff_value(Sall, payoff_type.value, payoff_params)
@@ -115,7 +115,7 @@ class EquityRainbowOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._validatePayoff(payoff_type, payoff_params, num_assets)
+        self._validate_payoff(payoff_type, payoff_params, num_assets)
 
         self._expiry_date = expiry_date
         self._payoff_type = payoff_type
@@ -151,7 +151,7 @@ class EquityRainbowOption(EquityOption):
 
 ###############################################################################
 
-    def _validatePayoff(self, payoff_type, payoff_params, num_assets):
+    def _validate_payoff(self, payoff_type, payoff_params, num_assets):
 
         num_params = 0
 
@@ -191,18 +191,18 @@ class EquityRainbowOption(EquityOption):
               discount_curve: DiscountCurve,
               dividend_curves: (list),
               volatilities: np.ndarray,
-              corrMatrix: np.ndarray):
+              corr_matrix: np.ndarray):
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")
 
-        if corrMatrix.ndim != 2:
+        if corr_matrix.ndim != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
-        if corrMatrix.shape[0] != 2:
+        if corr_matrix.shape[0] != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
-        if corrMatrix.shape[1] != 2:
+        if corr_matrix.shape[1] != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
         if valuation_date > self._expiry_date:
@@ -221,12 +221,12 @@ class EquityRainbowOption(EquityOption):
         self._validate(stock_prices,
                        dividend_yields,
                        volatilities,
-                       corrMatrix)
+                       corr_matrix)
 
 #        q1 = dividend_yields[0]
 #        q2 = dividend_yields[1]
 
-        rho = corrMatrix[0][1]
+        rho = corr_matrix[0][1]
         s1 = stock_prices[0]
         s2 = stock_prices[1]
         b1 = r - q1
@@ -274,14 +274,14 @@ class EquityRainbowOption(EquityOption):
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths=10000,
                 seed=4242):
 
         self._validate(stock_prices,
                        dividend_curves,
                        volatilities,
-                       corrMatrix)
+                       corr_matrix)
 
         if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
@@ -293,7 +293,7 @@ class EquityRainbowOption(EquityOption):
                         discount_curve,
                         dividend_curves,
                         volatilities,
-                        corrMatrix,
+                        corr_matrix,
                         self._num_assets,
                         self._payoff_type,
                         self._payoff_params,

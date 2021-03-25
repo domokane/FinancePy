@@ -106,11 +106,11 @@ class EquityChooserOption(EquityOption):
         tc = (self._call_expiry_date - valuation_date) / gDaysInYear
         tp = (self._put_expiry_date - valuation_date) / gDaysInYear
 
-        rt = discount_curve.ccRate(self._chooseDate)
-        rtc = discount_curve.ccRate(self._call_expiry_date)
-        rtp = discount_curve.ccRate(self._put_expiry_date)
+        rt = discount_curve.cc_rate(self._chooseDate)
+        rtc = discount_curve.cc_rate(self._call_expiry_date)
+        rtp = discount_curve.cc_rate(self._put_expiry_date)
 
-        q = dividend_curve.ccRate(self._chooseDate)
+        q = dividend_curve.cc_rate(self._chooseDate)
 
         t = max(t, gSmall)
         tc = max(tc, gSmall)
@@ -198,7 +198,7 @@ class EquityChooserOption(EquityOption):
         dq = dividend_curve.df(self._chooseDate)
         q = -np.log(dq) / t
 
-        #        q = dividendYield
+        #        q = dividend_yield
         kc = self._call_strike
         kp = self._put_strike
 

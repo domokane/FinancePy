@@ -118,8 +118,8 @@ class EquityBarrierOption(EquityOption):
         lnS0k = np.log(stock_price / self._strike_price)
         sqrtT = np.sqrt(texp)
 
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         k = self._strike_price
         s = stock_price
@@ -307,8 +307,8 @@ class EquityBarrierOption(EquityOption):
         
         # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
 
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
         
         #######################################################################
 

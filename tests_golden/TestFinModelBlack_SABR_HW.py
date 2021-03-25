@@ -38,8 +38,8 @@ def test_FinSABR():
     f = 0.0350
     T = 1.0
 
-    vols1 = model1.blackVol(f, strikes, T)
-    vols2 = model2.blackVol(f, strikes, T)
+    vols1 = model1.black_vol(f, strikes, T)
+    vols2 = model2.black_vol(f, strikes, T)
 
     if PLOT_GRAPHS:
         plt.figure()
@@ -69,8 +69,8 @@ def test_FinShiftedSABRSimple():
     f = 0.0350
     T = 1.0
 
-    vols1 = model1.blackVol(f, strikes, T)
-    vols2 = model2.blackVol(f, strikes, T)
+    vols1 = model1.black_vol(f, strikes, T)
+    vols2 = model2.black_vol(f, strikes, T)
 
     if PLOT_GRAPHS:
         plt.figure()
@@ -96,7 +96,7 @@ def test_FinShiftedSABR():
     f = 0.0006384
     T = 1.0
 
-    vols = model.blackVol(f, strikes, T)
+    vols = model.black_vol(f, strikes, T)
 
     if PLOT_GRAPHS:
         plt.figure()

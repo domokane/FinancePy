@@ -153,14 +153,14 @@ def calculateList():
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
-def dateIndex(d, m, y):
+def date_index(d, m, y):
     idx = (y-gStartYear) * 12 * 31 + (m-1) * 31 + (d-1)
     return idx
 
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
-def dateFromIndex(idx):
+def date_from_index(idx):
     """ Reverse mapping from index to date. Take care with numba as it can do
     weird rounding on the integer. Seems OK now. """
     y = int(gStartYear + idx/12/31)
@@ -276,7 +276,7 @@ class Date():
     ###########################################################################
 
     @classmethod
-    def fromString(cls, dateString, formatString):
+    def from_string(cls, dateString, formatString):
         """  Create a Date from a date and format string.
         Example Input:
         start_date = Date('1-1-2018', '%d-%m-%Y') """
@@ -290,7 +290,7 @@ class Date():
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
 
-        idx = dateIndex(self._d, self._m, self._y)
+        idx = date_index(self._d, self._m, self._y)
         daysSinceFirstJan1900 = gDateCounterList[idx]
         wd = weekDay(daysSinceFirstJan1900)
         self._excelDate = daysSinceFirstJan1900
@@ -377,7 +377,7 @@ class Date():
 
     ###########################################################################
 
-    def addHours(self, hours):
+    def add_hours(self, hours):
         """ Returns a new date that is h hours after the Date. """
 
         if hours < 0:
@@ -402,7 +402,7 @@ class Date():
         """ Returns a new date that is numDays after the Date. I also make
         it possible to go backwards a number of days. """
 
-        idx = dateIndex(self._d, self._m, self._y)
+        idx = date_index(self._d, self._m, self._y)
 
         step = +1
         if numDays < 0:
@@ -413,7 +413,7 @@ class Date():
             if gDateCounterList[idx] > 0:
                 numDays -= step
 
-        (d, m, y) = dateFromIndex(idx)
+        (d, m, y) = date_from_index(idx)
         newDt = Date(d, m, y)
         return newDt
 
@@ -423,7 +423,7 @@ class Date():
                     numDays: int):
         """ Returns a new date that is numDays working days after Date. Note
         that only weekends are taken into account. Other Holidays are not. If
-        you want to include regional holidays then use addBusinessDays from
+        you want to include regional holidays then use add_business_days from
         the FinCalendar class. """
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE

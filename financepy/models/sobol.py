@@ -53,10 +53,10 @@ with np.load(path, mmap_mode='r') as f:
 
 
 @njit(cache=True)
-def getGaussianSobol(num_points, dimension):
+def get_gaussian_sobol(num_points, dimension):
     """ Sobol Gaussian quasi random points generator based on graycode order.
     The generated points follow a normal distribution. """
-    points = getUniformSobol(num_points, dimension)
+    points = get_uniform_sobol(num_points, dimension)
 
     for i in range(num_points):
         for j in range(dimension):
@@ -67,7 +67,7 @@ def getGaussianSobol(num_points, dimension):
 
 
 @njit(cache=True)
-def getUniformSobol(num_points, dimension):
+def get_uniform_sobol(num_points, dimension):
     """ Sobol uniform quasi random points generator based on graycode order. 
     This function returns a 2D Numpy array of values where the number of rows
     is the number of draws and the number of columns is the number of 

@@ -13,8 +13,8 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import FinModelBlack
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.swaption import FinSwapTypes
-from financepy.products.rates.swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import FinSwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.FinIborLMMProducts import FinIborLMMProducts
 from financepy.products.rates.ibor_cap_floor import IborCapFloor

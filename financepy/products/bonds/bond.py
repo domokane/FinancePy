@@ -440,7 +440,7 @@ class Bond:
 
         dc = DayCount(self._accrual_type)
         cal = Calendar(calendar_type)
-        exDividend_date = cal.addBusinessDays(self._ncd, -numExDividendDays)
+        exDividend_date = cal.add_business_days(self._ncd, -numExDividendDays)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
                                             settlement_date,
@@ -634,7 +634,7 @@ class Bond:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 df = discount_curve.df(dt)
-                q = survival_curve.survProb(dt)
+                q = survival_curve.survival_prob(dt)
 
                 # Add PV of coupon conditional on surviving to payment date  
                 # Any default results in all subsequent coupons being lost

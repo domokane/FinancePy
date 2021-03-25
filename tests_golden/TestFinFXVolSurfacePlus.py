@@ -61,7 +61,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK5
+        vol_functionType = FinVolFunctionTypes.CLARK5
         alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -79,21 +79,21 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                         alpha,
                                         atmMethod,
                                         deltaMethod,
-                                        volFunctionType)
+                                        vol_functionType)
 
-        fxMarketPlus.checkCalibration(False)
+        fxMarketPlus.check_calibration(False)
 
         if 1==0: # PLOT_GRAPHS:
 
-            fxMarketPlus.plotVolCurves()
+            fxMarketPlus.plot_vol_curves()
 
             plt.figure()
 
-            dbns = fxMarketPlus.impliedDbns(0.5, 2.0, 1000)
+            dbns = fxMarketPlus.implied_dbns(0.5, 2.0, 1000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                plt.title(volFunctionType)
+                plt.title(vol_functionType)
                 print("SUM:", dbns[i].sum())
 
 ###############################################################################
@@ -131,7 +131,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-        volFunctionType = FinVolFunctionTypes.CLARK5
+        vol_functionType = FinVolFunctionTypes.CLARK5
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
                                         spot_fx_rate,
@@ -148,20 +148,20 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                                         alpha,
                                         atmMethod,
                                         deltaMethod,
-                                        volFunctionType)
+                                        vol_functionType)
 
-#        fxMarketPlus.checkCalibration(True)
+#        fxMarketPlus.check_calibration(True)
 
         if PLOT_GRAPHS:
-            fxMarketPlus.plotVolCurves()
+            fxMarketPlus.plot_vol_curves()
 
             plt.figure()
 
-            dbns = fxMarketPlus.impliedDbns(30, 120, 1000)
+            dbns = fxMarketPlus.implied_dbns(30, 120, 1000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                plt.title(volFunctionType)
+                plt.title(vol_functionType)
                 print("SUM:", dbns[i].sum())
 
 
@@ -203,7 +203,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.FORWARD_DELTA # THIS IS DIFFERENT
-        volFunctionType = FinVolFunctionTypes.CLARK5
+        vol_functionType = FinVolFunctionTypes.CLARK5
         alpha = 0.5 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -221,21 +221,21 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                                         alpha,
                                         atmMethod,
                                         deltaMethod,
-                                        volFunctionType)
+                                        vol_functionType)
 
-        fxMarketPlus.checkCalibration(False)
+        fxMarketPlus.check_calibration(False)
 
         if 1==0: # PLOT_GRAPHS:
 
-            fxMarketPlus.plotVolCurves()
+            fxMarketPlus.plot_vol_curves()
 
             plt.figure()
 
-            dbns = fxMarketPlus.impliedDbns(0.5, 2.0, 1000)
+            dbns = fxMarketPlus.implied_dbns(0.5, 2.0, 1000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                plt.title(volFunctionType)
+                plt.title(vol_functionType)
                 print("SUM:", dbns[i].sum())
 
         # Test interpolation
@@ -250,7 +250,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             for k in strikes:
                 volSmile = []
                 for dt in dates:
-                    vol = fxMarketPlus.volatilityFromStrikeDate(k, dt)
+                    vol = fxMarketPlus.volatility_from_strike_date(k, dt)
                     volSmile.append(vol*100.0)
                     
                     print(k, dt, vol*100.0)
@@ -340,7 +340,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK
+        vol_functionType = FinVolFunctionTypes.CLARK
         alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -358,9 +358,9 @@ def test_FinFXMktVolSurface4(verboseCalibration):
                                         alpha,
                                         atmMethod,
                                         deltaMethod,
-                                        volFunctionType)
+                                        vol_functionType)
 
-        fxMarketPlus.checkCalibration(False)
+        fxMarketPlus.check_calibration(False)
 
         years = [1.0/12.0, 2./12., 0.25, 0.5, 1.0, 2.0]
 
@@ -433,7 +433,7 @@ def test_FinFXMktVolSurface5(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK
+        vol_functionType = FinVolFunctionTypes.CLARK
         alpha = 0.50 # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -451,9 +451,9 @@ def test_FinFXMktVolSurface5(verboseCalibration):
                                         alpha,
                                         atmMethod,
                                         deltaMethod,
-                                        volFunctionType)
+                                        vol_functionType)
 
-        fxMarketPlus.checkCalibration(False)
+        fxMarketPlus.check_calibration(False)
 
 ###############################################################################
 

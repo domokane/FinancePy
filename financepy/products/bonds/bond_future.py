@@ -34,7 +34,7 @@ class BondFuture:
 
 ###############################################################################
 
-    def conversionFactor(self,
+    def conversion_factor(self,
                          bond: Bond):
         """ Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
@@ -73,7 +73,7 @@ class BondFuture:
                                 bond: Bond,
                                 futures_price: float):
         """ The principal invoice price as defined by the CME."""
-        cf = self.conversionFactor(bond)
+        cf = self.conversion_factor(bond)
         pip = self._contract_size * (futures_price * cf) / 100.0
         pip = round(pip, 2)
         return pip

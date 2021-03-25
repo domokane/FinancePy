@@ -367,7 +367,7 @@ class CDS:
 
     ###############################################################################
 
-    def creditDV01(self,
+    def credit_dv01(self,
                    valuation_date,
                    issuer_curve,
                    contract_recovery_rate=standard_recovery_rate,
@@ -391,7 +391,7 @@ class CDS:
         for cds in bumpedIssuerCurve._cds_contracts:
             cds._running_coupon += bump
 
-        bumpedIssuerCurve._buildCurve()
+        bumpedIssuerCurve._build_curve()
 
         v1 = self.value(valuation_date,
                         bumpedIssuerCurve,
@@ -400,12 +400,12 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        creditDV01 = (v1['full_pv'] - v0['full_pv'])
-        return creditDV01
+        credit_dv01 = (v1['full_pv'] - v0['full_pv'])
+        return credit_dv01
 
     ###############################################################################
 
-    def interestDV01(self,
+    def interest_dv01(self,
                      valuation_date: Date,
                      issuer_curve,
                      contract_recovery_rate=standard_recovery_rate,
@@ -434,9 +434,9 @@ class CDS:
         for swap in new_issuer_curve._libor_curve._usedSwaps:
             swap._fixed_leg._coupon += bump
 
-        new_issuer_curve._libor_curve._buildCurve()
+        new_issuer_curve._libor_curve._build_curve()
 
-        new_issuer_curve._buildCurve()
+        new_issuer_curve._build_curve()
 
         v1 = self.value(valuation_date,
                         new_issuer_curve,
@@ -445,8 +445,8 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        interestDV01 = (v1['full_pv'] - v0['full_pv'])
-        return interestDV01
+        interest_dv01 = (v1['full_pv'] - v0['full_pv'])
+        return interest_dv01
 
     ###############################################################################
 
@@ -822,7 +822,7 @@ class CDS:
             acc_factor = self._accrual_factors[it]
             flow = self._flows[it]
             z = issuer_curve.df(dt)
-            q = issuer_curve.survProb(dt)
+            q = issuer_curve.survival_prob(dt)
             print("%15s %10.6f %12.2f %12.6f %12.6f %12.2f" %
                   (dt, acc_factor, flow, z, q, flow * z * q))
 

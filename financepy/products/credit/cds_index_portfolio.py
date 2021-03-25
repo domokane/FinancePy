@@ -45,7 +45,7 @@ class CDSIndexPortfolio:
 
     ###############################################################################
 
-    def intrinsicRPV01(self,
+    def intrinsic_rpv01(self,
                        valuation_date,
                        step_in_date,
                        maturity_date,
@@ -59,7 +59,7 @@ class CDSIndexPortfolio:
                            maturity_date,
                            0.0)
 
-        intrinsicRPV01 = 0.0
+        intrinsic_rpv01 = 0.0
 
         for m in range(0, num_credits):
             retValue = cds_contract.risky_pv01(valuation_date,
@@ -67,14 +67,14 @@ class CDSIndexPortfolio:
 
             cleanRPV01 = retValue['clean_rpv01']
 
-            intrinsicRPV01 += cleanRPV01
+            intrinsic_rpv01 += cleanRPV01
 
-        intrinsicRPV01 /= num_credits
-        return (intrinsicRPV01)
+        intrinsic_rpv01 /= num_credits
+        return (intrinsic_rpv01)
 
     ###############################################################################
 
-    def intrinsicProtectionLegPV(self,
+    def intrinsic_protectionLegPV(self,
                                  valuation_date,
                                  step_in_date,
                                  maturity_date,
@@ -103,7 +103,7 @@ class CDSIndexPortfolio:
 
     ###############################################################################
 
-    def intrinsicSpread(self,
+    def intrinsic_spread(self,
                         valuation_date,
                         step_in_date,
                         maturity_date,
@@ -112,23 +112,23 @@ class CDSIndexPortfolio:
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spread. """
 
-        intrinsicProtPV = self.intrinsicProtectionLegPV(valuation_date,
+        intrinsicProtPV = self.intrinsic_protectionLegPV(valuation_date,
                                                         step_in_date,
                                                         maturity_date,
                                                         issuer_curves)
 
-        intrinsicRPV01 = self.intrinsicRPV01(valuation_date,
+        intrinsic_rpv01 = self.intrinsic_rpv01(valuation_date,
                                              step_in_date,
                                              maturity_date,
                                              issuer_curves)
 
-        intrinsicSpread = intrinsicProtPV / intrinsicRPV01
+        intrinsic_spread = intrinsicProtPV / intrinsic_rpv01
 
-        return (intrinsicSpread)
+        return (intrinsic_spread)
 
     ###############################################################################
 
-    def averageSpread(self,
+    def average_spread(self,
                       valuation_date,
                       step_in_date,
                       maturity_date,
@@ -141,14 +141,14 @@ class CDSIndexPortfolio:
                            maturity_date,
                            0.0)
 
-        averageSpread = 0.0
+        average_spread = 0.0
 
         for m in range(0, num_credits):
             spread = cds_contract.par_spread(valuation_date, issuer_curves[m])
-            averageSpread += spread
+            average_spread += spread
 
-        averageSpread /= num_credits
-        return averageSpread
+        average_spread /= num_credits
+        return average_spread
 
     ###############################################################################
 
@@ -176,7 +176,7 @@ class CDSIndexPortfolio:
 
     ###############################################################################
 
-    def minSpread(self,
+    def min_spread(self,
                   valuation_date,
                   step_in_date,
                   maturity_date,
@@ -193,18 +193,18 @@ class CDSIndexPortfolio:
                            maturity_date,
                            0.0)
 
-        minSpread = cds_contract.par_spread(valuation_date, issuer_curves[0])
+        min_spread = cds_contract.par_spread(valuation_date, issuer_curves[0])
 
         for m in range(1, num_credits):
             spread = cds_contract.par_spread(valuation_date, issuer_curves[m])
-            if spread < minSpread:
-                minSpread = spread
+            if spread < min_spread:
+                min_spread = spread
 
-        return minSpread
+        return min_spread
 
     ###############################################################################
 
-    def maxSpread(self,
+    def max_spread(self,
                   valuation_date,
                   step_in_date,
                   maturity_date,
@@ -221,18 +221,18 @@ class CDSIndexPortfolio:
                            maturity_date,
                            0.0)
 
-        maxSpread = cds_contract.par_spread(valuation_date, issuer_curves[0])
+        max_spread = cds_contract.par_spread(valuation_date, issuer_curves[0])
 
         for m in range(1, num_credits):
             spread = cds_contract.par_spread(valuation_date, issuer_curves[m])
-            if spread > maxSpread:
-                maxSpread = spread
+            if spread > max_spread:
+                max_spread = spread
 
-        return maxSpread
+        return max_spread
 
     ###############################################################################
 
-    def spreadAdjustIntrinsic(self,
+    def spread_adjust_intrinsic(self,
                               valuation_date,
                               issuer_curves,
                               index_coupons,

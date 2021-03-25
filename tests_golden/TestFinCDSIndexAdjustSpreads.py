@@ -166,22 +166,22 @@ def test_CDSIndexAdjustSpreads():
 
     cdsIndex = CDSIndexPortfolio()
 
-    averageSpd3Y = cdsIndex.averageSpread(valuation_date,
+    averageSpd3Y = cdsIndex.average_spread(valuation_date,
                                           step_in_date,
                                           maturity3Y,
                                           issuer_curves) * 10000.0
 
-    averageSpd5Y = cdsIndex.averageSpread(valuation_date,
+    averageSpd5Y = cdsIndex.average_spread(valuation_date,
                                           step_in_date,
                                           maturity5Y,
                                           issuer_curves) * 10000.0
 
-    averageSpd7Y = cdsIndex.averageSpread(valuation_date,
+    averageSpd7Y = cdsIndex.average_spread(valuation_date,
                                           step_in_date,
                                           maturity7Y,
                                           issuer_curves) * 10000.0
 
-    averageSpd10Y = cdsIndex.averageSpread(valuation_date,
+    averageSpd10Y = cdsIndex.average_spread(valuation_date,
                                            step_in_date,
                                            maturity10Y,
                                            issuer_curves) * 10000.0
@@ -199,22 +199,22 @@ def test_CDSIndexAdjustSpreads():
 
     cdsIndex = CDSIndexPortfolio()
 
-    intrinsicSpd3Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd3Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               maturity3Y,
                                               issuer_curves) * 10000.0
 
-    intrinsicSpd5Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd5Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               maturity5Y,
                                               issuer_curves) * 10000.0
 
-    intrinsicSpd7Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd7Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               maturity7Y,
                                               issuer_curves) * 10000.0
 
-    intrinsicSpd10Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd10Y = cdsIndex.intrinsic_spread(valuation_date,
                                                step_in_date,
                                                maturity10Y,
                                                issuer_curves) * 10000.0
@@ -245,7 +245,7 @@ def test_CDSIndexAdjustSpreads():
     start = time.time()
 
     indexPortfolio = CDSIndexPortfolio()
-    adjustedIssuerCurves = indexPortfolio.spreadAdjustIntrinsic(
+    adjustedIssuerCurves = indexPortfolio.spread_adjust_intrinsic(
         valuation_date,
         issuer_curves,
         index_coupons,
@@ -260,22 +260,22 @@ def test_CDSIndexAdjustSpreads():
 
     cdsIndex = CDSIndexPortfolio()
 
-    intrinsicSpd3Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd3Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               indexMaturityDates[0],
                                               adjustedIssuerCurves) * 10000.0
 
-    intrinsicSpd5Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd5Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               indexMaturityDates[1],
                                               adjustedIssuerCurves) * 10000.0
 
-    intrinsicSpd7Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd7Y = cdsIndex.intrinsic_spread(valuation_date,
                                               step_in_date,
                                               indexMaturityDates[2],
                                               adjustedIssuerCurves) * 10000.0
 
-    intrinsicSpd10Y = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd10Y = cdsIndex.intrinsic_spread(valuation_date,
                                                step_in_date,
                                                indexMaturityDates[3],
                                                adjustedIssuerCurves) * 10000.0

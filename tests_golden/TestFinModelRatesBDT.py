@@ -12,8 +12,8 @@ from financepy.utils.date import Date
 from financepy.market.discount.curve import DiscountCurve
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
-from financepy.products.rates.swaption import IborSwaption
-from financepy.products.rates.swaption import FinSwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import FinSwapTypes
 from financepy.models.black import FinModelBlack
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -172,7 +172,7 @@ def test_BDTExampleTwo():
     for num_time_steps in num_stepsList:
         model = FinModelRatesBDT(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
-        v = model.bondOption(texp, strike_price,
+        v = model.bond_option(texp, strike_price,
                              face, coupon_times, coupon_flows, exercise_type)
 
         testCases.print(v)
@@ -260,7 +260,7 @@ def test_BDTExampleThree():
                 model = FinModelRatesBDT(sigma, num_time_steps)
                 model.buildTree(tmat, times, dfs)
 
-                v = model.bermudanSwaption(texp,
+                v = model.bermudan_swaption(texp,
                                            tmat,
                                            strike_price,
                                            face,

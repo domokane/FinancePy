@@ -66,7 +66,7 @@ class BondYieldCurve():
             xdata = self._yearsToMaturity
             ydata = self._ylds
 
-            popt, pcov = curve_fit(self._curveFit._interpolatedYield,
+            popt, pcov = curve_fit(self._curveFit._interpolated_yield,
                                    xdata, ydata, bounds=fit._bounds)
 
             fit._beta1 = popt[0]
@@ -79,7 +79,7 @@ class BondYieldCurve():
             xdata = self._yearsToMaturity
             ydata = self._ylds
 
-            popt, pcov = curve_fit(self._curveFit._interpolatedYield,
+            popt, pcov = curve_fit(self._curveFit._interpolated_yield,
                                    xdata, ydata, bounds=fit._bounds)
 
             fit._beta1 = popt[0]
@@ -103,7 +103,7 @@ class BondYieldCurve():
 
 ###############################################################################
 
-    def interpolatedYield(self,
+    def interpolated_yield(self,
                           maturity_date: Date):
 
         if type(maturity_date) is Date:
@@ -120,16 +120,16 @@ class BondYieldCurve():
         fit = self._curveFit
 
         if type(fit) == CurveFitPolynomial:
-            yld = fit._interpolatedYield(t)
+            yld = fit._interpolated_yield(t)
         elif type(fit) == CurveFitNelsonSiegel:
-            yld = fit._interpolatedYield(t,
+            yld = fit._interpolated_yield(t,
                                          fit._beta1,
                                          fit._beta2,
                                          fit._beta3,
                                          fit._tau)
 
         elif type(fit) == CurveFitNelsonSiegelSvensson:
-            yld = fit._interpolatedYield(t,
+            yld = fit._interpolated_yield(t,
                                          fit._beta1,
                                          fit._beta2,
                                          fit._beta3,
@@ -138,7 +138,7 @@ class BondYieldCurve():
                                          fit._tau2)
 
         elif type(fit) == CurveFitBSpline:
-            yld = fit._interpolatedYield(t)
+            yld = fit._interpolated_yield(t)
 
         return yld
 
@@ -158,7 +158,7 @@ class BondYieldCurve():
         tmax = np.max(self._yearsToMaturity)
         t = np.linspace(0.0, int(tmax+0.5), 100)
 
-        yld = self.interpolatedYield(t)
+        yld = self.interpolated_yield(t)
         yld = scale(yld, 100.0)
         plt.plot(t, yld, label=str(self._curveFit))
         plt.legend(loc='lower right')

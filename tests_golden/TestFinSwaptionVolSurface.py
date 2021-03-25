@@ -72,33 +72,33 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         divRate = 0.010  # USD
         dividend_curve = DiscountCurveFlat(valuation_date, divRate)
 
-        volFunctionType = FinVolFunctionTypes.SABR_BETA_HALF
+        vol_functionType = FinVolFunctionTypes.SABR_BETA_HALF
 
         swaptionSurface = SwaptionVolSurface(valuation_date,
                                              exercise_dates,
                                              fwd_swap_rates,
                                              marketStrikes,
                                              marketVolatilities,
-                                             volFunctionType)
+                                             vol_functionType)
 
         tol = 1e-4
-        swaptionSurface.checkCalibration(False, tol)
+        swaptionSurface.check_calibration(False, tol)
 
         if 1==1: # PLOT_GRAPHS:
 
-            swaptionSurface.plotVolCurves()
+            swaptionSurface.plot_vol_curves()
 
             # plt.figure()
 
             # mins = 0.5
             # maxs = 5.0
 
-            # dbns = swaptionSurface.impliedDbns(mins, maxs, 1000)
+            # dbns = swaptionSurface.implied_dbns(mins, maxs, 1000)
 
             # for i in range(0, len(dbns)):
             #     expiry_dateStr = str(equitySurface._expiry_dates[i])
             #     plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_dateStr)
-            #     plt.title(volFunctionType)
+            #     plt.title(vol_functionType)
             #     plt.legend()
             #     print("SUM:", dbns[i].sum())
 

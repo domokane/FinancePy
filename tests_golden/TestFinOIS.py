@@ -60,8 +60,8 @@ def test_FinFixedOIS():
     
 #    print(v)
     
-#    ois._fixed_leg.printValuation()
-#    ois._floatLeg.printValuation()
+#    ois._fixed_leg.print_valuation()
+#    ois._floatLeg.print_valuation()
     
     testCases.header("LABEL", "VALUE")
     testCases.print("SWAP_VALUE", v)

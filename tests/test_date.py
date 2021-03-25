@@ -21,7 +21,7 @@ def test_addDays():
 
 
 def test_from_string():
-    assert Date.fromString("1-1-2018", "%d-%m-%Y") == Date(1, 1, 2018)
+    assert Date.from_string("1-1-2018", "%d-%m-%Y") == Date(1, 1, 2018)
 
 
 def test_weekday():

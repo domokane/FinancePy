@@ -25,15 +25,15 @@ def test_EquityBarrierOption():
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05
-    dividendYield = 0.02
+    dividend_yield = 0.02
     option_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
 
-    drift = interest_rate - dividendYield
+    drift = interest_rate - dividend_yield
     scheme = FinGBMNumericalScheme.NORMAL
     process_type = FinProcessTypes.GBM
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     model = BlackScholes(volatility)
 

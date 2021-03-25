@@ -187,13 +187,13 @@ def test_HullWhiteBondOption():
 
         exercise_type = FinExerciseTypes.EUROPEAN
 
-        v1 = model.bondOption(texp, strike_price, face,
+        v1 = model.bond_option(texp, strike_price, face,
                               coupon_times, coupon_flows, exercise_type)
 
         model = FinModelRatesHW(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
         model.buildTree(texp, times, dfs)
 
-        v2 = model.bondOption(texp, strike_price, face,
+        v2 = model.bond_option(texp, strike_price, face,
                               coupon_times, coupon_flows, exercise_type)
 
         end = time.time()

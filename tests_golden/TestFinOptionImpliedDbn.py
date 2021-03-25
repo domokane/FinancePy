@@ -71,11 +71,11 @@ def test_FinOptionImpliedDbn():
                                 atmMethod,
                                 deltaMethod)
 
-#        fxMarket.checkCalibration(True)
+#        fxMarket.check_calibration(True)
 
         PLOT_GRAPHS = False
         if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+            fxMarket.plot_vol_curves()
  
         for iTenor in range(0, len(fxMarket._tenors)):
             

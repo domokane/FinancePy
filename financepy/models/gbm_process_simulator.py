@@ -10,7 +10,7 @@ from ..utils.math import cholesky
 
 @njit(float64[:, :](int64, int64, float64, float64, float64, float64, int64),
       cache=True, fastmath=True)
-def getPaths(num_paths,
+def get_paths(num_paths,
              num_time_steps,
              t,
              mu,
@@ -44,14 +44,14 @@ def getPaths(num_paths,
 @njit(float64[:, :, :](int64, int64, int64, float64, float64[:], float64[:],
                        float64[:], float64[:, :], int64),
       cache=True, fastmath=True)
-def getPathsAssets(num_assets,
+def get_paths_assets(num_assets,
                    num_paths,
                    num_time_steps,
                    t,
                    mus,
                    stock_prices,
                    volatilities,
-                   corrMatrix,
+                   corr_matrix,
                    seed):
     """ Get the simulated GBM process for a number of assets and paths and num
     time steps. Inputs include the number of assets, paths, the vector of mus,
@@ -65,7 +65,7 @@ def getPathsAssets(num_assets,
     Sall = np.empty((2 * num_paths, num_time_steps + 1, num_assets))
 
     g = np.random.standard_normal((num_paths, num_time_steps + 1, num_assets))
-    c = cholesky(corrMatrix)
+    c = cholesky(corr_matrix)
     gCorr = np.empty((num_paths, num_time_steps + 1, num_assets))
 
     # Calculate the dot product
@@ -100,13 +100,13 @@ def getPathsAssets(num_assets,
 #                   float64[:, :], int64),
 #                   cache=True, fastmath=True)
 @njit
-def getAssets(num_assets,
+def get_assets(num_assets,
               num_paths,
               t,
               mus,
               stock_prices,
               volatilities,
-              corrMatrix,
+              corr_matrix,
               seed):
     
     """ Get the simulated GBM process for a number of assets and paths for one
@@ -118,7 +118,7 @@ def getAssets(num_assets,
     m = np.exp((mus - volatilities * volatilities / 2.0) * t)
     Sall = np.empty((2 * num_paths, num_assets))
     g = np.random.standard_normal((num_paths, num_assets))
-    c = cholesky(corrMatrix)
+    c = cholesky(corr_matrix)
     gCorr = np.empty((num_paths, num_assets))
 
     # Calculate the dot product
@@ -142,7 +142,7 @@ def getAssets(num_assets,
 
 class FinGBMProcess():
 
-    def getPaths(self,
+    def get_paths(self,
                  num_paths: int,
                  num_time_steps: int,
                  t: float,
@@ -154,14 +154,14 @@ class FinGBMProcess():
         Inputs are the number of paths and time steps, the time horizon and
         the initial asset value, volatility and random number seed. """
 
-        paths = getPaths(num_paths, num_time_steps,
+        paths = get_paths(num_paths, num_time_steps,
                          t, mu, stock_price, volatility, seed)
 
         return paths
 
 ###############################################################################
 
-    def getPathsAssets(self,
+    def get_paths_assets(self,
                        num_assets,
                        num_paths,
                        num_time_steps,
@@ -169,20 +169,20 @@ class FinGBMProcess():
                        mus,
                        stock_prices,
                        volatilities,
-                       corrMatrix,
+                       corr_matrix,
                        seed):
         """ Get a matrix of simulated GBM asset values by asset, path and time
         step. Inputs are the number of assets, paths and time steps, the time-
         horizon and the initial asset values, volatilities and betas. """
 
         if num_time_steps == 2:
-            paths = getAssets(num_assets, num_paths,
+            paths = get_assets(num_assets, num_paths,
                               t, mus, stock_prices,
-                              volatilities, corrMatrix, seed)
+                              volatilities, corr_matrix, seed)
         else:
-            paths = getPathsAssets(num_assets, num_paths, num_time_steps,
+            paths = get_paths_assets(num_assets, num_paths, num_time_steps,
                                    t, mus, stock_prices,
-                                   volatilities, corrMatrix, seed)
+                                   volatilities, corr_matrix, seed)
         return paths
 
 ###############################################################################

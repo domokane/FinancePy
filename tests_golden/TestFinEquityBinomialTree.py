@@ -26,7 +26,7 @@ def test_FinBinomialTree():
 
     stock_price = 50.0
     riskFreeRate = 0.06
-    dividendYield = 0.04
+    dividend_yield = 0.04
     volatility = 0.40
 
     valuation_date = Date(1, 1, 2016)
@@ -34,7 +34,7 @@ def test_FinBinomialTree():
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, riskFreeRate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     num_stepsList = [100, 500, 1000, 2000, 5000]
 

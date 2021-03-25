@@ -49,19 +49,19 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
     simultaneous equations. """
 
     def __init__(self,
-                 equityValue: (float, list, np.ndarray),
+                 equity_value: (float, list, np.ndarray),
                  bondFace: (float, list,np.ndarray),
                  timeToMaturity: (float, list, np.ndarray),
                  riskFreeRate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
-                 equityVolatility: (float, list, np.ndarray)):
+                 equity_volatility: (float, list, np.ndarray)):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 
         check_argument_types(self.__init__, locals())
 
-        if isinstance(equityValue, float):
-            equityValue = [equityValue]
+        if isinstance(equity_value, float):
+            equity_value = [equity_value]
 
         if isinstance(bondFace, float):
             bondFace = [bondFace]
@@ -75,15 +75,15 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
         if isinstance(assetGrowthRate, float):
             assetGrowthRate = [assetGrowthRate]
 
-        if isinstance(equityVolatility, float):
-            equityVolatility = [equityVolatility]
+        if isinstance(equity_volatility, float):
+            equity_volatility = [equity_volatility]
 
-        self._E = np.array(equityValue)
+        self._E = np.array(equity_value)
         self._L = np.array(bondFace)
         self._t = np.array(timeToMaturity)
         self._r = np.array(riskFreeRate)
         self._mu = np.array(assetGrowthRate)
-        self._vE = np.array(equityVolatility)
+        self._vE = np.array(equity_volatility)
 
         nmax = max(len(self._E),
                    len(self._L),
@@ -112,7 +112,7 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
 
         self._nmax = nmax
         self._solveForAssetValueAndVol()
-        self._D = self.debtValue()
+        self._D = self.debt_value()
         
 ###############################################################################
 

@@ -166,7 +166,7 @@ class FinIborBermudanSwaption:
 
             model.buildTree(tmat, df_times, df_values)
 
-            v = model.bermudanSwaption(texp,
+            v = model.bermudan_swaption(texp,
                                        tmat,
                                        strike_price,
                                        face_amount,

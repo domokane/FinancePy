@@ -54,7 +54,7 @@ class FXFloatLookbackOption(FXOption):
               domestic_curve: DiscountCurve,
               foreign_curve: DiscountCurve,
               volatility: float,
-              stockMinMax: float):
+              stock_min_max: float):
         """ Valuation of the Floating Lookback option using Black-Scholes
         using the formulae derived by Goldman, Sosin and Gatto (1979). """
 
@@ -72,12 +72,12 @@ class FXFloatLookbackOption(FXOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > s0:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < s0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
@@ -137,7 +137,7 @@ class FXFloatLookbackOption(FXOption):
                  domestic_curve,
                  foreign_curve,
                  volatility,
-                 stockMinMax,
+                 stock_min_max,
                  num_paths=10000,
                  num_steps_per_year=252,
                  seed=4242):
@@ -157,18 +157,18 @@ class FXFloatLookbackOption(FXOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(
+        Sall = model.get_paths(
             num_paths,
             num_time_steps,
             t,

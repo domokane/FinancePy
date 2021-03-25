@@ -46,7 +46,7 @@ def test_FinCapVolCurve():
     testCases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in capVolDates:
         capFloorVol = volCurve.capVol(dt)
-        capFloorLetVol = volCurve.capletVol(dt)
+        capFloorLetVol = volCurve.caplet_vol(dt)
         testCases.print("%s" % dt,
                         "%7.3f" % (capFloorVol*100.0),
                         "%7.2f" % (capFloorLetVol*100.0))

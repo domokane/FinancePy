@@ -56,7 +56,7 @@ def test_equity_vol_surface(verboseCalibration):
     q = 0.010  # USD
     dividend_curve = DiscountCurveFlat(valuation_date, q)
 
-    volFunctionType = FinVolFunctionTypes.SVI
+    vol_functionType = FinVolFunctionTypes.SVI
 
     equitySurface = EquityVolSurface(valuation_date,
                                      stock_price,
@@ -65,26 +65,26 @@ def test_equity_vol_surface(verboseCalibration):
                                      expiry_dates,
                                      strikes,
                                      volSurface,
-                                     volFunctionType)
+                                     vol_functionType)
 
 #    tol = 1e-4
-#    equitySurface.checkCalibration(False, tol)
+#    equitySurface.check_calibration(False, tol)
 
     if 1==0: # PLOT_GRAPHS:
 
-        equitySurface.plotVolCurves()
+        equitySurface.plot_vol_curves()
 
         plt.figure()
 
         mins = strikes[0] * 0.5
         maxs = strikes[-1] * 1.5
 
-        dbns = equitySurface.impliedDbns(mins, maxs, 1000)
+        dbns = equitySurface.implied_dbns(mins, maxs, 1000)
 
         for i in range(0, len(dbns)):
             expiry_dateStr = str(equitySurface._expiry_dates[i])
             plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_dateStr)
-            plt.title(volFunctionType)
+            plt.title(vol_functionType)
             plt.legend()
             print("SUM:", dbns[i].sum())
 

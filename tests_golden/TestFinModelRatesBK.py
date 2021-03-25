@@ -112,7 +112,7 @@ def test_BKExampleTwo():
     model = FinModelRatesBK(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
-    v = model.bondOption(texp, strike_price, face, coupon_times,
+    v = model.bond_option(texp, strike_price, face, coupon_times,
                          coupon_flows, exercise_type)
 
     # Test convergence
@@ -125,7 +125,7 @@ def test_BKExampleTwo():
         start = time.time()
         model = FinModelRatesBK(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
-        v = model.bondOption(texp, strike_price,
+        v = model.bond_option(texp, strike_price,
                              face, coupon_times, coupon_flows, exercise_type)
         end = time.time()
         period = end-start

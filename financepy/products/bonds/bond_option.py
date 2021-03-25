@@ -114,7 +114,7 @@ class BondOption():
         # This is wasteful if the model is Jamshidian but how to do neat design ?
         model.buildTree(tmat, df_times, df_values)
 
-        v = model.bondOption(texp, self._strike_price, self._face_amount,
+        v = model.bond_option(texp, self._strike_price, self._face_amount,
                              coupon_times, coupon_flows, exercise_type)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL \

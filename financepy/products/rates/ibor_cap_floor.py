@@ -121,13 +121,13 @@ class IborCapFloor():
         self._generateDates()
 
         self._day_counter = DayCount(self._day_count_type)
-        numOptions = len(self._capFloorLetDates)
+        num_options = len(self._capFloorLetDates)
         strikeRate = self._strikeRate
 
         if strikeRate < 0.0:
             raise FinError("Strike < 0.0")
 
-        if numOptions <= 1:
+        if num_options <= 1:
             raise FinError("Number of options in capfloor equals 1")
 
         self._capFloorLetValues = [0]
@@ -168,7 +168,7 @@ class IborCapFloor():
         self._capFloorLetDiscountFactors.append(df)
         self._capFloorPV.append(capFloorValue)
 
-        for i in range(2, numOptions):
+        for i in range(2, num_options):
 
             start_date = self._capFloorLetDates[i - 1]
             end_date = self._capFloorLetDates[i]
@@ -299,7 +299,7 @@ class IborCapFloor():
 
 ###############################################################################
 
-    def printLeg(self):
+    def print_leg(self):
         """ Prints the cap floor payment amounts. """
 
         print("START DATE:", self._start_date)

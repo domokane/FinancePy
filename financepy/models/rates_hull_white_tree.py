@@ -413,7 +413,7 @@ def americanBondOption_Tree_Fast(texp,
 
 
 @njit(fastmath=True, cache=True)
-def bermudanSwaption_Tree_Fast(texp, tmat, strike_price, face_amount,
+def bermudan_swaption_Tree_Fast(texp, tmat, strike_price, face_amount,
                                coupon_times, coupon_flows,
                                exercise_typeInt,
                                _df_times, _df_values,
@@ -1097,7 +1097,7 @@ class FinModelRatesHW():
 
 ###############################################################################
 
-    def bermudanSwaption(self, texp, tmat, strike, face,
+    def bermudan_swaption(self, texp, tmat, strike, face,
                          coupon_times, coupon_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -1116,7 +1116,7 @@ class FinModelRatesHW():
         #######################################################################
 
         payValue, recValue \
-            = bermudanSwaption_Tree_Fast(texp, tmat, strike, face,
+            = bermudan_swaption_Tree_Fast(texp, tmat, strike, face,
                                          coupon_times, coupon_flows,
                                          exercise_typeInt,
                                          self._df_times, self._dfs,
@@ -1129,7 +1129,7 @@ class FinModelRatesHW():
 
 ###############################################################################
 
-    def bondOption(self, texp, strike_price, face_amount,
+    def bond_option(self, texp, strike_price, face_amount,
                    coupon_times, coupon_flows, exercise_type):
         """ Value a bond option that can have European or American exercise.
         This is done using a trinomial tree that we extend out to bond 

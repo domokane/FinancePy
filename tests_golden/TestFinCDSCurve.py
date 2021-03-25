@@ -74,12 +74,12 @@ def test_FinCDSCurve():
 
     if 1 == 0:
         x = [0.0, 1.2, 1.6, 1.7, 10.0]
-        qs = issuer_curve.survProb(x)
+        qs = issuer_curve.survival_prob(x)
         print("===>", qs)
 
         x = [0.3, 1.2, 1.6, 1.7, 10.0]
         xx = np.array(x)
-        qs = issuer_curve.survProb(xx)
+        qs = issuer_curve.survival_prob(xx)
         print("===>", qs)
 
         x = [0.3, 1.2, 1.6, 1.7, 10.0]

@@ -137,7 +137,7 @@ class FinIborLMMProducts():
         gammas = np.zeros(numGridPoints)
         for ix in range(1, numGridPoints):
             dt = self._gridDates[ix]
-            gammas[ix] = volCurve.capletVol(dt)
+            gammas[ix] = volCurve.caplet_vol(dt)
 
         self._fwds = LMMSimulateFwds1F(self._numForwards,
                                        num_paths,
@@ -259,7 +259,7 @@ class FinIborLMMProducts():
         zetas = np.zeros(numGridPoints)
         for ix in range(1, numGridPoints):
             dt = self._gridDates[ix]
-            zetas[ix] = volCurve.capletVol(dt)
+            zetas[ix] = volCurve.caplet_vol(dt)
 
         # This function does not use Sobol - TODO
         self._fwds = LMMSimulateFwdsNF(self._numForwards,

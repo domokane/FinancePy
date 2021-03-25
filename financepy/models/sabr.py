@@ -172,7 +172,7 @@ class FinModelSABR():
 ###############################################################################
 
 
-    def blackVol(self, f, k, t):
+    def black_vol(self, f, k, t):
         """ Black volatility from SABR model using Hagan et al. approx. """
 
         params = np.array([self._alpha, self._beta, self._rho, self._nu])
@@ -207,7 +207,7 @@ class FinModelSABR():
     def blackVolWithAlpha(self, alpha, f, k, t):
 
         self._alpha = alpha[0]
-        blackVol = self.blackVol(f, k, t)
+        blackVol = self.black_vol(f, k, t)
         return blackVol
 
 ###############################################################################
@@ -225,7 +225,7 @@ class FinModelSABR():
         t = time_to_expiry
         k = strikeRate
         sqrtT = np.sqrt(t)
-        vol = self.blackVol(f, k, t)
+        vol = self.black_vol(f, k, t)
 
         d1 = np.log(f/k) + vol * vol * t / 2
         d1 = d1 / (vol * sqrtT)

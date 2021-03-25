@@ -516,8 +516,8 @@ def test_bloombergPricingExample():
 
     oisCurve = OISCurve(valuation_date, depos, fras, swaps)
 
-#    swaps[0]._fixed_leg.printValuation()
-#    swaps[0]._floatLeg.printValuation()
+#    swaps[0]._fixed_leg.print_valuation()
+#    swaps[0]._floatLeg.print_valuation()
     
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0

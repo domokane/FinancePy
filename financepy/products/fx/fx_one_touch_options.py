@@ -148,7 +148,7 @@ class FXOneTouchOption(EquityOption):
                  expiry_date: Date,
                  option_type: TouchOptionPayoffTypes,
                  barrierFXRate: float,
-                 paymentSize: float = 1.0):
+                 payment_size: float = 1.0):
         """ Create the one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash . """
 
@@ -157,7 +157,7 @@ class FXOneTouchOption(EquityOption):
         self._expiry_date = expiry_date
         self._option_type = option_type
         self._barrierFXRate = float(barrierFXRate)
-        self._paymentSize = paymentSize
+        self._payment_size = payment_size
 
 ###############################################################################
 
@@ -183,13 +183,13 @@ class FXOneTouchOption(EquityOption):
 
         s0 = spot_fx_rate
         H = self._barrierRate
-        K = self._paymentSize
+        K = self._payment_size
 
         sqrtT = np.sqrt(t)
 
         df = domCurve.df(self._expiry_date)
-        rd = domCurve.ccRate(self._expiry_date)
-        rf = forCurve.ccRate(self._expiry_date)
+        rd = domCurve.cc_rate(self._expiry_date)
+        rf = forCurve.cc_rate(self._expiry_date)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -425,10 +425,10 @@ class FXOneTouchOption(EquityOption):
         s0 = stock_price
         mu = rd - rf
 
-        s = getPaths(num_paths, num_time_steps, t, mu, s0, v, seed)
+        s = get_paths(num_paths, num_time_steps, t, mu, s0, v, seed)
 
-        H = self._barrierPrice
-        X = self._paymentSize
+        H = self._barrier_price
+        X = self._payment_size
 
         v = 0.0
 
@@ -558,8 +558,8 @@ class FXOneTouchOption(EquityOption):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("BARRIER LEVEL", self._barrierPrice)
-        s += label_to_string("PAYMENT SIZE", self._paymentSize, "")
+        s += label_to_string("BARRIER LEVEL", self._barrier_price)
+        s += label_to_string("PAYMENT SIZE", self._payment_size, "")
         return s
 
 ###############################################################################

@@ -634,17 +634,17 @@ def cholesky(rho):
 
 
 @njit(fastmath=True, cache=True)
-def corrMatrixGenerator(rho, n):
+def corr_matrixGenerator(rho, n):
     """ Utility function to generate a full rank n x n correlation matrix with
     a flat correlation structure and value rho. """
 
-    corrMatrix = np.zeros(shape=(n, n))
+    corr_matrix = np.zeros(shape=(n, n))
     for i in range(0, n):
-        corrMatrix[i, i] = 1.0
+        corr_matrix[i, i] = 1.0
         for j in range(0, i):
-            corrMatrix[i, j] = rho
-            corrMatrix[j, i] = rho
+            corr_matrix[i, j] = rho
+            corr_matrix[j, i] = rho
 
-    return corrMatrix
+    return corr_matrix
 
 ###############################################################################

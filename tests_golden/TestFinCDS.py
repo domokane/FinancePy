@@ -582,7 +582,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     dates = settlement_date.addYears(years)
     for dt in dates:
         df = libor_curve.df(dt)
-        q = issuer_curve.survProb(dt)
+        q = issuer_curve.survival_prob(dt)
         testCases.print("%16s" % dt, "%12.8f" % df, "%12.8f" % q)
 
     return libor_curve, issuer_curve
@@ -643,11 +643,11 @@ def test_full_priceCDSModelCheck():
     testCases.print("FULL_RPV01", rpv01['full_rpv01'])
     testCases.print("CLEAN_RPV01", rpv01['clean_rpv01'])
 
-    creditDV01 = cds_contract.creditDV01(valuation_date, issuer_curve, cdsRecovery)
-    testCases.print("CREDIT DV01", creditDV01)
+    credit_dv01 = cds_contract.credit_dv01(valuation_date, issuer_curve, cdsRecovery)
+    testCases.print("CREDIT DV01", credit_dv01)
 
-    interestDV01 = cds_contract.interestDV01(valuation_date, issuer_curve, cdsRecovery)
-    testCases.print("INTEREST DV01", interestDV01)
+    interest_dv01 = cds_contract.interest_dv01(valuation_date, issuer_curve, cdsRecovery)
+    testCases.print("INTEREST DV01", interest_dv01)
 
     # Consider fast approximation
     t = (maturity_date - valuation_date) / gDaysInYear

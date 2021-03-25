@@ -23,9 +23,9 @@ class FinFXVarianceSwap:
     def __init__(self,
                  effective_date: Date,
                  maturity_date_or_tenor: [Date, str],
-                 strikeVariance: float,
+                 strike_variance: float,
                  notional: float = ONE_MILLION,
-                 payStrikeFlag: bool = True):
+                 pay_strike_flag: bool = True):
         """ Create variance swap contract. """
 
         check_argument_types(self.__init__, locals())
@@ -40,13 +40,13 @@ class FinFXVarianceSwap:
 
         self._effective_date = effective_date
         self._maturity_date = maturity_date
-        self._strikeVariance = strikeVariance
+        self._strike_variance = strike_variance
         self._notional = notional
-        self._payStrike = payStrikeFlag
+        self._payStrike = pay_strike_flag
 
         # Replication portfolio is stored
-        self._numPutOptions = 0
-        self._numCallOptions = 0
+        self._num_put_options = 0
+        self._num_call_options = 0
         self._putWts = []
         self._put_strikes = []
         self._callWts = []
@@ -57,7 +57,7 @@ class FinFXVarianceSwap:
     def value(self,
               valuation_date,
               realisedVar,
-              fairStrikeVar,
+              fair_strikeVar,
               libor_curve):
         """ Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
@@ -67,9 +67,9 @@ class FinFXVarianceSwap:
         t2 = (self._maturity_date - self._effective_date) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
-        expectedVariance += (t2-t1) * fairStrikeVar / t2
+        expectedVariance += (t2-t1) * fair_strikeVar / t2
 
-        payoff = expectedVariance - self._strikeVariance
+        payoff = expectedVariance - self._strike_variance
 
         df = libor_curve.df(self._maturity_date)
         v = payoff * self._notional * df
@@ -77,7 +77,7 @@ class FinFXVarianceSwap:
 
 ###############################################################################
 
-    def fairStrikeApprox(self,
+    def fair_strikeApprox(self,
                          valuation_date,
                          fwdStockPrice,
                          strikes,
@@ -103,23 +103,23 @@ class FinFXVarianceSwap:
 
 ###############################################################################
 
-    def fairStrike(self,
+    def fair_strike(self,
                    valuation_date,
                    stock_price,
                    dividend_curve,
-                   volatilityCurve,
-                   numCallOptions,
-                   numPutOptions,
-                   strikeSpacing,
+                   volatility_curve,
+                   num_call_options,
+                   num_put_options,
+                   strike_spacing,
                    discount_curve,
-                   useForward=True):
+                   use_forward=True):
         """ Calculate the implied variance according to the volatility surface
         using a static replication methodology with a specially weighted
         portfolio of put and call options across a range of strikes using the
         approximate method set out by Demeterfi et al. 1999. """
 
-        self._numPutOptions = numPutOptions
-        self._numCallOptions = numCallOptions
+        self._num_put_options = num_put_options
+        self._num_call_options = num_call_options
 
         call_type = FinOptionTypes.EUROPEAN_CALL
         put_type = FinOptionTypes.EUROPEAN_PUT
@@ -137,7 +137,7 @@ class FinFXVarianceSwap:
         fwd = stock_price * g
 
         # This fixes the centre strike of the replication options
-        if useForward is True:
+        if use_forward is True:
             sstar = fwd
         else:
             sstar = stock_price
@@ -146,7 +146,7 @@ class FinFXVarianceSwap:
         Goldman Sachs Research notes March 1999. See Appendix A. This aim is
         to use calls and puts to approximate the payoff of a log contract """
 
-        minStrike = sstar - (numPutOptions+1) * strikeSpacing
+        minStrike = sstar - (num_put_options+1) * strike_spacing
 
         self._putWts = []
         self._put_strikes = []
@@ -154,49 +154,49 @@ class FinFXVarianceSwap:
         self._call_strikes = []
 
         # if the lower strike is < 0 we go to as low as the strike spacing
-        if minStrike < strikeSpacing:
+        if minStrike < strike_spacing:
             k = sstar
             klist = [sstar]
-            while k >= strikeSpacing:
-                k -= strikeSpacing
+            while k >= strike_spacing:
+                k -= strike_spacing
                 klist.append(k)
             putK = np.array(klist)
-            self._numPutOptions = len(putK) - 1
+            self._num_put_options = len(putK) - 1
         else:
-            putK = np.linspace(sstar, minStrike, numPutOptions+2)
+            putK = np.linspace(sstar, minStrike, num_put_options+2)
 
         self._put_strikes = putK
 
-        maxStrike = sstar + (numCallOptions+1) * strikeSpacing
-        callK = np.linspace(sstar, maxStrike, numCallOptions+2)
+        maxStrike = sstar + (num_call_options+1) * strike_spacing
+        callK = np.linspace(sstar, maxStrike, num_call_options+2)
 
         self._call_strikes = callK
 
         optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - np.log(sstar/s0))/tmat
 
-        self._callWts = np.zeros(numCallOptions)
-        self._putWts = np.zeros(numPutOptions)
+        self._callWts = np.zeros(num_call_options)
+        self._putWts = np.zeros(num_put_options)
 
         def f(x): return (2.0/tmat)*((x-sstar)/sstar-np.log(x/sstar))
 
         sumWts = 0.0
-        for n in range(0, self._numPutOptions):
+        for n in range(0, self._num_put_options):
             kp = putK[n+1]
             k = putK[n]
             self._putWts[n] = (f(kp)-f(k))/(k-kp) - sumWts
             sumWts += self._putWts[n]
 
         sumWts = 0.0
-        for n in range(0, self._numCallOptions):
+        for n in range(0, self._num_call_options):
             kp = callK[n+1]
             k = callK[n]
             self._callWts[n] = (f(kp)-f(k))/(kp-k) - sumWts
             sumWts += self._callWts[n]
 
         piPut = 0.0
-        for n in range(0, numPutOptions):
+        for n in range(0, num_put_options):
             k = putK[n]
-            vol = volatilityCurve.volatility(k)
+            vol = volatility_curve.volatility(k)
             opt = FXVanillaOption(self._maturity_date, k, put_type)
             model = BlackScholes(vol)
             v = opt.value(valuation_date, s0, discount_curve,
@@ -204,9 +204,9 @@ class FinFXVarianceSwap:
             piPut += v * self._putWts[n]
 
         piCall = 0.0
-        for n in range(0, numCallOptions):
+        for n in range(0, num_call_options):
             k = callK[n]
-            vol = volatilityCurve.volatility(k)
+            vol = volatility_curve.volatility(k)
             opt = FXVanillaOption(self._maturity_date, k, call_type)
             model = BlackScholes(vol)
             v = opt.value(valuation_date, s0, discount_curve,
@@ -221,7 +221,7 @@ class FinFXVarianceSwap:
 
 ###############################################################################
 
-    def realisedVariance(self, closePrices, useLogs=True):
+    def realised_variance(self, closePrices, useLogs=True):
         """ Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns."""
 
@@ -250,16 +250,16 @@ class FinFXVarianceSwap:
 
     def printStrikes(self):
 
-        if self._numPutOptions == 0 and self._numCallOptions == 0:
+        if self._num_put_options == 0 and self._num_call_options == 0:
             return
 
         print("TYPE", "STRIKE", "WEIGHT")
-        for n in range(0, self._numPutOptions):
+        for n in range(0, self._num_put_options):
             k = self._put_strikes[n]
             wt = self._putWts[n]*self._notional
             print("PUT %7.2f %10.3f" % (k, wt))
 
-        for n in range(0, self._numCallOptions):
+        for n in range(0, self._num_call_options):
             k = self._call_strikes[n]
             wt = self._callWts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))

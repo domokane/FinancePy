@@ -245,14 +245,14 @@ def test_full_priceCDSIndexOption():
                                     strike / 10000.0,
                                     notional)
 
-            v_pay_1, v_rec_1, strikeValue, mu, expH = option.valueAnderson(
+            v_pay_1, v_rec_1, strikeValue, mu, expH = option.value_anderson(
                 valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
             end = time.time()
             elapsed = end - start
 
             end = time.time()
 
-            v_pay_2, v_rec_2 = option.valueAdjustedBlack(valuation_date,
+            v_pay_2, v_rec_2 = option.value_adjusted_black(valuation_date,
                                                          index_curve,
                                                          indexRecovery,
                                                          libor_curve,

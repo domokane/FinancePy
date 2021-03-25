@@ -136,8 +136,8 @@ class OISBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatIborLeg.printPayments()
-        self._floatOISLeg.printPayments()
+        self._floatIborLeg.print_payments()
+        self._floatOISLeg.print_payments()
 
 ##########################################################################
 

@@ -110,7 +110,7 @@ def _value_convertible(tmat,
         treeDfs[i] = df
 
     h = credit_spread / (1.0 - recRate)
-    survProb = exp(-h * dt)
+    survival_prob = exp(-h * dt)
 
     # map coupons onto tree but preserve their present value using risky dfs
     treeFlows = np.zeros(num_times)
@@ -193,8 +193,8 @@ def _value_convertible(tmat,
     q = 0.0  # we have discrete dividends paid as dividend yields only
     for iTime in range(1, num_times):
         a = treeDfs[iTime - 1] / treeDfs[iTime] * exp(-q * dt)
-        treeProbsUp[iTime] = (a - d * survProb) / (u - d)
-        treeProbsDn[iTime] = (u * survProb - a) / (u - d)
+        treeProbsUp[iTime] = (a - d * survival_prob) / (u - d)
+        treeProbsDn[iTime] = (u * survival_prob - a) / (u - d)
     #        r = log(a)/dt
     #        n_min = r*r / stock_volatility / stock_volatility
 
@@ -216,7 +216,7 @@ def _value_convertible(tmat,
 
         pUp = treeProbsUp[iTime + 1]
         pDn = treeProbsDn[iTime + 1]
-        pDef = 1.0 - survProb
+        pDef = 1.0 - survival_prob
         df = treeDfs[iTime + 1] / treeDfs[iTime]
         call = tree_call_value[iTime]
         put = treePutValue[iTime]
@@ -231,7 +231,7 @@ def _value_convertible(tmat,
             value = min(max(holdPV, conv, put), call)
             treeConvBondValue[iTime, iNode] = value
 
-        bulletPV = df * bulletPV * survProb
+        bulletPV = df * bulletPV * survival_prob
         bulletPV += pDef * df * recRate * face_amount
         bulletPV += flow * face_amount
 

@@ -136,7 +136,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg1.printValuation()
+        self._floatLeg1.print_valuation()
 
 ###############################################################################
 
@@ -144,7 +144,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg2.printValuation()
+        self._floatLeg2.print_valuation()
 
 ###############################################################################
 
@@ -152,8 +152,8 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg1.printPayments()
-        self._floatLeg2.printPayments()
+        self._floatLeg1.print_payments()
+        self._floatLeg2.print_payments()
 
 ##########################################################################
 

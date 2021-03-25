@@ -38,16 +38,16 @@ class EquityModel:
 
 
 class EquityModelHeston(EquityModel):
-    def __init__(self, volatility, meanReversion):
+    def __init__(self, volatility, mean_reversion):
         self._parentType = EquityModel
         self._volatility = volatility
-        self._meanReversion = meanReversion
+        self._mean_reversion = mean_reversion
         self._implementation = 0
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self._volatility)
-        s += label_to_string("MEAN REVERSION", self._meanReversion)
+        s += label_to_string("MEAN REVERSION", self._mean_reversion)
         s += label_to_string("IMPLEMENTATION", self._implementation)
         return s
 

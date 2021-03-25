@@ -6,7 +6,7 @@ from .ibor_fra import *
 from .ibor_future import *
 from .ibor_conventions import *
 from .ibor_swap import *
-from .swaption import *
+from .ibor_swaption import *
 from .ois_curve import *
 from .ois import *
 from .ibor_single_curve import *

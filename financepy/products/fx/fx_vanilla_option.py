@@ -82,7 +82,7 @@ def fvega(volatility, *args):
 ###############################################################################
 
 @njit(fastmath=True, cache=True)
-def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
+def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
     """ Calculation of the FX Option delta. Used in the determination of
     the volatility surface. Avoids discount curve interpolation so it 
     should be slightly faster than the full calculation of delta. """
@@ -151,7 +151,7 @@ def fastDelta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 
 #     self._strike_fx_rate = K
 
-#     deltaDict = self.fastDelta(valuation_date,
+#     deltaDict = self.fast_delta(valuation_date,
 #                                stock_price,
 #                                domDF,
 #                                forDF,
@@ -444,7 +444,7 @@ class FXVanillaOption():
 
 ###############################################################################
 
-    def fastDelta(self,
+    def fast_delta(self,
                   t,
                   s,
                   rd,

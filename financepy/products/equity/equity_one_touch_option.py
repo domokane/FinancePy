@@ -13,7 +13,7 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.discount.curve import DiscountCurve
-from ...models.gbm_process_simulator import getPaths
+from ...models.gbm_process_simulator import get_paths
 
 from numba import njit
 
@@ -148,8 +148,8 @@ class EquityOneTouchOption(EquityOption):
     def __init__(self,
                  expiry_date: Date,
                  option_type: FinTouchOptionPayoffTypes,
-                 barrierPrice: float,
-                 paymentSize: float = 1.0):
+                 barrier_price: float,
+                 payment_size: float = 1.0):
         """ Create the one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash . """
 
@@ -157,8 +157,8 @@ class EquityOneTouchOption(EquityOption):
 
         self._expiry_date = expiry_date
         self._option_type = option_type
-        self._barrierPrice = float(barrierPrice)
-        self._paymentSize = paymentSize
+        self._barrier_price = float(barrier_price)
+        self._payment_size = payment_size
 
 ###############################################################################
 
@@ -181,14 +181,14 @@ class EquityOneTouchOption(EquityOption):
         t = max(t, 1e-6)
 
         s0 = stock_price
-        H = self._barrierPrice
-        K = self._paymentSize
+        H = self._barrier_price
+        K = self._payment_size
 
         sqrtT = np.sqrt(t)
 
         df = discount_curve.df(self._expiry_date)
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -424,10 +424,10 @@ class EquityOneTouchOption(EquityOption):
         s0 = stock_price
         mu = r - q
 
-        s = getPaths(num_paths, num_time_steps, t, mu, s0, v, seed)
+        s = get_paths(num_paths, num_time_steps, t, mu, s0, v, seed)
 
-        H = self._barrierPrice
-        X = self._paymentSize
+        H = self._barrier_price
+        X = self._payment_size
 
         v = 0.0
 
@@ -557,8 +557,8 @@ class EquityOneTouchOption(EquityOption):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("BARRIER LEVEL", self._barrierPrice)
-        s += label_to_string("PAYMENT SIZE", self._paymentSize, "")
+        s += label_to_string("BARRIER LEVEL", self._barrier_price)
+        s += label_to_string("PAYMENT SIZE", self._payment_size, "")
         return s
 
 ###############################################################################

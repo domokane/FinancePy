@@ -37,7 +37,7 @@ def test_FinFXOneTouchOption():
     forCurve = DiscountCurveFlat(valuation_date, foreignRate)
 
     spot_fx_rate = 1.050
-    paymentSize = 1.5
+    payment_size = 1.5
 
     testCases.header("================================= CASH ONLY")
 
@@ -52,7 +52,7 @@ def test_FinFXOneTouchOption():
         option = EquityOneTouchOption(expiry_date,
                                          downType,
                                          barrier_level,
-                                         paymentSize)
+                                         payment_size)
 
         v = option.value(valuation_date,
                          spot_fx_rate,
@@ -73,7 +73,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v_mc)
 
     spot_fx_rate = 0.950
-    paymentSize = 1.5
+    payment_size = 1.5
 
     upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT,
                FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_EXPIRY,
@@ -86,7 +86,7 @@ def test_FinFXOneTouchOption():
         option = EquityOneTouchOption(expiry_date,
                                          upType,
                                          barrier_level,
-                                         paymentSize)
+                                         payment_size)
 
         v = option.value(valuation_date,
                          spot_fx_rate,

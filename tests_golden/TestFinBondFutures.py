@@ -55,7 +55,7 @@ def test_BondFuture():
     # Get the Conversion Factors
     testCases.header("Bond Maturity", "Coupon", "Conversion Factor")
     for bond in bonds:
-        cf = bondFutureContract.conversionFactor(bond)
+        cf = bondFutureContract.conversion_factor(bond)
         testCases.print(bond._maturity_date, bond._coupon * 100, cf)
 
     # Example from
@@ -130,7 +130,7 @@ def test_BondFuture():
 
     testCases.header("BOND MATURITY", "CF")
     for bond in bonds:
-        cf = bondFutureContract.conversionFactor(bond)
+        cf = bondFutureContract.conversion_factor(bond)
         testCases.print(str(bond._maturity_date), cf)
 
     # Get the Invoice Prices

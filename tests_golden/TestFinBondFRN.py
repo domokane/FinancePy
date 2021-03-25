@@ -225,7 +225,7 @@ def test_BondFRN():
 
     settlement_date = Date(21, 7, 2017)
 
-    dm = bond.discountMargin(settlement_date,
+    dm = bond.discount_margin(settlement_date,
                              resetIbor,
                              currentIbor,
                              futureIbors,
@@ -282,7 +282,7 @@ def test_BondFRN():
 
     testCases.print("Macauley Duration = ", macauley_duration)
 
-    convexity = bond.convexityFromDM(settlement_date,
+    convexity = bond.convexity_from_dm(settlement_date,
                                      resetIbor,
                                      currentIbor,
                                      futureIbors,
@@ -298,7 +298,7 @@ def test_BondFRN():
 
     testCases.print("Dollar Credit Duration = ", duration)
 
-    modified_duration = bond.modifiedCreditDuration(settlement_date,
+    modified_duration = bond.modified_credit_duration(settlement_date,
                                                    resetIbor,
                                                    currentIbor,
                                                    futureIbors,
@@ -333,7 +333,7 @@ def test_BondFRN():
     currentIbor = 0.027558
     futureIbors = 0.03295
 
-    dm = bond.discountMargin(settlement_date,
+    dm = bond.discount_margin(settlement_date,
                              resetIbor,
                              currentIbor,
                              futureIbors,
@@ -390,7 +390,7 @@ def test_BondFRN():
 
     testCases.print("Macauley Duration = ", macauley_duration)
 
-    convexity = bond.convexityFromDM(settlement_date,
+    convexity = bond.convexity_from_dm(settlement_date,
                                      resetIbor,
                                      currentIbor,
                                      futureIbors,
@@ -414,7 +414,7 @@ def test_BondFRN():
 
     testCases.print("Dollar Credit Duration = ", duration)
 
-    modified_duration = bond.modifiedCreditDuration(settlement_date,
+    modified_duration = bond.modified_credit_duration(settlement_date,
                                                    resetIbor,
                                                    currentIbor,
                                                    futureIbors,

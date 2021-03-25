@@ -75,8 +75,8 @@ class EquityAmericanOption(EquityOption):
 
         texp = np.maximum(texp, 1e-10)
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         s = stock_price
         k = self._strike_price

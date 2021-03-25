@@ -9,7 +9,7 @@ import numpy as np
 from numba import njit, float64, int64, prange
 from ..utils.global_types import FinOptionTypes
 from ..utils.error import FinError
-from ..models.sobol import getGaussianSobol
+from ..models.sobol import get_gaussian_sobol
 from math import exp
 
 
@@ -26,7 +26,7 @@ def _value_mc_NONUMBA_NONUMPY(s, t, K, option_type, r, q, v, num_paths, seed, us
     payoff = 0.0
 
     if useSobol == 1:
-        g = getGaussianSobol(num_paths, 1)[:, 0]
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
 
@@ -67,7 +67,7 @@ def _value_mc_NUMPY_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(num_paths, 1)[:, 0]
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
 
@@ -105,7 +105,7 @@ def _value_mc_NUMPY_NUMBA(s, t, K, option_type, r, q, v, num_paths, seed, useSob
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(num_paths, 1)[:, 0]
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
 
@@ -144,7 +144,7 @@ def _value_mc_NUMBA_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
     payoff = 0.0
 
     if useSobol == 1:
-        g = getGaussianSobol(num_paths, 1)[:, 0]
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
 
@@ -190,7 +190,7 @@ def _value_mc_NUMBA_PARALLEL(s, t, K, option_type, r, q, v, num_paths, seed, use
     vsqrtt = v * np.sqrt(t)
 
     if useSobol == 1:
-        g = getGaussianSobol(num_paths, 1)[:, 0]
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
 

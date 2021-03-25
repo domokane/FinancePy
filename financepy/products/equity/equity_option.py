@@ -33,7 +33,7 @@ class EquityOption:
               valuation_date: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
-              dividendYield: float,
+              dividend_yield: float,
               model):
 
         print("You should not be here!")

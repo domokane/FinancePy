@@ -34,7 +34,7 @@ def testConvergence():
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
-    dividendYield = 0.10
+    dividend_yield = 0.10
     num_observations = 120  # daily as we have a half year
     accruedAverage = None
     K = 100
@@ -42,7 +42,7 @@ def testConvergence():
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     asianOption = EquityAsianOption(startAveragingDate,
                                        expiry_date,
@@ -148,7 +148,7 @@ def testTimeEvolution():
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
-    dividendYield = 0.10
+    dividend_yield = 0.10
     num_observations = 100  # weekly as we have a year
     accruedAverage = None
     K = 100
@@ -192,7 +192,7 @@ def testTimeEvolution():
         accruedAverage = stock_price * 0.9
 
         discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-        dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+        dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
         value_mc_fast = asianOption._value_mc_fast(valuation_date,
                                                  stock_price,
@@ -274,7 +274,7 @@ def testMCTimings():
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
-    dividendYield = 0.10
+    dividend_yield = 0.10
     num_observations = 120  # daily as we have a half year
     accruedAverage = None
     K = 100
@@ -282,7 +282,7 @@ def testMCTimings():
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     asianOption = EquityAsianOption(startAveragingDate,
                                        expiry_date,

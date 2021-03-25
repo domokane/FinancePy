@@ -52,7 +52,7 @@ class FXFixedLookbackOption:
               domestic_curve: DiscountCurve,
               foreign_curve: DiscountCurve,
               volatility: float,
-              stockMinMax: float):
+              stock_min_max: float):
         """ Value FX Fixed Lookback Option using Black Scholes model and
         analytical formulae. """
 
@@ -71,12 +71,12 @@ class FXFixedLookbackOption:
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < s0:
                 raise FinError(
                     "The Smax value must be >= the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > s0:
                 raise FinError(
                     "The Smin value must be <= the stock price.")
@@ -206,7 +206,7 @@ class FXFixedLookbackOption:
                     "Smin must be less than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(
+        Sall = model.get_paths(
             num_paths,
             num_time_steps,
             t,

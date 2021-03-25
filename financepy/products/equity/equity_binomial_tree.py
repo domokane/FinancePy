@@ -35,7 +35,7 @@ class EquityTreeExerciseTypes(Enum):
 
 
 @jit
-def _validatePayoff(payoff_type, payoff_params):
+def _validate_payoff(payoff_type, payoff_params):
 
     num_params = 0
 
@@ -109,7 +109,7 @@ def _valueOnce(stock_price,
     if num_steps < 3:
         num_steps = 3
 
-#        validatePayoff(payoff_type.value,payoff_params)
+#        validate_payoff(payoff_type.value,payoff_params)
 
     payoff_typeValue = payoff_type.value
 

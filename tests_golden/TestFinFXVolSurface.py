@@ -55,7 +55,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        volFunctionType = FinVolFunctionTypes.CLARK
+        vol_functionType = FinVolFunctionTypes.CLARK
 
         fxMarket = FXVolSurface(valuation_date,
                                 spot_fx_rate,
@@ -69,14 +69,14 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                 riskReversal25DeltaVols,
                                 atmMethod,
                                 deltaMethod,
-                                volFunctionType)
+                                vol_functionType)
 
-        fxMarket.checkCalibration(verboseCalibration)
+        fxMarket.check_calibration(verboseCalibration)
 
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
         # for atmMethod in FinFXATMMethod:
         #     for deltaMethod in FinFXDeltaMethod:
-        #         for volFunctionType in FinVolFunctionTypes:
+        #         for vol_functionType in FinVolFunctionTypes:
     
         #             fxMarket = FinFXVolSurface(valuation_date,
         #                                        spot_fx_rate,
@@ -90,19 +90,19 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #                                        riskReversal25DeltaVols,
         #                                        atmMethod,
         #                                        deltaMethod, 
-        #                                        volFunctionType)
+        #                                        vol_functionType)
         
-        #             fxMarket.checkCalibration(verboseCalibration)
+        #             fxMarket.check_calibration(verboseCalibration)
 
         if PLOT_GRAPHS:
 
-            fxMarket.plotVolCurves()
+            fxMarket.plot_vol_curves()
 
-            dbns = fxMarket.impliedDbns(0.00001, 5.0, 10000)
+            dbns = fxMarket.implied_dbns(0.00001, 5.0, 10000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                plt.title(volFunctionType)
+                plt.title(vol_functionType)
                 print("SUM:", dbns[i].sum())
 
     ###########################################################################
@@ -150,10 +150,10 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                                 atmMethod,
                                 deltaMethod)
 
-        fxMarket.checkCalibration(verboseCalibration)
+        fxMarket.check_calibration(verboseCalibration)
 
         if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+            fxMarket.plot_vol_curves()
 
 #   print("==================================================================")
 
@@ -200,10 +200,10 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                                 atmMethod,
                                 deltaMethod)
 
-        fxMarket.checkCalibration(verboseCalibration)
+        fxMarket.check_calibration(verboseCalibration)
 
         if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+            fxMarket.plot_vol_curves()
 
     ###########################################################################
 
@@ -248,10 +248,10 @@ def test_FinFXMktVolSurface4(verboseCalibration):
                                 atmMethod,
                                 deltaMethod)
 
-        fxMarket.checkCalibration(verboseCalibration)
+        fxMarket.check_calibration(verboseCalibration)
 
         if PLOT_GRAPHS:
-            fxMarket.plotVolCurves()
+            fxMarket.plot_vol_curves()
 
     #    testCases.header("value", "delta")
     #    testCases.print(value, delta)

@@ -19,16 +19,16 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_EquityDigitalOption():
 
-    underlyingType = FinDigitalOptionTypes.CASH_OR_NOTHING
+    underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
 
     valuation_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.30
     interest_rate = 0.05
-    dividendYield = 0.01
+    dividend_yield = 0.01
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
     
     model = BlackScholes(volatility)
     import time
@@ -51,7 +51,7 @@ def test_EquityDigitalOption():
     for num_paths in num_pathsList:
 
         callOption = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlyingType)
+            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlying_type)
         value = callOption.value(
             valuation_date,
             stock_price,
@@ -89,7 +89,7 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         callOption = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlyingType)
+            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlying_type)
         value = callOption.value(
             valuation_date,
             stock_price,
@@ -126,7 +126,7 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         putOption = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, underlyingType)
+            expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, underlying_type)
         value = putOption.value(
             valuation_date,
             stock_price,

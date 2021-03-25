@@ -99,7 +99,7 @@ class IborFuture:
 
 ###############################################################################
 
-    def convexity(self, valuation_date, volatility, meanReversion):
+    def convexity(self, valuation_date, volatility, mean_reversion):
         """ Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note
         in link below:
@@ -108,7 +108,7 @@ class IborFuture:
         NOTE THIS DOES NOT APPEAR TO AGREE WITH BLOOMBERG!! INVESTIGATE.
         """
 
-        a = meanReversion
+        a = mean_reversion
         t0 = 0.0
         t1 = (self._lastTradingDate - valuation_date) / gDaysInYear
         t2 = (self._endOfInterestPeriod - valuation_date) / gDaysInYear

@@ -17,4 +17,4 @@ from .equity_variance_swap import *
 from .equity_one_touch_option import *
 
 
-# dividend_curve = FinDiscountCurveFlat(valuation_date, dividendYield)
+# dividend_curve = FinDiscountCurveFlat(valuation_date, dividend_yield)

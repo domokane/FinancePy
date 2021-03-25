@@ -208,7 +208,7 @@ class BondPortfolio:
             if dt >= settlement_date:
 
                 df = discount_curve.df(dt)
-                q = survival_curve.survProb(dt)
+                q = survival_curve.survival_prob(dt)
 
                 # Add PV of coupon conditional on surviving to payment date  
                 # Any default results in all subsequent coupons being lost

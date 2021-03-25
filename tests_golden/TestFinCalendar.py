@@ -38,8 +38,8 @@ def test_Calendar():
                 testCases.banner("================================")
 #                print("=========================")
 
-            isHolidayDay = cal.isHoliday(next_date)
-            if isHolidayDay is True:
+            is_holidayDay = cal.is_holiday(next_date)
+            if is_holidayDay is True:
                 testCases.print(cal, next_date)
 #                print(cal, next_date)
 

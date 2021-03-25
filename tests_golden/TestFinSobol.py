@@ -5,7 +5,7 @@ from numba import jit
 import sys
 sys.path.append("..")
 
-from financepy.models.sobol import getUniformSobol, getGaussianSobol
+from financepy.models.sobol import get_uniform_sobol, get_gaussian_sobol
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -18,7 +18,7 @@ def test_FinSobol():
     num_points = 1000
     dimensions = 3
 
-    points = getUniformSobol(num_points, dimensions)
+    points = get_uniform_sobol(num_points, dimensions)
 
     for d in range(dimensions):
         av = 0.0
@@ -42,13 +42,13 @@ def test_FinSobol():
     testCases.header("LABEL", "TIME")
     start = time.time()
     for _ in range(numRepeats):
-        getUniformSobol(1000, numDimensions)
+        get_uniform_sobol(1000, numDimensions)
     end = time.time()
     testCases.print("Average time taken", (end - start) / numRepeats)
 
     start = time.time()
     for _ in range(numRepeats):
-        getGaussianSobol(1000, numDimensions)
+        get_gaussian_sobol(1000, numDimensions)
     end = time.time()
     testCases.print("Average time taken", (end - start) / numRepeats)
 
@@ -57,7 +57,7 @@ def test_FinSobol():
 
 @jit(cache=True, nopython=True)
 def test_FinSobolCache():
-    return getUniformSobol(2, 2)
+    return get_uniform_sobol(2, 2)
 
 ###############################################################################
 

@@ -85,7 +85,7 @@ def value_mcFast(t,
     model = FinGBMProcess()
 
     num_time_steps = 2
-    Sall = model.getPathsAssets(num_assets, num_paths, num_time_steps,
+    Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
                                 t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoff_value(Sall, payoff_type.value, payoff_params)
@@ -106,7 +106,7 @@ class FXRainbowOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        self.validatePayoff(payoff_type, payoff_params, num_assets)
+        self.validate_payoff(payoff_type, payoff_params, num_assets)
 
         self._expiry_date = expiry_date
         self._payoff_type = payoff_type
@@ -143,7 +143,7 @@ class FXRainbowOption(EquityOption):
 
     ###############################################################################
 
-    def validatePayoff(self, payoff_type, payoff_params, num_assets):
+    def validate_payoff(self, payoff_type, payoff_params, num_assets):
 
         num_params = 0
 

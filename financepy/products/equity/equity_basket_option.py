@@ -116,7 +116,7 @@ class EquityBasketOption:
 
         qs = []
         for curve in dividend_curves:
-            q = curve.ccRate(self._expiry_date)
+            q = curve.cc_rate(self._expiry_date)
             qs.append(q)
 
         v = volatilities
@@ -129,7 +129,7 @@ class EquityBasketOption:
 
         a = np.ones(self._num_assets) * (1.0 / self._num_assets)
 
-        r = discount_curve.ccRate(self._expiry_date)        
+        r = discount_curve.cc_rate(self._expiry_date)
 
         smean = 0.0
         for ia in range(0, self._num_assets):
@@ -187,7 +187,7 @@ class EquityBasketOption:
                 discount_curve: DiscountCurve,
                 dividend_curves: (list),
                 volatilities: np.ndarray,
-                corrMatrix: np.ndarray,
+                corr_matrix: np.ndarray,
                 num_paths:int = 10000,
                 seed:int = 4242):
         """ Valuation of the EquityBasketOption using a Monte-Carlo simulation
@@ -212,7 +212,7 @@ class EquityBasketOption:
         self._validate(stock_prices,
                        dividend_yields,
                        volatilities,
-                       corrMatrix)
+                       corr_matrix)
 
         num_assets = len(stock_prices)
 
@@ -227,14 +227,14 @@ class EquityBasketOption:
         model = FinGBMProcess()
         np.random.seed(seed)
 
-        Sall = model.getPathsAssets(num_assets,
+        Sall = model.get_paths_assets(num_assets,
                                     num_paths,
                                     num_time_steps,
                                     texp,
                                     mus,
                                     stock_prices,
                                     volatilities,
-                                    corrMatrix,
+                                    corr_matrix,
                                     seed)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:

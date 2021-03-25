@@ -31,7 +31,7 @@ from ...models.sabr import vol_function_sabr_BETA_HALF
 from ...utils.math import norminvcdf
 
 from ...models.black_scholes_analytic import bs_value
-from ...products.fx.fx_vanilla_option import fastDelta
+from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 
 from ...utils.solver_1d import newton_secant
@@ -55,7 +55,7 @@ def g(K, *args):
     option_type_value = args[6]
     deltaTarget = args[7]
 
-    deltaOut = fastDelta(s, t, K, rd, rf,
+    deltaOut = fast_delta(s, t, K, rd, rf,
                          volatility,
                          deltaMethodValue,
                          option_type_value)
@@ -89,19 +89,19 @@ def objFAST(params, *args):
     # new volatility curve
 
     # Match the at-the-money option volatility
-    atmCurveVol = volFunction(volTypeValue, params, f, K_ATM, t)
+    atmCurveVol = vol_function(volTypeValue, params, f, K_ATM, t)
     term1 = (atmVol - atmCurveVol)**2
 
     ###########################################################################
     # Match the market strangle value but this has to be at the MS strikes
     ###########################################################################
 
-    sigma_K_25D_C_MS = volFunction(volTypeValue, params, f, K_25D_C_MS, t)
+    sigma_K_25D_C_MS = vol_function(volTypeValue, params, f, K_25D_C_MS, t)
 
     V_25D_C_MS = bs_value(s, t, K_25D_C_MS, rd, rf, sigma_K_25D_C_MS,
                          FinOptionTypes.EUROPEAN_CALL.value)
 
-    sigma_K_25D_P_MS = volFunction(volTypeValue, params, f, K_25D_P_MS, t)
+    sigma_K_25D_P_MS = vol_function(volTypeValue, params, f, K_25D_P_MS, t)
 
     V_25D_P_MS = bs_value(s, t, K_25D_P_MS, rd, rf, sigma_K_25D_P_MS,
                          FinOptionTypes.EUROPEAN_PUT.value)
@@ -113,21 +113,21 @@ def objFAST(params, *args):
     # Match the risk reversal volatility    
     ###########################################################################
 
-    K_25D_C = solveForSmileStrikeFAST(s, t, rd, rf, 
+    K_25D_C = solver_for_smile_strikeFAST(s, t, rd, rf,
                                       FinOptionTypes.EUROPEAN_CALL.value, 
                                       volTypeValue, +0.2500, 
                                       deltaMethodValue, K_25D_C_MS, 
                                       params)
  
-    sigma_K_25D_C = volFunction(volTypeValue, params, f, K_25D_C, t)
+    sigma_K_25D_C = vol_function(volTypeValue, params, f, K_25D_C, t)
 
-    K_25D_P = solveForSmileStrikeFAST(s, t, rd, rf, 
+    K_25D_P = solver_for_smile_strikeFAST(s, t, rd, rf,
                                       FinOptionTypes.EUROPEAN_PUT.value,
                                       volTypeValue, -0.2500, 
                                       deltaMethodValue, K_25D_P_MS,
                                       params)
 
-    sigma_K_25D_P = volFunction(volTypeValue, params, f, K_25D_P, t)
+    sigma_K_25D_P = vol_function(volTypeValue, params, f, K_25D_P, t)
 
     sigma_25D_RR = (sigma_K_25D_C - sigma_K_25D_P)
     term3 = (sigma_25D_RR - targetRRVol)**2
@@ -155,13 +155,13 @@ def solveToHorizonFAST(s, t,
 
     vol_25D_MS = atmVol + ms25DVol
 
-    K_25D_C_MS = solveForStrike(s, t, rd, rf,
+    K_25D_C_MS = solve_for_strike(s, t, rd, rf,
                                 FinOptionTypes.EUROPEAN_CALL.value,
                                 +0.2500,
                                 deltaMethodValue,
                                 vol_25D_MS)
 
-    K_25D_P_MS = solveForStrike(s, t, rd, rf,
+    K_25D_P_MS = solve_for_strike(s, t, rd, rf,
                                 FinOptionTypes.EUROPEAN_PUT.value,
                                 -0.2500,
                                 deltaMethodValue,
@@ -191,13 +191,13 @@ def solveToHorizonFAST(s, t,
 
     params = np.array(xopt)
 
-    K_25D_C = solveForSmileStrikeFAST(s, t, rd, rf, 
+    K_25D_C = solver_for_smile_strikeFAST(s, t, rd, rf,
                                       FinOptionTypes.EUROPEAN_CALL.value, 
                                       volTypeValue, +0.2500, 
                                       deltaMethodValue, K_25D_C_MS, 
                                       params)
  
-    K_25D_P = solveForSmileStrikeFAST(s, t, rd, rf, 
+    K_25D_P = solver_for_smile_strikeFAST(s, t, rd, rf,
                                       FinOptionTypes.EUROPEAN_PUT.value,
                                       volTypeValue, -0.2500, 
                                       deltaMethodValue, K_25D_P_MS,
@@ -210,7 +210,7 @@ def solveToHorizonFAST(s, t,
 
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
-def volFunction(vol_function_type_value, params, f, k, t):
+def vol_function(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
     
@@ -238,7 +238,7 @@ def volFunction(vol_function_type_value, params, f, k, t):
 ###############################################################################
 
 @njit(cache=True, fastmath=True)
-def deltaFit(K, *args):
+def delta_fit(K, *args):
     """ This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol 
@@ -256,8 +256,8 @@ def deltaFit(K, *args):
     params = args[8]
 
     f = s*np.exp((rd-rf)*t)
-    v = volFunction(volTypeValue, params, f, K, t)
-    deltaOut = fastDelta(s, t, K, rd, rf, v, deltaTypeValue, option_type_value)
+    v = vol_function(volTypeValue, params, f, K, t)
+    deltaOut = fast_delta(s, t, K, rd, rf, v, deltaTypeValue, option_type_value)
     inverseDeltaOut = norminvcdf(np.abs(deltaOut))   
     invObjFn = inverseDeltaTarget - inverseDeltaOut
 
@@ -267,7 +267,7 @@ def deltaFit(K, *args):
 # Unable to cache this function due to dynamic globals warning. Revisit.
 @njit(float64(float64, float64, float64, float64, int64, int64, float64, 
               int64, float64, float64[:]), fastmath=True)
-def solveForSmileStrikeFAST(s, t, rd, rf,
+def solver_for_smile_strikeFAST(s, t, rd, rf,
                             option_type_value,
                             volatilityTypeValue,
                             deltaTarget,
@@ -283,7 +283,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
     argtuple = (volatilityTypeValue, s, t, rd, rf, option_type_value,
                 deltaMethodValue, inverseDeltaTarget, parameters)
 
-    K = newton_secant(deltaFit, x0=initialGuess, args=argtuple,
+    K = newton_secant(delta_fit, x0=initialGuess, args=argtuple,
                       tol=1e-8, maxiter=50)
 
     return K
@@ -292,7 +292,7 @@ def solveForSmileStrikeFAST(s, t, rd, rf,
 # Unable to cache function
 @njit(float64(float64, float64, float64, float64, int64, float64, 
               int64, float64), fastmath=True)
-def solveForStrike(spot_fx_rate,
+def solve_for_strike(spot_fx_rate,
                    tdel, rd, rf,
                    option_type_value,
                    deltaTarget,
@@ -454,7 +454,7 @@ class FXVolSurface():
             expiry_date = valuation_date.addTenor(tenors[i])
             self._expiry_dates.append(expiry_date)
 
-        self.buildVolSurface()
+        self.build_vol_surface()
 
 ###############################################################################
 
@@ -477,7 +477,7 @@ class FXVolSurface():
             # The volatility term structure is flat if there is only one expiry
             fwd = self._F0T[0]
             texp = self._texp[0]
-            vol = volFunction(volTypeValue, self._parameters[0], 
+            vol = vol_function(volTypeValue, self._parameters[0],
                                   fwd, K, texp)
             return vol
         
@@ -486,7 +486,7 @@ class FXVolSurface():
 
             fwd = self._F0T[0]
             texp = self._texp[0]
-            vol = volFunction(volTypeValue, self._parameters[0],
+            vol = vol_function(volTypeValue, self._parameters[0],
                                   fwd, K, texp)
             return vol
 
@@ -495,7 +495,7 @@ class FXVolSurface():
 
             fwd = self._F0T[-1]
             texp = self._texp[-1]
-            vol = volFunction(volTypeValue, self._parameters[-1],
+            vol = vol_function(volTypeValue, self._parameters[-1],
                                   fwd, K, texp)
             return vol
 
@@ -508,12 +508,12 @@ class FXVolSurface():
         
         fwd0 = self._F0T[index0]
         t0 = self._texp[index0]
-        vol0 = volFunction(volTypeValue, self._parameters[index0],
+        vol0 = vol_function(volTypeValue, self._parameters[index0],
                                fwd0, K, t0)
 
         fwd1 = self._F0T[index1]
         t1 = self._texp[index1]
-        vol1 = volFunction(volTypeValue, self._parameters[index1],
+        vol1 = vol_function(volTypeValue, self._parameters[index1],
                                fwd1, K, t1)
 
         vart0 = vol0*vol0*t0
@@ -528,7 +528,7 @@ class FXVolSurface():
         
 ###############################################################################
 
-    def buildVolSurface(self):
+    def build_vol_surface(self):
 
         s = self._spot_fx_rate
         numVolCurves = self._numVolCurves
@@ -692,7 +692,7 @@ class FXVolSurface():
 
 ###############################################################################
 
-    def solveForSmileStrike(self,
+    def solver_for_smile_strike(self,
                             option_type_value,
                             deltaTarget,
                             tenorIndex, 
@@ -716,14 +716,14 @@ class FXVolSurface():
                     self._deltaMethod.value, 
                     inverseDeltaTarget, self._parameters[tenorIndex])
 
-        K = newton_secant(deltaFit, x0=initialValue, args=argtuple,
+        K = newton_secant(delta_fit, x0=initialValue, args=argtuple,
                        tol=1e-5, maxiter=50)
 
         return K
 
 ###############################################################################
 
-    def checkCalibration(self, verbose: bool, tol: float = 1e-6):
+    def check_calibration(self, verbose: bool, tol: float = 1e-6):
 
         if verbose:
 
@@ -773,7 +773,7 @@ class FXVolSurface():
                 print("CNT_CPD_RF:%9.6f %%"% (self._rf[i]*100))
                 print("FWD_RATE:  %9.6f"% (self._F0T[i]))
  
-            sigma_ATM_out = volFunction(self._volatility_function_type.value,
+            sigma_ATM_out = vol_function(self._volatility_function_type.value,
                                         self._parameters[i],
                                         self._F0T[i],
                                         self._K_ATM[i],
@@ -878,7 +878,7 @@ class FXVolSurface():
             ###################################################################
 
             # CALL
-            sigma_K_25D_C_MS = volFunction(self._volatility_function_type.value,
+            sigma_K_25D_C_MS = vol_function(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C_MS[i],
@@ -899,7 +899,7 @@ class FXVolSurface():
                                     model)[self._deltaMethodString]
 
             # PUT
-            sigma_K_25D_P_MS = volFunction(self._volatility_function_type.value,
+            sigma_K_25D_P_MS = vol_function(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P_MS[i],
@@ -944,7 +944,7 @@ class FXVolSurface():
             call._strike_fx_rate = self._K_25D_C[i]
             put._strike_fx_rate = self._K_25D_P[i]
 
-            sigma_K_25D_C = volFunction(self._volatility_function_type.value,
+            sigma_K_25D_C = vol_function(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_C[i],
@@ -959,7 +959,7 @@ class FXVolSurface():
                                     self._for_discount_curve,
                                     model)[self._deltaMethodString]
 
-            sigma_K_25D_P = volFunction(self._volatility_function_type.value,
+            sigma_K_25D_P = vol_function(self._volatility_function_type.value,
                                             self._parameters[i],
                                             self._F0T[i],
                                             self._K_25D_P[i],
@@ -1000,7 +1000,7 @@ class FXVolSurface():
 
 ###############################################################################
 
-    def impliedDbns(self, lowFX, highFX, numIntervals):
+    def implied_dbns(self, lowFX, highFX, numIntervals):
         """ Calculate the pdf for each tenor horizon. Returns a list of 
         FinDistribution objects, one for each tenor horizon. """
 
@@ -1026,7 +1026,7 @@ class FXVolSurface():
 
                 k = lowFX + iK*dFX                
 
-                vol = volFunction(self._volatility_function_type.value,
+                vol = vol_function(self._volatility_function_type.value,
                                       self._parameters[iTenor], 
                                       f, k, texp)
 
@@ -1046,7 +1046,7 @@ class FXVolSurface():
 
 ###############################################################################
 
-    def plotVolCurves(self):
+    def plot_vol_curves(self):
 
         plt.figure()
 
@@ -1071,7 +1071,7 @@ class FXVolSurface():
             f = self._F0T[tenorIndex]
 
             for _ in range(0, numIntervals):
-                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
+                sigma = vol_function(volTypeVal, params, f, K, t) * 100.0
                 strikes.append(K)
                 vols.append(sigma)
                 K = K + dK
@@ -1092,7 +1092,7 @@ class FXVolSurface():
 
             keyVols = []
             for K in keyStrikes:
-                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
+                sigma = vol_function(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
             plt.plot(keyStrikes, keyVols, 'ko', markersize=4)
@@ -1106,7 +1106,7 @@ class FXVolSurface():
             keyVols = []
 
             for K in keyStrikes:
-                sigma = volFunction(volTypeVal, params, f, K, t) * 100.0
+                sigma = vol_function(volTypeVal, params, f, K, t) * 100.0
                 keyVols.append(sigma)
 
             plt.plot(keyStrikes, keyVols, 'bo', markersize=4)

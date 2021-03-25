@@ -40,7 +40,7 @@ class FinHestonNumericalScheme(Enum):
 @njit(float64[:, :](float64, float64, float64, float64, float64, float64,
                     float64, float64, float64, float64, int64, int64, int64),
       cache=True, fastmath=True)
-def getPaths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
+def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
              seed, scheme):
 
     np.random.seed(seed)
@@ -168,7 +168,7 @@ class FinModelHeston():
                  option,
                  stock_price,
                  interest_rate,
-                 dividendYield,
+                 dividend_yield,
                  num_paths,
                  num_steps_per_year,
                  seed,
@@ -180,9 +180,9 @@ class FinModelHeston():
         dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
-        sPaths = getPaths(stock_price,
+        sPaths = get_paths(stock_price,
                           interest_rate,
-                          dividendYield,
+                          dividend_yield,
                           self._v0,
                           self._kappa,
                           self._theta,
@@ -212,7 +212,7 @@ class FinModelHeston():
                     option,
                     stock_price,
                     interest_rate,
-                    dividendYield):
+                    dividend_yield):
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
@@ -223,7 +223,7 @@ class FinModelHeston():
         theta = self._theta
 
         r = interest_rate
-        q = dividendYield
+        q = dividend_yield
         S0 = stock_price
         K = option._strike_price
         F = S0 * exp((r - q) * tau)
@@ -260,7 +260,7 @@ class FinModelHeston():
                           option,
                           stock_price,
                           interest_rate,
-                          dividendYield):
+                          dividend_yield):
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
@@ -270,7 +270,7 @@ class FinModelHeston():
         kappa = self._kappa
         theta = self._theta
 
-        q = dividendYield
+        q = dividend_yield
         r = interest_rate
         V = sigma * sigma
 
@@ -304,7 +304,7 @@ class FinModelHeston():
                     option,
                     stock_price,
                     interest_rate,
-                    dividendYield):
+                    dividend_yield):
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
@@ -314,7 +314,7 @@ class FinModelHeston():
         kappa = self._kappa
         theta = self._theta
 
-        q = dividendYield
+        q = dividend_yield
         r = interest_rate
         S0 = stock_price
         K = option._strike_price
@@ -350,7 +350,7 @@ class FinModelHeston():
                        option,
                        stock_price,
                        interest_rate,
-                       dividendYield):
+                       dividend_yield):
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
@@ -360,7 +360,7 @@ class FinModelHeston():
         kappa = self._kappa
         theta = self._theta
 
-        q = dividendYield
+        q = dividend_yield
         r = interest_rate
         S0 = stock_price
         K = option._strike_price

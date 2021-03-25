@@ -240,7 +240,7 @@ def test_FinIborCapFloorVolCurve():
     testCases.header("START", "END", "VOL", "VALUE")
 
     for capletEndDate in capFloor._capFloorLetDates[2:]:
-        vol = volCurve.capletVol(capletEndDate)
+        vol = volCurve.caplet_vol(capletEndDate)
         modelCaplet = FinModelBlack(vol)
         vCaplet = capFloor.valueCapletFloorLet(valuation_date,
                                                capletStartDate,

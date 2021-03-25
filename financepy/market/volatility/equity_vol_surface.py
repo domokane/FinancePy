@@ -72,7 +72,7 @@ def _obj(params, *args):
     tot = 0.0
 
     for i in range(0, numStrikes):
-        fittedVol = volFunction(volTypeValue, params, f, strikes[i], t)
+        fittedVol = vol_function(volTypeValue, params, f, strikes[i], t)
         mktVol = volatility_grid[index][i]
         diff = fittedVol - mktVol
         tot += diff**2
@@ -83,7 +83,7 @@ def _obj(params, *args):
 # Do not cache this function as it leads to complaints
 ###############################################################################
 
-def _solveToHorizon(s, t, r, q,
+def _solve_to_horizon(s, t, r, q,
                     strikes,
                     timeIndex,
                     volatility_grid,
@@ -129,7 +129,7 @@ def _solveToHorizon(s, t, r, q,
 
 @njit(float64(int64, float64[:], float64, float64, float64), 
       cache=True, fastmath=True)
-def volFunction(vol_function_type_value, params, f, k, t):
+def vol_function(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
 
@@ -164,7 +164,7 @@ def volFunction(vol_function_type_value, params, f, k, t):
 
 
 @njit(cache=True, fastmath=True)
-def _deltaFit(k, *args):
+def _delta_fit(k, *args):
     """ This is the objective function used in the determination of the 
     option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
@@ -181,7 +181,7 @@ def _deltaFit(k, *args):
     params = args[7]
 
     f = s * np.exp((r-q)*t)
-    v = volFunction(volTypeValue, params, f, k, t)
+    v = vol_function(volTypeValue, params, f, k, t)
     deltaOut = bs_delta(s, t, k, r, q, v, option_type_value)
     inverseDeltaOut = norminvcdf(np.abs(deltaOut))
     invObjFn = inverseDeltaTarget - inverseDeltaOut
@@ -195,7 +195,7 @@ def _deltaFit(k, *args):
 
 @njit(float64(float64, float64, float64, float64, int64, int64, float64,
               float64, float64[:]), fastmath=True)
-def _solveForSmileStrike(s, t, r, q,
+def _solver_for_smile_strike(s, t, r, q,
                          option_type_value,
                          volatilityTypeValue,
                          deltaTarget,
@@ -212,7 +212,7 @@ def _solveForSmileStrike(s, t, r, q,
                  inverseDeltaTarget, 
                  parameters)
 
-     K = newton_secant(_deltaFit, x0=initialGuess, args=argtuple,
+     K = newton_secant(_delta_fit, x0=initialGuess, args=argtuple,
                        tol=1e-8, maxiter=50)
 
      return K
@@ -270,11 +270,11 @@ class EquityVolSurface:
         self._volatility_grid = volatility_grid
         self._volatility_function_type = volatility_function_type
 
-        self._buildVolSurface(finSolverType=finSolverType)
+        self._build_vol_surface(finSolverType=finSolverType)
 
 ###############################################################################
 
-    def volatilityFromStrikeDate(self, K, expiry_date):
+    def volatility_from_strike_date(self, K, expiry_date):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are 
@@ -326,12 +326,12 @@ class EquityVolSurface:
         t0 = self._texp[index0]
         t1 = self._texp[index1]
 
-        vol0 = volFunction(volTypeValue, self._parameters[index0],
+        vol0 = vol_function(volTypeValue, self._parameters[index0],
                                fwd0, K, t0)
 
         if index1 != index0:
 
-            vol1 = volFunction(volTypeValue, self._parameters[index1],
+            vol1 = vol_function(volTypeValue, self._parameters[index1],
                                fwd1, K, t1)
 
         else:
@@ -358,7 +358,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    # def deltaToStrike(self, callDelta, expiry_date, deltaMethod):
+    # def delta_to_strike(self, callDelta, expiry_date, deltaMethod):
     #     """ Interpolates the strike at a delta and expiry date. Linear 
     #     interpolation is used in strike."""
 
@@ -412,7 +412,7 @@ class EquityVolSurface:
 
     #     initialGuess = self._K_ATM[index0]
 
-    #     K0 = _solveForSmileStrike(s, texp, self._rd[index0], self._rf[index0],
+    #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
     #                               FinOptionTypes.EUROPEAN_CALL.value,
     #                               volTypeValue, callDelta,
     #                               deltaMethodValue,
@@ -423,7 +423,7 @@ class EquityVolSurface:
 
     #     if index1 != index0:
 
-    #         K1 = _solveForSmileStrike(s, texp, 
+    #         K1 = _solver_for_smile_strike(s, texp,
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
     #                                   FinOptionTypes.EUROPEAN_CALL.value,
@@ -510,7 +510,7 @@ class EquityVolSurface:
 
         initialGuess = self._stock_price
 
-        K0 = _solveForSmileStrike(s,
+        K0 = _solver_for_smile_strike(s,
                                   texp,
                                   self._r[index0],
                                   self._q[index0],
@@ -519,12 +519,12 @@ class EquityVolSurface:
                                   initialGuess,
                                   self._parameters[index0])
 
-        vol0 = volFunction(volTypeValue, self._parameters[index0],
+        vol0 = vol_function(volTypeValue, self._parameters[index0],
                            fwd0, K0, t0)
 
         if index1 != index0:
 
-            K1 = _solveForSmileStrike(s, texp, 
+            K1 = _solver_for_smile_strike(s, texp,
                                       self._r[index1], 
                                       self._q[index1],
                                       FinOptionTypes.EUROPEAN_CALL.value,
@@ -532,7 +532,7 @@ class EquityVolSurface:
                                       initialGuess,
                                       self._parameters[index1])
 
-            vol1 = volFunction(volTypeValue, self._parameters[index1], 
+            vol1 = vol_function(volTypeValue, self._parameters[index1],
                                fwd1, K1, t1)
         else:
             vol1 = vol0
@@ -561,7 +561,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def _buildVolSurface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
+    def _build_vol_surface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
         s = self._stock_price
@@ -631,7 +631,7 @@ class EquityVolSurface:
             r = self._r[i]
             q = self._q[i]
 
-            res = _solveToHorizon(s, t, r, q,
+            res = _solve_to_horizon(s, t, r, q,
                                   self._strikes,
                                   i,
                                   self._volatility_grid,
@@ -646,7 +646,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def checkCalibration(self, verbose: bool, tol: float = 1e-6):
+    def check_calibration(self, verbose: bool, tol: float = 1e-6):
         """ Compare calibrated vol surface with market and output a report
         which sets out the quality of fit to the ATM and 10 and 25 delta market
         strangles and risk reversals. """
@@ -669,7 +669,7 @@ class EquityVolSurface:
                 
                 strike = self._strikes[j]
 
-                fittedVol = self.volatilityFromStrikeDate(strike, expiry_date)
+                fittedVol = self.volatility_from_strike_date(strike, expiry_date)
 
                 mktVol = self._volatility_grid[i][j]
                 
@@ -683,7 +683,7 @@ class EquityVolSurface:
         
 ###############################################################################
 
-    def impliedDbns(self, lowS, highS, numIntervals):
+    def implied_dbns(self, lowS, highS, numIntervals):
         """ Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon. """
 
@@ -709,7 +709,7 @@ class EquityVolSurface:
 
                 k = lowS + iK*dS
 
-                vol = volFunction(self._volatility_function_type.value,
+                vol = vol_function(self._volatility_function_type.value,
                                   self._parameters[iTenor], 
                                   f, k, t)
 
@@ -728,7 +728,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def plotVolCurves(self):
+    def plot_vol_curves(self):
         """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
         
@@ -750,7 +750,7 @@ class EquityVolSurface:
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.volatilityFromStrikeDate(K, expiry_date) * 100.
+                fittedVol = self.volatility_from_strike_date(K, expiry_date) * 100.
                 fittedVols.append(fittedVol)
                 K = K + dK
 

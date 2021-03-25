@@ -13,8 +13,8 @@ from financepy.utils.frequency import FrequencyTypes
 
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.swaption import IborSwaption
-from financepy.products.rates.swaption import FinSwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import FinSwapTypes
 
 from financepy.models.black import FinModelBlack
 from financepy.models.black_shifted import FinModelBlackShifted
@@ -342,7 +342,7 @@ def testFinIborCashSettledSwaption():
 
     model = FinModelBlack(0.1533)
 
-    v = swaption.cashSettledValue(valuation_date,
+    v = swaption.cash_settled_value(valuation_date,
                                   libor_curve,
                                   fwdSwapRate2,
                                   model)

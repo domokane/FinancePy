@@ -10,7 +10,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_types import FinSwapTypes
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.products.rates.swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swap import IborSwap
 
 from financepy.products.rates.bermudan_swaption import FinIborBermudanSwaption
@@ -168,7 +168,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -180,7 +180,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -197,10 +197,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -214,10 +214,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -230,7 +230,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -242,7 +242,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -259,10 +259,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -276,10 +276,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBK(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BK REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -339,7 +339,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -349,7 +349,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     fixed_leg_type = FinSwapTypes.RECEIVE
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -365,10 +365,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -381,10 +381,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -397,7 +397,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -407,7 +407,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     fixed_leg_type = FinSwapTypes.RECEIVE
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -424,10 +424,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -441,10 +441,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesBDT(sigma, num_time_steps)
 
 #    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -504,7 +504,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -514,7 +514,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     fixed_leg_type = FinSwapTypes.RECEIVE
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -529,10 +529,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -545,10 +545,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN BDT REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -561,7 +561,7 @@ def test_FinIborBermudanSwaptionBKModel():
     fixed_leg_type = FinSwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudanSwaptionPay = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -571,7 +571,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedDayCountType)
 
     fixed_leg_type = FinSwapTypes.RECEIVE
-    bermudanSwaptionRec = FinIborBermudanSwaption(settlement_date,
+    bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
                                                    fixed_leg_type,
@@ -588,10 +588,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN HW PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN HW REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec
@@ -605,10 +605,10 @@ def test_FinIborBermudanSwaptionBKModel():
     model = FinModelRatesHW(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudanSwaptionPay.value(valuation_date, libor_curve, model)
+    valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN HW PAY VALUE:", valuePay)
 
-    valueRec = bermudanSwaptionRec.value(valuation_date, libor_curve, model)
+    valueRec = bermudan_swaption_rec.value(valuation_date, libor_curve, model)
     testCases.print("BERMUDAN HW REC VALUE:", valueRec)
 
     payRec = valuePay - valueRec

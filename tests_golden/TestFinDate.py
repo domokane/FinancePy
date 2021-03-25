@@ -23,7 +23,7 @@ def test_Date():
 
     start_date = Date(1, 1, 2018)
 
-    assert Date(1, 1, 2018) == Date.fromString('1-1-2018', '%d-%m-%Y')
+    assert Date(1, 1, 2018) == Date.from_string('1-1-2018', '%d-%m-%Y')
 
     testCases.header("DATE", "MONTHS", "CDS DATE")
 

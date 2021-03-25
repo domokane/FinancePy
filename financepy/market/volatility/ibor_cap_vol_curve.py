@@ -121,7 +121,7 @@ class IborCapVolCurve():
 
 ###############################################################################
 
-    def capletVol(self, dt):
+    def caplet_vol(self, dt):
         """ Return the forward rate caplet/floorlet volatility for a specific
         forward caplet expiry date. The period of the volatility is the
         the intercaplet spacing period used when creating the class object.

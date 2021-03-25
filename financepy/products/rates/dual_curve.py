@@ -93,21 +93,21 @@ class IborDualCurve(DiscountCurve):
 
         self._valuation_date = valuation_date
         self._discount_curve = discount_curve
-        self._validateInputs(iborDeposits, iborFRAs, iborSwaps)
+        self._validate_inputs(iborDeposits, iborFRAs, iborSwaps)
         self._interp_type = interp_type
         self._checkRefit = checkRefit
-        self._buildCurve()
+        self._build_curve()
 
 ###############################################################################
 
-    def _buildCurve(self):
+    def _build_curve(self):
         """ Build curve based on interpolation. """
 
         self._buildCurveUsing1DSolver()
 
 ###############################################################################
 
-    def _validateInputs(self,
+    def _validate_inputs(self,
                         iborDeposits,
                         iborFRAs,
                         iborSwaps):

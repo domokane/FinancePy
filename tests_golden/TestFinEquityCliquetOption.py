@@ -34,10 +34,10 @@ def test_EquityCliquetOption():
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05
-    dividendYield = 0.02
+    dividend_yield = 0.02
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     v = cliquetOption.value(valuation_date,
                             stock_price,

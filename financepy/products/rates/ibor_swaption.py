@@ -236,7 +236,7 @@ class IborSwaption():
         elif isinstance(model, FinModelRatesBK):
 
             model.buildTree(tmat, df_times, df_values)
-            swaptionPx = model.bermudanSwaption(texp,
+            swaptionPx = model.bermudan_swaption(texp,
                                                 tmat,
                                                 strike_price,
                                                 face_amount,
@@ -254,7 +254,7 @@ class IborSwaption():
         elif isinstance(model, FinModelRatesBDT):
 
             model.buildTree(tmat, df_times, df_values)
-            swaptionPx = model.bermudanSwaption(texp,
+            swaptionPx = model.bermudan_swaption(texp,
                                                 tmat,
                                                 strike_price,
                                                 face_amount,
@@ -285,7 +285,7 @@ class IborSwaption():
 
 ###############################################################################
 
-    def cashSettledValue(self,
+    def cash_settled_value(self,
                          valuation_date: Date,
                          discount_curve,
                          swap_rate: float,
@@ -351,7 +351,7 @@ class IborSwaption():
 
 ###############################################################################
 
-    def printSwapFixedLeg(self):
+    def print_swap_fixed_leg(self):
 
         if self._underlyingSwap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
@@ -360,7 +360,7 @@ class IborSwaption():
 
 ###############################################################################
 
-    def printSwapFloatLeg(self):
+    def print_swap_float_leg(self):
 
         if self._underlyingSwap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")

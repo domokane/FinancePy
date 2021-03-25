@@ -26,7 +26,7 @@ def test_EquityVanillaOptionFactored():
     stock_price = 100
     volatility = 0.30
     interest_rate = 0.05
-    dividendYield = 0.01
+    dividend_yield = 0.01
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
 
@@ -39,10 +39,10 @@ def test_EquityVanillaOptionFactored():
         callOption = EquityVanillaOptionOLD(
             expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         start = time.time()
         value_mc = callOption.value_mc(valuation_date, stock_price, discount_curve,
-                                     dividendYield, model, num_paths)
+                                     dividend_yield, model, num_paths)
         end = time.time()
         duration = end - start
         testCases.print(num_paths, value, value_mc, duration)
@@ -63,17 +63,17 @@ def test_EquityVanillaOptionFactored():
                                             FinOptionTypes.EUROPEAN_CALL)
 
         value = callOption.value(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
 
         start = time.time()
 
         useSobol = False
         value_mc1 = callOption.value_mc(valuation_date, stock_price, discount_curve,
-                                      dividendYield, model, num_paths, useSobol)
+                                      dividend_yield, model, num_paths, useSobol)
 
         useSobol = True
         value_mc2 = callOption.value_mc(valuation_date, stock_price, discount_curve,
-                                      dividendYield, model, num_paths, useSobol)
+                                      dividend_yield, model, num_paths, useSobol)
 
         end = time.time()
         duration = end - start
@@ -93,17 +93,17 @@ def test_EquityVanillaOptionFactored():
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valuation_date, stock_price, discount_curve,
-                                dividendYield, model)
+                                dividend_yield, model)
 
         start = time.time()
 
         useSobol = False
         value_mc1 = putOption.value_mc(valuation_date, stock_price, discount_curve,
-                                      dividendYield, model, num_paths, useSobol)
+                                      dividend_yield, model, num_paths, useSobol)
 
         useSobol = True
         value_mc2 = putOption.value_mc(valuation_date, stock_price, discount_curve,
-                                      dividendYield, model, num_paths, useSobol)
+                                      dividend_yield, model, num_paths, useSobol)
 
         end = time.time()
         duration = end - start
@@ -121,15 +121,15 @@ def test_EquityVanillaOptionFactored():
         callOption = EquityVanillaOptionOLD(expiry_date, 100.0, 
                                             FinOptionTypes.EUROPEAN_CALL)
         value = callOption.value(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         delta = callOption.delta(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         vega = callOption.vega(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         theta = callOption.theta(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         rho = callOption.rho(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         testCases.print(stock_price, value, delta, vega, theta, rho)
 
     ###########################################################################
@@ -143,15 +143,15 @@ def test_EquityVanillaOptionFactored():
                                            FinOptionTypes.EUROPEAN_PUT)
 
         value = putOption.value(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         delta = putOption.delta(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         vega = putOption.vega(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         theta = putOption.theta(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         rho = putOption.rho(valuation_date, stock_price, discount_curve,
-                                 dividendYield, model)
+                                 dividend_yield, model)
         testCases.print(stock_price, value, delta, vega, theta, rho)
 
 ###############################################################################
@@ -167,10 +167,10 @@ def test_EquityVanillaOptionFactored():
             valuation_date,
             stock_price,
             discount_curve,
-            dividendYield,
+            dividend_yield,
             model)
         impliedVol = callOption.implied_volatility(
-            valuation_date, stock_price, discount_curve, dividendYield, value)
+            valuation_date, stock_price, discount_curve, dividend_yield, value)
         testCases.print(stock_price, value, volatility, impliedVol)
 
 ###############################################################################

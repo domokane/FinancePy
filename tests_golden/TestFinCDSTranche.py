@@ -232,7 +232,7 @@ def test_FinCDSTranche():
                                             spd10Y,
                                             num_credits)
 
-    intrinsicSpd = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
                                             step_in_date,
                                             trancheMaturity,
                                             issuer_curves) * 10000.0
@@ -279,7 +279,7 @@ def test_FinCDSTranche():
     issuer_curves = loadHeterogeneousSpreadCurves(valuation_date,
                                                  libor_curve)
 
-    intrinsicSpd = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
                                             step_in_date,
                                             trancheMaturity,
                                             issuer_curves) * 10000.0

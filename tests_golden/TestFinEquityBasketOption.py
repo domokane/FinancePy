@@ -52,7 +52,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -61,7 +61,7 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             vMC = callOption.value_mc(
                 valuation_date,
@@ -69,7 +69,7 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
             end = time.time()
             duration = end - start
@@ -100,7 +100,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
 
@@ -110,7 +110,7 @@ def test_EquityBasketOption():
                     discount_curve,
                     dividend_curves,
                     volatilities,
-                    corrMatrix)
+                    corr_matrix)
 
             vMC = callOption.value_mc(
                     valuation_date,
@@ -118,7 +118,7 @@ def test_EquityBasketOption():
                     discount_curve,
                     dividend_curves,
                     volatilities,
-                    corrMatrix,
+                    corr_matrix,
                     num_paths)
 
             end = time.time()
@@ -147,7 +147,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -156,14 +156,14 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
             vMC = callOption.value_mc(
                 valuation_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
             end = time.time()
             duration = end - start
@@ -193,7 +193,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -202,14 +202,14 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
             vMC = callOption.value_mc(
                 valuation_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
             end = time.time()
             duration = end - start

@@ -27,15 +27,15 @@ def test_EquityOneTouchOption():
     volatility = 0.20
     barrier_level = 100.0  # H
     model = BlackScholes(volatility)
-    dividendYield = 0.03
+    dividend_yield = 0.03
     num_paths = 10000
     num_steps_per_year = 252
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     stock_price = 105.0
-    paymentSize = 15.0
+    payment_size = 15.0
 
     testCases.header("================================= CASH ONLY")
 
@@ -50,7 +50,7 @@ def test_EquityOneTouchOption():
         option = EquityOneTouchOption(expiry_date,
                                          downType,
                                          barrier_level,
-                                         paymentSize)
+                                         payment_size)
 
         v = option.value(valuation_date,
                          stock_price,
@@ -71,7 +71,7 @@ def test_EquityOneTouchOption():
                         "%9.5f" % v_mc)
 
     stock_price = 95.0
-    paymentSize = 15.0
+    payment_size = 15.0
 
     upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT,
                FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_EXPIRY,
@@ -84,7 +84,7 @@ def test_EquityOneTouchOption():
         option = EquityOneTouchOption(expiry_date,
                                          upType,
                                          barrier_level,
-                                         paymentSize)
+                                         payment_size)
 
         v = option.value(valuation_date,
                          stock_price,

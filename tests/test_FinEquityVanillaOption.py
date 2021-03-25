@@ -20,10 +20,10 @@ valueDate = Date(1, 1, 2015)
 stockPrice = 100
 volatility = 0.30
 interest_rate = 0.05
-dividendYield = 0.01
+dividend_yield = 0.01
 model = BlackScholes(volatility)
 discountCurve = DiscountCurveFlat(valueDate, interest_rate)
-dividendCurve = DiscountCurveFlat(valueDate, dividendYield)
+dividendCurve = DiscountCurveFlat(valueDate, dividend_yield)
 
 def test_call_option():
     v = call_option.value(valueDate, stockPrice, discountCurve, dividendCurve, model)

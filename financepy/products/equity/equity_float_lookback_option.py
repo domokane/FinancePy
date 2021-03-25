@@ -62,7 +62,7 @@ class EquityFloatLookbackOption(EquityOption):
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
               volatility: float,
-              stockMinMax: float):
+              stock_min_max: float):
         """ Valuation of the Floating Lookback option using Black-Scholes using
         the formulae derived by Goldman, Sosin and Gatto (1979). """
 
@@ -70,8 +70,8 @@ class EquityFloatLookbackOption(EquityOption):
         df = discount_curve.df(self._expiry_date)
 
 
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         v = volatility
         s0 = stock_price
@@ -79,12 +79,12 @@ class EquityFloatLookbackOption(EquityOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > s0:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < s0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
@@ -144,7 +144,7 @@ class EquityFloatLookbackOption(EquityOption):
                 discount_curve: DiscountCurve,
                 dividend_curve: DiscountCurve,
                 volatility: float,
-                stockMinMax: float,
+                stock_min_max: float,
                 num_paths: int = 10000,
                 num_steps_per_year: int = 252,
                 seed: int = 4242):
@@ -155,8 +155,8 @@ class EquityFloatLookbackOption(EquityOption):
         num_time_steps = int(t * num_steps_per_year)
 
         df = discount_curve.df(self._expiry_date)
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
         mu = r - q
 
         option_type = self._option_type
@@ -164,18 +164,18 @@ class EquityFloatLookbackOption(EquityOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(num_paths, num_time_steps, t, mu, stock_price,
+        Sall = model.get_paths(num_paths, num_time_steps, t, mu, stock_price,
                               volatility, seed)
 
         # Due to antithetics we have doubled the number of paths

@@ -118,7 +118,7 @@ class BondZeroCurve(DiscountCurve):
 
 ###############################################################################
 
-    def survProb(self,
+    def survival_prob(self,
                  dt: Date):
         t = input_time(dt, self)
         q = interpolate(t, self._times, self._values, self._interp_type.value)

@@ -68,7 +68,7 @@ class CDSCurve:
         self._values = []
 
         if len(self._cds_contracts) > 0:
-            self._buildCurve()
+            self._build_curve()
         else:
             pass  # In some cases we allow None to be passed
 
@@ -92,7 +92,7 @@ class CDSCurve:
 
 ###############################################################################
 
-    def survProb(self, dt):
+    def survival_prob(self, dt):
         """ Extract the survival probability to date dt. This function
         supports vectorisation. """
 
@@ -141,7 +141,7 @@ class CDSCurve:
 
 ###############################################################################
 
-    def _buildCurve(self):
+    def _build_curve(self):
         """ Construct the CDS survival curve from a set of CDS contracts """
 
         self._validate(self._cds_contracts)
@@ -173,8 +173,8 @@ class CDSCurve:
 
         t = input_time(dt, self)
         epsilon = 1e-8
-        df1 = self.df(t) * self.survProb(t)
-        df2 = self.df(t+epsilon) * self.survProb(t+epsilon)
+        df1 = self.df(t) * self.survival_prob(t)
+        df2 = self.df(t+epsilon) * self.survival_prob(t+epsilon)
         fwd = np.log(df1/df2)/dt
         return fwd
 
@@ -208,7 +208,7 @@ class CDSCurve:
         t = input_time(dt, self)
         f = annual_frequency(freq_type)
         df = self.df(t)
-        q = self.survProb(t)
+        q = self.survival_prob(t)
         dfq = df * q
 
         if f == 0:  # Simple interest

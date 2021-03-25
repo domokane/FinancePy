@@ -22,7 +22,7 @@ def test_EquityForward():
     expiry_date = valuation_date.addMonths(12)
 
     stock_price = 130.0
-    forwardPrice = 125.0 # Locked
+    forward_price = 125.0 # Locked
     discountRate = 0.05
     dividendRate = 0.02
 
@@ -35,7 +35,7 @@ def test_EquityForward():
     dividend_curve = DiscountCurveFlat(valuation_date, dividendRate)
 
     equityForward = EquityForward(expiry_date,
-                                     forwardPrice,
+                                     forward_price,
                                      notional,
                                      FinLongShort.LONG)
 

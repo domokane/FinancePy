@@ -112,7 +112,7 @@ class BondMortgage:
 
 ###############################################################################
 
-    def printLeg(self):
+    def print_leg(self):
         print("START DATE:", self._start_date)
         print("MATURITY DATE:", self._end_date)
         print("MORTGAGE TYPE:", self._mortgage_type)

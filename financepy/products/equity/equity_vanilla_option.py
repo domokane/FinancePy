@@ -79,7 +79,7 @@ class EquityVanillaOption():
                  expiry_date: (Date, list),
                  strike_price: (float, np.ndarray),
                  option_type: (FinOptionTypes, list),
-                 numOptions: float = 1.0):
+                 num_options: float = 1.0):
         """ Create the Equity Vanilla option object by specifying the expiry
         date, the option strike, the option type and the number of options. """
 
@@ -92,7 +92,7 @@ class EquityVanillaOption():
         self._expiry_date = expiry_date
         self._strike_price = strike_price
         self._option_type = option_type
-        self._num_options = numOptions
+        self._num_options = num_options
         self._texp = None
 
 ###############################################################################

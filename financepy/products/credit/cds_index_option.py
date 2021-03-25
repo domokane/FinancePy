@@ -81,7 +81,7 @@ class CDSIndexOption:
 
 ###############################################################################
 
-    def valueAdjustedBlack(self,
+    def value_adjusted_black(self,
                            valuation_date,
                            index_curve,
                            indexRecovery,
@@ -94,7 +94,7 @@ class CDSIndexOption:
         c = self._index_coupon
         time_to_expiry = (self._expiry_date - valuation_date) / gDaysInYear
         df = libor_curve.df(self._expiry_date)
-        qExpiryIndex = index_curve.survProb(time_to_expiry)
+        qExpiryIndex = index_curve.survival_prob(time_to_expiry)
 
         cds = CDS(valuation_date, self._maturity_date, k)
         strikeCurve = CDSCurve(
@@ -128,7 +128,7 @@ class CDSIndexOption:
 
 ###############################################################################
 
-    def valueAnderson(self,
+    def value_anderson(self,
                       valuation_date,
                       issuer_curves,
                       indexRecovery,
@@ -155,7 +155,7 @@ class CDSIndexOption:
             1.0)
         strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve)
         strikeRPV01s = strikeCDS.risky_pv01(valuation_date, strikeCurve)
-        qToExpiry = strikeCurve.survProb(time_to_expiry)
+        qToExpiry = strikeCurve.survival_prob(time_to_expiry)
         strikeValue = (k - c) * strikeRPV01s['clean_rpv01']
         strikeValue /= (dfToExpiry * qToExpiry)
 
@@ -166,7 +166,7 @@ class CDSIndexOption:
         for iCredit in range(0, num_credits):
 
             issuer_curve = issuer_curves[iCredit]
-            q = issuer_curve.survProb(time_to_expiry)
+            q = issuer_curve.survival_prob(time_to_expiry)
             dh1 = (1.0 - issuer_curve._recovery_rate) * (1.0 - q)
 
             s = self._cds_contract.par_spread(valuation_date, issuer_curve)
@@ -185,7 +185,7 @@ class CDSIndexOption:
                             libor_curve,
                             expH)
 
-        v = self._calcIndexPayerOptionPrice(valuation_date,
+        v = self._calc_index_payer_option_price(valuation_date,
                                             x,
                                             sigma,
                                             c,
@@ -218,10 +218,10 @@ class CDSIndexOption:
         xacc = 0.000000001
         rtb = 999999
 
-        f = self._calcObjFunc(x1, valuation_date, sigma, index_coupon,
+        f = self._calc_obj_func(x1, valuation_date, sigma, index_coupon,
                               indexRecovery, libor_curve) - expH
 
-        fmid = self._calcObjFunc(x2, valuation_date, sigma, index_coupon,
+        fmid = self._calc_obj_func(x2, valuation_date, sigma, index_coupon,
                                  indexRecovery, libor_curve) - expH
 
         if f * fmid >= 0.0:
@@ -237,7 +237,7 @@ class CDSIndexOption:
         for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self._calcObjFunc(xmid, valuation_date, sigma, index_coupon,
+            fmid = self._calc_obj_func(xmid, valuation_date, sigma, index_coupon,
                                      indexRecovery, libor_curve) - expH
             if fmid <= 0.0:
                 rtb = xmid
@@ -248,7 +248,7 @@ class CDSIndexOption:
 
 ###############################################################################
 
-    def _calcObjFunc(self,
+    def _calc_obj_func(self,
                      x,
                      valuation_date,
                      sigma,
@@ -261,7 +261,7 @@ class CDSIndexOption:
         # of the return value
         strikeValue = 0.0
 
-        values = self._calcIndexPayerOptionPrice(valuation_date,
+        values = self._calc_index_payer_option_price(valuation_date,
                                                  x,
                                                  sigma,
                                                  self._index_coupon,
@@ -273,7 +273,7 @@ class CDSIndexOption:
 
 ###############################################################################
 
-    def _calcIndexPayerOptionPrice(self,
+    def _calc_index_payer_option_price(self,
                                    valuation_date,
                                    x,
                                    sigma,

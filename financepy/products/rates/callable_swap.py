@@ -156,7 +156,7 @@
 #                             self._bus_day_adjust_type,
 #                             self._date_gen_rule_type)
 
-#         swap.generateFlows()
+#         swap.generate_flows()
 #         cpn_times = []
 #         cpn_amounts = []
 

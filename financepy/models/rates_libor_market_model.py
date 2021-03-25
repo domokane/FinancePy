@@ -8,7 +8,7 @@ from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
 from ..utils.error import FinError
 from ..utils.math import N
 from ..utils.math import norminvcdf
-from ..models.sobol import getUniformSobol
+from ..models.sobol import get_uniform_sobol
 
 # TO DO: SHIFTED LOGNORMAL
 # TO DO: TERMINAL MEASURE
@@ -448,7 +448,7 @@ def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
 
     if useSobol == 1:
         numDimensions = num_times
-        rands = getUniformSobol(halfNumPaths, numDimensions)
+        rands = get_uniform_sobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((num_paths, num_times))
         for iPath in range(0, halfNumPaths):
             for j in range(0, num_times):
@@ -535,7 +535,7 @@ def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
 
     if useSobol == 1:
         numDimensions = num_times * numFactors
-        rands = getUniformSobol(halfNumPaths, numDimensions)
+        rands = get_uniform_sobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((num_paths, num_times, numFactors))
         for iPath in range(0, halfNumPaths):
             for j in range(0, num_times):

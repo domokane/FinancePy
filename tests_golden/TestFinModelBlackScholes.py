@@ -34,7 +34,7 @@ def testFinModelBlackScholes():
     stock_price = 127.62
     volatility = 0.20
     interest_rate = 0.001
-    dividendYield = 0.0163
+    dividend_yield = 0.0163
 
     option_type = FinOptionTypes.AMERICAN_CALL
     euOptionType = FinOptionTypes.EUROPEAN_CALL
@@ -52,7 +52,7 @@ def testFinModelBlackScholes():
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield,
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield,
                                       FrequencyTypes.CONTINUOUS,
                                       DayCountTypes.ACT_365F)
     
@@ -106,16 +106,16 @@ def testFinModelBlackScholes():
 
 
     #     v_am = amOption.value(valuation_date, stock_price, discount_curve,
-    #                           dividendYield, modelTree)
+    #                           dividend_yield, modelTree)
 
     #     v_eu = ameuOption.value(valuation_date, stock_price, discount_curve,
-    #                             dividendYield, modelTree)
+    #                             dividend_yield, modelTree)
  
     #     v_bs = euOption.value(valuation_date, stock_price, discount_curve,
-    #                           dividendYield, modelAnal)
+    #                           dividend_yield, modelAnal)
 
     #     v_am_baw = amOption.value(valuation_date, stock_price, discount_curve,
-    #                               dividendYield, modelBAW)
+    #                               dividend_yield, modelBAW)
         
     #     amTreeValue.append(v_am)
     #     euTreeValue.append(v_eu)

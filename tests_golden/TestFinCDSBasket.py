@@ -17,9 +17,9 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.math import corrMatrixGenerator
+from financepy.utils.math import corr_matrixGenerator
 from financepy.utils.date import Date
-from financepy.models.gbm_process_simulator import getPathsAssets
+from financepy.models.gbm_process_simulator import get_paths_assets
 from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -219,7 +219,7 @@ def test_FinCDSBasket():
         issuer_curves = loadHeterogeneousSpreadCurves(valuation_date, libor_curve)
         issuer_curves = issuer_curves[0:num_credits]
 
-    intrinsicSpd = cdsIndex.intrinsicSpread(valuation_date,
+    intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
                                             step_in_date,
                                             basketMaturity,
                                             issuer_curves) * 10000.0
@@ -233,14 +233,14 @@ def test_FinCDSBasket():
 
     testCases.print("SUMMED UP SPD BASKET MATURITY", totalSpd)
 
-    minSpd = cdsIndex.minSpread(valuation_date,
+    minSpd = cdsIndex.min_spread(valuation_date,
                                 step_in_date,
                                 basketMaturity,
                                 issuer_curves) * 10000.0
 
     testCases.print("MINIMUM SPD BASKET MATURITY", minSpd)
 
-    maxSpd = cdsIndex.maxSpread(valuation_date,
+    maxSpd = cdsIndex.max_spread(valuation_date,
                                 step_in_date,
                                 basketMaturity,
                                 issuer_curves) * 10000.0
@@ -264,14 +264,14 @@ def test_FinCDSBasket():
         for beta in [0.0, 0.5]:
             rho = beta * beta
             betaVector = np.ones(num_credits) * beta
-            corrMatrix = corrMatrixGenerator(rho, num_credits)
+            corr_matrix = corr_matrixGenerator(rho, num_credits)
             for num_trials in [1000]:  # [1000,5000,10000,20000,50000,100000]:
                 start = time.time()
 
                 v1 = basket.valueGaussian_MC(valuation_date,
                                              ntd,
                                              issuer_curves,
-                                             corrMatrix,
+                                             corr_matrix,
                                              libor_curve,
                                              num_trials,
                                              seed)
@@ -303,7 +303,7 @@ def test_FinCDSBasket():
 
     for beta in [0.0, 0.5]:
         rho = beta ** 2
-        corrMatrix = corrMatrixGenerator(rho, num_credits)
+        corr_matrix = corr_matrixGenerator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
             for doF in [3, 6]:
                 start = time.time()
@@ -311,7 +311,7 @@ def test_FinCDSBasket():
                 v = basket.valueStudentT_MC(valuation_date,
                                             ntd,
                                             issuer_curves,
-                                            corrMatrix,
+                                            corr_matrix,
                                             doF,
                                             libor_curve,
                                             num_trials,
@@ -326,7 +326,7 @@ def test_FinCDSBasket():
                 valuation_date,
                 ntd,
                 issuer_curves,
-                corrMatrix,
+                corr_matrix,
                 libor_curve,
                 num_trials,
                 seed)
@@ -345,7 +345,7 @@ def test_FinCDSBasket():
     testCases.header("TIME", "NUMTRIALS", "RHO", "NTD", "SPD")
     for beta in [0.0, 0.5]:
         rho = beta ** 2
-        corrMatrix = corrMatrixGenerator(rho, num_credits)
+        corr_matrix = corr_matrixGenerator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
             for num_trials in [1000]:
                 start = time.time()
@@ -353,7 +353,7 @@ def test_FinCDSBasket():
                 v = basket.valueStudentT_MC(valuation_date,
                                             ntd,
                                             issuer_curves,
-                                            corrMatrix,
+                                            corr_matrix,
                                             doF,
                                             libor_curve,
                                             num_trials,
@@ -375,12 +375,12 @@ def testFinGBMProcess():
     stock_prices = 100.0 * np.ones(num_assets)
     volatilities = 0.2 * np.ones(num_assets)
     rho = 0.8
-    corrMatrix = corrMatrixGenerator(rho, num_assets)
+    corr_matrix = corr_matrixGenerator(rho, num_assets)
     seed = 1912
 
-    _ = getPathsAssets(num_assets, num_paths, num_time_steps, t,
+    _ = get_paths_assets(num_assets, num_paths, num_time_steps, t,
                        mus, stock_prices, volatilities,
-                       corrMatrix, seed)
+                       corr_matrix, seed)
 
 ###############################################################################
 

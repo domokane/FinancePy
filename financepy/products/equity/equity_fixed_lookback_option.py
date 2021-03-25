@@ -59,7 +59,7 @@ class EquityFixedLookbackOption(EquityOption):
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
               volatility: float,
-              stockMinMax: float):
+              stock_min_max: float):
         """ Valuation of the Fixed Lookback option using Black-Scholes using
         the formulae derived by Conze and Viswanathan (1991). One of the inputs
         is the minimum of maximum of the stock price since the start of the
@@ -80,11 +80,11 @@ class EquityFixedLookbackOption(EquityOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < s0:
                 raise FinError("The Smax value must be >= the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > s0:
                 raise FinError("The Smin value must be <= the stock price.")
 
@@ -179,7 +179,7 @@ class EquityFixedLookbackOption(EquityOption):
                 discount_curve: DiscountCurve,
                 dividend_curve: DiscountCurve,
                 volatility: float,
-                stockMinMax: float,
+                stock_min_max: float,
                 num_paths: int = 10000,
                 num_steps_per_year: int = 252,
                 seed: int = 4242):
@@ -189,8 +189,8 @@ class EquityFixedLookbackOption(EquityOption):
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
         df = discount_curve.df(self._expiry_date)
-        r = discount_curve.ccRate(self._expiry_date)
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         mu = r - q
         num_time_steps = int(t * num_steps_per_year)
@@ -202,18 +202,18 @@ class EquityFixedLookbackOption(EquityOption):
         smax = 0.0
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-            smax = stockMinMax
+            smax = stock_min_max
             if smax < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-            smin = stockMinMax
+            smin = stock_min_max
             if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.getPaths(num_paths, num_time_steps, t, mu, stock_price,
+        Sall = model.get_paths(num_paths, num_time_steps, t, mu, stock_price,
                               volatility, seed)
 
         # Due to antithetics we have doubled the number of paths

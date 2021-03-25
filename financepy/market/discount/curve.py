@@ -116,7 +116,7 @@ class DiscountCurve:
 
     ###############################################################################
 
-    def _dfToZero(self,
+    def _df_to_zero(self,
                   dfs: (float, np.ndarray),
                   maturityDts: (Date, list),
                   freq_type: FrequencyTypes,
@@ -182,7 +182,7 @@ class DiscountCurve:
             raise FinError("Invalid Day Count type.")
 
         dfs = self.df(dts)
-        zero_rates = self._dfToZero(dfs, dts, freq_type, day_count_type)
+        zero_rates = self._df_to_zero(dfs, dts, freq_type, day_count_type)
 
         if isinstance(dts, Date):
             return zero_rates[0]
@@ -193,15 +193,15 @@ class DiscountCurve:
 
     ###############################################################################
 
-    def ccRate(self,
+    def cc_rate(self,
                dts: (list, Date),
                day_count_type: DayCountTypes = DayCountTypes.SIMPLE):
         """ Calculation of zero rates with continuous compounding. This
         function can return a vector of cc rates given a vector of
         dates so must use Numpy functions. """
 
-        ccRates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, day_count_type)
-        return ccRates
+        cc_rates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, day_count_type)
+        return cc_rates
 
     ###############################################################################
 
@@ -316,7 +316,7 @@ class DiscountCurve:
 
     ###############################################################################
 
-    def survProb(self,
+    def survival_prob(self,
                  dt: Date):
         """ This returns a survival probability to a specified date based on
         the assumption that the continuously compounded rate is a default

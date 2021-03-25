@@ -38,9 +38,9 @@ class EquityDigitalOption(EquityOption):
 
     def __init__(self,
                  expiry_date: Date,
-                 barrierPrice: float,
+                 barrier_price: float,
                  option_type: FinOptionTypes,
-                 underlyingType: FinDigitalOptionTypes):
+                 underlying_type: FinDigitalOptionTypes):
         """ Create the digital option by specifying the expiry date, the
         barrier price and the type of option which is either a EUROPEAN_CALL
         or a EUROPEAN_PUT or an AMERICAN_CALL or AMERICAN_PUT. There are two
@@ -52,9 +52,9 @@ class EquityDigitalOption(EquityOption):
             raise FinError("Option type must be EUROPEAN CALL or EUROPEAN PUT")
 
         self._expiry_date = expiry_date
-        self._barrierPrice = float(barrierPrice)
+        self._barrier_price = float(barrier_price)
         self._option_type = option_type
-        self._underlyingType = underlyingType
+        self._underlying_type = underlying_type
 
 ###############################################################################
 
@@ -75,7 +75,7 @@ class EquityDigitalOption(EquityOption):
         t = max(t, 1e-6)
 
         S0 = stock_price
-        X = self._barrierPrice
+        X = self._barrier_price
         lnS0k = np.log(S0 / X)
 
         sqrtT = np.sqrt(t)
@@ -95,12 +95,12 @@ class EquityDigitalOption(EquityOption):
         d1 = d1 / volatility / sqrtT
         d2 = d1 - volatility * sqrtT
 
-        if self._underlyingType == FinDigitalOptionTypes.CASH_OR_NOTHING:
+        if self._underlying_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
                 v = np.exp(-r * t) * NVect(d2)
             elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
                 v = np.exp(-r * t) * NVect(-d2)
-        elif self._underlyingType == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+        elif self._underlying_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
                 v = S0 * np.exp(-q * t) * NVect(d1)
             elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
@@ -133,7 +133,7 @@ class EquityDigitalOption(EquityOption):
         q = -np.log(dq)/t
 
         volatility = model._volatility
-        K = self._barrierPrice
+        K = self._barrier_price
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
@@ -144,14 +144,14 @@ class EquityDigitalOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        if self._underlyingType == FinDigitalOptionTypes.CASH_OR_NOTHING:
+        if self._underlying_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = np.heaviside(s_1 - K, 0.0)
                 payoff_a_2 = np.heaviside(s_2 - K, 0.0)
             elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
                 payoff_a_1 = np.heaviside(K - s_1, 0.0)
                 payoff_a_2 = np.heaviside(K - s_2, 0.0)
-        elif self._underlyingType == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+        elif self._underlying_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = s_1 * np.heaviside(s_1 - K, 0.0)
                 payoff_a_2 = s_2 * np.heaviside(s_2 - K, 0.0)
@@ -168,9 +168,9 @@ class EquityDigitalOption(EquityOption):
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
-        s += label_to_string("BARRIER LEVEL", self._barrierPrice)
+        s += label_to_string("BARRIER LEVEL", self._barrier_price)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("UNDERLYING TYPE", self._underlyingType, "")
+        s += label_to_string("UNDERLYING TYPE", self._underlying_type, "")
         return s
 
 ###############################################################################

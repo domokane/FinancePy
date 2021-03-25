@@ -28,11 +28,11 @@ def test_EquityChooserOptionHaug():
     stock_price = 50.0
     volatility = 0.35
     interest_rate = 0.10
-    dividendYield = 0.05
+    dividend_yield = 0.05
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
                                            call_expiry_date,
@@ -71,12 +71,12 @@ def test_EquityChooserOptionMatlab():
     stock_price = 50.0
     volatility = 0.20
     interest_rate = 0.10
-    dividendYield = 0.05
+    dividend_yield = 0.05
 
     model = BlackScholes(volatility)
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
                                            call_expiry_date,
@@ -115,11 +115,11 @@ def test_EquityChooserOptionDerivicom():
     stock_price = 38.0
     volatility = 0.20
     interest_rate = 0.08
-    dividendYield = 0.0625
+    dividend_yield = 0.0625
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
                                            call_expiry_date,

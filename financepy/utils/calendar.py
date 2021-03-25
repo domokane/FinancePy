@@ -114,7 +114,7 @@ class Calendar:
         elif busDayConventionType == BusDayAdjustTypes.FOLLOWING:
 
             # step forward until we find a business day
-            while self.isBusinessDay(dt) is False:
+            while self.is_business_day(dt) is False:
                 dt = dt.addDays(1)
 
             return dt
@@ -126,7 +126,7 @@ class Calendar:
             y_start = dt._y
 
             # step forward until we find a business day
-            while self.isBusinessDay(dt) is False:
+            while self.is_business_day(dt) is False:
                 dt = dt.addDays(1)
 
             # if the business day is in a different month look back
@@ -134,7 +134,7 @@ class Calendar:
             # TODO: I could speed this up by starting it at initial date
             if dt._m != m_start:
                 dt = Date(d_start, m_start, y_start)
-                while self.isBusinessDay(dt) is False:
+                while self.is_business_day(dt) is False:
                     dt = dt.addDays(-1)
 
             return dt
@@ -143,7 +143,7 @@ class Calendar:
 
             # if the business day is in the next month look back
             # for previous first business day one day at a time
-            while self.isBusinessDay(dt) is False:
+            while self.is_business_day(dt) is False:
                 dt = dt.addDays(-1)
 
             return dt
@@ -155,7 +155,7 @@ class Calendar:
             y_start = dt._y
 
             # step backward until we find a business day
-            while self.isBusinessDay(dt) is False:
+            while self.is_business_day(dt) is False:
                 dt = dt.addDays(-1)
 
             # if the business day is in a different month look forward
@@ -163,7 +163,7 @@ class Calendar:
             # I could speed this up by starting it at initial date
             if dt._m != m_start:
                 dt = Date(d_start, m_start, y_start)
-                while self.isBusinessDay(dt) is False:
+                while self.is_business_day(dt) is False:
                     dt = dt.addDays(+1)
 
             return dt
@@ -177,7 +177,7 @@ class Calendar:
 
 ###############################################################################
 
-    def addBusinessDays(self,
+    def add_business_days(self,
                         start_date: Date,
                         numDays: int):
         """ Returns a new date that is numDays business days after Date.
@@ -206,14 +206,14 @@ class Calendar:
             y = dt.year
             newDt = Date(d, m, y)
 
-            if self.isBusinessDay(newDt) is True:
+            if self.is_business_day(newDt) is True:
                 numDays -= 1
 
         return newDt
 
 ###############################################################################
 
-    def isBusinessDay(self,
+    def is_business_day(self,
                       dt: Date):
         """ Determines if a date is a business day according to the specified
         calendar. If it is it returns True, otherwise False. """
@@ -223,14 +223,14 @@ class Calendar:
         if dt.isWeekend():
             return False
 
-        if self.isHoliday(dt) is True:
+        if self.is_holiday(dt) is True:
             return False
         else:
             return True
 
 ###############################################################################
 
-    def isHoliday(self,
+    def is_holiday(self,
                   dt: Date):
         """ Determines if a date is a Holiday according to the specified
         calendar. Weekends are not holidays unless the holiday falls on a 
@@ -1041,7 +1041,7 @@ class Calendar:
         end_date = Date(1, 1, year + 1)
         holidayList = []
         while start_date < end_date:
-            if self.isBusinessDay(start_date) is False and \
+            if self.is_business_day(start_date) is False and \
               start_date.isWeekend() is False:
                 holidayList.append(start_date.__str__())
 

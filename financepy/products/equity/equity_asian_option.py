@@ -74,7 +74,7 @@ def _value_mc_NUMBA(t0,
                    option_type,
                    stock_price,
                    interest_rate,
-                   dividendYield,
+                   dividend_yield,
                    volatility,
                    num_paths,
                    seed,
@@ -98,7 +98,7 @@ def _value_mc_NUMBA(t0,
         # the number of observations is scaled and floored at 1
         n = int(n * t / tau + 0.5) + 1
 
-    mu = interest_rate - dividendYield
+    mu = interest_rate - dividend_yield
     v2 = volatility**2
     dt = (t - t0) / n
 
@@ -158,14 +158,14 @@ def _value_mc_fast_NUMBA(t0: float,
                         option_type: FinOptionTypes,
                         stock_price: float,
                         interest_rate: float,
-                        dividendYield: float,
+                        dividend_yield: float,
                         volatility: float,
                         num_paths: int,
                         seed: int,
                         accruedAverage: float):
 
     np.random.seed(seed)
-    mu = interest_rate - dividendYield
+    mu = interest_rate - dividend_yield
     v2 = volatility**2
     dt = (t - t0) / n
     r = interest_rate
@@ -239,11 +239,11 @@ def _value_mc_fast_NUMBA(t0: float,
 
 @njit(cache=True, fastmath=True)
 def _value_mc_fast_CV_NUMBA(t0, t, tau, K, n, option_type, stock_price,
-                           interest_rate, dividendYield, volatility, num_paths,
+                           interest_rate, dividend_yield, volatility, num_paths,
                            seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
-    mu = interest_rate - dividendYield
+    mu = interest_rate - dividend_yield
     v2 = volatility**2
     dt = (t - t0) / n
     r = interest_rate
@@ -441,8 +441,8 @@ class EquityAsianOption:
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
 #        print("r:", r, "q:", q)
         
@@ -506,8 +506,8 @@ class EquityAsianOption:
 
         multiplier = 1.0
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -574,8 +574,8 @@ class EquityAsianOption:
         multiplier = 1.0
         n = self._num_observations
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -659,8 +659,8 @@ class EquityAsianOption:
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         tau = (self._expiry_date - self._startAveragingDate) / gDaysInYear
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -700,8 +700,8 @@ class EquityAsianOption:
         K = self._strike_price
         n = self._num_observations
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         volatility = model._volatility
 
@@ -740,8 +740,8 @@ class EquityAsianOption:
         K = self._strike_price
         n = self._num_observations
 
-        r = discount_curve.ccRate(self._expiry_date)        
-        q = dividend_curve.ccRate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_date)
+        q = dividend_curve.cc_rate(self._expiry_date)
 
         volatility = model._volatility
 

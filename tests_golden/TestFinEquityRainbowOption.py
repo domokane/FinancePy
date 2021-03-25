@@ -65,7 +65,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -76,7 +76,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             v_MC = rainbowOption.value_mc(
                 valuation_date,
@@ -84,7 +84,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -120,7 +120,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -132,7 +132,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             v_MC = rainbowOption.value_mc(
                 valuation_date,
@@ -140,7 +140,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -177,7 +177,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -189,7 +189,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             v_MC = rainbowOption.value_mc(
                 valuation_date,
@@ -197,7 +197,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -233,7 +233,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -244,14 +244,14 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
             v_MC = rainbowOption.value_mc(
                 valuation_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
             end = time.time()
             duration = end - start
@@ -289,7 +289,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -311,7 +311,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             v_MC = rainbowOption2.value_mc(
                 valuation_date,
@@ -319,7 +319,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -349,7 +349,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corrMatrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = betaVectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -371,7 +371,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix)
+                corr_matrix)
 
             v_MC = rainbowOption2.value_mc(
                 valuation_date,
@@ -379,7 +379,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -437,7 +437,7 @@ def test_EquityRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(num_assets) * sqrt(correlation)
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
 
@@ -447,7 +447,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()
@@ -497,7 +497,7 @@ def test_EquityRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(num_assets) * sqrt(correlation)
-            corrMatrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = betaVectorToCorrMatrix(betas)
 
             start = time.time()
 
@@ -507,7 +507,7 @@ def test_EquityRainbowOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corrMatrix,
+                corr_matrix,
                 num_paths)
 
             end = time.time()

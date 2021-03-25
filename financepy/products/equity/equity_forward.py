@@ -21,18 +21,18 @@ class EquityForward():
 
     def __init__(self,
                  expiry_date: Date,
-                 forwardPrice: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
+                 forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
                  notional: float,
-                 longShort: FinLongShort = FinLongShort.LONG):
+                 long_short: FinLongShort = FinLongShort.LONG):
         """ Creates a EquityForward which allows the owner to buy the stock
         at a price agreed today. Need to specify if LONG or SHORT."""
 
         check_argument_types(self.__init__, locals())
 
         self._expiry_date = expiry_date
-        self._forwardPrice = forwardPrice
+        self._forward_price = forward_price
         self._notional = notional
-        self._longShort = longShort
+        self._long_short = long_short
         
 ###############################################################################
 
@@ -42,7 +42,7 @@ class EquityForward():
               discount_curve,
               dividend_curve):
         """ Calculate the value of an equity forward contract from the stock
-        price and discound and dividend discount. """
+        price and discount and dividend discount. """
 
         if type(valuation_date) == Date:
             t = (self._expiry_date - valuation_date) / gDaysInYear
@@ -64,10 +64,10 @@ class EquityForward():
 
         discountDF = discount_curve._df(t)
 
-        v = (fwdStockPrice - self._forwardPrice)
+        v = (fwdStockPrice - self._forward_price)
         v = v * self._notional * discountDF
         
-        if self._longShort == FinLongShort.SHORT:
+        if self._long_short == FinLongShort.SHORT:
             v = v * (-1.0)
 
         return v
@@ -105,8 +105,8 @@ class EquityForward():
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
-        s += label_to_string("FORWARD PRICE", self._forwardPrice)
-        s += label_to_string("LONG OR SHORT", self._longShort)
+        s += label_to_string("FORWARD PRICE", self._forward_price)
+        s += label_to_string("LONG OR SHORT", self._long_short)
         s += label_to_string("NOTIONAL", self._notional, "")
         return s
 

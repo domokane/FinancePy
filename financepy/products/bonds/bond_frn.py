@@ -282,7 +282,7 @@ class BondFRN:
 
     ###############################################################################
 
-    def modifiedCreditDuration(self,
+    def modified_credit_duration(self,
                                settlement_date: Date,
                                nextCoupon: float,
                                currentIbor: float,
@@ -311,7 +311,7 @@ class BondFRN:
 
     ###############################################################################
 
-    def convexityFromDM(self,
+    def convexity_from_dm(self,
                         settlement_date: Date,
                         nextCoupon: float,
                         currentIbor: float,
@@ -379,7 +379,7 @@ class BondFRN:
 
     ###############################################################################
 
-    def discountMargin(self,
+    def discount_margin(self,
                        settlement_date: Date,
                        nextCoupon: float,
                        currentIbor: float,

@@ -98,20 +98,20 @@ class InflationSwapCurve(DiscountCurve):
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         self._valuation_date = valuation_date
-        self._validateInputs(iborDeposits, iborFRAs, iborSwaps)
+        self._validate_inputs(iborDeposits, iborFRAs, iborSwaps)
         self._interp_type = interp_type
         self._checkRefit = checkRefit
-        self._buildCurve()
+        self._build_curve()
 
 ###############################################################################
 
-    def _buildCurve(self):
+    def _build_curve(self):
         """ Build curve based on interpolation. """
         self._buildCurveUsingSolver()
 
 ###############################################################################
 
-    def _validateInputs(self,
+    def _validate_inputs(self,
                         iborDeposits,
                         iborFRAs,
                         iborSwaps):

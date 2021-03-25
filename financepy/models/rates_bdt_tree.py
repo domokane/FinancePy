@@ -95,7 +95,7 @@ def searchRoot(x0, m, Q, rt, dfEnd, dt, sigma):
 
 
 @njit(fastmath=True, cache=True)
-def bermudanSwaption_Tree_Fast(texp, tmat,
+def bermudan_swaption_Tree_Fast(texp, tmat,
                                strike_price, face_amount,
                                coupon_times, coupon_flows,
                                exercise_typeInt,
@@ -701,7 +701,7 @@ class FinModelRatesBDT():
 
 ###############################################################################
 
-    def bondOption(self, texp, strike_price, face_amount,
+    def bond_option(self, texp, strike_price, face_amount,
                    coupon_times, coupon_flows, exercise_type):
         """ Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree. """
@@ -732,7 +732,7 @@ class FinModelRatesBDT():
 
 ###############################################################################
 
-    def bermudanSwaption(self, texp, tmat, strike, face_amount,
+    def bermudan_swaption(self, texp, tmat, strike, face_amount,
                          coupon_times, coupon_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -751,7 +751,7 @@ class FinModelRatesBDT():
         #######################################################################
 
         payValue, recValue \
-            = bermudanSwaption_Tree_Fast(texp, tmat,
+            = bermudan_swaption_Tree_Fast(texp, tmat,
                                          strike, face_amount,
                                          coupon_times, coupon_flows,
                                          exercise_typeInt,

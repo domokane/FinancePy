@@ -120,7 +120,7 @@ class SwapFixedLeg:
             if self._payment_lag == 0:
                 payment_date = nextDt
             else:
-                payment_date = calendar.addBusinessDays(nextDt,
+                payment_date = calendar.add_business_days(nextDt,
                                                        self._payment_lag)
 
             self._payment_dates.append(payment_date)
@@ -189,7 +189,7 @@ class SwapFixedLeg:
 
 ##########################################################################
 
-    def printPayments(self):
+    def print_payments(self):
         """ Prints the fixed leg dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
@@ -222,7 +222,7 @@ class SwapFixedLeg:
 
 ###############################################################################
 
-    def printValuation(self):
+    def print_valuation(self):
         """ Prints the fixed leg dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """

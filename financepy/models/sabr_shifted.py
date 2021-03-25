@@ -26,7 +26,7 @@ def _x(rho, z):
     return np.log(a / b)
 
 @njit
-def volFunctionShiftedSABR(params, f, k, t):
+def vol_functionShiftedSABR(params, f, k, t):
     """ Black volatility implied by SABR model. """
 
     alpha = params[0]
@@ -91,7 +91,7 @@ class FinModelSABRShifted():
 
 ###############################################################################
 
-    def blackVol(self, f, k, t):
+    def black_vol(self, f, k, t):
         """ Black volatility from SABR model using Hagan et al. approx. """
 
         params = np.array([self._alpha, self._beta, self._rho, 
@@ -101,24 +101,24 @@ class FinModelSABRShifted():
         if isinstance(f, np.ndarray):
             vols = []
             for x in f:
-                v = volFunctionShiftedSABR(params, x, k, t)
+                v = vol_functionShiftedSABR(params, x, k, t)
                 vols.append(v)
             return np.array(vols)
         elif isinstance(k, np.ndarray):
             vols = []
             for x in k:
-                v = volFunctionShiftedSABR(params, f, x, t)
+                v = vol_functionShiftedSABR(params, f, x, t)
                 vols.append(v)
             return np.array(vols)
 
         elif isinstance(t, np.ndarray):
             vols = []
             for x in t:
-                v = volFunctionShiftedSABR(params, f, k, x)
+                v = vol_functionShiftedSABR(params, f, k, x)
                 vols.append(v)
             return np.array(vols)
         else:
-            v = volFunctionShiftedSABR(params, f, k, t)
+            v = vol_functionShiftedSABR(params, f, k, t)
             return v
 
 ###############################################################################
@@ -126,7 +126,7 @@ class FinModelSABRShifted():
     def blackVolWithAlpha(self, alpha, f, k, t):
 
         self._alpha = alpha[0]
-        blackVol = self.blackVol(f, k, t)
+        blackVol = self.black_vol(f, k, t)
         return blackVol
 
 ###############################################################################
@@ -144,7 +144,7 @@ class FinModelSABRShifted():
         t = time_to_expiry
         k = strikeRate
         sqrtT = np.sqrt(t)
-        vol = self.blackVol(f, k, t)
+        vol = self.black_vol(f, k, t)
 
         d1 = (np.log((f)/(k)) + vol * vol * t / 2) / (vol * sqrtT)
         d2 = d1 - vol*sqrtT

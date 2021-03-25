@@ -24,13 +24,13 @@ def test_EquityLookBackOption():
     stock_price = 100.0
     volatility = 0.3
     interest_rate = 0.05
-    dividendYield = 0.01
+    dividend_yield = 0.01
     num_pathsRange = [10000]
     stock_priceRange = range(90, 110, 10)
     num_steps_per_year = 252
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
 ###############################################################################
 
@@ -522,17 +522,17 @@ def test_example():
     valuation_date = Date(1, 1, 2020)
     interest_rate = 0.10
     stock_price = 100.0
-    dividendYield = 0.0
-    stockMinMax = 100.0
+    dividend_yield = 0.0
+    stock_min_max = 100.0
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendYield)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     volatilities = [0.30]
 
     testCases.header("VALUE")
     for vol in volatilities:
-        v = lookbackCall.value(valuation_date, stock_price, discount_curve, dividend_curve, vol, stockMinMax)
+        v = lookbackCall.value(valuation_date, stock_price, discount_curve, dividend_curve, vol, stock_min_max)
         testCases.print(v)
 
 ###############################################################################

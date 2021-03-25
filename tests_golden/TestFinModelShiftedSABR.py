@@ -43,8 +43,8 @@ def test_ShiftedSABR():
     modelSABR_01 = FinModelSABRShifted(0.0, 1.0, 0.0, 0.0, 0.0)
     modelSABR_01.setAlphaFromBlackVol(strikeVol, f, k, texp)
 
-    impliedLognormalVol = modelSABR_01.blackVol(f, k, texp)
-    impliedATMLognormalVol = modelSABR_01.blackVol(k, k, texp)
+    impliedLognormalVol = modelSABR_01.black_vol(f, k, texp)
+    impliedATMLognormalVol = modelSABR_01.black_vol(k, k, texp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
 
     assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
@@ -55,8 +55,8 @@ def test_ShiftedSABR():
     modelSABR_02 = FinModelSABRShifted(alpha, beta, rho, nu, shift)
     modelSABR_02.setAlphaFromBlackVol(strikeVol, f, k, texp)
 
-    impliedLognormalVol = modelSABR_02.blackVol(f, k, texp)
-    impliedATMLognormalVol = modelSABR_02.blackVol(k, k, texp)
+    impliedLognormalVol = modelSABR_02.black_vol(f, k, texp)
+    impliedATMLognormalVol = modelSABR_02.black_vol(k, k, texp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
     testCases.print("SABR CASE", calibrationError)
