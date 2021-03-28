@@ -69,11 +69,11 @@ class BondEmbeddedOption:
         self._accrual_type = accrual_type
 
         self._bond = Bond(issue_date,
-                             maturity_date,
-                             coupon,
-                             freq_type,
-                             accrual_type,
-                             face_amount)
+                          maturity_date,
+                          coupon,
+                          freq_type,
+                          accrual_type,
+                          face_amount)
 
         # Validate call and put schedules
         for dt in call_dates:

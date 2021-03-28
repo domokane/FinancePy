@@ -86,9 +86,9 @@ class BondMortgage:
 
         self._mortgage_type = mortgage_type
         self._interest_flows = [0]
-        self._principalFlows = [0]
-        self._principalRemaining = [self._principal]
-        self._totalFlows = [0]
+        self._principal_flows = [0]
+        self._principal_remaining = [self._principal]
+        self._total_flows = [0]
 
         num_flows = len(self._schedule._adjusted_dates)
         principal = self._principal
@@ -106,9 +106,9 @@ class BondMortgage:
             principalFlow = monthly_flow - interestFlow
             principal = principal - principalFlow
             self._interest_flows.append(interestFlow)
-            self._principalFlows.append(principalFlow)
-            self._principalRemaining.append(principal)
-            self._totalFlows.append(monthly_flow)
+            self._principal_flows.append(principalFlow)
+            self._principal_remaining.append(principal)
+            self._total_flows.append(monthly_flow)
 
 ###############################################################################
 
@@ -132,9 +132,9 @@ class BondMortgage:
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
                   (self._schedule._adjusted_dates[i],
                    self._interest_flows[i],
-                   self._principalFlows[i],
-                   self._principalRemaining[i],
-                   self._totalFlows[i]))
+                   self._principal_flows[i],
+                   self._principal_remaining[i],
+                   self._total_flows[i]))
 
 ###############################################################################
 

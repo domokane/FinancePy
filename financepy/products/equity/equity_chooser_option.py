@@ -51,7 +51,6 @@ def _f(ss, *args):
     v = v_call - v_put
     return v
 
-
 ###############################################################################
 
 
@@ -86,7 +85,7 @@ class EquityChooserOption(EquityOption):
         self._call_strike = float(call_strike_price)
         self._put_strike = float(put_strike_price)
 
-    ###############################################################################
+    ###########################################################################
 
     def value(self,
               valuation_date: Date,
@@ -163,7 +162,7 @@ class EquityChooserOption(EquityOption):
         w = w + xp * np.exp(-rtp * tp) * M(-d2, -y2 + v * np.sqrt(tp), rho2)
         return w
 
-    ###############################################################################
+    ###########################################################################
 
     def value_mc(self,
                  valuation_date: Date,
@@ -226,7 +225,7 @@ class EquityChooserOption(EquityOption):
         v = payoff * dft / 2.0
         return v
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -237,7 +236,7 @@ class EquityChooserOption(EquityOption):
         s += label_to_string("PUT STRIKE PRICE", self._put_strike, "")
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

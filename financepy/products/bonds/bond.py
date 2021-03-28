@@ -126,25 +126,25 @@ class Bond:
         self._calculate_flow_dates()
         self._calculateFlows()
 
-    ###############################################################################
+    ###########################################################################
 
     def _calculate_flow_dates(self):
         """ Determine the bond cash flow payment dates."""
 
-        # This should only be called once from init 
+        # This should only be called once from init
 
         calendar_type = CalendarTypes.NONE
-        busDayRuleType = BusDayAdjustTypes.NONE
+        bus_day_rule_type = BusDayAdjustTypes.NONE
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     calendar_type,
-                                    busDayRuleType,
+                                    bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
-    ###############################################################################
+    ###########################################################################
 
     def _calculateFlows(self):
         """ Determine the bond cash flow payment amounts without principal """
@@ -155,7 +155,7 @@ class Bond:
             cpn = self._coupon / self._frequency
             self._flow_amounts.append(cpn)
 
-    ###############################################################################
+    ###########################################################################
 
     def full_price_from_ytm(self,
                             settlement_date: Date,
@@ -177,7 +177,7 @@ class Bond:
         c = self._coupon
         v = 1.0 / (1.0 + ytm / f)
 
-        # n is the number of flows after the next coupon         
+        # n is the number of flows after the next coupon
         n = 0
         for dt in self._flow_dates:
             if dt > settlement_date:
@@ -222,7 +222,7 @@ class Bond:
 
         return fp * self._par
 
-    ###############################################################################
+    ###########################################################################
 
     def principal(self,
                   settlement_date: Date,
@@ -238,7 +238,7 @@ class Bond:
         principal = principal - self._accrued_interest
         return principal
 
-    ###############################################################################
+    ###########################################################################
 
     def dollar_duration(self,
                         settlement_date: Date,
@@ -253,7 +253,7 @@ class Bond:
         durn = -(p2 - p0) / dy / 2.0
         return durn
 
-    ###############################################################################
+    ###########################################################################
 
     def macauley_duration(self,
                           settlement_date: Date,
@@ -267,7 +267,7 @@ class Bond:
         md = dd * (1.0 + ytm / self._frequency) / fp
         return md
 
-    ###############################################################################
+    ###########################################################################
 
     def modified_duration(self,
                           settlement_date: Date,
@@ -281,7 +281,7 @@ class Bond:
         md = dd / fp
         return md
 
-    ###############################################################################
+    ###########################################################################
 
     def convexity_from_ytm(self,
                            settlement_date: Date,
@@ -297,7 +297,7 @@ class Bond:
         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
         return conv
 
-    ###############################################################################
+    ###########################################################################
 
     def clean_price_from_ytm(self,
                              settlement_date: Date,
@@ -311,7 +311,7 @@ class Bond:
         clean_price = full_price - accrued_amount
         return clean_price
 
-    ###############################################################################
+    ###########################################################################
 
     def clean_price_from_discount_curve(self,
                                         settlement_date: Date,
@@ -328,7 +328,7 @@ class Bond:
         clean_price = full_price - accrued
         return clean_price
 
-    ##############################################################################
+    ###########################################################################
 
     def full_price_from_discount_curve(self,
                                        settlement_date: Date,
@@ -350,7 +350,7 @@ class Bond:
 
         for dt in self._flow_dates[1:]:
 
-            # coupons paid on the settlement date are included            
+            # coupons paid on the settlement date are included
             if dt >= settlement_date:
                 df = discount_curve.df(dt)
                 flow = self._coupon / self._frequency
@@ -362,7 +362,7 @@ class Bond:
 
         return px * self._par
 
-    ###############################################################################
+    ###########################################################################
 
     def current_yield(self, clean_price):
         """ Calculate the current yield of the bond which is the
@@ -371,7 +371,7 @@ class Bond:
         y = self._coupon * self._par / clean_price
         return y
 
-    ###############################################################################
+    ###########################################################################
 
     def yield_to_maturity(self,
                           settlement_date: Date,
@@ -411,19 +411,19 @@ class Bond:
         else:
             return np.array(ytms)
 
-    ###############################################################################
+    ###########################################################################
 
     def calc_accrued_interest(self,
                               settlement_date: Date,
                               numExDividendDays: int = 0,
-                              calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+                              calendar_type: CalendarTypes=CalendarTypes.WEEKEND):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
         between the previous coupon payment date and settlement date. If the
         bond trades with ex-coupon dates then you need to supply the number of
         days before the coupon date the ex-coupon date is. You can specify the
-        calendar to be used - NONE means only calendar days, WEEKEND is only 
+        calendar to be used - NONE means only calendar days, WEEKEND is only
         weekends or you can specify a country calendar for business days."""
 
         num_flows = len(self._flow_dates)
@@ -432,7 +432,7 @@ class Bond:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for iFlow in range(1, num_flows):
-            # coupons paid on a settlement date are paid 
+            # coupons paid on a settlement date are paid
             if self._flow_dates[iFlow] >= settlement_date:
                 self._pcd = self._flow_dates[iFlow - 1]
                 self._ncd = self._flow_dates[iFlow]
@@ -456,7 +456,7 @@ class Bond:
 
         return self._accrued_interest
 
-    ###############################################################################
+    ###########################################################################
 
     def asset_swap_spread(
             self,
@@ -512,7 +512,7 @@ class Bond:
         asw = (pvIbor - bondPrice / self._par) / pv01
         return asw
 
-    ###############################################################################
+    ###########################################################################
 
     def full_price_from_oas(self,
                             settlement_date: Date,
@@ -545,7 +545,7 @@ class Bond:
         pv *= self._par
         return pv
 
-    ###############################################################################
+    ###########################################################################
 
     def option_adjusted_spread(self,
                                settlement_date: Date,
@@ -587,7 +587,7 @@ class Bond:
         else:
             return np.array(oass)
 
-    ###############################################################################
+    ###########################################################################
 
     def print_flows(self,
                     settlement_date: Date):
@@ -604,7 +604,7 @@ class Bond:
         redemption_amount = self._face_amount + flow
         print("%12s" % self._flow_dates[-1], " %12.2f " % redemption_amount)
 
-    ###############################################################################
+    ###########################################################################
 
     def full_price_from_survival_curve(self,
                                        settlement_date: Date,
@@ -613,7 +613,7 @@ class Bond:
                                        recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
-        the recovery fraction of the par amount is paid at default. For the 
+        the recovery fraction of the par amount is paid at default. For the
         defaulting principal we discretize the time steps using the coupon
         payment times. A finer discretization may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
@@ -636,7 +636,7 @@ class Bond:
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 
-                # Add PV of coupon conditional on surviving to payment date  
+                # Add PV of coupon conditional on surviving to payment date
                 # Any default results in all subsequent coupons being lost
                 # with zero recovery
 
@@ -656,7 +656,7 @@ class Bond:
         pv *= self._par
         return pv
 
-    ###############################################################################
+    ###########################################################################
 
     def clean_price_from_survival_curve(self,
                                         settlement_date: Date,
@@ -677,7 +677,7 @@ class Bond:
         clean_price = full_price - self._accrued_interest
         return clean_price
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -690,7 +690,7 @@ class Bond:
         s += label_to_string("FACE AMOUNT", self._face_amount, "")
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Print a list of the unadjusted coupon payment dates used in

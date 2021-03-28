@@ -14,7 +14,7 @@ from ..utils.helpers import label_to_string, check_argument_types
 ###############################################################################
 
 
-class FinModelMertonCredit():
+class MertonCredit():
     """ Implementation of the Merton Credit Model according to the original
     formulation by Merton with the inputs being the asset value of the firm, 
     the liabilities (bond face), the time to maturity in years, the risk-free 

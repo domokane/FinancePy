@@ -26,7 +26,7 @@ class IborFRA:
     notional amount. This period starts on the settlement date of the
     FRA and ends on the maturity date of the FRA. For example a 1x4 FRA
     relates to a Ibor starting in 1 month for a loan period ending in 4
-    months. Hence it links to 3-month Ibor rate. The amount received by a 
+    months. Hence it links to 3-month Ibor rate. The amount received by a
     payer of fixed rate at settlement is:
 
         acc(1,2) * (Ibor(1,2) - FRA RATE) / (1 + acc(0,1) x Ibor(0,1))
@@ -38,14 +38,15 @@ class IborFRA:
     If the base date of the curve is before the value date then we
     forward adjust this amount to that value date. For simplicity I have
     assumed that the fixing date and the settlement date are the same date.
-    This should be amended later. 
-    
+    This should be amended later.
+
     The valuation below incorporates a dual curve approach.
     """
 
     def __init__(self,
                  start_date: Date,  # The date the FRA starts to accrue
-                 maturity_date_or_tenor: (Date, str),  # End of the Ibor rate period
+                 # End of the Ibor rate period
+                 maturity_date_or_tenor: (Date, str),
                  fraRate: float,  # The fixed contractual FRA rate
                  day_count_type: DayCountTypes,  # For interest period
                  notional: float = 100.0,
@@ -65,7 +66,7 @@ class IborFRA:
             maturity_date = start_date.addTenor(maturity_date_or_tenor)
             calendar = Calendar(self._calendar_type)
             maturity_date = calendar.adjust(maturity_date,
-                                           self._bus_day_adjust_type)
+                                            self._bus_day_adjust_type)
 
         if start_date > maturity_date:
             raise FinError("Settlement date after maturity date")

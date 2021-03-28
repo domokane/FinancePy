@@ -7,7 +7,7 @@ import sys
 import numpy as np
 sys.path.append("..")
 
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.utils.global_types import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -28,7 +28,7 @@ def test_Black():
     putOptionType = FinOptionTypes.EUROPEAN_PUT
 
     df = np.exp(-riskFreeIR * time_to_expiry)
-    model = FinModelBlack(volatility)
+    model = Black(volatility)
 
     dp = 12 # Precision
     

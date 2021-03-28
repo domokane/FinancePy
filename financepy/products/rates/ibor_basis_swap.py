@@ -20,21 +20,21 @@ from .swap_float_leg import SwapFloatLeg
 
 class IborBasisSwap:
     """ Class for managing an Ibor-Ibor basis swap contract. This is a
-    contract in which a floating leg with one LIBOR tenor is exchanged for a 
+    contract in which a floating leg with one LIBOR tenor is exchanged for a
     floating leg payment in a different LIBOR tenor. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
     from an effective date to a specified maturity date.
-    
+
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which can be different from the two 
+    is done on a supplied discount curve which can be different from the two
     index discount from which the implied index rates are extracted. """
-    
+
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
                  leg1Type: FinSwapTypes,
                  leg1FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 leg1DayCountType: DayCountTypes  = DayCountTypes.THIRTY_E_360,
+                 leg1DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  leg1Spread: float = 0.0,
                  leg2FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  leg2DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
@@ -57,11 +57,12 @@ class IborBasisSwap:
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.addTenor(termination_date_or_tenor)
+            self._termination_date = effective_date.addTenor(
+                termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -69,7 +70,7 @@ class IborBasisSwap:
         leg2Type = FinSwapTypes.PAY
         if leg1Type == FinSwapTypes.PAY:
             leg2Type = FinSwapTypes.RECEIVE
-        
+
         payment_lag = 0
         principal = 0.0
 
@@ -118,7 +119,7 @@ class IborBasisSwap:
             index_curveLeg2 = discount_curve
 
         floatLeg1Value = self._floatLeg1.value(valuation_date,
-                                               discount_curve, 
+                                               discount_curve,
                                                index_curveLeg1,
                                                firstFixingRateLeg1)
 

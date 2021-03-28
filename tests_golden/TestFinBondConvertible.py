@@ -24,9 +24,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_BondConvertible():
 
     settlement_date = Date(31, 12, 2003)
-    startConvertDate = Date(31, 12, 2003)
+    start_convert_date = Date(31, 12, 2003)
     maturity_date = Date(15, 3, 2022)
-    conversionRatio = 38.4615  # adjust for face
+    conversion_ratio = 38.4615  # adjust for face
     coupon = 0.0575
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrualBasis = DayCountTypes.ACT_365F
@@ -47,8 +47,8 @@ def test_BondConvertible():
     bond = BondConvertible(maturity_date,
                               coupon,
                               freq_type,
-                              startConvertDate,
-                              conversionRatio,
+                              start_convert_date,
+                              conversion_ratio,
                               call_dates,
                               call_prices,
                               put_dates,

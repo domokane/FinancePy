@@ -82,7 +82,6 @@ class EquityAmericanOption(EquityOption):
         k = self._strike_price
 
         v = model.value(s, texp, k, r, q, self._option_type)
-                    
         v = v * self._num_options
 
         if isinstance(s, float):

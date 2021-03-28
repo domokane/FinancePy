@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.ibor_swaption import FinSwapTypes
@@ -53,7 +53,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #                                      FrequencyTypes.ANNUAL,
 #                                      DayCountTypes.ACT_360)
 
-#     model = FinModelBlack(swaptionVol/100.0)
+#     model = Black(swaptionVol/100.0)
 #     v_BLK = liborSwaption.value(valuation_date, discount_curve, model)
 
 #     dt = 0.5
@@ -127,7 +127,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #                                     float_frequency_type,
 #                                     float_day_count_type)
 
-#         model = FinModelBlack(swaptionVol)
+#         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
 #         testCases.print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
@@ -168,7 +168,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #                                 FrequencyTypes.ANNUAL,
 #                                 DayCountTypes.ACT_360)
 
-#     model = FinModelBlack(capVol/100.0)
+#     model = Black(capVol/100.0)
 #     v_BLK = liborCap.value(valuation_date, discount_curve, model)
 
 #     ###########################################################################

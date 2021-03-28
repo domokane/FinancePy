@@ -27,7 +27,7 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def probLossGreaterThanK(self, K):
+    def prob_loss_gt_K(self, K):
         """ Returns P(L>K) where L is the portfolio loss given by model. """
         if K < (1.0 - self._R0) * self._H0:
             raise FinError("Function does not work when K<(1-R0)H0")
@@ -65,32 +65,32 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def expMinLKIntegral(self, K, dK):
+    def exp_min_lkIntegral(self, K, dK):
 
         k0 = 0.0
         num_steps = int(K / dK)
         dK = K / num_steps
         cdf0 = 1.0
         cdf1 = 0.0
-        expMinLK = 0.0
+        exp_min_lk = 0.0
         checkSum = 0.0
 
         for _ in range(0, num_steps):
             k0 += dK
-            cdf1 = self.probLossGreaterThanK(k0)
+            cdf1 = self.prob_loss_gt_K(k0)
             pdf = cdf0 - cdf1
             cdf0 = cdf1
             checkSum += pdf
-            expMinLK += pdf * k0
+            exp_min_lk += pdf * k0
 
         checkSum += cdf1
-        expMinLK += cdf1 * K
+        exp_min_lk += cdf1 * K
 
-        return expMinLK
+        return exp_min_lk
 
 ###############################################################################
 
-    def expMinLK(self, K):
+    def exp_min_lk(self, K):
 
         if abs(K) < 1e-6:
             return K
@@ -128,7 +128,7 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def expMinLK2(self, K):
+    def exp_min_lk2(self, K):
 
         if abs(K) < 1e-6:
             return K
@@ -167,14 +167,14 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def trancheSurvivalProbability(self, k1, k2):
+    def tranche_survival_prob(self, k1, k2):
 
         if k2 == k1:
-            raise FinError("trancheSurvivalProbability: Same strikes")
+            raise FinError("tranche_survival_prob: Same strikes")
 
         dk = 0.00001
-        elK2 = self.expMinLKIntegral(k2, dk)
-        elK1 = self.expMinLKIntegral(k1, dk)
+        elK2 = self.exp_min_lkIntegral(k2, dk)
+        elK1 = self.exp_min_lkIntegral(k1, dk)
         q = 1.0 - (elK2 - elK1) / (k2 - k1)
         return q
 

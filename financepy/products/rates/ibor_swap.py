@@ -31,8 +31,8 @@ class IborSwap:
     a start date to a specified maturity date.
 
     The floating rate is not known fully until the end of the preceding payment
-    period. It is set in advance and paid in arrears. 
-    
+    period. It is set in advance and paid in arrears.
+
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
     which the implied index rates are extracted. """
@@ -109,7 +109,7 @@ class IborSwap:
                                       bus_day_adjust_type,
                                       date_gen_rule_type)
 
-    ###############################################################################
+    ###########################################################################
 
     def value(self,
               valuation_date: Date,
@@ -133,7 +133,7 @@ class IborSwap:
         value = fixed_leg_value + float_leg_value
         return value
 
-    ###############################################################################
+    ###########################################################################
 
     def pv01(self, valuation_date, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
@@ -145,7 +145,7 @@ class IborSwap:
         pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
         return pv01
 
-    ###############################################################################
+    ###########################################################################
 
     def swap_rate(self,
                   valuation_date: Date,
@@ -157,7 +157,7 @@ class IborSwap:
         is the forward swap rate as it starts in the future. The swap rate
         is then a forward swap rate and so we use a forward discount
         factor. If the swap fixed leg has begun then we have a spot
-        starting swap. The swap rate can also be calculated in a dual curve 
+        starting swap. The swap rate can also be calculated in a dual curve
         approach but in this case the first fixing on the floating leg is
         needed. """
 
@@ -187,7 +187,7 @@ class IborSwap:
         cpn = float_leg_pv / pv01
         return cpn
 
-    ##########################################################################
+    ###########################################################################
 
     def cash_settled_pv01(self,
                           valuation_date,
@@ -225,7 +225,7 @@ class IborSwap:
 
         return flatPV01
 
-    ###############################################################################
+    ###########################################################################
 
     def print_fixed_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
@@ -233,7 +233,7 @@ class IborSwap:
 
         self._fixed_leg.print_valuation()
 
-    ###############################################################################
+    ###########################################################################
 
     def print_float_leg_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
@@ -241,7 +241,7 @@ class IborSwap:
 
         self._floatLeg.print_valuation()
 
-    ###############################################################################
+    ###########################################################################
 
     def print_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
@@ -250,7 +250,7 @@ class IborSwap:
         self._fixed_leg.print_payments()
         self._floatLeg.print_payments()
 
-    ##########################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -260,7 +260,7 @@ class IborSwap:
         s += self._floatLeg.__repr__()
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Print a list of the unadjusted coupon payment dates used in

@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 from financepy.utils.global_types import FinOptionTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
-from financepy.utils.helpers import betaVectorToCorrMatrix
+from financepy.utils.helpers import beta_vectorToCorrMatrix
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -52,7 +52,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -100,7 +100,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
 
@@ -147,7 +147,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(
@@ -193,7 +193,7 @@ def test_EquityBasketOption():
             callOption = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
             v = callOption.value(

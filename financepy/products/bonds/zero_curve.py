@@ -29,7 +29,8 @@ def _f(df, *args):
     marketCleanPrice = args[3]
     num_points = len(curve._times)
     curve._values[num_points - 1] = df
-    bondDiscountPrice = bond.clean_price_from_discount_curve(valuation_date, curve)
+    bondDiscountPrice = bond.clean_price_from_discount_curve(
+        valuation_date, curve)
     obj_fn = bondDiscountPrice - marketCleanPrice
     return obj_fn
 
@@ -68,11 +69,11 @@ class BondZeroCurve(DiscountCurve):
 
         self._yearsToMaturity = np.array(times)
 
-        self._bootstrapZeroRates()
+        self._bootstrap_zero_rates()
 
 ###############################################################################
 
-    def _bootstrapZeroRates(self):
+    def _bootstrap_zero_rates(self):
 
         self._times = np.array([0.0])
         self._values = np.array([1.0])
@@ -93,8 +94,8 @@ class BondZeroCurve(DiscountCurve):
 ###############################################################################
 
     def zero_rate(self,
-                 dt: Date,
-                 frequencyType: FrequencyTypes = FrequencyTypes.CONTINUOUS):
+                  dt: Date,
+                  frequencyType: FrequencyTypes = FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to maturity date. """
         t = input_time(dt, self)
         f = annual_frequency(frequencyType)
@@ -119,7 +120,7 @@ class BondZeroCurve(DiscountCurve):
 ###############################################################################
 
     def survival_prob(self,
-                 dt: Date):
+                      dt: Date):
         t = input_time(dt, self)
         q = interpolate(t, self._times, self._values, self._interp_type.value)
         return q
@@ -139,9 +140,9 @@ class BondZeroCurve(DiscountCurve):
 ###############################################################################
 
     def fwd_rate(self,
-                date1: Date,
-                date2: Date,
-                day_count_type: DayCountTypes):
+                 date1: Date,
+                 date2: Date,
+                 day_count_type: DayCountTypes):
         """ Calculate the forward rate according to the specified
         day count convention. """
 

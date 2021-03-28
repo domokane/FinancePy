@@ -67,7 +67,7 @@ def test_FinInterpolate():
     testCases.header("LABEL", "TIME")
     interpolator = FinInterpolator(interp_type)
     interpolator.fit(xp, yp)
-    
+
     start = time.time()
     for i in range(0, n):
         interpolator.interpolate(0.8)

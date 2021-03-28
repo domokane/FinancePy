@@ -14,7 +14,7 @@ from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import FinSwapTypes
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
@@ -60,7 +60,7 @@ def testBlackModelCheck():
                             fixed_day_count_type,
                             notional)
 
-    model = FinModelBlack(0.20)
+    model = Black(0.20)
     v = swaption.value(valuation_date, libor_curve, model)
     testCases.header("LABEL", "VALUE")
     testCases.print("BLACK'S MODEL PRICE:", v*100)
@@ -222,19 +222,19 @@ def test_BDTExampleThree():
     for exercise_type in [FinExerciseTypes.EUROPEAN,
                          FinExerciseTypes.BERMUDAN]:
 
-        for maturityYears in [4.0, 5.0, 10.0, 20.0]:
+        for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:
 
-            maturity_date = settlement_date.addYears(maturityYears)
+            maturity_date = settlement_date.addYears(years_to_maturity)
             issue_date = Date(maturity_date._d, maturity_date._m, 2000)
 
-            if maturityYears == 4.0 or maturityYears == 5.0:
+            if years_to_maturity == 4.0 or years_to_maturity == 5.0:
                 sigma = 0.2012
-            elif maturityYears == 10.0:
+            elif years_to_maturity == 10.0:
                 sigma = 0.1522
-            elif maturityYears == 20.0:
+            elif years_to_maturity == 20.0:
                 sigma = 0.1035
 
-            for expiryYears in range(int(maturityYears/2)-1, int(maturityYears)):
+            for expiryYears in range(int(years_to_maturity/2)-1, int(years_to_maturity)):
 
                 expiry_date = settlement_date.addYears(expiryYears)
 
@@ -272,7 +272,7 @@ def test_BDTExampleThree():
                                 "%9.5f" % sigma,
                                 "%9.5f" % num_time_steps,
                                 "%9.5f" % expiryYears,
-                                "%9.5f" % maturityYears,
+                                "%9.5f" % years_to_maturity,
                                 "%9.5f" % price,
                                 "%9.2f" % (v['pay']*100.0),
                                 "%9.2f" % (v['rec']*100.0))

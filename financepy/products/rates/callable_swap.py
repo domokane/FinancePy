@@ -259,8 +259,8 @@
 #         s += label_to_string("FREQUENCY", self._freq_type)
 #         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
 #         s += label_to_string("FACE AMOUNT", self._face)
-#         s += label_to_string("CONVERSION RATIO", self._conversionRatio)
-#         s += label_to_string("START CONVERT DATE", self._startConvertDate)
+#         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
+#         s += label_to_string("START CONVERT DATE", self._start_convert_date)
 
 #         for i in range(0, len(self._call_dates)):
 #             s += label_to_string("CALL DATE AND PRICE", self._call_dates[i],

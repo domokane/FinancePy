@@ -24,21 +24,21 @@ minZ = -6.0
 
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def lossDbnRecursionGCD(num_credits,
-                        defaultProbs,
+def loss_dbn_recursion_gcd(num_credits,
+                        default_probs,
                         lossUnits,
-                        betaVector,
-                        numIntegrationSteps):
+                        beta_vector,
+                        num_integration_steps):
     """ Full construction of the loss distribution of a portfolio of credits
     where losses have been calculate as number of units based on the GCD. """
 
-    if len(defaultProbs) != num_credits:
+    if len(default_probs) != num_credits:
         raise FinError("Default probability length must equal num credits.")
 
     if len(lossUnits) != num_credits:
         raise FinError("Loss units length must equal num credits.")
 
-    if len(betaVector) != num_credits:
+    if len(beta_vector) != num_credits:
         raise FinError("Beta vector length must equal num credits.")
 
     numLossUnits = 1
@@ -48,17 +48,17 @@ def lossDbnRecursionGCD(num_credits,
     uncondLossDbn = np.zeros(numLossUnits)
 
     z = minZ
-    dz = 2.0 * abs(z) / numIntegrationSteps
+    dz = 2.0 * abs(z) / num_integration_steps
 
     condDefaultProbs = np.zeros(num_credits)
 
     thresholds = np.zeros(num_credits)
     for iCredit in range(0, int(num_credits)):
-        thresholds[iCredit] = norminvcdf(defaultProbs[iCredit])
+        thresholds[iCredit] = norminvcdf(default_probs[iCredit])
 
-    for _ in range(0, numIntegrationSteps):
+    for _ in range(0, num_integration_steps):
         for iCredit in range(0, num_credits):
-            beta = betaVector[iCredit]
+            beta = beta_vector[iCredit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
@@ -83,15 +83,15 @@ def lossDbnRecursionGCD(num_credits,
 
 @njit(float64[:](float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def homogeneousBasketLossDbn(survivalProbabilities,
+def homog_basket_loss_dbn(survival_probabilities,
                              recovery_rates,
-                             betaVector,
-                             numIntegrationSteps):
+                             beta_vector,
+                             num_integration_steps):
     """ Calculate the loss distribution of a CDS default basket where the
     portfolio is equally weighted and the losses in the portfolio are homo-
     geneous i.e. the credits have the same recovery rates. """
 
-    num_credits = len(survivalProbabilities)
+    num_credits = len(survival_probabilities)
 
     if num_credits == 0:
         raise FinError("Number of credits equals zero")
@@ -101,28 +101,28 @@ def homogeneousBasketLossDbn(survivalProbabilities,
             raise FinError("Losses are not homogeneous")
 
     m = 0.0
-    for i in range(0, len(betaVector)):
-        m += betaVector[i]
-    m /= len(betaVector)
+    for i in range(0, len(beta_vector)):
+        m += beta_vector[i]
+    m /= len(beta_vector)
 
     # High beta requires more integration steps
     if m > 0.7:
-        numIntegrationSteps *= 2
+        num_integration_steps *= 2
 
     if m > 0.9:
-        numIntegrationSteps *= 5
+        num_integration_steps *= 5
 
     lossUnits = np.ones(num_credits)
 
-    defaultProbs = np.zeros(num_credits)
+    default_probs = np.zeros(num_credits)
     for iCredit in range(0, num_credits):
-        defaultProbs[iCredit] = 1.0 - survivalProbabilities[iCredit]
+        default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
-    lossDbn = lossDbnRecursionGCD(num_credits,
-                                  defaultProbs,
+    lossDbn = loss_dbn_recursion_gcd(num_credits,
+                                  default_probs,
                                   lossUnits,
-                                  betaVector,
-                                  numIntegrationSteps)
+                                  beta_vector,
+                                  num_integration_steps)
 
     return lossDbn
 
@@ -131,13 +131,13 @@ def homogeneousBasketLossDbn(survivalProbabilities,
 
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True)
-def trSurvProbRecursion(k1,
+def tranche_surv_prob_recursion(k1,
                         k2,
                         num_credits,
-                        survivalProbabilities,
+                        survival_probabilities,
                         recovery_rates,
-                        betaVector,
-                        numIntegrationSteps):
+                        beta_vector,
+                        num_integration_steps):
     """ Get the tranche survival probability of a portfolio of credits in the
     one-factor GC model using a full recursion calculation of the loss
     distribution and survival probabilities to some time horizon. """
@@ -159,12 +159,12 @@ def trSurvProbRecursion(k1,
     gcd = 0.0
 
     m = 0.0
-    for i in range(0, len(betaVector)):
-        m += betaVector[i]
-    m /= len(betaVector)
+    for i in range(0, len(beta_vector)):
+        m += beta_vector[i]
+    m /= len(beta_vector)
 
     if m > 0.8:
-        numIntegrationSteps *= 2
+        num_integration_steps *= 2
 
     if commonRecoveryFlag == 1:
         gcd = lossAmounts[0]
@@ -178,16 +178,16 @@ def trSurvProbRecursion(k1,
         lossUnits[iCredit] = lossAmounts[iCredit] / gcd
         numLossUnits = numLossUnits + lossUnits[iCredit]
 
-    defaultProbs = np.zeros(num_credits)
+    default_probs = np.zeros(num_credits)
 
     for iCredit in range(0, num_credits):
-        defaultProbs[iCredit] = 1.0 - survivalProbabilities[iCredit]
+        default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
-    lossDbn = lossDbnRecursionGCD(num_credits,
-                                  defaultProbs,
+    lossDbn = loss_dbn_recursion_gcd(num_credits,
+                                  default_probs,
                                   lossUnits,
-                                  betaVector,
-                                  numIntegrationSteps)
+                                  beta_vector,
+                                  num_integration_steps)
 
     trancheEL = 0.0
     for iLossUnit in range(0, int(numLossUnits)):
@@ -202,37 +202,37 @@ def trSurvProbRecursion(k1,
 
 
 @njit(float64(float64, float64, float64, float64), fastmath=True, cache=True)
-def gaussApproxTrancheLoss(k1, k2, mu, sigma):
+def gauss_approx_tranche_loss(k1, k2, mu, sigma):
 
     if abs(sigma) < 1e-6:
-        gaussApproxTrancheLoss = 0.0
+        gauss_approx_tranche_loss = 0.0
         if mu > k1:
-            gaussApproxTrancheLoss += (mu - k1)
+            gauss_approx_tranche_loss += (mu - k1)
 
         if mu > k2:
-            gaussApproxTrancheLoss += (mu - k2)
+            gauss_approx_tranche_loss += (mu - k2)
     else:
         d1 = (mu - k1) / sigma
         d2 = (mu - k2) / sigma
 
-        gaussApproxTrancheLoss = (mu - k1) * N(d1) - (mu - k2) * N(d2)
+        gauss_approx_tranche_loss = (mu - k1) * N(d1) - (mu - k2) * N(d2)
         + sigma * np.exp(-0.5 * d1 * d1) * INVROOT2PI
         - sigma * np.exp(-0.5 * d2 * d2) * INVROOT2PI
 
-    return gaussApproxTrancheLoss
+    return gauss_approx_tranche_loss
 
 ###############################################################################
 
 
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True, cache=True)
-def trSurvProbGaussian(k1,
+def tranch_surv_prob_gaussian(k1,
                        k2,
                        num_credits,
-                       survivalProbabilities,
+                       survival_probabilities,
                        recovery_rates,
-                       betaVector,
-                       numIntegrationSteps):
+                       beta_vector,
+                       num_integration_steps):
     """ Get the approximated tranche survival probability of a portfolio
     of credits in the one-factor GC model using a Gaussian fit of the
     conditional loss distribution and survival probabilities to some time
@@ -244,30 +244,30 @@ def trSurvProbGaussian(k1,
     if k1 >= k2:
         raise FinError("K1 >= K2")
 
-    defaultProbs = [0.0] * num_credits
+    default_probs = [0.0] * num_credits
     for iCredit in range(0, num_credits):
-        defaultProbs[iCredit] = 1.0 - survivalProbabilities[iCredit]
+        default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
-    dz = 2.0 * abs(minZ) / numIntegrationSteps
+    dz = 2.0 * abs(minZ) / num_integration_steps
     z = minZ
 
     thresholds = np.zeros(num_credits)
     losses = np.zeros(num_credits)
 
     for iCredit in range(0, num_credits):
-        pd = 1.0 - survivalProbabilities[iCredit]
+        pd = 1.0 - survival_probabilities[iCredit]
         thresholds[iCredit] = norminvcdf(pd)
         losses[iCredit] = (1.0 - recovery_rates[iCredit]) / num_credits
 
     v = 0.0
-    for _ in range(0, numIntegrationSteps):
+    for _ in range(0, num_integration_steps):
 
         mu = 0.0
         var = 0.0
 
         # calculate the mean and variance of the conditional loss distribution
         for iCredit in range(0, num_credits):
-            beta = betaVector[iCredit]
+            beta = beta_vector[iCredit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condprob = N(argz)
@@ -275,7 +275,7 @@ def trSurvProbGaussian(k1,
             var += (losses[iCredit]**2) * condprob * (1.0 - condprob)
 
         sigma = np.sqrt(var)
-        el = gaussApproxTrancheLoss(k1, k2, mu, sigma)
+        el = gauss_approx_tranche_loss(k1, k2, mu, sigma)
         gaussWt = np.exp(-(z**2) / 2.0)
 
         v += el * gaussWt
@@ -289,11 +289,11 @@ def trSurvProbGaussian(k1,
 
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def lossDbnHeterogeneousAdjBinomial(num_credits,
-                                    defaultProbs,
-                                    lossRatio,
-                                    betaVector,
-                                    numIntegrationSteps):
+def loss_dbn_hetero_adj_binomial(num_credits,
+                                    default_probs,
+                                    loss_ratio,
+                                    beta_vector,
+                                    num_integration_steps):
     """ Get the portfolio loss distribution using the adjusted binomial
     approximation to the conditional loss distribution. """
 
@@ -305,21 +305,21 @@ def lossDbnHeterogeneousAdjBinomial(num_credits,
     # Determine default threshold for each credit
     thresholds = np.zeros(num_credits)
     for iCredit in range(0, num_credits):
-        thresholds[iCredit] = norminvcdf(defaultProbs[iCredit])
+        thresholds[iCredit] = norminvcdf(default_probs[iCredit])
 
-    dz = 2.0 * abs(minZ) / numIntegrationSteps
+    dz = 2.0 * abs(minZ) / num_integration_steps
     z = minZ
 
-    for iStep in range(0, numIntegrationSteps):
+    for iStep in range(0, num_integration_steps):
         for iCredit in range(0, num_credits):
-            beta = betaVector[iCredit]
+            beta = beta_vector[iCredit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
 
         indepDbn = indepLossDbnHeterogeneousAdjBinomial(num_credits,
                                                         condDefaultProbs,
-                                                        lossRatio)
+                                                        loss_ratio)
 
         gaussWt = np.exp(-(z**2) / 2.0)
 
@@ -338,13 +338,13 @@ def lossDbnHeterogeneousAdjBinomial(num_credits,
 
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True, cache=True)
-def trSurvProbAdjBinomial(k1,
+def tranche_surv_prob_adj_binomial(k1,
                           k2,
                           num_credits,
-                          survivalProbabilities,
+                          survival_probabilities,
                           recovery_rates,
-                          betaVector,
-                          numIntegrationSteps):
+                          beta_vector,
+                          num_integration_steps):
     """ Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the adjusted binomial fit of the
     conditional loss distribution and survival probabilities to some time
@@ -356,9 +356,9 @@ def trSurvProbAdjBinomial(k1,
     if k1 >= k2:
         raise FinError("K1 >= K2")
 
-    defaultProbs = np.zeros(num_credits)
+    default_probs = np.zeros(num_credits)
     for iCredit in range(0, num_credits):
-        defaultProbs[iCredit] = 1.0 - survivalProbabilities[iCredit]
+        default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
     totalLoss = 0.0
     for iCredit in range(0, num_credits):
@@ -367,16 +367,16 @@ def trSurvProbAdjBinomial(k1,
 
     avgLoss = totalLoss / num_credits
 
-    lossRatio = np.zeros(num_credits)
+    loss_ratio = np.zeros(num_credits)
     for iCredit in range(0, num_credits):
-        lossRatio[iCredit] = (
+        loss_ratio[iCredit] = (
             1.0 - recovery_rates[iCredit]) / num_credits / avgLoss
 
-    lossDbn = lossDbnHeterogeneousAdjBinomial(num_credits,
-                                              defaultProbs,
-                                              lossRatio,
-                                              betaVector,
-                                              numIntegrationSteps)
+    lossDbn = loss_dbn_hetero_adj_binomial(num_credits,
+                                              default_probs,
+                                              loss_ratio,
+                                              beta_vector,
+                                              num_integration_steps)
     trancheEL = 0.0
     numLossUnits = num_credits + 1
     for iLossUnit in range(0, numLossUnits):

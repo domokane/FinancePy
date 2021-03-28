@@ -55,7 +55,8 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if valuation_date != libor_curve._valuation_date:
-            raise FinError("Ibor curve does not have same valuation date as Issuer curve.")
+            raise FinError(
+                "Curve does not have same valuation date as Issuer curve.")
 
         self._valuation_date = valuation_date
         self._cds_contracts = cds_contracts
@@ -200,8 +201,8 @@ class CDSCurve:
 ##############################################################################
 
     def zero_rate(self,
-                 dt,
-                 freq_type=FrequencyTypes.CONTINUOUS):
+                  dt,
+                  freq_type=FrequencyTypes.CONTINUOUS):
         """ Calculate the zero rate to date dt in the chosen compounding
         frequency where -1 is continuous is the default. """
 

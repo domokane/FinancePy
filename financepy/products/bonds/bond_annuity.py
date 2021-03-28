@@ -55,7 +55,7 @@ class BondAnnuity:
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-    ###############################################################################
+    ###########################################################################
 
     def clean_price_from_discount_curve(self,
                                         settlement_date: Date,
@@ -69,7 +69,7 @@ class BondAnnuity:
         clean_price = full_price - accrued
         return clean_price
 
-    ###############################################################################
+    ###########################################################################
 
     def full_price_from_discount_curve(self,
                                        settlement_date: Date,
@@ -90,10 +90,10 @@ class BondAnnuity:
 
         return pv * self._par / self._face
 
-    ###############################################################################
+    ###########################################################################
 
     def calculate_payments(self,
-                                     settlement_date: Date):
+                           settlement_date: Date):
 
         # No need to generate flows if settlement date has not changed
         if settlement_date == self._settlement_date:
@@ -104,14 +104,14 @@ class BondAnnuity:
 
         self._settlement_date = settlement_date
         calendar_type = CalendarTypes.NONE
-        busDayRuleType = BusDayAdjustTypes.NONE
+        bus_day_rule_type = BusDayAdjustTypes.NONE
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(settlement_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     calendar_type,
-                                    busDayRuleType,
+                                    bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
         self._pcd = self._flow_dates[0]
@@ -129,7 +129,7 @@ class BondAnnuity:
             self._flow_amounts.append(flow)
             prev_dt = nextDt
 
-    ###############################################################################
+    ###########################################################################
 
     def calc_accrued_interest(self,
                               settlement_date: Date):
@@ -155,10 +155,10 @@ class BondAnnuity:
         self._accrued_days = num
         return self._accrued_interest
 
-    ###############################################################################
+    ###########################################################################
 
     def print_flows(self,
-                   settlement_date: Date):
+                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -170,7 +170,7 @@ class BondAnnuity:
             flow = self._flow_amounts[i]
             print(dt, ",", flow)
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         """ Print a list of the unadjusted coupon payment dates used in
@@ -185,7 +185,7 @@ class BondAnnuity:
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

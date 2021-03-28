@@ -10,9 +10,10 @@ from scipy import optimize
 
 from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
-from .credit_merton import FinModelMertonCredit
+from .credit_merton import MertonCredit
 
 ###############################################################################
+
 
 def _fobj(x, *args):
     """ Find value of asset value and vol that fit equity value and vol """
@@ -24,33 +25,33 @@ def _fobj(x, *args):
     L = args[2]
     t = args[3]
     r = args[4]
-    
+
     lvg = A / L
     sigmaRootT = vA * np.sqrt(t)
     d1 = np.log(lvg) + (r + 0.5 * vA ** 2) * t
-    d1 = d1 / sigmaRootT    
+    d1 = d1 / sigmaRootT
     d2 = d1 - sigmaRootT
 
     vE_LHS = (A / E) * N(d1) * vA
     E_LHS = A * N(d1) - L * np.exp(-r * t) * N(d2)
-    obj = (E - E_LHS)**2 + (vE - vE_LHS)**2        
+    obj = (E - E_LHS)**2 + (vE - vE_LHS)**2
 
     return obj
 
 ###############################################################################
 
 
-class FinModelMertonCreditMkt(FinModelMertonCredit):
+class MertonCreditMkt(MertonCredit):
     """ Market Extension of the Merton Credit Model according to the original
-    formulation by Merton with the inputs being the equity value of the firm, 
-    the liabilities (bond face), the time to maturity in years, the risk-free 
+    formulation by Merton with the inputs being the equity value of the firm,
+    the liabilities (bond face), the time to maturity in years, the risk-free
     rate, the asset growth rate and the equity volatility. The asset value and
-    asset volatility are computed internally by solving two non-linear 
+    asset volatility are computed internally by solving two non-linear
     simultaneous equations. """
 
     def __init__(self,
                  equity_value: (float, list, np.ndarray),
-                 bondFace: (float, list,np.ndarray),
+                 bondFace: (float, list, np.ndarray),
                  timeToMaturity: (float, list, np.ndarray),
                  riskFreeRate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
@@ -113,7 +114,7 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
         self._nmax = nmax
         self._solveForAssetValueAndVol()
         self._D = self.debt_value()
-        
+
 ###############################################################################
 
     def _solveForAssetValueAndVol(self):
@@ -153,11 +154,11 @@ class FinModelMertonCreditMkt(FinModelMertonCredit):
             # I initialise asset value and vol to equity value and vol
             x0 = np.array([argtuple[0], argtuple[1]])
 
-            result = optimize.minimize(_fobj, x0, args=argtuple, tol = 1e-9)
-                
+            result = optimize.minimize(_fobj, x0, args=argtuple, tol=1e-9)
+
             self._A.append(result.x[0])
             self._vA.append(result.x[1])
-                
+
         self._A = np.array(self._A)
         self._vA = np.array(self._vA)
 

@@ -14,7 +14,7 @@ from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swap import IborSwap
 
 from financepy.products.rates.bermudan_swaption import FinIborBermudanSwaption
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.models.rates_bk_tree import FinModelRatesBK
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
@@ -86,7 +86,7 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     testCases.banner("======= ZERO VOLATILITY ========")
-    model = FinModelBlack(0.0000001)
+    model = Black(0.0000001)
     testCases.print("Black Model", model._volatility)
 
     valuePay = europeanSwaptionPay.value(settlement_date, libor_curve, model)
@@ -100,7 +100,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     testCases.banner("======= 20%% BLACK VOLATILITY ========")
 
-    model = FinModelBlack(0.20)
+    model = Black(0.20)
     testCases.print("Black Model", model._volatility)
 
     valuePay = europeanSwaptionPay.value(settlement_date, libor_curve, model)

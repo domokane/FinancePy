@@ -17,7 +17,7 @@ from ..utils.math import N
 ###############################################################################
 
 
-class FinModelBlackShifted():
+class BlackShifted():
     """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. This model also allows
     the distribution to be shifted to the negative in order to allow for
@@ -37,10 +37,10 @@ class FinModelBlackShifted():
 
     def value(self,
               forward_rate,   # Forward rate
-              strikeRate,    # Strike Rate
+              strike_rate,    # Strike Rate
               time_to_expiry,  # time to expiry in years
               df,            # Discount Factor to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. The sign of the shift is the
         same as Matlab. """
@@ -48,7 +48,7 @@ class FinModelBlackShifted():
         s = self._shift
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         sqrtT = np.sqrt(t)
         vol = self._volatility
 
@@ -56,9 +56,9 @@ class FinModelBlackShifted():
         d1 = d1 / (vol * sqrtT)
         d2 = d1 - vol * sqrtT
 
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             return df * ((f+s) * N(d1) - (k+s) * N(d2))
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             return df * ((k+s) * N(-d2) - (f+s) * N(-d1))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")

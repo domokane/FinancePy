@@ -11,7 +11,7 @@ sys.path.append("..")
 
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOptionTypes
-from financepy.utils.helpers import betaVectorToCorrMatrix
+from financepy.utils.helpers import beta_vectorToCorrMatrix
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
@@ -65,7 +65,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -120,7 +120,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -177,7 +177,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -233,7 +233,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -289,7 +289,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -349,7 +349,7 @@ def test_EquityRainbowOption():
     for correlation in corrList:
 
         betas = np.ones(num_assets) * sqrt(correlation)
-        corr_matrix = betaVectorToCorrMatrix(betas)
+        corr_matrix = beta_vectorToCorrMatrix(betas)
 
         for num_paths in num_pathsList:
 
@@ -437,7 +437,7 @@ def test_EquityRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(num_assets) * sqrt(correlation)
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
 
@@ -497,7 +497,7 @@ def test_EquityRainbowOption():
         for correlation in corrList:
 
             betas = np.ones(num_assets) * sqrt(correlation)
-            corr_matrix = betaVectorToCorrMatrix(betas)
+            corr_matrix = beta_vectorToCorrMatrix(betas)
 
             start = time.time()
 

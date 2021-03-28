@@ -37,7 +37,7 @@ def gridIndex(t, gridTimes):
 ###############################################################################
 
 
-def betaVectorToCorrMatrix(betas):
+def beta_vectorToCorrMatrix(betas):
     """ Convert a one-factor vector of factor weights to a square correlation
     matrix. """
 

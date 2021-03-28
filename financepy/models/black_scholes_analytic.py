@@ -206,11 +206,11 @@ def bsIntrinsic(s, t, k, r, q, option_type_value):
     fwd = s * np.exp((r-q)*t)
 
     if option_type_value==FinOptionTypes.EUROPEAN_CALL.value:
-        intrinsicVal = np.exp(-r*t) * max(fwd - k, 0.0)
+        intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
     else:
-        intrinsicVal = np.exp(-r*t) * max(k - fwd, 0.0)
+        intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
 
-    return intrinsicVal
+    return intrinsic_value
 
 ###############################################################################
 
@@ -224,15 +224,15 @@ def bsImpliedVolatility(s, t, k, r, q, price, option_type_value):
     fwd = s * np.exp((r-q)*t)
                                 
     if option_type_value==FinOptionTypes.EUROPEAN_CALL.value:
-        intrinsicVal = np.exp(-r*t) * max(fwd - k, 0.0)
+        intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
     else:
-        intrinsicVal = np.exp(-r*t) * max(k - fwd, 0.0)
+        intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
 
     divAdjStockPrice = s * np.exp(-q * t)
     df = np.exp(-r * t)
 
     # Flip ITM call option to be OTM put and vice-versa using put call parity
-    if intrinsicVal > 0.0:
+    if intrinsic_value > 0.0:
 
         if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
             price = price - (divAdjStockPrice - k * df)
@@ -243,11 +243,11 @@ def bsImpliedVolatility(s, t, k, r, q, price, option_type_value):
 
         # Update intrinsic based on new option type
         if option_type_value==FinOptionTypes.EUROPEAN_CALL.value:
-            intrinsicVal = np.exp(-r*t) * max(fwd - k, 0.0)
+            intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
         else:
-            intrinsicVal = np.exp(-r*t) * max(k - fwd, 0.0)
+            intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
 
-    timeValue = price - intrinsicVal
+    timeValue = price - intrinsic_value
 
     # Add a tolerance in case it is just numerical imprecision 
     if timeValue < 0.0:

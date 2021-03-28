@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-#TODO  Add Japan 
+# TODO  Add Japan
 
 
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
-from ...utils.error import FinError
 from ...utils.calendar import CalendarTypes
 
 
@@ -54,7 +53,8 @@ class BondMarkets(Enum):
     SOUTH_AFRICA = 37
 
 ###############################################################################
-    
+
+
 def get_bond_market_conventions(country):
     """ Returns the day count convention for accrued interest, the frequency
     and the number of days from trade date to settlement date.
@@ -66,7 +66,7 @@ def get_bond_market_conventions(country):
     thirtye360 = DayCountTypes.THIRTY_E_360
 
     # TODO: CHECK CONVENTIONS
-    
+
     # RETURNS
     # ACCRUAL CONVENTION
     # COUPON FREQUENCY
@@ -132,7 +132,7 @@ def get_bond_market_conventions(country):
     elif country == BondMarkets.ROMANIA:
         return (act_act, semi_annual, 2, 0, None)
     elif country == BondMarkets.SOUTH_AFRICA:
-        return (act_act, annual, 2, 10, CalendarTypes.NONE) # CHECK
+        return (act_act, annual, 2, 10, CalendarTypes.NONE)  # CHECK
     elif country == BondMarkets.SWEDEN:
         return (thirtye360, annual, 2, 0, None)
     elif country == BondMarkets.JAPAN:

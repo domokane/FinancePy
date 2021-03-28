@@ -263,7 +263,7 @@ def test_FinCDSBasket():
     for ntd in range(1, num_credits + 1):
         for beta in [0.0, 0.5]:
             rho = beta * beta
-            betaVector = np.ones(num_credits) * beta
+            beta_vector = np.ones(num_credits) * beta
             corr_matrix = corr_matrixGenerator(rho, num_credits)
             for num_trials in [1000]:  # [1000,5000,10000,20000,50000,100000]:
                 start = time.time()
@@ -279,7 +279,7 @@ def test_FinCDSBasket():
                 v2 = basket.value1FGaussian_Homo(valuation_date,
                                                  ntd,
                                                  issuer_curves,
-                                                 betaVector,
+                                                 beta_vector,
                                                  libor_curve)
 
                 end = time.time()

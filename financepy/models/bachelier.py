@@ -16,7 +16,7 @@ from ..utils.global_types import FinOptionTypes
 ###############################################################################
 
 
-class FinModelBachelier():
+class Bachelier():
     """ Bachelier's Model which prices call and put options in the forward
     measure assuming the underlying rate follows a normal process. """
 
@@ -28,22 +28,22 @@ class FinModelBachelier():
 
     def value(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Price a call or put option using Bachelier's model. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         sqrtT = np.sqrt(t)
         vol = self._volatility
         d = (f-k) / (vol * sqrtT)
 
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             return df * ((f - k) * norm.cdf(d) + vol * sqrtT * norm.pdf(d))
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             return df * ((k - f) * norm.cdf(-d) + vol * sqrtT * norm.pdf(d))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")

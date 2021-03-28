@@ -9,8 +9,8 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.credit_gaussian_copula_onefactor import lossDbnRecursionGCD
-from financepy.models.credit_gaussian_copula_onefactor import lossDbnHeterogeneousAdjBinomial
+from financepy.models.credit_gaussian_copula_onefactor import loss_dbn_recursion_gcd
+from financepy.models.credit_gaussian_copula_onefactor import loss_dbn_hetero_adj_binomial
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -28,7 +28,7 @@ def test_FinLossDbnBuilder():
     defaultProb = 0.30
     num_steps = 25
     lossUnits = np.ones(num_credits)
-    lossRatio = np.ones(num_credits)
+    loss_ratio = np.ones(num_credits)
 
     testCases.header(
         "BETA",
@@ -41,15 +41,15 @@ def test_FinLossDbnBuilder():
 
     for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
 
-        defaultProbs = np.ones(num_credits) * defaultProb
-        betaVector = np.ones(num_credits) * beta
+        default_probs = np.ones(num_credits) * defaultProb
+        beta_vector = np.ones(num_credits) * beta
 
         start = time.time()
 
-        dbn1 = lossDbnRecursionGCD(num_credits,
-                                   defaultProbs,
+        dbn1 = loss_dbn_recursion_gcd(num_credits,
+                                   default_probs,
                                    lossUnits,
-                                   betaVector,
+                                   beta_vector,
                                    num_steps)
 
         end = time.time()
@@ -66,10 +66,10 @@ def test_FinLossDbnBuilder():
         #######################################################################
 
         start = time.time()
-        dbn2 = lossDbnHeterogeneousAdjBinomial(num_credits,
-                                               defaultProbs,
-                                               lossRatio,
-                                               betaVector,
+        dbn2 = loss_dbn_hetero_adj_binomial(num_credits,
+                                               default_probs,
+                                               loss_ratio,
+                                               beta_vector,
                                                num_steps)
         end = time.time()
 
@@ -104,15 +104,15 @@ def test_FinLossDbnBuilder():
     beta = 0.0
     defaultProb = 0.10
 
-    defaultProbs = np.random.randint(3, 4, size=(num_credits)) / 10.0
-    betaVector = np.random.randint(5, 6, size=(num_credits)) / 10.0
+    default_probs = np.random.randint(3, 4, size=(num_credits)) / 10.0
+    beta_vector = np.random.randint(5, 6, size=(num_credits)) / 10.0
     lossUnits = np.random.randint(1, 3, size=(num_credits)) / 1.0
 
     start = time.time()
-    dbn1 = lossDbnRecursionGCD(num_credits,
-                               defaultProbs,
+    dbn1 = loss_dbn_recursion_gcd(num_credits,
+                               default_probs,
                                lossUnits,
-                               betaVector,
+                               beta_vector,
                                num_steps)
     end = time.time()
 
@@ -126,10 +126,10 @@ def test_FinLossDbnBuilder():
         end - start)
 
     start = time.time()
-    dbn2 = lossDbnHeterogeneousAdjBinomial(num_credits,
-                                           defaultProbs,
-                                           lossRatio,
-                                           betaVector,
+    dbn2 = loss_dbn_hetero_adj_binomial(num_credits,
+                                           default_probs,
+                                           loss_ratio,
+                                           beta_vector,
                                            num_steps)
     end = time.time()
 

@@ -77,7 +77,7 @@ def test_CDSFastApproximation():
         cds_contract = CDS(valuation_date, maturity_date, contractCoupon)
         v_exact = cds_contract.value(
             valuation_date, issuer_curve, recovery_rate)['full_pv']
-        v_approx = cds_contract.valueFastApprox(
+        v_approx = cds_contract.value_fast_approx(
             valuation_date, r, mktCoupon, recovery_rate)[0]
         pctdiff = (v_exact - v_approx) / ONE_MILLION * 100.0
         testCases.print(mktCoupon * 10000, v_exact, v_approx, pctdiff)
@@ -450,7 +450,7 @@ def test_full_priceCDS1():
     z = libor_curve.df(maturity_date)
     r = -np.log(z) / t
 
-    v_approx = cds_contract.valueFastApprox(valuation_date,
+    v_approx = cds_contract.value_fast_approx(valuation_date,
                                            r,
                                            mktSpread,
                                            cdsRecovery)
@@ -655,7 +655,7 @@ def test_full_priceCDSModelCheck():
     r = -np.log(z) / t
 
     mktSpread = 0.01
-    v_approx = cds_contract.valueFastApprox(valuation_date,
+    v_approx = cds_contract.value_fast_approx(valuation_date,
                                            r,
                                            mktSpread,
                                            cdsRecovery)

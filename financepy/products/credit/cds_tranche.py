@@ -7,9 +7,9 @@
 import numpy as np
 from math import sqrt
 
-from ...models.credit_gaussian_copula_onefactor import trSurvProbGaussian
-from ...models.credit_gaussian_copula_onefactor import trSurvProbAdjBinomial
-from ...models.credit_gaussian_copula_onefactor import trSurvProbRecursion
+from ...models.credit_gaussian_copula_onefactor import tranch_surv_prob_gaussian
+from ...models.credit_gaussian_copula_onefactor import tranche_surv_prob_adj_binomial
+from ...models.credit_gaussian_copula_onefactor import tranche_surv_prob_recursion
 from ...models.credit_gaussian_copula_lhp import trSurvProbLHP
 
 from ...utils.day_count import DayCountTypes
@@ -131,13 +131,13 @@ class CDSTranche:
 
         beta1 = sqrt(corr1)
         beta2 = sqrt(corr2)
-        betaVector1 = np.zeros(num_credits)
+        beta_vector1 = np.zeros(num_credits)
         for bb in range(0, num_credits):
-            betaVector1[bb] = beta1
+            beta_vector1[bb] = beta1
 
-        betaVector2 = np.zeros(num_credits)
+        beta_vector2 = np.zeros(num_credits)
         for bb in range(0, num_credits):
-            betaVector2[bb] = beta2
+            beta_vector2[bb] = beta2
 
         qVector = np.zeros(num_credits)
         qt1 = np.zeros(num_times)
@@ -163,35 +163,35 @@ class CDSTranche:
                     t, vTimes, qRow, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
-                qt1[i] = trSurvProbRecursion(
+                qt1[i] = tranche_surv_prob_recursion(
                     0.0, k1, num_credits, qVector, recovery_rates,
-                    betaVector1, num_points)
-                qt2[i] = trSurvProbRecursion(
+                    beta_vector1, num_points)
+                qt2[i] = tranche_surv_prob_recursion(
                     0.0, k2, num_credits, qVector, recovery_rates,
-                    betaVector2, num_points)
+                    beta_vector2, num_points)
             elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
-                qt1[i] = trSurvProbAdjBinomial(
+                qt1[i] = tranche_surv_prob_adj_binomial(
                     0.0, k1, num_credits, qVector, recovery_rates,
-                    betaVector1, num_points)
-                qt2[i] = trSurvProbAdjBinomial(
+                    beta_vector1, num_points)
+                qt2[i] = tranche_surv_prob_adj_binomial(
                     0.0, k2, num_credits, qVector, recovery_rates,
-                    betaVector2, num_points)
+                    beta_vector2, num_points)
             elif model == FinLossDistributionBuilder.GAUSSIAN:
-                qt1[i] = trSurvProbGaussian(
+                qt1[i] = tranch_surv_prob_gaussian(
                     0.0,
                     k1,
                     num_credits,
                     qVector,
                     recovery_rates,
-                    betaVector1,
+                    beta_vector1,
                     num_points)
-                qt2[i] = trSurvProbGaussian(
+                qt2[i] = tranch_surv_prob_gaussian(
                     0.0,
                     k2,
                     num_credits,
                     qVector,
                     recovery_rates,
-                    betaVector2,
+                    beta_vector2,
                     num_points)
             elif model == FinLossDistributionBuilder.LHP:
                 qt1[i] = trSurvProbLHP(

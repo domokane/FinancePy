@@ -133,25 +133,25 @@ class FinModelSABRShifted():
 
     def value(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Price an option using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         sqrtT = np.sqrt(t)
         vol = self.black_vol(f, k, t)
 
         d1 = (np.log((f)/(k)) + vol * vol * t / 2) / (vol * sqrtT)
         d2 = d1 - vol*sqrtT
 
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             return df * (f * N(d1) - k * N(d2))
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             return df * (k * N(-d2) - f * N(-d1))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")

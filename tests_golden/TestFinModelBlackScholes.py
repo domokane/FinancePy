@@ -13,7 +13,7 @@ from financepy.utils.global_types import FinOptionTypes
 
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.black_scholes import FinModelBlackScholesTypes
+from financepy.models.black_scholes import BlackScholesTypes
 
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.products.equity.equity_american_option import EquityAmericanOption

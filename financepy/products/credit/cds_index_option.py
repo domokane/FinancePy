@@ -82,11 +82,11 @@ class CDSIndexOption:
 ###############################################################################
 
     def value_adjusted_black(self,
-                           valuation_date,
-                           index_curve,
-                           indexRecovery,
-                           libor_curve,
-                           sigma):
+                             valuation_date,
+                             index_curve,
+                             indexRecovery,
+                             libor_curve,
+                             sigma):
         """ This approach uses two adjustments to Black's option pricing
         model to value an option on a CDS index. """
 
@@ -129,13 +129,13 @@ class CDSIndexOption:
 ###############################################################################
 
     def value_anderson(self,
-                      valuation_date,
-                      issuer_curves,
-                      indexRecovery,
-                      sigma):
+                       valuation_date,
+                       issuer_curves,
+                       indexRecovery,
+                       sigma):
         """ This function values a CDS index option following approach by
         Anderson (2006). This ensures that a no-arbitrage relationship between
-        the consituent CDS contract and the CDS index is enforced. It models
+        the constituent CDS contract and the CDS index is enforced. It models
         the forward spread as a log-normally distributed quantity and uses the
         credit triangle to compute the forward RPV01. """
 
@@ -186,12 +186,12 @@ class CDSIndexOption:
                             expH)
 
         v = self._calc_index_payer_option_price(valuation_date,
-                                            x,
-                                            sigma,
-                                            c,
-                                            strikeValue,
-                                            libor_curve,
-                                            indexRecovery)
+                                                x,
+                                                sigma,
+                                                c,
+                                                strikeValue,
+                                                libor_curve,
+                                                indexRecovery)
 
         v = v[1]
         v_pay = v * self._notional
@@ -219,10 +219,10 @@ class CDSIndexOption:
         rtb = 999999
 
         f = self._calc_obj_func(x1, valuation_date, sigma, index_coupon,
-                              indexRecovery, libor_curve) - expH
+                                indexRecovery, libor_curve) - expH
 
         fmid = self._calc_obj_func(x2, valuation_date, sigma, index_coupon,
-                                 indexRecovery, libor_curve) - expH
+                                   indexRecovery, libor_curve) - expH
 
         if f * fmid >= 0.0:
             raise FinError("Solution not bracketed.")
@@ -237,8 +237,9 @@ class CDSIndexOption:
         for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self._calc_obj_func(xmid, valuation_date, sigma, index_coupon,
-                                     indexRecovery, libor_curve) - expH
+            fmid = self._calc_obj_func(xmid, valuation_date, sigma, 
+                                       index_coupon,
+                                       indexRecovery, libor_curve) - expH
             if fmid <= 0.0:
                 rtb = xmid
             if abs(dx) < xacc or abs(fmid) < ftol:
@@ -249,12 +250,12 @@ class CDSIndexOption:
 ###############################################################################
 
     def _calc_obj_func(self,
-                     x,
-                     valuation_date,
-                     sigma,
-                     index_coupon,
-                     indexRecovery,
-                     libor_curve):
+                       x,
+                       valuation_date,
+                       sigma,
+                       index_coupon,
+                       indexRecovery,
+                       libor_curve):
         """ An internal function used in the Anderson valuation. """
 
         # The strike value is not relevant here as we want the zeroth element
@@ -262,25 +263,25 @@ class CDSIndexOption:
         strikeValue = 0.0
 
         values = self._calc_index_payer_option_price(valuation_date,
-                                                 x,
-                                                 sigma,
-                                                 self._index_coupon,
-                                                 strikeValue,
-                                                 libor_curve,
-                                                 indexRecovery)
+                                                     x,
+                                                     sigma,
+                                                     self._index_coupon,
+                                                     strikeValue,
+                                                     libor_curve,
+                                                     indexRecovery)
 
         return values[0]
 
 ###############################################################################
 
     def _calc_index_payer_option_price(self,
-                                   valuation_date,
-                                   x,
-                                   sigma,
-                                   index_coupon,
-                                   strikeValue,
-                                   libor_curve,
-                                   indexRecovery):
+                                       valuation_date,
+                                       x,
+                                       sigma,
+                                       index_coupon,
+                                       strikeValue,
+                                       libor_curve,
+                                       indexRecovery):
         """ Calculates the intrinsic value of the index payer swap and the
         value of the index payer option which are both returned in an array.
         """

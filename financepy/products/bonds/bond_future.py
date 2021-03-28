@@ -35,7 +35,7 @@ class BondFuture:
 ###############################################################################
 
     def conversion_factor(self,
-                         bond: Bond):
+                          bond: Bond):
         """ Determine the conversion factor for a specific bond using CME
         convention. To do this we need to know the contract standard coupon and
         must round the bond maturity (starting its life on the first delivery
@@ -54,14 +54,14 @@ class BondFuture:
         issue_date = Date(newMat._d, newMat._m, 2000)
 
         newBond = Bond(issue_date,
-                          newMat,
-                          bond._coupon,
-                          bond._freq_type,
-                          bond._accrual_type,
-                          face)
+                       newMat,
+                       bond._coupon,
+                       bond._freq_type,
+                       bond._accrual_type,
+                       face)
 
         p = newBond.clean_price_from_ytm(self._first_delivery_date,
-                                      self._coupon)
+                                         self._coupon)
 
         # Convention is to round the conversion factor to 4dp
         p = round(p, 4)
@@ -89,10 +89,10 @@ class BondFuture:
         if bond._accrued_interest is None:
             bond.calculate_flow_dates(settlement_date)
 
-        accrued_interest= bond._accrued_interest
+        accrued_interest = bond._accrued_interest
 
         pip = self.principal_invoice_price(bond, futures_price)
-        accrued = accrued_interest* self._contract_size / 100.0
+        accrued = accrued_interest * self._contract_size / 100.0
         tia = pip + accrued
         tia = round(tia, 2)
         return tia

@@ -67,7 +67,8 @@ class BondOption():
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        # We need all of the flows in case the option is American and some occur before expiry
+        # We need all of the flows in case the option is American
+        # and some occur before expiry
         flow_dates = self._bond._flow_dates
         flow_amounts = self._bond._flow_amounts
 
@@ -77,7 +78,7 @@ class BondOption():
         num_flows = len(self._bond._flow_dates)
 
         # Want the first flow to be the previous coupon date
-        # This is needed to calculate accrued correctly        
+        # This is needed to calculate accrued correctly
         for i in range(1, num_flows):
             pcd = flow_dates[i-1]
             ncd = flow_dates[i]
@@ -91,7 +92,7 @@ class BondOption():
             if flow_dates[i] == valuation_date:
                 coupon_times.append(0.0)
                 coupon_flows.append(flow_amounts[i])
-                
+
         # Now calculate the remaining coupons
         for i in range(1, num_flows):
             ncd = flow_dates[i]
@@ -108,21 +109,21 @@ class BondOption():
         exercise_type = FinExerciseTypes.AMERICAN
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL \
-            or self._option_type == FinOptionTypes.EUROPEAN_PUT:
-                exercise_type = FinExerciseTypes.EUROPEAN
+                or self._option_type == FinOptionTypes.EUROPEAN_PUT:
+            exercise_type = FinExerciseTypes.EUROPEAN
 
-        # This is wasteful if the model is Jamshidian but how to do neat design ?
+        # This is wasteful if model is Jamshidian but how to do neat design
         model.buildTree(tmat, df_times, df_values)
 
         v = model.bond_option(texp, self._strike_price, self._face_amount,
-                             coupon_times, coupon_flows, exercise_type)
+                              coupon_times, coupon_flows, exercise_type)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL \
-            or self._option_type == FinOptionTypes.AMERICAN_CALL:
-                return v['call']    
+                or self._option_type == FinOptionTypes.AMERICAN_CALL:
+            return v['call']
         elif self._option_type == FinOptionTypes.EUROPEAN_PUT \
-            or self._option_type == FinOptionTypes.AMERICAN_PUT:
-                return v['put']
+                or self._option_type == FinOptionTypes.AMERICAN_PUT:
+            return v['put']
         else:
             print(self._option_type)
             raise FinError("Unknown option type.")

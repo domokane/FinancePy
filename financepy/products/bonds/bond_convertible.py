@@ -38,8 +38,8 @@ def _value_convertible(tmat,
                        call_prices,
                        put_times,
                        put_prices,
-                       convRatio,
-                       startConvertTime,
+                       conv_ratio,
+                       start_convert_time,
                        # Market inputs
                        stock_price,
                        df_times,
@@ -48,7 +48,7 @@ def _value_convertible(tmat,
                        dividend_yields,
                        stock_volatility,
                        credit_spread,
-                       recRate,
+                       recovery_rate,
                        # Tree details
                        num_steps_per_year):
     interp = InterpTypes.FLAT_FWD_RATES.value
@@ -76,7 +76,7 @@ def _value_convertible(tmat,
     if credit_spread < 0.0:
         raise FinError("Credit spread negative.")
 
-    if recRate < 0.0 or recRate > 1.0:
+    if recovery_rate < 0.0 or recovery_rate > 1.0:
         raise FinError("Recovery rate should be between 0 and 1.")
 
     if stock_volatility < 0.0:
@@ -89,7 +89,7 @@ def _value_convertible(tmat,
         if dividend_times[-1] > tmat:
             raise FinError("Last dividend is after bond maturity.")
 
-    if recRate > 0.999 or recRate < 0.0:
+    if recovery_rate > 0.999 or recovery_rate < 0.0:
         raise FinError("Recovery rate must be between 0 and 0.999.")
 
     num_times = int(num_steps_per_year * tmat) + 1  # add one for today time 0
@@ -109,7 +109,7 @@ def _value_convertible(tmat,
         df = _uinterpolate(treeTimes[i], df_times, df_values, interp)
         treeDfs[i] = df
 
-    h = credit_spread / (1.0 - recRate)
+    h = credit_spread / (1.0 - recovery_rate)
     survival_prob = exp(-h * dt)
 
     # map coupons onto tree but preserve their present value using risky dfs
@@ -127,16 +127,16 @@ def _value_convertible(tmat,
 
     # map call onto tree - must have no calls at high value
     tree_call_value = np.ones(num_times) * face_amount * 1000.0
-    numCalls = len(call_times)
-    for i in range(0, numCalls):
+    num_calls = len(call_times)
+    for i in range(0, num_calls):
         call_time = call_times[i]
         n = int(round(call_time / dt, 0))
         tree_call_value[n] = call_prices[i]
 
     # map puts onto tree
     treePutValue = np.zeros(num_times)
-    numPuts = len(put_times)
-    for i in range(0, numPuts):
+    num_puts = len(put_times)
+    for i in range(0, num_puts):
         put_time = put_times[i]
         n = int(round(put_time / dt, 0))
         treePutValue[n] = put_prices[i]
@@ -178,10 +178,10 @@ def _value_convertible(tmat,
 
     treeConvertValue = np.zeros(shape=(num_times, numLevels))
     for iTime in range(0, num_times):
-        if treeTimes[iTime] >= startConvertTime:
+        if treeTimes[iTime] >= start_convert_time:
             for iNode in range(0, iTime + 1):
                 s = treeStockValue[iTime, iNode]
-                treeConvertValue[iTime, iNode] = s * convRatio * 1.0
+                treeConvertValue[iTime, iNode] = s * conv_ratio * 1.0
 
     #    print_tree(treeConvertValue)
 
@@ -226,13 +226,13 @@ def _value_convertible(tmat,
             futValueUp = treeConvBondValue[iTime + 1, iNode + 1]
             futValueDn = treeConvBondValue[iTime + 1, iNode]
             hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
-            holdPV = df * hold + pDef * df * recRate * face_amount + flow * face_amount
+            holdPV = df * hold + pDef * df * recovery_rate * face_amount + flow * face_amount
             conv = treeConvertValue[iTime, iNode]
             value = min(max(holdPV, conv, put), call)
             treeConvBondValue[iTime, iNode] = value
 
         bulletPV = df * bulletPV * survival_prob
-        bulletPV += pDef * df * recRate * face_amount
+        bulletPV += pDef * df * recovery_rate * face_amount
         bulletPV += flow * face_amount
 
     price = treeConvBondValue[0, 0]
@@ -263,8 +263,8 @@ class BondConvertible:
                  maturity_date: Date,  # bond maturity date
                  coupon: float,  # annual coupon
                  freq_type: FrequencyTypes,  # coupon frequency type
-                 startConvertDate: Date,  # conversion starts on this date
-                 conversionRatio: float,  # num shares per face of notional
+                 start_convert_date: Date,  # conversion starts on this date
+                 conversion_ratio: float,  # num shares per face of notional
                  call_dates: List[Date],  # list of call dates
                  call_prices: List[float],  # list of call prices
                  put_dates: List[Date],  # list of put dates
@@ -279,7 +279,7 @@ class BondConvertible:
 
         check_argument_types(self.__init__, locals())
 
-        if startConvertDate > maturity_date:
+        if start_convert_date > maturity_date:
             raise FinError("Start convert date is after bond maturity.")
 
         self._maturity_date = maturity_date
@@ -308,12 +308,12 @@ class BondConvertible:
             if call_dates[-1] > maturity_date:
                 raise FinError("Last call is after bond maturity.")
 
-        self._startConvertDate = startConvertDate
+        self._start_convert_date = start_convert_date
 
-        if conversionRatio < 0.0:
+        if conversion_ratio < 0.0:
             raise FinError("Conversion ratio is negative.")
 
-        self._conversionRatio = conversionRatio
+        self._conversion_ratio = conversion_ratio
         self._face_amount = face_amount
 
         self._settlement_date = Date(1, 1, 1900)
@@ -337,14 +337,14 @@ class BondConvertible:
 
         self._settlement_date = settlement_date
         calendar_type = CalendarTypes.NONE
-        busDayRuleType = BusDayAdjustTypes.NONE
+        bus_day_rule_type = BusDayAdjustTypes.NONE
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(settlement_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     calendar_type,
-                                    busDayRuleType,
+                                    bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
         self._pcd = self._flow_dates[0]
@@ -450,7 +450,7 @@ class BondConvertible:
         dividend_yields = np.array(dividend_yields)
 
         # If it's before today it starts today
-        tconv = (self._startConvertDate - settlement_date) / gDaysInYear
+        tconv = (self._start_convert_date - settlement_date) / gDaysInYear
         tconv = max(tconv, 0.0)
 
         discount_factors = []
@@ -484,7 +484,7 @@ class BondConvertible:
                                 call_prices,
                                 put_times,
                                 put_prices,
-                                self._conversionRatio,
+                                self._conversion_ratio,
                                 tconv,
                                 # Market inputs
                                 stock_price,
@@ -506,7 +506,7 @@ class BondConvertible:
                                 call_prices,
                                 put_times,
                                 put_prices,
-                                self._conversionRatio,
+                                self._conversion_ratio,
                                 tconv,
                                 # Market inputs
                                 stock_price,
@@ -590,8 +590,8 @@ class BondConvertible:
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         s += label_to_string("FACE AMOUNT", self._face_amount)
-        s += label_to_string("CONVERSION RATIO", self._conversionRatio)
-        s += label_to_string("START CONVERT DATE", self._startConvertDate)
+        s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
+        s += label_to_string("START CONVERT DATE", self._start_convert_date)
         s += label_to_string("CALL", "DATES")
 
         for i in range(0, len(self._call_dates)):

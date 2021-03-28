@@ -18,7 +18,7 @@ from ..utils.error import FinError
 def trSurvProbLHP(k1,
                   k2,
                   num_credits,
-                  survivalProbabilities,
+                  survival_probabilities,
                   recovery_rates,
                   beta):
     """ Get the approximated tranche survival probability of a portfolio of
@@ -35,7 +35,7 @@ def trSurvProbLHP(k1,
     p = 0.0
     portfolioEL = 0.0
     for iCredit in range(0, num_credits):
-        pd = (1.0 - survivalProbabilities[iCredit])
+        pd = (1.0 - survival_probabilities[iCredit])
         p += pd
         portfolioEL += pd * (1.0 - recovery_rates[iCredit])
 
@@ -46,8 +46,8 @@ def trSurvProbLHP(k1,
     portfolioEL = portfolioEL / num_credits
 
     recovery = 1.0 - portfolioEL / p
-    elk1 = expMinLK(k1, p, recovery, 1.0, beta)
-    elk2 = expMinLK(k2, p, recovery, 1.0, beta)
+    elk1 = exp_min_lk(k1, p, recovery, 1.0, beta)
+    elk2 = exp_min_lk(k2, p, recovery, 1.0, beta)
     value = 1.0 - (elk2 - elk1) / (k2 - k1)
     return value
 
@@ -90,7 +90,7 @@ def portfolioCDF_LHP(k, num_credits, qvector, recovery_rates, beta, num_points):
 
 
 @njit(fastmath=True, cache=True)
-def expMinLK(k, p, r, n, beta):
+def exp_min_lk(k, p, r, n, beta):
 
     if beta == 0:
         beta = 0.0000000001

@@ -16,7 +16,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
 from ...products.credit.cds import CDS
 
-from ...models.credit_gaussian_copula_onefactor import homogeneousBasketLossDbn
+from ...models.credit_gaussian_copula_onefactor import homog_basket_loss_dbn
 from ...models.credit_gaussian_copula import default_timesGC
 from ...models.credit_student_t_copula import FinModelStudentTCopula
 
@@ -172,15 +172,15 @@ class CDSBasket:
             raise FinError("nToDefault must be 1 to num_credits")
 
         default_times = default_timesGC(issuer_curves,
-                                      correlationMatrix,
-                                      num_trials,
-                                      seed)
+                                        correlationMatrix,
+                                        num_trials,
+                                        seed)
 
         rpv01, prot_pv = self.valueLegs_MC(valuation_date,
-                                          nToDefault,
-                                          default_times,
-                                          issuer_curves,
-                                          libor_curve)
+                                           nToDefault,
+                                           default_times,
+                                           issuer_curves,
+                                           libor_curve)
 
         spd = prot_pv / rpv01
         value = self._notional * (prot_pv - self._running_coupon * rpv01)
@@ -211,16 +211,16 @@ class CDSBasket:
         model = FinModelStudentTCopula()
 
         default_times = model.default_times(issuer_curves,
-                                          correlationMatrix,
-                                          degreesOfFreedom,
-                                          num_trials,
-                                          seed)
+                                            correlationMatrix,
+                                            degreesOfFreedom,
+                                            num_trials,
+                                            seed)
 
         rpv01, prot_pv = self.valueLegs_MC(valuation_date,
-                                          nToDefault,
-                                          default_times,
-                                          issuer_curves,
-                                          libor_curve)
+                                           nToDefault,
+                                           default_times,
+                                           issuer_curves,
+                                           libor_curve)
 
         spd = prot_pv / rpv01
         value = self._notional * (prot_pv - self._running_coupon * rpv01)
@@ -236,7 +236,7 @@ class CDSBasket:
                              valuation_date,
                              nToDefault,
                              issuer_curves,
-                             betaVector,
+                             beta_vector,
                              libor_curve,
                              num_points=50):
         """ Value default basket using 1 factor Gaussian copula and analytical
@@ -277,9 +277,9 @@ class CDSBasket:
                     t, issuer_curve._times, issuer_curve._values,
                     InterpTypes.FLAT_FWD_RATES.value)
 
-            lossDbn = homogeneousBasketLossDbn(issuerSurvivalProbabilities,
+            lossDbn = homog_basket_loss_dbn(issuerSurvivalProbabilities,
                                                recovery_rates,
-                                               betaVector,
+                                               beta_vector,
                                                num_points)
 
             basketSurvivalCurve[iTime] = 1.0
@@ -296,7 +296,8 @@ class CDSBasket:
 
         protLegPV = self._cds_contract.protection_leg_pv(
             valuation_date, basketCurve, curveRecovery)
-        risky_pv01 = self._cds_contract.risky_pv01(valuation_date, basketCurve)['clean_rpv01']
+        risky_pv01 = self._cds_contract.risky_pv01(
+            valuation_date, basketCurve)['clean_rpv01']
 
         # Long protection
         mtm = self._notional * (protLegPV - risky_pv01 * self._running_coupon)
@@ -321,17 +322,18 @@ class CDSBasket:
         s += label_to_string("STEP-IN DATE", self._step_in_date)
         s += label_to_string("MATURITY", self._maturity_date)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("RUNNING COUPON", self._running_coupon*10000, "bp\n")
+        s += label_to_string("RUNNING COUPON",
+                             self._running_coupon*10000, "bp\n")
         s += label_to_string("DAYCOUNT", self._day_count_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._calendar_type)
         s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
         s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
 
-#        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-#        valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]
-#        precision = "12.6f"
-#        s += tableToString(header, valueTable, precision)
+#       header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
+#       valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]
+#       precision = "12.6f"
+#       s += tableToString(header, valueTable, precision)
 
         return s
 

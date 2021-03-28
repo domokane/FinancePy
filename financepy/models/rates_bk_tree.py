@@ -662,8 +662,8 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
 
     # map puts onto tree
     treePutValue = np.zeros(num_time_steps)
-    numPuts = len(put_times)
-    for i in range(0, numPuts):
+    num_puts = len(put_times)
+    for i in range(0, num_puts):
         put_time = put_times[i]
         n = int(put_time/dt + 0.50)
         treePutValue[n] = put_prices[i]

@@ -122,11 +122,11 @@ class EquityVanillaOption():
 
         k = self._strike_price
 
-        intrinsicValue = bsIntrinsic(s0, texp, k, r, q,
+        intrinsic_value = bsIntrinsic(s0, texp, k, r, q,
                                      self._option_type.value)
 
-        intrinsicValue = intrinsicValue * self._num_options
-        return intrinsicValue
+        intrinsic_value = intrinsic_value * self._num_options
+        return intrinsic_value
 
 ###############################################################################
 

@@ -11,7 +11,7 @@ sys.path.append("..")
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.ibor_swaption import FinSwapTypes
@@ -176,7 +176,7 @@ def getForwardCurve(numFwds, r):
 #                                     float_frequency_type,
 #                                     float_day_count_type)
 
-#         model = FinModelBlack(swaptionVol)
+#         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
 #         print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 

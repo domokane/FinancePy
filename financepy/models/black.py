@@ -39,7 +39,7 @@ def calculateD1D2(f, t, k, v):
 
 ###############################################################################
 
-class FinModelBlack():
+class Black():
     """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. """
 
@@ -57,23 +57,23 @@ class FinModelBlack():
 
     def value(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         v = self._volatility
         
         [d1, d2] = calculateD1D2(f, t, k, v)
         
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             value = df * (f * NVect(d1) - k * NVect(d2))
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             value = df * (k * NVect(-d2) - f * NVect(-d1))
         else:
             raise FinError("Option type must be a European Call or Put")
@@ -85,23 +85,23 @@ class FinModelBlack():
 
     def delta(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Calculate delta using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         v = self._volatility
 
         [d1, d2] = calculateD1D2(f, t, k, v)
 
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             delta = df * NVect(d1)
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             delta = - df * NVect(-d1)
         else:
             raise FinError("Option type must be a European Call or Put")
@@ -113,16 +113,16 @@ class FinModelBlack():
 
     def gamma(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,  # RFR to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Calculate gamma using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         v = self._volatility
 
         [d1, d2] = calculateD1D2(f, t, k, v)
@@ -136,16 +136,16 @@ class FinModelBlack():
 
     def theta(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,  # Discount Factor to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Calculate theta using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         v = self._volatility
         r = -np.log(df)/t
 
@@ -153,10 +153,10 @@ class FinModelBlack():
 
         sqrtT = np.sqrt(t)
 
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             theta = df * (-(f * v * NPrimeVect(d1)) / (2*sqrtT) + r * f * NVect(d1)
                           - r * k * NVect(d2))        
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             theta = df * (-(f * v * NPrimeVect(d1)) / (2*sqrtT) - r * f * NVect(-d1)
                           + r * k * NVect(-d2))
         else:
@@ -168,24 +168,24 @@ class FinModelBlack():
 
     def vega(self,
               forward_rate,   # Forward rate F
-              strikeRate,    # Strike Rate K
+              strike_rate,    # Strike Rate K
               time_to_expiry,  # Time to Expiry (years)
               df,  # df RFR to expiry date
-              callOrPut):    # Call or put
+              call_or_put):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. """
 
         f = forward_rate
         t = time_to_expiry
-        k = strikeRate
+        k = strike_rate
         v = self._volatility
         sqrtT = np.sqrt(t)
         
         [d1, d2] = calculateD1D2(f, t, k, v)
         
-        if callOrPut == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
             vega = df * f * sqrtT * NPrimeVect(d1)
-        elif callOrPut == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
             vega = df * f * sqrtT * NPrimeVect(d1)
         else:
             raise FinError("Option type must be a European Call or Put")

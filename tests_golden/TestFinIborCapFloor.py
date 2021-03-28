@@ -30,9 +30,9 @@ from financepy.market.discount.curve_zeros import DiscountCurveZeros
 from financepy.market.discount.interpolator import InterpTypes
 from financepy.market.discount.curve_flat import DiscountCurveFlat
 
-from financepy.models.black import FinModelBlack
+from financepy.models.black import Black
 from financepy.models.bachelier import FinModelBachelier
-from financepy.models.black_shifted import FinModelBlackShifted
+from financepy.models.black_shifted import BlackShifted
 from financepy.models.sabr import FinModelSABR
 from financepy.models.sabr_shifted import FinModelSABRShifted
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
@@ -107,7 +107,7 @@ def test_FinIborCapFloor():
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
                      "SABR_SHFTD", "HW", "BACH")
 
-    model1 = FinModelBlack(0.20)
+    model1 = Black(0.20)
     model2 = FinModelBlackShifted(0.25, 0.0)
     model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
     model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
@@ -230,7 +230,7 @@ def test_FinIborCapFloorVolCurve():
     # Value cap using a single flat cap volatility
     tcap = (maturity_date - valuation_date) / gDaysInYear
     vol = volCurve.capVol(maturity_date)
-    model = FinModelBlack(vol)
+    model = Black(vol)
     valueCap = capFloor.value(valuation_date, libor_curve, model)
 #    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
 
@@ -241,7 +241,7 @@ def test_FinIborCapFloorVolCurve():
 
     for capletEndDate in capFloor._capFloorLetDates[2:]:
         vol = volCurve.caplet_vol(capletEndDate)
-        modelCaplet = FinModelBlack(vol)
+        modelCaplet = Black(vol)
         vCaplet = capFloor.valueCapletFloorLet(valuation_date,
                                                capletStartDate,
                                                capletEndDate,
@@ -284,7 +284,7 @@ def test_FinIborCapletHull():
                             DayCountTypes.THIRTY_E_360)
 
     # Value cap using a single flat cap volatility
-    model = FinModelBlack(0.20)
+    model = Black(0.20)
     capFloor.value(valuation_date, libor_curve, model)
 
     # Value cap by breaking it down into caplets using caplet vols
@@ -338,14 +338,14 @@ def test_FinIborCapFloorQLExample():
     notional = 1000000
     day_count_type = DayCountTypes.ACT_360
     option_type = FinCapFloorTypes.CAP
-    strikeRate = 0.02
+    strike_rate = 0.02
 
-    cap = IborCapFloor(start_date, end_date, option_type, strikeRate,
+    cap = IborCapFloor(start_date, end_date, option_type, strike_rate,
                        lastFixing, freq_type, day_count_type, notional,
                        calendar_type, bus_day_adjust_type, date_gen_rule_type)
 
     blackVol = 0.547295
-    model = FinModelBlack(blackVol)
+    model = Black(blackVol)
 
     start = time.time()
     numRepeats = 10

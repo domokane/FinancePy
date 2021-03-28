@@ -13,7 +13,7 @@ from ..utils.math import pairGCD
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
 def indepLossDbnHeterogeneousAdjBinomial(num_credits,
                                          condProbs,
-                                         lossRatio):
+                                         loss_ratio):
 
     # Algorithm due to D. O'Kane.
 
@@ -22,7 +22,7 @@ def indepLossDbnHeterogeneousAdjBinomial(num_credits,
 
     p = 0.0
     for iCredit in range(0, num_credits):
-        p += lossRatio[iCredit] * condProbs[iCredit]
+        p += loss_ratio[iCredit] * condProbs[iCredit]
     p = p / num_credits
 
     ###########################################################################
@@ -45,9 +45,9 @@ def indepLossDbnHeterogeneousAdjBinomial(num_credits,
     vexact = 0.0
 
     for iCredit in range(0, num_credits):
-        lossRatio2 = lossRatio[iCredit] ** 2
-        vapprox += lossRatio2 * p * (1.0 - p)
-        vexact += lossRatio2 * condProbs[iCredit] * (1.0 - condProbs[iCredit])
+        loss_ratio2 = loss_ratio[iCredit] ** 2
+        vapprox += loss_ratio2 * p * (1.0 - p)
+        vexact += loss_ratio2 * condProbs[iCredit] * (1.0 - condProbs[iCredit])
 
     ###########################################################################
 

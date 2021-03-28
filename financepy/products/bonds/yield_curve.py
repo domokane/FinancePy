@@ -51,8 +51,8 @@ class BondYieldCurve():
 
         yearsToMaturities = []
         for bond in bonds:
-            maturityYears = (bond._maturity_date-settlement_date)/gDaysInYear
-            yearsToMaturities.append(maturityYears)
+            years_to_maturity = (bond._maturity_date-settlement_date)/gDaysInYear
+            yearsToMaturities.append(years_to_maturity)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
         if fitType is CurveFitPolynomial:
@@ -104,7 +104,7 @@ class BondYieldCurve():
 ###############################################################################
 
     def interpolated_yield(self,
-                          maturity_date: Date):
+                           maturity_date: Date):
 
         if type(maturity_date) is Date:
             t = (maturity_date - self._settlement_date) / gDaysInYear
@@ -123,19 +123,19 @@ class BondYieldCurve():
             yld = fit._interpolated_yield(t)
         elif type(fit) == CurveFitNelsonSiegel:
             yld = fit._interpolated_yield(t,
-                                         fit._beta1,
-                                         fit._beta2,
-                                         fit._beta3,
-                                         fit._tau)
+                                          fit._beta1,
+                                          fit._beta2,
+                                          fit._beta3,
+                                          fit._tau)
 
         elif type(fit) == CurveFitNelsonSiegelSvensson:
             yld = fit._interpolated_yield(t,
-                                         fit._beta1,
-                                         fit._beta2,
-                                         fit._beta3,
-                                         fit._beta4,
-                                         fit._tau1,
-                                         fit._tau2)
+                                          fit._beta1,
+                                          fit._beta2,
+                                          fit._beta3,
+                                          fit._beta4,
+                                          fit._tau1,
+                                          fit._tau2)
 
         elif type(fit) == CurveFitBSpline:
             yld = fit._interpolated_yield(t)

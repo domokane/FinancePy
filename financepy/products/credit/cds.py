@@ -226,12 +226,12 @@ class CDS:
         self._freq_type = freq_type
         self._bus_day_adjust_type = bus_day_adjust_type
 
-        self._generateAdjustedCDSPaymentDates()
-        self._calcFlows()
+        self._generate_adjusted_cds_payment_dates()
+        self._calc_flows()
 
     ###############################################################################
 
-    def _generateAdjustedCDSPaymentDates(self):
+    def _generate_adjusted_cds_payment_dates(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
         frequency = annual_frequency(self._freq_type)
         calendar = Calendar(self._calendar_type)
@@ -302,7 +302,7 @@ class CDS:
 
     ###############################################################################
 
-    def _calcFlows(self):
+    def _calc_flows(self):
         """ Calculate cash flow amounts on premium leg. """
         payment_dates = self._adjusted_dates
         day_count = DayCount(self._day_count_type)
@@ -734,7 +734,7 @@ class CDS:
 
     ###############################################################################
 
-    def valueFastApprox(self,
+    def value_fast_approx(self,
                         valuation_date,
                         flatContinuousInterestRate,
                         flatCDSCurveSpread,

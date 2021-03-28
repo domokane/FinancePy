@@ -205,38 +205,38 @@ def test_BondFRN():
     testCases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE")
     issue_date = Date(10, 11, 2010)
     maturity_date = Date(10, 11, 2021)
-    quotedMargin = 0.0025
+    quoted_margin = 0.0025
     freq_type = FrequencyTypes.QUARTERLY
     accrual_type = DayCountTypes.THIRTY_E_360
     face = 1000000
 
     bond = BondFRN(issue_date,
                    maturity_date,
-                   quotedMargin,
+                   quoted_margin,
                    freq_type,
                    accrual_type,
                    face)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 96.793
-    resetIbor = 0.0143456 - quotedMargin
-    currentIbor = 0.0120534
-    futureIbors = 0.0130522
+    resetIbor = 0.0143456 - quoted_margin
+    current_ibor = 0.0120534
+    future_ibors = 0.0130522
 
     settlement_date = Date(21, 7, 2017)
 
     dm = bond.discount_margin(settlement_date,
                              resetIbor,
-                             currentIbor,
-                             futureIbors,
+                             current_ibor,
+                             future_ibors,
                              clean_price)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
     full_price = bond.full_price_from_dm(settlement_date,
                                      resetIbor,
-                                     currentIbor,
-                                     futureIbors,
+                                     current_ibor,
+                                     future_ibors,
                                      dm)
 
     testCases.print("Full Price = ", full_price)
@@ -252,56 +252,56 @@ def test_BondFRN():
 
     principal = bond.principal(settlement_date,
                                resetIbor,
-                               currentIbor,
-                               futureIbors,
+                               current_ibor,
+                               future_ibors,
                                dm)
 
     testCases.print("Dollar Principal = ", principal)
 
     duration = bond.dollar_duration(settlement_date,
                                    resetIbor,
-                                   currentIbor,
-                                   futureIbors,
+                                   current_ibor,
+                                   future_ibors,
                                    dm)
 
     testCases.print("Dollar Rate Duration = ", duration)
 
     modified_duration = bond.modified_duration(settlement_date,
                                                  resetIbor,
-                                                 currentIbor,
-                                                 futureIbors,
+                                                 current_ibor,
+                                                 future_ibors,
                                                  dm)
 
     testCases.print("Modified Rate Duration = ", modified_duration)
 
     macauley_duration = bond.macauley_duration(settlement_date,
                                                  resetIbor,
-                                                 currentIbor,
-                                                 futureIbors,
+                                                 current_ibor,
+                                                 future_ibors,
                                                  dm)
 
     testCases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexity_from_dm(settlement_date,
                                      resetIbor,
-                                     currentIbor,
-                                     futureIbors,
+                                     current_ibor,
+                                     future_ibors,
                                      dm)
 
     testCases.print("Convexity = ", convexity)
 
     duration = bond.dollar_credit_duration(settlement_date,
                                          resetIbor,
-                                         currentIbor,
-                                         futureIbors,
+                                         current_ibor,
+                                         future_ibors,
                                          dm)
 
     testCases.print("Dollar Credit Duration = ", duration)
 
     modified_duration = bond.modified_credit_duration(settlement_date,
                                                    resetIbor,
-                                                   currentIbor,
-                                                   futureIbors,
+                                                   current_ibor,
+                                                   future_ibors,
                                                    dm)
 
     testCases.print("Modified Credit Duration = ", modified_duration)
@@ -315,36 +315,36 @@ def test_BondFRN():
     issue_date = Date(28, 3, 2000)
     settlement_date = Date(28, 3, 2014)
     maturity_date = Date(3, 2, 2021)
-    quotedMargin = 0.0020
+    quoted_margin = 0.0020
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
     face = 1000000.0
 
     bond = BondFRN(issue_date,
                    maturity_date,
-                   quotedMargin,
+                   quoted_margin,
                    freq_type,
                    accrual_type,
                    face)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 93.08
-    resetIbor = 0.00537 - quotedMargin
-    currentIbor = 0.027558
-    futureIbors = 0.03295
+    resetIbor = 0.00537 - quoted_margin
+    current_ibor = 0.027558
+    future_ibors = 0.03295
 
     dm = bond.discount_margin(settlement_date,
                              resetIbor,
-                             currentIbor,
-                             futureIbors,
+                             current_ibor,
+                             future_ibors,
                              clean_price)
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
     
     full_price = bond.full_price_from_dm(settlement_date,
                                      resetIbor,
-                                     currentIbor,
-                                     futureIbors,
+                                     current_ibor,
+                                     future_ibors,
                                      dm)
 
     testCases.print("Full Price = ", full_price)
@@ -360,64 +360,64 @@ def test_BondFRN():
 
     principal = bond.principal(settlement_date,
                                resetIbor,
-                               currentIbor,
-                               futureIbors,
+                               current_ibor,
+                               future_ibors,
                                dm)
 
     testCases.print("Dollar Principal = ", principal)
 
     duration = bond.dollar_duration(settlement_date,
                                        resetIbor,
-                                       currentIbor,
-                                       futureIbors,
+                                       current_ibor,
+                                       future_ibors,
                                        dm)
 
     testCases.print("Dollar Rate Duration = ", duration)
 
     modified_duration = bond.modified_duration(settlement_date,
                                                  resetIbor,
-                                                 currentIbor,
-                                                 futureIbors,
+                                                 current_ibor,
+                                                 future_ibors,
                                                  dm)
 
     testCases.print("Modified Rate Duration = ", modified_duration)
 
     macauley_duration = bond.macauley_duration(settlement_date,
                                                  resetIbor,
-                                                 currentIbor,
-                                                 futureIbors,
+                                                 current_ibor,
+                                                 future_ibors,
                                                  dm)
 
     testCases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexity_from_dm(settlement_date,
                                      resetIbor,
-                                     currentIbor,
-                                     futureIbors,
+                                     current_ibor,
+                                     future_ibors,
                                      dm)
 
     testCases.print("Convexity = ", convexity)
 
     principal = bond.principal(settlement_date,
                                resetIbor,
-                               currentIbor,
-                               futureIbors,
+                               current_ibor,
+                               future_ibors,
                                dm)
 
     testCases.print("Principal = ", principal)
 
     duration = bond.dollar_credit_duration(settlement_date,
                                          resetIbor,
-                                         currentIbor,
-                                         futureIbors,
+                                         current_ibor,
+                                         future_ibors,
                                          dm)
 
     testCases.print("Dollar Credit Duration = ", duration)
 
     modified_duration = bond.modified_credit_duration(settlement_date,
                                                    resetIbor,
-                                                   currentIbor,
-                                                   futureIbors,
+                                                   current_ibor,
+                                                   future_ibors,
                                                    dm)
 
     testCases.print("Modified Credit Duration = ", modified_duration)

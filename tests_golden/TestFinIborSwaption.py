@@ -16,8 +16,8 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import FinSwapTypes
 
-from financepy.models.black import FinModelBlack
-from financepy.models.black_shifted import FinModelBlackShifted
+from financepy.models.black import Black
+from financepy.models.black_shifted import BlackShifted
 from financepy.models.sabr import FinModelSABR
 from financepy.models.sabr_shifted import FinModelSABRShifted
 from financepy.models.rates_hull_white_tree import FinModelRatesHW
@@ -95,7 +95,7 @@ def testFinIborSwaptionModels():
     testCases.header("LAB", "STRIKE", "BLK", "BLK_SHFT", "SABR",
                      "SABR_SHFT", "HW", "BK")
 
-    model1 = FinModelBlack(0.00001)
+    model1 = Black(0.00001)
     model2 = FinModelBlackShifted(0.00001, 0.0)
     model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
     model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
@@ -220,7 +220,7 @@ def test_FinIborSwaptionQLExample():
 
     testCases.header("MODEL", "VALUE")
 
-    model = FinModelBlack(0.1533)
+    model = Black(0.1533)
     v = swaption.value(settlement_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
@@ -319,7 +319,7 @@ def testFinIborCashSettledSwaption():
                             swapFloatFrequencyType,
                             swapFloatDayCountType)
 
-    model = FinModelBlack(0.1533)
+    model = Black(0.1533)
     v = swaption.value(settlement_date, libor_curve, model)
     testCases.print("Swaption No-Arb Value:", v)
 
@@ -340,7 +340,7 @@ def testFinIborCashSettledSwaption():
     fwdSwapRate2 = fwdSwap.swap_rate(settlement_date, libor_curve)
     testCases.print("Fwd Swap Swap Rate:", fwdSwapRate2)
 
-    model = FinModelBlack(0.1533)
+    model = Black(0.1533)
 
     v = swaption.cash_settled_value(valuation_date,
                                   libor_curve,
@@ -386,7 +386,7 @@ def testFinIborSwaptionMatlabExamples():
                             fixed_day_count_type,
                             notional)
 
-    model = FinModelBlack(0.20)
+    model = Black(0.20)
     v_finpy = swaption.value(valuation_date, libor_curve, model)
     v_matlab = 2.071
 
@@ -440,7 +440,7 @@ def testFinIborSwaptionMatlabExamples():
                             float_frequency_type,
                             float_day_count_type)
 
-    model = FinModelBlack(0.21)
+    model = Black(0.21)
     v_finpy = swaption.value(valuation_date, libor_curve, model)
     v_matlab = 0.5771
 
