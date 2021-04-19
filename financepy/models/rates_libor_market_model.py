@@ -22,8 +22,8 @@ useParallel = False
     forward rate simulation consisting of a 3D matrix of num_paths x numForwards
     x (numForwards-1)/2 elements. This is a lognormal model although a shifted
     Lognormal rate is also allowed. Implementations include 1 factor, M factor
-    where the volaility curve per factor is provided and a full N-factor corr-
-    elaton matrix where a Cholesky is done to decompose the N factors. """
+    where the volatility curve per factor is provided and a full N-factor corr-
+    elation matrix where a Cholesky is done to decompose the N factors. """
 
 ###############################################################################
 

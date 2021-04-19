@@ -15,14 +15,13 @@ class FinAmount:
 
     def __init__(self,
                  notional: float = ONE_MILLION,
-                 currencyType: CurrencyTypes = CurrencyTypes.NONE):
+                 currency_type: CurrencyTypes = CurrencyTypes.NONE):
         """ Create FinAmount object. """
 
         check_argument_types(self.__init__, locals())
 
         self._notional = notional
-        self._currencyType = currencyType
-
+        self._currency_type = currency_type
 
     def __repr__(self):
         """ Print out the details of the schedule and the actual dates. This
@@ -34,7 +33,7 @@ class FinAmount:
             s += " "
 
         s += '{:,.2f}'.format(self._notional)
-        
+
         return s
 
     def amount(self):
@@ -46,5 +45,3 @@ class FinAmount:
         print(self)
 
 ###############################################################################
-
-

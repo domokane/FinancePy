@@ -2,26 +2,27 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import FinExerciseTypes
+from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.utils.helpers import print_tree
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.bonds.bond import Bond
+from financepy.market.discount.curve import DiscountCurve
+from financepy.utils.date import Date
 import numpy as np
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.market.discount.curve import DiscountCurve
-from financepy.products.bonds.bond import Bond
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.helpers import print_tree
-from financepy.models.rates_bk_tree import FinModelRatesBK
-from financepy.utils.global_types import FinExerciseTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_BKExampleOne():
 
@@ -113,7 +114,7 @@ def test_BKExampleTwo():
     model.buildTree(tmat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
     v = model.bond_option(texp, strike_price, face, coupon_times,
-                         coupon_flows, exercise_type)
+                          coupon_flows, exercise_type)
 
     # Test convergence
     num_stepsList = [100, 200, 300, 500, 1000]
@@ -126,7 +127,7 @@ def test_BKExampleTwo():
         model = FinModelRatesBK(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
-                             face, coupon_times, coupon_flows, exercise_type)
+                              face, coupon_times, coupon_flows, exercise_type)
         end = time.time()
         period = end-start
         treeVector.append(v)
