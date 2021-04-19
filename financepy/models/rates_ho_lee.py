@@ -7,7 +7,7 @@ from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import N
-from ..market.discount.interpolator import InterpTypes, _uinterpolate
+from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 
 interp = InterpTypes.FLAT_FWD_RATES.value

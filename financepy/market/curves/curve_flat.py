@@ -12,9 +12,9 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.helpers import timesFromDates
-from ...market.discount.interpolator import InterpTypes
+from ...market.curves.interpolator import InterpTypes
 
 ###############################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in

@@ -9,8 +9,8 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.market.discount.curve import DiscountCurve
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve import DiscountCurve
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import FinSwapTypes
@@ -18,7 +18,7 @@ from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
-from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
 from financepy.models.rates_bdt_tree import FinModelRatesBDT
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes

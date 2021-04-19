@@ -19,7 +19,7 @@ from financepy.products.rates.ois import OIS
 from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.market.discount.interpolator import InterpTypes
+from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.global_types import FinSwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode

@@ -10,8 +10,8 @@ from ...utils.date import Date
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.global_vars import gDaysInYear
-from ...market.discount.interpolator import InterpTypes
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.interpolator import InterpTypes
+from ...market.curves.curve import DiscountCurve
 
 swaptol = 1e-8
 

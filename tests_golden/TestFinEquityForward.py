@@ -8,7 +8,7 @@ sys.path.append("..")
 from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinLongShort
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

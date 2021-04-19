@@ -8,7 +8,7 @@ from math import ceil
 
 from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
-from ..market.discount.interpolator import InterpTypes, _uinterpolate
+from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
 from ..utils.global_vars import gSmall

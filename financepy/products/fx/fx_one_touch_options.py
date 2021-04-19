@@ -12,7 +12,7 @@ from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...models.gbm_process_simulator import getPaths
 
 from numba import njit

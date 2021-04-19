@@ -13,10 +13,10 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import input_time
 from ...utils.helpers import tableToString
-from ...market.discount.interpolator import InterpTypes, interpolate
+from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.helpers import label_to_string
 
 ###############################################################################

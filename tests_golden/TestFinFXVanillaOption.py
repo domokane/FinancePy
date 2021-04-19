@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve

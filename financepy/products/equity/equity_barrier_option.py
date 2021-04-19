@@ -9,7 +9,7 @@ from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
 from ...products.equity.equity_option import EquityOption
 from ...models.process_simulator import FinProcessSimulator
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 

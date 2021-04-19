@@ -11,7 +11,7 @@ from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import Black
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.rates.ibor_swaption import FinSwapTypes
 from financepy.products.rates.ibor_swaption import IborSwaption

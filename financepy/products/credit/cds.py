@@ -17,7 +17,7 @@ from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...utils.helpers import label_to_string, tableToString
-from ...market.discount.interpolator import InterpTypes, _uinterpolate
+from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 from ...utils.helpers import check_argument_types
 

@@ -10,8 +10,8 @@ sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.discount.interpolator import InterpTypes
-from financepy.market.discount.curve import DiscountCurve
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.curve import DiscountCurve
 from financepy.utils.math import scale
 
 from FinTestCases import FinTestCases, globalTestCaseMode

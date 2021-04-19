@@ -11,7 +11,7 @@ import numpy as np
 
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.error import FinError

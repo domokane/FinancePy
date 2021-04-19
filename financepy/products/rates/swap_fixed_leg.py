@@ -12,7 +12,7 @@ from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_types import FinSwapTypes
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 
 ##########################################################################
 

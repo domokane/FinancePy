@@ -7,7 +7,7 @@ sys.path.append("..")
 
 from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
 from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 

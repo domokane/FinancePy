@@ -7,7 +7,7 @@ from enum import Enum
 
 from ...utils.global_vars import gDaysInYear
 from ...models.black_scholes import BlackScholes
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.date import Date
 
 ###############################################################################

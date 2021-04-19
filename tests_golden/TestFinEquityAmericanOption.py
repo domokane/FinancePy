@@ -9,7 +9,7 @@ sys.path.append("..")
 
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.utils.global_types import FinOptionTypes
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes, FinModelBlackScholesTypes
 from financepy.utils.date import Date
 

@@ -22,8 +22,8 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 
-from ...market.discount.curve import DiscountCurve
-from ...market.discount.interpolator import InterpTypes, _uinterpolate
+from ...market.curves.curve import DiscountCurve
+from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 
 ###############################################################################

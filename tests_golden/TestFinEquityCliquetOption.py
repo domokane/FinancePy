@@ -7,7 +7,7 @@ sys.path.append("..")
 
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinOptionTypes

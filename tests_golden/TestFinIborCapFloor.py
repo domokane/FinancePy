@@ -26,9 +26,9 @@ from financepy.utils.calendar import DateGenRuleTypes
 
 from financepy.utils.global_types import FinSwapTypes
 
-from financepy.market.discount.curve_zeros import DiscountCurveZeros
-from financepy.market.discount.interpolator import InterpTypes
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 
 from financepy.models.black import Black
 from financepy.models.bachelier import FinModelBachelier

@@ -17,7 +17,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.schedule import Schedule
 from ...products.equity.equity_option import EquityOption
-from ...market.discount.curve_flat import DiscountCurve
+from ...market.curves.curve_flat import DiscountCurve
 
 from ...models.black_scholes import bs_value, BlackScholes
 from ...models.FinModel import FinModel

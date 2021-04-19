@@ -21,7 +21,8 @@
 # GET THE COUPON AND THE ACCRUED INTEREST EQUALS THE COUPON.
 ###############################################################################
 
-import numpy as np
+# import numpy as np
+# from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -34,9 +35,8 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 
-from scipy import optimize
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD

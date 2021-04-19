@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 

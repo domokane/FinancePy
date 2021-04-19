@@ -13,7 +13,7 @@ from ...utils.date import Date
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.global_types import FinOptionTypes
 
 ##########################################################################

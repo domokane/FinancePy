@@ -10,7 +10,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 
 ###############################################################################
 

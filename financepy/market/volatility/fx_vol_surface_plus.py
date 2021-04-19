@@ -17,7 +17,7 @@ from ...models.option_implied_dbn import optionImpliedDbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 
 from ...models.black_scholes import BlackScholes
 

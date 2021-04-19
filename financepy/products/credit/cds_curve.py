@@ -8,7 +8,7 @@ import scipy.optimize as optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
-from ...market.discount.interpolator import _uinterpolate, InterpTypes
+from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, tableToString
 from ...utils.day_count import DayCount
 from ...utils.frequency import annual_frequency, FrequencyTypes

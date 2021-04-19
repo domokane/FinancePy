@@ -10,7 +10,7 @@ sys.path.append("..")
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
 from financepy.products.fx.fx_fixed_lookback_option import FXFixedLookbackOption
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, globalTestCaseMode

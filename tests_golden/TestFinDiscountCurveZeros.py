@@ -11,8 +11,8 @@ sys.path.append("..")
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
-from financepy.market.discount.interpolator import InterpTypes
-from financepy.market.discount.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

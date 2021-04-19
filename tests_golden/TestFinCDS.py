@@ -10,10 +10,10 @@ sys.path.append("..")
 
 from financepy.products.credit.cds import CDS
 from financepy.utils.math import ONE_MILLION
-from financepy.market.discount.interpolator import InterpTypes
+from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.market.discount.curve import DiscountCurve
+from financepy.market.curves.curve import DiscountCurve
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.global_vars import gDaysInYear

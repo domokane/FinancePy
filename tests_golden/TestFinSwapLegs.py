@@ -16,7 +16,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
 from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
-from financepy.market.discount.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

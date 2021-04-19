@@ -24,7 +24,7 @@ from ...products.credit.cds_curve import CDSCurve
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...market.discount.interpolator import interpolate, InterpTypes
+from ...market.curves.interpolator import interpolate, InterpTypes
 
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date

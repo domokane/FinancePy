@@ -20,10 +20,10 @@ from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.FinIborSwapOLD import FinIborSwapOLD
 from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.market.discount.interpolator import InterpTypes
+from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import FinSwapTypes
-from financepy.market.discount.interpolator import InterpTypes
+from financepy.market.curves.interpolator import InterpTypes
 
 from financepy.products.rates.FinIborSingleCurveOLD import FinIborSingleCurveOLD
 from financepy.products.rates.FinIborDualCurveOLD import FinIborDualCurveOLD

@@ -6,7 +6,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.discount.curve import DiscountCurve
+from ...market.curves.curve import DiscountCurve
 from ...utils.global_types import FinOptionTypes, FinExerciseTypes
 from ...products.bonds.bond import Bond
 

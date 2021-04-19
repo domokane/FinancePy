@@ -10,7 +10,7 @@ from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
-from financepy.market.discount.curve import DiscountCurve
+from financepy.market.curves.curve import DiscountCurve
 from financepy.utils.date import Date
 import numpy as np
 import time
