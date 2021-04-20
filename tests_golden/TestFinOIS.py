@@ -11,7 +11,7 @@ from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -28,7 +28,7 @@ def test_FinFixedOIS():
 
     end_date = effective_date.addMonths(60)
     oisRate = 0.04
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixedFreqType = FrequencyTypes.ANNUAL
     fixedDayCount = DayCountTypes.ACT_360
     floatFreqType = FrequencyTypes.ANNUAL

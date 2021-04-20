@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 import numpy as np
-from financepy.models.sabr_shifted import FinModelSABRShifted
+from financepy.models.sabr_shifted import SABRShifted
 from financepy.utils.global_types import FinOptionTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -40,7 +40,7 @@ def test_ShiftedSABR():
     df = np.exp(-r * texp)
     
     # SABR equivalent to lognormal (Black) model (i.e. beta = 1, rho = 0, nu = 0, shift = 0)
-    modelSABR_01 = FinModelSABRShifted(0.0, 1.0, 0.0, 0.0, 0.0)
+    modelSABR_01 = SABRShifted(0.0, 1.0, 0.0, 0.0, 0.0)
     modelSABR_01.setAlphaFromBlackVol(strikeVol, f, k, texp)
 
     impliedLognormalVol = modelSABR_01.black_vol(f, k, texp)
@@ -52,7 +52,7 @@ def test_ShiftedSABR():
     testCases.print("LOGNORMAL CASE", calibrationError)
 
     # Volatility: pure SABR dynamics
-    modelSABR_02 = FinModelSABRShifted(alpha, beta, rho, nu, shift)
+    modelSABR_02 = SABRShifted(alpha, beta, rho, nu, shift)
     modelSABR_02.setAlphaFromBlackVol(strikeVol, f, k, texp)
 
     impliedLognormalVol = modelSABR_02.black_vol(f, k, texp)

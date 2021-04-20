@@ -21,8 +21,8 @@
 # GET THE COUPON AND THE ACCRUED INTEREST EQUALS THE COUPON.
 ###############################################################################
 
-# import numpy as np
-# from scipy import optimize
+import numpy as np
+from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError

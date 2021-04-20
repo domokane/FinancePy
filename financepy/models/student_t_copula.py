@@ -11,14 +11,14 @@ from ..utils.helpers import uniformToDefaultTime
 ###############################################################################
 
 
-class FinModelStudentTCopula():
+class StudentTCopula():
 
     def default_times(self,
-                     issuer_curves,
-                     correlationMatrix,
-                     degreesOfFreedom,
-                     num_trials,
-                     seed):
+                      issuer_curves,
+                      correlationMatrix,
+                      degreesOfFreedom,
+                      num_trials,
+                      seed):
 
         np.random.seed(seed)
         num_credits = len(issuer_curves)

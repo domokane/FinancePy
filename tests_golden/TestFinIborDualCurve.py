@@ -20,7 +20,7 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.dual_curve import IborDualCurve
@@ -43,7 +43,7 @@ def buildOIS(valuation_date):
     spot_days = 0
     spot_days = 0
     settlement_date = valuation_date.addWeekDays(spot_days)
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
 
     fras = []
     # 1 x 4 FRA
@@ -59,7 +59,7 @@ def buildOIS(valuation_date):
     swaps.append(swap)
 
     swap_rate += 0.000
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     maturity_date = settlement_date.addMonths(36)
     swap = OIS(settlement_date, maturity_date, fixed_leg_type, swap_rate,
                fixedFreqType, fixedDCCType)
@@ -196,7 +196,7 @@ def test_bloombergPricingExample():
     spot_days = 2
     settlement_date = valuation_date.addWeekDays(spot_days)
     notional = ONE_MILLION
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     swaps = []
@@ -295,7 +295,7 @@ def test_swapValuationExample():
     start_date = Date(27, 12, 2017)
     maturity_date = Date(27, 12, 2067)
     notional = 10 * ONE_MILLION
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     
     fixedRate = 0.0150
     fixedDCCType = DayCountTypes.THIRTY_360_BOND
@@ -340,7 +340,7 @@ def test_swapValuationExample():
     fra = IborFRA(settlement_date.addTenor("12M"), "6M", -0.1360 / 100.0, fraDCCType); fras.append(fra)
     
     swaps = []
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_360_BOND
     fixedFreqType = FrequencyTypes.ANNUAL
     
@@ -388,7 +388,7 @@ def test_swapValuationExample():
     fras = []
     
     swaps = []
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.ACT_365F
     fixedFreqType = FrequencyTypes.ANNUAL
     

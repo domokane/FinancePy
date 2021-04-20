@@ -27,14 +27,14 @@ from ...products.rates.ibor_swap import IborSwap
 
 from ...models.black import Black
 from ...models.black_shifted import BlackShifted
-from ...models.sabr import FinModelSABR
-from ...models.sabr_shifted import FinModelSABRShifted
-from ...models.rates_hull_white_tree import FinModelRatesHW
-from ...models.rates_bk_tree import FinModelRatesBK
-from ...models.rates_bdt_tree import FinModelRatesBDT
+from ...models.sabr import SABR
+from ...models.sabr_shifted import SABRShifted
+from ...models.hw_tree import HWTree
+from ...models.bk_tree import BKTree
+from ...models.bdt_tree import BDTTree
 
 from ...utils.global_types import FinOptionTypes
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...utils.global_types import FinExerciseTypes
 
 ###############################################################################
@@ -49,7 +49,7 @@ class IborSwaption():
                  settlement_date: Date,
                  exercise_date: Date,
                  maturity_date: Date,
-                 fixed_leg_type: FinSwapTypes,
+                 fixed_leg_type: SwapTypes,
                  fixed_coupon: float,
                  fixed_frequency_type: FrequencyTypes,
                  fixed_day_count_type: DayCountTypes,
@@ -103,7 +103,7 @@ class IborSwaption():
               model):
         """ Valuation of a Ibor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
-        FinModelBlackShifted, FinModelSABR, FinModelSABRShifted, FinModelHW,
+        FinModelBlackShifted, SABR, SABRShifted, FinModelHW,
         FinModelBK and FinModelBDT. The last two involved a tree-based
         valuation. """
 
@@ -178,41 +178,41 @@ class IborSwaption():
 
         if isinstance(model, Black):
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_CALL)
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, BlackShifted):
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_CALL)
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelSABR):
+        elif isinstance(model, SABR):
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_CALL)
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelSABRShifted):
+        elif isinstance(model, SABRShifted):
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_CALL)
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelRatesHW):
+        elif isinstance(model, HWTree):
 
             swaptionPx = model.europeanBondOptionJamshidian(texp,
                                                             strike_price,
@@ -222,9 +222,9 @@ class IborSwaption():
                                                             df_times,
                                                             df_values)
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = swaptionPx['put']
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = swaptionPx['call']
             else:
                 raise FinError("Unknown swaption option type" +
@@ -233,7 +233,7 @@ class IborSwaption():
             # Cancel the multiplication at the end below
             swaption_price /= pv01
 
-        elif isinstance(model, FinModelRatesBK):
+        elif isinstance(model, BKTree):
 
             model.buildTree(tmat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(texp,
@@ -244,14 +244,14 @@ class IborSwaption():
                                                  cpn_flows,
                                                  FinExerciseTypes.EUROPEAN)
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = swaptionPx['pay']
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = swaptionPx['rec']
 
             swaption_price /= pv01
 
-        elif isinstance(model, FinModelRatesBDT):
+        elif isinstance(model, BDTTree):
 
             model.buildTree(tmat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(texp,
@@ -262,9 +262,9 @@ class IborSwaption():
                                                  cpn_flows,
                                                  FinExerciseTypes.EUROPEAN)
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = swaptionPx['pay']
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = swaptionPx['rec']
 
             swaption_price /= pv01
@@ -326,10 +326,10 @@ class IborSwaption():
 
         if isinstance(model, Black):
 
-            if self._fixed_leg_type == FinSwapTypes.PAY:
+            if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_CALL)
-            elif self._fixed_leg_type == FinSwapTypes.RECEIVE:
+            elif self._fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, texp, df,
                                              FinOptionTypes.EUROPEAN_PUT)
         else:

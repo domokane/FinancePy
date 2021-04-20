@@ -18,7 +18,7 @@ from financepy.products.credit.cds_curve import CDSCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -49,7 +49,7 @@ def buildIborCurve(tradeDate):
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -59,7 +59,7 @@ def buildIborCurve(tradeDate):
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -69,7 +69,7 @@ def buildIborCurve(tradeDate):
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
@@ -79,7 +79,7 @@ def buildIborCurve(tradeDate):
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -89,7 +89,7 @@ def buildIborCurve(tradeDate):
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)

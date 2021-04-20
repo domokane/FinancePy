@@ -3,8 +3,8 @@
 # ##############################################################################
 
 # from ...utils.FinGlobalVariables import gDaysInYear
-# from ...models.FinModelRatesHW import FinModelRatesHW
-# from ...models.FinModelRatesBK import FinModelRatesBK
+# from ...models.HWTree import HWTree
+# from ...models.BKTree import BKTree
 # from ...utils.FinError import FinError
 # from ...utils.FinFrequency import FrequencyTypes
 # from ...utils.FinDayCount import FinDayCount
@@ -202,7 +202,7 @@
 
 #         face = self._bond._face
 
-#         if type(model) is FinModelRatesHW:
+#         if type(model) is HWTree:
 
 #             """ We need to build the tree out to the bond maturity date. To be
 #             more precise we only need to go out the the last option date but
@@ -224,7 +224,7 @@
 
 #             return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
 
-#         elif type(model) == FinModelRatesBK:
+#         elif type(model) == BKTree:
 
 #             """ Because we not have a closed form bond price we need to build
 #             the tree out to the bond maturity which is after option expiry. """

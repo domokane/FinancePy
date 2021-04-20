@@ -13,7 +13,7 @@ from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...market.curves.curve import DiscountCurve
 
 from .swap_fixed_leg import SwapFixedLeg
@@ -40,7 +40,7 @@ class IborSwap:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 fixed_leg_type: FinSwapTypes,
+                 fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixed_freq_type: FrequencyTypes,
                  fixed_day_count_type: DayCountTypes,
@@ -76,9 +76,9 @@ class IborSwap:
 
         self._effective_date = effective_date
 
-        float_leg_type = FinSwapTypes.PAY
-        if fixed_leg_type == FinSwapTypes.PAY:
-            float_leg_type = FinSwapTypes.RECEIVE
+        float_leg_type = SwapTypes.PAY
+        if fixed_leg_type == SwapTypes.PAY:
+            float_leg_type = SwapTypes.RECEIVE
 
         payment_lag = 0
         principal = 0.0

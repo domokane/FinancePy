@@ -32,7 +32,8 @@ class FinCIRNumericalScheme(Enum):
 # THIS CLASS IS NOT USED BUT MAY BE USED IF WE CREATE AN OO FRAMEWORK
 
 
-class ModelRatesCIR():
+class CIR_MC():
+    ''' This is a Monte Carlo implementation of the Cox-Ingersoll-Ross Model'''
 
     def __init__(self, a, b, sigma):
         self._a = a

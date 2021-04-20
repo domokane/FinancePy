@@ -13,7 +13,7 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 
-from ...models.FinModel import FinModel
+from ...models.model import Model
 
 ###############################################################################
 # TODO: Implement some analytical approximations
@@ -55,7 +55,7 @@ class EquityAmericanOption(EquityOption):
               stock_price: (np.ndarray, float),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model: FinModel):
+              model: Model):
         """ Valuation of an American option using a CRR tree to take into
         account the value of early exercise. """
 
@@ -67,7 +67,7 @@ class EquityAmericanOption(EquityOption):
         if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
 
-        if isinstance(model, FinModel) is False:
+        if isinstance(model, Model) is False:
             raise FinError("Model is not inherited off type FinModel.")
 
         if np.any(texp < 0.0):

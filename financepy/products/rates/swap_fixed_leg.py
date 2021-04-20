@@ -11,7 +11,7 @@ from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...market.curves.curve import DiscountCurve
 
 ##########################################################################
@@ -25,7 +25,7 @@ class SwapFixedLeg:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  end_date: (Date, str),  # Date contract ends
-                 leg_type: FinSwapTypes,
+                 leg_type: SwapTypes,
                  coupon: (float),
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
@@ -182,7 +182,7 @@ class SwapFixedLeg:
             legPV += paymentPV
             self._cumulativePVs[-1] = legPV
 
-        if self._leg_type == FinSwapTypes.PAY:
+        if self._leg_type == SwapTypes.PAY:
             legPV = legPV * (-1.0)
 
         return legPV

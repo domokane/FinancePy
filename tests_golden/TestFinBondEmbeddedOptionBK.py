@@ -19,9 +19,9 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
-from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.bk_tree import BKTree
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -42,7 +42,7 @@ def test_BondEmbeddedOptionMATLAB():
 
     ###########################################################################
 
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     dcType = DayCountTypes.THIRTY_E_360
     fixedFreq = FrequencyTypes.ANNUAL
     swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type, 0.0350, fixedFreq, dcType)
@@ -88,7 +88,7 @@ def test_BondEmbeddedOptionMATLAB():
     timeSteps = range(100, 200, 10)  # 1000, 10)
     values = []
     for num_time_steps in timeSteps:
-        model = FinModelRatesBK(sigma, a, num_time_steps)
+        model = BKTree(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()
@@ -163,7 +163,7 @@ def test_BondEmbeddedOptionQUANTLIB():
     timeSteps = range(100, 200, 20)  # 1000, 10)
     values = []
     for num_time_steps in timeSteps:
-        model = FinModelRatesBK(sigma, a, num_time_steps)
+        model = BKTree(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()

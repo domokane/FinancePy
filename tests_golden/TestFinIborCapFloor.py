@@ -3,49 +3,42 @@
 ###############################################################################
 
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.schedule import Schedule
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+from financepy.utils.global_vars import gDaysInYear
+from financepy.models.hw_tree import HWTree
+from financepy.models.sabr_shifted import SABRShifted
+from financepy.models.sabr import SABR
+from financepy.models.black_shifted import BlackShifted
+from financepy.models.bachelier import Bachelier
+from financepy.models.black import Black
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_cap_floor import IborCapFloor
+from financepy.utils.global_types import FinCapFloorTypes
 import time
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.global_types import FinCapFloorTypes
-from financepy.products.rates.ibor_cap_floor import IborCapFloor
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_swap import FinSwapTypes
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
 
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.calendar import DateGenRuleTypes
-
-from financepy.utils.global_types import FinSwapTypes
-
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-
-from financepy.models.black import Black
-from financepy.models.bachelier import FinModelBachelier
-from financepy.models.black_shifted import BlackShifted
-from financepy.models.sabr import FinModelSABR
-from financepy.models.sabr_shifted import FinModelSABRShifted
-from financepy.models.rates_hull_white_tree import FinModelRatesHW
-
-from financepy.utils.global_vars import gDaysInYear
-
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.schedule import Schedule
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##############################################################################
+
 
 def test_FinIborDepositsAndSwaps(valuation_date):
 
@@ -69,12 +62,15 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     swaps = []
     fixedBasis = DayCountTypes.ACT_365F
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type, swap_rate, fixedFreq, fixedBasis)
+    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+                     swap_rate, fixedFreq, fixedBasis)
+    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+                     swap_rate, fixedFreq, fixedBasis)
+    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type,
+                     swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -108,11 +104,11 @@ def test_FinIborCapFloor():
                      "SABR_SHFTD", "HW", "BACH")
 
     model1 = Black(0.20)
-    model2 = FinModelBlackShifted(0.25, 0.0)
-    model3 = FinModelSABR(0.013, 0.5, 0.5, 0.5)
-    model4 = FinModelSABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
-    model5 = FinModelRatesHW(0.30, 0.01)
-    model6 = FinModelBachelier(0.01)
+    model2 = BlackShifted(0.25, 0.0)
+    model3 = SABR(0.013, 0.5, 0.5, 0.5)
+    model4 = SABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
+    model5 = HWTree(0.30, 0.01)
+    model6 = Bachelier(0.01)
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
@@ -123,7 +119,8 @@ def test_FinIborCapFloor():
         cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
         cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
         cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-        testCases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
+        testCases.print("CAP", k, cvalue1, cvalue2,
+                        cvalue3, cvalue4, cvalue5, cvalue6)
 
     testCases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
                      "SABR_SHFTD", "HW", "BACH")
@@ -137,7 +134,8 @@ def test_FinIborCapFloor():
         fvalue4 = capfloor.value(valuation_date, libor_curve, model4)
         fvalue5 = capfloor.value(valuation_date, libor_curve, model5)
         fvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-        testCases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
+        testCases.print("FLR", k, fvalue1, fvalue2,
+                        fvalue3, fvalue4, fvalue5, fvalue6)
 
 ###############################################################################
 # PUT CALL CHECK

@@ -5,7 +5,6 @@
 # TODO Fix this
 
 import numpy as np
-from scipy.stats import norm
 
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinOptionTypes

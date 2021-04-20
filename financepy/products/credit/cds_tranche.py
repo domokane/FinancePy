@@ -7,10 +7,10 @@
 import numpy as np
 from math import sqrt
 
-from ...models.credit_gaussian_copula_onefactor import tranch_surv_prob_gaussian
-from ...models.credit_gaussian_copula_onefactor import tranche_surv_prob_adj_binomial
-from ...models.credit_gaussian_copula_onefactor import tranche_surv_prob_recursion
-from ...models.credit_gaussian_copula_lhp import trSurvProbLHP
+from ...models.gauss_copula_onefactor import tranch_surv_prob_gaussian
+from ...models.gauss_copula_onefactor import tranche_surv_prob_adj_binomial
+from ...models.gauss_copula_onefactor import tranche_surv_prob_recursion
+from ...models.gauss_copula_lhp import trSurvProbLHP
 
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes

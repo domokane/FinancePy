@@ -9,8 +9,8 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.credit_gaussian_copula_onefactor import loss_dbn_recursion_gcd
-from financepy.models.credit_gaussian_copula_onefactor import loss_dbn_hetero_adj_binomial
+from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
+from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -10,7 +10,7 @@ from scipy import optimize
 
 from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
-from .credit_merton import MertonCredit
+from .merton_firm import MertonFirm
 
 ###############################################################################
 
@@ -41,8 +41,8 @@ def _fobj(x, *args):
 ###############################################################################
 
 
-class MertonCreditMkt(MertonCredit):
-    """ Market Extension of the Merton Credit Model according to the original
+class MertonFirmMkt(MertonFirm):
+    """ Market Extension of the Merton Firm Model according to the original
     formulation by Merton with the inputs being the equity value of the firm,
     the liabilities (bond face), the time to maturity in years, the risk-free
     rate, the asset growth rate and the equity volatility. The asset value and

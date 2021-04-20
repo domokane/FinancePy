@@ -2,27 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
+from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.market.volatility.fx_vol_surface import FXVolSurface
+from financepy.models.option_implied_dbn import optionImpliedDbn
+from financepy.models.black_scholes import BlackScholes
+from financepy.models.volatility_fns import vol_function_clark
+from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 sys.path.append("..")
 
-import numpy as np
-import matplotlib.pyplot as plt
 
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
-
-from financepy.models.volatility_fns import FinVolFunctionTypes
-from financepy.models.volatility_fns import vol_function_clark
-
-from financepy.models.black_scholes import BlackScholes
-from financepy.models.option_implied_dbn import optionImpliedDbn
-
-from financepy.market.volatility.fx_vol_surface import FXVolSurface
-from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
-from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -76,9 +71,9 @@ def test_FinOptionImpliedDbn():
         PLOT_GRAPHS = False
         if PLOT_GRAPHS:
             fxMarket.plot_vol_curves()
- 
+
         for iTenor in range(0, len(fxMarket._tenors)):
-            
+
             F = fxMarket._F0T[iTenor]
             texp = fxMarket._texp[iTenor]
 
@@ -86,7 +81,7 @@ def test_FinOptionImpliedDbn():
             endFX = F * 5.0
 
             num_steps = 10000
-            dFX = (endFX - startFX)/ num_steps
+            dFX = (endFX - startFX) / num_steps
 
             domDF = dom_discount_curve._df(texp)
             forDF = for_discount_curve._df(texp)
@@ -100,16 +95,16 @@ def test_FinOptionImpliedDbn():
             vols = []
 
             for iK in range(0, num_steps):
-                strike = startFX + iK*dFX                
+                strike = startFX + iK*dFX
                 vol = vol_function_clark(params, F, strike, texp)
-                strikes.append(strike) 
+                strikes.append(strike)
                 vols.append(vol)
-            
+
             strikes = np.array(strikes)
             vols = np.array(vols)
 
             dbn = optionImpliedDbn(spot_fx_rate, texp, rd, rf, strikes, vols)
-            
+
 #            print("SUM:", dbn.sum())
 #            plt.figure()
 #            plt.plot(dbn._x, dbn._densitydx)

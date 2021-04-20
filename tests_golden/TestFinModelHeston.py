@@ -2,18 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.utils.global_types import FinOptionTypes
+from financepy.models.heston import Heston, HestonNumericalScheme
 import time
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.models.heston import FinModelHeston, FinHestonNumericalScheme
-from financepy.utils.global_types import FinOptionTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -51,7 +51,7 @@ def testAnalyticalModels():
 
     for sigma in [0.5, 0.75, 1.0]:
         for rho in [-0.9, -0.5, 0.0]:
-            hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
+            hestonModel = Heston(v0, kappa, theta, sigma, rho)
             for strike_price in np.linspace(95, 105, 3):
                 callOption = EquityVanillaOption(
                     expiry_date, strike_price, FinOptionTypes.EUROPEAN_CALL)
@@ -123,7 +123,7 @@ def testMonteCarlo():
     for strike_price in np.linspace(95, 105, 3):
         for num_steps in [25, 50]:
             for num_paths in [10000, 20000]:
-                hestonModel = FinModelHeston(v0, kappa, theta, sigma, rho)
+                hestonModel = Heston(v0, kappa, theta, sigma, rho)
                 callOption = EquityVanillaOption(
                     expiry_date, strike_price, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
@@ -140,7 +140,7 @@ def testMonteCarlo():
                     num_paths,
                     num_steps,
                     seed,
-                    FinHestonNumericalScheme.EULER)
+                    HestonNumericalScheme.EULER)
                 value_mc_EULERLOG = hestonModel.value_MC(
                     valuation_date,
                     callOption,
@@ -150,7 +150,7 @@ def testMonteCarlo():
                     num_paths,
                     num_steps,
                     seed,
-                    FinHestonNumericalScheme.EULERLOG)
+                    HestonNumericalScheme.EULERLOG)
                 value_mc_QUADEXP = hestonModel.value_MC(
                     valuation_date,
                     callOption,
@@ -160,7 +160,7 @@ def testMonteCarlo():
                     num_paths,
                     num_steps,
                     seed,
-                    FinHestonNumericalScheme.QUADEXP)
+                    HestonNumericalScheme.QUADEXP)
 
                 err_EULER = (value_mc_EULER - valueWeber)
                 err_EULERLOG = (value_mc_EULERLOG - valueWeber)

@@ -2,24 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.helpers import print_tree
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.bonds.bond import Bond
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
+from financepy.utils.date import Date
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.models.rates_hull_white_tree import FinModelRatesHW, FinHWEuropeanCalcType
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.products.bonds.bond import Bond
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.helpers import print_tree
-from financepy.utils.global_types import FinExerciseTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -39,7 +38,7 @@ def test_HullWhiteExampleOne():
     sigma = 0.01
     a = 0.1
     num_time_steps = 3
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
     treeMat = (end_date - start_date)/gDaysInYear
     model.buildTree(treeMat, times, dfs)
 #   print_tree(model._Q)
@@ -58,8 +57,8 @@ def test_HullWhiteExampleTwo():
                 1826, 2194, 2558, 2922, 3287, 3653]
 
     zero_rates = [5.0, 5.01772, 4.98282, 4.97234, 4.96157, 4.99058, 5.09389,
-                 5.79733, 6.30595, 6.73464, 6.94816, 7.08807, 7.27527,
-                 7.30852, 7.39790, 7.49015]
+                  5.79733, 6.30595, 6.73464, 6.94816, 7.08807, 7.27527,
+                  7.30852, 7.39790, 7.49015]
 
     times = np.array(zeroDays) / 365.0
     zeros = np.array(zero_rates) / 100.0
@@ -78,7 +77,7 @@ def test_HullWhiteExampleTwo():
     tmat = (maturity_date - start_date)/gDaysInYear
 
     num_time_steps = None
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
     vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
@@ -88,30 +87,30 @@ def test_HullWhiteExampleTwo():
 
     testCases.banner("Comparing option on zero coupon bond analytical vs Tree")
 
-    testCases.header("NUMTIMESTEP", "TIME", "VTREE_CALL", "VTREE_PUT", 
+    testCases.header("NUMTIMESTEP", "TIME", "VTREE_CALL", "VTREE_PUT",
                      "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF")
 
     for num_time_steps in num_stepsList:
 
         start = time.time()
 
-        model = FinModelRatesHW(sigma, a, num_time_steps)
+        model = HWTree(sigma, a, num_time_steps)
         model.buildTree(texp, times, dfs)
         vTree1 = model.optionOnZeroCouponBond_Tree(texp, tmat, strike, face)
 
-        model = FinModelRatesHW(sigma, a, num_time_steps+1)
+        model = HWTree(sigma, a, num_time_steps+1)
         model.buildTree(texp, times, dfs)
         vTree2 = model.optionOnZeroCouponBond_Tree(texp, tmat, strike, face)
- 
+
         end = time.time()
         period = end-start
         treeVector.append(vTree1['put'])
         analVector.append(vAnal['put'])
-        vTreeCall = (vTree1['call'] + vTree2['call'] ) / 2.0
-        vTreePut = (vTree1['put'] + vTree2['put'] ) / 2.0
+        vTreeCall = (vTree1['call'] + vTree2['call']) / 2.0
+        vTreePut = (vTree1['put'] + vTree2['put']) / 2.0
         diffC = vTreeCall - vAnal['call']
         diffP = vTreePut - vAnal['put']
-        
+
         testCases.print(num_time_steps, period, vTreeCall, vAnal['call'],
                         vTreePut, vAnal['put'], diffC, diffP)
 
@@ -144,12 +143,12 @@ def test_HullWhiteBondOption():
         ncd = bond._flow_dates[i]
 
         if ncd > settlement_date:
-            
+
             if len(coupon_times) == 0:
                 flow_time = (pcd - settlement_date) / gDaysInYear
                 coupon_times.append(flow_time)
                 coupon_flows.append(cpn)
-                
+
             flow_time = (ncd - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
@@ -165,7 +164,7 @@ def test_HullWhiteBondOption():
 
     sigma = 0.0000001
     a = 0.1
-    model = FinModelRatesHW(sigma, a, None)
+    model = HWTree(sigma, a, None)
 
     #  Test convergence
     num_stepsList = range(50, 500, 50)
@@ -174,27 +173,31 @@ def test_HullWhiteBondOption():
     vJam = model.europeanBondOptionJamshidian(texp, strike_price, face,
                                               coupon_times, coupon_flows,
                                               times, dfs)
-    
-    testCases.banner("Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry.")
 
-    testCases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN")
+    testCases.banner(
+        "Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry.")
+
+    testCases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY",
+                     "EXPIRY_TREE", "JAMSHIDIAN")
 
     for num_time_steps in num_stepsList:
 
         start = time.time()
-        model = FinModelRatesHW(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
+        model = HWTree(sigma, a, num_time_steps,
+                       FinHWEuropeanCalcType.EXPIRY_ONLY)
         model.buildTree(texp, times, dfs)
 
         exercise_type = FinExerciseTypes.EUROPEAN
 
         v1 = model.bond_option(texp, strike_price, face,
-                              coupon_times, coupon_flows, exercise_type)
+                               coupon_times, coupon_flows, exercise_type)
 
-        model = FinModelRatesHW(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
+        model = HWTree(sigma, a, num_time_steps,
+                       FinHWEuropeanCalcType.EXPIRY_TREE)
         model.buildTree(texp, times, dfs)
 
         v2 = model.bond_option(texp, strike_price, face,
-                              coupon_times, coupon_flows, exercise_type)
+                               coupon_times, coupon_flows, exercise_type)
 
         end = time.time()
         period = end-start
@@ -231,7 +234,7 @@ def test_HullWhiteCallableBond():
     cpn = bond._coupon/bond._frequency
 
     for flow_date in bond._flow_dates[1:]:
-        
+
         if flow_date > settlement_date:
             flow_time = (flow_date - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
@@ -247,13 +250,20 @@ def test_HullWhiteCallableBond():
     call_dates = []
     call_prices = []
     callPx = 120.0
-    call_dates.append(settlement_date.addTenor("2Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("3Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("4Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("5Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("6Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("7Y")); call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("8Y")); call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("2Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("3Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("4Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("5Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("6Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("7Y"))
+    call_prices.append(callPx)
+    call_dates.append(settlement_date.addTenor("8Y"))
+    call_prices.append(callPx)
 
     call_times = []
     for dt in call_dates:
@@ -263,13 +273,20 @@ def test_HullWhiteCallableBond():
     put_dates = []
     put_prices = []
     putPx = 98.0
-    put_dates.append(settlement_date.addTenor("2Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("3Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("4Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("5Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("6Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("7Y")); put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("8Y")); put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("2Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("3Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("4Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("5Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("6Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("7Y"))
+    put_prices.append(putPx)
+    put_dates.append(settlement_date.addTenor("8Y"))
+    put_prices.append(putPx)
 
     put_times = []
     for dt in put_dates:
@@ -289,8 +306,8 @@ def test_HullWhiteCallableBond():
             t = (dt - settlement_date) / gDaysInYear
             df = curve.df(dt)
             times.append(t)
-            dfs.append(df) 
-                        
+            dfs.append(df)
+
     dfs = np.array(dfs)
     times = np.array(times)
 
@@ -310,7 +327,7 @@ def test_HullWhiteCallableBond():
     for num_time_steps in num_stepsList:
 
         start = time.time()
-        model = FinModelRatesHW(sigma, a, num_time_steps)
+        model = HWTree(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
 
         v2 = model.callablePuttableBond_Tree(coupon_times, coupon_flows,

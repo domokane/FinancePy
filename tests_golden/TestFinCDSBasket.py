@@ -2,6 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.models.gbm_process_simulator import get_paths_assets
+from financepy.utils.date import Date
+from financepy.utils.math import corr_matrixGenerator
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
+from financepy.products.credit.cds_basket import CDSBasket
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 import time
 import numpy as np
 from os.path import dirname, join
@@ -9,20 +22,7 @@ from os.path import dirname, join
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_basket import CDSBasket
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.math import corr_matrixGenerator
-from financepy.utils.date import Date
-from financepy.models.gbm_process_simulator import get_paths_assets
-from financepy.utils.global_types import FinSwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -47,7 +47,7 @@ def buildIborCurve(tradeDate):
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -57,7 +57,7 @@ def buildIborCurve(tradeDate):
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -67,7 +67,7 @@ def buildIborCurve(tradeDate):
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
@@ -77,7 +77,7 @@ def buildIborCurve(tradeDate):
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
@@ -87,7 +87,7 @@ def buildIborCurve(tradeDate):
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
@@ -209,20 +209,21 @@ def test_FinCDSBasket():
 
     if 1 == 0:
         issuer_curves = loadHomogeneousSpreadCurves(valuation_date,
-                                                   libor_curve,
-                                                   spd3Y,
-                                                   spd5Y,
-                                                   spd7Y,
-                                                   spd10Y,
-                                                   num_credits)
+                                                    libor_curve,
+                                                    spd3Y,
+                                                    spd5Y,
+                                                    spd7Y,
+                                                    spd10Y,
+                                                    num_credits)
     else:
-        issuer_curves = loadHeterogeneousSpreadCurves(valuation_date, libor_curve)
+        issuer_curves = loadHeterogeneousSpreadCurves(
+            valuation_date, libor_curve)
         issuer_curves = issuer_curves[0:num_credits]
 
     intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
-                                            step_in_date,
-                                            basketMaturity,
-                                            issuer_curves) * 10000.0
+                                             step_in_date,
+                                             basketMaturity,
+                                             issuer_curves) * 10000.0
 
     testCases.print("INTRINSIC SPD BASKET MATURITY", intrinsicSpd)
 
@@ -234,16 +235,16 @@ def test_FinCDSBasket():
     testCases.print("SUMMED UP SPD BASKET MATURITY", totalSpd)
 
     minSpd = cdsIndex.min_spread(valuation_date,
-                                step_in_date,
-                                basketMaturity,
-                                issuer_curves) * 10000.0
+                                 step_in_date,
+                                 basketMaturity,
+                                 issuer_curves) * 10000.0
 
     testCases.print("MINIMUM SPD BASKET MATURITY", minSpd)
 
     maxSpd = cdsIndex.max_spread(valuation_date,
-                                step_in_date,
-                                basketMaturity,
-                                issuer_curves) * 10000.0
+                                 step_in_date,
+                                 basketMaturity,
+                                 issuer_curves) * 10000.0
 
     testCases.print("MAXIMUM SPD BASKET MATURITY", maxSpd)
 
@@ -319,7 +320,8 @@ def test_FinCDSBasket():
 
                 end = time.time()
                 period = (end - start)
-                testCases.print(period, num_trials, rho, doF, ntd, v[2] * 10000)
+                testCases.print(period, num_trials, rho,
+                                doF, ntd, v[2] * 10000)
 
             start = time.time()
             v = basket.valueGaussian_MC(
@@ -379,8 +381,8 @@ def testFinGBMProcess():
     seed = 1912
 
     _ = get_paths_assets(num_assets, num_paths, num_time_steps, t,
-                       mus, stock_prices, volatilities,
-                       corr_matrix, seed)
+                         mus, stock_prices, volatilities,
+                         corr_matrix, seed)
 
 ###############################################################################
 

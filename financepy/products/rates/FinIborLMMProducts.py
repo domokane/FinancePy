@@ -25,16 +25,16 @@ from ...utils.error import FinError
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
-from ...models.rates_libor_market_model import LMMSimulateFwds1F
-from ...models.rates_libor_market_model import LMMSimulateFwdsMF
-from ...models.rates_libor_market_model import LMMSimulateFwdsNF
-from ...models.rates_libor_market_model import ModelLMMModelTypes
-from ...models.rates_libor_market_model import LMMCapFlrPricer
+from ...models.lmm_mc import LMMSimulateFwds1F
+from ...models.lmm_mc import LMMSimulateFwdsMF
+from ...models.lmm_mc import LMMSimulateFwdsNF
+from ...models.lmm_mc import ModelLMMModelTypes
+from ...models.lmm_mc import LMMCapFlrPricer
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...utils.global_types import FinCapFloorTypes
 
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
@@ -276,7 +276,7 @@ class FinIborLMMProducts():
                       settlement_date: Date,
                       exercise_date: Date,
                       maturity_date: Date,
-                      swaptionType: FinSwapTypes,
+                      swaptionType: SwapTypes,
                       fixed_coupon: float,
                       fixed_frequency_type: FrequencyTypes,
                       fixed_day_count_type: DayCountTypes,

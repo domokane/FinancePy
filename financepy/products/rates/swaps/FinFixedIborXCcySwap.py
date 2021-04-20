@@ -12,7 +12,7 @@ from ...utils.FinCalendar import FinCalendar, BusDayAdjustTypes
 from ...utils.FinSchedule import FinSchedule
 from ...utils.FinHelperFunctions import label_to_string, check_argument_types
 from ...utils.FinMath import ONE_MILLION
-from ...utils.FinGlobalTypes import FinSwapTypes
+from ...utils.FinGlobalTypes import SwapTypes
 
 ##########################################################################
 
@@ -31,7 +31,7 @@ class FinFixedIborXCcySwap:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 fixed_leg_type: FinSwapTypes,
+                 fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FrequencyTypes,
                  fixed_day_count_type: DayCountTypes,
@@ -139,7 +139,7 @@ class FinFixedIborXCcySwap:
 
         value = fixed_legValue - floatLegValue
 
-        if self._fixed_leg_type == FinSwapTypes.PAY:
+        if self._fixed_leg_type == SwapTypes.PAY:
             value = value * (-1.0)
 
         return value

@@ -13,15 +13,15 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinExerciseTypes
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 
 from ...products.rates.ibor_swap import IborSwap
 
-from ...models.rates_bdt_tree import FinModelRatesBDT
-from ...models.rates_bk_tree import FinModelRatesBK
-from ...models.rates_hull_white_tree import FinModelRatesHW
+from ...models.bdt_tree import BDTTree
+from ...models.bk_tree import BKTree
+from ...models.hw_tree import HWTree
 
 ###############################################################################
 
@@ -37,7 +37,7 @@ class FinIborBermudanSwaption:
                  settlement_date: Date,
                  exercise_date: Date,
                  maturity_date: Date,
-                 fixed_leg_type: FinSwapTypes,
+                 fixed_leg_type: SwapTypes,
                  exercise_type: FinExerciseTypes,
                  fixed_coupon: float,
                  fixed_frequency_type: FrequencyTypes,
@@ -86,7 +86,7 @@ class FinIborBermudanSwaption:
         self._underlyingSwap = None
         self._cpn_times = None
         self._cpn_flows = None
-        
+
 ###############################################################################
 
     def value(self,
@@ -155,31 +155,31 @@ class FinIborBermudanSwaption:
         df_values = discount_curve._dfs
 
         face_amount = 1.0
-        strike_price = 1.0 # Floating leg is assumed to price at par
+        strike_price = 1.0  # Floating leg is assumed to price at par
 
         #######################################################################
         # For both models, the tree needs to extend out to maturity because of
         # the multi-callable nature of the Bermudan Swaption
         #######################################################################
 
-        if isinstance(model, FinModelRatesBDT) or isinstance(model, FinModelRatesBK) or isinstance(model, FinModelRatesHW):
+        if isinstance(model, BDTTree) or isinstance(model, BKTree) or isinstance(model, HWTree):
 
             model.buildTree(tmat, df_times, df_values)
 
             v = model.bermudan_swaption(texp,
-                                       tmat,
-                                       strike_price,
-                                       face_amount,
-                                       cpn_times,
-                                       cpn_flows,
-                                       self._exercise_type)
+                                        tmat,
+                                        strike_price,
+                                        face_amount,
+                                        cpn_times,
+                                        cpn_flows,
+                                        self._exercise_type)
         else:
 
             raise FinError("Invalid model choice for Bermudan Swaption")
 
-        if self._fixed_leg_type == FinSwapTypes.RECEIVE:
+        if self._fixed_leg_type == SwapTypes.RECEIVE:
             v = self._notional * v['rec']
-        elif self._fixed_leg_type == FinSwapTypes.PAY:
+        elif self._fixed_leg_type == SwapTypes.PAY:
             v = self._notional * v['pay']
 
         return v
@@ -189,19 +189,19 @@ class FinIborBermudanSwaption:
     def printSwaptionValue(self):
 
         print("SWAP PV01:", self._pv01)
-        
+
         n = len(self._cpn_times)
-        
-        for i in range(0,n):
+
+        for i in range(0, n):
             print("CPN TIME: ", self._cpn_times[i], "FLOW", self._cpn_flows[i])
 
         n = len(self._call_times)
 
-        for i in range(0,n):
+        for i in range(0, n):
             print("CALL TIME: ", self._call_times[i])
 
 ###############################################################################
-        
+
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXERCISE DATE", self._exercise_date)

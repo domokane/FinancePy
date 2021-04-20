@@ -18,12 +18,14 @@ from ..utils.helpers import label_to_string
 ###############################################################################
 ###############################################################################
 
+
 @njit
 def _x(rho, z):
     """Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
     a = (1.0 - 2.0*rho*z + z**2)**.5 + z - rho
     b = 1.0 - rho
     return np.log(a / b)
+
 
 @njit
 def vol_functionShiftedSABR(params, f, k, t):
@@ -62,7 +64,8 @@ def vol_functionShiftedSABR(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = alpha * z * (1.0 + (a + b + c) * t) / \
+            (d * (1.0 + v + w) * _x(rho, z))
         return vz
     else:
         v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
@@ -71,7 +74,7 @@ def vol_functionShiftedSABR(params, f, k, t):
 ###############################################################################
 
 
-class FinModelSABRShifted():
+class SABRShifted():
     """ SABR - Shifted Stochastic alpha beta rho model by Hagan et al. is a 
     stochastic volatility model where alpha controls the implied volatility,
     beta is the exponent on the the underlying asset's process so beta = 0
@@ -79,7 +82,7 @@ class FinModelSABRShifted():
     underlying and the volatility process. The shift allows negative rates."""
 
     def __init__(self, alpha, beta, rho, nu, shift):
-        """ Create FinModelSABRShifted with all of the model parameters. We 
+        """ Create SABRShifted with all of the model parameters. We
         also provide functions below to assist with the calibration of the 
         value of alpha. """
 
@@ -94,7 +97,7 @@ class FinModelSABRShifted():
     def black_vol(self, f, k, t):
         """ Black volatility from SABR model using Hagan et al. approx. """
 
-        params = np.array([self._alpha, self._beta, self._rho, 
+        params = np.array([self._alpha, self._beta, self._rho,
                            self._nu, self._shift])
 
         # I wish to enable vectorisations
@@ -174,14 +177,16 @@ class FinModelSABRShifted():
 
         if initAlpha != blackVol:
             # Objective function
-            fn = lambda x: np.sqrt((blackVol - self.blackVolWithAlpha(x, f, K, texp))**2)
+            def fn(x): return np.sqrt(
+                (blackVol - self.blackVolWithAlpha(x, f, K, texp))**2)
             bnds = ((0.0, None),)
             x0 = initAlpha
-            results = minimize(fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8)
+            results = minimize(fn, x0, method="L-BFGS-B",
+                               bounds=bnds, tol=1e-8)
             alpha = results.x[0]
         else:
             alpha = initAlpha
-        
+
         self._alpha = alpha
 
 ###############################################################################
@@ -191,7 +196,7 @@ class FinModelSABRShifted():
         special ATM case of the strike equalling the forward following Hagan 
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
-        chosen.""" 
+        chosen."""
 
         # For shifted SABR
         atmStrike = atmStrike + self._shift

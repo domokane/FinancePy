@@ -17,7 +17,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 
@@ -108,7 +108,7 @@ def buildIborSingleCurve(valuation_date):
     
     fixedFreq = FrequencyTypes.ANNUAL
     dcType = DayCountTypes.THIRTY_E_360
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
 
     #######################################
     maturity_date = settlement_date.addMonths(24) 
@@ -286,7 +286,7 @@ def test_LiborSwap():
     swapCalendarType = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     
     notional = 10.0 * ONE_MILLION
 
@@ -333,7 +333,7 @@ def test_dp_example():
     bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixed_coupon = 0.0124
     notional = ONE_MILLION
 

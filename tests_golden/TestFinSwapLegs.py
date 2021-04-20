@@ -6,11 +6,11 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.math import ONE_MILLION
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.amount import FinAmount
+from financepy.utils.amount import Amount
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
@@ -33,7 +33,7 @@ def test_FinFixedIborSwapLeg():
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
-    legPayRecType = FinSwapTypes.PAY
+    legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
@@ -64,7 +64,7 @@ def test_FinFixedOISSwapLeg():
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
-    legPayRecType = FinSwapTypes.PAY
+    legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
@@ -95,7 +95,7 @@ def test_FinFloatIborLeg():
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
-    legPayRecType = FinSwapTypes.PAY
+    legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
@@ -134,7 +134,7 @@ def test_FinFloatOISLeg():
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
-    legPayRecType = FinSwapTypes.PAY
+    legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD

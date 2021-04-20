@@ -16,7 +16,7 @@ from ...utils.global_types import FinOptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.curve import DiscountCurve
 
-from ...models.FinModel import FinModel
+from ...models.model import Model
 from ...models.black_scholes import BlackScholes
 from ...models.black_scholes_analytic import bs_value
 from ...models.black_scholes_analytic import bs_delta
@@ -37,6 +37,7 @@ from ...models.black_scholes_mc import _value_mc_NUMBA_PARALLEL
 from ...utils.math import N
 
 ###############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def _f(v, args):
@@ -123,7 +124,7 @@ class EquityVanillaOption():
         k = self._strike_price
 
         intrinsic_value = bsIntrinsic(s0, texp, k, r, q,
-                                     self._option_type.value)
+                                      self._option_type.value)
 
         intrinsic_value = intrinsic_value * self._num_options
         return intrinsic_value
@@ -135,7 +136,7 @@ class EquityVanillaOption():
               stock_price: (np.ndarray, float),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model: FinModel):
+              model: Model):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
         if type(valuation_date) == Date:
@@ -225,7 +226,7 @@ class EquityVanillaOption():
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model:FinModel):
+              model: Model):
         """ Calculate the analytical gamma of a European vanilla option. """
 
         if type(valuation_date) == Date:
@@ -268,7 +269,7 @@ class EquityVanillaOption():
              stock_price: float,
              discount_curve: DiscountCurve,
              dividend_curve: DiscountCurve,
-             model:FinModel):
+             model: Model):
         """ Calculate the analytical vega of a European vanilla option. """
 
         if type(valuation_date) == Date:
@@ -310,7 +311,7 @@ class EquityVanillaOption():
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model:FinModel):
+              model: Model):
         """ Calculate the analytical theta of a European vanilla option. """
 
         if type(valuation_date) == Date:
@@ -352,7 +353,7 @@ class EquityVanillaOption():
             stock_price: float,
             discount_curve: DiscountCurve,
             dividend_curve: DiscountCurve,
-            model:FinModel):
+            model: Model):
         """ Calculate the analytical rho of a European vanilla option. """
 
         if type(valuation_date) == Date:
@@ -390,11 +391,11 @@ class EquityVanillaOption():
 ###############################################################################
 
     def implied_volatility(self,
-                          valuation_date: Date,
-                          stock_price: (float, list, np.ndarray),
-                          discount_curve: DiscountCurve,
-                          dividend_curve: DiscountCurve,
-                          price):
+                           valuation_date: Date,
+                           stock_price: (float, list, np.ndarray),
+                           discount_curve: DiscountCurve,
+                           dividend_curve: DiscountCurve,
+                           price):
         """ Calculate the Black-Scholes implied volatility of a European 
         vanilla option. """
 
@@ -413,126 +414,19 @@ class EquityVanillaOption():
         k = self._strike_price
         s0 = stock_price
 
-        sigma = bsImpliedVolatility(s0, texp, k, r, q, price, 
+        sigma = bsImpliedVolatility(s0, texp, k, r, q, price,
                                     self._option_type.value)
-        
+
         return sigma
 
 ###############################################################################
 
     def value_mc_NUMPY_ONLY(self,
-                           valuation_date: Date,
-                           stock_price: float,
-                           discount_curve: DiscountCurve,
-                           dividend_curve: DiscountCurve,
-                           model:FinModel,
-                           num_paths: int = 10000,
-                           seed: int = 4242,
-                           useSobol: int = 0):
-
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
-
-        df = discount_curve.df(self._expiry_date)
-        r = -np.log(df)/texp
-
-        dq = dividend_curve.df(self._expiry_date)
-        q = -np.log(dq)/texp
-
-        vol = model._volatility
-
-        v = _value_mc_NUMPY_ONLY(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed,
-                           useSobol)
-
-        return v
-
-###############################################################################
-
-    def value_mc_NUMBA_ONLY(self,
-                           valuation_date: Date,
-                           stock_price: float,
-                           discount_curve: DiscountCurve,
-                           dividend_curve: DiscountCurve,
-                           model:FinModel,
-                           num_paths: int = 10000,
-                           seed: int = 4242,
-                           useSobol: int = 0):
-
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
-
-        df = discount_curve.df(self._expiry_date)
-        r = -np.log(df)/texp
-
-        dq = dividend_curve.df(self._expiry_date)
-        q = -np.log(dq)/texp
-
-        vol = model._volatility
-
-        v = _value_mc_NUMBA_ONLY(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed, 
-                           useSobol)
-
-        return v
-
-###############################################################################
-
-    def value_mc_NUMBA_PARALLEL(self,
-                               valuation_date: Date,
-                               stock_price: float,
-                               discount_curve: DiscountCurve,
-                               dividend_curve: DiscountCurve,
-                               model:FinModel,
-                               num_paths: int = 10000,
-                               seed: int = 4242,
-                               useSobol: int = 0):
-
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
-
-        df = discount_curve.df(self._expiry_date)
-        r = -np.log(df)/texp
-
-        dq = dividend_curve.df(self._expiry_date)
-        q = -np.log(dq)/texp
-
-        vol = model._volatility
-
-        v = _value_mc_NUMBA_PARALLEL(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed, 
-                           useSobol)
-
-#        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
-
-        return v
-
-###############################################################################
-
-    def value_mc_NUMPY_NUMBA(self,
                             valuation_date: Date,
                             stock_price: float,
                             discount_curve: DiscountCurve,
                             dividend_curve: DiscountCurve,
-                            model:FinModel,
+                            model: Model,
                             num_paths: int = 10000,
                             seed: int = 4242,
                             useSobol: int = 0):
@@ -547,27 +441,62 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMPY_NUMBA(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed,
-                           useSobol)
+        v = _value_mc_NUMPY_ONLY(stock_price,
+                                 texp,
+                                 self._strike_price,
+                                 self._option_type.value,
+                                 r,
+                                 q,
+                                 vol,
+                                 num_paths,
+                                 seed,
+                                 useSobol)
 
         return v
 
 ###############################################################################
 
-    def value_mc_NONUMBA_NONUMPY(self,
+    def value_mc_NUMBA_ONLY(self,
+                            valuation_date: Date,
+                            stock_price: float,
+                            discount_curve: DiscountCurve,
+                            dividend_curve: DiscountCurve,
+                            model: Model,
+                            num_paths: int = 10000,
+                            seed: int = 4242,
+                            useSobol: int = 0):
+
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+
+        df = discount_curve.df(self._expiry_date)
+        r = -np.log(df)/texp
+
+        dq = dividend_curve.df(self._expiry_date)
+        q = -np.log(dq)/texp
+
+        vol = model._volatility
+
+        v = _value_mc_NUMBA_ONLY(stock_price,
+                                 texp,
+                                 self._strike_price,
+                                 self._option_type.value,
+                                 r,
+                                 q,
+                                 vol,
+                                 num_paths,
+                                 seed,
+                                 useSobol)
+
+        return v
+
+###############################################################################
+
+    def value_mc_NUMBA_PARALLEL(self,
                                 valuation_date: Date,
                                 stock_price: float,
                                 discount_curve: DiscountCurve,
                                 dividend_curve: DiscountCurve,
-                                model:FinModel,
+                                model: Model,
                                 num_paths: int = 10000,
                                 seed: int = 4242,
                                 useSobol: int = 0):
@@ -582,30 +511,102 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
+        v = _value_mc_NUMBA_PARALLEL(stock_price,
+                                     texp,
+                                     self._strike_price,
+                                     self._option_type.value,
+                                     r,
+                                     q,
+                                     vol,
+                                     num_paths,
+                                     seed,
+                                     useSobol)
+
+#        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
+
+        return v
+
+###############################################################################
+
+    def value_mc_NUMPY_NUMBA(self,
+                             valuation_date: Date,
+                             stock_price: float,
+                             discount_curve: DiscountCurve,
+                             dividend_curve: DiscountCurve,
+                             model: Model,
+                             num_paths: int = 10000,
+                             seed: int = 4242,
+                             useSobol: int = 0):
+
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+
+        df = discount_curve.df(self._expiry_date)
+        r = -np.log(df)/texp
+
+        dq = dividend_curve.df(self._expiry_date)
+        q = -np.log(dq)/texp
+
+        vol = model._volatility
+
+        v = _value_mc_NUMPY_NUMBA(stock_price,
+                                  texp,
+                                  self._strike_price,
+                                  self._option_type.value,
+                                  r,
+                                  q,
+                                  vol,
+                                  num_paths,
+                                  seed,
+                                  useSobol)
+
+        return v
+
+###############################################################################
+
+    def value_mc_NONUMBA_NONUMPY(self,
+                                 valuation_date: Date,
+                                 stock_price: float,
+                                 discount_curve: DiscountCurve,
+                                 dividend_curve: DiscountCurve,
+                                 model: Model,
+                                 num_paths: int = 10000,
+                                 seed: int = 4242,
+                                 useSobol: int = 0):
+
+        texp = (self._expiry_date - valuation_date) / gDaysInYear
+
+        df = discount_curve.df(self._expiry_date)
+        r = -np.log(df)/texp
+
+        dq = dividend_curve.df(self._expiry_date)
+        q = -np.log(dq)/texp
+
+        vol = model._volatility
+
         v = _value_mc_NONUMBA_NONUMPY(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed,
-                           useSobol)
+                                      texp,
+                                      self._strike_price,
+                                      self._option_type.value,
+                                      r,
+                                      q,
+                                      vol,
+                                      num_paths,
+                                      seed,
+                                      useSobol)
 
         return v
 
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                model:FinModel,
-                num_paths: int = 10000,
-                seed: int = 4242,
-                useSobol: int = 0):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 model: Model,
+                 num_paths: int = 10000,
+                 seed: int = 4242,
+                 useSobol: int = 0):
         """ Value European style call or put option using Monte Carlo. This is
         mainly for educational purposes. Sobol numbers can be used. """
 
@@ -620,15 +621,15 @@ class EquityVanillaOption():
         vol = model._volatility
 
         v = _value_mc_NUMBA_ONLY(stock_price,
-                           texp, 
-                           self._strike_price,
-                           self._option_type.value,
-                           r, 
-                           q, 
-                           vol, 
-                           num_paths,
-                           seed, 
-                           useSobol)
+                                 texp,
+                                 self._strike_price,
+                                 self._option_type.value,
+                                 r,
+                                 q,
+                                 vol,
+                                 num_paths,
+                                 seed,
+                                 useSobol)
 
         return v
 

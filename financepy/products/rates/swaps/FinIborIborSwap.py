@@ -12,7 +12,7 @@ from ...utils.FinCalendar import FinCalendar, BusDayAdjustTypes
 from ...utils.FinSchedule import FinSchedule
 from ...utils.FinHelperFunctions import label_to_string, check_argument_types
 from ...utils.FinMath import ONE_MILLION
-from ...utils.FinGlobalTypes import FinSwapTypes
+from ...utils.FinGlobalTypes import SwapTypes
 
 ##########################################################################
 

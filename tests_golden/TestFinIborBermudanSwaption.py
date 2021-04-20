@@ -8,16 +8,16 @@ sys.path.append("..")
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swap import IborSwap
 
 from financepy.products.rates.bermudan_swaption import FinIborBermudanSwaption
 from financepy.models.black import Black
-from financepy.models.rates_bk_tree import FinModelRatesBK
-from financepy.models.rates_hull_white_tree import FinModelRatesHW
-from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.models.bk_tree import BKTree
+from financepy.models.hw_tree import HWTree
+from financepy.models.bdt_tree import BDTTree
 from financepy.market.curves.curve_flat import DiscountCurveFlat
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -46,7 +46,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     fwdPAYSwap = IborSwap(exercise_date,
                           swapMaturityDate,
-                          FinSwapTypes.PAY,
+                          SwapTypes.PAY,
                           swapFixedCoupon,
                           swapFixedFrequencyType,
                           swapFixedDayCountType)
@@ -59,7 +59,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # fwdPAYSwap.print_fixed_leg_pv()
 
     # Now we create the European swaptions
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     europeanSwaptionPay = IborSwaption(settlement_date,
                                        exercise_date,
                                        swapMaturityDate,
@@ -68,7 +68,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                        swapFixedFrequencyType,
                                        swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     europeanSwaptionRec = IborSwaption(settlement_date,
                                        exercise_date,
                                        swapMaturityDate,
@@ -132,7 +132,7 @@ def test_FinIborBermudanSwaptionBKModel():
     sigma = 0.000000001
     a = 0.01
     num_time_steps = 100
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuation_date, libor_curve, model)
     testCases.print("EUROPEAN BK PAY VALUE:", valuePay)
@@ -149,7 +149,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -165,7 +165,7 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -177,7 +177,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
@@ -194,7 +194,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -211,7 +211,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.2
     a = 0.01
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -227,7 +227,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -239,7 +239,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
@@ -256,7 +256,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -273,7 +273,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -304,7 +304,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.00001
     num_time_steps = 200
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuation_date, libor_curve, model)
     testCases.print("EUROPEAN BDT PAY VALUE:", valuePay)
@@ -320,7 +320,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
     testCases.banner("BDT MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -336,7 +336,7 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -348,7 +348,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
@@ -362,7 +362,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.000001
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -378,7 +378,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.2
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -394,7 +394,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -406,7 +406,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
@@ -421,7 +421,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -438,7 +438,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
-    model = FinModelRatesBDT(sigma, num_time_steps)
+    model = BDTTree(sigma, num_time_steps)
 
 #    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -469,7 +469,7 @@ def test_FinIborBermudanSwaptionBKModel():
     sigma = 0.0000001
     a = 0.1
     num_time_steps = 200
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     valuePay = europeanSwaptionPay.value(valuation_date, libor_curve, model)
     testCases.print("EUROPEAN HW PAY VALUE:", valuePay)
@@ -485,7 +485,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.01
     a = 0.01
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
@@ -501,7 +501,7 @@ def test_FinIborBermudanSwaptionBKModel():
     ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -513,7 +513,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
@@ -526,7 +526,7 @@ def test_FinIborBermudanSwaptionBKModel():
     testCases.banner("======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE HW MODEL ========")
 
     sigma = 0.000001
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     testCases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -542,7 +542,7 @@ def test_FinIborBermudanSwaptionBKModel():
 
     # Used BK with constant short-rate volatility
     sigma = 0.01
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     testCases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -558,7 +558,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Now we create the Bermudan swaptions but allow Bermudan exercise
     ###########################################################################
 
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = FinIborBermudanSwaption(settlement_date,
@@ -570,7 +570,7 @@ def test_FinIborBermudanSwaptionBKModel():
                                                    swapFixedFrequencyType,
                                                    swapFixedDayCountType)
 
-    fixed_leg_type = FinSwapTypes.RECEIVE
+    fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = FinIborBermudanSwaption(settlement_date,
                                                    exercise_date,
                                                    swapMaturityDate,
@@ -585,7 +585,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)
@@ -602,7 +602,7 @@ def test_FinIborBermudanSwaptionBKModel():
     # Used BK with constant short-rate volatility
     sigma = 0.01
     a = 0.01
-    model = FinModelRatesHW(sigma, a, num_time_steps)
+    model = HWTree(sigma, a, num_time_steps)
 
     testCases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
     valuePay = bermudan_swaption_pay.value(valuation_date, libor_curve, model)

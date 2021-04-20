@@ -10,13 +10,13 @@ from .math import ONE_MILLION
 ###############################################################################
 
 
-class FinAmount:
-    """ A FinAmount is a holder for an amount in a specific currency. """
+class Amount:
+    """ An Amount is a holder for an amount in a specific currency. """
 
     def __init__(self,
                  notional: float = ONE_MILLION,
                  currency_type: CurrencyTypes = CurrencyTypes.NONE):
-        """ Create FinAmount object. """
+        """ Create Amount object. """
 
         check_argument_types(self.__init__, locals())
 
@@ -28,8 +28,8 @@ class FinAmount:
         can be used for providing transparency on schedule calculations. """
 
         s = ""
-        if self._currencyType != CurrencyTypes.NONE:
-            s += self._currencyType.name
+        if self._currency_type != CurrencyTypes.NONE:
+            s += self._currency_type.name
             s += " "
 
         s += '{:,.2f}'.format(self._notional)

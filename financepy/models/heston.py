@@ -29,7 +29,7 @@ from ..utils.error import FinError
 from enum import Enum
 
 
-class FinHestonNumericalScheme(Enum):
+class HestonNumericalScheme(Enum):
     EULER = 1
     EULERLOG = 2
     QUADEXP = 3
@@ -41,7 +41,7 @@ class FinHestonNumericalScheme(Enum):
                     float64, float64, float64, float64, int64, int64, int64),
       cache=True, fastmath=True)
 def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
-             seed, scheme):
+              seed, scheme):
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -51,7 +51,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
     rhohat = np.sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
 
-    if scheme == FinHestonNumericalScheme.EULER.value:
+    if scheme == HestonNumericalScheme.EULER.value:
         # Basic scheme to first order with truncation on variance
         for iPath in range(0, num_paths):
             s = s0
@@ -69,7 +69,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
                     zS + 0.5 * s * vplus * (zV * zV - dt)
                 sPaths[iPath, iStep] = s
 
-    elif scheme == FinHestonNumericalScheme.EULERLOG.value:
+    elif scheme == HestonNumericalScheme.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
         for iPath in range(0, num_paths):
             x = log(s0)
@@ -84,7 +84,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
                     rtvplus * zV + sigma2 * (zV * zV - dt) / 4.0
                 sPaths[iPath, iStep] = exp(x)
 
-    elif scheme == FinHestonNumericalScheme.QUADEXP.value:
+    elif scheme == HestonNumericalScheme.QUADEXP.value:
         # Due to Leif Andersen(2006)
         Q = exp(-kappa * dt)
         psic = 1.50
@@ -146,7 +146,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
 ###############################################################################
 
 
-class FinModelHeston():
+class Heston():
 
     def __init__(self, v0, kappa, theta, sigma, rho):
 
@@ -172,7 +172,7 @@ class FinModelHeston():
                  num_paths,
                  num_steps_per_year,
                  seed,
-                 scheme=FinHestonNumericalScheme.EULERLOG):
+                 scheme=HestonNumericalScheme.EULERLOG):
 
         tau = (option._expiry_date - valuation_date) / gDaysInYear
 
@@ -181,18 +181,18 @@ class FinModelHeston():
         schemeValue = float(scheme.value)
 
         sPaths = get_paths(stock_price,
-                          interest_rate,
-                          dividend_yield,
-                          self._v0,
-                          self._kappa,
-                          self._theta,
-                          self._sigma,
-                          self._rho,
-                          tau,
-                          dt,
-                          num_paths,
-                          seed,
-                          schemeValue)
+                           interest_rate,
+                           dividend_yield,
+                           self._v0,
+                           self._kappa,
+                           self._theta,
+                           self._sigma,
+                           self._rho,
+                           tau,
+                           dt,
+                           num_paths,
+                           seed,
+                           schemeValue)
 
         if option._option_type == FinOptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(sPaths[:, -1] - K, 0.0)
@@ -243,8 +243,8 @@ class FinModelHeston():
             return phi
 
         def phi_transform(x):
-            def integrand(k): return 2.0 * np.real(np.exp(-1j * \
-                          k * x) * phi(k)) / (k**2 + 1.0 / 4.0)
+            def integrand(k): return 2.0 * np.real(np.exp(-1j *
+                                                          k * x) * phi(k)) / (k**2 + 1.0 / 4.0)
             return integrate.quad(integrand, 0, np.inf)[0]
 
         x = log(F / K)
@@ -283,7 +283,7 @@ class FinModelHeston():
             q = V * tau / 2.0
             Q = np.exp(-e * q)
             H = np.exp((2.0 * kappa * theta / V) * (q * g - np.log((1.0 -
-                  h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
+                                                                    h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
             return integrand.real
 
@@ -329,7 +329,7 @@ class FinModelHeston():
                 B = (beta - d) * (1.0 - Q) / (1.0 - g * Q) / V
                 A = kappa * ((beta - d) * tau - 2.0 *
                              np.log((1.0 - g * Q) / (1.0 - g))) / V
-                v = np.exp(A * theta + B * v0 + 1j * u * \
+                v = np.exp(A * theta + B * v0 + 1j * u *
                            np.log(S0 / (K * np.exp(-(r - q) * tau)))) / (u * 1j)
                 return v.real
 

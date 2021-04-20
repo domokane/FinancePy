@@ -23,7 +23,7 @@ from financepy.products.rates.FinIborSwapOLD import FinIborSwapOLD
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -210,7 +210,7 @@ def test_FinIborDepositsFRAsSwaps():
 #                        fixedDCCType)
 #    swaps.append(swap)
 
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     maturity_date = settlement_date.addMonths(36)
     swap = FinIborSwapOLD(settlement_date, maturity_date, fixed_leg_type, swap_rate,
                         fixedFreqType,
@@ -402,7 +402,7 @@ def test_FinIborDepositsFuturesSwaps():
     start_date = spotDate.addWeekDays(spot_days)
 
     swaps = []
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360
     fixedFreqType = FrequencyTypes.SEMI_ANNUAL
     floatFreqType = FrequencyTypes.QUARTERLY
@@ -560,7 +560,7 @@ def test_derivativePricingExample():
     day_count_type = DayCountTypes.THIRTY_E_360_ISDA
 #    day_count_type = DayCountTypes.ACT_360
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     
     swap_rate = 0.0058
     swap = FinIborSwapOLD(settlement_date, "1Y", fixed_leg_type, swap_rate, freq_type, day_count_type)
@@ -661,7 +661,7 @@ def test_bloombergPricingExample(interp_type):
     spot_days = 2
     settlement_date = valuation_date.addWeekDays(spot_days)
     notional = ONE_MILLION
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
 
     swaps = []
     swap = FinIborSwapOLD(settlement_date, "2Y", fixed_leg_type, (2.77417+2.77844)/200, freq, accrual); swaps.append(swap)

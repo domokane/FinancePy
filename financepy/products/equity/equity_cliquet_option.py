@@ -20,12 +20,13 @@ from ...products.equity.equity_option import EquityOption
 from ...market.curves.curve_flat import DiscountCurve
 
 from ...models.black_scholes import bs_value, BlackScholes
-from ...models.FinModel import FinModel
+from ...models.model import Model
 
 ###############################################################################
 # TODO: Do we need to day count adjust option payoffs ?
 # TODO: Monte Carlo pricer
 ###############################################################################
+
 
 class EquityCliquetOption(EquityOption):
     """ A EquityCliquetOption is a series of options which start and stop at
@@ -64,11 +65,11 @@ class EquityCliquetOption(EquityOption):
         self._date_gen_rule_type = date_gen_rule_type
 
         self._expiry_dates = Schedule(self._start_date,
-                                     self._final_expiry_date,
-                                     self._freq_type,
-                                     self._calendar_type,
-                                     self._bus_day_adjust_type,
-                                     self._date_gen_rule_type)._generate()
+                                      self._final_expiry_date,
+                                      self._freq_type,
+                                      self._calendar_type,
+                                      self._bus_day_adjust_type,
+                                      self._date_gen_rule_type)._generate()
 
 ###############################################################################
 
@@ -77,7 +78,7 @@ class EquityCliquetOption(EquityOption):
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model:FinModel):
+              model: Model):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
 
@@ -120,10 +121,12 @@ class EquityCliquetOption(EquityOption):
                     q = -np.log(dqMat/dq)/tau
 
                     if self._option_type == CALL:
-                        v_fwd_opt = s * dq * bs_value(1.0, tau, 1.0, r, q, v, CALL.value)
+                        v_fwd_opt = s * dq * \
+                            bs_value(1.0, tau, 1.0, r, q, v, CALL.value)
                         v_cliquet += v_fwd_opt
                     elif self._option_type == PUT:
-                        v_fwd_opt = s * dq * bs_value(1.0, tau, 1.0, r, q, v, PUT.value)
+                        v_fwd_opt = s * dq * \
+                            bs_value(1.0, tau, 1.0, r, q, v, PUT.value)
                         v_cliquet += v_fwd_opt
                     else:
                         raise FinError("Unknown option type")
@@ -157,7 +160,8 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("DAY COUNT TYPE", self._day_count_type)
         s += label_to_string("CALENDAR TYPE", self._calendar_type)
         s += label_to_string("BUS DAY ADJUST TYPE", self._bus_day_adjust_type)
-        s += label_to_string("DATE GEN RULE TYPE", self._date_gen_rule_type, "")
+        s += label_to_string("DATE GEN RULE TYPE",
+                             self._date_gen_rule_type, "")
         return s
 
 ###############################################################################

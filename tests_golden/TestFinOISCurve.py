@@ -20,7 +20,7 @@ from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -312,7 +312,7 @@ def test_FinOISDepositsFuturesSwaps():
     start_date = spotDate.addWeekDays(spot_days)
 
     swaps = []
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360
     fixedFreqType = FrequencyTypes.SEMI_ANNUAL
     floatFreqType = FrequencyTypes.QUARTERLY
@@ -492,7 +492,7 @@ def test_bloombergPricingExample():
     freq = FrequencyTypes.SEMI_ANNUAL
     spot_days = 2
     settleDt = valuation_date.addWeekDays(spot_days)
-    payRec = FinSwapTypes.PAY
+    payRec = SwapTypes.PAY
     lag = 1 # Not used
 
     swaps = []

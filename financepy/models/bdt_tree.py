@@ -15,7 +15,7 @@ from ..utils.global_vars import gSmall
 interp = InterpTypes.FLAT_FWD_RATES.value
 
 ###############################################################################
-# TODO: PUT CALL PARITY IS NOT EXACTLY OBSERVED FOR BERMUDAN SWAPTIONS WHEN 
+# TODO: PUT CALL PARITY IS NOT EXACTLY OBSERVED FOR BERMUDAN SWAPTIONS WHEN
 #       VOL IS TURNED UP. SMALL EFFECT. $3 OUT OF $1m. SEE TESTFINBERMUDANSWAPTIONS
 ###############################################################################
 
@@ -96,12 +96,12 @@ def searchRoot(x0, m, Q, rt, dfEnd, dt, sigma):
 
 @njit(fastmath=True, cache=True)
 def bermudan_swaption_Tree_Fast(texp, tmat,
-                               strike_price, face_amount,
-                               coupon_times, coupon_flows,
-                               exercise_typeInt,
-                               _df_times, _df_values,
-                               _treeTimes,
-                               _Q, _rt, _dt):
+                                strike_price, face_amount,
+                                coupon_times, coupon_flows,
+                                exercise_typeInt,
+                                _df_times, _df_values,
+                                _treeTimes,
+                                _Q, _rt, _dt):
     """ Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to non-analytical bond
     price we need to extend tree out to bond maturity and take into account
@@ -130,7 +130,7 @@ def bermudan_swaption_Tree_Fast(texp, tmat,
         df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
         fixed_legFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
-        floatLegValues[n] = strike_price # * df_flow / df_tree
+        floatLegValues[n] = strike_price  # * df_flow / df_tree
 
     ###########################################################################
     # Mapped times stores the mapped times and flows and is used to calculate
@@ -212,7 +212,7 @@ def bermudan_swaption_Tree_Fast(texp, tmat,
 
             # The floating value is clean and so must be the fixed value
             fixed_legValue = fixed_legValues[m, k] - accrued[m]
-            floatLegValue = floatLegValues[m]               
+            floatLegValue = floatLegValues[m]
 
             payExercise = max(floatLegValue - fixed_legValue, 0.0)
             recExercise = max(fixed_legValue - floatLegValue, 0.0)
@@ -231,7 +231,7 @@ def bermudan_swaption_Tree_Fast(texp, tmat,
 
                 raise FinError("American optionality not completed.")
 
-                ## Need to define floating value on all grid dates
+                # Need to define floating value on all grid dates
 
                 payValues[m, k] = max(payExercise, holdPay)
                 recValues[m, k] = max(recExercise, holdRec)
@@ -405,7 +405,7 @@ def americanBondOption_Tree_Fast(texp, tmat,
             holdCall = callOptionValues[m, k]
             holdPut = putOptionValues[m, k]
 
-            if m == expiryStep: 
+            if m == expiryStep:
 
                 callOptionValues[m, k] = max(callExercise, holdCall)
                 putOptionValues[m, k] = max(putExercise, holdPut)
@@ -641,11 +641,11 @@ def buildTreeFast(sigma, treeTimes, num_time_steps, discount_factors):
 ###############################################################################
 
 
-class FinModelRatesBDT():
+class BDTTree():
 
-    def __init__(self, 
-                 sigma: float, 
-                 num_time_steps:int=100):
+    def __init__(self,
+                 sigma: float,
+                 num_time_steps: int = 100):
         """ Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
         and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh """
@@ -702,7 +702,7 @@ class FinModelRatesBDT():
 ###############################################################################
 
     def bond_option(self, texp, strike_price, face_amount,
-                   coupon_times, coupon_flows, exercise_type):
+                    coupon_times, coupon_flows, exercise_type):
         """ Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree. """
 
@@ -719,7 +719,7 @@ class FinModelRatesBDT():
         #######################################################################
 
         callValue, putValue \
-            = americanBondOption_Tree_Fast(texp, tmat, 
+            = americanBondOption_Tree_Fast(texp, tmat,
                                            strike_price, face_amount,
                                            coupon_times, coupon_flows,
                                            exercise_typeInt,
@@ -733,7 +733,7 @@ class FinModelRatesBDT():
 ###############################################################################
 
     def bermudan_swaption(self, texp, tmat, strike, face_amount,
-                         coupon_times, coupon_flows, exercise_type):
+                          coupon_times, coupon_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
@@ -752,13 +752,13 @@ class FinModelRatesBDT():
 
         payValue, recValue \
             = bermudan_swaption_Tree_Fast(texp, tmat,
-                                         strike, face_amount,
-                                         coupon_times, coupon_flows,
-                                         exercise_typeInt,
-                                         self._df_times, self._dfs,
-                                         self._treeTimes, self._Q,
-                                         self._rt,
-                                         self._dt)
+                                          strike, face_amount,
+                                          coupon_times, coupon_flows,
+                                          exercise_typeInt,
+                                          self._df_times, self._dfs,
+                                          self._treeTimes, self._Q,
+                                          self._rt,
+                                          self._dt)
 
         return {'pay': payValue, 'rec': recValue}
 

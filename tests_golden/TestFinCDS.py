@@ -2,30 +2,30 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.curve import DiscountCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.utils.math import ONE_MILLION
+from financepy.products.credit.cds import CDS
 import time
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds import CDS
-from financepy.utils.math import ONE_MILLION
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.market.curves.curve import DiscountCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.calendar import DateGenRuleTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import FinSwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -223,7 +223,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.015910 + irBump,
         fixedFreq,
         dcType)
@@ -233,7 +233,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.014990 + irBump,
         fixedFreq,
         dcType)
@@ -243,7 +243,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.014725 + irBump,
         fixedFreq,
         dcType)
@@ -253,7 +253,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.014640 + irBump,
         fixedFreq,
         dcType)
@@ -263,7 +263,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.014800 + irBump,
         fixedFreq,
         dcType)
@@ -273,7 +273,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap6 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.014995 + irBump,
         fixedFreq,
         dcType)
@@ -283,7 +283,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap7 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.015180 + irBump,
         fixedFreq,
         dcType)
@@ -293,7 +293,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap8 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.015610 + irBump,
         fixedFreq,
         dcType)
@@ -303,7 +303,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap9 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.015880 + irBump,
         fixedFreq,
         dcType)
@@ -313,7 +313,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     swap10 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.016430 + irBump,
         fixedFreq,
         dcType)
@@ -413,7 +413,7 @@ def test_full_priceCDS1():
     testCases.print("CLEAN_PRICE", p)
 
     # MARKIT PRICE IS 168517
-    
+
     accrued_days = cds_contract.accrued_days()
     testCases.print("ACCRUED_DAYS", accrued_days)
 
@@ -424,10 +424,12 @@ def test_full_priceCDS1():
         valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION_PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(valuation_date, issuer_curve, cdsRecovery)
+    premPV = cds_contract.premium_leg_pv(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM_PV", premPV)
 
-    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(valuation_date, issuer_curve)
+    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(
+        valuation_date, issuer_curve)
     testCases.print("FULL_RPV01", fullRPV01)
     testCases.print("CLEAN_RPV01", cleanRPV01)
 
@@ -451,9 +453,9 @@ def test_full_priceCDS1():
     r = -np.log(z) / t
 
     v_approx = cds_contract.value_fast_approx(valuation_date,
-                                           r,
-                                           mktSpread,
-                                           cdsRecovery)
+                                              r,
+                                              mktSpread,
+                                              cdsRecovery)
 
     testCases.print("FULL APPROX VALUE", v_approx[0])
     testCases.print("CLEAN APPROX VALUE", v_approx[1])
@@ -504,7 +506,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.002155 + irBump,
         fixedFreq,
         dcType)
@@ -514,7 +516,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.002305 + irBump,
         fixedFreq,
         dcType)
@@ -524,7 +526,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.002665 + irBump,
         fixedFreq,
         dcType)
@@ -534,7 +536,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
-        FinSwapTypes.PAY,
+        SwapTypes.PAY,
         m * 0.003290 + irBump,
         fixedFreq,
         dcType)
@@ -633,20 +635,24 @@ def test_full_priceCDSModelCheck():
     accrued_interest = cds_contract.accrued_interest()
     testCases.print("ACCRUED_COUPON", accrued_interest)
 
-    prot_pv = cds_contract.protection_leg_pv(valuation_date, issuer_curve, cdsRecovery)
+    prot_pv = cds_contract.protection_leg_pv(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION_PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(valuation_date, issuer_curve, cdsRecovery)
+    premPV = cds_contract.premium_leg_pv(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM_PV", premPV)
 
     rpv01 = cds_contract.risky_pv01(valuation_date, issuer_curve)
     testCases.print("FULL_RPV01", rpv01['full_rpv01'])
     testCases.print("CLEAN_RPV01", rpv01['clean_rpv01'])
 
-    credit_dv01 = cds_contract.credit_dv01(valuation_date, issuer_curve, cdsRecovery)
+    credit_dv01 = cds_contract.credit_dv01(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("CREDIT DV01", credit_dv01)
 
-    interest_dv01 = cds_contract.interest_dv01(valuation_date, issuer_curve, cdsRecovery)
+    interest_dv01 = cds_contract.interest_dv01(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("INTEREST DV01", interest_dv01)
 
     # Consider fast approximation
@@ -656,9 +662,9 @@ def test_full_priceCDSModelCheck():
 
     mktSpread = 0.01
     v_approx = cds_contract.value_fast_approx(valuation_date,
-                                           r,
-                                           mktSpread,
-                                           cdsRecovery)
+                                              r,
+                                              mktSpread,
+                                              cdsRecovery)
 
     testCases.header("FAST VALUATIONS", "VALUE")
 
@@ -727,7 +733,6 @@ def test_CDSDateGeneration():
             cds_contract._flows[n])
 
 ##########################################################################
-
 
 
 test_CDSCurveBuildTiming()

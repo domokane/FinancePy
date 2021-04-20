@@ -16,9 +16,9 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
 from ...products.credit.cds import CDS
 
-from ...models.credit_gaussian_copula_onefactor import homog_basket_loss_dbn
-from ...models.credit_gaussian_copula import default_timesGC
-from ...models.credit_student_t_copula import FinModelStudentTCopula
+from ...models.gauss_copula_onefactor import homog_basket_loss_dbn
+from ...models.gauss_copula import default_timesGC
+from ...models.student_t_copula import StudentTCopula
 
 from ...products.credit.cds_curve import CDSCurve
 
@@ -208,7 +208,7 @@ class CDSBasket:
         if nToDefault > num_credits or nToDefault < 1:
             raise FinError("nToDefault must be 1 to num_credits")
 
-        model = FinModelStudentTCopula()
+        model = StudentTCopula()
 
         default_times = model.default_times(issuer_curves,
                                             correlationMatrix,
@@ -278,9 +278,9 @@ class CDSBasket:
                     InterpTypes.FLAT_FWD_RATES.value)
 
             lossDbn = homog_basket_loss_dbn(issuerSurvivalProbabilities,
-                                               recovery_rates,
-                                               beta_vector,
-                                               num_points)
+                                            recovery_rates,
+                                            beta_vector,
+                                            num_points)
 
             basketSurvivalCurve[iTime] = 1.0
             for iToDefault in range(nToDefault, num_credits + 1):

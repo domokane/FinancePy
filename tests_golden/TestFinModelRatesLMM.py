@@ -14,21 +14,21 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.models.black import Black
 from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.ibor_swaption import FinSwapTypes
+from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.utils.helpers import checkVectorDifferences
-from financepy.models.rates_libor_market_model import LMMSimulateFwdsNF
-from financepy.models.rates_libor_market_model import LMMSimulateFwds1F
-from financepy.models.rates_libor_market_model import LMMSimulateFwdsMF
-from financepy.models.rates_libor_market_model import LMMSwaptionPricer
-from financepy.models.rates_libor_market_model import LMMSimSwaptionVol
-from financepy.models.rates_libor_market_model import LMMSwaptionVolApprox
-from financepy.models.rates_libor_market_model import LMMCapFlrPricer
-from financepy.models.rates_libor_market_model import LMMPriceCapsBlack
-from financepy.models.rates_libor_market_model import LMMSwapPricer
-from financepy.models.rates_libor_market_model import LMMFwdFwdCorrelation
-from financepy.models.rates_libor_market_model import LMMRatchetCapletPricer
-from financepy.models.rates_libor_market_model import LMMStickyCapletPricer
+from financepy.models.lmm_mc import LMMSimulateFwdsNF
+from financepy.models.lmm_mc import LMMSimulateFwds1F
+from financepy.models.lmm_mc import LMMSimulateFwdsMF
+from financepy.models.lmm_mc import LMMSwaptionPricer
+from financepy.models.lmm_mc import LMMSimSwaptionVol
+from financepy.models.lmm_mc import LMMSwaptionVolApprox
+from financepy.models.lmm_mc import LMMCapFlrPricer
+from financepy.models.lmm_mc import LMMPriceCapsBlack
+from financepy.models.lmm_mc import LMMSwapPricer
+from financepy.models.lmm_mc import LMMFwdFwdCorrelation
+from financepy.models.lmm_mc import LMMRatchetCapletPricer
+from financepy.models.lmm_mc import LMMStickyCapletPricer
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)

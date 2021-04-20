@@ -2,21 +2,21 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import FinSwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -39,7 +39,7 @@ def test_FinCDSCurve():
         maturity_date = curve_date.addMonths(12 * i)
         swap = IborSwap(curve_date,
                         maturity_date,
-                        FinSwapTypes.PAY,
+                        SwapTypes.PAY,
                         fixed_coupon,
                         fixedFreq,
                         fixedDCC)

@@ -12,7 +12,7 @@ from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types
 from ...utils.math import ONE_MILLION
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...market.curves.curve import DiscountCurve
 
 from .swap_fixed_leg import SwapFixedLeg
@@ -63,7 +63,7 @@ class OIS:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 fixed_leg_type: FinSwapTypes,
+                 fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixedFreqType: FrequencyTypes,
                  fixed_day_count_type: DayCountTypes,
@@ -100,9 +100,9 @@ class OIS:
 
         self._effective_date = effective_date
 
-        floatLegType = FinSwapTypes.PAY
-        if fixed_leg_type == FinSwapTypes.PAY:
-            floatLegType = FinSwapTypes.RECEIVE
+        floatLegType = SwapTypes.PAY
+        if fixed_leg_type == SwapTypes.PAY:
+            floatLegType = SwapTypes.RECEIVE
 
         principal = 0.0
 

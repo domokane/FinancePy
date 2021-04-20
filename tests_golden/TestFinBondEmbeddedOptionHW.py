@@ -8,11 +8,11 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.models.rates_hull_white_tree import FinModelRatesHW
+from financepy.models.hw_tree import HWTree
 
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
@@ -42,7 +42,7 @@ def test_BondEmbeddedOptionMATLAB():
 
     dcType = DayCountTypes.THIRTY_E_360
     fixedFreq = FrequencyTypes.ANNUAL
-    fixed_leg_type = FinSwapTypes.PAY
+    fixed_leg_type = SwapTypes.PAY
     swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type, 0.0350, fixedFreq, dcType)
     swap2 = IborSwap(settlement_date, "2Y", fixed_leg_type, 0.0400, fixedFreq, dcType)
     swap3 = IborSwap(settlement_date, "3Y", fixed_leg_type, 0.0450, fixedFreq, dcType)
@@ -88,7 +88,7 @@ def test_BondEmbeddedOptionMATLAB():
     timeSteps = range(50, 1000, 10)
     values = []
     for num_time_steps in timeSteps:
-        model = FinModelRatesHW(sigma, a, num_time_steps)
+        model = HWTree(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()
@@ -163,7 +163,7 @@ def test_BondEmbeddedOptionQUANTLIB():
     timeSteps = range(100, 1000, 100)
     values = []
     for num_time_steps in timeSteps:
-        model = FinModelRatesHW(sigma, a, num_time_steps)
+        model = HWTree(sigma, a, num_time_steps)
         start = time.time()
         v = puttableBond.value(settlement_date, discount_curve, model)
         end = time.time()

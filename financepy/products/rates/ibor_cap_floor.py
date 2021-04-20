@@ -23,9 +23,9 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...models.black import Black
 from ...models.black_shifted import BlackShifted
 from ...models.bachelier import Bachelier
-from ...models.sabr import FinModelSABR
-from ...models.sabr_shifted import FinModelSABRShifted
-from ...models.rates_hull_white_tree import FinModelRatesHW
+from ...models.sabr import SABR
+from ...models.sabr_shifted import SABRShifted
+from ...models.hw_tree import HWTree
 from ...utils.global_types import FinCapFloorTypes, FinOptionTypes
 
 ##########################################################################
@@ -253,7 +253,7 @@ class IborCapFloor():
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelSABR):
+        elif isinstance(model, SABR):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
@@ -262,7 +262,7 @@ class IborCapFloor():
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelSABRShifted):
+        elif isinstance(model, SABRShifted):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
@@ -271,7 +271,7 @@ class IborCapFloor():
                 capFloorLetValue = model.value(f, k, texp, df,
                                                FinOptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, FinModelRatesHW):
+        elif isinstance(model, HWTree):
 
             tmat = (capletEndDate - valuation_date) / gDaysInYear
             alpha = self._day_counter.year_frac(capletStartDate,

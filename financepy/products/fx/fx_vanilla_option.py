@@ -18,7 +18,7 @@ from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 
 from ...models.equity_crr_tree import crrTreeValAvg
 from ...models.sabr import vol_function_sabr
-from ...models.sabr import FinModelSABR
+from ...models.sabr import SABR
 from ...models.black_scholes import BlackScholes
 
 from ...models.black_scholes_analytic import bs_value, bs_delta
@@ -277,11 +277,11 @@ class FXVanillaOption():
         F0T = S0 * np.exp((rd-rf)*tdel)
 
         if type(model) == BlackScholes or \
-           type(model) == FinModelSABR:
+           type(model) == SABR:
 
             if type(model) == BlackScholes:
                 volatility = model._volatility
-            elif type(model) == FinModelSABR:
+            elif type(model) == SABR:
                 volatility = vol_function_sabr(model.alpha,
                                              model.beta,
                                              model.rho,

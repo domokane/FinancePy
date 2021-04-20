@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
-from financepy.models.sabr import FinModelSABR
-from financepy.models.sabr_shifted import FinModelSABRShifted
+from financepy.models.sabr import SABR
+from financepy.models.sabr_shifted import SABRShifted
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -27,13 +27,13 @@ def test_FinSABR():
     beta = 0.5
     rho = 0.2097
     nu = 0.75091
-    model1 = FinModelSABR(alpha, beta, rho, nu)
+    model1 = SABR(alpha, beta, rho, nu)
 
     alpha = 0.058484
     beta = 0.5
     rho = 0.20568
     nu = 0.79647
-    model2 = FinModelSABR(alpha, beta, rho, nu)
+    model2 = SABR(alpha, beta, rho, nu)
 
     f = 0.0350
     T = 1.0
@@ -58,13 +58,13 @@ def test_FinShiftedSABRSimple():
     beta = 0.5
     rho = 0.2097
     nu = 0.75091
-    model1 = FinModelSABRShifted(alpha, beta, rho, nu, 0.0)
+    model1 = SABRShifted(alpha, beta, rho, nu, 0.0)
 
     alpha = 0.058484
     beta = 0.5
     rho = 0.20568
     nu = 0.79647
-    model2 = FinModelSABRShifted(alpha, beta, rho, nu, 0.0)
+    model2 = SABRShifted(alpha, beta, rho, nu, 0.0)
 
     f = 0.0350
     T = 1.0
@@ -91,7 +91,7 @@ def test_FinShiftedSABR():
     nu = 0.49861
     shift = 0.008
 
-    model = FinModelSABRShifted(alpha, beta, rho, nu, shift)
+    model = SABRShifted(alpha, beta, rho, nu, shift)
 
     f = 0.0006384
     T = 1.0

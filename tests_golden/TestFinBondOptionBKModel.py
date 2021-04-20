@@ -19,7 +19,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
 from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_types import FinOptionTypes
-from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.bk_tree import BKTree
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -70,7 +70,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a, num_time_steps)
+        model = BKTree(sigma, a, num_time_steps)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN CALL - BK", strike_price, v)
 
@@ -80,7 +80,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a, num_time_steps)
+        model = BKTree(sigma, a, num_time_steps)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN CALL - BK", strike_price, v)
 
@@ -100,7 +100,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN CALL - BK", strike_price, v)
 
@@ -110,7 +110,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN CALL - BK", strike_price, v)
 
@@ -126,7 +126,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN PUT - BK", strike_price, v)
 
@@ -136,7 +136,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN PUT - BK", strike_price, v)
 
@@ -152,7 +152,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN PUT - BK", strike_price, v)
 
@@ -162,7 +162,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model = FinModelRatesBK(sigma, a)
+        model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN PUT - BK", strike_price, v)
 
@@ -202,22 +202,22 @@ def test_BondOptionAmericanConvergenceONE():
 
         option_type = FinOptionTypes.AMERICAN_PUT
         bond_option1 = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model1 = FinModelRatesBK(sigma, a, num_time_steps)
+        model1 = BKTree(sigma, a, num_time_steps)
         v1put = bond_option1.value(settlement_date, discount_curve, model1)
 
         option_type = FinOptionTypes.EUROPEAN_PUT
         bond_option2 = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model2 = FinModelRatesBK(sigma, a, num_time_steps)
+        model2 = BKTree(sigma, a, num_time_steps)
         v2put = bond_option2.value(settlement_date, discount_curve, model2)
 
         option_type = FinOptionTypes.AMERICAN_CALL
         bond_option1 = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model1 = FinModelRatesBK(sigma, a, num_time_steps)
+        model1 = BKTree(sigma, a, num_time_steps)
         v1call = bond_option1.value(settlement_date, discount_curve, model1)
 
         option_type = FinOptionTypes.EUROPEAN_CALL
         bond_option2 = BondOption(bond, expiry_date, strike_price, face, option_type)
-        model2 = FinModelRatesBK(sigma, a, num_time_steps)
+        model2 = BKTree(sigma, a, num_time_steps)
         v2call = bond_option2.value(settlement_date, discount_curve, model2)
 
         end = time.time()
@@ -256,7 +256,7 @@ def test_BondOptionAmericanConvergenceTWO():
 
     sigma = 0.2
     a = 0.1
-    bkModel = FinModelRatesBK(sigma, a)
+    bkModel = BKTree(sigma, a)
     K = 101.0
 
     vec_ec = []
@@ -266,7 +266,7 @@ def test_BondOptionAmericanConvergenceTWO():
 
     if 1 == 1:
         K = 100.0
-        bkModel = FinModelRatesBK(sigma, a, 100)
+        bkModel = BKTree(sigma, a, 100)
         europeanCallBondOption = BondOption(bond, expiry_date, K, face,
                                             FinOptionTypes.EUROPEAN_CALL)
 
@@ -279,7 +279,7 @@ def test_BondOptionAmericanConvergenceTWO():
 
     for num_steps in num_stepsVector:
 
-        bkModel = FinModelRatesBK(sigma, a, num_steps)
+        bkModel = BKTree(sigma, a, num_steps)
 
         start = time.time()
 
@@ -379,7 +379,7 @@ def test_BondOptionZEROVOLConvergence():
 
             sigma = 0.0000001
             a = 0.1
-            model = FinModelRatesBK(sigma, a, num_steps)
+            model = BKTree(sigma, a, num_steps)
         
             option_type = FinOptionTypes.EUROPEAN_CALL
             bond_option1 = BondOption(bond, expiry_date, strike_price, face, option_type)

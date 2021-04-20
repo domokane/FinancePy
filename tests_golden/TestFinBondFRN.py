@@ -12,7 +12,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.utils.global_types import FinSwapTypes
+from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -25,7 +25,7 @@ def buildIborCurve(valuation_date):
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    payFixed = FinSwapTypes.PAY
+    payFixed = SwapTypes.PAY
 
     spot_days = 2
     settlement_date = valuation_date.addWeekDays(spot_days)

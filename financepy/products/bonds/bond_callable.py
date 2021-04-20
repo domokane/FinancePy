@@ -3,8 +3,8 @@
 ##############################################################################
 
 from ...utils.global_vars import gDaysInYear
-from ...models.rates_hull_white_tree import FinModelRatesHW
-from ...models.rates_bk_tree import FinModelRatesBK
+from ...models.hw_tree import HWTree
+from ...models.bk_tree import BKTree
 from ...utils.error import FinError
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
@@ -170,7 +170,7 @@ class BondEmbeddedOption:
 
         face_amount = self._bond._face_amount
 
-        if isinstance(model, FinModelRatesHW):
+        if isinstance(model, HWTree):
 
             """ We need to build the tree out to the bond maturity date. To be
             more precise we only need to go out the the last option date but
@@ -194,7 +194,7 @@ class BondEmbeddedOption:
 
             return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
 
-        elif isinstance(model, FinModelRatesBK):
+        elif isinstance(model, BKTree):
 
             """ Because we not have a closed form bond price we need to build
             the tree out to the bond maturity which is after option expiry. """

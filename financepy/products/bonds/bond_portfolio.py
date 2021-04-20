@@ -35,9 +35,9 @@ class BondPortfolio:
         self._flow_amounts = [0.0]
 
         for _ in self._flow_dates[1:]:
-           cpn = self._coupon / self._frequency
-           self._flow_amounts.append(cpn)
-    
+            cpn = self._coupon / self._frequency
+            self._flow_amounts.append(cpn)
+
 ###############################################################################
 
     def dollar_duration(self,
@@ -47,7 +47,7 @@ class BondPortfolio:
         """ Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. """
 
-        dy = 0.0001 # 1 basis point
+        dy = 0.0001  # 1 basis point
         p0 = self.full_priceFromYTM(settlement_date, ytm - dy, convention)
         p2 = self.full_priceFromYTM(settlement_date, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0
@@ -154,16 +154,16 @@ class BondPortfolio:
 ###############################################################################
 
     def calc_accrued_interest(self,
-                            settlement_date: Date,
-                            numExDividendDays: int = 0,
-                            calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
- 
+                              settlement_date: Date,
+                              numExDividendDays: int = 0,
+                              calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+
         return self._accrued_interest
 
 ###############################################################################
 
     def print_flows(self,
-                   settlement_date: Date):
+                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -190,12 +190,12 @@ class BondPortfolio:
         defaulting principal we discretise the time steps using the coupon
         payment times. A finer discretisation may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
-        end payment present values. """ 
+        end payment present values. """
 
         f = self._frequency
         c = self._coupon
 
-        pv = 0.0        
+        pv = 0.0
         prevQ = 1.0
         prevDf = 1.0
 
@@ -203,14 +203,14 @@ class BondPortfolio:
         defaultingPrincipalPVPayEnd = 0.0
 
         for dt in self._flow_dates[1:]:
-            
+
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
 
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 
-                # Add PV of coupon conditional on surviving to payment date  
+                # Add PV of coupon conditional on surviving to payment date
                 # Any default results in all subsequent coupons being lost
                 # with zero recovery
 
@@ -239,22 +239,22 @@ class BondPortfolio:
                                      recovery_rate: float):
         """ Calculate clean price value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
-        the recovery fraction of the par amount is paid at default. """ 
+        the recovery fraction of the par amount is paid at default. """
 
         self.calc_accrued_interest(settlement_date)
 
         full_price = self.full_price_from_survival_curve(settlement_date,
-                                                    discount_curve,
-                                                    survival_curve,
-                                                    recovery_rate)
-        
+                                                         discount_curve,
+                                                         survival_curve,
+                                                         recovery_rate)
+
         clean_price = full_price - self._accrued_interest
         return clean_price
-    
+
 ###############################################################################
 
     def __repr__(self):
-        
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)

@@ -15,6 +15,7 @@ from ..utils.helpers import label_to_string
 ###############################################################################
 ###############################################################################
 
+
 @njit
 def _x(rho, z):
     """ Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
@@ -22,7 +23,8 @@ def _x(rho, z):
     b = 1.0 - rho
     return np.log(a / b)
 
-@njit(float64(float64[:], float64, float64, float64), 
+
+@njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def vol_function_sabr(params, f, k, t):
     """ Black volatility implied by SABR model. """
@@ -56,7 +58,8 @@ def vol_function_sabr(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = alpha * z * (1.0 + (a + b + c) * t) / \
+            (d * (1.0 + v + w) * _x(rho, z))
         return vz
     else:
         v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
@@ -64,20 +67,21 @@ def vol_function_sabr(params, f, k, t):
 
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), 
+
+@njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def vol_function_sabr_BETA_ONE(params, f, k, t):
     """ This is the SABR function with the exponent beta set equal to 1 so only
-    3 parameters are free. The first parameter is alpha, then nu and the third 
+    3 parameters are free. The first parameter is alpha, then nu and the third
     parameter is rho. Check the order as it is not the same as main SABR fn"""
-    
+
     alpha = params[0]
     rho = params[1]
     nu = params[2]
 
     if rho > 1.0:
         rho = 0.99
-    
+
     if rho < -1.0:
         rho = -0.99
 
@@ -109,7 +113,8 @@ def vol_function_sabr_BETA_ONE(params, f, k, t):
 
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), 
+
+@njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def vol_function_sabr_BETA_HALF(params, f, k, t):
     """ Black volatility implied by SABR model. """
@@ -144,7 +149,8 @@ def vol_function_sabr_BETA_HALF(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = alpha * z * (1.0 + (a + b + c) * t) / \
+            (d * (1.0 + v + w) * _x(rho, z))
         return vz
     else:
         v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
@@ -152,16 +158,17 @@ def vol_function_sabr_BETA_HALF(params, f, k, t):
 
 ###############################################################################
 
-class FinModelSABR():
-    """ SABR - Stochastic alpha beta rho model by Hagan et al. which is a 
+
+class SABR():
+    """ SABR - Stochastic alpha beta rho model by Hagan et al. which is a
     stochastic volatility model where alpha controls the implied volatility,
     beta is the exponent on the the underlying asset's process so beta = 0
-    is normal and beta = 1 is lognormal, rho is the correlation between the 
+    is normal and beta = 1 is lognormal, rho is the correlation between the
     underlying and the volatility process. """
 
     def __init__(self, alpha, beta, rho, nu):
-        """ Create FinModelSABR with all of the model parameters. We will 
-        also provide functions below to assist with the calibration of the 
+        """ Create SABR with all of the model parameters. We will
+        also provide functions below to assist with the calibration of the
         value of alpha. """
 
         self._alpha = alpha
@@ -170,7 +177,6 @@ class FinModelSABR():
         self._nu = nu
 
 ###############################################################################
-
 
     def black_vol(self, f, k, t):
         """ Black volatility from SABR model using Hagan et al. approx. """
@@ -256,24 +262,26 @@ class FinModelSABR():
 
         if initAlpha != blackVol:
             # Objective function
-            fn = lambda x: np.sqrt((blackVol - self.blackVolWithAlpha(x, f, K, texp))**2)
+            def fn(x): return np.sqrt(
+                (blackVol - self.blackVolWithAlpha(x, f, K, texp))**2)
             bnds = ((0.0, None),)
             x0 = initAlpha
-            results = minimize(fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8)
+            results = minimize(fn, x0, method="L-BFGS-B",
+                               bounds=bnds, tol=1e-8)
             alpha = results.x[0]
         else:
             alpha = initAlpha
-        
+
         self._alpha = alpha
 
 ###############################################################################
 
     def setAlphaFromATMBlackVol(self, blackVol, atmStrike, time_to_expiry):
-        """ We solve cubic equation for the unknown variable alpha for the 
-        special ATM case of the strike equalling the forward following Hagan 
+        """ We solve cubic equation for the unknown variable alpha for the
+        special ATM case of the strike equalling the forward following Hagan
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
-        chosen.""" 
+        chosen."""
 
         beta = self._beta
         rho = self._rho

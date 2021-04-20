@@ -13,13 +13,13 @@ from financepy.market.curves.curve import DiscountCurve
 from financepy.market.curves.curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swaption import FinSwapTypes
+from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import gDaysInYear
 from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.models.rates_bdt_tree import FinModelRatesBDT
+from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes
 
@@ -50,7 +50,7 @@ def testBlackModelCheck():
     notional = 100.0
 
     # Pricing a PAY
-    swaptionType = FinSwapTypes.PAY
+    swaptionType = SwapTypes.PAY
     swaption = IborSwaption(settlement_date,
                             exercise_date,
                             maturity_date,
@@ -100,7 +100,7 @@ def test_BDTExampleOne():
     years = np.array(years)
     dfs = np.array(dfs)
 
-    model = FinModelRatesBDT(yieldVol, num_time_steps)
+    model = BDTTree(yieldVol, num_time_steps)
     model.buildTree(tmat, years, dfs)
 
 ###############################################################################
@@ -170,7 +170,7 @@ def test_BDTExampleTwo():
     testCases.header("Values")
     treeVector = []
     for num_time_steps in num_stepsList:
-        model = FinModelRatesBDT(sigma, num_time_steps)
+        model = BDTTree(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
                              face, coupon_times, coupon_flows, exercise_type)
@@ -257,7 +257,7 @@ def test_BDTExampleThree():
 
                 price = bond.clean_price_from_discount_curve(settlement_date, curve)
 
-                model = FinModelRatesBDT(sigma, num_time_steps)
+                model = BDTTree(sigma, num_time_steps)
                 model.buildTree(tmat, times, dfs)
 
                 v = model.bermudan_swaption(texp,

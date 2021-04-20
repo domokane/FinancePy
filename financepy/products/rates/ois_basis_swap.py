@@ -10,7 +10,7 @@ from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
-from ...utils.global_types import FinSwapTypes
+from ...utils.global_types import SwapTypes
 from ...market.curves.curve import DiscountCurve
 
 from .swap_float_leg import SwapFloatLeg
@@ -32,7 +32,7 @@ class OISBasisSwap:
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
-                 iborType: FinSwapTypes,
+                 iborType: SwapTypes,
                  iborFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  iborDayCountType: DayCountTypes  = DayCountTypes.THIRTY_E_360,
                  iborSpread: float = 0.0,
@@ -67,9 +67,9 @@ class OISBasisSwap:
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
 
-        oisType = FinSwapTypes.PAY
-        if iborType == FinSwapTypes.PAY:
-            oisType = FinSwapTypes.RECEIVE
+        oisType = SwapTypes.PAY
+        if iborType == SwapTypes.PAY:
+            oisType = SwapTypes.RECEIVE
         
         principal = 0.0
 

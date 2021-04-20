@@ -2,8 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
 import numpy as np
-from numba import jit, njit, float64, int64 # , prange DOES NOT WORK ON GITHUB
+from numba import jit, njit, float64, int64  # , prange DOES NOT WORK ON GITHUB
 
 from ..utils.error import FinError
 from ..utils.math import N
@@ -26,8 +27,6 @@ useParallel = False
     elation matrix where a Cholesky is done to decompose the N factors. """
 
 ###############################################################################
-
-from enum import Enum
 
 
 class ModelLMMModelTypes(Enum):
@@ -156,7 +155,7 @@ def LMMSimSwaptionVol(a, b, fwd0, fwds, taus):
     fwdSwapRateMean = 0.0
     fwdSwapRateVar = 0.0
 
-    for iPath in range(0, num_paths): # changed from prange
+    for iPath in range(0, num_paths):  # changed from prange
 
         numeraire = 1.0
 
@@ -189,6 +188,7 @@ def LMMSimSwaptionVol(a, b, fwd0, fwds, taus):
 
 ###############################################################################
 
+
 @njit(float64[:, :](int64, int64, int64, float64[:, :, :]),
       cache=True, fastmath=True, parallel=useParallel)
 def LMMFwdFwdCorrelation(numForwards, num_paths, iTime, fwds):
@@ -207,7 +207,7 @@ def LMMFwdFwdCorrelation(numForwards, num_paths, iTime, fwds):
             sumfwdifwdj = 0.0
             sumfwdjfwdj = 0.0
 
-            for p in range(0, num_paths): # changed from prange
+            for p in range(0, num_paths):  # changed from prange
                 dfwdi = fwds[p, iTime, iFwd] - fwds[p, iTime-1, iFwd]
                 dfwdj = fwds[p, iTime, jFwd] - fwds[p, iTime-1, jFwd]
                 sumfwdi += dfwdi
@@ -237,6 +237,7 @@ def LMMFwdFwdCorrelation(numForwards, num_paths, iTime, fwds):
     return fwdCorr
 
 ###############################################################################
+
 
 @njit(float64[:](float64[:], float64[:], int64, float64, float64[:]),
       cache=True, fastmath=True)
@@ -466,7 +467,7 @@ def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
     else:
         raise FinError("Use Sobol must be 0 or 1")
 
-    for iPath in range(0, num_paths): # changed from prange
+    for iPath in range(0, num_paths):  # changed from prange
         # Initial value of forward curve at time 0
         for iFwd in range(0, numForwards):
             fwd[iPath, 0, iFwd] = fwd0[iFwd]
@@ -672,6 +673,7 @@ def LMMCapFlrPricer(numForwards, num_paths, K, fwd0, fwds, taus, isCap):
     return capFlrLetValues
 
 ###############################################################################
+
 
 @njit(float64(float64, int64, int64, float64[:], float64[:, :, :],
               float64[:]), cache=True, fastmath=True, parallel=useParallel)
@@ -920,6 +922,7 @@ def LMMFlexiCapPricer(maxCaplets, K, numPeriods, num_paths, fwd0, fwds, taus):
     return flexiCapValue
 
 ###############################################################################
+
 
 @njit(float64[:](float64, int64, int64, float64[:], float64[:, :, :],
                  float64[:]), cache=True, fastmath=True, parallel=useParallel)

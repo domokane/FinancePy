@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.models.rates_bk_tree import FinModelRatesBK
+from financepy.models.bk_tree import BKTree
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.day_count import DayCountTypes
@@ -40,7 +40,7 @@ def test_BKExampleOne():
     a = 0.22
     num_time_steps = 3
     tmat = (end_date - start_date)/gDaysInYear
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
 
     # Agrees with Figure 28.10 - Not exact as we have dt not exactly 0.50
@@ -110,7 +110,7 @@ def test_BKExampleTwo():
     a = 0.05
     num_time_steps = 26
 
-    model = FinModelRatesBK(sigma, a, num_time_steps)
+    model = BKTree(sigma, a, num_time_steps)
     model.buildTree(tmat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
     v = model.bond_option(texp, strike_price, face, coupon_times,
@@ -124,7 +124,7 @@ def test_BKExampleTwo():
     treeVector = []
     for num_time_steps in num_stepsList:
         start = time.time()
-        model = FinModelRatesBK(sigma, a, num_time_steps)
+        model = BKTree(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
                               face, coupon_times, coupon_flows, exercise_type)

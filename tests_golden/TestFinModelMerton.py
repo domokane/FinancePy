@@ -3,8 +3,8 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.credit_merton_mkt import MertonCreditMkt
-from financepy.models.credit_merton import MertonCredit
+from financepy.models.merton_firm_mkt import MertonFirmMkt
+from financepy.models.merton_firm import MertonFirm
 import sys
 sys.path.append("..")
 
@@ -24,12 +24,12 @@ def test_FinModelMertonCredit():
     assetGrowthRate = [0.0306, 0.03, 0.031, 0.0302, 0.0305]
     timeToMaturity = 1.0  # np.linspace(0.1, 10, 100)
 
-    model = MertonCreditMkt(equity_value,
-                            bondFace,
-                            timeToMaturity,
-                            riskFreeRate,
-                            assetGrowthRate,
-                            equity_vol)
+    model = MertonFirmMkt(equity_value,
+                          bondFace,
+                          timeToMaturity,
+                          riskFreeRate,
+                          assetGrowthRate,
+                          equity_vol)
 
     testCases.header("MERTON MARKET MODEL", "VALUE")
     testCases.print("ASSET VALUE", model._A)
@@ -46,12 +46,12 @@ def test_FinModelMertonCredit():
     assetValue = model._A
     assetVol = model._vA
 
-    model = MertonCredit(assetValue,
-                         bondFace,
-                         timeToMaturity,
-                         riskFreeRate,
-                         assetGrowthRate,
-                         assetVol)
+    model = MertonFirm(assetValue,
+                       bondFace,
+                       timeToMaturity,
+                       riskFreeRate,
+                       assetGrowthRate,
+                       assetVol)
 
     testCases.header("BASIC MERTON MODEL", "VALUE")
 
@@ -74,12 +74,12 @@ def test_FinModelMertonCredit():
     assetGrowthRate = 0.05
     assetVol = 0.20
 
-    model = MertonCredit(assetValue,
-                         bondFace,
-                         timeToMaturity,
-                         riskFreeRate,
-                         assetGrowthRate,
-                         assetVol)
+    model = MertonFirm(assetValue,
+                       bondFace,
+                       timeToMaturity,
+                       riskFreeRate,
+                       assetGrowthRate,
+                       assetVol)
 
     testCases.header("BASIC MERTON MODEL", "VALUE")
 

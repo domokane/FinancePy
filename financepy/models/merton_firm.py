@@ -2,27 +2,27 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from ..utils.helpers import label_to_string, check_argument_types
 import numpy as np
 
 from scipy.stats import norm
 N = norm.cdf
 
-from ..utils.helpers import label_to_string, check_argument_types
 
 # TODO: Redesign this class
 
 ###############################################################################
 
 
-class MertonCredit():
-    """ Implementation of the Merton Credit Model according to the original
-    formulation by Merton with the inputs being the asset value of the firm, 
-    the liabilities (bond face), the time to maturity in years, the risk-free 
+class MertonFirm():
+    """ Implementation of the Merton Firm Value Model according to the original
+    formulation by Merton with the inputs being the asset value of the firm,
+    the liabilities (bond face), the time to maturity in years, the risk-free
     rate, the asset growth rate and the asset value volatility. """
 
     def __init__(self,
                  assetValue: (float, list, np.ndarray),
-                 bondFace: (float, list,np.ndarray),
+                 bondFace: (float, list, np.ndarray),
                  timeToMaturity: (float, list, np.ndarray),
                  riskFreeRate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
@@ -75,8 +75,8 @@ class MertonCredit():
         sigmaRootT = self._vA * np.sqrt(self._t)
 
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA ** 2) * self._t
-        d1 = d1 / sigmaRootT        
-        evol = (self._A / E) * N(d1) * self._vA        
+        d1 = d1 / sigmaRootT
+        evol = (self._A / E) * N(d1) * self._vA
         return evol
 
 ###############################################################################
@@ -102,7 +102,8 @@ class MertonCredit():
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA ** 2) * self._t
         d1 = d1 / sigmaRootT
         d2 = d1 - sigmaRootT
-        dvalue = self._A * N(-d1) + self._L * np.exp(-self._r * self._t) * N(d2)
+        dvalue = self._A * N(-d1) + self._L * \
+            np.exp(-self._r * self._t) * N(d2)
         return dvalue
 
 ###############################################################################
@@ -119,7 +120,7 @@ class MertonCredit():
     def prob_default(self):
         """ Calculate the default probability. This is not risk-neutral so it
         uses the real world drift rather than the risk-free rate. """
-        
+
         lvg = self._A / self._L
         dd = np.log(lvg) + (self._mu - (self._vA**2)/2.0) * self._t
         dd = dd / self._vA / np.sqrt(self._t)
@@ -131,7 +132,7 @@ class MertonCredit():
     def dist_default(self):
         """ Calculate the distance to default. This is not risk-neutral so it
         uses the real world drift rather than the risk-free rate. """
-        
+
         lvg = self._A / self._L
         dd = np.log(lvg) + (self._mu - (self._vA**2)/2.0) * self._t
         dd = dd / self._vA / np.sqrt(self._t)

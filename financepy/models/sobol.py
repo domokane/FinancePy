@@ -74,7 +74,7 @@ def get_uniform_sobol(num_points, dimension):
     dimensions of the random values. Each dimension has the same number of 
     random draws. Each column of random numbers is ordered so as not to
     correlate, i.e be independent from any other column."""
-    
+
     global sArr
     global aArr
     global m_i
