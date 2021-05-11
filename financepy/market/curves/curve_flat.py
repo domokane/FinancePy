@@ -54,7 +54,7 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
-        dates = self._valuation_date.addYears(years)
+        dates = self._valuation_date.add_years(years)
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)

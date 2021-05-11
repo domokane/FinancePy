@@ -44,7 +44,7 @@ class SwapFloatLeg:
         if type(end_date) == Date:
             self._termination_date = end_date
         else:
-            self._termination_date = effective_date.addTenor(end_date)
+            self._termination_date = effective_date.add_tenor(end_date)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,

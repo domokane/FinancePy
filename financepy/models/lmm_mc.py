@@ -72,32 +72,32 @@ def LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, rho):
     at the end of period b taking into account the forward volatility term
     structure (zetas) and the forward-forward correlation matrix rho.. """
 
-    numPeriods = len(fwd0)
+    num_periods = len(fwd0)
 
-#    if len(taus) != numPeriods:
-#        raise FinError("Tau vector must have length" + str(numPeriods))
+#    if len(taus) != num_periods:
+#        raise FinError("Tau vector must have length" + str(num_periods))
 
-#    if len(zetas) != numPeriods:
-#        raise FinError("Tau vector must have length" + str(numPeriods))
+#    if len(zetas) != num_periods:
+#        raise FinError("Tau vector must have length" + str(num_periods))
 
-#    if len(rho) != numPeriods:
-#        raise FinError("Rho matrix must have length" + str(numPeriods))
+#    if len(rho) != num_periods:
+#        raise FinError("Rho matrix must have length" + str(num_periods))
 
-#    if len(rho[0]) != numPeriods:
-#        raise FinError("Rho matrix must have height" + str(numPeriods))
+#    if len(rho[0]) != num_periods:
+#        raise FinError("Rho matrix must have height" + str(num_periods))
 
-    if b > numPeriods:
-        raise FinError("Swap maturity beyond numPeriods.")
+    if b > num_periods:
+        raise FinError("Swap maturity beyond num_periods.")
 
     if a == b:
         raise FinError("Swap maturity on swap expiry date")
 
-    p = np.zeros(numPeriods)
+    p = np.zeros(num_periods)
     p[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, numPeriods):
+    for ix in range(1, num_periods):
         p[ix] = p[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
-    wts = np.zeros(numPeriods)
+    wts = np.zeros(num_periods)
     pv01ab = 0.0
     for k in range(a+1, b):
         pv01ab += taus[k] * p[k]
@@ -677,14 +677,14 @@ def LMMCapFlrPricer(numForwards, num_paths, K, fwd0, fwds, taus, isCap):
 
 @njit(float64(float64, int64, int64, float64[:], float64[:, :, :],
               float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMSwapPricer(cpn, numPeriods, num_paths, fwd0, fwds, taus):
+def LMMSwapPricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
     """ Function to reprice a basic swap using the simulated forward Ibors.
     """
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0])
 
-    if numPeriods > maxForwards:
+    if num_periods > maxForwards:
         raise FinError("NumPeriods > numForwards")
 
     if num_paths > maxPaths:
@@ -710,7 +710,7 @@ def LMMSwapPricer(cpn, numPeriods, num_paths, fwd0, fwds, taus):
         fixedFlows[0] = cpn * taus[0]
         numeraire[0] = 1.0 / discFactor[0]
 
-        for j in range(1, numPeriods):  # TIME LOOP
+        for j in range(1, num_periods):  # TIME LOOP
 
             libor = fwds[iPath, j, j]
 
@@ -724,7 +724,7 @@ def LMMSwapPricer(cpn, numPeriods, num_paths, fwd0, fwds, taus):
             periodRoll = (1.0 + libor * taus[j])
             numeraire[j] = numeraire[j - 1] * periodRoll
 
-        for iFwd in range(0, numPeriods):
+        for iFwd in range(0, num_periods):
             sumFloat += floatFlows[iFwd] / numeraire[iFwd]
             sumFixed += fixedFlows[iFwd] / numeraire[iFwd]
 
@@ -806,13 +806,13 @@ def LMMSwaptionPricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
 
 @njit(float64[:](float64, int64, int64, float64[:], float64[:, :, :],
                  float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMRatchetCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
+def LMMRatchetCapletPricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a ratchet using the simulated Ibor rates."""
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0][0])
 
-    if numPeriods > maxForwards:
+    if num_periods > maxForwards:
         raise FinError("NumPeriods > numForwards")
 
     if num_paths > maxPaths:
@@ -834,7 +834,7 @@ def LMMRatchetCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
         libor = fwds[iPath, 0, 0]
         ratchetCaplets[0] = 0.0
 
-        for j in range(1, numPeriods):  # TIME LOOP
+        for j in range(1, num_periods):  # TIME LOOP
 
             prevIbor = libor
             K = prevIbor + spread
@@ -849,10 +849,10 @@ def LMMRatchetCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
             periodRoll = (1.0 + libor * taus[j])
             numeraire[j] = numeraire[j - 1] * periodRoll
 
-        for iFwd in range(0, numPeriods):
+        for iFwd in range(0, num_periods):
             ratchetCapletValues[iFwd] += ratchetCaplets[iFwd] / numeraire[iFwd]
 
-    for iFwd in range(0, numPeriods):
+    for iFwd in range(0, num_periods):
         ratchetCapletValues[iFwd] /= num_paths
 
     return ratchetCapletValues
@@ -862,13 +862,13 @@ def LMMRatchetCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
 
 @njit(float64(int64, float64, int64, int64, float64[:], float64[:, :, :],
               float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMFlexiCapPricer(maxCaplets, K, numPeriods, num_paths, fwd0, fwds, taus):
+def LMMFlexiCapPricer(maxCaplets, K, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a flexicap using the simulated Ibor rates."""
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0][0])
 
-    if numPeriods > maxForwards:
+    if num_periods > maxForwards:
         raise FinError("NumPeriods > numForwards")
 
     if num_paths > maxPaths:
@@ -892,7 +892,7 @@ def LMMFlexiCapPricer(maxCaplets, K, numPeriods, num_paths, fwd0, fwds, taus):
 
         numCapletsLeft = maxCaplets
 
-        for j in range(1, numPeriods):  # TIME LOOP
+        for j in range(1, num_periods):  # TIME LOOP
 
             libor = fwds[iPath, j, j]
 
@@ -909,14 +909,14 @@ def LMMFlexiCapPricer(maxCaplets, K, numPeriods, num_paths, fwd0, fwds, taus):
             periodRoll = (1.0 + libor * taus[j])
             numeraire[j] = numeraire[j - 1] * periodRoll
 
-        for iFwd in range(0, numPeriods):
+        for iFwd in range(0, num_periods):
             flexiCapletValues[iFwd] += flexiCaplets[iFwd] / numeraire[iFwd]
 
-    for iFwd in range(0, numPeriods):
+    for iFwd in range(0, num_periods):
         flexiCapletValues[iFwd] /= num_paths
 
     flexiCapValue = 0.0
-    for iFwd in range(0, numPeriods):
+    for iFwd in range(0, num_periods):
         flexiCapValue += flexiCapletValues[iFwd]
 
     return flexiCapValue
@@ -926,13 +926,13 @@ def LMMFlexiCapPricer(maxCaplets, K, numPeriods, num_paths, fwd0, fwds, taus):
 
 @njit(float64[:](float64, int64, int64, float64[:], float64[:, :, :],
                  float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMStickyCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
+def LMMStickyCapletPricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a sticky cap using the simulated Ibor rates. """
 
     maxPaths = len(fwds)
     maxForwards = len(fwds[0][0])
 
-    if numPeriods > maxForwards:
+    if num_periods > maxForwards:
         raise FinError("NumPeriods > numForwards")
 
     if num_paths > maxPaths:
@@ -955,7 +955,7 @@ def LMMStickyCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
         stickyCaplets[0] = 0.0
         K = libor
 
-        for j in range(1, numPeriods):  # TIME LOOP
+        for j in range(1, num_periods):  # TIME LOOP
 
             prevIbor = libor
             K = min(prevIbor, K) + spread
@@ -970,10 +970,10 @@ def LMMStickyCapletPricer(spread, numPeriods, num_paths, fwd0, fwds, taus):
             periodRoll = (1.0 + libor * taus[j])
             numeraire[j] = numeraire[j - 1] * periodRoll
 
-        for iFwd in range(0, numPeriods):
+        for iFwd in range(0, num_periods):
             stickyCapletValues[iFwd] += stickyCaplets[iFwd] / numeraire[iFwd]
 
-    for iFwd in range(0, numPeriods):
+    for iFwd in range(0, num_periods):
         stickyCapletValues[iFwd] /= num_paths
 
     return stickyCapletValues

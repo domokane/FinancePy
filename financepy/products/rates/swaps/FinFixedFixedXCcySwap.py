@@ -60,7 +60,7 @@ class FinIborIborXCcySwap
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.addTenor(termination_date_or_tenor)
+            self._termination_date = effective_date.add_tenor(termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,

@@ -12,7 +12,7 @@ from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date, setDateFormatType, DateFormatTypes
+from financepy.utils.date import Date, set_date_format, DateFormatTypes
 from financepy.products.bonds.bond_annuity import BondAnnuity
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -35,7 +35,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
     face = 1000000
 
     annuity = BondAnnuity(maturity_date,
@@ -44,7 +44,7 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basisType,
+                          basis_type,
                           face)
 
     annuity.calculate_payments(settlement_date)
@@ -66,7 +66,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
         maturity_date,
@@ -75,7 +75,7 @@ def test_BondAnnuity():
         calendar_type,
         bus_day_adjust_type,
         date_gen_rule_type,
-        basisType,
+        basis_type,
         face)
 
     annuity.calculate_payments(settlement_date)
@@ -97,7 +97,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(maturity_date,
                           coupon,
@@ -105,7 +105,7 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basisType,
+                          basis_type,
                           face)
 
     annuity.calculate_payments(settlement_date)
@@ -127,7 +127,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.FORWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(maturity_date,
                           coupon,
@@ -135,7 +135,7 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basisType,
+                          basis_type,
                           face)
 
     annuity.calculate_payments(settlement_date)
@@ -157,7 +157,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.FORWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(maturity_date,
                           coupon, 
@@ -165,7 +165,7 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basisType,
+                          basis_type,
                           face)
 
     annuity.calculate_payments(settlement_date)
@@ -187,7 +187,7 @@ def test_BondAnnuity():
     calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.FORWARD
-    basisType = DayCountTypes.ACT_360
+    basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(maturity_date,
                           coupon,
@@ -195,7 +195,7 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basisType,
+                          basis_type,
                           face)
     
     annuity.calculate_payments(settlement_date)

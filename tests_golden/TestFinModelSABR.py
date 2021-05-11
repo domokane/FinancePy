@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import FinOptionTypes
+from financepy.models.sabr import SABR
+from financepy.models.sabr import vol_function_sabr
+import numpy as np
 import sys
 sys.path.append("..")
 
-import numpy as np
-from financepy.models.sabr import vol_function_sabr
-from financepy.models.sabr import SABR
-from financepy.utils.global_types import FinOptionTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -40,14 +40,15 @@ def test_SABR():
 
 ###############################################################################
 
+
 def test_SABR_Calibration():
 
     beta = 0.5
     rho = -0.09
     nu = 0.1
-    
+
     strikeVol = 0.1
-    
+
     f = 0.043
     k = 0.050
     r = 0.03
@@ -60,7 +61,7 @@ def test_SABR_Calibration():
 
     testCases.header("TEST", "CALIBRATION ERROR")
 
-    # Make SABR equivalent to lognormal (Black) model 
+    # Make SABR equivalent to lognormal (Black) model
     # (i.e. alpha = 0, beta = 1, rho = 0, nu = 0, shift = 0)
     modelSABR_01 = SABR(0.0, 1.0, 0.0, 0.0)
     modelSABR_01.setAlphaFromBlackVol(strikeVol, f, k, texp)
@@ -72,7 +73,7 @@ def test_SABR_Calibration():
     assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
     testCases.print("LOGNORMAL CASE", calibrationError)
-    
+
     # Volatility: pure SABR dynamics
     modelSABR_02 = SABR(alpha, beta, rho, nu)
     modelSABR_02.setAlphaFromBlackVol(strikeVol, f, k, texp)
@@ -88,7 +89,7 @@ def test_SABR_Calibration():
     valuePut = modelSABR_02.value(f, k, texp, df, putOptionType)
     assert round(valueCall - valuePut, 12) == round(df*(f - k), 12), \
         "The method called 'value()' doesn't comply with Call-Put parity"
-        
+
 ###############################################################################
 
 

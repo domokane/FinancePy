@@ -2,14 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.market.volatility.equity_vol_curve import EquityVolCurve
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
@@ -25,7 +25,7 @@ def test_FinVolatilityCurve():
     vols = np.array([0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35])
     polynomial = 5
     volCurve = EquityVolCurve(valuation_date, expiry_date,
-                                 strikes, vols, polynomial)
+                              strikes, vols, polynomial)
 
     interpStrikes = np.linspace(50, 150, 10)
     interpVols = volCurve.volatility(interpStrikes)

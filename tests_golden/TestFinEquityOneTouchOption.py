@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
+from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
-from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -48,9 +48,9 @@ def test_EquityOneTouchOption():
     for downType in downTypes:
 
         option = EquityOneTouchOption(expiry_date,
-                                         downType,
-                                         barrier_level,
-                                         payment_size)
+                                      downType,
+                                      barrier_level,
+                                      payment_size)
 
         v = option.value(valuation_date,
                          stock_price,
@@ -59,12 +59,12 @@ def test_EquityOneTouchOption():
                          model)
 
         v_mc = option.value_mc(valuation_date,
-                              stock_price,
-                              discount_curve,
-                              dividend_curve,
-                              model,
-                              num_steps_per_year,
-                              num_paths)
+                               stock_price,
+                               discount_curve,
+                               dividend_curve,
+                               model,
+                               num_steps_per_year,
+                               num_paths)
 
         testCases.print("%60s " % downType,
                         "%9.5f" % v,
@@ -82,9 +82,9 @@ def test_EquityOneTouchOption():
     for upType in upTypes:
 
         option = EquityOneTouchOption(expiry_date,
-                                         upType,
-                                         barrier_level,
-                                         payment_size)
+                                      upType,
+                                      barrier_level,
+                                      payment_size)
 
         v = option.value(valuation_date,
                          stock_price,
@@ -93,12 +93,12 @@ def test_EquityOneTouchOption():
                          model)
 
         v_mc = option.value_mc(valuation_date,
-                              stock_price,
-                              discount_curve,
-                              dividend_curve,
-                              model,
-                              num_steps_per_year,
-                              num_paths)
+                               stock_price,
+                               discount_curve,
+                               dividend_curve,
+                               model,
+                               num_steps_per_year,
+                               num_paths)
 
         testCases.print("%60s " % upType,
                         "%9.5f" % v,
@@ -118,8 +118,8 @@ def test_EquityOneTouchOption():
     for downType in downTypes:
 
         option = EquityOneTouchOption(expiry_date,
-                                         downType,
-                                         barrier_level)
+                                      downType,
+                                      barrier_level)
 
         v = option.value(valuation_date,
                          stock_price,
@@ -128,12 +128,12 @@ def test_EquityOneTouchOption():
                          model)
 
         v_mc = option.value_mc(valuation_date,
-                              stock_price,
-                              discount_curve,
-                              dividend_curve,
-                              model,
-                              num_steps_per_year,
-                              num_paths)
+                               stock_price,
+                               discount_curve,
+                               dividend_curve,
+                               model,
+                               num_steps_per_year,
+                               num_paths)
 
         testCases.print("%60s " % downType,
                         "%9.5f" % v,
@@ -148,8 +148,8 @@ def test_EquityOneTouchOption():
     for upType in upTypes:
 
         option = EquityOneTouchOption(expiry_date,
-                                         upType,
-                                         barrier_level)
+                                      upType,
+                                      barrier_level)
 
         v = option.value(valuation_date,
                          stock_price,
@@ -158,12 +158,12 @@ def test_EquityOneTouchOption():
                          model)
 
         v_mc = option.value_mc(valuation_date,
-                              stock_price,
-                              discount_curve,
-                              dividend_curve,
-                              model,
-                              num_steps_per_year,
-                              num_paths)
+                               stock_price,
+                               discount_curve,
+                               dividend_curve,
+                               model,
+                               num_steps_per_year,
+                               num_paths)
 
         testCases.print("%60s " % upType,
                         "%9.5f" % v,

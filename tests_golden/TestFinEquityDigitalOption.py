@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
+from financepy.utils.global_types import FinOptionTypes
 import sys
 sys.path.append("..")
 
-from financepy.utils.global_types import FinOptionTypes
-from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -29,7 +29,7 @@ def test_EquityDigitalOption():
     dividend_yield = 0.01
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    
+
     model = BlackScholes(volatility)
     import time
 
@@ -157,6 +157,7 @@ def test_EquityDigitalOption():
         putOptionThetas.append(theta)
 
 ##########################################################################
+
 
 test_EquityDigitalOption()
 testCases.compareTestCases()

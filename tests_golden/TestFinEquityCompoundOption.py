@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.utils.global_types import FinOptionTypes
+from financepy.products.equity.equity_compound_option import EquityCompoundOption
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_compound_option import EquityCompoundOption
-from financepy.utils.global_types import FinOptionTypes
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -39,7 +39,8 @@ def test_EquityCompoundOption():
 
     stock_price = 85.0
 
-    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S", "TreeSteps", "Exact", "TreeValue")
+    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S",
+                     "TreeSteps", "Exact", "TreeValue")
 
     for option_type1 in [
             FinOptionTypes.EUROPEAN_CALL,
@@ -49,16 +50,16 @@ def test_EquityCompoundOption():
                 FinOptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                                 expiry_date2, option_type2, k2)
+                                              expiry_date2, option_type2, k2)
 
             for num_steps in num_stepsList:
-        
+
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model)
 
                 values = cmpdOption._valueTree(valuation_date, stock_price, discount_curve,
                                                dividend_curve, model, num_steps)
-        
+
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
                                 num_steps, value, values[0])
 
@@ -66,7 +67,8 @@ def test_EquityCompoundOption():
 
     stock_price = 85.0
 
-    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S", "TreeSteps", "Exact", "TreeValue")
+    testCases.header("TYPE1", "TYPE2", "K1", "K2", "S",
+                     "TreeSteps", "Exact", "TreeValue")
 
     for option_type1 in [
             FinOptionTypes.AMERICAN_CALL,
@@ -76,16 +78,16 @@ def test_EquityCompoundOption():
                 FinOptionTypes.AMERICAN_PUT]:
 
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                                 expiry_date2, option_type2, k2)
+                                              expiry_date2, option_type2, k2)
 
             for num_steps in num_stepsList:
-        
+
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model, num_steps)
 
                 values = cmpdOption._valueTree(valuation_date, stock_price, discount_curve,
                                                dividend_curve, model, num_steps)
-        
+
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
                                 num_steps, value, values[0])
 

@@ -2,21 +2,21 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.bonds import YTMCalcType
+from financepy.products.inflation.FinInflationBond import FinInflationBond
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.products.inflation.FinInflationBond import FinInflationBond
-from financepy.products.bonds import YTMCalcType
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.market.curves.curve_flat import DiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -84,7 +84,7 @@ def test_FinInflationBondBBG():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    accrued_interest= bond._accrued_interest
+    accrued_interest = bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
@@ -98,7 +98,7 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calcInflationAccruedInterest(settlement_date, 
+    inflationAccd = bond.calcInflationAccruedInterest(settlement_date,
                                                       refCPIValue)
 
     testCases.print("Inflation Accrued = ", inflationAccd)
@@ -163,18 +163,18 @@ def test_FinInflationBondStack():
 
     lag = 3
     fixingCPI = 244.65884
-    fixingDate = settlement_date.addMonths(-lag)
+    fixingDate = settlement_date.add_months(-lag)
 
     ###########################################################################
     # Create Index Curve
     months = range(0, 12, 1)
-    fixingDates = Date(31, 8, 2018).addMonths(months)
+    fixingDates = Date(31, 8, 2018).add_months(months)
     fixingRates = [284.2, 284.1, 284.5, 284.6, 285.6, 283.0, 285.0,
-                   285.1, 288.2, 289.2, 289.6, 289.5]    
+                   285.1, 288.2, 289.2, 289.6, 289.5]
     inflationIndex = FinInflationIndexCurve(fixingDates, fixingRates, lag)
 #    print(inflationIndex)
     ###########################################################################
-        
+
     zciisData = [(Date(31, 7, 2020), 3.1500000000137085),
                  (Date(31, 7, 2021), 3.547500000013759),
                  (Date(31, 7, 2022), 3.675000000013573),
@@ -245,7 +245,7 @@ def test_FinInflationBondStack():
 
 #    print(inflationZeroCurve)
 
-    ###########################################################################    
+    ###########################################################################
 
     bond = FinInflationBond(issue_date,
                             maturity_date,
@@ -294,22 +294,19 @@ def test_FinInflationBondStack():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    accrued_interest= bond._accrued_interest
+    accrued_interest = bond._accrued_interest
     testCases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
     # Inflation functions that calculate nominal yield with CPI adjustment
     ###########################################################################
 
- 
- 
-    
     ###########################################################################
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calcInflationAccruedInterest(settlement_date, 
+    inflationAccd = bond.calcInflationAccruedInterest(settlement_date,
                                                       refCPIValue)
 
     testCases.print("Inflation Accrued = ", inflationAccd)

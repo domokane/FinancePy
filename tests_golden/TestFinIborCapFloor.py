@@ -46,7 +46,7 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.addWeekDays(spot_days)
+    settlement_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
     depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
@@ -87,8 +87,8 @@ def test_FinIborCapFloor():
 
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
-    start_date = todayDate.addWeekDays(2)
-    maturity_date = start_date.addTenor("1Y")
+    start_date = todayDate.add_weekdays(2)
+    maturity_date = start_date.add_tenor("1Y")
     libor_curve = test_FinIborDepositsAndSwaps(todayDate)
 
     # The capfloor has begun
@@ -183,7 +183,7 @@ def test_FinIborCapFloorVolCurve():
 
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
-    maturity_date = valuation_date.addTenor("3Y")
+    maturity_date = valuation_date.add_tenor("3Y")
     day_count_type = DayCountTypes.THIRTY_E_360
     frequency = FrequencyTypes.ANNUAL
 
@@ -198,7 +198,7 @@ def test_FinIborCapFloorVolCurve():
                             day_count_type)
 
     capVolDates = Schedule(valuation_date,
-                           valuation_date.addTenor("10Y"),
+                           valuation_date.add_tenor("10Y"),
                            frequency)._generate()
 
     flat_rate = 0.04
@@ -265,7 +265,7 @@ def test_FinIborCapletHull():
     #  Hull Page 703, example 29.3
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
-    maturity_date = valuation_date.addTenor("2Y")
+    maturity_date = valuation_date.add_tenor("2Y")
     libor_curve = DiscountCurveFlat(valuation_date,
                                     0.070,
                                     FrequencyTypes.QUARTERLY,
@@ -286,8 +286,8 @@ def test_FinIborCapletHull():
     capFloor.value(valuation_date, libor_curve, model)
 
     # Value cap by breaking it down into caplets using caplet vols
-    capletStartDate = valuation_date.addTenor("1Y")
-    capletEndDate = capletStartDate.addTenor("3M")
+    capletStartDate = valuation_date.add_tenor("1Y")
+    capletEndDate = capletStartDate.add_tenor("3M")
 
     vCaplet = capFloor.valueCapletFloorLet(valuation_date,
                                            capletStartDate,

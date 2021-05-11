@@ -9,15 +9,15 @@ from financepy.utils.date import Date, dateRange
 
 # Not under test
 
-from financepy.utils.date import DateFormatTypes, setDateFormatType
+from financepy.utils.date import DateFormatTypes, set_date_format
 
-setDateFormatType(DateFormatTypes.UK_LONGEST)
+set_date_format(DateFormatTypes.UK_LONGEST)
 
 # new sample tests
 
 
-def test_addDays():
-    assert Date(1, 1, 2018).addDays(-1).addDays(1) == Date(1, 1, 2018)
+def test_add_days():
+    assert Date(1, 1, 2018).add_days(-1).add_days(1) == Date(1, 1, 2018)
 
 
 def test_from_string():
@@ -44,15 +44,15 @@ def test_Date():
     startDate = Date(1, 1, 2018)
 
     for num_months in range(0, 120):
-        nextCDSDate = startDate.nextCDSDate(num_months)
-        print(str(startDate), num_months, str(nextCDSDate))
+        next_cds_date = startDate.next_cds_date(num_months)
+        print(str(startDate), num_months, str(next_cds_date))
 
     startDate = Date(1, 1, 2018)
 
     for num_months in range(0, 365):
-        startDate = startDate.addDays(1)
-        nextIMMDate = startDate.nextIMMDate()
-        print(num_months, str(startDate), str(nextIMMDate))
+        startDate = startDate.add_days(1)
+        next_imm_date = startDate.next_imm_date()
+        print(num_months, str(startDate), str(next_imm_date))
 
 
 def test_DateTenors():
@@ -60,45 +60,45 @@ def test_DateTenors():
     startDate = Date(23, 2, 2018)
 
     tenor = "5d"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "7D"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "1W"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "4W"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "1M"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "24M"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "2Y"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "10y"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "0m"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
     tenor = "20Y"
-    print(tenor, startDate.addTenor(tenor))
+    print(tenor, startDate.add_tenor(tenor))
 
 
 def test_DateRange():
 
     startDate = Date(1, 1, 2010)
 
-    endDate = startDate.addDays(3)
+    endDate = startDate.add_days(3)
     tenor = "Default"
     print(tenor, dateRange(startDate, endDate))
 
-    endDate = startDate.addDays(20)
+    endDate = startDate.add_days(20)
     tenor = "1W"
     print(tenor, dateRange(startDate, endDate, tenor))
 
@@ -117,7 +117,7 @@ def test_DateAddMonths():
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
 
-    dates = startDate.addMonths(months)
+    dates = startDate.add_months(months)
 
     for dt in dates:
         print("DATE", dt)
@@ -128,17 +128,17 @@ def test_DateAddYears():
     startDate = Date(1, 1, 2010)
 
     years = [1, 3, 5, 7, 10]
-    dates1 = startDate.addYears(years)
+    dates1 = startDate.add_years(years)
     for dt in dates1:
         print("DATES1", dt)
 
     years = np.array([1, 3, 5, 7, 10])
-    dates2 = startDate.addYears(years)
+    dates2 = startDate.add_years(years)
     for dt in dates2:
         print("DATES2", dt)
 
     years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
-    dates3 = startDate.addYears(years)
+    dates3 = startDate.add_years(years)
 
     for dt in dates3:
         print("DATES3", dt)
@@ -147,7 +147,7 @@ def test_DateAddYears():
     years = np.array(
         [1.5 + 2.0 * dt, 3.5 - 6 * dt, 5.75 + 3 * dt, 7.25 + dt, 10.0 + dt]
     )
-    dates4 = startDate.addYears(years)
+    dates4 = startDate.add_years(years)
 
     for dt in dates4:
         print("DATES4", dt)
@@ -158,7 +158,7 @@ def test_DateFormat():
     dt = Date(20, 10, 2019)
 
     for formatType in DateFormatTypes:
-        setDateFormatType(formatType)
+        set_date_format(formatType)
         print(formatType.name, dt)
 
 

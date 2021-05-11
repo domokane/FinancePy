@@ -2,18 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.utils.helpers import beta_vectorToCorrMatrix
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.utils.global_types import FinOptionTypes
+from financepy.products.equity.equity_basket_option import EquityBasketOption
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_basket_option import EquityBasketOption
-from financepy.utils.global_types import FinOptionTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.helpers import beta_vectorToCorrMatrix
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -105,21 +105,21 @@ def test_EquityBasketOption():
             start = time.time()
 
             v = callOption.value(
-                    valuation_date,
-                    stock_prices,
-                    discount_curve,
-                    dividend_curves,
-                    volatilities,
-                    corr_matrix)
+                valuation_date,
+                stock_prices,
+                discount_curve,
+                dividend_curves,
+                volatilities,
+                corr_matrix)
 
             vMC = callOption.value_mc(
-                    valuation_date,
-                    stock_prices,
-                    discount_curve,
-                    dividend_curves,
-                    volatilities,
-                    corr_matrix,
-                    num_paths)
+                valuation_date,
+                stock_prices,
+                discount_curve,
+                dividend_curves,
+                volatilities,
+                corr_matrix,
+                num_paths)
 
             end = time.time()
             duration = end - start

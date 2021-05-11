@@ -69,7 +69,7 @@ def test_BondEmbeddedOptionMATLAB():
     for _ in range(0, 24):
         put_dates.append(putDate)
         put_prices.append(100)
-        putDate = putDate.addMonths(1)
+        putDate = putDate.add_months(1)
 
     testCases.header("BOND PRICE", "PRICE")
     v = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
@@ -114,7 +114,7 @@ def test_BondEmbeddedOptionQUANTLIB():
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
     valuation_date = Date(16, 8, 2016)
-    settlement_date = valuation_date.addWeekDays(3)
+    settlement_date = valuation_date.add_weekdays(3)
 
     ###########################################################################
 
@@ -139,7 +139,7 @@ def test_BondEmbeddedOptionQUANTLIB():
     call_prices = [100.0]
 
     for _ in range(1, 24):
-        nextCallDate = nextCallDate.addMonths(3)
+        nextCallDate = nextCallDate.add_months(3)
         call_dates.append(nextCallDate)
         call_prices.append(100.0)
 

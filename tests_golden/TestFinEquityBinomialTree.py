@@ -2,25 +2,26 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.utils.date import Date
+from financepy.utils.global_types import FinOptionTypes
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
+from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
+from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
 import numpy as np
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
-from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
-from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.global_types import FinOptionTypes
-from financepy.utils.date import Date
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinBinomialTree():
 
@@ -46,10 +47,14 @@ def test_FinBinomialTree():
         expiry_date,
         strike_price,
         FinOptionTypes.EUROPEAN_PUT)
-    value = putOption.value(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    delta = putOption.delta(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    gamma = putOption.gamma(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    theta = putOption.theta(valuation_date, stock_price, discount_curve, dividend_curve, model)
+    value = putOption.value(valuation_date, stock_price,
+                            discount_curve, dividend_curve, model)
+    delta = putOption.delta(valuation_date, stock_price,
+                            discount_curve, dividend_curve, model)
+    gamma = putOption.gamma(valuation_date, stock_price,
+                            discount_curve, dividend_curve, model)
+    theta = putOption.theta(valuation_date, stock_price,
+                            discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -112,10 +117,14 @@ def test_FinBinomialTree():
         expiry_date,
         strike_price,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    delta = callOption.delta(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    gamma = callOption.gamma(valuation_date, stock_price, discount_curve, dividend_curve, model)
-    theta = callOption.theta(valuation_date, stock_price, discount_curve, dividend_curve, model)
+    value = callOption.value(valuation_date, stock_price,
+                             discount_curve, dividend_curve, model)
+    delta = callOption.delta(valuation_date, stock_price,
+                             discount_curve, dividend_curve, model)
+    gamma = callOption.gamma(valuation_date, stock_price,
+                             discount_curve, dividend_curve, model)
+    theta = callOption.theta(valuation_date, stock_price,
+                             discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -175,6 +184,7 @@ def test_FinBinomialTree():
         testCases.print(num_steps, results, duration)
 
 ###############################################################################
+
 
 test_FinBinomialTree()
 testCases.compareTestCases()

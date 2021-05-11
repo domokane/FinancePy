@@ -209,8 +209,8 @@ class CDS:
             # To get the next CDS date we move on by the tenor and then roll to
             # the next CDS date after that. We do not holiday adjust it. That
             # is handled in the schedule generation.
-            maturity_date = step_in_date.addTenor(maturity_date_or_tenor)
-            maturity_date = maturity_date.nextCDSDate()
+            maturity_date = step_in_date.add_tenor(maturity_date_or_tenor)
+            maturity_date = maturity_date.next_cds_date()
 
         if step_in_date > maturity_date:
             raise FinError("Step in date after maturity date")
@@ -250,7 +250,7 @@ class CDS:
 
             while next_date > start_date:
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.addMonths(-num_months)
+                next_date = next_date.add_months(-num_months)
                 flow_num += 1
 
             # Add on the Previous Coupon Date
@@ -272,7 +272,7 @@ class CDS:
             finalDate = self._adjusted_dates[flow_num - 1]
 
             # Final date is moved forward by one day
-            self._adjusted_dates[flow_num - 1] = finalDate.addDays(1)
+            self._adjusted_dates[flow_num - 1] = finalDate.add_days(1)
 
         elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
@@ -284,7 +284,7 @@ class CDS:
 
             while next_date < end_date:
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.addMonths(num_months)
+                next_date = next_date.add_months(num_months)
                 flow_num = flow_num + 1
 
             for i in range(1, flow_num):
@@ -293,7 +293,7 @@ class CDS:
 
                 self._adjusted_dates.append(dt)
 
-            finalDate = end_date.addDays(1)
+            finalDate = end_date.add_days(1)
             self._adjusted_dates.append(finalDate)
 
         else:

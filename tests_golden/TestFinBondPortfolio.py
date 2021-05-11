@@ -36,8 +36,8 @@ def test_BondPortfolio():
 
         for _, bond in bondDataFrame.iterrows():
 
-            dateString = bond['maturity']
-            matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
+            date_string = bond['maturity']
+            matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
             maturityDt = fromDatetime(matDatetime)
             issueDt = Date(maturityDt._d, maturityDt._m, 2000)
             coupon = bond['coupon']/100.0

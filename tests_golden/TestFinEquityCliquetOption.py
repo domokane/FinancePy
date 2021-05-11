@@ -2,17 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import FinOptionTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -26,9 +26,9 @@ def test_EquityCliquetOption():
     option_type = FinOptionTypes.EUROPEAN_CALL
 
     cliquetOption = EquityCliquetOption(start_date,
-                                           final_expiry_date,
-                                           option_type,
-                                           freq_type)
+                                        final_expiry_date,
+                                        option_type,
+                                        freq_type)
 
     valuation_date = Date(1, 1, 2015)
     stock_price = 100.0

@@ -45,14 +45,14 @@ class IborFuture:
         if futureTenor != "3M" and futureTenor != "3m":
             raise FinError("Only 3M IMM futures handled currently.")
 
-        self._delivery_date = todayDate.nextIMMDate()
+        self._delivery_date = todayDate.next_imm_date()
 
         for iFut in range(0, futureNumber - 1):
-            self._delivery_date = self._delivery_date.nextIMMDate()
+            self._delivery_date = self._delivery_date.next_imm_date()
 
-        self._endOfInterestPeriod = self._delivery_date.nextIMMDate()
+        self._endOfInterestPeriod = self._delivery_date.next_imm_date()
 
-        self._lastTradingDate = self._delivery_date.addDays(-2)
+        self._lastTradingDate = self._delivery_date.add_days(-2)
         self._accrual_type = accrual_type
         self._contract_size = contract_size
 

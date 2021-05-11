@@ -28,7 +28,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
-def buildIborCurve(valuation_date):
+def build_Ibor_Curve(valuation_date):
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
     deposit_rate = 0.050
@@ -40,36 +40,36 @@ def buildIborCurve(valuation_date):
         depoDCCType)
 
     spot_days = 2
-    settlement_date = valuation_date.addWeekDays(spot_days)
+    settlement_date = valuation_date.add_weekdays(spot_days)
 
-    maturity_date = settlement_date.addMonths(1)
+    maturity_date = settlement_date.add_months(1)
     depo1 = IborDeposit(settlement_date,
                         maturity_date,
                         deposit_rate,
                         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(3)
+    maturity_date = settlement_date.add_months(3)
     depo2 = IborDeposit(
         settlement_date,
         maturity_date,
         deposit_rate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(6)
+    maturity_date = settlement_date.add_months(6)
     depo3 = IborDeposit(
         settlement_date,
         maturity_date,
         deposit_rate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(9)
+    maturity_date = settlement_date.add_months(9)
     depo4 = IborDeposit(
         settlement_date,
         maturity_date,
         deposit_rate,
         depoDCCType)
 
-    maturity_date = settlement_date.addMonths(12)
+    maturity_date = settlement_date.add_months(12)
     depo5 = IborDeposit(
         settlement_date,
         maturity_date,
@@ -90,7 +90,7 @@ def buildIborCurve(valuation_date):
     swaps = []
 
     swap_rate = 0.05
-    maturity_date = settlement_date.addMonths(24)
+    maturity_date = settlement_date.add_months(24)
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
@@ -103,7 +103,7 @@ def buildIborCurve(valuation_date):
 
     swaps.append(swap1)
 
-    maturity_date = settlement_date.addMonths(36)
+    maturity_date = settlement_date.add_months(36)
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
@@ -115,7 +115,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap2._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(48)
+    maturity_date = settlement_date.add_months(48)
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
@@ -127,7 +127,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap3._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(60)
+    maturity_date = settlement_date.add_months(60)
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
@@ -139,7 +139,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap4._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(72)
+    maturity_date = settlement_date.add_months(72)
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
@@ -151,7 +151,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap5._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(84)
+    maturity_date = settlement_date.add_months(84)
     swap6 = IborSwap(
         settlement_date,
         maturity_date,
@@ -163,7 +163,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap6._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(96)
+    maturity_date = settlement_date.add_months(96)
     swap7 = IborSwap(
         settlement_date,
         maturity_date,
@@ -175,7 +175,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap7._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(108)
+    maturity_date = settlement_date.add_months(108)
     swap8 = IborSwap(
         settlement_date,
         maturity_date,
@@ -187,7 +187,7 @@ def buildIborCurve(valuation_date):
 
     #    print(swap8._fixed_leg._payment_dates)
 
-    maturity_date = settlement_date.addMonths(120)
+    maturity_date = settlement_date.add_months(120)
     swap9 = IborSwap(
         settlement_date,
         maturity_date,
@@ -239,8 +239,8 @@ def test_Bond():
                          "ACCRUED", "YTM")
 
         for _, bond in bondDataFrame.iterrows():
-            dateString = bond['maturity']
-            matDatetime = dt.datetime.strptime(dateString, '%d-%b-%y')
+            date_string = bond['maturity']
+            matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
             maturityDt = fromDatetime(matDatetime)
             issueDt = Date(maturityDt._d, maturityDt._m, 2000)
 
@@ -319,7 +319,7 @@ def test_Bond():
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
     # When the libor curve is the Libor curve then the ASW is positive
-    libor_curve = buildIborCurve(settlement_date)
+    libor_curve = build_Ibor_Curve(settlement_date)
     asw = bond.asset_swap_spread(settlement_date, clean_price, libor_curve)
     oas = bond.option_adjusted_spread(
         settlement_date, clean_price, libor_curve)
@@ -507,7 +507,7 @@ def test_BondExDividend():
     settlement_date = Date(25, 8, 2010)
 
     for _ in range(0, 13):
-        settlement_date = settlement_date.addDays(1)
+        settlement_date = settlement_date.add_days(1)
         accrued = bond.calc_accrued_interest(
             settlement_date, exDivDays, calendar_type)
         testCases.print(settlement_date, accrued)

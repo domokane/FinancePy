@@ -59,7 +59,7 @@ class IborDeposit:
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
         else:
-            maturity_date = start_date.addTenor(maturity_date_or_tenor)
+            maturity_date = start_date.add_tenor(maturity_date_or_tenor)
 
         calendar = Calendar(self._calendar_type)
 

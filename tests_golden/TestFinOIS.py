@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.products.rates.ois import OIS
+from financepy.utils.math import ONE_MILLION
 import sys
 sys.path.append("..")
 
-from financepy.utils.math import ONE_MILLION
-from financepy.products.rates.ois import OIS
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinFixedOIS():
 
@@ -26,7 +27,7 @@ def test_FinFixedOIS():
     effective_date = Date(30, 11, 2018)
     end_date = Date(30, 11, 2023)
 
-    end_date = effective_date.addMonths(60)
+    end_date = effective_date.add_months(60)
     oisRate = 0.04
     fixed_leg_type = SwapTypes.PAY
     fixedFreqType = FrequencyTypes.ANNUAL
@@ -36,7 +37,7 @@ def test_FinFixedOIS():
     float_spread = 0.0
     notional = ONE_MILLION
     payment_lag = 1
-    
+
     ois = OIS(effective_date,
               end_date,
               fixed_leg_type,
@@ -57,16 +58,17 @@ def test_FinFixedOIS():
                                  FrequencyTypes.ANNUAL)
 
     v = ois.value(effective_date, oisCurve)
-    
+
 #    print(v)
-    
+
 #    ois._fixed_leg.print_valuation()
 #    ois._floatLeg.print_valuation()
-    
+
     testCases.header("LABEL", "VALUE")
     testCases.print("SWAP_VALUE", v)
-    
+
 ###############################################################################
+
 
 test_FinFixedOIS()
 testCases.compareTestCases()

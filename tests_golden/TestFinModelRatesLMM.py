@@ -2,35 +2,35 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.models.lmm_mc import LMMStickyCapletPricer
+from financepy.models.lmm_mc import LMMRatchetCapletPricer
+from financepy.models.lmm_mc import LMMFwdFwdCorrelation
+from financepy.models.lmm_mc import LMMSwapPricer
+from financepy.models.lmm_mc import LMMPriceCapsBlack
+from financepy.models.lmm_mc import LMMCapFlrPricer
+from financepy.models.lmm_mc import LMMSwaptionVolApprox
+from financepy.models.lmm_mc import LMMSimSwaptionVol
+from financepy.models.lmm_mc import LMMSwaptionPricer
+from financepy.models.lmm_mc import LMMSimulateFwdsMF
+from financepy.models.lmm_mc import LMMSimulateFwds1F
+from financepy.models.lmm_mc import LMMSimulateFwdsNF
+from financepy.utils.helpers import checkVectorDifferences
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black import Black
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 import time as time
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.models.black import Black
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.utils.helpers import checkVectorDifferences
-from financepy.models.lmm_mc import LMMSimulateFwdsNF
-from financepy.models.lmm_mc import LMMSimulateFwds1F
-from financepy.models.lmm_mc import LMMSimulateFwdsMF
-from financepy.models.lmm_mc import LMMSwaptionPricer
-from financepy.models.lmm_mc import LMMSimSwaptionVol
-from financepy.models.lmm_mc import LMMSwaptionVolApprox
-from financepy.models.lmm_mc import LMMCapFlrPricer
-from financepy.models.lmm_mc import LMMPriceCapsBlack
-from financepy.models.lmm_mc import LMMSwapPricer
-from financepy.models.lmm_mc import LMMFwdFwdCorrelation
-from financepy.models.lmm_mc import LMMRatchetCapletPricer
-from financepy.models.lmm_mc import LMMStickyCapletPricer
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -55,12 +55,12 @@ def getCorrelationMatrix(numFwds, beta, dt):
 
     capVolDates = []
     capletVolTenor = "1Y"
-    numPeriods = 10
+    num_periods = 10
     capletDt = valuation_date
 
     capVolDates.append(valuation_date)
-    for _ in range(0, numPeriods):
-        capletDt = capletDt.addTenor(capletVolTenor)
+    for _ in range(0, num_periods):
+        capletDt = capletDt.add_tenor(capletVolTenor)
         capVolDates.append(capletDt)
 
     if flatVol is None:
@@ -68,7 +68,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
                            16.79, 16.30, 16.01, 15.76, 15.54]
         capVolatilities = np.array(capVolatilities)/100.0
     else:
-        capVolatilities = [flatVol] * (numPeriods+1)
+        capVolatilities = [flatVol] * (num_periods+1)
         capVolatilities = np.array(capVolatilities)
         capVolatilities[0] = 0.0
 
@@ -153,8 +153,8 @@ def getForwardCurve(numFwds, r):
 #                                           FrequencyTypes.QUARTERLY)
 
 #         settlement_date = valuation_date
-#         exercise_date = settlement_date.addMonths(a*3)
-#         maturity_date = settlement_date.addMonths(b*3)
+#         exercise_date = settlement_date.add_months(a*3)
+#         maturity_date = settlement_date.add_months(b*3)
 
 #         fixed_coupon = strike
 #         fixed_frequency_type = FrequencyTypes.QUARTERLY
@@ -179,7 +179,7 @@ def getForwardCurve(numFwds, r):
 #         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
-#         print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f" 
+#         print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
 #               % (strike, texp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaptionVol,
 #                  swaption_price1F, swaption_priceNF, blackSwaptionPrice))
 
@@ -445,8 +445,8 @@ def test_HullBookExamples():
 
     start = time.time()
     cpn = 0.05
-    numPeriods = 10
-    swap = LMMSwapPricer(cpn, numPeriods, num_paths, fwd0, fwds, taus)
+    num_periods = 10
+    swap = LMMSwapPricer(cpn, num_periods, num_paths, fwd0, fwds, taus)
     end = time.time()
     print("PRICER Period:", end - start)
 
@@ -466,6 +466,7 @@ def fwdfwdCorrelation(fwds):
 #    print(fwdCorr)
 
 ###############################################################################
+
 
 test_HullBookExamples()
 # test_CapsFloors()

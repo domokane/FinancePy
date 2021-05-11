@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.math import accrued_interpolator
 import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.math import accrued_interpolator
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 pltGraph = False
@@ -20,7 +20,8 @@ pltGraph = False
 
 def test_FinMathAccdInterpolator():
 
-    coupon_times = [0.0, 4.000087613144162, 4.495649459810208, 5.002162949496498]
+    coupon_times = [0.0, 4.000087613144162,
+                    4.495649459810208, 5.002162949496498]
     coupon_flows = [0.0, 0.0, 0.03461111111111111, 0.035194444444444445]
 
     treeTimes = [0., 0.12498563, 0.24997125, 0.37495688, 0.4999425, 0.62492813,

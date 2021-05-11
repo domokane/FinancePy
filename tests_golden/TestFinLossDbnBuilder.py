@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
+from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -9,10 +12,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
-from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
@@ -47,10 +47,10 @@ def test_FinLossDbnBuilder():
         start = time.time()
 
         dbn1 = loss_dbn_recursion_gcd(num_credits,
-                                   default_probs,
-                                   lossUnits,
-                                   beta_vector,
-                                   num_steps)
+                                      default_probs,
+                                      lossUnits,
+                                      beta_vector,
+                                      num_steps)
 
         end = time.time()
 
@@ -67,10 +67,10 @@ def test_FinLossDbnBuilder():
 
         start = time.time()
         dbn2 = loss_dbn_hetero_adj_binomial(num_credits,
-                                               default_probs,
-                                               loss_ratio,
-                                               beta_vector,
-                                               num_steps)
+                                            default_probs,
+                                            loss_ratio,
+                                            beta_vector,
+                                            num_steps)
         end = time.time()
 
         testCases.print(
@@ -110,10 +110,10 @@ def test_FinLossDbnBuilder():
 
     start = time.time()
     dbn1 = loss_dbn_recursion_gcd(num_credits,
-                               default_probs,
-                               lossUnits,
-                               beta_vector,
-                               num_steps)
+                                  default_probs,
+                                  lossUnits,
+                                  beta_vector,
+                                  num_steps)
     end = time.time()
 
     testCases.print(
@@ -127,10 +127,10 @@ def test_FinLossDbnBuilder():
 
     start = time.time()
     dbn2 = loss_dbn_hetero_adj_binomial(num_credits,
-                                           default_probs,
-                                           loss_ratio,
-                                           beta_vector,
-                                           num_steps)
+                                        default_probs,
+                                        loss_ratio,
+                                        beta_vector,
+                                        num_steps)
     end = time.time()
 
     testCases.print(

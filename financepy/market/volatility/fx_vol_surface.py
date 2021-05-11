@@ -451,7 +451,7 @@ class FXVolSurface():
 
         self._expiry_dates = []
         for i in range(0, self._numVolCurves):
-            expiry_date = valuation_date.addTenor(tenors[i])
+            expiry_date = valuation_date.add_tenor(tenors[i])
             self._expiry_dates.append(expiry_date)
 
         self.build_vol_surface()

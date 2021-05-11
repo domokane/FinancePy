@@ -2,19 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.math import scale
+from financepy.market.curves.curve import DiscountCurve
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.curve import DiscountCurve
-from financepy.utils.math import scale
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -31,14 +31,14 @@ def test_FinDiscountCurve():
     years = np.linspace(0, 10, 6)
     rate = 0.05 + 0.005*years - 0.0003*years*years
     dfs = np.exp(-rate * years)
-    dates = start_date.addYears(years)
+    dates = start_date.add_years(years)
 
     curve = DiscountCurve(start_date, dates, dfs, InterpTypes.FLAT_FWD_RATES)
 
     testCases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
     plotYears = np.linspace(0, 12, 12*12+1)[1:]
-    plotDates = start_date.addYears(plotYears)
+    plotDates = start_date.add_years(plotYears)
 
     # Examine dependency of curve on compounding rate
     zero_rates_A = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
@@ -68,7 +68,8 @@ def test_FinDiscountCurve():
         curve = DiscountCurve(start_date, dates, dfs, interp)
         fwd_rates = curve.fwd(plotDates)
         zero_rates = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
-        parRates = curve.swap_rate(start_date, plotDates, FrequencyTypes.ANNUAL)
+        parRates = curve.swap_rate(
+            start_date, plotDates, FrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))

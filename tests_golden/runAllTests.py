@@ -3,7 +3,7 @@
 ###############################################################################
 
 
-from financepy.utils.date import setDateFormatType, DateFormatTypes
+from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 from os.path import dirname, basename, join
 import glob
@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-setDateFormatType(DateFormatTypes.UK_LONG)
+set_date_format(DateFormatTypes.UK_LONG)
 
 # I put this here to get the library loaded and header printed before loop
 

@@ -8,9 +8,10 @@ import datetime
 
 from financepy.utils.error import FinError
 
-###############################################################################    
+###############################################################################
 
 from enum import Enum
+
 
 class DateFormatTypes(Enum):
     BLOOMBERG = 1
@@ -23,17 +24,19 @@ class DateFormatTypes(Enum):
     UK_LONG = 8
     UK_LONGEST = 9
     DATETIME = 10
-    
+
 
 # Set the default
 gDateFormatType = DateFormatTypes.UK_LONG
 
-def setDateFormatType(formatType):
+
+def set_date_format(formatType):
     """ Function that sets the global date format type. """
     global gDateFormatType
     gDateFormatType = formatType
 
 ###############################################################################
+
 
 shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 longDayNames = [
@@ -78,16 +81,18 @@ monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 # TODO: Fix this - it has stopped working
 # @njit(boolean(int64), fastmath=True, cache=True)
-def isLeapYear(y: int):
+
+
+def is_leap_year(y: int):
     """ Test whether year y is a leap year - if so return True, else False """
-    leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
-    return leapYear
+    leap_year = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
+    return leap_year
 
 ###############################################################################
 
 
-def parse_date(dateStr, dateFormat):
-    dt_obj = datetime.datetime.strptime(dateStr, dateFormat)
+def parse_date(date_str, dateFormat):
+    dt_obj = datetime.datetime.strptime(date_str, dateFormat)
     return dt_obj.day, dt_obj.month, dt_obj.year
 
 ###############################################################################
@@ -99,7 +104,8 @@ gDateCounterList = None
 gStartYear = 1900
 gEndYear = 2100
 
-def calculateList():
+
+def calculate_list():
     """ Calculate list of dates so that we can do quick lookup to get the
     number of dates since 1 Jan 1900 (inclusive) BUT TAKING INTO ACCOUNT THE
     FACT THAT EXCEL MISTAKENLY CALLS 1900 A LEAP YEAR. For us, agreement with
@@ -108,8 +114,8 @@ def calculateList():
     1900. Note that Excel inherited this "BUG" from LOTUS 1-2-3. """
 
     day_counter = 0
-    maxDays = 0
-    
+    max_days = 0
+
     global gDateCounterList
     global gStartYear
     global gEndYear
@@ -123,34 +129,35 @@ def calculateList():
         # DO NOT CHANGE THIS FOR AGREEMENT WITH EXCEL WHICH ASSUMES THAT 1900
         # WAS A LEAP YEAR AND THAT 29 FEB 1900 ACTUALLY HAPPENED. A LOTUS BUG.
         if yy == 1900:
-            leapYear = True
+            leap_year = True
         else:
-            leapYear = isLeapYear(yy)
+            leap_year = is_leap_year(yy)
 
         for mm in range(1, 13):
 
-            if leapYear is True:
-                maxDays = monthDaysLeapYear[mm-1]
+            if leap_year is True:
+                max_days = monthDaysLeapYear[mm-1]
             else:
-                maxDays = monthDaysNotLeapYear[mm-1]
+                max_days = monthDaysNotLeapYear[mm-1]
 
-            for _ in range(1, maxDays+1):
+            for _ in range(1, max_days+1):
                 idx += 1
                 day_counter += 1
                 if yy >= gStartYear:
                     gDateCounterList.append(day_counter)
 
-            for _ in range(maxDays, 31):
+            for _ in range(max_days, 31):
                 idx += 1
                 if yy >= gStartYear:
                     gDateCounterList.append(-999)
 
 ###############################################################################
-# The index in these functions is not the excel date index used as the 
+# The index in these functions is not the excel date index used as the
 # internal representation of the date but the index of that date in the
 # padded date object used to store the dates in a way that allows for a
 # quick lookup. Do not confuse them as you will find they are out by months
 ###############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def date_index(d, m, y):
@@ -158,6 +165,7 @@ def date_index(d, m, y):
     return idx
 
 ###############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def date_from_index(idx):
@@ -170,8 +178,9 @@ def date_from_index(idx):
 
 ###############################################################################
 
+
 @njit(fastmath=True, cache=True)
-def weekDay(day_count):
+def weekday(day_count):
     weekday = (day_count+5) % 7
     return weekday
 
@@ -181,7 +190,6 @@ def weekDay(day_count):
 class Date():
     """ A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. """
-
 
     MON = 0
     TUE = 1
@@ -193,7 +201,7 @@ class Date():
 
     ###########################################################################
 
-    def __init__(self, d, m, y, hh=0, mm=0, ss=0):  
+    def __init__(self, d, m, y, hh=0, mm=0, ss=0):
         """ Create a date given a day of month, month and year. The arguments
         must be in the order of day (of month), month number and then the year.
         The year must be a 4-digit number greater than or equal to 1900. The
@@ -209,10 +217,11 @@ class Date():
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
         if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
-            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
+            raise FinError(
+                "Date arguments must now be in the order Date(dd, mm, yyyy)")
 
         if gDateCounterList is None:
-            calculateList()
+            calculate_list()
 
         if y < 1900:
             raise FinError("Year cannot be before 1900")
@@ -220,11 +229,11 @@ class Date():
         # Resize date list dynamically if required
         if y < gStartYear:
             gStartYear = y
-            calculateList()
+            calculate_list()
 
         if y > gEndYear:
             gEndYear = y
-            calculateList()
+            calculate_list()
 
         if y < gStartYear or y > gEndYear:
             raise FinError(
@@ -234,9 +243,9 @@ class Date():
         if d < 1:
             raise FinError("Date: Leap year. Day not valid.")
 
-        leapYear = isLeapYear(y)
+        leap_year = is_leap_year(y)
 
-        if leapYear:
+        if leap_year:
             if d > monthDaysLeapYear[m - 1]:
                 print(d, m, y)
                 raise FinError("Date: Leap year. Day not valid.")
@@ -257,12 +266,12 @@ class Date():
         self._y = y
         self._m = m
         self._d = d
-        
+
         self._hh = hh
         self._mm = mm
         self._ss = ss
 
-        self._excelDate = 0 # This is a float as it includes intraday time
+        self._excelDate = 0  # This is a float as it includes intraday time
 
         # update the excel date used for doing lots of financial calculations
         self._refresh()
@@ -271,17 +280,17 @@ class Date():
         dayFraction += self._mm/24.0/60.0
         dayFraction += self._ss/24.0/60.0/60.0
 
-        self._excelDate += dayFraction # This is a float as it includes intraday time
+        self._excelDate += dayFraction  # This is a float as it includes intraday time
 
     ###########################################################################
 
     @classmethod
-    def from_string(cls, dateString, formatString):
+    def from_string(cls, date_string, formatString):
         """  Create a Date from a date and format string.
         Example Input:
         start_date = Date('1-1-2018', '%d-%m-%Y') """
- 
-        d, m, y = parse_date(dateString, formatString)
+
+        d, m, y = parse_date(date_string, formatString)
         return cls(d, m, y)
 
     ###########################################################################
@@ -292,7 +301,7 @@ class Date():
 
         idx = date_index(self._d, self._m, self._y)
         daysSinceFirstJan1900 = gDateCounterList[idx]
-        wd = weekDay(daysSinceFirstJan1900)
+        wd = weekday(daysSinceFirstJan1900)
         self._excelDate = daysSinceFirstJan1900
         self._weekday = wd
 
@@ -328,7 +337,7 @@ class Date():
 
     ###########################################################################
 
-    def isWeekend(self):
+    def is_weekend(self):
         """ returns True if the date falls on a weekend. """
 
         if self._weekday == Date.SAT or self._weekday == Date.SUN:
@@ -340,20 +349,20 @@ class Date():
 
     def isEOM(self):
         """ returns True if this date falls on a month end. """
-        
+
         y = self._y
         m = self._m
         d = self._d
 
-        leapYear = isLeapYear(y)
+        leap_year = is_leap_year(y)
 
-        if leapYear:
+        if leap_year:
             if d == monthDaysLeapYear[m - 1]:
                 return True
         else:
             if d == monthDaysNotLeapYear[m - 1]:
                 return True
-                    
+
         return False
 
     ###########################################################################
@@ -364,9 +373,9 @@ class Date():
         y = self._y
         m = self._m
 
-        leapYear = isLeapYear(y)
+        leap_year = is_leap_year(y)
 
-        if leapYear:
+        if leap_year:
             lastDay = monthDaysLeapYear[m - 1]
             return Date(lastDay, m, y)
         else:
@@ -382,14 +391,14 @@ class Date():
 
         if hours < 0:
             raise FinError("Number of hours must be positive")
-        
-        startHour = self._hh        
+
+        startHour = self._hh
         finalHour = startHour + hours
         days = int(finalHour/24)
         hour = finalHour % 24
 
         # Move forward a specific number of days
-        dt1 = self.addDays(days)
+        dt1 = self.add_days(days)
 
         # On that date we then move to the correct hour
         dt2 = Date(dt1._d, dt1._m, dt1._y, hour, dt1._mm, dt1._ss)
@@ -397,8 +406,8 @@ class Date():
 
     ###########################################################################
 
-    def addDays(self,
-                numDays: int = 1):
+    def add_days(self,
+                 numDays: int = 1):
         """ Returns a new date that is numDays after the Date. I also make
         it possible to go backwards a number of days. """
 
@@ -419,8 +428,8 @@ class Date():
 
     ###########################################################################
 
-    def addWeekDays(self,
-                    numDays: int):
+    def add_weekdays(self,
+                     numDays: int):
         """ Returns a new date that is numDays working days after Date. Note
         that only weekends are taken into account. Other Holidays are not. If
         you want to include regional holidays then use add_business_days from
@@ -433,7 +442,7 @@ class Date():
 
         positiveNumDays = (numDays > 0)
         numDays = abs(numDays)
-        
+
         # 5 week days make up a week
         numWeeks = int(numDays / 5)
         remainingDays = numDays % 5
@@ -443,18 +452,18 @@ class Date():
                 # add weekend
                 remainingDays += 2
 
-            return self.addDays(numWeeks * 7 + remainingDays)
+            return self.add_days(numWeeks * 7 + remainingDays)
         else:
             if (self._weekday - remainingDays < self.MON):
                 # add weekend
                 remainingDays += 2
 
-            return self.addDays(-(numWeeks * 7 + remainingDays))
+            return self.add_days(-(numWeeks * 7 + remainingDays))
 
     ###########################################################################
 
-    def addMonths(self,
-                  mm: (list, int)):
+    def add_months(self,
+                   mm: (list, int)):
         """ Returns a new date that is mm months after the Date. If mm is an
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates."""
@@ -494,9 +503,9 @@ class Date():
                 m = m + 12
                 y -= 1
 
-            leapYear = isLeapYear(y)
+            leap_year = is_leap_year(y)
 
-            if leapYear:
+            if leap_year:
                 if d > monthDaysLeapYear[m - 1]:
                     d = monthDaysLeapYear[m-1]
             else:
@@ -513,8 +522,8 @@ class Date():
 
     ###########################################################################
 
-    def addYears(self,
-                 yy: (np.ndarray, float)):
+    def add_years(self,
+                  yy: (np.ndarray, float)):
         """ Returns a new date that is yy years after the Date. If yy is an
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates."""
@@ -542,8 +551,8 @@ class Date():
 
             mmi = int(yyi * 12.0)
             ddi = int((yyi * 12.0 - mmi) * daysInMonth)
-            newDt = self.addMonths(mmi)
-            newDt = newDt.addDays(ddi)
+            newDt = self.add_months(mmi)
+            newDt = newDt.add_days(ddi)
 
             dateList.append(newDt)
 
@@ -554,12 +563,12 @@ class Date():
 
     ##########################################################################
 
-    def nextCDSDate(self,
-                    mm: int = 0):
+    def next_cds_date(self,
+                      mm: int = 0):
         """ Returns a CDS date that is mm months after the Date. If no
         argument is supplied then the next CDS date after today is returned."""
 
-        next_date = self.addMonths(mm)
+        next_date = self.add_months(mm)
 
         y = next_date._y
         m = next_date._m
@@ -592,9 +601,9 @@ class Date():
 
     ##########################################################################
 
-    def thirdWednesdayOfMonth(self,
-                              m: int,  # Month number
-                              y: int):  # Year number
+    def third_wednesday_of_month(self,
+                                 m: int,  # Month number
+                                 y: int):  # Year number
         """ For a specific month and year this returns the day number of the
             3rd Wednesday by scanning through dates in the third week. """
 
@@ -615,7 +624,7 @@ class Date():
 
     ##########################################################################
 
-    def nextIMMDate(self):
+    def next_imm_date(self):
         """ This function returns the next IMM date after the current date
             This is a 3rd Wednesday of Jun, March, Sep or December. For an 
             IMM contract the IMM date is the First Delivery Date of the
@@ -627,33 +636,33 @@ class Date():
 
         y_imm = y
 
-        if m == 12 and d >= self.thirdWednesdayOfMonth(m, y):
+        if m == 12 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 3
             y_imm = y + 1
         elif m == 10 or m == 11 or m == 12:
             m_imm = 12
-        elif m == 9 and d >= self.thirdWednesdayOfMonth(m, y):
+        elif m == 9 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 12
         elif m == 7 or m == 8 or m == 9:
             m_imm = 9
-        elif m == 6 and d >= self.thirdWednesdayOfMonth(m, y):
+        elif m == 6 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 9
         elif m == 4 or m == 5 or m == 6:
             m_imm = 6
-        elif m == 3 and d >= self.thirdWednesdayOfMonth(m, y):
+        elif m == 3 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 6
         elif m == 1 or m == 2 or m == 3:
             m_imm = 3
 
-        d_imm = self.thirdWednesdayOfMonth(m_imm, y_imm)
+        d_imm = self.third_wednesday_of_month(m_imm, y_imm)
 
         immDate = Date(d_imm, m_imm, y_imm)
         return immDate
 
     ###########################################################################
 
-    def addTenor(self,
-                 tenor: (list,str)):
+    def add_tenor(self,
+                  tenor: (list, str)):
         """ Return the date following the Date by a period given by the
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
@@ -676,51 +685,51 @@ class Date():
 
         newDates = []
 
-        for tenStr in tenor:            
+        for tenStr in tenor:
             tenStr = tenStr.upper()
             DAYS = 1
             WEEKS = 2
             MONTHS = 3
             YEARS = 4
-    
+
             periodType = 0
-            numPeriods = 0
-    
+            num_periods = 0
+
             if tenStr == "ON":   # overnight - should be used only if spot days = 0
                 periodType = DAYS
-                numPeriods = 1
+                num_periods = 1
             elif tenStr == "TN":  # overnight - should be used when spot days > 0
                 periodType = DAYS
-                numPeriods = 1
+                num_periods = 1
             elif tenStr[-1] == "D":
                 periodType = DAYS
-                numPeriods = int(tenStr[0:-1])
+                num_periods = int(tenStr[0:-1])
             elif tenStr[-1] == "W":
                 periodType = WEEKS
-                numPeriods = int(tenStr[0:-1])
+                num_periods = int(tenStr[0:-1])
             elif tenStr[-1] == "M":
                 periodType = MONTHS
-                numPeriods = int(tenStr[0:-1])
+                num_periods = int(tenStr[0:-1])
             elif tenStr[-1] == "Y":
                 periodType = YEARS
-                numPeriods = int(tenStr[0:-1])
+                num_periods = int(tenStr[0:-1])
             else:
                 raise FinError("Unknown tenor type in " + tenor)
-    
+
             newDate = Date(self._d, self._m, self._y)
-    
+
             if periodType == DAYS:
-                for _ in range(0, numPeriods):
-                    newDate = newDate.addDays(1)
+                for _ in range(0, num_periods):
+                    newDate = newDate.add_days(1)
             elif periodType == WEEKS:
-                for _ in range(0, numPeriods):
-                    newDate = newDate.addDays(7)
+                for _ in range(0, num_periods):
+                    newDate = newDate.add_days(7)
             elif periodType == MONTHS:
-                for _ in range(0, numPeriods):
-                    newDate = newDate.addMonths(1)
+                for _ in range(0, num_periods):
+                    newDate = newDate.add_months(1)
             elif periodType == YEARS:
-                for _ in range(0, numPeriods):
-                    newDate = newDate.addMonths(12)
+                for _ in range(0, num_periods):
+                    newDate = newDate.add_months(12)
 
             newDates.append(newDate)
 
@@ -743,16 +752,16 @@ class Date():
 
     def str(self, format):
         """ returns a formatted string of the date """
-        dateStr = ""
+        date_str = ""
 
         if self._d < 10:
-            dateStr += "0" + str(self._d) + ""
+            date_str += "0" + str(self._d) + ""
         else:
-            dateStr += "" + str(self._d) + ""
+            date_str += "" + str(self._d) + ""
 
-        dateStr += shortMonthNames[self._m - 1]
-        dateStr += "" + str(self._y)
-        return dateStr
+        date_str += shortMonthNames[self._m - 1]
+        date_str += "" + str(self._y)
+        return date_str
 
     ###########################################################################
 
@@ -760,7 +769,7 @@ class Date():
         """ returns a formatted string of the date """
 
         global gDateFormatType
-        
+
         dayNameStr = shortDayNames[self._weekday]
 
         if self._d < 10:
@@ -781,56 +790,56 @@ class Date():
         if gDateFormatType == DateFormatTypes.UK_LONGEST:
 
             sep = " "
-            dateStr = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
-            return dateStr
+            date_str = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.UK_LONG:
 
             sep = "-"
-            dateStr = dayStr + sep + longMonthStr + sep + longYearStr
-            return dateStr
+            date_str = dayStr + sep + longMonthStr + sep + longYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
-            dateStr = dayStr + sep + shortMonthStr + sep + longYearStr
-            return dateStr
-    
+            date_str = dayStr + sep + shortMonthStr + sep + longYearStr
+            return date_str
+
         elif gDateFormatType == DateFormatTypes.UK_SHORT:
 
             sep = "/"
-            dateStr = dayStr + sep + shortMonthStr + sep + shortYearStr
-            return dateStr
+            date_str = dayStr + sep + shortMonthStr + sep + shortYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.US_LONGEST:
 
             sep = " "
-            dateStr = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
-            return dateStr
+            date_str = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.US_LONG:
 
             sep = "-"
-            dateStr = longMonthStr + sep + dayStr + sep + longYearStr
-            return dateStr
+            date_str = longMonthStr + sep + dayStr + sep + longYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.US_MEDIUM:
-            
+
             sep = "-"
-            dateStr = shortMonthStr + sep + dayStr + sep + longYearStr
-            return dateStr
+            date_str = shortMonthStr + sep + dayStr + sep + longYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.US_SHORT:
 
             sep = "-"
-            dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
-            return dateStr
+            date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
-            dateStr = shortMonthStr + sep + dayStr + sep + shortYearStr
-            return dateStr
+            date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
+            return date_str
 
         elif gDateFormatType == DateFormatTypes.DATETIME:
 
@@ -852,17 +861,17 @@ class Date():
                 secondStr = str(self._ss)
 
             timeStr = hourStr + ":" + minuteStr + ":" + secondStr
-            dateStr = dayStr + sep + shortMonthStr + sep + longYearStr
-            dateStr = dateStr + " " + timeStr
-            return dateStr
+            date_str = dayStr + sep + shortMonthStr + sep + longYearStr
+            date_str = date_str + " " + timeStr
+            return date_str
 
         else:
-            
+
             raise FinError("Unknown date format")
 
     ###########################################################################
     # REMOVE THIS
-    
+
     def _print(self):
         """ prints formatted string of the date. """
         print(self)
@@ -877,14 +886,14 @@ def dailyWorkingDaySchedule(self,
                             start_date: Date,
                             end_date: Date):
     """ Returns a list of working dates between start_date and end_date.
-    This function should be replaced by dateRange once addTenor allows
+    This function should be replaced by dateRange once add_tenor allows
     for working days. """
     dateList = []
 
     dt = start_date
     dateList.append(dt)
     while dt < end_date:
-        dt = dt.addWeekDays(1)
+        dt = dt.add_weekdays(1)
         dateList.append(dt)
 
     return dateList
@@ -910,18 +919,20 @@ def fromDatetime(dt: Date):
 
 ###############################################################################
 
+
 def daysInMonth(m, y):
     """ Get the number of days in the month (1-12) of a given year y. """
 
     if m < 1 or m > 12:
         raise FinError("Month must be 1-12")
-    
-    if isLeapYear(y) is False:
+
+    if is_leap_year(y) is False:
         return monthDaysNotLeapYear[m-1]
     else:
         return monthDaysLeapYear[m-1]
 
 ###############################################################################
+
 
 def dateRange(start_date: Date,
               end_date: Date,
@@ -938,15 +949,16 @@ def dateRange(start_date: Date,
     dt = start_date
     while dt < end_date:
         dateList.append(dt)
-        dt = dt.addTenor(tenor)
+        dt = dt.add_tenor(tenor)
     dateList.append(end_date)
 
     return dateList
 
 ###############################################################################
 
+
 def testType():
     global gDateFormatType
     print("TEST TYPE", gDateFormatType)
-    
+
 ###############################################################################

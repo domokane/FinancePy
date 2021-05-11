@@ -7,12 +7,9 @@ from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.models.option_implied_dbn import optionImpliedDbn
-from financepy.models.black_scholes import BlackScholes
 from financepy.models.volatility_fns import vol_function_clark
-from financepy.models.volatility_fns import FinVolFunctionTypes
 from financepy.utils.date import Date
 from financepy.market.curves.curve_flat import DiscountCurveFlat
-import matplotlib.pyplot as plt
 import numpy as np
 import sys
 sys.path.append("..")
@@ -103,8 +100,7 @@ def test_FinOptionImpliedDbn():
             strikes = np.array(strikes)
             vols = np.array(vols)
 
-            dbn = optionImpliedDbn(spot_fx_rate, texp, rd, rf, strikes, vols)
-
+#            dbn = optionImpliedDbn(spot_fx_rate, texp, rd, rf, strikes, vols)
 #            print("SUM:", dbn.sum())
 #            plt.figure()
 #            plt.plot(dbn._x, dbn._densitydx)

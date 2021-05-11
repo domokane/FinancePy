@@ -2,17 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
+from financepy.market.volatility.equity_vol_curve import EquityVolCurve
+from financepy.utils.date import Date
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.market.volatility.equity_vol_curve import EquityVolCurve
-from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
-from financepy.market.curves.curve_flat import DiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -38,7 +38,7 @@ def test_EquityVarianceSwap():
     dividend_yield = 0.0
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    maturity_date = start_date.addMonths(3)
+    maturity_date = start_date.add_months(3)
 
     atmVol = 0.20
     atmK = 100.0
@@ -59,8 +59,8 @@ def test_EquityVarianceSwap():
     testCases.header("LABEL", "VALUE")
 
     k1 = volSwap.fair_strike(valuation_date, stock_price, dividend_curve,
-                            volCurve, num_call_options, num_put_options,
-                            strike_spacing, discount_curve, use_forward)
+                             volCurve, num_call_options, num_put_options,
+                             strike_spacing, discount_curve, use_forward)
 
     testCases.print("REPLICATION VARIANCE:", k1)
 

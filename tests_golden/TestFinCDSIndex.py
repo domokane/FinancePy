@@ -25,9 +25,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildIborCurve(tradeDate):
+def build_Ibor_Curve(tradeDate):
 
-    valuation_date = tradeDate.addDays(1)
+    valuation_date = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
     depos = []
 
@@ -39,7 +39,7 @@ def buildIborCurve(tradeDate):
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
     settlement_date = valuation_date
 
-    maturity_date = settlement_date.addMonths(12)
+    maturity_date = settlement_date.add_months(12)
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
@@ -49,7 +49,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.addMonths(24)
+    maturity_date = settlement_date.add_months(24)
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
@@ -59,7 +59,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.addMonths(36)
+    maturity_date = settlement_date.add_months(36)
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
@@ -69,7 +69,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.addMonths(48)
+    maturity_date = settlement_date.add_months(48)
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
@@ -79,7 +79,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.addMonths(60)
+    maturity_date = settlement_date.add_months(60)
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
@@ -98,7 +98,7 @@ def buildIborCurve(tradeDate):
 
 def buildIssuerCurve(tradeDate, libor_curve):
 
-    valuation_date = tradeDate.addDays(1)
+    valuation_date = tradeDate.add_days(1)
 
     cdsMarketContracts = []
 
@@ -122,9 +122,9 @@ def test_valueCDSIndex():
 
     # We treat an index as a CDS contract with a flat CDS curve
     tradeDate = Date(7, 2, 2006)
-    libor_curve = buildIborCurve(tradeDate)
+    libor_curve = build_Ibor_Curve(tradeDate)
     issuer_curve = buildIssuerCurve(tradeDate, libor_curve)
-    step_in_date = tradeDate.addDays(1)
+    step_in_date = tradeDate.add_days(1)
     valuation_date = step_in_date
     maturity_date = Date(20, 6, 2010)
 

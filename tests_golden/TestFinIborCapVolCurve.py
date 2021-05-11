@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -24,13 +24,13 @@ def test_FinCapVolCurve():
 
     capVolDates = []
     capletVolTenor = "1Y"
-    numPeriods = 10
+    num_periods = 10
     capletDt = valuation_date
 
     capVolDates.append(valuation_date)
 
-    for i in range(0, numPeriods):
-        capletDt = capletDt.addTenor(capletVolTenor)
+    for i in range(0, num_periods):
+        capletDt = capletDt.add_tenor(capletVolTenor)
         capVolDates.append(capletDt)
 
     capVolatilities = [0.0, 15.50, 18.25, 17.91, 17.74, 17.27,

@@ -2,17 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import numpy as np
+from FinTestCases import FinTestCases, globalTestCaseMode
+# import numpy as np
 
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 #
-#def test_FinPieceCurve():
+# def test_FinPieceCurve():
 #
 #    times = np.linspace(0.0, 1.0, 5)
 #    values = np.ones(5) * 0.05
@@ -31,5 +31,5 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-#test_FinPieceCurve()
+# test_FinPieceCurve()
 testCases.compareTestCases()

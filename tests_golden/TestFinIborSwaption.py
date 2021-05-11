@@ -38,7 +38,7 @@ def test_FinIborDepositsAndSwaps(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.addWeekDays(spot_days)
+    settlement_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
     depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
@@ -102,7 +102,7 @@ def testFinIborSwaptionModels():
     model5 = HWTree(0.00001, 0.00001)
     model6 = BKTree(0.01, 0.01)
 
-    settlement_date = valuation_date.addWeekDays(2)
+    settlement_date = valuation_date.add_weekdays(2)
 
     for k in strikes:
         swaptionType = SwapTypes.PAY
@@ -209,8 +209,8 @@ def test_FinIborSwaptionQLExample():
     libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
                                   InterpTypes.LINEAR_ZERO_RATES)
 
-    exercise_date = settlement_date.addTenor("5Y")
-    swapMaturityDate = exercise_date.addTenor("5Y")
+    exercise_date = settlement_date.add_tenor("5Y")
+    swapMaturityDate = exercise_date.add_tenor("5Y")
     swapFixedCoupon = 0.040852
     swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
@@ -322,8 +322,8 @@ def testFinIborCashSettledSwaption():
     libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
                                   InterpTypes.LINEAR_ZERO_RATES)
 
-    exercise_date = settlement_date.addTenor("5Y")
-    swapMaturityDate = exercise_date.addTenor("5Y")
+    exercise_date = settlement_date.add_tenor("5Y")
+    swapMaturityDate = exercise_date.add_tenor("5Y")
     swapFixedCoupon = 0.040852
     swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA

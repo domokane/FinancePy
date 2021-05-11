@@ -52,10 +52,10 @@ def accrued_interpolator(tset: float,  # Settlement time in years
 
 
 @njit(boolean(int64), fastmath=True, cache=True)
-def isLeapYear(y: int):
+def is_leap_year(y: int):
     """ Test whether year y is a leap year - if so return True, else False """
-    leapYear = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
-    return leapYear
+    leap_year = ((y % 4 == 0) and (y % 100 != 0) or (y % 400 == 0))
+    return leap_year
 
 ###############################################################################
 

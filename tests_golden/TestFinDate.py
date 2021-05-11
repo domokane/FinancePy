@@ -2,22 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import set_date_format
+from financepy.utils.date import DateFormatTypes
+from financepy.utils.date import Date, dateRange
 import numpy as np
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date, dateRange
-from financepy.utils.date import DateFormatTypes
-from financepy.utils.date import setDateFormatType
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-setDateFormatType(DateFormatTypes.UK_LONGEST)
+set_date_format(DateFormatTypes.UK_LONGEST)
+
 
 def test_Date():
 
@@ -28,17 +29,17 @@ def test_Date():
     testCases.header("DATE", "MONTHS", "CDS DATE")
 
     for num_months in range(0, 120):
-        nextCDSDate = start_date.nextCDSDate(num_months)
-        testCases.print(str(start_date), num_months, str(nextCDSDate))
+        next_cds_date = start_date.next_cds_date(num_months)
+        testCases.print(str(start_date), num_months, str(next_cds_date))
 
     start_date = Date(1, 1, 2018)
 
     testCases.header("STARTDATE", "MONTHS", "CDS DATE")
 
     for num_months in range(0, 365):
-        start_date = start_date.addDays(1)
-        nextIMMDate = start_date.nextIMMDate()
-        testCases.print(num_months, str(start_date), str(nextIMMDate))
+        start_date = start_date.add_days(1)
+        next_imm_date = start_date.next_imm_date()
+        testCases.print(num_months, str(start_date), str(next_imm_date))
 
 ###############################################################################
 
@@ -49,34 +50,34 @@ def test_DateTenors():
 
     testCases.header("TENOR", "DATE")
     tenor = "5d"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "7D"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "1W"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "4W"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "1M"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "24M"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "2Y"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "10y"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "0m"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
     tenor = "20Y"
-    testCases.print(tenor, start_date.addTenor(tenor))
+    testCases.print(tenor, start_date.add_tenor(tenor))
 
 ###############################################################################
 
@@ -87,11 +88,11 @@ def test_DateRange():
 
     testCases.header("Tenor", "Dates")
 
-    end_date = start_date.addDays(3)
+    end_date = start_date.add_days(3)
     tenor = "Default"
     testCases.print(tenor, dateRange(start_date, end_date))
 
-    end_date = start_date.addDays(20)
+    end_date = start_date.add_days(20)
     tenor = "1W"
     testCases.print(tenor, dateRange(start_date, end_date, tenor))
 
@@ -116,7 +117,7 @@ def test_DateAddMonths():
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
 
-    dates = start_date.addMonths(months)
+    dates = start_date.add_months(months)
 
     testCases.header("DATES", "DATE")
 
@@ -133,24 +134,24 @@ def test_DateAddYears():
     testCases.header("Years", "Dates")
 
     years = [1, 3, 5, 7, 10]
-    dates1 = start_date.addYears(years)
+    dates1 = start_date.add_years(years)
     for dt in dates1:
         testCases.print("DATES1", dt)
 
     years = np.array([1, 3, 5, 7, 10])
-    dates2 = start_date.addYears(years)
+    dates2 = start_date.add_years(years)
     for dt in dates2:
         testCases.print("DATES2", dt)
 
     years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
-    dates3 = start_date.addYears(years)
+    dates3 = start_date.add_years(years)
 
     for dt in dates3:
         testCases.print("DATES3", dt)
 
     dt = 1.0/365.0
     years = np.array([1.5+2.0*dt, 3.5-6*dt, 5.75+3*dt, 7.25+dt, 10.0+dt])
-    dates4 = start_date.addYears(years)
+    dates4 = start_date.add_years(years)
 
     for dt in dates4:
         testCases.print("DATES4", dt)
@@ -185,7 +186,7 @@ def test_DateFormat():
     testCases.header("FORMAT", "DATE")
 
     for formatType in DateFormatTypes:
-        setDateFormatType(formatType) 
+        set_date_format(formatType)
         testCases.print(formatType.name, dt)
 
 ###############################################################################
@@ -225,6 +226,7 @@ def test_IntraDay():
     testCases.print(d1._excelDate, d2._excelDate, diff)
 
 ###############################################################################
+
 
 def test_DateEOM():
 
@@ -277,7 +279,8 @@ def test_DateEOM():
     assert(dt.EOM().isEOM() == True)
 
 ###############################################################################
-    
+
+
 start = time.time()
 
 test_Date()
@@ -296,4 +299,4 @@ elapsed = end - start
 
 testCases.compareTestCases()
 
-setDateFormatType(DateFormatTypes.UK_LONG)
+set_date_format(DateFormatTypes.UK_LONG)

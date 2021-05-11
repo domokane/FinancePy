@@ -33,7 +33,7 @@ class FinFXVarianceSwap:
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
         else:
-            maturity_date = effective_date.addTenor(maturity_date_or_tenor)
+            maturity_date = effective_date.add_tenor(maturity_date_or_tenor)
 
         if effective_date >= maturity_date:
             raise FinError("Start date after or same as maturity date")

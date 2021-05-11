@@ -118,7 +118,7 @@ class EquityOption:
                        discount_curve,
                        dividend_curve, model)
 
-        next_date = valuation_date.addDays(1)
+        next_date = valuation_date.add_days(1)
 
         # Need to do this carefully.
 

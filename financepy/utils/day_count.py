@@ -3,7 +3,7 @@
 ##############################################################################
 
 from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
-from .date import isLeapYear
+from .date import is_leap_year
 from .error import FinError
 from .frequency import FrequencyTypes, annual_frequency
 from .global_vars import gDaysInYear
@@ -22,7 +22,7 @@ from enum import Enum
 def isLastDayOfFeb(dt: Date):
     # Return true if we are on the last day of February
     if dt._m == 2:
-        isLeap = isLeapYear(dt._y)
+        isLeap = is_leap_year(dt._y)
         if isLeap is True and dt._d == 29:
             return True
         if isLeap is False and dt._d == 28:
@@ -187,12 +187,12 @@ class DayCount:
 
         elif self._type == DayCountTypes.ACT_ACT_ISDA:
 
-            if isLeapYear(y1):
+            if is_leap_year(y1):
                 denom1 = 366
             else:
                 denom1 = 365
 
-            if isLeapYear(y2):
+            if is_leap_year(y2):
                 denom2 = 366
             else:
                 denom2 = 365
@@ -256,9 +256,9 @@ class DayCount:
             num = dt2 - dt1
             den = 365
 
-            if isLeapYear(y1):
+            if is_leap_year(y1):
                 feb29 = Date(29, 2, y1)
-            elif isLeapYear(y3):
+            elif is_leap_year(y3):
                 feb29 = Date(29, 2, y3)
             else:
                 feb29 = Date(1, 1, 1900)
@@ -267,7 +267,7 @@ class DayCount:
                 if feb29 > dt1 and feb29 <= dt3:
                     den = 366
             else:
-                if isLeapYear(y3) is True:
+                if is_leap_year(y3) is True:
                     den = 366
 
             acc_factor = num / den

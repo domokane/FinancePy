@@ -70,8 +70,8 @@ def test_HullWhiteExampleTwo():
     strike = 63.0
     face = 100.0
 
-    expiry_date = start_date.addTenor("3Y")
-    maturity_date = start_date.addTenor("9Y")
+    expiry_date = start_date.add_tenor("3Y")
+    maturity_date = start_date.add_tenor("9Y")
 
     texp = (expiry_date - start_date)/gDaysInYear
     tmat = (maturity_date - start_date)/gDaysInYear
@@ -125,8 +125,8 @@ def test_HullWhiteBondOption():
 
     settlement_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    expiry_date = settlement_date.addTenor("18m")
-    maturity_date = settlement_date.addTenor("10Y")
+    expiry_date = settlement_date.add_tenor("18m")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
@@ -223,7 +223,7 @@ def test_HullWhiteCallableBond():
 
     settlement_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    maturity_date = settlement_date.addTenor("10Y")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
@@ -250,19 +250,19 @@ def test_HullWhiteCallableBond():
     call_dates = []
     call_prices = []
     callPx = 120.0
-    call_dates.append(settlement_date.addTenor("2Y"))
+    call_dates.append(settlement_date.add_tenor("2Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("3Y"))
+    call_dates.append(settlement_date.add_tenor("3Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("4Y"))
+    call_dates.append(settlement_date.add_tenor("4Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("5Y"))
+    call_dates.append(settlement_date.add_tenor("5Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("6Y"))
+    call_dates.append(settlement_date.add_tenor("6Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("7Y"))
+    call_dates.append(settlement_date.add_tenor("7Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.addTenor("8Y"))
+    call_dates.append(settlement_date.add_tenor("8Y"))
     call_prices.append(callPx)
 
     call_times = []
@@ -273,19 +273,19 @@ def test_HullWhiteCallableBond():
     put_dates = []
     put_prices = []
     putPx = 98.0
-    put_dates.append(settlement_date.addTenor("2Y"))
+    put_dates.append(settlement_date.add_tenor("2Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("3Y"))
+    put_dates.append(settlement_date.add_tenor("3Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("4Y"))
+    put_dates.append(settlement_date.add_tenor("4Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("5Y"))
+    put_dates.append(settlement_date.add_tenor("5Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("6Y"))
+    put_dates.append(settlement_date.add_tenor("6Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("7Y"))
+    put_dates.append(settlement_date.add_tenor("7Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.addTenor("8Y"))
+    put_dates.append(settlement_date.add_tenor("8Y"))
     put_prices.append(putPx)
 
     put_times = []

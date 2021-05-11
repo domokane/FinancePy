@@ -196,7 +196,7 @@ class FXVanillaOption():
 
         check_argument_types(self.__init__, locals())
 
-        delivery_date = expiry_date.addWeekDays(spot_days)
+        delivery_date = expiry_date.add_weekdays(spot_days)
 
         """ The FX rate the price in domestic currency ccy2 of a single unit
         of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
@@ -250,7 +250,7 @@ class FXVanillaOption():
         price in domestic of one unit of foreign currency. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.addWeekDays(self._spot_days)
+            spotDate = valuation_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spotDate) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
@@ -398,7 +398,7 @@ class FXVanillaOption():
         by Iain Clark, published by Wiley Finance. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.addWeekDays(self._spot_days)
+            spotDate = valuation_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spotDate) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
@@ -454,7 +454,7 @@ class FXVanillaOption():
         the volatility surface. Avoids discount curve interpolation so it 
         should be slightly faster than the full calculation of delta. """
 
-#        spotDate = valuation_date.addWeekDays(self._spot_days)
+#        spotDate = valuation_date.add_weekdays(self._spot_days)
 #        tdel = (self._delivery_date - valuation_date) / gDaysInYear
 #        tdel = np.maximum(tdel, gSmall)
 

@@ -65,7 +65,7 @@ class FXDigitalOption:
         domestic or foreign currency. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.addWeekDays(self._spot_days)
+            spotDate = valuation_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spotDate) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:

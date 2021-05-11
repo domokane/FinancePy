@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.utils.global_types import FinOptionTypes
+from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
+from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
-from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
-from financepy.utils.global_types import FinOptionTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_EquityLookBackOption():
     valuation_date = Date(1, 1, 2015)
@@ -510,14 +511,17 @@ def test_EquityLookBackOption():
 
 ###############################################################################
 
+
 def test_example():
 
     expiry_date = Date(1, 1, 2021)
     strike_price = 105.0
     option_typeCall = FinOptionTypes.EUROPEAN_CALL
     option_typePut = FinOptionTypes.EUROPEAN_PUT
-    lookbackCall = EquityFixedLookbackOption(expiry_date, option_typeCall, strike_price)
-    lookbackPut = EquityFixedLookbackOption(expiry_date, option_typePut, strike_price)
+    lookbackCall = EquityFixedLookbackOption(
+        expiry_date, option_typeCall, strike_price)
+    lookbackPut = EquityFixedLookbackOption(
+        expiry_date, option_typePut, strike_price)
 
     valuation_date = Date(1, 1, 2020)
     interest_rate = 0.10
@@ -532,11 +536,13 @@ def test_example():
 
     testCases.header("VALUE")
     for vol in volatilities:
-        v = lookbackCall.value(valuation_date, stock_price, discount_curve, dividend_curve, vol, stock_min_max)
+        v = lookbackCall.value(valuation_date, stock_price,
+                               discount_curve, dividend_curve, vol, stock_min_max)
         testCases.print(v)
 
 ###############################################################################
 
+
 test_example()
-#test_EquityLookBackOption()
+# test_EquityLookBackOption()
 testCases.compareTestCases()

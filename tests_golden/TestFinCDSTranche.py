@@ -30,9 +30,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
-def buildIborCurve(tradeDate):
+def build_Ibor_Curve(tradeDate):
 
-    valuation_date = tradeDate.addDays(1)
+    valuation_date = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
 
     depos = []
@@ -43,7 +43,7 @@ def buildIborCurve(tradeDate):
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
     settlement_date = valuation_date
 
-    maturity_date = settlement_date.addMonths(12)
+    maturity_date = settlement_date.add_months(12)
     swap1 = IborSwap(
         settlement_date,
         maturity_date,
@@ -53,7 +53,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.addMonths(24)
+    maturity_date = settlement_date.add_months(24)
     swap2 = IborSwap(
         settlement_date,
         maturity_date,
@@ -63,7 +63,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.addMonths(36)
+    maturity_date = settlement_date.add_months(36)
     swap3 = IborSwap(
         settlement_date,
         maturity_date,
@@ -73,7 +73,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.addMonths(48)
+    maturity_date = settlement_date.add_months(48)
     swap4 = IborSwap(
         settlement_date,
         maturity_date,
@@ -83,7 +83,7 @@ def buildIborCurve(tradeDate):
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.addMonths(60)
+    maturity_date = settlement_date.add_months(60)
     swap5 = IborSwap(
         settlement_date,
         maturity_date,
@@ -106,10 +106,10 @@ def loadHomogeneousCDSCurves(valuation_date,
                              cdsSpread10Y,
                              num_credits):
 
-    maturity3Y = valuation_date.nextCDSDate(36)
-    maturity5Y = valuation_date.nextCDSDate(60)
-    maturity7Y = valuation_date.nextCDSDate(84)
-    maturity10Y = valuation_date.nextCDSDate(120)
+    maturity3Y = valuation_date.next_cds_date(36)
+    maturity5Y = valuation_date.next_cds_date(60)
+    maturity7Y = valuation_date.next_cds_date(84)
+    maturity10Y = valuation_date.next_cds_date(120)
 
     recovery_rate = 0.40
 
@@ -136,10 +136,10 @@ def loadHomogeneousCDSCurves(valuation_date,
 
 def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
 
-    maturity3Y = valuation_date.nextCDSDate(36)
-    maturity5Y = valuation_date.nextCDSDate(60)
-    maturity7Y = valuation_date.nextCDSDate(84)
-    maturity10Y = valuation_date.nextCDSDate(120)
+    maturity3Y = valuation_date.next_cds_date(36)
+    maturity5Y = valuation_date.next_cds_date(60)
+    maturity7Y = valuation_date.next_cds_date(84)
+    maturity10Y = valuation_date.next_cds_date(120)
     path = os.path.join(os.path.dirname(__file__), './/data//CDX_NA_IG_S7_SPREADS.csv')
     f = open(path, 'r')
     data = f.readlines()
@@ -176,15 +176,15 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
 def test_FinCDSTranche():
 
     tradeDate = Date(1, 3, 2007)
-    step_in_date = tradeDate.addDays(1)
-    valuation_date = tradeDate.addDays(1)
+    step_in_date = tradeDate.add_days(1)
+    valuation_date = tradeDate.add_days(1)
 
     testCases.header("DATE")
     testCases.print(str((tradeDate)))
     testCases.print(str((step_in_date)))
     testCases.print(str((valuation_date)))
 
-    libor_curve = buildIborCurve(tradeDate)
+    libor_curve = build_Ibor_Curve(tradeDate)
 
     trancheMaturity = Date(20, 12, 2011)
     tranche1 = CDSTranche(valuation_date, trancheMaturity, 0.00, 0.03)

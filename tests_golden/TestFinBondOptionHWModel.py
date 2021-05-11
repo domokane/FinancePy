@@ -33,7 +33,7 @@ def test_BondOption():
 
     settlement_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    maturity_date = settlement_date.addTenor("10Y")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
@@ -41,10 +41,10 @@ def test_BondOption():
 
     times = np.linspace(0, 10.0, 21)
     dfs = np.exp(-0.05*times)
-    dates = settlement_date.addYears(times)
+    dates = settlement_date.add_years(times)
     discount_curve = DiscountCurve(settlement_date, dates, dfs)
 
-    expiry_date = settlement_date.addTenor("18m")
+    expiry_date = settlement_date.add_tenor("18m")
     strike_price = 105.0
     face = 100.0
 
@@ -287,12 +287,12 @@ def test_BondOptionAmericanConvergenceTWO():
 
     # Bond details
     issue_date = Date(1, 12, 2015)
-    maturity_date = settlement_date.addTenor("10Y")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
-    expiry_date = settlement_date.addTenor("18m")
+    expiry_date = settlement_date.add_tenor("18m")
     face = 100.0
 
     spotValue = bond.clean_price_from_discount_curve(settlement_date, discount_curve)

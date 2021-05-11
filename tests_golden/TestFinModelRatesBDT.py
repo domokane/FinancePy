@@ -2,33 +2,34 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.helpers import print_tree
+from financepy.models.bdt_tree import BDTTree
+from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.models.black import Black
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.bonds.bond import Bond
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.curve import DiscountCurve
+from financepy.utils.date import Date
 import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.market.curves.curve import DiscountCurve
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.products.bonds.bond import Bond
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.models.black import Black
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import gDaysInYear
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.models.bdt_tree import BDTTree
-from financepy.utils.helpers import print_tree
-from financepy.utils.global_types import FinExerciseTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
 ###############################################################################
+
 
 def testBlackModelCheck():
 
@@ -74,7 +75,7 @@ def test_BDTExampleOne():
 
     valuation_date = Date(1, 1, 2020)
     years = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-    zero_dates = valuation_date.addYears(years)
+    zero_dates = valuation_date.add_years(years)
     zero_rates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
 
     testCases.header("DATES")
@@ -115,8 +116,8 @@ def test_BDTExampleTwo():
 
     settlement_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2015)
-    expiry_date = settlement_date.addTenor("18m")
-    maturity_date = settlement_date.addTenor("10Y")
+    expiry_date = settlement_date.add_tenor("18m")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
@@ -150,7 +151,7 @@ def test_BDTExampleTwo():
     tmat = (maturity_date - settlement_date) / gDaysInYear
     texp = (expiry_date - settlement_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settlement_date.addYears(times)
+    dates = settlement_date.add_years(times)
     dfs = np.exp(-0.05*times)
 
     testCases.header("LABEL", "VALUES")
@@ -164,7 +165,7 @@ def test_BDTExampleTwo():
     sigma = 0.20
 
     # Test convergence
-    num_stepsList = [5] #[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    num_stepsList = [5]  # [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exercise_type = FinExerciseTypes.AMERICAN
 
     testCases.header("Values")
@@ -173,7 +174,7 @@ def test_BDTExampleTwo():
         model = BDTTree(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
-                             face, coupon_times, coupon_flows, exercise_type)
+                              face, coupon_times, coupon_flows, exercise_type)
 
         testCases.print(v)
         treeVector.append(v['call'])
@@ -203,7 +204,7 @@ def test_BDTExampleThree():
 
     settlement_date = Date(1, 1, 2020)
     times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-    dates = settlement_date.addYears(times)
+    dates = settlement_date.add_years(times)
     rate = 0.06
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
     curve = DiscountCurve(settlement_date, dates, dfs)
@@ -216,15 +217,15 @@ def test_BDTExampleThree():
     # Andersen paper
     num_time_steps = 200
 
-    testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", 
+    testCases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat",
                      "V_Fixed", "V_pay", "V_rec")
 
     for exercise_type in [FinExerciseTypes.EUROPEAN,
-                         FinExerciseTypes.BERMUDAN]:
+                          FinExerciseTypes.BERMUDAN]:
 
         for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:
 
-            maturity_date = settlement_date.addYears(years_to_maturity)
+            maturity_date = settlement_date.add_years(years_to_maturity)
             issue_date = Date(maturity_date._d, maturity_date._m, 2000)
 
             if years_to_maturity == 4.0 or years_to_maturity == 5.0:
@@ -236,12 +237,13 @@ def test_BDTExampleThree():
 
             for expiryYears in range(int(years_to_maturity/2)-1, int(years_to_maturity)):
 
-                expiry_date = settlement_date.addYears(expiryYears)
+                expiry_date = settlement_date.add_years(expiryYears)
 
                 tmat = (maturity_date - settlement_date) / gDaysInYear
                 texp = (expiry_date - settlement_date) / gDaysInYear
 
-                bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+                bond = Bond(issue_date, maturity_date,
+                            coupon, freq_type, accrual_type)
 
                 coupon_times = []
                 coupon_flows = []
@@ -255,18 +257,19 @@ def test_BDTExampleThree():
                 coupon_times = np.array(coupon_times)
                 coupon_flows = np.array(coupon_flows)
 
-                price = bond.clean_price_from_discount_curve(settlement_date, curve)
+                price = bond.clean_price_from_discount_curve(
+                    settlement_date, curve)
 
                 model = BDTTree(sigma, num_time_steps)
                 model.buildTree(tmat, times, dfs)
 
                 v = model.bermudan_swaption(texp,
-                                           tmat,
-                                           strike_price,
-                                           face,
-                                           coupon_times,
-                                           coupon_flows,
-                                           exercise_type)
+                                            tmat,
+                                            strike_price,
+                                            face,
+                                            coupon_times,
+                                            coupon_flows,
+                                            exercise_type)
 
                 testCases.print("%s" % exercise_type,
                                 "%9.5f" % sigma,

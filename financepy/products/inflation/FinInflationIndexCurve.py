@@ -58,10 +58,10 @@ class FinInflationIndexCurve():
     def indexValue(self, dt: Date):
         """ Calculate index value by interpolating the CPI curve """
 
-        lagMonthsAgoDt = dt.addMonths(-self._lagInMonths)
+        lagMonthsAgoDt = dt.add_months(-self._lagInMonths)
         
         cpiFirstDate = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
-        cpiSecondDate = cpiFirstDate.addMonths(1)
+        cpiSecondDate = cpiFirstDate.add_months(1)
         
         cpiFirstTime = (cpiFirstDate - self._baseDate) / gDaysInYear
         cpiSecondTime = (cpiSecondDate - self._baseDate) / gDaysInYear

@@ -2,17 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.math import scale
+from financepy.market.curves.curve_ns import DiscountCurveNS
+from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.market.curves.curve_ns import DiscountCurveNS
-from financepy.utils.math import scale
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
@@ -25,7 +25,7 @@ def test_FinNelsonSiegelCurve():
     tau = 2.0
     times = np.linspace(0.0, 10.0, 5)
     curve_date = Date(6, 6, 2019)
-    dates = curve_date.addYears(times)
+    dates = curve_date.add_years(times)
 
     curve1 = DiscountCurveNS(curve_date, 1, 0, 0, tau)
     factor1loading = curve1.zero_rate(dates)

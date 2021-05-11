@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_chooser_option import EquityChooserOption
 import sys
 sys.path.append("..")
 
-from financepy.products.equity.equity_chooser_option import EquityChooserOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##############################################################################
@@ -35,10 +35,10 @@ def test_EquityChooserOptionHaug():
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           call_expiry_date,
-                                           put_expiry_date,
-                                           call_strike,
-                                           put_strike)
+                                        call_expiry_date,
+                                        put_expiry_date,
+                                        call_strike,
+                                        put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,
@@ -47,10 +47,10 @@ def test_EquityChooserOptionHaug():
                             model)
 
     v_mc = chooserOption.value_mc(valuation_date,
-                                 stock_price,
-                                 discount_curve,
-                                 dividend_curve,
-                                 model, 20000)
+                                  stock_price,
+                                  discount_curve,
+                                  dividend_curve,
+                                  model, 20000)
 
     v_haug = 6.0508
     testCases.header("", "", "", "", "", "")
@@ -79,10 +79,10 @@ def test_EquityChooserOptionMatlab():
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           call_expiry_date,
-                                           put_expiry_date,
-                                           call_strike,
-                                           put_strike)
+                                        call_expiry_date,
+                                        put_expiry_date,
+                                        call_strike,
+                                        put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,
@@ -91,10 +91,10 @@ def test_EquityChooserOptionMatlab():
                             model)
 
     v_mc = chooserOption.value_mc(valuation_date,
-                                 stock_price,
-                                 discount_curve,
-                                 dividend_curve,
-                                 model, 20000)
+                                  stock_price,
+                                  discount_curve,
+                                  dividend_curve,
+                                  model, 20000)
 
     v_matlab = 8.9308
     testCases.header("", "", "", "", "", "")
@@ -122,10 +122,10 @@ def test_EquityChooserOptionDerivicom():
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                           call_expiry_date,
-                                           put_expiry_date,
-                                           call_strike,
-                                           put_strike)
+                                        call_expiry_date,
+                                        put_expiry_date,
+                                        call_strike,
+                                        put_strike)
 
     v = chooserOption.value(valuation_date,
                             stock_price,
@@ -134,10 +134,10 @@ def test_EquityChooserOptionDerivicom():
                             model)
 
     v_mc = chooserOption.value_mc(valuation_date,
-                                 stock_price,
-                                 discount_curve,
-                                 dividend_curve,
-                                 model, 20000)
+                                  stock_price,
+                                  discount_curve,
+                                  dividend_curve,
+                                  model, 20000)
 
     v_derivicom = 1.0989
     testCases.header("", "", "", "", "", "")

@@ -36,7 +36,7 @@ def test_FinCDSCurve():
 
     for i in range(1, 11):
 
-        maturity_date = curve_date.addMonths(12 * i)
+        maturity_date = curve_date.add_months(12 * i)
         swap = IborSwap(curve_date,
                         maturity_date,
                         SwapTypes.PAY,
@@ -50,7 +50,7 @@ def test_FinCDSCurve():
     cds_contracts = []
 
     for i in range(1, 11):
-        maturity_date = curve_date.addMonths(12 * i)
+        maturity_date = curve_date.add_months(12 * i)
         cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
         cds_contracts.append(cds)
 
@@ -67,7 +67,7 @@ def test_FinCDSCurve():
 
     testCases.header("CONTRACT", "VALUE")
     for i in range(1, 11):
-        maturity_date = curve_date.addMonths(12 * i)
+        maturity_date = curve_date.add_months(12 * i)
         cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
         v = cds.value(curve_date, issuer_curve)
         testCases.print(i, v)

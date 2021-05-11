@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.date import Date
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.global_types import FinOptionTypes
-from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
+
 
 def test_FinFXAmericanOption():
 
@@ -58,7 +59,7 @@ def test_FinFXAmericanOption():
                                      currency_pair,
                                      FinOptionTypes.EUROPEAN_CALL,
                                      1000000,
-                                        "USD")
+                                     "USD")
 
         valueEuropean = callOption.value(valuation_date,
                                          spot_fx_rate,
@@ -68,10 +69,10 @@ def test_FinFXAmericanOption():
 
         callOption = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
-                                        "EURUSD",
+                                     "EURUSD",
                                      FinOptionTypes.AMERICAN_CALL,
                                      1000000,
-                                        "USD")
+                                     "USD")
 
         valueAmerican = callOption.value(valuation_date,
                                          spot_fx_rate,
@@ -86,10 +87,10 @@ def test_FinFXAmericanOption():
 
         callOption = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
-                                        "EURUSD",
+                                     "EURUSD",
                                      FinOptionTypes.EUROPEAN_PUT,
                                      1000000,
-                                        "USD")
+                                     "USD")
 
         valueEuropean = callOption.value(valuation_date,
                                          spot_fx_rate,
@@ -99,10 +100,10 @@ def test_FinFXAmericanOption():
 
         callOption = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
-                                        "EURUSD",
+                                     "EURUSD",
                                      FinOptionTypes.AMERICAN_PUT,
                                      1000000,
-                                        "USD")
+                                     "USD")
 
         valueAmerican = callOption.value(valuation_date,
                                          spot_fx_rate,
@@ -114,6 +115,7 @@ def test_FinFXAmericanOption():
         testCases.print(spot_fx_rate, valueEuropean, valueAmerican, diff)
 
 ###############################################################################
+
 
 test_FinFXAmericanOption()
 testCases.compareTestCases()

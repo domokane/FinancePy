@@ -115,7 +115,7 @@ class Calendar:
 
             # step forward until we find a business day
             while self.is_business_day(dt) is False:
-                dt = dt.addDays(1)
+                dt = dt.add_days(1)
 
             return dt
 
@@ -127,7 +127,7 @@ class Calendar:
 
             # step forward until we find a business day
             while self.is_business_day(dt) is False:
-                dt = dt.addDays(1)
+                dt = dt.add_days(1)
 
             # if the business day is in a different month look back
             # for previous first business day one day at a time
@@ -135,7 +135,7 @@ class Calendar:
             if dt._m != m_start:
                 dt = Date(d_start, m_start, y_start)
                 while self.is_business_day(dt) is False:
-                    dt = dt.addDays(-1)
+                    dt = dt.add_days(-1)
 
             return dt
 
@@ -144,7 +144,7 @@ class Calendar:
             # if the business day is in the next month look back
             # for previous first business day one day at a time
             while self.is_business_day(dt) is False:
-                dt = dt.addDays(-1)
+                dt = dt.add_days(-1)
 
             return dt
 
@@ -156,7 +156,7 @@ class Calendar:
 
             # step backward until we find a business day
             while self.is_business_day(dt) is False:
-                dt = dt.addDays(-1)
+                dt = dt.add_days(-1)
 
             # if the business day is in a different month look forward
             # for previous first business day one day at a time
@@ -164,7 +164,7 @@ class Calendar:
             if dt._m != m_start:
                 dt = Date(d_start, m_start, y_start)
                 while self.is_business_day(dt) is False:
-                    dt = dt.addDays(+1)
+                    dt = dt.add_days(+1)
 
             return dt
 
@@ -220,7 +220,7 @@ class Calendar:
 
         # For all calendars so far, SAT and SUN are not business days
         # If this ever changes I will need to add a filter here.
-        if dt.isWeekend():
+        if dt.is_weekend():
             return False
 
         if self.is_holiday(dt) is True:
@@ -286,7 +286,7 @@ class Calendar:
     def HOLIDAY_WEEKEND(self):
         """ Weekends by themselves are a holiday. """
 
-        if self._dt.isWeekend():
+        if self._dt.is_weekend():
             return True
         else:
             return False
@@ -1042,10 +1042,10 @@ class Calendar:
         holidayList = []
         while start_date < end_date:
             if self.is_business_day(start_date) is False and \
-              start_date.isWeekend() is False:
+              start_date.is_weekend() is False:
                 holidayList.append(start_date.__str__())
 
-            start_date = start_date.addDays(1)
+            start_date = start_date.add_days(1)
 
         return holidayList
 
@@ -1062,7 +1062,7 @@ class Calendar:
 
         emDays = easterMondayDay[year - 1901]
         start_date = Date(1, 1, year)
-        em = start_date.addDays(emDays-1)
+        em = start_date.add_days(emDays-1)
         return em
 
 ###############################################################################

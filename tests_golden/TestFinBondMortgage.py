@@ -22,7 +22,7 @@ def test_BondMortgage():
 
     principal = 130000
     start_date = Date(23, 2, 2018)
-    end_date = start_date.addTenor("10Y")
+    end_date = start_date.add_tenor("10Y")
     mortgage = BondMortgage(start_date, end_date, principal)
 
     rate = 0.035

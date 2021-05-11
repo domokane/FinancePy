@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_barrier_option import EquityBarrierOption
+from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
+from financepy.models.process_simulator import FinGBMNumericalScheme
+from financepy.models.process_simulator import FinProcessTypes
 import sys
 sys.path.append("..")
 
-from financepy.models.process_simulator import FinProcessTypes
-from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
-from financepy.products.equity.equity_barrier_option import EquityBarrierOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_EquityBarrierOption():
 
@@ -70,11 +71,11 @@ def test_EquityBarrierOption():
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
             value_mc = option.value_mc(valuation_date,
-                                     stock_price,
-                                     discount_curve,
-                                     dividend_curve,
-                                     process_type,
-                                     model_params)
+                                       stock_price,
+                                       discount_curve,
+                                       dividend_curve,
+                                       process_type,
+                                       model_params)
 
             end = time.time()
             timeElapsed = round(end - start, 3)
@@ -178,6 +179,7 @@ def test_EquityBarrierOption():
                 theta)
 
 ###############################################################################
+
 
 test_EquityBarrierOption()
 testCases.compareTestCases()

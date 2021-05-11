@@ -48,7 +48,7 @@ class BondFuture:
 
         tmat = (bond._maturity_date - self._first_delivery_date) / gDaysInYear
         roundedTmatInMonths = int(tmat * 4.0) * 3
-        newMat = self._first_delivery_date.addMonths(roundedTmatInMonths)
+        newMat = self._first_delivery_date.add_months(roundedTmatInMonths)
         face = 1.0
 
         issue_date = Date(newMat._d, newMat._m, 2000)

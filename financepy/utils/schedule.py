@@ -144,7 +144,7 @@ class Schedule:
             while next_date > self._effective_date:
 
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.addMonths(-num_months)
+                next_date = next_date.add_months(-num_months)
 
                 if self._end_of_month_flag is True:
                     next_date = next_date.EOM()
@@ -181,7 +181,7 @@ class Schedule:
 
             while next_date < self._termination_date:
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.addMonths(num_months)
+                next_date = next_date.add_months(num_months)
                 flow_num = flow_num + 1
 
             # The effective date is not adjusted as it is given

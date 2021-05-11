@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.products.fx.fx_barrier_option import FXBarrierOption
+from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
+from financepy.models.black_scholes import BlackScholes
+from financepy.models.process_simulator import FinGBMNumericalScheme
+from financepy.models.process_simulator import FinProcessTypes
 import sys
 sys.path.append("..")
 
-from financepy.models.process_simulator import FinProcessTypes
-from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
-from financepy.products.fx.fx_barrier_option import FXBarrierOption
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_FinFXBarrierOption():
 
@@ -64,8 +65,8 @@ def test_FinFXBarrierOption():
             start = time.time()
             model_params = (spot_fx_rate, drift, volatility, scheme)
             value_mc = option.value_mc(valuation_date, spot_fx_rate,
-                                     dom_interest_rate, process_type,
-                                     model_params)
+                                       dom_interest_rate, process_type,
+                                       model_params)
 
             end = time.time()
             timeElapsed = round(end - start, 3)
@@ -89,10 +90,10 @@ def test_FinFXBarrierOption():
             start = time.time()
             model_params = (spot_fx_rate, drift, volatility, scheme)
             value_mc = option.value_mc(valuation_date,
-                                     spot_fx_rate,
-                                     dom_interest_rate,
-                                     process_type,
-                                     model_params)
+                                       spot_fx_rate,
+                                       dom_interest_rate,
+                                       process_type,
+                                       model_params)
 
             end = time.time()
             timeElapsed = round(end - start, 3)
@@ -155,6 +156,7 @@ def test_FinFXBarrierOption():
                             theta)
 
 ###############################################################################
+
 
 test_FinFXBarrierOption()
 testCases.compareTestCases()

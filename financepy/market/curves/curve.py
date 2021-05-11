@@ -337,11 +337,11 @@ class DiscountCurve:
         one date. """
 
         if isinstance(dts, Date):
-            dtsPlusOneDays = [dts.addDays(1)]
+            dtsPlusOneDays = [dts.add_days(1)]
         else:
             dtsPlusOneDays = []
             for dt in dts:
-                dtsPlusOneDay = dt.addDays(1)
+                dtsPlusOneDay = dt.add_days(1)
                 dtsPlusOneDays.append(dtsPlusOneDay)
 
         df1 = self.df(dts)
@@ -421,7 +421,7 @@ class DiscountCurve:
             dt1 = start_dates[i]
 
             if isinstance(date_or_tenor, str):
-                dt2 = dt1.addTenor(date_or_tenor)
+                dt2 = dt1.add_tenor(date_or_tenor)
             elif isinstance(date_or_tenor, Date):
                 dt2 = date_or_tenor
             elif isinstance(date_or_tenor, list):

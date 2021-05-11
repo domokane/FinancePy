@@ -63,8 +63,8 @@ def test_BKExampleTwo():
 
     settlement_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    expiry_date = settlement_date.addTenor("18m")
-    maturity_date = settlement_date.addTenor("10Y")
+    expiry_date = settlement_date.add_tenor("18m")
+    maturity_date = settlement_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
@@ -98,7 +98,7 @@ def test_BKExampleTwo():
     tmat = (maturity_date - settlement_date) / gDaysInYear
     texp = (expiry_date - settlement_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settlement_date.addYears(times)
+    dates = settlement_date.add_years(times)
     dfs = np.exp(-0.05*times)
     curve = DiscountCurve(settlement_date, dates, dfs)
 

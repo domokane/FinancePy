@@ -2,17 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.products.fx.fx_forward import FXForward
 import sys
 sys.path.append("..")
 
-from financepy.products.fx.fx_forward import FXForward
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -24,7 +24,7 @@ def test_FinFXForward():
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
     valuation_date = Date(13, 2, 2018)
-    expiry_date = valuation_date.addMonths(12)
+    expiry_date = valuation_date.add_months(12)
     # Forward is on EURUSD which is expressed as number of USD per EUR
     # ccy1 = EUR and ccy2 = USD
     forName = "EUR"
@@ -38,8 +38,8 @@ def test_FinFXForward():
     ###########################################################################
 
     spot_days = 0
-    settlement_date = valuation_date.addWeekDays(spot_days)
-    maturity_date = settlement_date.addMonths(12)
+    settlement_date = valuation_date.add_weekdays(spot_days)
+    maturity_date = settlement_date.add_months(12)
     notional = 100.0
     calendar_type = CalendarTypes.TARGET
 

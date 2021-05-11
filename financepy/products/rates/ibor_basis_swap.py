@@ -57,7 +57,7 @@ class IborBasisSwap:
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.addTenor(
+            self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
