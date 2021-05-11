@@ -164,8 +164,8 @@ def getForwardCurve(numFwds, r):
 #         notional = 1.0
 
 #         # Pricing a PAY
-#         swaptionType = FinIborSwaptionTypes.PAY
-#         swaption = FinIborSwaption(settlement_date,
+#         swaptionType = IborSwaptionTypes.PAY
+#         swaption = IborSwaption(settlement_date,
 #                                     exercise_date,
 #                                     maturity_date,
 #                                     swaptionType,

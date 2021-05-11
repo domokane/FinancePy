@@ -117,12 +117,12 @@ def test_BKExampleTwo():
                           coupon_flows, exercise_type)
 
     # Test convergence
-    num_stepsList = [100, 200, 300, 500, 1000]
+    num_steps_list = [100, 200, 300, 500, 1000]
     exercise_type = FinExerciseTypes.AMERICAN
 
     testCases.header("TIMESTEPS", "TIME", "VALUE")
     treeVector = []
-    for num_time_steps in num_stepsList:
+    for num_time_steps in num_steps_list:
         start = time.time()
         model = BKTree(sigma, a, num_time_steps)
         model.buildTree(tmat, times, dfs)
@@ -133,7 +133,7 @@ def test_BKExampleTwo():
         treeVector.append(v)
         testCases.print(num_time_steps, period, v)
 
-#    plt.plot(num_stepsList, treeVector)
+#    plt.plot(num_steps_list, treeVector)
 
     # Value in Hill converges to 0.699 with 100 time steps while I get 0.700
 

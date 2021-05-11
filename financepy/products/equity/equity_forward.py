@@ -33,7 +33,7 @@ class EquityForward():
         self._forward_price = forward_price
         self._notional = notional
         self._long_short = long_short
-        
+
 ###############################################################################
 
     def value(self,
@@ -66,7 +66,7 @@ class EquityForward():
 
         v = (fwdStockPrice - self._forward_price)
         v = v * self._notional * discountDF
-        
+
         if self._long_short == FinLongShort.SHORT:
             v = v * (-1.0)
 
@@ -117,4 +117,3 @@ class EquityForward():
         print(self)
 
 ###############################################################################
-

@@ -17,14 +17,14 @@ class EquityModel:
 
 
 # class EquityModelBlackScholes(EquityModel):
-#     def __init__(self, 
-#                  volatility: float, 
+#     def __init__(self,
+#                  volatility: float,
 #                  implementation, parameters):
 
 #         check_argument_types(self.__init__, locals())
 
 #         self._volatility = volatility
-#         self._implementation = implementation 
+#         self._implementation = implementation
 #         self._parameters = parameters
 
 #     def __repr__(self):

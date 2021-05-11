@@ -185,9 +185,9 @@ def test_DateFormat():
     dt = Date(20, 10, 2019)
     testCases.header("FORMAT", "DATE")
 
-    for formatType in DateFormatTypes:
-        set_date_format(formatType)
-        testCases.print(formatType.name, dt)
+    for format_type in DateFormatTypes:
+        set_date_format(format_type)
+        testCases.print(format_type.name, dt)
 
 ###############################################################################
 
@@ -199,7 +199,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 0, 0, 0)
     diff = d2 - d1
     testCases.print(d1, d2, diff)
-    testCases.print(d1._excelDate, d2._excelDate, diff)
+    testCases.print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -207,7 +207,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     testCases.print(d1, d2, diff)
-    testCases.print(d1._excelDate, d2._excelDate, diff)
+    testCases.print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -215,7 +215,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     testCases.print(d1, d2, diff)
-    testCases.print(d1._excelDate, d2._excelDate, diff)
+    testCases.print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -223,7 +223,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
     testCases.print(d1, d2, diff)
-    testCases.print(d1._excelDate, d2._excelDate, diff)
+    testCases.print(d1._excel_date, d2._excel_date, diff)
 
 ###############################################################################
 

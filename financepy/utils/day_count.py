@@ -19,13 +19,13 @@ from enum import Enum
 ###############################################################################
 
 
-def isLastDayOfFeb(dt: Date):
+def is_last_day_of_feb(dt: Date):
     # Return true if we are on the last day of February
     if dt._m == 2:
-        isLeap = is_leap_year(dt._y)
-        if isLeap is True and dt._d == 29:
+        is_leap = is_leap_year(dt._y)
+        if is_leap is True and dt._d == 29:
             return True
-        if isLeap is False and dt._d == 28:
+        if is_leap is False and dt._d == 28:
             return True
     else:
         return False
@@ -155,21 +155,21 @@ class DayCount:
             if d1 == 31:
                 d1 = 30
 
-            lastDayOfFeb1 = isLastDayOfFeb(dt1)
+            lastDayOfFeb1 = is_last_day_of_feb(dt1)
             if lastDayOfFeb1 is True:
                 d1 = 30
 
             if d2 == 31:
                 d2 = 30
 
-            lastDayOfFeb2 = isLastDayOfFeb(dt2)
+            lastDayOfFeb2 = is_last_day_of_feb(dt2)
             if lastDayOfFeb2 is True and isTerminationDate is False:
                 d2 = 30
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.THIRTY_E_PLUS_360:
 
@@ -183,7 +183,7 @@ class DayCount:
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.ACT_ACT_ISDA:
 

@@ -113,13 +113,13 @@ class EquityDigitalOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                model,
-                num_paths: int = 10000,
-                seed: int = 4242):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 model,
+                 num_paths: int = 10000,
+                 seed: int = 4242):
         """ Digital Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
         handles both a cash-or-nothing and an asset-or-nothing option."""

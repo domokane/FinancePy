@@ -34,20 +34,20 @@ def testEquityAmericanOption():
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
-    putOption = EquityAmericanOption(
+    put_option = EquityAmericanOption(
         expiry_date, strike_price, FinOptionTypes.EUROPEAN_PUT)
 
     model = BlackScholes(volatility,
                          BlackScholesTypes.CRR_TREE,
                          100)
 
-    value = putOption.value(valuation_date, stock_price,
+    value = put_option.value(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    delta = putOption.delta(valuation_date, stock_price,
+    delta = put_option.delta(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    gamma = putOption.gamma(valuation_date, stock_price,
+    gamma = put_option.gamma(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    theta = putOption.theta(valuation_date, stock_price,
+    theta = put_option.theta(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
@@ -59,9 +59,9 @@ def testEquityAmericanOption():
     testCases.header("OPTION_TYPE", "NUMSTEPS",
                      "VALUE DELTA GAMMA THETA", "TIME")
 
-    num_stepsList = [100, 200, 500, 1000, 2000]
+    num_steps_list = [100, 200, 500, 1000, 2000]
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
 
         model = BlackScholes(volatility,
                              BlackScholesTypes.CRR_TREE,
@@ -87,7 +87,7 @@ def testEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
 
         model = BlackScholes(volatility,
                              BlackScholesTypes.CRR_TREE,
@@ -103,17 +103,18 @@ def testEquityAmericanOption():
     testCases.banner(
         "================== EUROPEAN CALL =======================")
 
-    callOption = EquityAmericanOption(
+    call_option = EquityAmericanOption(
         expiry_date,
         strike_price,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valuation_date, stock_price,
+
+    value = call_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    delta = callOption.delta(valuation_date, stock_price,
+    delta = call_option.delta(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    gamma = callOption.gamma(valuation_date, stock_price,
+    gamma = call_option.gamma(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    theta = callOption.theta(valuation_date, stock_price,
+    theta = call_option.theta(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
@@ -130,7 +131,7 @@ def testEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
 
         model = BlackScholes(volatility,
                              BlackScholesTypes.CRR_TREE,
@@ -153,7 +154,7 @@ def testEquityAmericanOption():
     option = EquityAmericanOption(expiry_date, strike_price,
                                   FinOptionTypes.AMERICAN_CALL)
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
 
         model = BlackScholes(volatility,
                              BlackScholesTypes.CRR_TREE,

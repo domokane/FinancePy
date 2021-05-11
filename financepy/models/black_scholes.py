@@ -45,7 +45,7 @@ class BlackScholes(Model):
               spotPrice: float,
               time_to_expiry: float,
               strike_price: float,
-              riskFreeRate: float,
+              risk_free_rate: float,
               dividendRate: float,
               option_type: FinOptionTypes):
 
@@ -58,14 +58,14 @@ class BlackScholes(Model):
             if self._implementationType == BlackScholesTypes.ANALYTICAL:
 
                 v = bs_value(spotPrice, time_to_expiry, strike_price,
-                             riskFreeRate, dividendRate, self._volatility,
+                             risk_free_rate, dividendRate, self._volatility,
                              option_type.value)
 
                 return v
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate,
+                v = crrTreeValAvg(spotPrice, risk_free_rate, dividendRate,
                                   self._volatility, self._num_steps_per_year,
                                   time_to_expiry, option_type.value,
                                   strike_price)['value']
@@ -90,14 +90,14 @@ class BlackScholes(Model):
                     phi = -1
 
                 v = bawValue(spotPrice, time_to_expiry, strike_price,
-                             riskFreeRate, dividendRate, self._volatility,
+                             risk_free_rate, dividendRate, self._volatility,
                              phi)
 
                 return v
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crrTreeValAvg(spotPrice, riskFreeRate, dividendRate,
+                v = crrTreeValAvg(spotPrice, risk_free_rate, dividendRate,
                                   self._volatility, self._num_steps_per_year,
                                   time_to_expiry, option_type.value,
                                   strike_price)['value']

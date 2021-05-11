@@ -11,9 +11,9 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 # from ...products.equity.EquityOption import FinOption
 from ...utils.date import Date
-#from ...products.fx.FinFXModelTypes import FinFXModel
+# from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import check_argument_types
 from ...utils.global_types import FinOptionTypes
 
 ###############################################################################
@@ -99,17 +99,17 @@ class FXDigitalOption:
             d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den
 
             if self._option_type == FinOptionTypes.DIGITAL_CALL and \
-                self._forName == self._premCurrency:
-                    v = S0 * exp(-rf * tdel) * N(d2)
+                    self._forName == self._premCurrency:
+                v = S0 * exp(-rf * tdel) * N(d2)
             elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
-                self._forName == self._premCurrency:
-                    v = S0 * exp(-rf * tdel) * N(-d2)
+                    self._forName == self._premCurrency:
+                v = S0 * exp(-rf * tdel) * N(-d2)
             if self._option_type == FinOptionTypes.DIGITAL_CALL and \
-                self._domName == self._premCurrency:
-                    v = exp(-rd * tdel) * N(d2)
+                    self._domName == self._premCurrency:
+                v = exp(-rd * tdel) * N(d2)
             elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
-                self._domName == self._premCurrency:
-                    v = exp(-rd * tdel) * N(-d2)
+                    self._domName == self._premCurrency:
+                v = exp(-rd * tdel) * N(-d2)
             else:
                 raise FinError("Unknown option type")
 

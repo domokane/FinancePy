@@ -81,7 +81,7 @@ def test_HullWhiteExampleTwo():
     vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
-    num_stepsList = range(100, 500, 100)
+    num_steps_list = range(100, 500, 100)
     analVector = []
     treeVector = []
 
@@ -90,7 +90,7 @@ def test_HullWhiteExampleTwo():
     testCases.header("NUMTIMESTEP", "TIME", "VTREE_CALL", "VTREE_PUT",
                      "VANAL CALL", "VANAL_PUT", "CALLDIFF", "PUTDIFF")
 
-    for num_time_steps in num_stepsList:
+    for num_time_steps in num_steps_list:
 
         start = time.time()
 
@@ -114,8 +114,8 @@ def test_HullWhiteExampleTwo():
         testCases.print(num_time_steps, period, vTreeCall, vAnal['call'],
                         vTreePut, vAnal['put'], diffC, diffP)
 
- #   plt.plot(num_stepsList, treeVector)
- #   plt.plot(num_stepsList, analVector)
+ #   plt.plot(num_steps_list, treeVector)
+ #   plt.plot(num_steps_list, analVector)
 
 ###############################################################################
 
@@ -167,7 +167,7 @@ def test_HullWhiteBondOption():
     model = HWTree(sigma, a, None)
 
     #  Test convergence
-    num_stepsList = range(50, 500, 50)
+    num_steps_list = range(50, 500, 50)
     texp = (expiry_date - settlement_date)/gDaysInYear
 
     vJam = model.europeanBondOptionJamshidian(texp, strike_price, face,
@@ -180,7 +180,7 @@ def test_HullWhiteBondOption():
     testCases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY",
                      "EXPIRY_TREE", "JAMSHIDIAN")
 
-    for num_time_steps in num_stepsList:
+    for num_time_steps in num_steps_list:
 
         start = time.time()
         model = HWTree(sigma, a, num_time_steps,
@@ -204,7 +204,7 @@ def test_HullWhiteBondOption():
 
         testCases.print(num_time_steps, period, v1, v2, vJam)
 
-#    plt.plot(num_stepsList, treeVector)
+#    plt.plot(num_steps_list, treeVector)
 
     if 1 == 0:
         print("RT")
@@ -319,12 +319,12 @@ def test_HullWhiteCallableBond():
     a = 0.01
 
     # Test convergence
-    num_stepsList = [100, 200, 500, 1000]
+    num_steps_list = [100, 200, 500, 1000]
     tmat = (maturity_date - settlement_date)/gDaysInYear
 
     testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 
-    for num_time_steps in num_stepsList:
+    for num_time_steps in num_steps_list:
 
         start = time.time()
         model = HWTree(sigma, a, num_time_steps)

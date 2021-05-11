@@ -214,7 +214,8 @@ class EquityOneTouchOption(EquityOption):
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta *
+                                                    z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -227,7 +228,8 @@ class EquityOneTouchOption(EquityOption):
             eta = -1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta *
+                                                    z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -241,7 +243,8 @@ class EquityOneTouchOption(EquityOption):
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta *
+                                                    z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -255,7 +258,8 @@ class EquityOneTouchOption(EquityOption):
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * NVect(eta *
+                                                    z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -396,14 +400,14 @@ class EquityOneTouchOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                model,
-                num_paths: int = 10000,
-                num_steps_per_year: int = 252,
-                seed: int = 4242):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 model,
+                 num_paths: int = 10000,
+                 num_steps_per_year: int = 252,
+                 seed: int = 4242):
         """ Touch Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Accuracy is not great when compared to the analytical
         result as we only observe the barrier a finite number of times. The

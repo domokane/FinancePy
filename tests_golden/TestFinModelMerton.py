@@ -20,14 +20,14 @@ def test_FinModelMertonCredit():
     equity_value = [2.6406, 2.6817, 3.977, 2.947, 2.528]
     equity_vol = [0.7103, 0.3929, 0.3121, 0.4595, 0.6181]
     bondFace = [4.0, 3.5, 3.5, 3.2, 4.0]
-    riskFreeRate = [0.05, 0.05, 0.05, 0.05, 0.05]
+    risk_free_rate = [0.05, 0.05, 0.05, 0.05, 0.05]
     assetGrowthRate = [0.0306, 0.03, 0.031, 0.0302, 0.0305]
     timeToMaturity = 1.0  # np.linspace(0.1, 10, 100)
 
     model = MertonFirmMkt(equity_value,
                           bondFace,
                           timeToMaturity,
-                          riskFreeRate,
+                          risk_free_rate,
                           assetGrowthRate,
                           equity_vol)
 
@@ -49,7 +49,7 @@ def test_FinModelMertonCredit():
     model = MertonFirm(assetValue,
                        bondFace,
                        timeToMaturity,
-                       riskFreeRate,
+                       risk_free_rate,
                        assetGrowthRate,
                        assetVol)
 
@@ -70,14 +70,14 @@ def test_FinModelMertonCredit():
     assetValue = 140.0
     bondFace = 100.0
     timeToMaturity = 1.0
-    riskFreeRate = 0.05
+    risk_free_rate = 0.05
     assetGrowthRate = 0.05
     assetVol = 0.20
 
     model = MertonFirm(assetValue,
                        bondFace,
                        timeToMaturity,
-                       riskFreeRate,
+                       risk_free_rate,
                        assetGrowthRate,
                        assetVol)
 

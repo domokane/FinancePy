@@ -112,21 +112,21 @@ class SwapFixedLeg:
         day_counter = DayCount(self._day_count_type)
         calendar = Calendar(self._calendar_type)
 
-        for nextDt in scheduleDates[1:]:
+        for next_dt in scheduleDates[1:]:
 
             self._startAccruedDates.append(prev_dt)
-            self._endAccruedDates.append(nextDt)
+            self._endAccruedDates.append(next_dt)
 
             if self._payment_lag == 0:
-                payment_date = nextDt
+                payment_date = next_dt
             else:
-                payment_date = calendar.add_business_days(nextDt,
+                payment_date = calendar.add_business_days(next_dt,
                                                        self._payment_lag)
 
             self._payment_dates.append(payment_date)
 
             (year_frac, num, den) = day_counter.year_frac(prev_dt,
-                                                       nextDt)
+                                                       next_dt)
 
             self._rates.append(self._coupon)
 
@@ -136,7 +136,7 @@ class SwapFixedLeg:
             self._year_fracs.append(year_frac)
             self._accrued_days.append(num)
 
-            prev_dt = nextDt
+            prev_dt = next_dt
 
 ###############################################################################
 

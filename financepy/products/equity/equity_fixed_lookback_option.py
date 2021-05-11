@@ -174,15 +174,15 @@ class EquityFixedLookbackOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                volatility: float,
-                stock_min_max: float,
-                num_paths: int = 10000,
-                num_steps_per_year: int = 252,
-                seed: int = 4242):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 volatility: float,
+                 stock_min_max: float,
+                 num_paths: int = 10000,
+                 num_steps_per_year: int = 252,
+                 seed: int = 4242):
         """ Monte Carlo valuation of a fixed strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process. """
 
@@ -214,7 +214,7 @@ class EquityFixedLookbackOption(EquityOption):
 
         model = FinGBMProcess()
         Sall = model.get_paths(num_paths, num_time_steps, t, mu, stock_price,
-                              volatility, seed)
+                               volatility, seed)
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths

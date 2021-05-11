@@ -69,11 +69,11 @@ def test_FinFXBarrierOption():
                                        model_params)
 
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
 
             testCases.print(option_type, K, B, spot_fx_rate, value, value_mc,
-                            timeElapsed, diff)
+                            time_elapsed, diff)
 
         for spot_fx_rate in range(60, 140, 10):
             B = 100.0
@@ -96,11 +96,11 @@ def test_FinFXBarrierOption():
                                        model_params)
 
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
 
             testCases.print(option_type, K, B, spot_fx_rate, value, value_mc,
-                            timeElapsed, diff)
+                            time_elapsed, diff)
 
     end = time.time()
 
@@ -113,7 +113,7 @@ def test_FinFXBarrierOption():
 
     for option_type in FinFXBarrierTypes:
         for spot_fx_rate in spot_fx_rates:
-            barrierOption = FXBarrierOption(expiry_date,
+            barrier_option = FXBarrierOption(expiry_date,
                                             100.0,
                                             currency_pair,
                                             option_type,
@@ -122,25 +122,25 @@ def test_FinFXBarrierOption():
                                             notional,
                                             notional_currency)
 
-            value = barrierOption.value(valuation_date,
+            value = barrier_option.value(valuation_date,
                                         spot_fx_rate,
                                         dom_discount_curve,
                                         for_discount_curve,
                                         model)
 
-            delta = barrierOption.delta(valuation_date,
+            delta = barrier_option.delta(valuation_date,
                                         spot_fx_rate,
                                         dom_discount_curve,
                                         for_discount_curve,
                                         model)
 
-            vega = barrierOption.vega(valuation_date,
+            vega = barrier_option.vega(valuation_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
                                       model)
 
-            theta = barrierOption.theta(valuation_date,
+            theta = barrier_option.theta(valuation_date,
                                         spot_fx_rate,
                                         dom_discount_curve,
                                         for_discount_curve,

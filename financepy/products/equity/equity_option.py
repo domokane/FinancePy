@@ -16,6 +16,7 @@ bump = 1e-4
 
 ###############################################################################
 
+
 class EquityOptionModelTypes(Enum):
     BLACKSCHOLES = 1
     ANOTHER = 2

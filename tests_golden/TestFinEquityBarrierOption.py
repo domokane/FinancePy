@@ -78,7 +78,7 @@ def test_EquityBarrierOption():
                                        model_params)
 
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
 
             testCases.print(
@@ -89,7 +89,7 @@ def test_EquityBarrierOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
         for stock_price in range(80, 120, 10):
 
@@ -114,7 +114,7 @@ def test_EquityBarrierOption():
                 process_type,
                 model_params)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
 
             testCases.print(
@@ -125,7 +125,7 @@ def test_EquityBarrierOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
         end = time.time()
 
@@ -140,28 +140,28 @@ def test_EquityBarrierOption():
 
         for stock_price in stock_prices:
 
-            barrierOption = EquityBarrierOption(
+            barrier_option = EquityBarrierOption(
                 expiry_date, 100.0, option_type, B, num_observations_per_year)
 
-            value = barrierOption.value(
+            value = barrier_option.value(
                 valuation_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
                 model)
-            delta = barrierOption.delta(
+            delta = barrier_option.delta(
                 valuation_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
                 model)
-            vega = barrierOption.vega(
+            vega = barrier_option.vega(
                 valuation_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
                 model)
-            theta = barrierOption.theta(
+            theta = barrier_option.theta(
                 valuation_date,
                 stock_price,
                 discount_curve,

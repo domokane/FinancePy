@@ -435,8 +435,8 @@ def americanBondOption_Tree_Fast(texp, tmat,
 
     #######################################################################
 
-    callOptionValues = np.zeros(shape=(num_time_steps, num_nodes))
-    putOptionValues = np.zeros(shape=(num_time_steps, num_nodes))
+    call_option_values = np.zeros(shape=(num_time_steps, num_nodes))
+    put_option_values = np.zeros(shape=(num_time_steps, num_nodes))
     bondValues = np.zeros(shape=(num_time_steps, num_nodes))
 
     # Start with the value of the bond at maturity
@@ -528,64 +528,64 @@ def americanBondOption_Tree_Fast(texp, tmat,
             vput = 0.0
 
             if k == jmax:
-                vu = callOptionValues[m+1, kN]
-                vm = callOptionValues[m+1, kN-1]
-                vd = callOptionValues[m+1, kN-2]
+                vu = call_option_values[m+1, kN]
+                vm = call_option_values[m+1, kN-1]
+                vd = call_option_values[m+1, kN-2]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
             elif k == -jmax:
-                vu = callOptionValues[m+1, kN+2]
-                vm = callOptionValues[m+1, kN+1]
-                vd = callOptionValues[m+1, kN]
+                vu = call_option_values[m+1, kN+2]
+                vm = call_option_values[m+1, kN+1]
+                vd = call_option_values[m+1, kN]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
             else:
-                vu = callOptionValues[m+1, kN+1]
-                vm = callOptionValues[m+1, kN]
-                vd = callOptionValues[m+1, kN-1]
+                vu = call_option_values[m+1, kN+1]
+                vm = call_option_values[m+1, kN]
+                vd = call_option_values[m+1, kN-1]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
 
-            callOptionValues[m, kN] = vcall
+            call_option_values[m, kN] = vcall
 
             if k == jmax:
-                vu = putOptionValues[m+1, kN]
-                vm = putOptionValues[m+1, kN-1]
-                vd = putOptionValues[m+1, kN-2]
+                vu = put_option_values[m+1, kN]
+                vm = put_option_values[m+1, kN-1]
+                vd = put_option_values[m+1, kN-2]
                 vput = (pu*vu + pm*vm + pd*vd) * df
             elif k == -jmax:
-                vu = putOptionValues[m+1, kN+2]
-                vm = putOptionValues[m+1, kN+1]
-                vd = putOptionValues[m+1, kN]
+                vu = put_option_values[m+1, kN+2]
+                vm = put_option_values[m+1, kN+1]
+                vd = put_option_values[m+1, kN]
                 vput = (pu*vu + pm*vm + pd*vd) * df
             else:
-                vu = putOptionValues[m+1, kN+1]
-                vm = putOptionValues[m+1, kN]
-                vd = putOptionValues[m+1, kN-1]
+                vu = put_option_values[m+1, kN+1]
+                vm = put_option_values[m+1, kN]
+                vd = put_option_values[m+1, kN-1]
                 vput = (pu*vu + pm*vm + pd*vd) * df
 
-            putOptionValues[m, kN] = vput
+            put_option_values[m, kN] = vput
 
             full_price = bondValues[m, kN]
             clean_price = full_price - accrued[m]
             callExercise = max(clean_price - strike_price, 0.0)
             putExercise = max(strike_price - clean_price, 0.0)
 
-            holdCall = callOptionValues[m, kN]
-            holdPut = putOptionValues[m, kN]
+            holdCall = call_option_values[m, kN]
+            holdPut = put_option_values[m, kN]
 
             if m == expiryStep:
 
-                callOptionValues[m, kN] = max(callExercise, holdCall)
-                putOptionValues[m, kN] = max(putExercise, holdPut)
+                call_option_values[m, kN] = max(callExercise, holdCall)
+                put_option_values[m, kN] = max(putExercise, holdPut)
 
             elif exercise_typeInt == 3 and m < expiryStep:  # AMERICAN
 
-                callOptionValues[m, kN] = max(callExercise, holdCall)
-                putOptionValues[m, kN] = max(putExercise, holdPut)
+                call_option_values[m, kN] = max(callExercise, holdCall)
+                put_option_values[m, kN] = max(putExercise, holdPut)
 
         if DEBUG:
             print(m, _treeTimes[m], accrued[m], full_price, clean_price,
                   callExercise, putExercise)
 
-    return callOptionValues[0, jmax], putOptionValues[0, jmax]
+    return call_option_values[0, jmax], put_option_values[0, jmax]
 
 ###############################################################################
 

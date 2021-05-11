@@ -26,7 +26,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinBinomialTree():
 
     stock_price = 50.0
-    riskFreeRate = 0.06
+    risk_free_rate = 0.06
     dividend_yield = 0.04
     volatility = 0.40
 
@@ -34,26 +34,26 @@ def test_FinBinomialTree():
     expiry_date = Date(1, 1, 2017)
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, riskFreeRate)
+    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    num_stepsList = [100, 500, 1000, 2000, 5000]
+    num_steps_list = [100, 500, 1000, 2000, 5000]
 
     strike_price = 50.0
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
-    putOption = EquityVanillaOption(
+    put_option = EquityVanillaOption(
         expiry_date,
         strike_price,
         FinOptionTypes.EUROPEAN_PUT)
-    value = putOption.value(valuation_date, stock_price,
+    value = put_option.value(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    delta = putOption.delta(valuation_date, stock_price,
+    delta = put_option.delta(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    gamma = putOption.gamma(valuation_date, stock_price,
+    gamma = put_option.gamma(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
-    theta = putOption.theta(valuation_date, stock_price,
+    theta = put_option.theta(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
@@ -64,7 +64,7 @@ def test_FinBinomialTree():
 
     testCases.header("NumSteps", "Results", "TIME")
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
         start = time.time()
         tree = EquityBinomialTree()
         results = tree.value(
@@ -91,7 +91,7 @@ def test_FinBinomialTree():
 
     testCases.header("NumSteps", "Results", "TIME")
 
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
         start = time.time()
         tree = EquityBinomialTree()
         results = tree.value(
@@ -113,17 +113,17 @@ def test_FinBinomialTree():
     testCases.banner(
         "================== EUROPEAN CALL =======================")
 
-    callOption = EquityVanillaOption(
+    call_option = EquityVanillaOption(
         expiry_date,
         strike_price,
         FinOptionTypes.EUROPEAN_CALL)
-    value = callOption.value(valuation_date, stock_price,
+    value = call_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    delta = callOption.delta(valuation_date, stock_price,
+    delta = call_option.delta(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    gamma = callOption.gamma(valuation_date, stock_price,
+    gamma = call_option.gamma(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    theta = callOption.theta(valuation_date, stock_price,
+    theta = call_option.theta(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
@@ -133,7 +133,7 @@ def test_FinBinomialTree():
     params = np.array([1.0, strike_price])
 
     testCases.header("NumSteps", "Results", "TIME")
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
         start = time.time()
         tree = EquityBinomialTree()
 
@@ -162,7 +162,7 @@ def test_FinBinomialTree():
     params = np.array([1.0, strike_price])
 
     testCases.header("NumSteps", "Results", "TIME")
-    for num_steps in num_stepsList:
+    for num_steps in num_steps_list:
         start = time.time()
         tree = EquityBinomialTree()
 

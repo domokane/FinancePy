@@ -23,28 +23,28 @@ def test_FinFlatCurve():
     testCases.header("COMPOUNDING", "DFS")
     compounding = FrequencyTypes.CONTINUOUS
 
-    flatCurve = DiscountCurveFlat(curve_date, 0.05, compounding)
-    dfs = flatCurve.df(dates)
+    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    dfs = flat_curve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FrequencyTypes.ANNUAL
-    flatCurve = DiscountCurveFlat(curve_date, 0.05, compounding)
-    dfs = flatCurve.df(dates)
+    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    dfs = flat_curve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FrequencyTypes.SEMI_ANNUAL
-    flatCurve = DiscountCurveFlat(curve_date, 0.05, compounding)
-    dfs = flatCurve.df(dates)
+    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    dfs = flat_curve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FrequencyTypes.QUARTERLY
-    flatCurve = DiscountCurveFlat(curve_date, 0.05, compounding)
-    dfs = flatCurve.df(dates)
+    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    dfs = flat_curve.df(dates)
     testCases.print(compounding, dfs)
 
     compounding = FrequencyTypes.MONTHLY
-    flatCurve = DiscountCurveFlat(curve_date, 0.05, compounding)
-    dfs = flatCurve.df(dates)
+    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    dfs = flat_curve.df(dates)
     testCases.print(compounding, dfs)
 
 ###############################################################################

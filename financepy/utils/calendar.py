@@ -237,13 +237,13 @@ class Calendar:
         weekend date. """
 
         start_date = Date(1, 1, dt._y)
-        dayInYear = dt._excelDate - start_date._excelDate + 1
+        day_in_year = dt._excel_date - start_date._excel_date + 1
         weekday = dt._weekday
 
         self._y = dt._y
         self._m = dt._m
         self._d = dt._d
-        self._dayInYear = dayInYear
+        self._day_in_year = day_in_year
         self._weekday = weekday
         self._dt = dt
 
@@ -297,7 +297,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
         weekday = self._weekday
 
         if m == 1 and d == 1:  # new years day
@@ -314,10 +314,10 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
         if m == 4 and d == 25:  # Australia day
@@ -361,7 +361,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        weekday = self._weekday ; dayInYear = self._dayInYear
+        weekday = self._weekday ; day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
@@ -374,10 +374,10 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
         if m == 5 and d <= 7 and weekday == Date.MON:
@@ -421,17 +421,17 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
         if m == 5 and d == 1: # LABOUR DAY
@@ -440,10 +440,10 @@ class Calendar:
         if m == 5 and d == 8: # VICTORY DAY
             return True
 
-        if dayInYear == em + 39 - 1:  # Ascension
+        if day_in_year == em + 39 - 1:  # Ascension
             return True
 
-        if dayInYear == em + 50 - 1:  # pentecost
+        if day_in_year == em + 50 - 1:  # pentecost
             return True
 
         if m == 7 and d == 14: # BASTILLE DAY
@@ -472,7 +472,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
         weekday = self._weekday
 
         if m == 1 and d == 1:  # new years day
@@ -483,13 +483,13 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em + 39 - 1:  # Ascension
+        if day_in_year == em + 39 - 1:  # Ascension
             return True
 
         if m == 5 and d == 1:  # labour day
@@ -521,26 +521,26 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
         if m == 5 and d == 1: # LABOUR DAY
             return True
 
-        if dayInYear == em + 39 - 1:  # Ascension
+        if day_in_year == em + 39 - 1:  # Ascension
             return True
 
-        if dayInYear == em + 50 - 1:  # pentecost
+        if day_in_year == em + 50 - 1:  # pentecost
             return True
 
         if m == 10 and d == 3:  # GERMAN UNITY DAY
@@ -563,7 +563,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
@@ -573,16 +573,16 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
-        if dayInYear == em + 39 - 1:  # Ascension
+        if day_in_year == em + 39 - 1:  # Ascension
             return True
 
-        if dayInYear == em + 50 - 1:  # pentecost / whit
+        if day_in_year == em + 50 - 1:  # pentecost / whit
             return True
 
         if m == 5 and d == 1:  # Labour day
@@ -705,7 +705,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
         weekday = self._weekday
 
         if m == 1 and d == 1:  # new years day
@@ -725,10 +725,10 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
         if m == 4 and d == 25:  # ANZAC day
@@ -766,26 +766,26 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 4:  # holy thursday
+        if day_in_year == em - 4:  # holy thursday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em + 38:  # Ascension
+        if day_in_year == em + 38:  # Ascension
             return True
 
-        if dayInYear == em + 49:  # Pentecost
+        if day_in_year == em + 49:  # Pentecost
             return True
 
         if m == 5 and d == 1:  # May day
@@ -878,7 +878,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        weekday = self._weekday; dayInYear = self._dayInYear
+        weekday = self._weekday; day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # NYD
             return True
@@ -894,7 +894,7 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
         if m == 5 and d >= 18 and d < 25 and weekday == Date.MON:  # VICTORIA
@@ -953,7 +953,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new years day
             return True
@@ -963,10 +963,10 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em:  # Easter Monday
+        if day_in_year == em:  # Easter Monday
             return True
 
-        if dayInYear == em - 3:  # good friday
+        if day_in_year == em - 3:  # good friday
             return True
 
         if m == 4 and d == 25: # LIBERATION DAY
@@ -1001,7 +1001,7 @@ class Calendar:
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
-        dayInYear = self._dayInYear
+        day_in_year = self._day_in_year
 
         if m == 1 and d == 1:  # new year's day
             return True
@@ -1011,10 +1011,10 @@ class Calendar:
 
         em = easterMondayDay[y - 1901]
 
-        if dayInYear == em - 3:  # Easter Friday holiday
+        if day_in_year == em - 3:  # Easter Friday holiday
             return True
 
-        if dayInYear == em:  # Easter monday holiday
+        if day_in_year == em:  # Easter monday holiday
             return True
 
         if m == 12 and d == 25:  # Xmas bank holiday

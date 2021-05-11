@@ -33,7 +33,7 @@ def test_EquityCompoundOption():
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    num_stepsList = [100, 200, 500, 1000, 2000, 5000]
+    num_steps_list = [100, 200, 500, 1000, 2000, 5000]
 
     ###########################################################################
 
@@ -52,7 +52,7 @@ def test_EquityCompoundOption():
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                               expiry_date2, option_type2, k2)
 
-            for num_steps in num_stepsList:
+            for num_steps in num_steps_list:
 
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model)
@@ -80,7 +80,7 @@ def test_EquityCompoundOption():
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                               expiry_date2, option_type2, k2)
 
-            for num_steps in num_stepsList:
+            for num_steps in num_steps_list:
 
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model, num_steps)

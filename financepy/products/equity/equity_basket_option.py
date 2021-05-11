@@ -182,14 +182,14 @@ class EquityBasketOption:
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_prices: np.ndarray,
-                discount_curve: DiscountCurve,
-                dividend_curves: (list),
-                volatilities: np.ndarray,
-                corr_matrix: np.ndarray,
-                num_paths:int = 10000,
-                seed:int = 4242):
+                 valuation_date: Date,
+                 stock_prices: np.ndarray,
+                 discount_curve: DiscountCurve,
+                 dividend_curves: (list),
+                 volatilities: np.ndarray,
+                 corr_matrix: np.ndarray,
+                 num_paths: int = 10000,
+                 seed: int = 4242):
         """ Valuation of the EquityBasketOption using a Monte-Carlo simulation
         of stock prices assuming a GBM distribution. Cholesky decomposition is
         used to handle a full rank correlation structure between the individual
@@ -228,14 +228,14 @@ class EquityBasketOption:
         np.random.seed(seed)
 
         Sall = model.get_paths_assets(num_assets,
-                                    num_paths,
-                                    num_time_steps,
-                                    texp,
-                                    mus,
-                                    stock_prices,
-                                    volatilities,
-                                    corr_matrix,
-                                    seed)
+                                      num_paths,
+                                      num_time_steps,
+                                      texp,
+                                      mus,
+                                      stock_prices,
+                                      volatilities,
+                                      corr_matrix,
+                                      seed)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(Sall, axis=1) - k, 0.0)

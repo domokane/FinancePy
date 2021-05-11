@@ -68,7 +68,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -78,7 +78,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -113,7 +113,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -123,7 +123,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -158,7 +158,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -168,7 +168,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -203,7 +203,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -213,7 +213,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
 ###############################################################################
 ###############################################################################
@@ -256,7 +256,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -267,7 +267,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -304,7 +304,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -315,7 +315,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -352,7 +352,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -363,7 +363,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -400,7 +400,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -411,7 +411,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -448,7 +448,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -459,7 +459,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
     testCases.header(
         "NUMPATHS",
@@ -496,7 +496,7 @@ def test_EquityLookBackOption():
                 num_paths,
                 num_steps_per_year)
             end = time.time()
-            timeElapsed = round(end - start, 3)
+            time_elapsed = round(end - start, 3)
             diff = value_mc - value
             testCases.print(
                 num_paths,
@@ -507,7 +507,7 @@ def test_EquityLookBackOption():
                 value,
                 value_mc,
                 diff,
-                timeElapsed)
+                time_elapsed)
 
 ###############################################################################
 

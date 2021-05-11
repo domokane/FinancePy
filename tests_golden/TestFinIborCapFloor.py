@@ -40,7 +40,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##############################################################################
 
 
-def test_FinIborDepositsAndSwaps(valuation_date):
+def test_ibor_depositsAndSwaps(valuation_date):
 
     depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -89,7 +89,7 @@ def test_FinIborCapFloor():
     valuation_date = todayDate
     start_date = todayDate.add_weekdays(2)
     maturity_date = start_date.add_tenor("1Y")
-    libor_curve = test_FinIborDepositsAndSwaps(todayDate)
+    libor_curve = test_ibor_depositsAndSwaps(todayDate)
 
     # The capfloor has begun
     # lastFixing = 0.028

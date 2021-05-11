@@ -26,7 +26,7 @@ from ...models.hw_tree import HWTree
 ###############################################################################
 
 
-class FinIborBermudanSwaption:
+class IborBermudanSwaption:
     """ This is the class for the Bermudan-style swaption, an option to enter
     into a swap (payer or receiver of the fixed coupon), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. This swaption

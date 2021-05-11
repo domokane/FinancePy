@@ -41,10 +41,10 @@ def _f(s0, *args):
         raise FinError("Unable to solve for stock price that fits K1")
 
     obj_fn = self.value(valuation_date,
-                       s0,
-                       discount_curve,
-                       dividend_curve,
-                       model) - value
+                        s0,
+                        discount_curve,
+                        dividend_curve,
+                        model) - value
 
     return obj_fn
 
@@ -128,7 +128,7 @@ def _valueOnce(stock_price,
            or option_type2 == FinOptionTypes.AMERICAN_CALL:
             option_values[index + iNode] = max(s - k2, 0.0)
         elif option_type2 == FinOptionTypes.EUROPEAN_PUT\
-           or option_type2 == FinOptionTypes.AMERICAN_PUT:
+                or option_type2 == FinOptionTypes.AMERICAN_PUT:
             option_values[index + iNode] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
@@ -145,7 +145,7 @@ def _valueOnce(stock_price,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
+            exerciseValue = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if option_type1 == FinOptionTypes.AMERICAN_CALL:
                 exerciseValue = max(s - k2, 0.0)
@@ -172,7 +172,7 @@ def _valueOnce(stock_price,
            or option_type1 == FinOptionTypes.AMERICAN_CALL:
             option_values[index + iNode] = max(holdValue - k1, 0.0)
         elif option_type1 == FinOptionTypes.EUROPEAN_PUT\
-           or option_type1 == FinOptionTypes.AMERICAN_PUT:
+                or option_type1 == FinOptionTypes.AMERICAN_PUT:
             option_values[index + iNode] = max(k1 - holdValue, 0.0)
 
     # begin backward steps from t1 expiry to value date
@@ -189,7 +189,7 @@ def _valueOnce(stock_price,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            exerciseValue = 0.0 # NUMBA NEEDS HELP TO DETERMINE THE TYPE
+            exerciseValue = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if option_type1 == FinOptionTypes.AMERICAN_CALL:
                 exerciseValue = max(holdValue - k1, 0.0)
@@ -244,19 +244,22 @@ class EquityCompoundOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         if cExpiryDate > uExpiryDate:
-            raise FinError("Compound expiry date must precede underlying expiry date")
+            raise FinError(
+                "Compound expiry date must precede underlying expiry date")
 
         if cOptionType != FinOptionTypes.EUROPEAN_CALL and \
-            cOptionType != FinOptionTypes.AMERICAN_CALL and \
-            cOptionType != FinOptionTypes.EUROPEAN_PUT and \
-            cOptionType != FinOptionTypes.AMERICAN_PUT:
-                raise FinError("Compound option must be European or American call or put.")
+                cOptionType != FinOptionTypes.AMERICAN_CALL and \
+                cOptionType != FinOptionTypes.EUROPEAN_PUT and \
+                cOptionType != FinOptionTypes.AMERICAN_PUT:
+            raise FinError(
+                "Compound option must be European or American call or put.")
 
         if uOptionType != FinOptionTypes.EUROPEAN_CALL and \
-            uOptionType != FinOptionTypes.AMERICAN_CALL and \
-            uOptionType != FinOptionTypes.EUROPEAN_PUT and \
-            uOptionType != FinOptionTypes.AMERICAN_PUT:
-                raise FinError("Underlying Option must be European or American call or put.")
+                uOptionType != FinOptionTypes.AMERICAN_CALL and \
+                uOptionType != FinOptionTypes.EUROPEAN_PUT and \
+                uOptionType != FinOptionTypes.AMERICAN_PUT:
+            raise FinError(
+                "Underlying Option must be European or American call or put.")
 
         self._cExpiryDate = cExpiryDate
         self._cStrikePrice = float(cStrikePrice)

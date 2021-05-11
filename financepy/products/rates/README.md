@@ -2,7 +2,7 @@
 
 This folder contains a set of funding-related products. These reflect contracts linked to funding indices such as Ibors and Overnight index rate swaps (OIS). It includes:
 
-## FinIborDeposit
+## IborDeposit
 
 This is the basic Ibor instrument in which a party borrows an amount for a specified term and rate unsecured.
 
@@ -63,7 +63,7 @@ This is a discount curve that is extracted by bootstrapping a set of Ibor deposi
 
 ### FinIborCapFloor
 
-### FinIborSwaption
+### IborSwaption
 
 This is a contract to buy or sell an option to enter into a swap to either pay or receive a fixed swap rate at a specific future expiry date. The model includes code that prices a payer or receiver swaption with the following models:
 
@@ -75,7 +75,7 @@ This is a contract to buy or sell an option to enter into a swap to either pay o
 - Black-Karasinski Tree Model
 - Black-Derman-Toy Tree Model
 
-### FinIborBermudanSwaption
+### IborBermudanSwaption
 
 This is a contract to buy or sell an option to enter into a swap to either pay or receive a fixed swap rate at a specific future expiry date on specific coupon dates starting on a designated expiry date. The model includes code that prices a payer or receiver swaption with the following models:
 

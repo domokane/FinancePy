@@ -67,18 +67,18 @@ errorStr = "In averaging period so need to enter accrued average."
 
 @njit(cache=True, fastmath=True)
 def _value_mc_NUMBA(t0,
-                   t,
-                   tau,
-                   K,
-                   n,
-                   option_type,
-                   stock_price,
-                   interest_rate,
-                   dividend_yield,
-                   volatility,
-                   num_paths,
-                   seed,
-                   accruedAverage):
+                    t,
+                    tau,
+                    K,
+                    n,
+                    option_type,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
+                    volatility,
+                    num_paths,
+                    seed,
+                    accruedAverage):
 
     # Start pricing here
     np.random.seed(seed)
@@ -109,9 +109,9 @@ def _value_mc_NUMBA(t0,
         # evolve stock price to start of averaging period
         g = np.random.standard_normal(1)
         s_1 = stock_price * np.exp((mu - v2 / 2.0) * t0 +
-                                  g[0] * np.sqrt(t0) * volatility)
+                                   g[0] * np.sqrt(t0) * volatility)
         s_2 = stock_price * np.exp((mu - v2 / 2.0) * t0 -
-                                  g[0] * np.sqrt(t0) * volatility)
+                                   g[0] * np.sqrt(t0) * volatility)
 
         # enter averaging period
         s_1_arithmetic = 0.0
@@ -151,18 +151,18 @@ def _value_mc_NUMBA(t0,
 
 @njit(cache=True, fastmath=True)
 def _value_mc_fast_NUMBA(t0: float,
-                        t: float,
-                        tau: float,
-                        K: float,
-                        n: int,
-                        option_type: FinOptionTypes,
-                        stock_price: float,
-                        interest_rate: float,
-                        dividend_yield: float,
-                        volatility: float,
-                        num_paths: int,
-                        seed: int,
-                        accruedAverage: float):
+                         t: float,
+                         tau: float,
+                         K: float,
+                         n: int,
+                         option_type: FinOptionTypes,
+                         stock_price: float,
+                         interest_rate: float,
+                         dividend_yield: float,
+                         volatility: float,
+                         num_paths: int,
+                         seed: int,
+                         accruedAverage: float):
 
     np.random.seed(seed)
     mu = interest_rate - dividend_yield
@@ -239,8 +239,8 @@ def _value_mc_fast_NUMBA(t0: float,
 
 @njit(cache=True, fastmath=True)
 def _value_mc_fast_CV_NUMBA(t0, t, tau, K, n, option_type, stock_price,
-                           interest_rate, dividend_yield, volatility, num_paths,
-                           seed, accruedAverage, v_g_exact):
+                            interest_rate, dividend_yield, volatility, num_paths,
+                            seed, accruedAverage, v_g_exact):
 
     np.random.seed(seed)
     mu = interest_rate - dividend_yield
@@ -445,7 +445,7 @@ class EquityAsianOption:
         q = dividend_curve.cc_rate(self._expiry_date)
 
 #        print("r:", r, "q:", q)
-        
+
         volatility = model._volatility
 
         K = self._strike_price
@@ -542,7 +542,8 @@ class EquityAsianOption:
         EA2 = EA2 * (w + 2.0 / (1.0 - np.exp((b + sigma2) * h)) * (u - w))
         sigmaA = np.sqrt((np.log(EA2) - 2.0 * np.log(FA)) / texp)
 
-        d1 = (np.log(FA / K) + sigmaA * sigmaA * texp / 2.0) / (sigmaA*np.sqrt(texp))
+        d1 = (np.log(FA / K) + sigmaA * sigmaA *
+              texp / 2.0) / (sigmaA*np.sqrt(texp))
         d2 = d1 - sigmaA * np.sqrt(texp)
 
         if self._option_type == FinOptionTypes.EUROPEAN_CALL:
@@ -635,14 +636,14 @@ class EquityAsianOption:
 ###############################################################################
 
     def _value_mc(self,
-                 valuation_date: Date,
-                 stock_price: float,
-                 discount_curve: DiscountCurve,
-                 dividend_curve: DiscountCurve,
-                 model,
-                 num_paths: int,
-                 seed: int,
-                 accruedAverage: float):
+                  valuation_date: Date,
+                  stock_price: float,
+                  discount_curve: DiscountCurve,
+                  dividend_curve: DiscountCurve,
+                  model,
+                  num_paths: int,
+                  seed: int,
+                  accruedAverage: float):
         """ Monte Carlo valuation of the Asian Average option using standard
         Monte Carlo code enhanced by Numba. I have discontinued the use of this
         as it is both slow and has limited variance reduction. """
@@ -668,27 +669,27 @@ class EquityAsianOption:
         n = self._num_observations
 
         v = _value_mc_NUMBA(t0, texp, tau, K, n, self._option_type,
-                           stock_price,
-                           r,
-                           q,
-                           volatility,
-                           num_paths,
-                           seed,
-                           accruedAverage)
+                            stock_price,
+                            r,
+                            q,
+                            volatility,
+                            num_paths,
+                            seed,
+                            accruedAverage)
 
         return v
 
 ##############################################################################
 
     def _value_mc_fast(self,
-                      valuation_date,
-                      stock_price,
-                      discount_curve,
-                      dividend_curve,  # Yield
-                      model,          # Model
-                      num_paths,       # Numpaths integer
-                      seed,
-                      accruedAverage):
+                       valuation_date,
+                       stock_price,
+                       discount_curve,
+                       dividend_curve,  # Yield
+                       model,          # Model
+                       num_paths,       # Numpaths integer
+                       seed,
+                       accruedAverage):
         """ Monte Carlo valuation of the Asian Average option. This method uses
         a lot of Numpy vectorisation. It is also helped by Numba. """
 
@@ -706,28 +707,28 @@ class EquityAsianOption:
         volatility = model._volatility
 
         v = _value_mc_fast_NUMBA(t0, texp, tau,
-                                K, n, self._option_type,
-                                stock_price,
-                                r,
-                                q,
-                                volatility,
-                                num_paths,
-                                seed,
-                                accruedAverage)
+                                 K, n, self._option_type,
+                                 stock_price,
+                                 r,
+                                 q,
+                                 volatility,
+                                 num_paths,
+                                 seed,
+                                 accruedAverage)
 
         return v
 
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                model,
-                num_paths: int,
-                seed: int,
-                accruedAverage: float):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 model,
+                 num_paths: int,
+                 seed: int,
+                 accruedAverage: float):
         """ Monte Carlo valuation of the Asian Average option using a control
         variate method that improves accuracy and reduces the variance of the
         price. This uses Numpy and Numba. This is the standard MC pricer. """
@@ -754,19 +755,19 @@ class EquityAsianOption:
                                          accruedAverage)
 
         v = _value_mc_fast_CV_NUMBA(t0,
-                                   texp,
-                                   tau,
-                                   K,
-                                   n,
-                                   self._option_type,
-                                   stock_price,
-                                   r,
-                                   q,
-                                   volatility,
-                                   num_paths,
-                                   seed,
-                                   accruedAverage,
-                                   v_g_exact)
+                                    texp,
+                                    tau,
+                                    K,
+                                    n,
+                                    self._option_type,
+                                    stock_price,
+                                    r,
+                                    q,
+                                    volatility,
+                                    num_paths,
+                                    seed,
+                                    accruedAverage,
+                                    v_g_exact)
 
         return v
 

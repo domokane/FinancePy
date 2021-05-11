@@ -18,7 +18,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_DateAdjust():
+def test_date_adjust():
 
     start_date = Date(28, 2, 2008)
     end_date = Date(28, 2, 2011)
@@ -97,5 +97,5 @@ def test_DateAdjust():
 ###############################################################################
 
 
-test_DateAdjust()
+test_date_adjust()
 testCases.compareTestCases()

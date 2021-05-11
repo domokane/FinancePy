@@ -128,7 +128,7 @@ def test_FinOISDepositsFRAsSwaps():
 
     swap_rate = 0.05
 #    maturity_date = settleDt.add_months(24)
-#    swap = FinIborSwap(settleDt, maturity_date, swap_rate, fixedFreqType,
+#    swap = IborSwap(settleDt, maturity_date, swap_rate, fixedFreqType,
 #                        fixedDCCType)
 #    swaps.append(swap)
 

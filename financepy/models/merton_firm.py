@@ -24,7 +24,7 @@ class MertonFirm():
                  assetValue: (float, list, np.ndarray),
                  bondFace: (float, list, np.ndarray),
                  timeToMaturity: (float, list, np.ndarray),
-                 riskFreeRate: (float, list, np.ndarray),
+                 risk_free_rate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
                  assetVolatility: (float, list, np.ndarray)):
         """ Create an object that holds all of the model parameters. These
@@ -35,7 +35,7 @@ class MertonFirm():
         self._A = np.array(assetValue)
         self._L = np.array(bondFace)
         self._t = np.array(timeToMaturity)
-        self._r = np.array(riskFreeRate)
+        self._r = np.array(risk_free_rate)
         self._mu = np.array(assetGrowthRate)
         self._vA = np.array(assetVolatility)
         self._D = self.debt_value()

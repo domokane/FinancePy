@@ -53,11 +53,11 @@ def testAnalyticalModels():
         for rho in [-0.9, -0.5, 0.0]:
             hestonModel = Heston(v0, kappa, theta, sigma, rho)
             for strike_price in np.linspace(95, 105, 3):
-                callOption = EquityVanillaOption(
+                call_option = EquityVanillaOption(
                     expiry_date, strike_price, FinOptionTypes.EUROPEAN_CALL)
                 value_mc_Heston = hestonModel.value_MC(
                     valuation_date,
-                    callOption,
+                    call_option,
                     stock_price,
                     interest_rate,
                     dividend_yield,
@@ -66,13 +66,13 @@ def testAnalyticalModels():
                     seed)
                 start = time.time()
                 valueGatheral = hestonModel.value_Gatheral(
-                    valuation_date, callOption, stock_price, interest_rate, dividend_yield)
+                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueLewisRouah = hestonModel.value_Lewis_Rouah(
-                    valuation_date, callOption, stock_price, interest_rate, dividend_yield)
+                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueLewis = hestonModel.value_Lewis(
-                    valuation_date, callOption, stock_price, interest_rate, dividend_yield)
+                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueWeber = hestonModel.value_Weber(
-                    valuation_date, callOption, stock_price, interest_rate, dividend_yield)
+                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
                 err = (value_mc_Heston - valueWeber)
                 end = time.time()
                 elapsed = end - start
@@ -124,16 +124,16 @@ def testMonteCarlo():
         for num_steps in [25, 50]:
             for num_paths in [10000, 20000]:
                 hestonModel = Heston(v0, kappa, theta, sigma, rho)
-                callOption = EquityVanillaOption(
+                call_option = EquityVanillaOption(
                     expiry_date, strike_price, FinOptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_Weber(
-                    valuation_date, callOption, stock_price, interest_rate, dividend_yield)
+                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
 
                 start = time.time()
 
                 value_mc_EULER = hestonModel.value_MC(
                     valuation_date,
-                    callOption,
+                    call_option,
                     stock_price,
                     interest_rate,
                     dividend_yield,
@@ -143,7 +143,7 @@ def testMonteCarlo():
                     HestonNumericalScheme.EULER)
                 value_mc_EULERLOG = hestonModel.value_MC(
                     valuation_date,
-                    callOption,
+                    call_option,
                     stock_price,
                     interest_rate,
                     dividend_yield,
@@ -153,7 +153,7 @@ def testMonteCarlo():
                     HestonNumericalScheme.EULERLOG)
                 value_mc_QUADEXP = hestonModel.value_MC(
                     valuation_date,
-                    callOption,
+                    call_option,
                     stock_price,
                     interest_rate,
                     dividend_yield,

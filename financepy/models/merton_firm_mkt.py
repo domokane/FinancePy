@@ -53,7 +53,7 @@ class MertonFirmMkt(MertonFirm):
                  equity_value: (float, list, np.ndarray),
                  bondFace: (float, list, np.ndarray),
                  timeToMaturity: (float, list, np.ndarray),
-                 riskFreeRate: (float, list, np.ndarray),
+                 risk_free_rate: (float, list, np.ndarray),
                  assetGrowthRate: (float, list, np.ndarray),
                  equity_volatility: (float, list, np.ndarray)):
         """ Create an object that holds all of the model parameters. These
@@ -70,8 +70,8 @@ class MertonFirmMkt(MertonFirm):
         if isinstance(timeToMaturity, float):
             timeToMaturity = [timeToMaturity]
 
-        if isinstance(riskFreeRate, float):
-            riskFreeRate = [riskFreeRate]
+        if isinstance(risk_free_rate, float):
+            risk_free_rate = [risk_free_rate]
 
         if isinstance(assetGrowthRate, float):
             assetGrowthRate = [assetGrowthRate]
@@ -82,7 +82,7 @@ class MertonFirmMkt(MertonFirm):
         self._E = np.array(equity_value)
         self._L = np.array(bondFace)
         self._t = np.array(timeToMaturity)
-        self._r = np.array(riskFreeRate)
+        self._r = np.array(risk_free_rate)
         self._mu = np.array(assetGrowthRate)
         self._vE = np.array(equity_volatility)
 

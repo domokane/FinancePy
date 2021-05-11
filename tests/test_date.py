@@ -29,8 +29,8 @@ def test_weekday():
 
 
 def test_excel_representation():
-    assert Date(5, 1, 1900)._excelDate == 5
-    assert Date(1, 3, 2020)._excelDate == 43891
+    assert Date(5, 1, 1900)._excel_date == 5
+    assert Date(1, 3, 2020)._excel_date == 43891
 
 
 # tests not refactored below
@@ -157,9 +157,9 @@ def test_DateFormat():
 
     dt = Date(20, 10, 2019)
 
-    for formatType in DateFormatTypes:
-        set_date_format(formatType)
-        print(formatType.name, dt)
+    for format_type in DateFormatTypes:
+        set_date_format(format_type)
+        print(format_type.name, dt)
 
 
 def test_IntraDay():
@@ -168,7 +168,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 0, 0, 0)
     diff = d2 - d1
     print(d1, d2, diff)
-    print(d1._excelDate, d2._excelDate, diff)
+    print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -176,7 +176,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     print(d1, d2, diff)
-    print(d1._excelDate, d2._excelDate, diff)
+    print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -184,7 +184,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     print(d1, d2, diff)
-    print(d1._excelDate, d2._excelDate, diff)
+    print(d1._excel_date, d2._excel_date, diff)
 
     ###########################################################################
 
@@ -192,7 +192,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
     print(d1, d2, diff)
-    print(d1._excelDate, d2._excelDate, diff)
+    print(d1._excel_date, d2._excel_date, diff)
 
 
 def test_DateEOM():

@@ -17,15 +17,15 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #    times = np.linspace(0.0, 1.0, 5)
 #    values = np.ones(5) * 0.05
 #
-#    flatCurve = FinPieceCurve(times,values)
+#    flat_curve = FinPieceCurve(times,values)
 #
-#    dfs = flatCurve.df(times, 0)
+#    dfs = flat_curve.df(times, 0)
 #    testCases.print(dfs)
-#    dfs = flatCurve.df(times, 1)
+#    dfs = flat_curve.df(times, 1)
 #    testCases.print(dfs)
-#    dfs = flatCurve.df(times, 2)
+#    dfs = flat_curve.df(times, 2)
 #    testCases.print(dfs)
-#    dfs = flatCurve.df(times, -1)
+#    dfs = flat_curve.df(times, -1)
 #    testCases.print(dfs)
 
 ##########################################################################

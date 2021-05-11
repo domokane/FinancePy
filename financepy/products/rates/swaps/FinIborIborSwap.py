@@ -183,10 +183,10 @@ class FinIborIborSwap:
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
         prev_dt = self._adjustedFloatDates[start_index - 1]
-        nextDt = self._adjustedFloatDates[start_index]
-        alpha = basis.year_frac(prev_dt, nextDt)[0]
+        next_dt = self._adjustedFloatDates[start_index]
+        alpha = basis.year_frac(prev_dt, next_dt)[0]
         df1_index = index_curve.df(self._effective_date)  # Cannot be pcd as has past
-        df2_index = index_curve.df(nextDt)
+        df2_index = index_curve.df(next_dt)
 
         floatRate = 0.0
 
@@ -199,7 +199,7 @@ class FinIborIborSwap:
             floatRate = self._firstFixingRate
 
         # All discounting is done forward to the valuation date
-        df_discount = discount_curve.df(nextDt) / self._dfValuationDate
+        df_discount = discount_curve.df(next_dt) / self._dfValuationDate
 
         pv = flow * df_discount
 
@@ -210,22 +210,22 @@ class FinIborIborSwap:
         self._floatFlowPVs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
 
-        prev_dt = nextDt
+        prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for nextDt in self._adjustedFloatDates[start_index + 1:]:
-            alpha = basis.year_frac(prev_dt, nextDt)[0]
-            df2_index = index_curve.df(nextDt)
+        for next_dt in self._adjustedFloatDates[start_index + 1:]:
+            alpha = basis.year_frac(prev_dt, next_dt)[0]
+            df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
-            df_discount = discount_curve.df(nextDt) / self._dfValuationDate
+            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
 
             pv += flow * df_discount
             df1_index = df2_index
-            prev_dt = nextDt
+            prev_dt = next_dt
 
             self._floatFlows.append(flow)
             self._floatYearFracs.append(alpha)

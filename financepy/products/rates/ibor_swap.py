@@ -195,7 +195,7 @@ class IborSwap:
                           frequency_type):
         """ Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinIborSwaption
+        used in the pricing of a cash-settled swaption in the IborSwaption
         class. This method does not affect the standard valuation methods."""
 
         m = annual_frequency(frequency_type)

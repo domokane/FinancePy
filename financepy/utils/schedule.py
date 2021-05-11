@@ -114,7 +114,7 @@ class Schedule:
 
     ###############################################################################
 
-    def scheduleDates(self):
+    def schedule_dates(self):
         """ Returns a list of the schedule of Dates. """
 
         if self._adjusted_dates is None:

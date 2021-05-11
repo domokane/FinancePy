@@ -37,7 +37,7 @@ class OIS:
     which pays the rolled-up overnight index rate (OIR). There is no exchange
     of par. The contract is entered into at zero initial cost.
 
-    NOTE: This class is almost identical to FinIborSwap but will possibly
+    NOTE: This class is almost identical to IborSwap but will possibly
     deviate as distinctions between the two become clear to me. If not they 
     will be converged (or inherited) to avoid duplication.
     

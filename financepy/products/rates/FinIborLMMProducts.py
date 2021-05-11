@@ -83,12 +83,12 @@ class FinIborLMMProducts():
 
         self._gridTimes = [0.0]
 
-        for nextDt in self._gridDates[1:]:
-            tau = basis.year_frac(prev_dt, nextDt)[0]
-            t = (nextDt - self._gridDates[0]) / gDaysInYear
+        for swap_start_date in self._gridDates[1:]:
+            tau = basis.year_frac(prev_dt, next_dt)[0]
+            t = (next_dt - self._gridDates[0]) / gDaysInYear
             self._accrual_factors.append(tau)
             self._gridTimes.append(t)
-            prev_dt = nextDt
+            prev_dt = next_dt
 
 #        print(self._gridTimes)
         self._accrual_factors = np.array(self._accrual_factors)

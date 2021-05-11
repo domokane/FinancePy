@@ -214,7 +214,7 @@ class DiscountCurve:
         a swap that has a price of par today. This is the same as a Libor swap
         rate except that we do not do any business day adjustments. """
 
-        # Note that this function does not call the FinIborSwap class to
+        # Note that this function does not call the IborSwap class to
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
@@ -256,11 +256,11 @@ class DiscountCurve:
             pv01 = 0.0
             df = 1.0
 
-            for nextDt in flow_dates[1:]:
-                df = self.df(nextDt)
-                alpha = day_counter.year_frac(prev_dt, nextDt)[0]
+            for next_dt in flow_dates[1:]:
+                df = self.df(next_dt)
+                alpha = day_counter.year_frac(prev_dt, next_dt)[0]
                 pv01 += alpha * df
-                prev_dt = nextDt
+                prev_dt = next_dt
 
             if abs(pv01) < gSmall:
                 parRate = 0.0

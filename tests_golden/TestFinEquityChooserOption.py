@@ -20,7 +20,7 @@ def test_EquityChooserOptionHaug():
     """ Following example in Haug Page 130 """
 
     valuation_date = Date(1, 1, 2015)
-    chooseDate = Date(2, 4, 2015)
+    choose_date = Date(2, 4, 2015)
     call_expiry_date = Date(1, 7, 2015)
     put_expiry_date = Date(2, 8, 2015)
     call_strike = 55.0
@@ -34,7 +34,7 @@ def test_EquityChooserOptionHaug():
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    chooserOption = EquityChooserOption(chooseDate,
+    chooserOption = EquityChooserOption(choose_date,
                                         call_expiry_date,
                                         put_expiry_date,
                                         call_strike,

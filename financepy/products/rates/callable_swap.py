@@ -51,7 +51,7 @@
 # ###############################################################################
 
 
-# class FinIborBermudanSwaption
+# class IborBermudanSwaption
 #     """ Class for fixed coupon bonds with embedded call or put optionality. """
 
 #     def __init__(self,
@@ -142,7 +142,7 @@
 #         payFixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
-#         swap = FinIborSwap(self._exercise_date,
+#         swap = IborSwap(self._exercise_date,
 #                             self._maturity_date,
 #                             self._fixed_coupon,
 #                             self._fixed_frequency_type,
@@ -179,7 +179,7 @@
 #         call_prices = np.array(self._call_prices)
 
 #         # Generate bond put times and prices
-#         if self._swaptionType == FinIborSwaptionType.PAY:
+#         if self._swaptionType == IborSwaptionType.PAY:
 #             call_price = 100.0
 #             putPrice = 1e10
 #         else:

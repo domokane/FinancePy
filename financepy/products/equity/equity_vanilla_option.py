@@ -7,8 +7,6 @@ import numpy as np
 from numba import njit
 
 # from scipy import optimize
-from ...utils.solver_1d import newton_secant, bisection, newton
-
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError

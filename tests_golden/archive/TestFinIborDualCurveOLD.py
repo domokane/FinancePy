@@ -18,7 +18,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.FinIborSwapOLD import FinIborSwapOLD
+from financepy.products.rates.IborSwapOLD import IborSwapOLD
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
@@ -202,23 +202,23 @@ def test_bloombergPricingExample():
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     swaps = []
-    swap = FinIborSwapOLD(settlement_date, "2Y", fixed_leg_type, (2.77417+2.77844)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "3Y", fixed_leg_type, (2.86098+2.86582)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "4Y", fixed_leg_type, (2.90240+2.90620)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "5Y", fixed_leg_type, (2.92944+2.92906)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "6Y", fixed_leg_type, (2.94001+2.94499)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "7Y", fixed_leg_type, (2.95352+2.95998)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "8Y", fixed_leg_type, (2.96830+2.97400)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "9Y", fixed_leg_type, (2.98403+2.98817)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "10Y", fixed_leg_type, (2.99716+3.00394)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "11Y", fixed_leg_type, (3.01344+3.01596)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "12Y", fixed_leg_type, (3.02276+3.02684)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "15Y", fixed_leg_type, (3.04092+3.04508)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "20Y", fixed_leg_type, (3.04417+3.05183)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "25Y", fixed_leg_type, (3.03219+3.03621)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "30Y", fixed_leg_type, (3.01030+3.01370)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "40Y", fixed_leg_type, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "50Y", fixed_leg_type, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "2Y", fixed_leg_type, (2.77417+2.77844)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "3Y", fixed_leg_type, (2.86098+2.86582)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "4Y", fixed_leg_type, (2.90240+2.90620)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "5Y", fixed_leg_type, (2.92944+2.92906)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "6Y", fixed_leg_type, (2.94001+2.94499)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "7Y", fixed_leg_type, (2.95352+2.95998)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "8Y", fixed_leg_type, (2.96830+2.97400)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "9Y", fixed_leg_type, (2.98403+2.98817)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "10Y", fixed_leg_type, (2.99716+3.00394)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "11Y", fixed_leg_type, (3.01344+3.01596)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "12Y", fixed_leg_type, (3.02276+3.02684)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "15Y", fixed_leg_type, (3.04092+3.04508)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "20Y", fixed_leg_type, (3.04417+3.05183)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "25Y", fixed_leg_type, (3.03219+3.03621)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "30Y", fixed_leg_type, (3.01030+3.01370)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "40Y", fixed_leg_type, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "50Y", fixed_leg_type, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
     libor_curve = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type, True)
 
@@ -307,7 +307,7 @@ def test_swapValuationExample():
     floatDCCType = DayCountTypes.ACT_360
     floatFreqType = FrequencyTypes.SEMI_ANNUAL
 
-    offMarketSwap = FinIborSwapOLD(start_date, maturity_date, fixed_leg_type,
+    offMarketSwap = IborSwapOLD(start_date, maturity_date, fixed_leg_type,
                                 fixedRate, fixedFreqType, fixedDCCType,
                                 notional,
                                 float_spread, floatFreqType, floatDCCType)
@@ -346,31 +346,31 @@ def test_swapValuationExample():
     fixedDCCType = DayCountTypes.THIRTY_360_BOND
     fixedFreqType = FrequencyTypes.ANNUAL
     
-    swap = FinIborSwapOLD(settlement_date, "2Y", fixed_leg_type, -0.1525/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "3Y", fixed_leg_type, -0.0185/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "4Y", fixed_leg_type, 0.1315/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "5Y", fixed_leg_type, 0.2745/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "6Y", fixed_leg_type, 0.4135/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "7Y", fixed_leg_type, 0.5439/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "8Y", fixed_leg_type, 0.6652/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "9Y", fixed_leg_type, 0.7784/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "10Y", fixed_leg_type, 0.8799/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "11Y", fixed_leg_type, 0.9715/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "12Y", fixed_leg_type, 1.0517/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "15Y", fixed_leg_type, 1.2369/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "20Y", fixed_leg_type, 1.3965/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "25Y", fixed_leg_type, 1.4472/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "30Y", fixed_leg_type, 1.4585/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "35Y", fixed_leg_type, 1.4595/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "40Y", fixed_leg_type, 1.4535/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "45Y", fixed_leg_type, 1.4410/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
-    swap = FinIborSwapOLD(settlement_date, "50Y", fixed_leg_type, 1.4335/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "2Y", fixed_leg_type, -0.1525/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "3Y", fixed_leg_type, -0.0185/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "4Y", fixed_leg_type, 0.1315/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "5Y", fixed_leg_type, 0.2745/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "6Y", fixed_leg_type, 0.4135/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "7Y", fixed_leg_type, 0.5439/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "8Y", fixed_leg_type, 0.6652/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "9Y", fixed_leg_type, 0.7784/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "10Y", fixed_leg_type, 0.8799/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "11Y", fixed_leg_type, 0.9715/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "12Y", fixed_leg_type, 1.0517/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "15Y", fixed_leg_type, 1.2369/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "20Y", fixed_leg_type, 1.3965/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "25Y", fixed_leg_type, 1.4472/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "30Y", fixed_leg_type, 1.4585/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "35Y", fixed_leg_type, 1.4595/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "40Y", fixed_leg_type, 1.4535/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "45Y", fixed_leg_type, 1.4410/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
+    swap = IborSwapOLD(settlement_date, "50Y", fixed_leg_type, 1.4335/100.0, fixedFreqType, fixedDCCType); swaps.append(swap)
     
     iborDepos = depos.copy()
     iborFras = fras.copy()
-    iborSwaps = swaps.copy()
+    ibor_swaps = swaps.copy()
     
-    iborCurve = FinIborSingleCurve(valuation_date, iborDepos, iborFras, iborSwaps, interp_type)
+    iborCurve = FinIborSingleCurve(valuation_date, iborDepos, iborFras, ibor_swaps, interp_type)
     v1 = offMarketSwap.value(valuation_date, iborCurve, iborCurve, -0.268/100.0)    
 
     testCases.banner("DERISCOPE EXAMPLE REPLICATION")    
@@ -436,7 +436,7 @@ def test_swapValuationExample():
     
 #    oisCurveFF = FinOISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interp_type)
     
-    iborDualCurve = FinIborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, iborSwaps, interp_type)
+    iborDualCurve = FinIborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, ibor_swaps, interp_type)
     
 #    v2 = offMarketSwap.value(valuation_date, oisCurveFF, iborDualCurve, -0.268/100.0)
     

@@ -262,13 +262,13 @@ class FinIborIborXCcySwap
         if len(self._adjustedFixedDates) == 1:
             return 0.0
 
-        for nextDt in self._adjustedFixedDates[start_index:]:
-            alpha = day_counter.year_frac(prev_dt, nextDt)[0]
-            df_discount = discount_curve.df(nextDt) / self._dfValuationDate
+        for next_dt in self._adjustedFixedDates[start_index:]:
+            alpha = day_counter.year_frac(prev_dt, next_dt)[0]
+            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
             flow = self._fixed_coupon * alpha * self._notional
             flowPV = flow * df_discount
             pv += flowPV
-            prev_dt = nextDt
+            prev_dt = next_dt
 
             self._fixedYearFracs.append(alpha)
             self._fixedFlows.append(flow)
@@ -295,10 +295,10 @@ class FinIborIborXCcySwap
         """ Now PV fixed leg flows. """
         prev_dt = self._adjustedFixedDates[0]
 
-        for nextDt in self._adjustedFixedDates[1:]:
-            alpha = day_counter.year_frac(prev_dt, nextDt)[0]
+        for next_dt in self._adjustedFixedDates[1:]:
+            alpha = day_counter.year_frac(prev_dt, next_dt)[0]
             flow = self._fixed_coupon * alpha * self._notional
-            prev_dt = nextDt
+            prev_dt = next_dt
             self._fixedYearFracs.append(alpha)
             self._fixedFlows.append(flow)
 
@@ -310,7 +310,7 @@ class FinIborIborXCcySwap
                         frequencyType):
         """ Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the FinIborSwaption
+        used in the pricing of a cash-settled swaption in the IborSwaption
         class. This method does not affect the standard valuation methods."""
 
         m = FinFrequency(frequencyType)
@@ -385,10 +385,10 @@ class FinIborIborXCcySwap
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
         prev_dt = self._adjustedFloatDates[start_index - 1]
-        nextDt = self._adjustedFloatDates[start_index]
-        alpha = basis.year_frac(prev_dt, nextDt)[0]
+        next_dt = self._adjustedFloatDates[start_index]
+        alpha = basis.year_frac(prev_dt, next_dt)[0]
         df1_index = index_curve.df(self._effective_date)  # Cannot be pcd as has past
-        df2_index = index_curve.df(nextDt)
+        df2_index = index_curve.df(next_dt)
 
         floatRate = 0.0
 
@@ -401,7 +401,7 @@ class FinIborIborXCcySwap
             floatRate = self._firstFixingRate
 
         # All discounting is done forward to the valuation date
-        df_discount = discount_curve.df(nextDt) / self._dfValuationDate
+        df_discount = discount_curve.df(next_dt) / self._dfValuationDate
 
         pv = flow * df_discount
 
@@ -412,22 +412,22 @@ class FinIborIborXCcySwap
         self._floatFlowPVs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
 
-        prev_dt = nextDt
+        prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for nextDt in self._adjustedFloatDates[start_index + 1:]:
-            alpha = basis.year_frac(prev_dt, nextDt)[0]
-            df2_index = index_curve.df(nextDt)
+        for next_dt in self._adjustedFloatDates[start_index + 1:]:
+            alpha = basis.year_frac(prev_dt, next_dt)[0]
+            df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
-            df_discount = discount_curve.df(nextDt) / self._dfValuationDate
+            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
 
             pv += flow * df_discount
             df1_index = df2_index
-            prev_dt = nextDt
+            prev_dt = next_dt
 
             self._floatFlows.append(flow)
             self._floatYearFracs.append(alpha)

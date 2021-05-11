@@ -34,8 +34,8 @@ def test_ShiftedSABR():
     r = 0.03
     texp = 2.0
 
-    callOptionType = FinOptionTypes.EUROPEAN_CALL
-    putOptionType = FinOptionTypes.EUROPEAN_PUT
+    call_optionType = FinOptionTypes.EUROPEAN_CALL
+    put_optionType = FinOptionTypes.EUROPEAN_PUT
 
     df = np.exp(-r * texp)
 
@@ -62,8 +62,8 @@ def test_ShiftedSABR():
     testCases.print("SABR CASE", calibrationError)
 
     # Valuation: pure SABR dynamics
-    valueCall = modelSABR_02.value(f, k, texp, df, callOptionType)
-    valuePut = modelSABR_02.value(f, k, texp, df, putOptionType)
+    valueCall = modelSABR_02.value(f, k, texp, df, call_optionType)
+    valuePut = modelSABR_02.value(f, k, texp, df, put_optionType)
     assert round((valueCall - valuePut), 12) == round(df*(f - k), 12), \
         "The method called 'value()' doesn't comply with Call-Put parity"
 

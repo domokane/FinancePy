@@ -30,16 +30,16 @@ class DateFormatTypes(Enum):
 gDateFormatType = DateFormatTypes.UK_LONG
 
 
-def set_date_format(formatType):
+def set_date_format(format_type):
     """ Function that sets the global date format type. """
     global gDateFormatType
-    gDateFormatType = formatType
+    gDateFormatType = format_type
 
 ###############################################################################
 
 
-shortDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-longDayNames = [
+short_day_names = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+long_day_names = [
     'MONDAY',
     'TUESDAY',
     'WEDNESDAY',
@@ -91,8 +91,8 @@ def is_leap_year(y: int):
 ###############################################################################
 
 
-def parse_date(date_str, dateFormat):
-    dt_obj = datetime.datetime.strptime(date_str, dateFormat)
+def parse_date(date_str, date_format):
+    dt_obj = datetime.datetime.strptime(date_str, date_format)
     return dt_obj.day, dt_obj.month, dt_obj.year
 
 ###############################################################################
@@ -271,7 +271,7 @@ class Date():
         self._mm = mm
         self._ss = ss
 
-        self._excelDate = 0  # This is a float as it includes intraday time
+        self._excel_date = 0  # This is a float as it includes intraday time
 
         # update the excel date used for doing lots of financial calculations
         self._refresh()
@@ -280,7 +280,7 @@ class Date():
         dayFraction += self._mm/24.0/60.0
         dayFraction += self._ss/24.0/60.0/60.0
 
-        self._excelDate += dayFraction  # This is a float as it includes intraday time
+        self._excel_date += dayFraction  # This is a float as it includes intraday time
 
     ###########################################################################
 
@@ -302,38 +302,38 @@ class Date():
         idx = date_index(self._d, self._m, self._y)
         daysSinceFirstJan1900 = gDateCounterList[idx]
         wd = weekday(daysSinceFirstJan1900)
-        self._excelDate = daysSinceFirstJan1900
+        self._excel_date = daysSinceFirstJan1900
         self._weekday = wd
 
     ###########################################################################
 
     def __lt__(self, other):
-        return self._excelDate < other._excelDate
+        return self._excel_date < other._excel_date
 
     ###########################################################################
 
     def __gt__(self, other):
-        return self._excelDate > other._excelDate
+        return self._excel_date > other._excel_date
 
     ###########################################################################
 
     def __le__(self, other):
-        return self._excelDate <= other._excelDate
+        return self._excel_date <= other._excel_date
 
     ###########################################################################
 
     def __ge__(self, other):
-        return self._excelDate >= other._excelDate
+        return self._excel_date >= other._excel_date
 
     ###########################################################################
 
     def __sub__(self, other):
-        return self._excelDate - other._excelDate
+        return self._excel_date - other._excel_date
 
     ###########################################################################
 
     def __eq__(self, other):
-        return self._excelDate == other._excelDate
+        return self._excel_date == other._excel_date
 
     ###########################################################################
 
@@ -770,7 +770,7 @@ class Date():
 
         global gDateFormatType
 
-        dayNameStr = shortDayNames[self._weekday]
+        dayNameStr = short_day_names[self._weekday]
 
         if self._d < 10:
             dayStr = "0" + str(self._d)
@@ -904,7 +904,7 @@ def dailyWorkingDaySchedule(self,
 def datediff(d1: Date,
              d2: Date):
     """ Calculate the number of days between two Findates. """
-    dd = (d2._excelDate - d1._excelDate)
+    dd = (d2._excel_date - d1._excel_date)
     return int(dd)
 
 ###############################################################################

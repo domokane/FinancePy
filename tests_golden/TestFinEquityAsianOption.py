@@ -64,9 +64,9 @@ def testConvergence():
     valuesMC_fast = []
     valuesMC_CV = []
 
-    num_pathsList = [5000]
+    num_paths_list = [5000]
 
-    for num_paths in num_pathsList:
+    for num_paths in num_paths_list:
 
         accruedAverage = stock_price * 1.1
 
@@ -127,7 +127,7 @@ def testConvergence():
             value_mc_CV)
 
 #    import matplotlib.pyplot as plt
-#    x = num_pathsList
+#    x = num_paths_list
 #    plt.figure(figsize=(8,6))
 #    plt.plot(x,valuesGeometric,label="Geometric")
 #    plt.plot(x,valuesTurnbull,label="Turbull_Wakeman")
@@ -307,9 +307,9 @@ def testMCTimings():
     tvaluesMC_fast = []
     tvaluesMC_fast_CV = []
 
-    num_pathsList = [5000]
+    num_paths_list = [5000]
 
-    for num_paths in num_pathsList:
+    for num_paths in num_paths_list:
 
         accruedAverage = stock_price * 1.1
 
@@ -370,7 +370,7 @@ def testMCTimings():
             t_MC_fast_CV)
 
 #    import matplotlib.pyplot as plt
-#    x = num_pathsList
+#    x = num_paths_list
 #    plt.figure(figsize=(8,6))
 #    plt.plot(x,valuesMC,label="Basic MC")
 #    plt.plot(x,valuesMC_fast,label="MC_Fast")

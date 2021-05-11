@@ -42,7 +42,7 @@ def test_EquityRainbowOption():
         dividend_curves.append(dividend_curve)
 
     stock_prices = np.ones(num_assets) * 100
-    num_pathsList = [10000]
+    num_paths_list = [10000]
     corrList = np.linspace(0.0, 0.999999, 6)
     strike = 100.0
 
@@ -67,7 +67,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             start = time.time()
             v = rainbowOption.value(
@@ -122,7 +122,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             start = time.time()
 
@@ -179,7 +179,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             start = time.time()
 
@@ -235,7 +235,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             start = time.time()
             v = rainbowOption.value(
@@ -291,7 +291,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             payoff_type1 = EquityRainbowOptionTypes.CALL_ON_MAXIMUM
             payoff_params1 = [strike]
@@ -351,7 +351,7 @@ def test_EquityRainbowOption():
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vectorToCorrMatrix(betas)
 
-        for num_paths in num_pathsList:
+        for num_paths in num_paths_list:
 
             payoff_type1 = EquityRainbowOptionTypes.CALL_ON_MINIMUM
             payoff_params1 = [strike]

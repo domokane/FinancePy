@@ -63,7 +63,7 @@ class IborSwaption():
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
         floating leg payment schedules. Bermudan style swaption should be
-        priced using the FinIborBermudanSwaption class. """
+        priced using the IborBermudanSwaption class. """
 
         check_argument_types(self.__init__, locals())
 

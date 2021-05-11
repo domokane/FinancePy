@@ -65,16 +65,16 @@ def payoff_value(s, payoff_typeValue, payoff_params):
 
 
 def value_mcFast(t,
-                stock_prices,
-                discount_curve,
-                dividend_curves,
-                volatilities,
-                betas,
-                num_assets,
-                payoff_type,
-                payoff_params,
-                num_paths=10000,
-                seed=4242):
+                 stock_prices,
+                 discount_curve,
+                 dividend_curves,
+                 volatilities,
+                 betas,
+                 num_assets,
+                 payoff_type,
+                 payoff_params,
+                 num_paths=10000,
+                 seed=4242):
 
     np.random.seed(seed)
 
@@ -88,14 +88,14 @@ def value_mcFast(t,
         qs.append(q)
 
     qs = np.array(qs)
-    
+
     mus = r - qs
 
     model = FinGBMProcess()
 
     num_time_steps = 2
     Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
-                                t, mus, stock_prices, volatilities, betas, seed)
+                                  t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoff_value(Sall, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
@@ -208,7 +208,6 @@ class EquityRainbowOption(EquityOption):
         if valuation_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiry_date - valuation_date) / gDaysInYear
         r = discount_curve.zero_rate(self._expiry_date)
@@ -247,14 +246,16 @@ class EquityRainbowOption(EquityOption):
 
         if self._payoff_type == EquityRainbowOptionTypes.CALL_ON_MAXIMUM:
             v = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k * df * \
+                (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
         elif self._payoff_type == EquityRainbowOptionTypes.CALL_ON_MINIMUM:
             v = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrt(t), -rho2) \
                 - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
         elif self._payoff_type == EquityRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrt(t))
             cmax2 = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2) \
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k * df * \
+                (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             v = k * df - cmax1 + cmax2
         elif self._payoff_type == EquityRainbowOptionTypes.PUT_ON_MINIMUM:
             cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrt(t))
@@ -269,14 +270,14 @@ class EquityRainbowOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date,
-                stock_prices,
-                discount_curve,
-                dividend_curves,
-                volatilities,
-                corr_matrix,
-                num_paths=10000,
-                seed=4242):
+                 valuation_date,
+                 stock_prices,
+                 discount_curve,
+                 dividend_curves,
+                 volatilities,
+                 corr_matrix,
+                 num_paths=10000,
+                 seed=4242):
 
         self._validate(stock_prices,
                        dividend_curves,
@@ -289,16 +290,16 @@ class EquityRainbowOption(EquityOption):
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
         v = value_mcFast(t,
-                        stock_prices,
-                        discount_curve,
-                        dividend_curves,
-                        volatilities,
-                        corr_matrix,
-                        self._num_assets,
-                        self._payoff_type,
-                        self._payoff_params,
-                        num_paths,
-                        seed)
+                         stock_prices,
+                         discount_curve,
+                         dividend_curves,
+                         volatilities,
+                         corr_matrix,
+                         self._num_assets,
+                         self._payoff_type,
+                         self._payoff_params,
+                         num_paths,
+                         seed)
 
         return v
 

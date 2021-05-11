@@ -218,15 +218,17 @@ class EquityBarrierOption(EquityOption):
             if h >= k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
                     - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c_ui
             else:
                 price = c
         elif self._option_type == EquityBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                     - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                     + k * df * pow(hOverS, 2.0 * l - 2.0) * (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c - c_ui
             else:
                 price = 0.0
@@ -259,7 +261,8 @@ class EquityBarrierOption(EquityOption):
                 p_di = -s * dq * N(-x1) \
                     + k * df * N(-x1 + sigmaRootT) \
                     + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                    - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p - p_di
         elif self._option_type == EquityBarrierTypes.DOWN_AND_IN_PUT:
             if h >= k:
@@ -268,7 +271,8 @@ class EquityBarrierOption(EquityOption):
                 p_di = -s * dq * N(-x1) \
                     + k * df * N(-x1 + sigmaRootT) \
                     + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                    - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p_di
         else:
             raise FinError("Unknown barrier option type." +
@@ -280,15 +284,15 @@ class EquityBarrierOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                discount_curve: DiscountCurve,
-                dividend_curve: DiscountCurve,
-                process_type,
-                model_params,
-                numAnnObs: int = 252,
-                num_paths: int = 10000,
-                seed: int = 4242):
+                 valuation_date: Date,
+                 stock_price: float,
+                 discount_curve: DiscountCurve,
+                 dividend_curve: DiscountCurve,
+                 process_type,
+                 model_params,
+                 numAnnObs: int = 252,
+                 num_paths: int = 10000,
+                 seed: int = 4242):
         """ A Monte-Carlo based valuation of the barrier option which simulates
         the evolution of the stock price of at a specified number of annual
         observation times until expiry to examine if the barrier has been
@@ -304,12 +308,12 @@ class EquityBarrierOption(EquityOption):
         process = FinProcessSimulator()
 
         r = discount_curve.zero_rate(self._expiry_date)
-        
+
         # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
 
         r = discount_curve.cc_rate(self._expiry_date)
         q = dividend_curve.cc_rate(self._expiry_date)
-        
+
         #######################################################################
 
         if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL and stock_price <= B:
@@ -413,7 +417,8 @@ class EquityBarrierOption(EquityOption):
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_level)
-        s += label_to_string("NUM OBSERVATIONS", self._num_observations_per_year)
+        s += label_to_string("NUM OBSERVATIONS",
+                             self._num_observations_per_year)
         s += label_to_string("NOTIONAL", self._notional, "")
         return s
 

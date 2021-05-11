@@ -308,14 +308,14 @@ def test_Bond():
 
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
-    flatCurve = DiscountCurveFlat(settlement_date,
+    flat_curve = DiscountCurveFlat(settlement_date,
                                   ytm,
                                   FrequencyTypes.SEMI_ANNUAL)
 
     testCases.header("FIELD", "VALUE")
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
-    asw = bond.asset_swap_spread(settlement_date, clean_price, flatCurve)
+    asw = bond.asset_swap_spread(settlement_date, clean_price, flat_curve)
     testCases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
     # When the libor curve is the Libor curve then the ASW is positive

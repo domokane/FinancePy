@@ -165,12 +165,12 @@ def test_BDTExampleTwo():
     sigma = 0.20
 
     # Test convergence
-    num_stepsList = [5]  # [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    num_steps_list = [5]  # [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     exercise_type = FinExerciseTypes.AMERICAN
 
     testCases.header("Values")
     treeVector = []
-    for num_time_steps in num_stepsList:
+    for num_time_steps in num_steps_list:
         model = BDTTree(sigma, num_time_steps)
         model.buildTree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
@@ -180,7 +180,7 @@ def test_BDTExampleTwo():
         treeVector.append(v['call'])
 
     if PLOT_GRAPHS:
-        plt.plot(num_stepsList, treeVector)
+        plt.plot(num_steps_list, treeVector)
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
 

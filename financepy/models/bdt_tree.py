@@ -328,8 +328,8 @@ def americanBondOption_Tree_Fast(texp, tmat,
 
     ###########################################################################
 
-    callOptionValues = np.zeros(shape=(num_time_steps, num_nodes))
-    putOptionValues = np.zeros(shape=(num_time_steps, num_nodes))
+    call_option_values = np.zeros(shape=(num_time_steps, num_nodes))
+    put_option_values = np.zeros(shape=(num_time_steps, num_nodes))
     bondValues = np.zeros(shape=(num_time_steps, num_nodes))
 
     # Start with the value of the bond at maturity
@@ -385,41 +385,41 @@ def americanBondOption_Tree_Fast(texp, tmat,
             vcall = 0.0
             vput = 0.0
 
-            vu = callOptionValues[m+1, k+1]
-            vd = callOptionValues[m+1, k]
+            vu = call_option_values[m+1, k+1]
+            vd = call_option_values[m+1, k]
             vcall = (pu*vu + pd*vd) * df
 
-            callOptionValues[m, k] = vcall
+            call_option_values[m, k] = vcall
 
-            vu = putOptionValues[m+1, k+1]
-            vd = putOptionValues[m+1, k]
+            vu = put_option_values[m+1, k+1]
+            vd = put_option_values[m+1, k]
             vput = (pu*vu + pd*vd) * df
 
-            putOptionValues[m, k] = vput
+            put_option_values[m, k] = vput
 
             full_price = bondValues[m, k]
             clean_price = full_price - accrued[m]
             callExercise = max(clean_price - strike_price, 0.0)
             putExercise = max(strike_price - clean_price, 0.0)
 
-            holdCall = callOptionValues[m, k]
-            holdPut = putOptionValues[m, k]
+            holdCall = call_option_values[m, k]
+            holdPut = put_option_values[m, k]
 
             if m == expiryStep:
 
-                callOptionValues[m, k] = max(callExercise, holdCall)
-                putOptionValues[m, k] = max(putExercise, holdPut)
+                call_option_values[m, k] = max(callExercise, holdCall)
+                put_option_values[m, k] = max(putExercise, holdPut)
 
             elif exercise_typeInt == 3 and m < expiryStep:
 
-                callOptionValues[m, k] = max(callExercise, holdCall)
-                putOptionValues[m, k] = max(putExercise, holdPut)
+                call_option_values[m, k] = max(callExercise, holdCall)
+                put_option_values[m, k] = max(putExercise, holdPut)
 
         if DEBUG:
             print(m, _treeTimes[m], accrued[m], full_price, clean_price,
                   callExercise, putExercise)
 
-    return callOptionValues[0, 0], putOptionValues[0, 0]
+    return call_option_values[0, 0], put_option_values[0, 0]
 
 ###############################################################################
 

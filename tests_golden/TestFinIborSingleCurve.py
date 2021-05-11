@@ -31,7 +31,7 @@ PLOT_GRAPHS = False
 ###############################################################################
 
 
-def test_FinIborDepositsOnly():
+def test_ibor_depositsOnly():
 
     # I have used the following useful blog post by Ioannis Rigopoulos for this
     # https://blog.deriscope.com/index.php/en/yield-curve-excel-quantlib-deposit
@@ -142,7 +142,7 @@ def test_FinIborFRAsOnly():
 ###############################################################################
 
 
-def test_FinIborDepositsFRAsSwaps():
+def test_ibor_depositsFRAsSwaps():
 
     valuation_date = Date(18, 9, 2019)
 
@@ -205,7 +205,7 @@ def test_FinIborDepositsFRAsSwaps():
 
     swap_rate = 0.05
 #    maturity_date = settlement_date.add_months(24)
-#    swap = FinIborSwap(settlement_date, maturity_date, swap_rate, fixedFreqType,
+#    swap = IborSwap(settlement_date, maturity_date, swap_rate, fixedFreqType,
 #                        fixedDCCType)
 #    swaps.append(swap)
 
@@ -334,7 +334,7 @@ def futureToFRARate(price, convexity):
 ###############################################################################
 
 
-def test_FinIborDepositsFuturesSwaps():
+def test_ibor_depositsFuturesSwaps():
 
     spotDate = Date(6, 6, 2018)
     spot_days = 0
@@ -787,9 +787,9 @@ if 1 == 0:
 
 test_bloombergPricingExample(InterpTypes.FLAT_FWD_RATES)
 test_derivativePricingExample()
-test_FinIborDepositsOnly()
+test_ibor_depositsOnly()
 test_FinIborFRAsOnly()
-test_FinIborDepositsFRAsSwaps()
-test_FinIborDepositsFuturesSwaps()
+test_ibor_depositsFRAsSwaps()
+test_ibor_depositsFuturesSwaps()
 
 testCases.compareTestCases()

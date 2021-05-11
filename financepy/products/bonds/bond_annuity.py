@@ -123,11 +123,11 @@ class BondAnnuity:
 
         prev_dt = self._pcd
 
-        for nextDt in self._flow_dates[1:]:
-            alpha = basis.year_frac(prev_dt, nextDt)[0]
+        for next_dt in self._flow_dates[1:]:
+            alpha = basis.year_frac(prev_dt, next_dt)[0]
             flow = self._coupon * alpha * self._face
             self._flow_amounts.append(flow)
-            prev_dt = nextDt
+            prev_dt = next_dt
 
     ###########################################################################
 

@@ -32,7 +32,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinIborDepositsAndSwaps(valuation_date):
+def test_ibor_depositsAndSwaps(valuation_date):
 
     depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -75,14 +75,14 @@ def test_FinIborDepositsAndSwaps(valuation_date):
 
 ##########################################################################
 
-def testFinIborSwaptionModels():
+def testIborSwaptionModels():
 
     ##########################################################################
     # COMPARISON OF MODELS
     ##########################################################################
 
     valuation_date = Date(1, 1, 2011)
-    libor_curve = test_FinIborDepositsAndSwaps(valuation_date)
+    libor_curve = test_ibor_depositsAndSwaps(valuation_date)
 
     exercise_date = Date(1, 1, 2012)
     swapMaturityDate = Date(1, 1, 2017)
@@ -146,7 +146,7 @@ def testFinIborSwaptionModels():
 ###############################################################################
 
 
-def test_FinIborSwaptionQLExample():
+def test_IborSwaptionQLExample():
 
     valuation_date = Date(4, 3, 2014)
     settlement_date = Date(4, 3, 2014)
@@ -376,7 +376,7 @@ def testFinIborCashSettledSwaption():
 ###############################################################################
 
 
-def testFinIborSwaptionMatlabExamples():
+def testIborSwaptionMatlabExamples():
 
     # We value a European swaption using Black's model and try to replicate a
     # ML example at https://fr.mathworks.com/help/fininst/swaptionbyblk.html
@@ -705,9 +705,9 @@ def testFinIborSwaptionMatlabExamples():
 ###############################################################################
 
 
-testFinIborSwaptionModels()
+testIborSwaptionModels()
 testFinIborCashSettledSwaption()
-testFinIborSwaptionMatlabExamples()
-test_FinIborSwaptionQLExample()
+testIborSwaptionMatlabExamples()
+test_IborSwaptionQLExample()
 
 testCases.compareTestCases()

@@ -149,7 +149,7 @@ def _valueOnce(stock_price,
     for iNode in range(0, iTime + 1):
         s = stock_values[index + iNode]
         option_values[index +
-                     iNode] = _payoff_value(s, payoff_typeValue, payoff_params)
+                      iNode] = _payoff_value(s, payoff_typeValue, payoff_params)
 
     # begin backward steps from expiry
     for iTime in range(num_steps - 1, -1, -1):
@@ -171,7 +171,8 @@ def _valueOnce(stock_price,
                 option_values[index + iNode] = holdValue
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + iNode]
-                exerciseValue = _payoff_value(s, payoff_typeValue, payoff_params)
+                exerciseValue = _payoff_value(
+                    s, payoff_typeValue, payoff_params)
                 option_values[index + iNode] = max(exerciseValue, holdValue)
 
     price = option_values[0]

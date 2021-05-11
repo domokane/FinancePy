@@ -24,8 +24,8 @@ def test_Black():
 
     testCases.header("ITEM", "CALL", "PUT")
 
-    callOptionType = FinOptionTypes.EUROPEAN_CALL
-    putOptionType = FinOptionTypes.EUROPEAN_PUT
+    call_optionType = FinOptionTypes.EUROPEAN_CALL
+    put_optionType = FinOptionTypes.EUROPEAN_PUT
 
     df = np.exp(-riskFreeIR * time_to_expiry)
     model = Black(volatility)
@@ -37,9 +37,9 @@ def test_Black():
         #######################################################################
 
         valueCall = model.value(
-            forward, strike, time_to_expiry, df, callOptionType)
+            forward, strike, time_to_expiry, df, call_optionType)
         valuePut = model.value(
-            forward, strike, time_to_expiry, df, putOptionType)
+            forward, strike, time_to_expiry, df, put_optionType)
 
         assert round((valueCall - valuePut), dp) == round(df*(forward - strike), dp), \
             "The method called 'value()' doesn't comply with Call-Put parity"
@@ -49,9 +49,9 @@ def test_Black():
         #######################################################################
 
         deltaCall = model.delta(
-            forward, strike, time_to_expiry, df, callOptionType)
+            forward, strike, time_to_expiry, df, call_optionType)
         deltaPut = model.delta(
-            forward, strike, time_to_expiry, df, putOptionType)
+            forward, strike, time_to_expiry, df, put_optionType)
 
         assert round((1/df) * (deltaCall - deltaPut), dp) == 1.0, \
             "The method called 'delta()' doesn't comply with Call-put parity"
@@ -61,9 +61,9 @@ def test_Black():
         #######################################################################
 
         gammaCall = model.gamma(
-            forward, strike, time_to_expiry, df, callOptionType)
+            forward, strike, time_to_expiry, df, call_optionType)
         gammaPut = model.gamma(
-            forward, strike, time_to_expiry, df, putOptionType)
+            forward, strike, time_to_expiry, df, put_optionType)
 
         assert round(gammaCall - gammaPut, dp) == 0.0, \
             "The method called 'gamma()' doesn't comply with Call-Put parity"
@@ -73,9 +73,9 @@ def test_Black():
         #######################################################################
 
         thetaCall = model.theta(
-            forward, strike, time_to_expiry, df, callOptionType)
+            forward, strike, time_to_expiry, df, call_optionType)
         thetaPut = model.theta(
-            forward, strike, time_to_expiry, df, putOptionType)
+            forward, strike, time_to_expiry, df, put_optionType)
 
         assert round((thetaCall - thetaPut), dp) == round((riskFreeIR * time_to_expiry) * (forward - strike) * df, dp), \
             "The method called 'theta()' doesn't comply with Call-Put parity"
@@ -85,9 +85,9 @@ def test_Black():
         #######################################################################
 
         vegaCall = model.vega(
-            forward, strike, time_to_expiry, df, callOptionType)
+            forward, strike, time_to_expiry, df, call_optionType)
         vegaPut = model.vega(
-            forward, strike, time_to_expiry, df, putOptionType)
+            forward, strike, time_to_expiry, df, put_optionType)
 
         assert round(vegaCall - vegaPut, dp) == 0.0, \
             "The method called 'vega()' doesn't comply with Call-Put parity"
