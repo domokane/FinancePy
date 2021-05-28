@@ -13,7 +13,10 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date, fromDatetime
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.yield_curve import BondYieldCurve
-from financepy.products.bonds.yield_curve_model import *
+from financepy.products.bonds.yield_curve_model import CurveFitPolynomial
+from financepy.products.bonds.yield_curve_model import CurveFitBSpline
+from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegel
+from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegelSvensson
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -74,6 +77,12 @@ def test_BondYieldCurve():
 #    fittedCurve5.display("GBP Yield Curve")
 
 ###############################################################################
+
+    testCases.header("PARAMETER", "VALUE")
+    testCases.print("values", fittedCurve1._curveFit._coeffs)
+
+    testCases.header("PARAMETER", "VALUE")
+    testCases.print("values", fittedCurve2._curveFit._coeffs)
 
     testCases.header("PARAMETER", "VALUE")
     testCases.print("beta1", fittedCurve3._curveFit._beta1)

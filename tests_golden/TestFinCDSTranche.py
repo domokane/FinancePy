@@ -2,25 +2,25 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
+from financepy.products.credit.cds_tranche import CDSTranche
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
 import os
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_tranche import CDSTranche
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -98,6 +98,7 @@ def build_Ibor_Curve(tradeDate):
 
 ##############################################################################
 
+
 def loadHomogeneousCDSCurves(valuation_date,
                              libor_curve,
                              cdsSpread3Y,
@@ -140,7 +141,8 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
     maturity5Y = valuation_date.next_cds_date(60)
     maturity7Y = valuation_date.next_cds_date(84)
     maturity10Y = valuation_date.next_cds_date(120)
-    path = os.path.join(os.path.dirname(__file__), './/data//CDX_NA_IG_S7_SPREADS.csv')
+    path = os.path.join(os.path.dirname(__file__),
+                        './/data//CDX_NA_IG_S7_SPREADS.csv')
     f = open(path, 'r')
     data = f.readlines()
     f.close()
@@ -225,17 +227,17 @@ def test_FinCDSTranche():
     spd10Y = 0.0046
 
     issuer_curves = loadHomogeneousCDSCurves(valuation_date,
-                                            libor_curve,
-                                            spd3Y,
-                                            spd5Y,
-                                            spd7Y,
-                                            spd10Y,
-                                            num_credits)
+                                             libor_curve,
+                                             spd3Y,
+                                             spd5Y,
+                                             spd7Y,
+                                             spd10Y,
+                                             num_credits)
 
     intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
-                                            step_in_date,
-                                            trancheMaturity,
-                                            issuer_curves) * 10000.0
+                                             step_in_date,
+                                             trancheMaturity,
+                                             issuer_curves) * 10000.0
 
     testCases.header("LABEL", "VALUE")
     testCases.print("INTRINSIC SPD TRANCHE MATURITY", intrinsicSpd)
@@ -277,12 +279,12 @@ def test_FinCDSTranche():
         "===================================================================")
 
     issuer_curves = loadHeterogeneousSpreadCurves(valuation_date,
-                                                 libor_curve)
+                                                  libor_curve)
 
     intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
-                                            step_in_date,
-                                            trancheMaturity,
-                                            issuer_curves) * 10000.0
+                                             step_in_date,
+                                             trancheMaturity,
+                                             issuer_curves) * 10000.0
 
     testCases.header("LABEL", "VALUE")
     testCases.print("INTRINSIC SPD TRANCHE MATURITY", intrinsicSpd)

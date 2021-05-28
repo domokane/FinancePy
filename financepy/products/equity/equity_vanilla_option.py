@@ -12,7 +12,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 from ...utils.global_types import FinOptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.model import Model
 from ...models.black_scholes import BlackScholes

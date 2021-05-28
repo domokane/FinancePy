@@ -12,7 +12,7 @@ from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from financepy.utils.date import Date
 from financepy.products.bonds.bond_annuity import BondAnnuity
 
 from FinTestCases import FinTestCases, globalTestCaseMode

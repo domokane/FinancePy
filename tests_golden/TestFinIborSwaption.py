@@ -4,8 +4,8 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.models.bdt_tree import BDTTree
 from financepy.models.bk_tree import BKTree

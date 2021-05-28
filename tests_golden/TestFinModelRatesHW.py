@@ -9,7 +9,7 @@ from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from financepy.utils.date import Date
 import numpy as np

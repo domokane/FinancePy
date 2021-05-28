@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
 from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption

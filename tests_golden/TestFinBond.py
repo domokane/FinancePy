@@ -3,7 +3,7 @@
 ##############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -309,8 +309,8 @@ def test_Bond():
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
     flat_curve = DiscountCurveFlat(settlement_date,
-                                  ytm,
-                                  FrequencyTypes.SEMI_ANNUAL)
+                                   ytm,
+                                   FrequencyTypes.SEMI_ANNUAL)
 
     testCases.header("FIELD", "VALUE")
 

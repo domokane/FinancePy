@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.bdt_tree import BDTTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree

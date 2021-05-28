@@ -2,22 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from os.path import dirname, join
 
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -168,24 +168,24 @@ def test_performCDSIndexHazardRateAdjustment():
     cdsIndex = CDSIndexPortfolio()
 
     averageSpd3Y = cdsIndex.average_spread(valuation_date,
-                                          step_in_date,
-                                          maturity3Y,
-                                          issuer_curves) * 10000.0
+                                           step_in_date,
+                                           maturity3Y,
+                                           issuer_curves) * 10000.0
 
     averageSpd5Y = cdsIndex.average_spread(valuation_date,
-                                          step_in_date,
-                                          maturity5Y,
-                                          issuer_curves) * 10000.0
+                                           step_in_date,
+                                           maturity5Y,
+                                           issuer_curves) * 10000.0
 
     averageSpd7Y = cdsIndex.average_spread(valuation_date,
-                                          step_in_date,
-                                          maturity7Y,
-                                          issuer_curves) * 10000.0
+                                           step_in_date,
+                                           maturity7Y,
+                                           issuer_curves) * 10000.0
 
     averageSpd10Y = cdsIndex.average_spread(valuation_date,
-                                           step_in_date,
-                                           maturity10Y,
-                                           issuer_curves) * 10000.0
+                                            step_in_date,
+                                            maturity10Y,
+                                            issuer_curves) * 10000.0
 
     testCases.header("LABEL", "VALUE")
     testCases.print("AVERAGE SPD 3Y", averageSpd3Y)
@@ -203,24 +203,24 @@ def test_performCDSIndexHazardRateAdjustment():
     cdsIndex = CDSIndexPortfolio()
 
     intrinsicSpd3Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              maturity3Y,
-                                              issuer_curves) * 10000.0
+                                               step_in_date,
+                                               maturity3Y,
+                                               issuer_curves) * 10000.0
 
     intrinsicSpd5Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              maturity5Y,
-                                              issuer_curves) * 10000.0
+                                               step_in_date,
+                                               maturity5Y,
+                                               issuer_curves) * 10000.0
 
     intrinsicSpd7Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              maturity7Y,
-                                              issuer_curves) * 10000.0
+                                               step_in_date,
+                                               maturity7Y,
+                                               issuer_curves) * 10000.0
 
     intrinsicSpd10Y = cdsIndex.intrinsic_spread(valuation_date,
-                                               step_in_date,
-                                               maturity10Y,
-                                               issuer_curves) * 10000.0
+                                                step_in_date,
+                                                maturity10Y,
+                                                issuer_curves) * 10000.0
 
     ##########################################################################
     ##########################################################################
@@ -276,24 +276,24 @@ def test_performCDSIndexHazardRateAdjustment():
     cdsIndex = CDSIndexPortfolio()
 
     intrinsicSpd3Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              indexMaturityDates[0],
-                                              adjustedIssuerCurves) * 10000.0
+                                               step_in_date,
+                                               indexMaturityDates[0],
+                                               adjustedIssuerCurves) * 10000.0
 
     intrinsicSpd5Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              indexMaturityDates[1],
-                                              adjustedIssuerCurves) * 10000.0
+                                               step_in_date,
+                                               indexMaturityDates[1],
+                                               adjustedIssuerCurves) * 10000.0
 
     intrinsicSpd7Y = cdsIndex.intrinsic_spread(valuation_date,
-                                              step_in_date,
-                                              indexMaturityDates[2],
-                                              adjustedIssuerCurves) * 10000.0
+                                               step_in_date,
+                                               indexMaturityDates[2],
+                                               adjustedIssuerCurves) * 10000.0
 
     intrinsicSpd10Y = cdsIndex.intrinsic_spread(valuation_date,
-                                               step_in_date,
-                                               indexMaturityDates[3],
-                                               adjustedIssuerCurves) * 10000.0
+                                                step_in_date,
+                                                indexMaturityDates[3],
+                                                adjustedIssuerCurves) * 10000.0
 
     # If the adjustment works then this should equal the index spreads
     testCases.header("LABEL", "VALUE")

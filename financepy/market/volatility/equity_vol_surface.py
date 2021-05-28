@@ -14,7 +14,7 @@ from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
 from ...models.option_implied_dbn import optionImpliedDbn
 from ...utils.helpers import check_argument_types, label_to_string
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.volatility_fns import vol_function_clark

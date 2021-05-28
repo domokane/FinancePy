@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve import DiscountCurve
+from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date
 import numpy as np

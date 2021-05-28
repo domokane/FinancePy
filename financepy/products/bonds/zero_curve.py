@@ -16,7 +16,7 @@ from ...utils.helpers import tableToString
 from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string
 
 ###############################################################################

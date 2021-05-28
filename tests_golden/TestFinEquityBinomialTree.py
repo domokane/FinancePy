@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinOptionTypes

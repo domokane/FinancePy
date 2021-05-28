@@ -14,7 +14,7 @@ from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import SwapTypes
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from .swap_fixed_leg import SwapFixedLeg
 from .swap_float_leg import SwapFloatLeg

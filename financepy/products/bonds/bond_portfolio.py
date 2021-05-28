@@ -9,7 +9,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 from .bond import YTMCalcType
 
 ###############################################################################

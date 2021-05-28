@@ -10,22 +10,17 @@ This folder contains a suite of bond-related functionality across a set of files
 * BondMortgage generates the periodic cash flows for an interest-only and a repayment mortgage. 
 * BondOption is a bond option class that includes a number of valuation models for pricing both European and American style bond options. Models for European options include a Lognormal Price, Hull-White (HW) and Black-Karasinski (BK). The HW valuation is fast as it uses Jamshidians decomposition trick. American options can also be priced using a HW and BK trinomial tree. The details are abstracted away making it easy to use.
 * BondPortfolio is a portfolio of bonds.
+* Yield Curve is a class to handle bond yield curves. It uses a variety of shapes to best-fit a set of bond yields.
+* Zero curve is a class to perform an exact fit to a set of provided bonds using a piece-wise flat zero rate.
 
 ## Conventions
-
 * All interest rates are expressed as a fraction of 1. So 3% is 0.03.
 * All notionals of bond positions are given in terms of a notional amount.
 * All bond prices are based on a notional of 100.0.
 * The face of a derivatives position is the size of the underlying position.
 
 ## Bond Curves
-These modules create a family of curve types related to the term structures of interest rates. There are two basic types of curve:
-
-1. Best fit yield curves fitting to bond prices which are used for interpolation. A range of curve shapes from polynomials to B-Splines is available.
-2. Discount curves that can be used to present value a future cash flow. These differ from best fits curves in that they exactly refit the prices of bonds or CDS. The different discount curves are created by calibrating to different instruments. They also differ in terms of the term structure shapes they can have. Different shapes have different impacts in terms of locality on risk management performed using these different curves. There is often a trade-off between smoothness and locality.
-
-### BondYieldCurve
-This module describes a curve that is fitted to bond yields calculated from bond market prices supplied by the user. The curve is not guaranteed to fit all of the bond prices exactly and a least squares approach is used. A number of fitting forms are provided which consist of 
+These modules create a family of curve types related to the term structures of interest rates. These are best fit yield curves fitting to bond prices which are used for interpolation. A range of curve shapes from polynomials to B-Splines is available. This module describes a curve that is fitted to bond yields calculated from bond market prices supplied by the user. The curve is not guaranteed to fit all of the bond prices exactly and a least squares approach is used. A number of fitting forms are provided which consist of 
 
 * Polynomial 
 * Nelson-Siegel

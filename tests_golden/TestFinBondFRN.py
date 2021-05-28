@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import *
+from financepy.utils.date import Date
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_frn import BondFRN
 from financepy.utils.frequency import FrequencyTypes

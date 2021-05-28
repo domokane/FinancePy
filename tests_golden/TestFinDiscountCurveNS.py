@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.math import scale
-from financepy.market.curves.curve_ns import DiscountCurveNS
+from financepy.market.curves.discount_curve_ns import DiscountCurveNS
 from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np

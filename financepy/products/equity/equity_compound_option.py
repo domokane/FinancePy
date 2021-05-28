@@ -17,8 +17,8 @@ from ...utils.global_types import FinOptionTypes
 
 from ...products.equity.equity_option import EquityOption
 from ...products.equity.equity_vanilla_option import EquityVanillaOption
-from ...market.curves.curve_flat import DiscountCurve
-from ...market.curves.curve_flat import DiscountCurveFlat
+from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.curves.discount_curve_flat import DiscountCurveFlat
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 

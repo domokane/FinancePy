@@ -12,7 +12,7 @@ from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import timesFromDates
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 
 ###############################################################################

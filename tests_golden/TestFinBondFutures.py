@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_future import BondFuture
 import sys
 sys.path.append("..")
 
-from financepy.products.bonds.bond_future import BondFuture
-from financepy.products.bonds.bond import Bond
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 

@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
-from financepy.market.curves.curve_poly import DiscountCurvePoly
+from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 import numpy as np
 
 import sys

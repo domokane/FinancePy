@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.utils.date import Date

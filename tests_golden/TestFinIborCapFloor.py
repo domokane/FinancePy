@@ -13,9 +13,9 @@ from financepy.models.sabr import SABR
 from financepy.models.black_shifted import BlackShifted
 from financepy.models.bachelier import Bachelier
 from financepy.models.black import Black
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes

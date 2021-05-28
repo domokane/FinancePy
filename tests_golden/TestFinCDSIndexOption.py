@@ -2,6 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
+from financepy.products.credit.cds_index_option import CDSIndexOption
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 import os
 import time
 import numpy as np
@@ -9,18 +20,7 @@ import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_index_option import CDSIndexOption
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -135,7 +135,8 @@ def test_full_priceCDSIndexOption():
     maturity7Y = tradeDate.next_cds_date(84)
     maturity10Y = tradeDate.next_cds_date(120)
 
-    path = os.path.join(os.path.dirname(__file__), './/data//CDX_NA_IG_S7_SPREADS.csv')
+    path = os.path.join(os.path.dirname(__file__),
+                        './/data//CDX_NA_IG_S7_SPREADS.csv')
     f = open(path, 'r')
     data = f.readlines()
     f.close()
@@ -225,9 +226,9 @@ def test_full_priceCDSIndexOption():
 
             indexSpread = index / 10000.0
             issuer_curve = buildFlatIssuerCurve(tradeDate,
-                                               libor_curve,
-                                               indexSpread,
-                                               indexRecovery)
+                                                libor_curve,
+                                                indexSpread,
+                                                indexRecovery)
 
             adjustedIssuerCurves = []
             for iCredit in range(0, 125):
@@ -253,10 +254,10 @@ def test_full_priceCDSIndexOption():
             end = time.time()
 
             v_pay_2, v_rec_2 = option.value_adjusted_black(valuation_date,
-                                                         index_curve,
-                                                         indexRecovery,
-                                                         libor_curve,
-                                                         volatility)
+                                                           index_curve,
+                                                           indexRecovery,
+                                                           libor_curve,
+                                                           volatility)
 
             elapsed = end - start
 

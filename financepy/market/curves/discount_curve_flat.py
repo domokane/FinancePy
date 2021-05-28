@@ -12,7 +12,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import timesFromDates
 from ...market.curves.interpolator import InterpTypes
 

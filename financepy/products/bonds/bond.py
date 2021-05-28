@@ -35,7 +35,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf

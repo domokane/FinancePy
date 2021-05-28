@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.curve import DiscountCurve
+from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes

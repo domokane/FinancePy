@@ -2,14 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.calendar import Calendar, CalendarTypes
+from financepy.utils.date import set_date_format, DateFormatTypes
+from financepy.utils.date import Date
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.date import set_date_format, DateFormatTypes
-from financepy.utils.calendar import Calendar, CalendarTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -33,7 +33,7 @@ def test_Calendar():
 
         while next_date < end_date:
             next_date = next_date.add_days(1)
-            
+
             if next_date._d == 1 and next_date._m == 1:
                 testCases.banner("================================")
 #                print("=========================")

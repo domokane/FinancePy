@@ -3,15 +3,14 @@
 ##############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 from financepy.products.bonds import YTMCalcType
 from financepy.products.inflation.FinInflationBond import FinInflationBond
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import numpy as np
 
 import sys
 sys.path.append("..")

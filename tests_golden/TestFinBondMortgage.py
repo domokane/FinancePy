@@ -2,16 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.bonds.bond_mortgage import BondMortgageTypes
+from financepy.products.bonds.bond_mortgage import BondMortgage
+from financepy.utils.date import Date
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
 
-from financepy.products.bonds.bond_mortgage import BondMortgage
-from financepy.products.bonds.bond_mortgage import BondMortgageTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 

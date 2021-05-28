@@ -10,18 +10,15 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_fra import IborFRA
-from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
-import time as time
 
 import sys
 sys.path.append("..")
@@ -36,9 +33,6 @@ PLOT_GRAPHS = False
 
 def buildOIS(valuation_date):
     """ Build the OIS funding curve from futures (FRAs) and OIS """
-
-    dccType = DayCountTypes.THIRTY_E_360_ISDA
-    depos = []
 
     spot_days = 0
     spot_days = 0
@@ -200,7 +194,6 @@ def test_bloombergPricingExample():
 
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    notional = ONE_MILLION
     fixed_leg_type = SwapTypes.PAY
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -260,7 +253,6 @@ def test_bloombergPricingExample():
     libor_curve = IborSingleCurve(
         valuation_date, depos, fras, swaps, interp_type, True)
 
-    principal = 0.0
     testCases.banner("======================================================")
     testCases.banner("SINGLE CURVE VALUATION")
     testCases.header("LABEL", "VALUE")

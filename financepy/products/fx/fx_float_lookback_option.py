@@ -13,7 +13,7 @@ from ...products.fx.fx_option import FXOption
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.global_types import FinOptionTypes
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 
 ##########################################################################

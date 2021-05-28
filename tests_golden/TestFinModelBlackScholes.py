@@ -7,7 +7,7 @@ from financepy.products.equity.equity_american_option import EquityAmericanOptio
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholesTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import FinOptionTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes

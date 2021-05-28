@@ -8,7 +8,6 @@ from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 
 from scipy.interpolate import PchipInterpolator
-from scipy.interpolate import interp1d
 from scipy.interpolate import CubicSpline
 
 ###############################################################################
@@ -139,7 +138,8 @@ def _uinterpolate(t, times, dfs, method):
             rt1 = -np.log(dfs[i - 2])
             rt2 = -np.log(dfs[i - 1])
             dt = times[i - 1] - times[i - 2]
-            rtvalue = ((times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2) / dt
+            rtvalue = ((times[i - 1] - t) * rt1 +
+                       (t - times[i - 2]) * rt2) / dt
             yvalue = np.exp(-rtvalue)
 
         return yvalue
@@ -152,13 +152,15 @@ def _uinterpolate(t, times, dfs, method):
             yvalue = np.exp(-yvalue)
         elif i < num_points:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / \
+                (times[i - 1] - times[i - 2])
             fwd2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
             dt = times[i] - times[i - 1]
             fwd = ((times[i] - t) * fwd1 + (t - times[i - 1]) * fwd2) / dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
         else:
-            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / \
+                (times[i - 1] - times[i - 2])
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
 
         return yvalue
@@ -249,14 +251,14 @@ class FinInterpolator():
                 zero_rates[0] = zero_rates[1]
 
             self._interp_fn = CubicSpline(self._times, zero_rates,
-                                         bc_type=((2, 0.0), (1, 0.0)))
+                                          bc_type=((2, 0.0), (1, 0.0)))
 
         elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
 
             """ Second derivatives are clamped to zero at end points """
             logDfs = np.log(self._dfs)
             self._interp_fn = CubicSpline(self._times, logDfs,
-                                         bc_type='natural')
+                                          bc_type='natural')
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
@@ -268,7 +270,7 @@ class FinInterpolator():
                 zero_rates[0] = zero_rates[1]
 
             self._interp_fn = CubicSpline(self._times, zero_rates,
-                                         bc_type='natural')
+                                          bc_type='natural')
 
     #        elif self._interp_type  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
     #

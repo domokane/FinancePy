@@ -2,21 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.bonds.bond import Bond
+from financepy.utils.date import Date, fromDatetime
 import os
 import datetime as dt
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date, fromDatetime
-from financepy.products.bonds.bond import Bond
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
+
 
 def test_BondPortfolio():
 
@@ -43,10 +44,10 @@ def test_BondPortfolio():
             coupon = bond['coupon']/100.0
             clean_price = bond['mid']
             bond = Bond(issueDt, maturityDt,
-                           coupon, freq_type, accrual_type)
+                        coupon, freq_type, accrual_type)
 
             ytm = bond.yield_to_maturity(settlement, clean_price)
-            accrued_interest= bond._accrued_interest
+            accrued_interest = bond._accrued_interest
 
             testCases.print(accrual_type, maturityDt, coupon*100.0,
                             clean_price, accrued_interest, ytm*100.0)

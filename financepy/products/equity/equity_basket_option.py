@@ -17,7 +17,7 @@ from ...utils.global_types import FinOptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.helpers import _func_name
 from ...utils.date import Date
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import N
 

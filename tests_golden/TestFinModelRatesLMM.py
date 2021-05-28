@@ -19,7 +19,7 @@ from financepy.utils.helpers import checkVectorDifferences
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black import Black
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date

@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.helpers import beta_vectorToCorrMatrix
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOptionTypes
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOption

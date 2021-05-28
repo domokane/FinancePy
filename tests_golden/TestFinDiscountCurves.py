@@ -4,14 +4,14 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_vars import gDaysInYear
-from financepy.market.curves.curve_poly import DiscountCurvePoly
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
-from financepy.market.curves.curve_pwl import DiscountCurvePWL
-from financepy.market.curves.curve_pwf import DiscountCurvePWF
-from financepy.market.curves.curve_nss import DiscountCurveNSS
-from financepy.market.curves.curve_ns import DiscountCurveNS
-from financepy.market.curves.curve_flat import DiscountCurveFlat
-from financepy.market.curves.curve import DiscountCurve
+from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
+from financepy.market.curves.discount_curve_pwf import DiscountCurvePWF
+from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
+from financepy.market.curves.discount_curve_ns import DiscountCurveNS
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
 import matplotlib.pyplot as plt

@@ -2,22 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.credit.cds import CDS
+from financepy.products.credit.cds_option import CDSOption
 import numpy as np
 import sys
 sys.path.append("..")
 
-from financepy.products.credit.cds_option import CDSOption
-from financepy.products.credit.cds import CDS
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
@@ -261,10 +261,12 @@ def test_full_priceCDSwaption():
         valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(valuation_date, issuer_curve, cdsRecovery)
+    premPV = cds_contract.premium_leg_pv(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(valuation_date, issuer_curve)
+    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(
+        valuation_date, issuer_curve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
@@ -295,10 +297,12 @@ def test_full_priceCDSwaption():
         valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(valuation_date, issuer_curve, cdsRecovery)
+    premPV = cds_contract.premium_leg_pv(
+        valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(valuation_date, issuer_curve)
+    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(
+        valuation_date, issuer_curve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
@@ -327,8 +331,8 @@ def test_full_priceCDSwaption():
                             volatility)
 
         vol = cdsOption.implied_volatility(valuation_date,
-                                          issuer_curve,
-                                          v)
+                                           issuer_curve,
+                                           v)
 
         testCases.print(strike, v, vol)
 

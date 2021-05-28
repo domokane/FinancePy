@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
@@ -114,37 +114,37 @@ def test_FinFXBarrierOption():
     for option_type in FinFXBarrierTypes:
         for spot_fx_rate in spot_fx_rates:
             barrier_option = FXBarrierOption(expiry_date,
-                                            100.0,
-                                            currency_pair,
-                                            option_type,
-                                            B,
-                                            num_observations_per_year,
-                                            notional,
-                                            notional_currency)
+                                             100.0,
+                                             currency_pair,
+                                             option_type,
+                                             B,
+                                             num_observations_per_year,
+                                             notional,
+                                             notional_currency)
 
             value = barrier_option.value(valuation_date,
-                                        spot_fx_rate,
-                                        dom_discount_curve,
-                                        for_discount_curve,
-                                        model)
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
+                                         model)
 
             delta = barrier_option.delta(valuation_date,
-                                        spot_fx_rate,
-                                        dom_discount_curve,
-                                        for_discount_curve,
-                                        model)
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
+                                         model)
 
             vega = barrier_option.vega(valuation_date,
-                                      spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
-                                      model)
+                                       spot_fx_rate,
+                                       dom_discount_curve,
+                                       for_discount_curve,
+                                       model)
 
             theta = barrier_option.theta(valuation_date,
-                                        spot_fx_rate,
-                                        dom_discount_curve,
-                                        for_discount_curve,
-                                        model)
+                                         spot_fx_rate,
+                                         dom_discount_curve,
+                                         for_discount_curve,
+                                         model)
 
             testCases.print(option_type,
                             K,

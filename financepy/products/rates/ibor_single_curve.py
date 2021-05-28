@@ -16,7 +16,7 @@ from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.global_vars import gDaysInYear
 from ...market.curves.interpolator import InterpTypes, FinInterpolator
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap

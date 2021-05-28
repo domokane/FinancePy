@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 import time

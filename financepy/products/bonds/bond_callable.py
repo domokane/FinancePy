@@ -12,7 +12,7 @@ from ...products.bonds.bond import Bond
 
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 from enum import Enum
 import numpy as np

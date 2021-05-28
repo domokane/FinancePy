@@ -8,7 +8,7 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import FinOptionTypes

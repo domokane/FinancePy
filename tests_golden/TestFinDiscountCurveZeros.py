@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes

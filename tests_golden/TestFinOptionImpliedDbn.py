@@ -6,10 +6,9 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
-from financepy.models.option_implied_dbn import optionImpliedDbn
 from financepy.models.volatility_fns import vol_function_clark
 from financepy.utils.date import Date
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
 import sys
 sys.path.append("..")

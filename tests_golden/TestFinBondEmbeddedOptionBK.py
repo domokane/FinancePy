@@ -13,10 +13,9 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
 
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.market.curves.curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
 from financepy.utils.global_types import SwapTypes

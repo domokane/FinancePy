@@ -11,7 +11,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.error import FinError
 from ...utils.helpers import check_argument_types, label_to_string
-from ...market.curves.curve import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 
 
 ###############################################################################
