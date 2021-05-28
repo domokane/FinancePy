@@ -570,29 +570,41 @@ class FinEquityVolSurface():
 
         s = self._stockPrice
 
+        numExpiryDates = self._numExpiryDates
+
         if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
             numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
             numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
             numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
             numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
             numParameters = 4
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
             numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.SVI:
             numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
         elif self._volatilityFunctionType == FinVolFunctionTypes.SSVI:
             numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+            self._parameters[:, 0] = 0.2 # sigma
+            self._parameters[:, 1] = 0.8 # gamma
+            self._parameters[:, 2] = -0.7 # rho
+            self._parameters[:, 3] = 0.3
+            self._parameters[:, 4] = 0.048            
         else:
             print(self._volatilityFunctionType)
             raise FinError("Unknown Model Type")
 
-        numExpiryDates = self._numExpiryDates
-
-        self._parameters = np.zeros([numExpiryDates, numParameters])        
         self._texp = np.zeros(numExpiryDates)
 
         self._F0T = np.zeros(numExpiryDates)

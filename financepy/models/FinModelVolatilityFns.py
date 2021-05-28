@@ -123,6 +123,13 @@ def volFunctionSVI(params, f, k, t):
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
 def phiSSVI(theta, gamma): 
+    
+    if abs(gamma) < 1e-8:
+        gamma = 1e-8
+        
+    if abs(theta) < 1e-8:
+        theta = 1e-8
+        
     phi = (1.0/gamma/theta) * (1.0 - (1.0 - np.exp(-gamma*theta))/gamma/theta)
     return phi
 
@@ -167,13 +174,17 @@ def SSVIt(x, gamma, sigma, rho, t):
     eps = 0.0001
     ssvitplus = SSVI(x, gamma, sigma, rho, t + eps)
     ssvitminus = SSVI(x, gamma, sigma, rho, t - eps)
-    deriv = (ssvitplus - ssvitminus) / 2.0/ eps
+    deriv = (ssvitplus - ssvitminus) / 2.0 / eps
     return deriv  
                    
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def g(x, gamma, sigma, rho, t):
     w = SSVI(x, gamma, sigma, rho, t)
+    
+    if abs(w) < 1e-10:
+        w = 1e-10
+
     w1 = SSVI1(x, gamma, sigma, rho, t)
     w2 = SSVI2(x, gamma, sigma, rho, t)
     xwv = x * w1 / w
@@ -208,14 +219,22 @@ def SSVI_LocalVarg(x, gamma, sigma, rho, t):
       fastmath=True, cache=True)
 def volFunctionSSVI(params, f, k, t):
     ''' Volatility Function proposed by Gatheral in 2004.'''
- 
+
     gamma = params[0]
     sigma = params[1]
     rho = params[2]
+    
     x = np.log(f/k)
 
     vart = SSVI_LocalVarg(x, gamma, sigma, rho, t)    
+    
+    if vart < 0.0:
+        vart = 0.0
+
     sigma = np.sqrt(vart)
+
+    print(gamma, sigma, rho, f, x, sigma)
+
     return sigma
 
 ###############################################################################
