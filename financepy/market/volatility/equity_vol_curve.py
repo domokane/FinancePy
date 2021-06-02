@@ -36,13 +36,13 @@ class EquityVolCurve():
         if testMonotonicity(strikes) is False:
             raise FinError("Strikes must be strictly monotonic.")
 
-        numStrikes = len(strikes)
-        numVols = len(volatilities)
+        num_strikes = len(strikes)
+        num_vols = len(volatilities)
 
-        if numStrikes != numVols:
+        if num_strikes != num_vols:
             raise FinError("Strike and volatility vectors not same length.")
 
-        for i in range(1, numStrikes):
+        for i in range(1, num_strikes):
             if strikes[i] <= strikes[i - 1]:
                 raise FinError("Grid Strikes are not in increasing order")
 

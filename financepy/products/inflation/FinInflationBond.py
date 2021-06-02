@@ -30,8 +30,8 @@ class FinInflationBond(Bond):
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  face_amount: float,
-                 baseCPIValue: float,
-                 numExDividendDays: int = 0): # Value of CPI index at bond issue date
+                 base_cpi_value: float,
+                 num_ex_dividend_days: int = 0): # Value of CPI index at bond issue date
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
@@ -49,10 +49,11 @@ class FinInflationBond(Bond):
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
-        self._baseCPIValue = baseCPIValue # CPI value at issue date of bond
+        self._baseCPIValue = base_cpi_value # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted
         self._redemption = 1.0 # Amount paid at maturity
-        self._numExDividendDays = numExDividendDays
+        self._num_ex_dividend_days = num_ex_dividend_days
+        self._inflation_accrued_interest = 0.0
 
         self._flow_dates = []
         self._flow_amounts = []
@@ -67,41 +68,41 @@ class FinInflationBond(Bond):
 
 ###############################################################################
 
-    def inflationPrincipal(self,
+    def inflation_principal(self,
                            settlement_date: Date,
                            ytm: float,
-                           referenceCPI: float,
+                           reference_cpi: float,
                            convention: YTMCalcType):
         """ Calculate the principal value of the bond based on the face
         amount and the CPI growth. """
 
-        indexRatio = referenceCPI / self._baseCPIValue
+        index_ratio = reference_cpi / self._baseCPIValue
         full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
         principal = full_price * self._face_amount / self._par
         principal = principal - self._accrued_interest
-        principal *= indexRatio
+        principal *= index_ratio
         return principal
 
 ###############################################################################
 
-    def flatPriceFromYieldToMaturity(self,
-                                     settlement_date: Date,
-                                     ytm: float,
-                                     lastCpnCPI: float,
-                                     convention: YTMCalcType):
+    def flat_price_from_yield_to_maturity(self,
+                                          settlement_date: Date,
+                                          ytm: float,
+                                          last_cpn_cpi: float,
+                                          convention: YTMCalcType):
         """ Calculate the flat clean price value of the bond based on the clean
         price amount and the CPI growth to the last coupon date. """
 
-        indexRatio = lastCpnCPI / self._baseCPIValue
+        index_ratio = last_cpn_cpi / self._baseCPIValue
         clean_price = self.clean_price_from_ytm(settlement_date, ytm, convention)
-        flatPrice = clean_price * self._face_amount / self._par
-        flatPrice *= indexRatio
-        return flatPrice
+        flat_price = clean_price * self._face_amount / self._par
+        flat_price *= index_ratio
+        return flat_price
 
 ###############################################################################
 
-    def calcInflationAccruedInterest(self, settlement_date: Date,
-                                     referenceCPI):
+    def calc_inflation_accrued_interest(self, settlement_date: Date,
+                                        reference_cpi):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
         index ratio in line with the CPI growth since the bond base CPI date.
@@ -109,9 +110,9 @@ class FinInflationBond(Bond):
         """
 
         self.calc_accrued_interest(settlement_date)
-        indexRatio = referenceCPI/self._baseCPIValue
-        self._inflationAccruedInterest = self._accrued_interest * indexRatio
-        return self._inflationAccruedInterest
+        index_ratio = reference_cpi/self._baseCPIValue
+        self._inflation_accrued_interest = self._accrued_interest * index_ratio
+        return self._inflation_accrued_interest
 
 ###############################################################################
 

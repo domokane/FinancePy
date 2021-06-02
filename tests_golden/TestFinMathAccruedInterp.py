@@ -24,7 +24,7 @@ def test_FinMathAccdInterpolator():
                     4.495649459810208, 5.002162949496498]
     coupon_flows = [0.0, 0.0, 0.03461111111111111, 0.035194444444444445]
 
-    treeTimes = [0., 0.12498563, 0.24997125, 0.37495688, 0.4999425, 0.62492813,
+    tree_times = [0., 0.12498563, 0.24997125, 0.37495688, 0.4999425, 0.62492813,
                  0.74991376, 0.87489938, 0.99988501, 1.12487063, 1.24985626, 1.37484189,
                  1.49982751, 1.62481314, 1.74979876, 1.87478439, 1.99977002, 2.12475564,
                  2.24974127, 2.37472689, 2.49971252, 2.62469815, 2.74968377, 2.8746694,
@@ -37,7 +37,7 @@ def test_FinMathAccdInterpolator():
 
     values = []
 
-    for t in treeTimes:
+    for t in tree_times:
         v = accrued_interpolator(t, coupon_times, coupon_flows)
         values.append(v)
 
@@ -45,7 +45,7 @@ def test_FinMathAccdInterpolator():
     testCases.print(values)
 
     if pltGraph:
-        plt.plot(treeTimes, values)
+        plt.plot(tree_times, values)
 
 ##########################################################################
 

@@ -34,8 +34,8 @@ def test_FinInflationIndexCurve():
 
     testCases.print(refDate, value)
 
-    indexRatio = curve.indexRatio(refDate)
-    testCases.print(refDate, indexRatio)
+    index_ratio = curve.index_ratio(refDate)
+    testCases.print(refDate, index_ratio)
 
 #    print(curve)
 

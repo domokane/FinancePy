@@ -321,7 +321,7 @@ class DiscountCurve:
         """ This returns a survival probability to a specified date based on
         the assumption that the continuously compounded rate is a default
         hazard rate in which case the survival probability is directly
-        analagous to a discount factor. """
+        analogous to a discount factor. """
 
         q = self.df(dt)
         return q

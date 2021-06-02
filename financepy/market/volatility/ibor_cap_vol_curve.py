@@ -39,9 +39,9 @@ class IborCapVolCurve():
         refer to cap volatilities in the code for code simplicity. """
 
         num_times = len(capMaturityDates)
-        numVols = len(capSigmas)
+        num_vols = len(capSigmas)
 
-        if num_times != numVols:
+        if num_times != num_vols:
             raise FinError("Date and volatility vectors not same length.")
 
         if num_times < 2:
@@ -140,10 +140,10 @@ class IborCapVolCurve():
             print(self._capletGammas)
             print(t)
 
-        numVols = len(self._times)
+        num_vols = len(self._times)
         vol = self._capletGammas[1]
 
-        for i in range(1, numVols):
+        for i in range(1, num_vols):
             if self._times[i] >= t:
                 vol = self._capletGammas[i]
                 return vol
@@ -162,7 +162,7 @@ class IborCapVolCurve():
         else:
             t = dt
 
-        numVols = len(self._times)
+        num_vols = len(self._times)
         vol = self._capSigmas[0]
 
         if 1 == 0:
@@ -170,7 +170,7 @@ class IborCapVolCurve():
             print(self._capletGammas)
             print(t)
 
-        for i in range(1, numVols):
+        for i in range(1, num_vols):
             if self._times[i] >= t:
                 vol = self._capSigmas[i]
                 return vol

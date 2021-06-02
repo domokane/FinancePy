@@ -83,7 +83,7 @@ class FinFXDeltaMethod(Enum):
 ###############################################################################
 
 
-premCurrency = {'EURUSD': 'USD',
+prem_currency = {'EURUSD': 'USD',
                 'USDJPY': 'USD',
                 'EURJPY': 'EUR',
                 'USDCHF': 'USD',

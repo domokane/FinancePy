@@ -155,7 +155,7 @@ class BondPortfolio:
 
     def calc_accrued_interest(self,
                               settlement_date: Date,
-                              numExDividendDays: int = 0,
+                              num_ex_dividend_days: int = 0,
                               calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
 
         return self._accrued_interest

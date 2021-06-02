@@ -210,7 +210,7 @@ def test_HullWhiteBondOption():
         print("RT")
         print_tree(model._rt, 5)
         print("BOND")
-        print_tree(model._bondValues, 5)
+        print_tree(model._bond_values, 5)
         print("OPTION")
         print_tree(model._option_values, 5)
 

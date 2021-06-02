@@ -89,7 +89,7 @@ class FinFXVarianceSwap:
         f = fwdStockPrice
 
         # TODO Linear interpolation - to be revisited
-        atmVol = np.interp(f, strikes, volatilities)
+        atm_vol = np.interp(f, strikes, volatilities)
         tmat = (self._maturity_date - valuation_date)/gDaysInYear
 
         """ Calculate the slope of the volatility curve by taking the end
@@ -98,7 +98,7 @@ class FinFXVarianceSwap:
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
         b = f * dvol / dK
-        var = (atmVol**2) * np.sqrt(1.0+3.0*tmat*(b**2))
+        var = (atm_vol**2) * np.sqrt(1.0+3.0*tmat*(b**2))
         return var
 
 ###############################################################################

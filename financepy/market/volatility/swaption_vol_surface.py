@@ -70,16 +70,16 @@ from ...utils.global_types import FinSolverTypes
 #     rd = args[2]
 #     rf = args[3]
 #     volatility = args[4]
-#     deltaMethodValue = args[5]
+#     delta_method_value = args[5]
 #     option_type_value = args[6]
-#     deltaTarget = args[7]
+#     delta_target = args[7]
 
-#     deltaOut = fast_delta(s, t, K, rd, rf,
+#     delta_out = fast_delta(s, t, K, rd, rf,
 #                          volatility,
-#                          deltaMethodValue,
+#                          delta_method_value,
 #                          option_type_value)
 
-#     obj_fn = deltaTarget - deltaOut
+#     obj_fn = delta_target - delta_out
 #     return obj_fn
 
 ###############################################################################
@@ -115,7 +115,7 @@ from ...utils.global_types import FinSolverTypes
 def _obj(params, *args):
     """ Return a value that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
-    params and specified by the volTypeValue at a single time slice only.
+    params and specified by the vol_type_value at a single time slice only.
     """
 
     t = args[0]
@@ -123,22 +123,22 @@ def _obj(params, *args):
     strikesGrid = args[2]
     index = args[3]
     volatility_grid = args[4]
-    volTypeValue = args[5]
+    vol_type_value = args[5]
 
     tot = 0.0
 
-    numStrikes = len(volatility_grid)
+    num_strikes = len(volatility_grid)
     numExpiryDates = len(volatility_grid[0])
  
-    for i in range(0, numStrikes):
+    for i in range(0, num_strikes):
 
         k = strikesGrid[i][index]
 
-        fittedVol = vol_function(volTypeValue, params, f, k, t)
+        fittedVol = vol_function(vol_type_value, params, f, k, t)
 
-        mktVol = volatility_grid[i][index]
+        mkt_vol = volatility_grid[i][index]
 
-        diff = fittedVol - mktVol
+        diff = fittedVol - mkt_vol
             
         tot += diff**2
 
@@ -152,8 +152,8 @@ def _solve_to_horizon(t, f,
                     strikesGrid,
                     timeIndex,
                     volatility_grid,
-                    volTypeValue,
-                    xinits,
+                    vol_type_value,
+                    x_inits,
                     finSolverType):
 
     ###########################################################################
@@ -162,28 +162,28 @@ def _solve_to_horizon(t, f,
 
     tol = 1e-6
 
-    args = (t, f, strikesGrid, timeIndex, volatility_grid, volTypeValue)
+    args = (t, f, strikesGrid, timeIndex, volatility_grid, vol_type_value)
 
     # Nelmer-Mead (both SciPy & Numba) is quicker, but occasionally fails 
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:
         if finSolverType == FinSolverTypes.NELDER_MEAD_NUMBA:
-            xopt = nelder_mead(_obj, np.array(xinits), 
+            xopt = nelder_mead(_obj, np.array(x_inits),
                                bounds=np.array([[], []]).T, 
                                args=args, tol_f=tol,
                                tol_x=tol, max_iter=1000)
         elif finSolverType == FinSolverTypes.NELDER_MEAD:
-            opt = minimize(_obj, xinits, args, method="Nelder-Mead", tol=tol)
+            opt = minimize(_obj, x_inits, args, method="Nelder-Mead", tol=tol)
             xopt = opt.x
         elif finSolverType == FinSolverTypes.CONJUGATE_GRADIENT:
-            opt = minimize(_obj, xinits, args, method="CG", tol=tol)
+            opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
     except:
         # If convergence fails try again with CG if necessary
         if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
             print('Failed to converge, will try CG')
-            opt = minimize(_obj, xinits, args, method="CG", tol=tol)
+            opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
 
     print("t: %9.5f alpha:%9.5f beta: %9.5f rho: %9.5f nu: %9.5f"%
@@ -239,7 +239,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     and high K. It speeds up the code as it allows initial values close to
 #     the solution to be used. """
 
-#     volTypeValue = args[0]
+#     vol_type_value = args[0]
 #     s = args[1]
 #     t = args[2]
 #     rd = args[3]
@@ -252,9 +252,9 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     gaps = args[10]
 
 #     f = s * np.exp((rd-rf)*t)
-#     v = vol_function(volTypeValue, params, strikes, gaps, f, k, t)
-#     deltaOut = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, option_type_value)
-#     inverseDeltaOut = norminvcdf(np.abs(deltaOut))
+#     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
+#     delta_out = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, option_type_value)
+#     inverseDeltaOut = norminvcdf(np.abs(delta_out))
 #     invObjFn = inverseDeltaTarget - inverseDeltaOut
 
 #     return invObjFn
@@ -270,8 +270,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 # def _solver_for_smile_strike(s, t, rd, rf,
 #                             option_type_value,
 #                             volatilityTypeValue,
-#                             deltaTarget,
-#                             deltaMethodValue,
+#                             delta_target,
+#                             delta_method_value,
 #                             initialGuess,
 #                             parameters,
 #                             strikes,
@@ -280,10 +280,10 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     target value of delta allowing the volatility to be a function of the
 #     strike. """
 
-#     inverseDeltaTarget = norminvcdf(np.abs(deltaTarget))
+#     inverseDeltaTarget = norminvcdf(np.abs(delta_target))
 
 #     argtuple = (volatilityTypeValue, s, t, rd, rf, 
-#                 option_type_value, deltaMethodValue,
+#                 option_type_value, delta_method_value,
 #                 inverseDeltaTarget, 
 #                 parameters, strikes, gaps)
 
@@ -302,8 +302,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 # def solve_for_strike(spot_fx_rate,
 #                    tdel, rd, rf,
 #                    option_type_value,
-#                    deltaTarget,
-#                    deltaMethodValue,
+#                    delta_target,
+#                    delta_method_value,
 #                    volatility):
 #     """ This function determines the implied strike of an FX option
 #     given a delta and the other option details. It uses a one-dimensional
@@ -320,7 +320,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     # places. It should however agree to 6-7 decimal places. Which is OK.
 #     # =========================================================================
 
-#     if deltaMethodValue == FinFXDeltaMethod.SPOT_DELTA.value:
+#     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
 
 #         domDF = np.exp(-rd*tdel)
 #         forDF = np.exp(-rf*tdel)
@@ -332,12 +332,12 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #         F0T = spot_fx_rate * forDF / domDF
 #         vsqrtt = volatility * np.sqrt(tdel)
-#         arg = deltaTarget*phi/forDF  # CHECK THIS !!!
+#         arg = delta_target*phi/forDF  # CHECK THIS !!!
 #         norminvdelta = norminvcdf(arg)
 #         K = F0T * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt/2.0))
 #         return K
 
-#     elif deltaMethodValue == FinFXDeltaMethod.FORWARD_DELTA.value:
+#     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
 #         domDF = np.exp(-rd*tdel)
 #         forDF = np.exp(-rf*tdel)
@@ -349,25 +349,25 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #         F0T = spot_fx_rate * forDF / domDF
 #         vsqrtt = volatility * np.sqrt(tdel)
-#         arg = deltaTarget*phi
+#         arg = delta_target*phi
 #         norminvdelta = norminvcdf(arg)
 #         K = F0T * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt/2.0))
 #         return K
 
-#     elif deltaMethodValue == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+#     elif delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
 
 #         argtuple = (spot_fx_rate, tdel, rd, rf, volatility,
-#                     deltaMethodValue, option_type_value, deltaTarget)
+#                     delta_method_value, option_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
 #                           tol=1e-7, maxiter=50)
 
 #         return K
 
-#     elif deltaMethodValue == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+#     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
 
 #         argtuple = (spot_fx_rate, tdel, rd, rf, volatility,
-#                     deltaMethodValue, option_type_value, deltaTarget)
+#                     delta_method_value, option_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
 #                           tol=1e-7, maxiter=50)
@@ -419,7 +419,7 @@ class SwaptionVolSurface():
             raise FinError("Expiry dates not same size as volatility grid")
 
         self._numExpiryDates = len(volatility_grid[0])
-        self._numStrikes = len(volatility_grid)
+        self._num_strikes = len(volatility_grid)
 
         self._strike_grid = strike_grid
         self._volatility_grid = volatility_grid
@@ -446,7 +446,7 @@ class SwaptionVolSurface():
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-        volTypeValue = self._volatility_function_type.value
+        vol_type_value = self._volatility_function_type.value
 
         index0 = 0 # lower index in bracket
         index1 = 0 # upper index in bracket
@@ -485,12 +485,12 @@ class SwaptionVolSurface():
         t0 = self._texp[index0]
         t1 = self._texp[index1]
 
-        vol0 = vol_function(volTypeValue, self._parameters[index0],
+        vol0 = vol_function(vol_type_value, self._parameters[index0],
                                fwd0, K, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(volTypeValue, self._parameters[index1],
+            vol1 = vol_function(vol_type_value, self._parameters[index1],
                                fwd1, K, t1)
 
         else:
@@ -523,19 +523,19 @@ class SwaptionVolSurface():
 
     #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-    #     volTypeValue = self._volatility_function_type.value
+    #     vol_type_value = self._volatility_function_type.value
 
     #     s = self._spot_fx_rate
 
     #     if deltaMethod is None:
-    #         deltaMethodValue = self._deltaMethod.value
+    #         delta_method_value = self._deltaMethod.value
     #     else:
-    #         deltaMethodValue = deltaMethod.value
+    #         delta_method_value = deltaMethod.value
 
     #     index0 = 0 # lower index in bracket
     #     index1 = 0 # upper index in bracket
 
-    #     num_curves = self._numVolCurves
+    #     num_curves = self._num_vol_curves
 
     #     # If there is only one time horizon then assume flat vol to this time
     #     if num_curves == 1:
@@ -573,8 +573,8 @@ class SwaptionVolSurface():
 
     #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
     #                               FinOptionTypes.EUROPEAN_CALL.value,
-    #                               volTypeValue, callDelta,
-    #                               deltaMethodValue,
+    #                               vol_type_value, callDelta,
+    #                               delta_method_value,
     #                               initialGuess,
     #                               self._parameters[index0], 
     #                               self._strikes[index0], 
@@ -586,8 +586,8 @@ class SwaptionVolSurface():
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
     #                                   FinOptionTypes.EUROPEAN_CALL.value,
-    #                                   volTypeValue, callDelta,
-    #                                   deltaMethodValue,
+    #                                   vol_type_value, callDelta,
+    #                                   delta_method_value,
     #                                   initialGuess,
     #                                   self._parameters[index1], 
     #                                   self._strikes[index1], 
@@ -625,19 +625,19 @@ class SwaptionVolSurface():
 
     #     texp = (expiry_date - self._valuation_date) / gDaysInYear
 
-    #     volTypeValue = self._volatility_function_type.value
+    #     vol_type_value = self._volatility_function_type.value
 
     #     s = self._spot_fx_rate
 
     #     if deltaMethod is None:
-    #         deltaMethodValue = self._deltaMethod.value
+    #         delta_method_value = self._deltaMethod.value
     #     else:
-    #         deltaMethodValue = deltaMethod.value
+    #         delta_method_value = deltaMethod.value
 
     #     index0 = 0 # lower index in bracket
     #     index1 = 0 # upper index in bracket
 
-    #     num_curves = self._numVolCurves
+    #     num_curves = self._num_vol_curves
 
     #     # If there is only one time horizon then assume flat vol to this time
     #     if num_curves == 1:
@@ -676,14 +676,14 @@ class SwaptionVolSurface():
 
     #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
     #                               FinOptionTypes.EUROPEAN_CALL.value,
-    #                               volTypeValue, callDelta,
-    #                               deltaMethodValue,
+    #                               vol_type_value, callDelta,
+    #                               delta_method_value,
     #                               initialGuess,
     #                               self._parameters[index0], 
     #                               self._strikes[index0], 
     #                               self._gaps[index0])
 
-    #     vol0 = vol_function(volTypeValue, self._parameters[index0],
+    #     vol0 = vol_function(vol_type_value, self._parameters[index0],
     #                        self._strikes[index0], self._gaps[index0],
     #                        fwd0, K0, t0)
 
@@ -693,14 +693,14 @@ class SwaptionVolSurface():
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
     #                                   FinOptionTypes.EUROPEAN_CALL.value,
-    #                                   volTypeValue, callDelta,
-    #                                   deltaMethodValue,
+    #                                   vol_type_value, callDelta,
+    #                                   delta_method_value,
     #                                   initialGuess,
     #                                   self._parameters[index1], 
     #                                   self._strikes[index1], 
     #                                   self._gaps[index1])
 
-    #         vol1 = vol_function(volTypeValue, self._parameters[index1],
+    #         vol1 = vol_function(vol_type_value, self._parameters[index1],
     #                            self._strikes[index1], self._gaps[index1],
     #                            fwd1, K1, t1)
     #     else:
@@ -772,11 +772,11 @@ class SwaptionVolSurface():
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
 
-        volTypeValue = self._volatility_function_type.value
+        vol_type_value = self._volatility_function_type.value
 
-        xinits = []
-        xinit = np.zeros(num_parameters)
-        xinits.append(xinit)
+        x_inits = []
+        x_init = np.zeros(num_parameters)
+        x_inits.append(x_init)
 
         for i in range(0, numExpiryDates):
 
@@ -787,14 +787,14 @@ class SwaptionVolSurface():
                                   self._strike_grid,
                                   i,
                                   self._volatility_grid,
-                                  volTypeValue,
-                                  xinits[i],
+                                  vol_type_value,
+                                  x_inits[i],
                                   finSolverType)
 
             self._parameters[i,:] = res
 
-            xinit = res
-            xinits.append(xinit)
+            x_init = res
+            x_inits.append(x_init)
 
 ###############################################################################
 
@@ -817,19 +817,19 @@ class SwaptionVolSurface():
             expiry_date = self._expiry_dates[i]
             print("==========================================================")
 
-            for j in range(0, self._numStrikes):
+            for j in range(0, self._num_strikes):
                 
                 strike = self._strike_grid[j][i]
 
                 fittedVol = self.volatility_from_strike_date(strike, expiry_date)
 
-                mktVol = self._volatility_grid[j][i]
+                mkt_vol = self._volatility_grid[j][i]
                 
-                diff = fittedVol - mktVol
+                diff = fittedVol - mkt_vol
                 
                 print("%s %12.3f %7.4f %7.4f %7.5f"% 
                       (expiry_date, strike, 
-                       fittedVol*100.0, mktVol*100, diff*100))
+                       fittedVol*100.0, mkt_vol*100, diff*100))
 
         print("==========================================================")
         
@@ -915,8 +915,8 @@ class SwaptionVolSurface():
             plt.plot(ks, fittedVols, label=labelStr)
 
             labelStr = "MARKET AT " + str(self._expiry_dates[tenorIndex])
-            mktVols = self._volatility_grid[:, tenorIndex] * 100.0
-            plt.plot(self._strike_grid[:, tenorIndex], mktVols, 'o', label=labelStr)
+            mkt_vols = self._volatility_grid[:, tenorIndex] * 100.0
+            plt.plot(self._strike_grid[:, tenorIndex], mkt_vols, 'o', label=labelStr)
 
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
@@ -943,9 +943,9 @@ class SwaptionVolSurface():
             s += label_to_string("TIME (YRS)", self._texp[i])
             s += label_to_string("FWD FX", self._F0T[i])
 
-            s += label_to_string("ATM VOLS", self._atmVols[i]*100.0)
+            s += label_to_string("ATM VOLS", self._atm_vols[i]*100.0)
 
-            for j in range(0, self._numStrikes):
+            for j in range(0, self._num_strikes):
                 
                 k = self._strikes[j]
                 vol = self._volGrid[i][j]

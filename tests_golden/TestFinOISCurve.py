@@ -259,9 +259,9 @@ def futureToFRARate(price, convexity):
 
 def test_FinOISDepositsFuturesSwaps():
 
-    spotDate = Date(6, 6, 2018)
+    spot_date = Date(6, 6, 2018)
     spot_days = 0
-    settleDt = spotDate.add_weekdays(spot_days)
+    settleDt = spot_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
 
     depo = IborDeposit(settleDt, "1D", 1.712 / 100.0, depoDCCType)
@@ -270,7 +270,7 @@ def test_FinOISDepositsFuturesSwaps():
     fras = []
 
     fraRate = futureToFRARate(97.6675, -0.00005)
-    frasettleDt = spotDate.next_imm_date()
+    frasettleDt = spot_date.next_imm_date()
     fraMaturityDate = frasettleDt.next_imm_date()
     fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
@@ -308,7 +308,7 @@ def test_FinOISDepositsFuturesSwaps():
     ###########################################################################
 
     spot_days = 2
-    start_date = spotDate.add_weekdays(spot_days)
+    start_date = spot_date.add_weekdays(spot_days)
 
     swaps = []
     fixed_leg_type = SwapTypes.PAY
@@ -331,10 +331,10 @@ def test_FinOISDepositsFuturesSwaps():
 
     swaps.append(swap)
 
-    libor_curve = OISCurve(spotDate, depos, fras, swaps)
+    libor_curve = OISCurve(spot_date, depos, fras, swaps)
 
     times = np.linspace(0.0, 2.0, 25)
-    dates = spotDate.add_years(times)
+    dates = spot_date.add_years(times)
     zero_rates = libor_curve.zero_rate(dates)
     fwd_rates = libor_curve.fwd(dates)
 
@@ -351,7 +351,7 @@ def test_FinOISDepositsFuturesSwaps():
             print(fra)
         print("==============================================================")
 
-        end_date = spotDate
+        end_date = spot_date
         df = libor_curve.df(end_date)
         print(end_date, df)
 
@@ -373,8 +373,8 @@ def test_FinOISDepositsFuturesSwaps():
             df = libor_curve.df(end_date)
             print(end_date, df)
 
-        swap.print_fixed_leg_pv(spotDate)
-        swap.print_float_leg_pv(spotDate)
+        swap.print_fixed_leg_pv(spot_date)
+        swap.print_float_leg_pv(spot_date)
 
 #        print(libor_curve)
 

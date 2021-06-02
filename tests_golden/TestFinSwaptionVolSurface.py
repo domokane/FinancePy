@@ -64,7 +64,7 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         marketStrikes = np.array(marketStrikes) / 100.0
 
         fwd_swap_rates = marketStrikes[3]
-        atmVols = marketVolatilities[3]
+        atm_vols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
         discount_curve = DiscountCurveFlat(valuation_date, rfrRate)

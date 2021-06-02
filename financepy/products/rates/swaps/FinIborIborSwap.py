@@ -123,13 +123,13 @@ class FinIborIborSwap:
         discount curve and each of the index discount for the two floating legs
         of the swap. """
 
-        payFloatLegValue = self.floatLegValue(valuation_date,
+        payFloatLegValue = self.float_leg_value(valuation_date,
                                               discount_curve,
                                               payIndexCurve,
                                               payFirstFixingRate,
                                               principal)
 
-        recFloatLegValue = self.floatLegValue(valuation_date,
+        recFloatLegValue = self.float_leg_value(valuation_date,
                                               discount_curve,
                                               recIndexCurve,
                                               recFirstFixingRate,
@@ -140,7 +140,7 @@ class FinIborIborSwap:
 
 ##########################################################################
 
-    def floatLegValue(self,
+    def float_leg_value(self,
                       valuation_date,  # This should be the settlement date
                       discount_curve,
                       index_curve,

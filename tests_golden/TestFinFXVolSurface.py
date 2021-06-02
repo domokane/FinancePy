@@ -48,7 +48,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
-        atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
+        atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
@@ -65,7 +65,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                 dom_discount_curve,
                                 for_discount_curve,
                                 tenors,
-                                atmVols,
+                                atm_vols,
                                 marketStrangle25DeltaVols,
                                 riskReversal25DeltaVols,
                                 atmMethod,
@@ -86,7 +86,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #                                        dom_discount_curve,
         #                                        for_discount_curve,
         #                                        tenors,
-        #                                        atmVols,
+        #                                        atm_vols,
         #                                        marketStrangle25DeltaVols,
         #                                        riskReversal25DeltaVols,
         #                                        atmMethod,
@@ -130,7 +130,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
     spot_fx_rate = 90.72
 
     tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
-    atmVols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
+    atm_vols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
     marketStrangle25DeltaVols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
     riskReversal25DeltaVols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
 
@@ -146,7 +146,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                             dom_discount_curve,
                             for_discount_curve,
                             tenors,
-                            atmVols,
+                            atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
@@ -181,7 +181,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
     spot_fx_rate = 1.3088
 
     tenors = ['1M']
-    atmVols = [21.6215]
+    atm_vols = [21.6215]
     marketStrangle25DeltaVols = [0.7375]
     riskReversal25DeltaVols = [-0.50]
 
@@ -197,7 +197,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                             dom_discount_curve,
                             for_discount_curve,
                             tenors,
-                            atmVols,
+                            atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
@@ -230,7 +230,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
     spot_fx_rate = 90.68
 
     tenors = ['1M']
-    atmVols = [21.00]
+    atm_vols = [21.00]
     marketStrangle25DeltaVols = [0.184]
     riskReversal25DeltaVols = [-5.30]
 
@@ -246,7 +246,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
                             dom_discount_curve,
                             for_discount_curve,
                             tenors,
-                            atmVols,
+                            atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,

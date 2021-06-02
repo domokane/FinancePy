@@ -415,7 +415,7 @@ class Bond:
 
     def calc_accrued_interest(self,
                               settlement_date: Date,
-                              numExDividendDays: int = 0,
+                              num_ex_dividend_days: int = 0,
                               calendar_type: CalendarTypes=CalendarTypes.WEEKEND):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
@@ -440,7 +440,7 @@ class Bond:
 
         dc = DayCount(self._accrual_type)
         cal = Calendar(calendar_type)
-        exDividend_date = cal.add_business_days(self._ncd, -numExDividendDays)
+        exDividend_date = cal.add_business_days(self._ncd, -num_ex_dividend_days)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
                                             settlement_date,

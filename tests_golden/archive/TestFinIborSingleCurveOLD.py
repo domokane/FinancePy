@@ -337,9 +337,9 @@ def futureToFRARate(price, convexity):
 
 def test_ibor_depositsFuturesSwaps():
 
-    spotDate = Date(6, 6, 2018)
+    spot_date = Date(6, 6, 2018)
     spot_days = 0
-    settlement_date = spotDate.add_weekdays(spot_days)
+    settlement_date = spot_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
@@ -361,7 +361,7 @@ def test_ibor_depositsFuturesSwaps():
     fras = []
 
     fraRate = futureToFRARate(97.6675, -0.00005)
-    fraSettlementDate = spotDate.next_imm_date()
+    fraSettlementDate = spot_date.next_imm_date()
     fraMaturityDate = fraSettlementDate.next_imm_date()
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate, depoDCCType)
     fras.append(fra)
@@ -399,7 +399,7 @@ def test_ibor_depositsFuturesSwaps():
     ###########################################################################
 
     spot_days = 2
-    start_date = spotDate.add_weekdays(spot_days)
+    start_date = spot_date.add_weekdays(spot_days)
 
     swaps = []
     fixed_leg_type = SwapTypes.PAY
@@ -422,10 +422,10 @@ def test_ibor_depositsFuturesSwaps():
 
     swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(spotDate, depos, fras, swaps)
+    libor_curve = FinIborSingleCurveOLD(spot_date, depos, fras, swaps)
 
     times = np.linspace(0.0, 2.0, 25)
-    dates = spotDate.add_years(times)
+    dates = spot_date.add_years(times)
     zero_rates = libor_curve.zero_rate(dates)
     fwd_rates = libor_curve.fwd(dates)
 
@@ -442,7 +442,7 @@ def test_ibor_depositsFuturesSwaps():
             print(fra)
         print("==============================================================")
 
-        end_date = spotDate
+        end_date = spot_date
         df = libor_curve.df(end_date)
         print(end_date, df)
 
@@ -469,8 +469,8 @@ def test_ibor_depositsFuturesSwaps():
             df = libor_curve.df(end_date)
             print(end_date, df)
 
-        swap.print_fixed_leg_pv(spotDate)
-        swap.print_float_leg_pv(spotDate)
+        swap.print_fixed_leg_pv(spot_date)
+        swap.print_float_leg_pv(spot_date)
 
 #        print(libor_curve)
 
@@ -689,13 +689,13 @@ def test_bloombergPricingExample(interp_type):
 
     testCases.header("VALUATION TO TODAY DATE"," PV")
     testCases.print("VALUE:", swaps[0].value(valuation_date, libor_curve, libor_curve, None))
-    testCases.print("FIXED:", swaps[0].fixed_legValue(valuation_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0].floatLegValue(valuation_date, libor_curve, libor_curve, None))
+    testCases.print("FIXED:", swaps[0].fixed_leg_value(valuation_date, libor_curve))
+    testCases.print("FLOAT:", swaps[0].float_leg_value(valuation_date, libor_curve, libor_curve, None))
 
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE"," PV")
     testCases.print("VALUE:", swaps[0].value(settlement_date, libor_curve, libor_curve, None))
-    testCases.print("FIXED:", swaps[0].fixed_legValue(settlement_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0].floatLegValue(settlement_date, libor_curve, libor_curve, None))
+    testCases.print("FIXED:", swaps[0].fixed_leg_value(settlement_date, libor_curve))
+    testCases.print("FLOAT:", swaps[0].float_leg_value(settlement_date, libor_curve, libor_curve, None))
 
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()

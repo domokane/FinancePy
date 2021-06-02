@@ -97,20 +97,20 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calcInflationAccruedInterest(settlement_date,
-                                                      refCPIValue)
+    inflationAccd = bond.calc_inflation_accrued_interest(settlement_date,
+                                                         refCPIValue)
 
     testCases.print("Inflation Accrued = ", inflationAccd)
 
     lastCpnCPIValue = 244.61839
 
-    clean_price = bond.flatPriceFromYieldToMaturity(settlement_date, ytm,
-                                                    lastCpnCPIValue,
-                                                    YTMCalcType.US_TREASURY)
+    clean_price = bond.flat_price_from_yield_to_maturity(settlement_date, ytm,
+                                                         lastCpnCPIValue,
+                                                         YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
-    principal = bond.inflationPrincipal(settlement_date,
+    principal = bond.inflation_principal(settlement_date,
                                         ytm,
                                         refCPIValue,
                                         YTMCalcType.US_TREASURY)
@@ -305,20 +305,20 @@ def test_FinInflationBondStack():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calcInflationAccruedInterest(settlement_date,
-                                                      refCPIValue)
+    inflationAccd = bond.calc_inflation_accrued_interest(settlement_date,
+                                                         refCPIValue)
 
     testCases.print("Inflation Accrued = ", inflationAccd)
 
     lastCpnCPIValue = 244.61839
 
-    clean_price = bond.flatPriceFromYieldToMaturity(settlement_date, ytm,
-                                                    lastCpnCPIValue,
-                                                    YTMCalcType.US_TREASURY)
+    clean_price = bond.flat_price_from_yield_to_maturity(settlement_date, ytm,
+                                                         lastCpnCPIValue,
+                                                         YTMCalcType.US_TREASURY)
 
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
-    principal = bond.inflationPrincipal(settlement_date,
+    principal = bond.inflation_principal(settlement_date,
                                         ytm,
                                         refCPIValue,
                                         YTMCalcType.US_TREASURY)

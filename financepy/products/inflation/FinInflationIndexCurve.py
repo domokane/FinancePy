@@ -83,13 +83,13 @@ class FinInflationIndexCurve():
 
 ###############################################################################
 
-    def indexRatio(self, dt: Date):
+    def index_ratio(self, dt: Date):
         """ Calculate index value by interpolating the CPI curve """
 
         vt = self.indexValue(dt)
         v0 = self.indexValue(self._baseDate)
-        indexRatio = vt / v0
-        return indexRatio
+        index_ratio = vt / v0
+        return index_ratio
 
 ###############################################################################
 

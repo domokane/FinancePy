@@ -122,22 +122,22 @@ class FinFixedIborXCcySwap:
               valuation_date,
               discount_curve,
               index_curve,
-              firstFixingRate=None,
+              first_fixing_rate=None,
               principal=0.0):
         """ Value the interest rate swap on a value date given a single Libor
         discount curve. """
 
-        fixed_legValue = self.fixed_legValue(valuation_date,
+        fixed_leg_value = self.fixed_leg_value(valuation_date,
                                            discount_curve,
                                            principal)
 
-        floatLegValue = self.floatLegValue(valuation_date,
-                                           discount_curve,
-                                           index_curve,
-                                           firstFixingRate,
-                                           principal)
+        float_leg_value = self.float_leg_value(valuation_date,
+                                               discount_curve,
+                                               index_curve,
+                                               first_fixing_rate,
+                                               principal)
 
-        value = fixed_legValue - floatLegValue
+        value = fixed_leg_value - float_leg_value
 
         if self._fixed_leg_type == SwapTypes.PAY:
             value = value * (-1.0)
@@ -193,7 +193,7 @@ class FinFixedIborXCcySwap:
     def pv01(self, valuation_date, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
-        pv = self.fixed_legValue(valuation_date, discount_curve)
+        pv = self.fixed_leg_value(valuation_date, discount_curve)
         pv01 = pv / self._fixed_coupon / self._notional
         return pv01
 
@@ -224,7 +224,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def fixed_legValue(self, valuation_date, discount_curve, principal=0.0):
+    def fixed_leg_value(self, valuation_date, discount_curve, principal=0.0):
 
         self._valuation_date = valuation_date
 
@@ -232,7 +232,7 @@ class FinFixedIborXCcySwap:
         self._fixedFlows = []
         self._fixedDfs = []
         self._fixedFlowPVs = []
-        self._fixedTotalPV = []
+        self._fixed_total_pv = []
 
         day_counter = FinDayCount(self._fixed_day_count_type)
 
@@ -270,13 +270,13 @@ class FinFixedIborXCcySwap:
             self._fixedFlows.append(flow)
             self._fixedDfs.append(df_discount)
             self._fixedFlowPVs.append(flow * df_discount)
-            self._fixedTotalPV.append(pv)
+            self._fixed_total_pv.append(pv)
 
         flow = principal * self._notional
         pv = pv + flow * df_discount
         self._fixedFlowPVs[-1] += flow * df_discount
         self._fixedFlows[-1] += flow
-        self._fixedTotalPV[-1] = pv
+        self._fixed_total_pv[-1] = pv
         return pv
 
 ##########################################################################
@@ -338,7 +338,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def floatLegValue(self,
+    def float_leg_value(self,
                       valuation_date,  # This should be the settlement date
                       discount_curve,
                       index_curve,
@@ -484,7 +484,7 @@ class FinFixedIborXCcySwap:
                    self._fixedFlows[iFlow],
                    self._fixedDfs[iFlow],
                    self._fixedFlowPVs[iFlow],
-                   self._fixedTotalPV[iFlow]))
+                   self._fixed_total_pv[iFlow]))
 
             iFlow += 1
 

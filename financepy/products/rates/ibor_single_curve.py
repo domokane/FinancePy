@@ -571,7 +571,7 @@ class IborSingleCurve(DiscountCurve):
         # Do I need this line ?
         interpolatedSwapRates[0] = interpolatedSwapRates[1]
 
-        accrual_factors = longestSwap._fixedYearFracs
+        accrual_factors = longestSwap._fixed_year_fracs
 
         acc = 0.0
         df = 1.0

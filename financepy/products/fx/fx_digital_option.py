@@ -27,7 +27,7 @@ class FXDigitalOption:
                  currency_pair: str,  # FORDOM
                  option_type: FinOptionTypes,
                  notional: float,
-                 premCurrency: str):
+                 prem_currency: str):
         """ Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -47,7 +47,7 @@ class FXDigitalOption:
         self._forName = self._currency_pair[0:3]
         self._domName = self._currency_pair[3:6]
 
-        if premCurrency != self._domName and premCurrency != self._forName:
+        if prem_currency != self._domName and prem_currency != self._forName:
             raise FinError("Notional currency not in currency pair.")
 
 ###############################################################################
@@ -65,8 +65,8 @@ class FXDigitalOption:
         domestic or foreign currency. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.add_weekdays(self._spot_days)
-            tdel = (self._delivery_date - spotDate) / gDaysInYear
+            spot_date = valuation_date.add_weekdays(self._spot_days)
+            tdel = (self._delivery_date - spot_date) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
             tdel = valuation_date
@@ -99,21 +99,22 @@ class FXDigitalOption:
             d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den
 
             if self._option_type == FinOptionTypes.DIGITAL_CALL and \
-                    self._forName == self._premCurrency:
+                    self._forName == self._prem_currency:
                 v = S0 * exp(-rf * tdel) * N(d2)
             elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
-                    self._forName == self._premCurrency:
+                    self._forName == self._prem_currency:
                 v = S0 * exp(-rf * tdel) * N(-d2)
             if self._option_type == FinOptionTypes.DIGITAL_CALL and \
-                    self._domName == self._premCurrency:
+                    self._domName == self._prem_currency:
                 v = exp(-rd * tdel) * N(d2)
             elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
-                    self._domName == self._premCurrency:
+                    self._domName == self._prem_currency:
                 v = exp(-rd * tdel) * N(-d2)
             else:
                 raise FinError("Unknown option type")
 
-            v = v * self.premNotional
+            print("Prem_notional is an error ?")
+            v = v * self.prem_notional
 
         return v
 

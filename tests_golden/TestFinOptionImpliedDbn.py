@@ -40,7 +40,7 @@ def test_FinOptionImpliedDbn():
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
-        atmVols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
+        atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
@@ -56,7 +56,7 @@ def test_FinOptionImpliedDbn():
                                 dom_discount_curve,
                                 for_discount_curve,
                                 tenors,
-                                atmVols,
+                                atm_vols,
                                 marketStrangle25DeltaVols,
                                 riskReversal25DeltaVols,
                                 atmMethod,

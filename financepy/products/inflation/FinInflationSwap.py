@@ -87,10 +87,10 @@ class FinInflationSwap():
         acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
         df1 = libor_curve.df(self._start_date)
         df2 = libor_curve.df(self._maturity_date)
-        liborFwd = (df1 / df2 - 1.0) / acc_factor
-        v = acc_factor * (liborFwd - self._fraRate) * df2
+        libor_fwd = (df1 / df2 - 1.0) / acc_factor
+        v = acc_factor * (libor_fwd - self._fraRate) * df2
 
-#        print(df1, df2, acc_factor, liborFwd, v)
+#        print(df1, df2, acc_factor, libor_fwd, v)
         # Forward value the FRA to the value date
         df_to_valuation_date = libor_curve.df(valuation_date)
         v = v * self._notional / df_to_valuation_date

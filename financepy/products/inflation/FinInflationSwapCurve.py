@@ -413,7 +413,7 @@ class InflationSwapCurve(DiscountCurve):
 #        print("Interpolated swap times:", interpolatedSwapTimes)
 #        print("Interpolated swap rates:", interpolatedSwapRates)
 
-        accrual_factors = longestSwap._fixedYearFracs
+        accrual_factors = longestSwap._fixed_year_fracs
 
         acc = 0.0
         df = 1.0

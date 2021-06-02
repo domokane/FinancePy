@@ -141,15 +141,15 @@ class OIS:
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
 
-        fixed_legValue = self._fixed_leg.value(valuation_date,
+        fixed_leg_value = self._fixed_leg.value(valuation_date,
                                              oisCurve)
 
-        floatLegValue = self._floatLeg.value(valuation_date,
+        float_leg_value = self._floatLeg.value(valuation_date,
                                              oisCurve,
                                              oisCurve,
                                              firstFixingRate)
 
-        value = fixed_legValue + floatLegValue
+        value = fixed_leg_value + float_leg_value
         return value
             
 ##########################################################################

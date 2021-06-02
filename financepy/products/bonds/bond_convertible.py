@@ -103,10 +103,10 @@ def _value_convertible(tmat,
     # this is the size of the step
     dt = tmat / (num_times - 1)
 
-    treeTimes = np.linspace(0.0, tmat, num_times)
+    tree_times = np.linspace(0.0, tmat, num_times)
     treeDfs = np.zeros(num_times)
     for i in range(0, num_times):
-        df = _uinterpolate(treeTimes[i], df_times, df_values, interp)
+        df = _uinterpolate(tree_times[i], df_times, df_values, interp)
         treeDfs[i] = df
 
     h = credit_spread / (1.0 - recovery_rate)
@@ -114,11 +114,11 @@ def _value_convertible(tmat,
 
     # map coupons onto tree but preserve their present value using risky dfs
     treeFlows = np.zeros(num_times)
-    numCoupons = len(coupon_times)
-    for i in range(0, numCoupons):
+    num_coupons = len(coupon_times)
+    for i in range(0, num_coupons):
         flow_time = coupon_times[i]
         n = int(round(flow_time / dt, 0))
-        treeTime = treeTimes[n]
+        treeTime = tree_times[n]
         df_flow = _uinterpolate(flow_time, df_times, df_values, interp)
         df_flow *= exp(-h * flow_time)
         df_tree = _uinterpolate(treeTime, df_times, df_values, interp)
@@ -178,7 +178,7 @@ def _value_convertible(tmat,
 
     treeConvertValue = np.zeros(shape=(num_times, numLevels))
     for iTime in range(0, num_times):
-        if treeTimes[iTime] >= start_convert_time:
+        if tree_times[iTime] >= start_convert_time:
             for iNode in range(0, iTime + 1):
                 s = treeStockValue[iTime, iNode]
                 treeConvertValue[iTime, iNode] = s * conv_ratio * 1.0
@@ -620,7 +620,7 @@ class BondConvertible:
 # TEST PV OF CASHFLOW MAPPING
 #    if 1==0:
 #        pv = 0.0
-#        for i in range(0, numCoupons):
+#        for i in range(0, num_coupons):
 #            t = coupon_times[i]
 #            df = uinterpolate(t, discount_times, discount_factors, interp)
 #            pv += df * couponAmounts[i]
@@ -631,7 +631,7 @@ class BondConvertible:
 #
 #        pv = 0.0
 #        for i in range(0, num_times):
-#            t = treeTimes[i]
+#            t = tree_times[i]
 #            df = uinterpolate(t, discount_times, discount_factors, interp)
 #            pv += df * treeFlows[i]
 #            print(i, t, treeFlows[i], df, pv)

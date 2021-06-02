@@ -244,7 +244,7 @@ def test_FinFXVanillaOptionHullExample():
 
     num_paths_list = [10000, 20000, 40000, 80000, 160000, 320000]
 
-    testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
+    testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC")
     strike_fx_rate = 1.60
 
     for num_paths in num_paths_list:
@@ -275,7 +275,7 @@ def test_FinFXVanillaOptionHullExample():
 
         end = time.time()
         duration = end - start
-        testCases.print(num_paths, value, value_mc, duration)
+        testCases.print(num_paths, value, value_mc)
 
 ##########################################################################
 
@@ -283,7 +283,7 @@ def test_FinFXVanillaOptionHullExample():
     spot_fx_rates = spot_fx_rates/100.0
     num_paths = 100000
 
-    testCases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC", "TIME")
+    testCases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC")
 
     for spot_fx_rate in spot_fx_rates:
 
@@ -310,14 +310,14 @@ def test_FinFXVanillaOptionHullExample():
             num_paths)
         end = time.time()
         duration = end - start
-        testCases.print(num_paths, value, value_mc, duration)
+        testCases.print(num_paths, value, value_mc)
 
 ##########################################################################
 
     spot_fx_rates = np.arange(100, 200, 10) / 100.0
     num_paths = 100000
 
-    testCases.header("SPOT FX RATE", "PUT_VALUE_BS", "PUT_VALUE_MC", "TIME")
+    testCases.header("SPOT FX RATE", "PUT_VALUE_BS", "PUT_VALUE_MC")
 
     for spot_fx_rate in spot_fx_rates:
 
@@ -344,7 +344,7 @@ def test_FinFXVanillaOptionHullExample():
             num_paths)
         end = time.time()
         duration = end - start
-        testCases.print(spot_fx_rate, value, value_mc, duration)
+        testCases.print(spot_fx_rate, value, value_mc)
 
 ##########################################################################
 

@@ -28,23 +28,23 @@ def _fois(oir, *args):
     """ Extract the implied overnight index rate assuming it is flat over 
     period in question. """
 
-    targetOISRate = args[0]
+    target_ois_rate = args[0]
     day_counter = args[1]
-    dateSchedule = args[2]
+    date_schedule = args[2]
 
-    start_date = dateSchedule[0]
-    end_date = dateSchedule[-1]
+    start_date = date_schedule[0]
+    end_date = date_schedule[-1]
 
     df = 1.0
-    prev_dt = dateSchedule[0]
-    for dt in dateSchedule[1:]:
+    prev_dt = date_schedule[0]
+    for dt in date_schedule[1:]:
         year_frac = day_counter.year_frac(prev_dt, dt)
         df = df * (1.0 + oir * year_frac)
 
     period = day_counter.year_frac(start_date, end_date)
     
-    OISRate = (df - 1.0) / period
-    diff = OISRate - targetOISRate
+    ois_rate = (df - 1.0) / period
+    diff = ois_rate - target_ois_rate
     return diff
 
 ###############################################################################
@@ -102,9 +102,9 @@ class OISCurve(DiscountCurve):
 
     def __init__(self,
                  valuation_date: Date,
-                 oisDeposits: list,
-                 oisFRAs: list,
-                 oisSwaps: list,
+                 ois_deposits: list,
+                 ois_fras: list,
+                 ois_swaps: list,
                  interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
                  check_refit: bool = False):  # Set to True to test it works
         """ Create an instance of an overnight index rate swap curve given a
@@ -120,7 +120,7 @@ class OISCurve(DiscountCurve):
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         self._valuation_date = valuation_date
-        self._validate_inputs(oisDeposits, oisFRAs, oisSwaps)
+        self._validate_inputs(ois_deposits, ois_fras, ois_swaps)
         self._interp_type = interp_type
         self._check_refit = check_refit
         self._interpolator = None
@@ -480,7 +480,7 @@ class OISCurve(DiscountCurve):
         # Do I need this line ?
         interpolatedSwapRates[0] = interpolatedSwapRates[1]
 
-        accrual_factors = longestSwap._fixedYearFracs
+        accrual_factors = longestSwap._fixed_year_fracs
 
         acc = 0.0
         df = 1.0

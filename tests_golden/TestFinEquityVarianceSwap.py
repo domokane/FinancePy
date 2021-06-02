@@ -18,8 +18,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def volSkew(K, atmVol, atmK, skew):
-    v = atmVol + skew * (K-atmK)
+def volSkew(K, atm_vol, atmK, skew):
+    v = atm_vol + skew * (K-atmK)
     return v
 
 ###############################################################################
@@ -40,11 +40,11 @@ def test_EquityVarianceSwap():
 
     maturity_date = start_date.add_months(3)
 
-    atmVol = 0.20
+    atm_vol = 0.20
     atmK = 100.0
     skew = -0.02/5.0  # defined as dsigma/dK
     strikes = np.linspace(50.0, 135.0, 18)
-    vols = volSkew(strikes, atmVol, atmK, skew)
+    vols = volSkew(strikes, atm_vol, atmK, skew)
     volCurve = EquityVolCurve(valuation_date, maturity_date, strikes, vols)
 
     strike_spacing = 5.0

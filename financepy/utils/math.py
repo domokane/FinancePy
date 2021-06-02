@@ -27,9 +27,9 @@ def accrued_interpolator(tset: float,  # Settlement time in years
     """ Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
-    numCoupons = len(coupon_times)
+    num_coupons = len(coupon_times)
 
-    for i in range(1, numCoupons):
+    for i in range(1, num_coupons):
 
         pct = coupon_times[i - 1]
         nct = coupon_times[i]

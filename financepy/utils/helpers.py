@@ -450,12 +450,12 @@ def accruedTree(gridTimes: np.ndarray,
             coupon_times = np.append(coupon_times, cpn_time)
             coupon_flows = np.append(coupon_flows, cpn_flow)
 
-    numCoupons = len(coupon_times)
+    num_coupons = len(coupon_times)
 
     # interpolate between coupons
     for iGrid in range(0, numGridTimes):
         t = gridTimes[iGrid]
-        for i in range(0, numCoupons):
+        for i in range(0, num_coupons):
             if t > coupon_times[i - 1] and t <= coupon_times[i]:
                 den = coupon_times[i] - coupon_times[i - 1]
                 num = (t - coupon_times[i - 1])

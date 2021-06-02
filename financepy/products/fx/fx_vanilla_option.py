@@ -131,8 +131,8 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 #                            for_discount_curve,
 #                            model)
 
-#     deltaOut = deltaDict[deltaType]
-#     obj_fn = delta - deltaOut
+#     delta_out = deltaDict[deltaType]
+#     obj_fn = delta - delta_out
 #     return obj_fn
 
 # ## THIS IS A HOPEFULLY FASTER VERSION WHICH AVOIDS CALLING DF
@@ -158,8 +158,8 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 #                                forDF,
 #                                volatility)
 
-#     deltaOut = deltaDict[deltaType]
-#     obj_fn = delta - deltaOut
+#     delta_out = deltaDict[deltaType]
+#     obj_fn = delta - delta_out
 #     return obj_fn
 
 
@@ -186,7 +186,7 @@ class FXVanillaOption():
                  currency_pair: str,  # FORDOM
                  option_type: (FinOptionTypes, list),
                  notional: float,
-                 premCurrency: str,
+                 prem_currency: str,
                  spot_days: int = 0):
         """ Create the FX Vanilla Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
@@ -222,10 +222,10 @@ class FXVanillaOption():
         self._forName = self._currency_pair[0:3]
         self._domName = self._currency_pair[3:6]
 
-        if premCurrency != self._domName and premCurrency != self._forName:
+        if prem_currency != self._domName and prem_currency != self._forName:
             raise FinError("Premium currency not in currency pair.")
 
-        self._premCurrency = premCurrency
+        self._prem_currency = prem_currency
 
         self._notional = notional
 
@@ -252,8 +252,8 @@ class FXVanillaOption():
         price in domestic of one unit of foreign currency. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.add_weekdays(self._spot_days)
-            tdel = (self._delivery_date - spotDate) / gDaysInYear
+            spot_date = valuation_date.add_weekdays(self._spot_days)
+            tdel = (self._delivery_date - spot_date) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
             tdel = valuation_date
@@ -320,10 +320,10 @@ class FXVanillaOption():
         # the option may be quoted in either currency terms and so we calculate
         # these
 
-        if self._premCurrency == self._domName:
+        if self._prem_currency == self._domName:
             notional_dom = self._notional
             notional_for = self._notional / self._strike_fx_rate
-        elif self._premCurrency == self._forName:
+        elif self._prem_currency == self._forName:
             notional_dom = self._notional * self._strike_fx_rate
             notional_for = self._notional
         else:
@@ -400,8 +400,8 @@ class FXVanillaOption():
         by Iain Clark, published by Wiley Finance. """
 
         if type(valuation_date) == Date:
-            spotDate = valuation_date.add_weekdays(self._spot_days)
-            tdel = (self._delivery_date - spotDate) / gDaysInYear
+            spot_date = valuation_date.add_weekdays(self._spot_days)
+            tdel = (self._delivery_date - spot_date) / gDaysInYear
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
             tdel = valuation_date
@@ -459,7 +459,7 @@ class FXVanillaOption():
         the volatility surface. Avoids discount curve interpolation so it
         should be slightly faster than the full calculation of delta. """
 
-#        spotDate = valuation_date.add_weekdays(self._spot_days)
+#        spot_date = valuation_date.add_weekdays(self._spot_days)
 #        tdel = (self._delivery_date - valuation_date) / gDaysInYear
 #        tdel = np.maximum(tdel, gSmall)
 
@@ -737,7 +737,7 @@ class FXVanillaOption():
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("CURRENCY PAIR", self._currency_pair)
-        s += label_to_string("PREMIUM CCY", self._premCurrency)
+        s += label_to_string("PREMIUM CCY", self._prem_currency)
         s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("SPOT DAYS", self._spot_days)
