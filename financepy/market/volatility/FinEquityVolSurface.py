@@ -606,7 +606,6 @@ class FinEquityVolSurface():
             raise FinError("Unknown Model Type")
 
         self._texp = np.zeros(numExpiryDates)
-
         self._F0T = np.zeros(numExpiryDates)
         self._r = np.zeros(numExpiryDates)
         self._q = np.zeros(numExpiryDates)
