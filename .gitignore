@@ -66,6 +66,7 @@ coverage.xml
 # virtualenv
 venv/
 ENV/
+.env
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -124,3 +125,6 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+#MacOS Files
+.DS_Store
