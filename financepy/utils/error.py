@@ -9,22 +9,27 @@
 import traceback
 import sys
 
-from IPython import get_ipython
+# iPython dependency is only loaded if required.
 
-ipython = get_ipython()
-
-###############################################################################
+ipython = None
+try:
+    from IPython import get_ipython
+    ipython = get_ipython()
+except:
+    pass
 
 def _hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                     exception_only=False, running_compiled_code=False):
     etype, value, _ = sys.exc_info()
-
-    msg = ipython._showtraceback(etype, value,
+    if ipython is not None:
+        msg = ipython._showtraceback(etype, value,
                                  ipython.InteractiveTB.get_exception_only(
                                      etype, value))
-
+    else:
+        msg = None
     return msg
 
+##############################################################################
 
 def func_name():
     return traceback.extract_stack(None, 2)[0][2]
