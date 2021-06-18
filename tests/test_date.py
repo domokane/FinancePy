@@ -43,16 +43,24 @@ def test_Date():
 
     startDate = Date(1, 1, 2018)
 
-    for num_months in range(0, 120):
-        next_cds_date = startDate.next_cds_date(num_months)
-        print(str(startDate), num_months, str(next_cds_date))
+    #Checking for num_months = 0
+    next_cds_date = startDate.next_cds_date( 0 )  
+    assert next_cds_date == Date(20,3,2018)
+
+    #Checking for num_months = 120
+    next_cds_date = startDate.next_cds_date( 120 )  
+    assert next_cds_date == Date(20,3,2028)
 
     startDate = Date(1, 1, 2018)
 
-    for num_months in range(0, 365):
-        startDate = startDate.add_days(1)
-        next_imm_date = startDate.next_imm_date()
-        print(num_months, str(startDate), str(next_imm_date))
+    #Checking for num_days = 1
+    next_imm_date = startDate.add_days(1).next_imm_date()
+    assert next_imm_date == Date(21,3,2018)
+
+    #Checking for num_days = 365
+    next_imm_date = startDate.add_days(365).next_imm_date()
+    assert next_imm_date == Date(20,3,2019)
+
 
 
 def test_DateTenors():
@@ -60,55 +68,64 @@ def test_DateTenors():
     startDate = Date(23, 2, 2018)
 
     tenor = "5d"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(28,2,2018)
 
     tenor = "7D"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(2,3,2018)
 
     tenor = "1W"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(2,3,2018)
 
     tenor = "4W"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,3,2018)
 
     tenor = "1M"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,3,2018)
 
     tenor = "24M"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,2,2020)
 
     tenor = "2Y"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,2,2020)
 
     tenor = "10y"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,2,2028)
 
     tenor = "0m"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,2,2018)
 
     tenor = "20Y"
-    print(tenor, startDate.add_tenor(tenor))
+    assert startDate.add_tenor(tenor) == Date(23,2,2038)
 
 
 def test_DateRange():
 
     startDate = Date(1, 1, 2010)
 
+    #Default
     endDate = startDate.add_days(3)
-    tenor = "Default"
-    print(tenor, dateRange(startDate, endDate))
+    dtRange =  dateRange(startDate, endDate)
+    assert dtRange[0]  == Date(1,1,2010)
+    assert dtRange[-1] == Date(4,1,2010)
 
+    #1W Tenor
     endDate = startDate.add_days(20)
     tenor = "1W"
-    print(tenor, dateRange(startDate, endDate, tenor))
+    dtRange =  dateRange(startDate, endDate,tenor)
+    assert dtRange[0] == Date(1,1,2010)
+    assert dtRange[-1] == Date(21,1,2010)
 
+    #7D Tenor
     tenor = "7D"
-    print(tenor, dateRange(startDate, endDate, tenor))
+    dtRange =  dateRange(startDate, endDate,tenor)
+    assert dtRange[1] == Date(8,1,2010)
+    assert dtRange[2] == Date(15,1,2010)
 
-    case = "Same startDate"
-    print(case, dateRange(startDate, startDate))
-    case = "startDate before endDate"
-    print(case, dateRange(endDate, startDate))
+    #Same startDate
+    assert dateRange(startDate, startDate)[0] == Date(1, 1, 2010)
+
+    #startDate before endDate"
+    assert len(dateRange(endDate, startDate)) == 0
 
 
 def test_DateAddMonths():
@@ -119,47 +136,63 @@ def test_DateAddMonths():
 
     dates = startDate.add_months(months)
 
-    for dt in dates:
-        print("DATE", dt)
+    assert dates[0] == Date(1,2,2010)
+    assert dates[-1] == Date(1,1,2015)
+    assert len(dates) == len(months)
+
 
 
 def test_DateAddYears():
 
     startDate = Date(1, 1, 2010)
 
+    #Simple list as input 
     years = [1, 3, 5, 7, 10]
-    dates1 = startDate.add_years(years)
-    for dt in dates1:
-        print("DATES1", dt)
+    dates_list = startDate.add_years(years)
+    assert len(dates_list) == len(years)
+    assert dates_list[0] == Date(1,1,2011)
+    assert dates_list[-1] == Date(1,1,2020)
 
+    #Numpy array as input 
     years = np.array([1, 3, 5, 7, 10])
-    dates2 = startDate.add_years(years)
-    for dt in dates2:
-        print("DATES2", dt)
+    dates_numpy = startDate.add_years(years)
+    assert len(dates_numpy) == len(years)
+    assert dates_numpy[0] == Date(1,1,2011)
+    assert dates_numpy[-1] == Date(1,1,2020)
 
+    #Fractional years as input
     years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
-    dates3 = startDate.add_years(years)
+    dates_fractional = startDate.add_years(years)
+    assert len(dates_fractional) == len(years)
+    assert dates_fractional[0] == Date(1,7,2011)
+    assert dates_fractional[-1] == Date(1,1,2020)
 
-    for dt in dates3:
-        print("DATES3", dt)
-
+    #Fractional years with date foramtting in a numpy array as input
     dt = 1.0 / 365.0
     years = np.array(
         [1.5 + 2.0 * dt, 3.5 - 6 * dt, 5.75 + 3 * dt, 7.25 + dt, 10.0 + dt]
     )
-    dates4 = startDate.add_years(years)
-
-    for dt in dates4:
-        print("DATES4", dt)
+    dates_fractional_np = startDate.add_years(years)
+    assert len(dates_fractional_np) == len(years)
+    assert dates_fractional_np[0] == Date(3,7,2011)
+    assert dates_fractional_np[-1] == Date(2,1,2020)
 
 
 def test_DateFormat():
 
     dt = Date(20, 10, 2019)
+    
+    #Date format in Bloomberg
+    set_date_format(DateFormatTypes.BLOOMBERG)
+    assert str(dt) == "10/20/19"
 
-    for format_type in DateFormatTypes:
-        set_date_format(format_type)
-        print(format_type.name, dt)
+    #Date format in Datetime
+    set_date_format(DateFormatTypes.DATETIME)
+    assert str(dt) == "20/10/2019 00:00:00"
+
+    #Date format in UK_LONGEST
+    set_date_format(DateFormatTypes.UK_LONGEST)
+    assert str(dt) == "SUN 20 OCT 2019"
 
 
 def test_IntraDay():
@@ -167,32 +200,28 @@ def test_IntraDay():
     d1 = Date(20, 10, 2019, 0, 0, 0)
     d2 = Date(25, 10, 2019, 0, 0, 0)
     diff = d2 - d1
-    print(d1, d2, diff)
-    print(d1._excel_date, d2._excel_date, diff)
+    assert round(diff,4) == 5
 
     ###########################################################################
 
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
-    print(d1, d2, diff)
-    print(d1._excel_date, d2._excel_date, diff)
+    assert round(diff,4) == 5.0174
 
     ###########################################################################
 
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
-    print(d1, d2, diff)
-    print(d1._excel_date, d2._excel_date, diff)
+    assert round(diff,4) == 0.0177
 
     ###########################################################################
 
     d1 = Date(19, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
-    print(d1, d2, diff)
-    print(d1._excel_date, d2._excel_date, diff)
+    assert round(diff,4) == 1.0178
 
 
 def test_DateEOM():
