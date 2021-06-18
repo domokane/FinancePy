@@ -161,6 +161,26 @@ def bsRho(s, t, k, r, q, v, optionTypeValue):
 
 ###############################################################################
 
+@vectorize([float64(float64, float64, float64, float64,
+                    float64, float64, int64)], fastmath=True, cache=True)
+def bsVanna(s, t, k, r, q, v, option_type_value):
+    """ Price a derivative using Black-Scholes model. """
+
+    k = np.maximum(k, gSmall)
+    t = np.maximum(t, gSmall)
+    v = np.maximum(v, gSmall)
+
+    sqrtT = np.sqrt(t)
+    vsqrtT = v * sqrtT
+    ss = s * np.exp(-q*t)
+    kk = k * np.exp(-r*t)
+    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    d2 = d1 - vsqrtT
+    vanna = np.exp(-q*t) * sqrtT * NPrimeVect(d1) * (d2/v)
+    return vanna
+
+###############################################################################
+
 #@njit(fastmath=True, cache=True)
 def _f(sigma, args):
 

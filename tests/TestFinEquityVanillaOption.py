@@ -117,7 +117,7 @@ def test_FinEquityVanillaOption():
     stockPrices = range(80, 120, 10)
 
     testCases.header("STOCK PRICE", "CALL_VALUE_BS", "CALL_DELTA_BS", 
-                     "CALL_VEGA_BS", "CALL_THETA_BS", "CALL_RHO_BS")
+                     "CALL_VEGA_BS", "CALL_THETA_BS", "CALL_RHO_BS","CALL_VANNA_BS")
 
     for stockPrice in stockPrices:
 
@@ -133,12 +133,14 @@ def test_FinEquityVanillaOption():
                                  dividendCurve, model)
         rho = callOption.rho(valueDate, stockPrice, discountCurve,
                                  dividendCurve, model)
-        testCases.print(stockPrice, value, delta, vega, theta, rho)
+        vanna = callOption.vanna(valueDate, stockPrice, discountCurve,
+                                 dividendCurve, model)
+        testCases.print(stockPrice, value, delta, vega, theta, rho, vanna)
 
     ###########################################################################
 
     testCases.header("STOCK PRICE", "PUT_VALUE_BS", "PUT_DELTA_BS", 
-                     "PUT_VEGA_BS", "PUT_THETA_BS", "PUT_RHO_BS")
+                     "PUT_VEGA_BS", "PUT_THETA_BS", "PUT_RHO_BS","PUT_VANNA_BS")
 
     for stockPrice in stockPrices:
         
@@ -155,7 +157,9 @@ def test_FinEquityVanillaOption():
                                  dividendCurve, model)
         rho = putOption.rho(valueDate, stockPrice, discountCurve,
                                  dividendCurve, model)
-        testCases.print(stockPrice, value, delta, vega, theta, rho)
+        vanna = putOption.vanna(valueDate, stockPrice, discountCurve,
+                                 dividendCurve, model)
+        testCases.print(stockPrice, value, delta, vega, theta, rho, vanna)
 
 
 def testImpliedVolatility_NEW():
