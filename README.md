@@ -1,5 +1,9 @@
 [![unit test action](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml/badge.svg)](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml)
 
+# Latest News
+
+I have just pushed a pep8 version of the library. It will be released as the 0.20 version of financepy very soon. Function names will change. Please see code.
+
 # Quick Start Guide
 
 FinancePy can be installed from pip using the following command:
