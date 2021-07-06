@@ -214,13 +214,13 @@ class IborSwaption():
 
         elif isinstance(model, HWTree):
 
-            swaptionPx = model.europeanBondOptionJamshidian(texp,
-                                                            strike_price,
-                                                            face_amount,
-                                                            cpn_times,
-                                                            cpn_flows,
-                                                            df_times,
-                                                            df_values)
+            swaptionPx = model.european_bond_option_jamshidian(texp,
+                                                               strike_price,
+                                                               face_amount,
+                                                               cpn_times,
+                                                               cpn_flows,
+                                                               df_times,
+                                                               df_values)
 
             if self._fixed_leg_type == SwapTypes.PAY:
                 swaption_price = swaptionPx['put']
@@ -235,7 +235,7 @@ class IborSwaption():
 
         elif isinstance(model, BKTree):
 
-            model.buildTree(tmat, df_times, df_values)
+            model.build_tree(tmat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(texp,
                                                  tmat,
                                                  strike_price,
@@ -253,7 +253,7 @@ class IborSwaption():
 
         elif isinstance(model, BDTTree):
 
-            model.buildTree(tmat, df_times, df_values)
+            model.build_tree(tmat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(texp,
                                                  tmat,
                                                  strike_price,

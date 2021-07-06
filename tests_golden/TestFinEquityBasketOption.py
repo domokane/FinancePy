@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
-from financepy.utils.helpers import beta_vectorToCorrMatrix
+from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import FinOptionTypes
 from financepy.products.equity.equity_basket_option import EquityBasketOption
@@ -52,7 +52,7 @@ def test_EquityBasketOption():
             call_option = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = beta_vectorToCorrMatrix(betas)
+            corr_matrix = beta_vector_to_corr_matrix(betas)
 
             start = time.time()
             v = call_option.value(
@@ -100,7 +100,7 @@ def test_EquityBasketOption():
             call_option = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = beta_vectorToCorrMatrix(betas)
+            corr_matrix = beta_vector_to_corr_matrix(betas)
 
             start = time.time()
 
@@ -147,7 +147,7 @@ def test_EquityBasketOption():
             call_option = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = beta_vectorToCorrMatrix(betas)
+            corr_matrix = beta_vector_to_corr_matrix(betas)
 
             start = time.time()
             v = call_option.value(
@@ -193,7 +193,7 @@ def test_EquityBasketOption():
             call_option = EquityBasketOption(
                 expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
-            corr_matrix = beta_vectorToCorrMatrix(betas)
+            corr_matrix = beta_vector_to_corr_matrix(betas)
 
             start = time.time()
             v = call_option.value(

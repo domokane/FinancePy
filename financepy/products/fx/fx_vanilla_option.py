@@ -16,7 +16,7 @@ from ...utils.global_types import FinOptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModelSABR
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 
-from ...models.equity_crr_tree import crrTreeValAvg
+from ...models.equity_crr_tree import crr_tree_val_avg
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import SABR
 from ...models.black_scholes import BlackScholes
@@ -307,12 +307,12 @@ class FXVanillaOption():
 
             elif self._option_type == FinOptionTypes.AMERICAN_CALL:
                 num_steps_per_year = 100
-                vdf = crrTreeValAvg(S0, rd, rf, volatility, num_steps_per_year,
-                                    texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
+                vdf = crr_tree_val_avg(S0, rd, rf, volatility, num_steps_per_year,
+                                       texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
             elif self._option_type == FinOptionTypes.AMERICAN_PUT:
                 num_steps_per_year = 100
-                vdf = crrTreeValAvg(S0, rd, rf, volatility, num_steps_per_year,
-                                    texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
+                vdf = crr_tree_val_avg(S0, rd, rf, volatility, num_steps_per_year,
+                                       texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
             else:
                 raise FinError("Unknown option type")
 

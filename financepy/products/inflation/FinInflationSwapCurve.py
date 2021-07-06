@@ -107,7 +107,7 @@ class InflationSwapCurve(DiscountCurve):
 
     def _build_curve(self):
         """ Build curve based on interpolation. """
-        self._buildCurveUsingSolver()
+        self._build_curve_using_solver()
 
 ###############################################################################
 
@@ -237,7 +237,7 @@ class InflationSwapCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsingSolver(self):
+    def _build_curve_using_solver(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
@@ -302,7 +302,7 @@ class InflationSwapCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveLinearSwapRateInterpolation(self):
+    def _build_curve_linear_swap_rate_interpolation(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. """

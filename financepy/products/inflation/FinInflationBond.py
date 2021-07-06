@@ -64,7 +64,7 @@ class FinInflationBond(Bond):
         self._alpha = 0.0
                    
         self._calculate_flow_dates()
-        self._calculateFlows()
+        self._calculate_flows()
 
 ###############################################################################
 

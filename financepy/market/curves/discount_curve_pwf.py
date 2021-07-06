@@ -7,12 +7,12 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_vars import gSmall
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...utils.day_count import DayCountTypes
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 
 
@@ -48,13 +48,13 @@ class DiscountCurvePWF(DiscountCurve):
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
-        dc_times = timesFromDates(zero_dates,
-                                 self._valuation_date,
-                                 self._day_count_type)
+        dc_times = times_from_dates(zero_dates,
+                                    self._valuation_date,
+                                    self._day_count_type)
 
         self._times = np.array(dc_times)
 
-        if testMonotonicity(self._times) is False:
+        if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
     ###############################################################################
@@ -129,9 +129,9 @@ class DiscountCurvePWF(DiscountCurve):
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dc_times = timesFromDates(dates,
-                                 self._valuation_date,
-                                 self._day_count_type)
+        dc_times = times_from_dates(dates,
+                                    self._valuation_date,
+                                    self._day_count_type)
 
         zero_rates = self._zero_rate(dc_times)
 

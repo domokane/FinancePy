@@ -6,7 +6,7 @@ from math import sqrt
 import numpy as np
 from scipy.stats import t as student
 
-from ..utils.helpers import uniformToDefaultTime
+from ..utils.helpers import uniform_to_default_time
 
 ###############################################################################
 
@@ -38,8 +38,8 @@ class StudentTCopula():
                 u2 = 1.0 - u1
                 times = issuer_curve._times
                 values = issuer_curve._values
-                t1 = uniformToDefaultTime(u1, times, values)
-                t2 = uniformToDefaultTime(u2, times, values)
+                t1 = uniform_to_default_time(u1, times, values)
+                t2 = uniform_to_default_time(u2, times, values)
                 corrTimes[iCredit, iTrial] = t1
                 corrTimes[iCredit, iTrial + num_trials] = t2
 

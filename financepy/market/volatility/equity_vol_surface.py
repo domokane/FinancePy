@@ -12,18 +12,18 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
-from ...models.option_implied_dbn import optionImpliedDbn
+from ...models.option_implied_dbn import option_implied_dbn
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.volatility_fns import vol_function_clark
-from ...models.volatility_fns import vol_Function_bloomberg
+from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi
 from ...models.volatility_fns import vol_function_ssvi
 from ...models.sabr import vol_function_sabr
-from ...models.sabr import vol_function_sabr_BETA_ONE
-from ...models.sabr import vol_function_sabr_BETA_HALF
+from ...models.sabr import vol_function_sabr_beta_one
+from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
@@ -137,13 +137,13 @@ def vol_function(vol_function_type_value, params, f, k, t):
         vol = vol_function_clark(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = vol_function_sabr_BETA_ONE(params, f, k, t)
+        vol = vol_function_sabr_beta_one(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = vol_function_sabr_BETA_HALF(params, f, k, t)
+        vol = vol_function_sabr_beta_half(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
-        vol = vol_Function_bloomberg(params, f, k, t)
+        vol = vol_function_bloomberg(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
         vol = vol_function_sabr(params, f, k, t)
@@ -452,8 +452,8 @@ class EquityVolSurface:
 
 ###############################################################################
         
-    def volatilityFromDeltaDate(self, callDelta, expiry_date, 
-                                deltaMethod = None):
+    def volatility_from_delta_date(self, callDelta, expiry_date,
+                                   deltaMethod = None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are 
@@ -719,7 +719,7 @@ class EquityVolSurface:
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._stock_price, t, r, q, Ks, vols)
+            density = option_implied_dbn(self._stock_price, t, r, q, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)

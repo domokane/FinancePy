@@ -88,8 +88,8 @@ class EquityBarrierOption(EquityOption):
 
         values = []
         for s in stock_prices:
-            v = self._valueOne(valuation_date, s, discount_curve,
-                               dividend_curve, model)
+            v = self._value_one(valuation_date, s, discount_curve,
+                                dividend_curve, model)
             values.append(v)
 
         if isinstance(stock_price, float):
@@ -99,12 +99,12 @@ class EquityBarrierOption(EquityOption):
 
 ###############################################################################
 
-    def _valueOne(self,
-                  valuation_date: Date,
-                  stock_price: (float, np.ndarray),
-                  discount_curve: DiscountCurve,
-                  dividend_curve: DiscountCurve,
-                  model):
+    def _value_one(self,
+                   valuation_date: Date,
+                   stock_price: (float, np.ndarray),
+                   discount_curve: DiscountCurve,
+                   dividend_curve: DiscountCurve,
+                   model):
         """ This values a single option. Because of its structure it cannot
         easily be vectorised which is why it has been wrapped. """
 
@@ -196,83 +196,83 @@ class EquityBarrierOption(EquityOption):
         if self._option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL:
             if h >= k:
                 c_do = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                    - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
+                       - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
                 price = c_do
             else:
                 c_di = s * dq * pow(hOverS, 2.0 * l) * N(y) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
                 price = c - c_di
         elif self._option_type == EquityBarrierTypes.DOWN_AND_IN_CALL:
             if h <= k:
                 c_di = s * dq * pow(hOverS, 2.0 * l) * N(y) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
                 price = c_di
             else:
                 c_do = s * dq * N(x1) \
-                    - k * df * N(x1 - sigmaRootT) \
-                    - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
+                       - k * df * N(x1 - sigmaRootT) \
+                       - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
                 price = c - c_do
         elif self._option_type == EquityBarrierTypes.UP_AND_IN_CALL:
             if h >= k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                       - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                       (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c_ui
             else:
                 price = c
         elif self._option_type == EquityBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                       - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                       (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c - c_ui
             else:
                 price = 0.0
         elif self._option_type == EquityBarrierTypes.UP_AND_IN_PUT:
             if h > k:
                 p_ui = -s * dq * pow(hOverS, 2.0 * l) * N(-y) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
                 price = p_ui
             else:
                 p_uo = -s * dq * N(-x1) \
-                    + k * df * N(-x1 + sigmaRootT) \
-                    + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
+                       + k * df * N(-x1 + sigmaRootT) \
+                       + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
                 price = p - p_uo
         elif self._option_type == EquityBarrierTypes.UP_AND_OUT_PUT:
             if h >= k:
                 p_ui = -s * dq * pow(hOverS, 2.0 * l) * N(-y) \
-                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
+                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
                 price = p - p_ui
             else:
                 p_uo = -s * dq * N(-x1) \
-                    + k * df * N(-x1 + sigmaRootT) \
-                    + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
+                       + k * df * N(-x1 + sigmaRootT) \
+                       + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
                 price = p_uo
         elif self._option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT:
             if h >= k:
                 price = 0.0
             else:
                 p_di = -s * dq * N(-x1) \
-                    + k * df * N(-x1 + sigmaRootT) \
-                    + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                       + k * df * N(-x1 + sigmaRootT) \
+                       + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                       (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p - p_di
         elif self._option_type == EquityBarrierTypes.DOWN_AND_IN_PUT:
             if h >= k:
                 price = p
             else:
                 p_di = -s * dq * N(-x1) \
-                    + k * df * N(-x1 + sigmaRootT) \
-                    + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
-                    - k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                       + k * df * N(-x1 + sigmaRootT) \
+                       + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                       (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p_di
         else:
             raise FinError("Unknown barrier option type." +
@@ -340,7 +340,7 @@ class EquityBarrierOption(EquityOption):
             simple_put = True
 
         if simple_put or simple_call:
-            Sall = process.getProcess(
+            Sall = process.get_process(
                 process_type, texp, model_params, 1, num_paths, seed)
 
         if simple_call:
@@ -354,8 +354,8 @@ class EquityBarrierOption(EquityOption):
             return p
 
         # Get full set of paths
-        Sall = process.getProcess(process_type, texp, model_params, num_time_steps,
-                                  num_paths, seed)
+        Sall = process.get_process(process_type, texp, model_params, num_time_steps,
+                                   num_paths, seed)
 
         (num_paths, num_time_steps) = Sall.shape
 

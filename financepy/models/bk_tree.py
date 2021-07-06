@@ -28,7 +28,7 @@ interp = InterpTypes.FLAT_FWD_RATES.value
 ###############################################################################
 
 
-def optionExerciseTypesToInt(optionExerciseType):
+def option_exercise_types_to_int(optionExerciseType):
 
     if optionExerciseType == FinExerciseTypes.EUROPEAN:
         return 1
@@ -79,7 +79,7 @@ def fprime(alpha, nm, Q, P, dX, dt, N):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def searchRoot(x0, nm, Q, P, dX, dt, N):
+def search_root(x0, nm, Q, P, dX, dt, N):
 
     #    print("Searching for root", x0)
     max_iter = 50
@@ -114,7 +114,7 @@ def searchRoot(x0, nm, Q, P, dX, dt, N):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def searchRootDeriv(x0, nm, Q, P, dX, dt, N):
+def search_root_deriv(x0, nm, Q, P, dX, dt, N):
 
     max_iter = 50
     max_error = 1e-8
@@ -367,15 +367,15 @@ def bermudan_swaption_tree_fast(texp, tmat,
 
 
 @njit(fastmath=True, cache=True)
-def americanBondOption_Tree_Fast(texp, tmat,
-                                 strike_price, face_amount,
-                                 coupon_times, coupon_flows,
-                                 exercise_typeInt,
-                                 _df_times, _df_values,
-                                 _tree_times, _Q,
-                                 _pu, _pm, _pd,
-                                 _rt,
-                                 _dt, _a):
+def american_bond_option_tree_fast(texp, tmat,
+                                   strike_price, face_amount,
+                                   coupon_times, coupon_flows,
+                                   exercise_typeInt,
+                                   _df_times, _df_values,
+                                   _tree_times, _Q,
+                                   _pu, _pm, _pd,
+                                   _rt,
+                                   _dt, _a):
     """ Option that can be exercised at any time over the exercise period.
     Due to non-analytical bond price we need to extend tree out to bond
     maturity and take into account cash flows through time. """
@@ -591,12 +591,12 @@ def americanBondOption_Tree_Fast(texp, tmat,
 
 
 @njit(fastmath=True, cache=True)
-def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
-                                   call_times, call_prices,
-                                   put_times, put_prices, face_amount,
-                                   _sigma, _a, _Q,  # IS SIGMA USED ?
-                                   _pu, _pm, _pd, _rt, _dt, _tree_times,
-                                   _df_times, _df_values):
+def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+                                     call_times, call_prices,
+                                     put_times, put_prices, face_amount,
+                                     _sigma, _a, _Q,  # IS SIGMA USED ?
+                                     _pu, _pm, _pd, _rt, _dt, _tree_times,
+                                     _df_times, _df_values):
     """ Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
@@ -761,7 +761,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
 
 
 @njit(fastmath=True)
-def buildTreeFast(a, sigma, tree_times, num_time_steps, discount_factors):
+def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     """ Calibrate the tree to a term structure of interest rates. """
 
     treeMaturity = tree_times[-1]
@@ -827,8 +827,8 @@ def buildTreeFast(a, sigma, tree_times, num_time_steps, discount_factors):
         # Need to do drift adjustment which is non-linear and so requires
         # a root search algorithm to find value of x0.
 
-        alpha[m] = searchRootDeriv(x0, nm, Q[m], discount_factors[m+1],
-                                   dX, dt, jmax)
+        alpha[m] = search_root_deriv(x0, nm, Q[m], discount_factors[m + 1],
+                                     dX, dt, jmax)
 
         x0 = alpha[m]
 
@@ -899,7 +899,7 @@ class BKTree():
 
 ###############################################################################
 
-    def buildTree(self, tmat, df_times, df_values):
+    def build_tree(self, tmat, df_times, df_values):
 
         if isinstance(df_times, np.ndarray) is False:
             raise FinError("DF TIMES must be a numpy vector")
@@ -924,8 +924,8 @@ class BKTree():
         self._dfs = df_values
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
-            = buildTreeFast(self._a, self._sigma,
-                            tree_times, self._num_time_steps, dfTree)
+            = build_tree_fast(self._a, self._sigma,
+                              tree_times, self._num_time_steps, dfTree)
 
         return
 
@@ -936,7 +936,7 @@ class BKTree():
         """ Value a bond option that has European or American exercise using
         the Black-Karasinski model. The model uses a trinomial tree. """
 
-        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
+        exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
         tmat = coupon_times[-1]
 
@@ -949,15 +949,15 @@ class BKTree():
         #######################################################################
 
         callValue, putValue \
-            = americanBondOption_Tree_Fast(texp, tmat,
-                                           strike_price, face_amount,
-                                           coupon_times, coupon_flows,
-                                           exercise_typeInt,
-                                           self._df_times, self._dfs,
-                                           self._tree_times, self._Q,
-                                           self._pu, self._pm, self._pd,
-                                           self._rt,
-                                           self._dt, self._a)
+            = american_bond_option_tree_fast(texp, tmat,
+                                             strike_price, face_amount,
+                                             coupon_times, coupon_flows,
+                                             exercise_typeInt,
+                                             self._df_times, self._dfs,
+                                             self._tree_times, self._Q,
+                                             self._pu, self._pm, self._pd,
+                                             self._rt,
+                                             self._dt, self._a)
 
         return {'call': callValue, 'put': putValue}
 
@@ -969,7 +969,7 @@ class BKTree():
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
 
-        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
+        exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
         tmat = coupon_times[-1]
 
@@ -996,11 +996,11 @@ class BKTree():
 
 ###############################################################################
 
-    def callablePuttableBond_Tree(self,
-                                  coupon_times, coupon_flows,
-                                  call_times, call_prices,
-                                  put_times, put_prices,
-                                  face):
+    def callable_puttable_bond_tree(self,
+                                    coupon_times, coupon_flows,
+                                    call_times, call_prices,
+                                    put_times, put_prices,
+                                    face):
         """ Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
         maturity and take into account cash flows through time. """
@@ -1011,15 +1011,15 @@ class BKTree():
         call_prices = np.array(call_prices)
         put_prices = np.array(put_prices)
 
-        v = callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
-                                           call_times, call_prices,
-                                           put_times, put_prices, face,
-                                           self._sigma, self._a,
-                                           self._Q,
-                                           self._pu, self._pm, self._pd,
-                                           self._rt, self._dt,
-                                           self._tree_times,
-                                           self._df_times, self._dfs)
+        v = callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+                                             call_times, call_prices,
+                                             put_times, put_prices, face,
+                                             self._sigma, self._a,
+                                             self._Q,
+                                             self._pu, self._pm, self._pd,
+                                             self._rt, self._dt,
+                                             self._tree_times,
+                                             self._df_times, self._dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}

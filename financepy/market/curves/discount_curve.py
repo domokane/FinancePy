@@ -12,10 +12,10 @@ from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.schedule import Schedule
 from ...utils.helpers import check_argument_types
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
 
 
@@ -69,7 +69,7 @@ class DiscountCurve:
 
         self._times = np.array(self._times)
 
-        if testMonotonicity(self._times) is False:
+        if test_monotonicity(self._times) is False:
             print(self._times)
             raise FinError("Times are not sorted in increasing order")
 
@@ -145,7 +145,7 @@ class DiscountCurve:
         num_dates = len(dateList)
         zero_rates = []
 
-        times = timesFromDates(dateList, self._valuation_date, day_count_type)
+        times = times_from_dates(dateList, self._valuation_date, day_count_type)
 
         for i in range(0, num_dates):
 
@@ -284,7 +284,7 @@ class DiscountCurve:
         """ Function to calculate a discount factor from a date or a
         vector of dates. """
 
-        times = timesFromDates(dt, self._valuation_date, self._day_count_type)
+        times = times_from_dates(dt, self._valuation_date, self._day_count_type)
         dfs = self._df(times)
 
         if isinstance(dfs, float):

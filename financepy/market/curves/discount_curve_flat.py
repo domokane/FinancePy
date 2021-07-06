@@ -13,7 +13,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 from ...market.curves.interpolator import InterpTypes
 
 ###############################################################################
@@ -58,7 +58,7 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)
-        self._times = timesFromDates(dates, self._valuation_date, day_count_type)
+        self._times = times_from_dates(dates, self._valuation_date, day_count_type)
 
 ###############################################################################
 
@@ -85,9 +85,9 @@ class DiscountCurveFlat(DiscountCurve):
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dc_times = timesFromDates(dates,
-                                 self._valuation_date,
-                                 self._day_count_type)
+        dc_times = times_from_dates(dates,
+                                    self._valuation_date,
+                                    self._day_count_type)
 
         dfs = self._zero_to_df(self._valuation_date,
                              self._flat_rate,

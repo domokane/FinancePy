@@ -12,7 +12,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 
 
 ###############################################################################
@@ -63,7 +63,7 @@ class DiscountCurvePoly(DiscountCurve):
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention
-        dc_times = timesFromDates(dts, self._valuation_date, self._day_count_type)
+        dc_times = times_from_dates(dts, self._valuation_date, self._day_count_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
@@ -106,9 +106,9 @@ class DiscountCurvePoly(DiscountCurve):
         constructor of the curve object. """
 
         # Get day count times to use with curve day count convention
-        dc_times = timesFromDates(dates,
-                                  self._valuation_date,
-                                  self._day_count_type)
+        dc_times = times_from_dates(dates,
+                                    self._valuation_date,
+                                    self._day_count_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)

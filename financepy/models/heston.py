@@ -163,7 +163,7 @@ class Heston():
 
 ###############################################################################
 
-    def value_MC(self,
+    def value_mc(self,
                  valuation_date,
                  option,
                  stock_price,
@@ -207,7 +207,7 @@ class Heston():
 
 ###############################################################################
 
-    def value_Lewis(self,
+    def value_lewis(self,
                     valuation_date,
                     option,
                     stock_price,
@@ -255,7 +255,7 @@ class Heston():
 
 ###############################################################################
 
-    def value_Lewis_Rouah(self,
+    def value_lewis_rouah(self,
                           valuation_date,
                           option,
                           stock_price,
@@ -299,7 +299,7 @@ class Heston():
 # Taken from Nick Weber's VBA Finance book
 ###############################################################################
 
-    def value_Weber(self,
+    def value_weber(self,
                     valuation_date,
                     option,
                     stock_price,
@@ -320,7 +320,7 @@ class Heston():
         K = option._strike_price
         V = sigma**2
 
-        def F(s, b):
+        def f(s, b):
             def integrand(u):
                 beta = b - 1j * rho * sigma * u
                 d = np.sqrt((beta**2) - V * u * (s * 1j - u))
@@ -336,8 +336,8 @@ class Heston():
             area = 0.50 + (1.0 / pi) * integrate.quad(integrand, 0, np.inf)[0]
             return area
 
-        v = S0 * exp(-q * tau) * F(1.0, kappa - rho * sigma) - \
-            exp(-r * tau) * K * F(-1.0, kappa)
+        v = S0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - \
+            exp(-r * tau) * K * f(-1.0, kappa)
         return(v)
 
 ###############################################################################
@@ -345,7 +345,7 @@ class Heston():
 # that the value C is a forward value and so needs to be discounted
 ###############################################################################
 
-    def value_Gatheral(self,
+    def value_gatheral(self,
                        valuation_date,
                        option,
                        stock_price,
@@ -367,7 +367,7 @@ class Heston():
         F = S0 * exp((r - q) * tau)
         x0 = log(F / K)
 
-        def FF(j):
+        def ff(j):
             def integrand(u):
                 V = sigma * sigma
                 A = -u * u / 2.0 - 1j * u / 2.0 + 1j * j * u
@@ -387,7 +387,7 @@ class Heston():
             area = 0.50 + 1.0 / pi * integrate.quad(integrand, 0.0, np.inf)[0]
             return area
 
-        v = S0 * exp(-q * tau) * FF(1) - K * exp(-r * tau) * FF(0)
+        v = S0 * exp(-q * tau) * ff(1) - K * exp(-r * tau) * ff(0)
         return(v)
 
 ###############################################################################

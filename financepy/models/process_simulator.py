@@ -31,7 +31,7 @@ class FinProcessSimulator():
     def __init__(self):
         pass
 
-    def getProcess(
+    def get_process(
             self,
             process_type,
             t,
@@ -42,29 +42,29 @@ class FinProcessSimulator():
 
         if process_type == FinProcessTypes.GBM:
             (stock_price, drift, volatility, scheme) = model_params
-            paths = getGBMPaths(num_paths, numAnnSteps, t, drift,
-                                stock_price, volatility, scheme.value, seed)
+            paths = get_gbm_paths(num_paths, numAnnSteps, t, drift,
+                                  stock_price, volatility, scheme.value, seed)
             return paths
 
         elif process_type == FinProcessTypes.HESTON:
             (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = model_params
-            paths = getHestonPaths(num_paths,
-                                   numAnnSteps,
-                                   t,
-                                   drift,
-                                   stock_price,
-                                   v0,
-                                   kappa,
-                                   theta,
-                                   sigma,
-                                   rho,
-                                   scheme.value,
-                                   seed)
+            paths = get_heston_paths(num_paths,
+                                     numAnnSteps,
+                                     t,
+                                     drift,
+                                     stock_price,
+                                     v0,
+                                     kappa,
+                                     theta,
+                                     sigma,
+                                     rho,
+                                     scheme.value,
+                                     seed)
             return paths
 
         elif process_type == FinProcessTypes.VASICEK:
             (r0, kappa, theta, sigma, scheme) = model_params
-            paths = getVasicekPaths(
+            paths = get_vasicek_paths(
                 num_paths,
                 numAnnSteps,
                 t,
@@ -78,8 +78,8 @@ class FinProcessSimulator():
 
         elif process_type == FinProcessTypes.CIR:
             (r0, kappa, theta, sigma, scheme) = model_params
-            paths = getCIRPaths(num_paths, numAnnSteps, t,
-                                r0, kappa, theta, sigma, scheme.value, seed)
+            paths = get_cir_paths(num_paths, numAnnSteps, t,
+                                  r0, kappa, theta, sigma, scheme.value, seed)
             return paths
 
         else:
@@ -99,18 +99,18 @@ class FinHestonNumericalScheme(Enum):
 @njit(float64[:, :](int64, int64, float64, float64, float64, float64, float64,
                     float64, float64, float64, int64, int64),
       cache=True, fastmath=True)
-def getHestonPaths(num_paths,
-                   numAnnSteps,
-                   t,
-                   drift,
-                   s0,
-                   v0,
-                   kappa,
-                   theta,
-                   sigma,
-                   rho,
-                   scheme,
-                   seed):
+def get_heston_paths(num_paths,
+                     numAnnSteps,
+                     t,
+                     drift,
+                     s0,
+                     v0,
+                     kappa,
+                     theta,
+                     sigma,
+                     rho,
+                     scheme,
+                     seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
@@ -224,7 +224,7 @@ class FinGBMNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, int64, int64), cache=True, fastmath=True)
-def getGBMPaths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed):
+def get_gbm_paths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
@@ -274,15 +274,15 @@ class FinVasicekNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
-def getVasicekPaths(num_paths,
-                    numAnnSteps,
-                    t,
-                    r0,
-                    kappa,
-                    theta,
-                    sigma,
-                    scheme,
-                    seed):
+def get_vasicek_paths(num_paths,
+                      numAnnSteps,
+                      t,
+                      r0,
+                      kappa,
+                      theta,
+                      sigma,
+                      scheme,
+                      seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps
@@ -328,15 +328,15 @@ class FinCIRNumericalScheme(Enum):
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
-def getCIRPaths(num_paths,
-                numAnnSteps,
-                t,
-                r0,
-                kappa,
-                theta,
-                sigma,
-                scheme,
-                seed):
+def get_cir_paths(num_paths,
+                  numAnnSteps,
+                  t,
+                  r0,
+                  kappa,
+                  theta,
+                  sigma,
+                  scheme,
+                  seed):
 
     np.random.seed(seed)
     dt = 1.0 / numAnnSteps

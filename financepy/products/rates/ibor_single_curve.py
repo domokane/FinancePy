@@ -64,7 +64,7 @@ def _g(df, *args):
 ###############################################################################
 
 
-def _costFunction(dfs, *args):
+def _cost_function(dfs, *args):
     """ Root search objective function for swaps """
 
 #    print("Discount factors:", dfs)
@@ -174,7 +174,7 @@ class IborSingleCurve(DiscountCurve):
     def _build_curve(self):
         """ Build curve based on interpolation. """
 
-        self._buildCurveUsing1DSolver()
+        self._build_curve_using_1d_solver()
 
 ###############################################################################
 
@@ -355,7 +355,7 @@ class IborSingleCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsing1DSolver(self):
+    def _build_curve_using_1d_solver(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
@@ -422,7 +422,7 @@ class IborSingleCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsingQuadraticMinimiser(self):
+    def _build_curve_using_quadratic_minimiser(self):
         """ Construct the discount curve using a minimisation approach. This is
         the This enables a more complex interpolation scheme. """
 
@@ -450,7 +450,7 @@ class IborSingleCurve(DiscountCurve):
 
         argtuple = (self)
 
-        res = optimize.minimize(_costFunction, self._dfs, method='BFGS',
+        res = optimize.minimize(_cost_function, self._dfs, method='BFGS',
                                 args=argtuple, options={'gtol': 1e-3})
 
         self._dfs = np.array(res.x)
@@ -460,7 +460,7 @@ class IborSingleCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveLinearSwapRateInterpolation(self):
+    def _build_curve_linear_swap_rate_interpolation(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. """

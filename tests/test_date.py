@@ -5,7 +5,7 @@
 import numpy as np
 import time
 
-from financepy.utils.date import Date, dateRange
+from financepy.utils.date import Date, date_range
 
 # Not under test
 
@@ -104,28 +104,28 @@ def test_DateRange():
 
     #Default
     endDate = startDate.add_days(3)
-    dtRange =  dateRange(startDate, endDate)
+    dtRange =  date_range(startDate, endDate)
     assert dtRange[0]  == Date(1,1,2010)
     assert dtRange[-1] == Date(4,1,2010)
 
     #1W Tenor
     endDate = startDate.add_days(20)
     tenor = "1W"
-    dtRange =  dateRange(startDate, endDate,tenor)
+    dtRange =  date_range(startDate, endDate, tenor)
     assert dtRange[0] == Date(1,1,2010)
     assert dtRange[-1] == Date(21,1,2010)
 
     #7D Tenor
     tenor = "7D"
-    dtRange =  dateRange(startDate, endDate,tenor)
+    dtRange =  date_range(startDate, endDate, tenor)
     assert dtRange[1] == Date(8,1,2010)
     assert dtRange[2] == Date(15,1,2010)
 
     #Same startDate
-    assert dateRange(startDate, startDate)[0] == Date(1, 1, 2010)
+    assert date_range(startDate, startDate)[0] == Date(1, 1, 2010)
 
     #startDate before endDate"
-    assert len(dateRange(endDate, startDate)) == 0
+    assert len(date_range(endDate, startDate)) == 0
 
 
 def test_DateAddMonths():
@@ -227,52 +227,52 @@ def test_IntraDay():
 def test_DateEOM():
 
     dt = Date(29, 2, 2000)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(28, 2, 2001)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(29, 2, 2004)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(28, 2, 2005)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(31, 3, 2003)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(30, 4, 2004)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(31, 5, 2004)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(31, 12, 2010)
-    assert dt.isEOM() == True
+    assert dt.is_eom() == True
 
     dt = Date(2, 2, 2000)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(24, 2, 2001)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(22, 2, 2004)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(1, 2, 2005)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(1, 3, 2003)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(3, 4, 2004)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(5, 5, 2004)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
     dt = Date(7, 12, 2010)
-    assert dt.EOM().isEOM() == True
+    assert dt.eom().is_eom() == True
 
 def test_datetime():
     

@@ -78,11 +78,11 @@ class EquityVarianceSwap:
 
 ###############################################################################
 
-    def fair_strikeApprox(self,
-                         valuation_date,
-                         fwdStockPrice,
-                         strikes,
-                         volatilities):
+    def fair_strike_approx(self,
+                           valuation_date,
+                           fwdStockPrice,
+                           strikes,
+                           volatilities):
         """ This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol. """

@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.cir_mc import FinCIRNumericalScheme
-from financepy.models.cir_mc import zeroPrice_MC, zeroPrice
+from financepy.models.cir_mc import zero_price_mc, zero_price
 import numpy as np
 import time
 
@@ -42,8 +42,8 @@ def test_FinModelRatesCIR():
     for t in np.linspace(0, 10, 21):
 
         start = time.time()
-        p = zeroPrice(r0, a, b, sigma, t)
-        p_MC1 = zeroPrice_MC(
+        p = zero_price(r0, a, b, sigma, t)
+        p_MC1 = zero_price_mc(
             r0,
             a,
             b,
@@ -53,7 +53,7 @@ def test_FinModelRatesCIR():
             num_paths,
             seed,
             FinCIRNumericalScheme.EULER.value)
-        p_MC2 = zeroPrice_MC(
+        p_MC2 = zero_price_mc(
             r0,
             a,
             b,
@@ -63,7 +63,7 @@ def test_FinModelRatesCIR():
             num_paths,
             seed,
             FinCIRNumericalScheme.LOGNORMAL.value)
-        p_MC3 = zeroPrice_MC(
+        p_MC3 = zero_price_mc(
             r0,
             a,
             b,
@@ -73,7 +73,7 @@ def test_FinModelRatesCIR():
             num_paths,
             seed,
             FinCIRNumericalScheme.MILSTEIN.value)
-        p_MC4 = zeroPrice_MC(
+        p_MC4 = zero_price_mc(
             r0,
             a,
             b,
@@ -83,7 +83,7 @@ def test_FinModelRatesCIR():
             num_paths,
             seed,
             FinCIRNumericalScheme.KAHLJACKEL.value)
-        p_MC5 = zeroPrice_MC(
+        p_MC5 = zero_price_mc(
             r0,
             a,
             b,

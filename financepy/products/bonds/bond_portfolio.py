@@ -29,7 +29,7 @@ class BondPortfolio:
 
 ###############################################################################
 
-    def _calculateFlows(self):
+    def _calculate_flows(self):
         """ Determine the bond cashflow payment amounts without principal """
 
         self._flow_amounts = [0.0]
@@ -232,11 +232,11 @@ class BondPortfolio:
 
 ###############################################################################
 
-    def clean_priceFromSurvivalCurve(self,
-                                     settlement_date: Date,
-                                     discount_curve: DiscountCurve,
-                                     survival_curve: DiscountCurve,
-                                     recovery_rate: float):
+    def clean_price_from_survival_curve(self,
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve,
+                                        survival_curve: DiscountCurve,
+                                        recovery_rate: float):
         """ Calculate clean price value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """

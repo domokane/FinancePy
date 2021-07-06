@@ -12,7 +12,7 @@ from typing import List
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
@@ -461,19 +461,19 @@ class BondConvertible:
         discount_times = np.array(coupon_times)
         discount_factors = np.array(discount_factors)
 
-        if testMonotonicity(coupon_times) is False:
+        if test_monotonicity(coupon_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(call_times) is False:
+        if test_monotonicity(call_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(put_times) is False:
+        if test_monotonicity(put_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(discount_times) is False:
+        if test_monotonicity(discount_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        if testMonotonicity(dividend_times) is False:
+        if test_monotonicity(dividend_times) is False:
             raise FinError("Coupon times not monotonic")
 
         v1 = _value_convertible(tmat,

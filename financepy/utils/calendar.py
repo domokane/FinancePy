@@ -248,42 +248,42 @@ class Calendar:
         self._dt = dt
 
         if self._type == CalendarTypes.NONE:
-            return self.HOLIDAY_NONE()
+            return self.holiday_none()
         elif self._type == CalendarTypes.WEEKEND:
-            return self.HOLIDAY_WEEKEND()
+            return self.holiday_weekend()
         elif self._type == CalendarTypes.AUSTRALIA:
-            return self.HOLIDAY_AUSTRALIA()
+            return self.holiday_australia()
         elif self._type == CalendarTypes.CANADA:
-            return self.HOLIDAY_CANADA()
+            return self.holiday_canada()
         elif self._type == CalendarTypes.FRANCE:
-            return self.HOLIDAY_FRANCE()
+            return self.holiday_france()
         elif self._type == CalendarTypes.GERMANY:
-            return self.HOLIDAY_GERMANY()
+            return self.holiday_germany()
         elif self._type == CalendarTypes.ITALY:
-            return self.HOLIDAY_ITALY()
+            return self.holiday_italy()
         elif self._type == CalendarTypes.JAPAN:
-            return self.HOLIDAY_JAPAN()
+            return self.holiday_japan()
         elif self._type == CalendarTypes.NEW_ZEALAND:
-            return self.HOLIDAY_NEW_ZEALAND()
+            return self.holiday_new_zealand()
         elif self._type == CalendarTypes.NORWAY:
-            return self.HOLIDAY_NORWAY()
+            return self.holiday_norway()
         elif self._type == CalendarTypes.SWEDEN:
-            return self.HOLIDAY_SWEDEN()
+            return self.holiday_sweden()
         elif self._type == CalendarTypes.SWITZERLAND:
-            return self.HOLIDAY_SWITZERLAND()
+            return self.holiday_switzerland()
         elif self._type == CalendarTypes.TARGET:
-            return self.HOLIDAY_TARGET()
+            return self.holiday_target()
         elif self._type == CalendarTypes.UNITED_KINGDOM:
-            return self.HOLIDAY_UNITED_KINGDOM()
+            return self.holiday_united_kingdom()
         elif self._type == CalendarTypes.UNITED_STATES:
-            return self.HOLIDAY_UNITED_STATES()
+            return self.holiday_united_states()
         else:
             print(self._type)
             raise FinError("Unknown calendar")
 
 ###############################################################################
 
-    def HOLIDAY_WEEKEND(self):
+    def holiday_weekend(self):
         """ Weekends by themselves are a holiday. """
 
         if self._dt.is_weekend():
@@ -293,7 +293,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_AUSTRALIA(self):
+    def holiday_australia(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -357,7 +357,7 @@ class Calendar:
    
 ###############################################################################
 
-    def HOLIDAY_UNITED_KINGDOM(self):
+    def holiday_united_kingdom(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -417,7 +417,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_FRANCE(self):
+    def holiday_france(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -468,7 +468,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_SWEDEN(self):
+    def holiday_sweden(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -517,7 +517,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_GERMANY(self):
+    def holiday_germany(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -559,7 +559,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_SWITZERLAND(self):
+    def holiday_switzerland(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -601,7 +601,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_JAPAN(self):
+    def holiday_japan(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y;
@@ -701,7 +701,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_NEW_ZEALAND(self):
+    def holiday_new_zealand(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -762,7 +762,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_NORWAY(self):
+    def holiday_norway(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -804,7 +804,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_UNITED_STATES(self):
+    def holiday_united_states(self):
         """ Only bank holidays. Weekends by themselves are not a holiday.
         This is a generic US calendar that contains the superset of
         holidays for bond markets, NYSE, and public holidays. For each of
@@ -874,7 +874,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_CANADA(self):
+    def holiday_canada(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -949,7 +949,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_ITALY(self):
+    def holiday_italy(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -997,7 +997,7 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_TARGET(self):
+    def holiday_target(self):
         """ Only bank holidays. Weekends by themselves are not a holiday. """
 
         m = self._m; d = self._d; y = self._y
@@ -1027,14 +1027,14 @@ class Calendar:
 
 ###############################################################################
 
-    def HOLIDAY_NONE(self):
+    def holiday_none(self):
         """ No day is a holiday. """
         return False
 
 ###############################################################################
 
-    def getHolidayList(self,
-                       year: float):
+    def get_holiday_list(self,
+                         year: float):
         """ generates a list of holidays in a specific year for the specified
         calendar. Useful for diagnostics. """
         start_date = Date(1, 1, year)
@@ -1051,8 +1051,8 @@ class Calendar:
 
 ###############################################################################
 
-    def easterMonday(self,
-                     year: float):
+    def easter_monday(self,
+                      year: float):
         """ Get the day in a given year that is Easter Monday. This is not
         easy to compute so we rely on a pre-calculated array. """
 

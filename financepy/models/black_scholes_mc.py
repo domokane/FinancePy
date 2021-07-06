@@ -15,7 +15,7 @@ from math import exp
 
 ###############################################################################
 
-def _value_mc_NONUMBA_NONUMPY(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
 
     num_paths = int(num_paths)
@@ -57,7 +57,7 @@ def _value_mc_NONUMBA_NONUMPY(s, t, K, option_type, r, q, v, num_paths, seed, us
 
 ###############################################################################
 
-def _value_mc_NUMPY_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -95,7 +95,7 @@ def _value_mc_NUMPY_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), cache=True, fastmath=True)
-def _value_mc_NUMPY_NUMBA(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -133,7 +133,7 @@ def _value_mc_NUMPY_NUMBA(s, t, K, option_type, r, q, v, num_paths, seed, useSob
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), fastmath=True, cache=True)
-def _value_mc_NUMBA_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # No use of Numpy vectorisation but NUMBA 
 
     num_paths = int(num_paths)
@@ -180,7 +180,7 @@ def _value_mc_NUMBA_ONLY(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), fastmath=True, cache=True, parallel=True)
-def _value_mc_NUMBA_PARALLEL(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # No use of Numpy vectorisation but NUMBA 
 
     num_paths = int(num_paths)

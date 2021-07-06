@@ -17,7 +17,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...products.credit.cds import CDS
 
 from ...models.gauss_copula_onefactor import homog_basket_loss_dbn
-from ...models.gauss_copula import default_timesGC
+from ...models.gauss_copula import default_times_gc
 from ...models.student_t_copula import StudentTCopula
 
 from ...products.credit.cds_curve import CDSCurve
@@ -77,12 +77,12 @@ class CDSBasket:
 
 ###############################################################################
 
-    def valueLegs_MC(self,
-                     valuation_date,
-                     nToDefault,
-                     default_times,
-                     issuer_curves,
-                     libor_curve):
+    def value_legs_mc(self,
+                      valuation_date,
+                      nToDefault,
+                      default_times,
+                      issuer_curves,
+                      libor_curve):
         """ Value the legs of the default basket using Monte Carlo. The default
         times are an input so this valuation is not model dependent. """
 
@@ -155,14 +155,14 @@ class CDSBasket:
 
 ###############################################################################
 
-    def valueGaussian_MC(self,
-                         valuation_date,
-                         nToDefault,
-                         issuer_curves,
-                         correlationMatrix,
-                         libor_curve,
-                         num_trials,
-                         seed):
+    def value_gaussian_mc(self,
+                          valuation_date,
+                          nToDefault,
+                          issuer_curves,
+                          correlationMatrix,
+                          libor_curve,
+                          num_trials,
+                          seed):
         """ Value the default basket using a Gaussian copula model. This
         depends on the issuer discount and correlation matrix. """
 
@@ -171,16 +171,16 @@ class CDSBasket:
         if nToDefault > num_credits or nToDefault < 1:
             raise FinError("nToDefault must be 1 to num_credits")
 
-        default_times = default_timesGC(issuer_curves,
-                                        correlationMatrix,
-                                        num_trials,
-                                        seed)
+        default_times = default_times_gc(issuer_curves,
+                                         correlationMatrix,
+                                         num_trials,
+                                         seed)
 
-        rpv01, prot_pv = self.valueLegs_MC(valuation_date,
-                                           nToDefault,
-                                           default_times,
-                                           issuer_curves,
-                                           libor_curve)
+        rpv01, prot_pv = self.value_legs_mc(valuation_date,
+                                            nToDefault,
+                                            default_times,
+                                            issuer_curves,
+                                            libor_curve)
 
         spd = prot_pv / rpv01
         value = self._notional * (prot_pv - self._running_coupon * rpv01)
@@ -192,15 +192,15 @@ class CDSBasket:
 
 ###############################################################################
 
-    def valueStudentT_MC(self,
-                         valuation_date,
-                         nToDefault,
-                         issuer_curves,
-                         correlationMatrix,
-                         degreesOfFreedom,
-                         libor_curve,
-                         num_trials,
-                         seed):
+    def value_student_t_mc(self,
+                           valuation_date,
+                           nToDefault,
+                           issuer_curves,
+                           correlationMatrix,
+                           degreesOfFreedom,
+                           libor_curve,
+                           num_trials,
+                           seed):
         """ Value the default basket using the Student-T copula. """
 
         num_credits = len(issuer_curves)
@@ -216,11 +216,11 @@ class CDSBasket:
                                             num_trials,
                                             seed)
 
-        rpv01, prot_pv = self.valueLegs_MC(valuation_date,
-                                           nToDefault,
-                                           default_times,
-                                           issuer_curves,
-                                           libor_curve)
+        rpv01, prot_pv = self.value_legs_mc(valuation_date,
+                                            nToDefault,
+                                            default_times,
+                                            issuer_curves,
+                                            libor_curve)
 
         spd = prot_pv / rpv01
         value = self._notional * (prot_pv - self._running_coupon * rpv01)
@@ -232,13 +232,13 @@ class CDSBasket:
 
 ###############################################################################
 
-    def value1FGaussian_Homo(self,
-                             valuation_date,
-                             nToDefault,
-                             issuer_curves,
-                             beta_vector,
-                             libor_curve,
-                             num_points=50):
+    def value_1f_gaussian_homo(self,
+                               valuation_date,
+                               nToDefault,
+                               issuer_curves,
+                               beta_vector,
+                               libor_curve,
+                               num_points=50):
         """ Value default basket using 1 factor Gaussian copula and analytical
         approach which is only exact when all recovery rates are the same. """
 

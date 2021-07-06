@@ -90,8 +90,8 @@ class FinIborIborXCcySwap
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
         # which cash flows are in the future and value the swap
-        self._generateFixedLegPaymentDates()
-        self._generateFloatLegPaymentDates()
+        self._generate_fixed_leg_payment_dates()
+        self._generate_float_leg_payment_dates()
 
         self._adjustedMaturityDate = self._adjustedFixedDates[-1]
 
@@ -150,7 +150,7 @@ class FinIborIborXCcySwap
 
 ##########################################################################
 
-    def _generateFixedLegPaymentDates(self):
+    def _generate_fixed_leg_payment_dates(self):
         """ Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjustedFixedDates = FinSchedule(
@@ -163,7 +163,7 @@ class FinIborIborXCcySwap
 
 ##########################################################################
 
-    def _generateFloatLegPaymentDates(self):
+    def _generate_float_leg_payment_dates(self):
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjustedFloatDates = FinSchedule(
@@ -176,7 +176,7 @@ class FinIborIborXCcySwap
 
 ##########################################################################
 
-    def fixedDates(self):
+    def fixed_dates(self):
         """ return a vector of the fixed leg payment dates """
         if self._adjustedFixedDates is None:
             raise FinError("Fixed dates have not been generated")
@@ -494,7 +494,7 @@ class FinIborIborXCcySwap
 
 ##########################################################################
 
-    def printFixedLegFlows(self):
+    def print_fixed_leg_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

@@ -5,7 +5,7 @@
 import numpy as np
 
 from ...utils.error import FinError
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.helpers import label_to_string
 
 ###############################################################################
@@ -33,7 +33,7 @@ class EquityVolCurve():
         if len(strikes) < 1:
             raise FinError("Volatility grid has zero length.")
 
-        if testMonotonicity(strikes) is False:
+        if test_monotonicity(strikes) is False:
             raise FinError("Strikes must be strictly monotonic.")
 
         num_strikes = len(strikes)

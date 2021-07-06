@@ -16,7 +16,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
-from ...utils.helpers import label_to_string, tableToString
+from ...utils.helpers import label_to_string, table_to_string
 from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 from ...utils.helpers import check_argument_types
@@ -36,15 +36,15 @@ standard_recovery_rate = 0.40
 @njit(float64[:](float64, float64, float64[:], float64[:], float64[:],
                  float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def _risky_pv01_NUMBA(teff,
-                     accrual_factorPCDToNow,
-                     paymentTimes,
-                     year_fracs,
-                     npIborTimes,
-                     npIborValues,
-                     npSurvTimes,
-                     npSurvValues,
-                     pv01_method):
+def _risky_pv01_numba(teff,
+                      accrual_factorPCDToNow,
+                      paymentTimes,
+                      year_fracs,
+                      npIborTimes,
+                      npIborValues,
+                      npSurvTimes,
+                      npSurvValues,
+                      pv01_method):
     """ Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01."""
 
@@ -126,7 +126,7 @@ def _risky_pv01_NUMBA(teff,
 
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
-def _protection_leg_pv_NUMBA(teff,
+def _protection_leg_pv_numba(teff,
                              tmat,
                              npIborTimes,
                              npIborValues,
@@ -503,7 +503,7 @@ class CDS:
 
     ###############################################################################
 
-    def risky_pv01_OLD(self,
+    def risky_pv01_old(self,
                        valuation_date,
                        issuer_curve,
                        pv01_method=0):
@@ -636,7 +636,7 @@ class CDS:
 
         libor_curve = issuer_curve._libor_curve
 
-        v = _protection_leg_pv_NUMBA(teff,
+        v = _protection_leg_pv_numba(teff,
                                      tmat,
                                      libor_curve._times,
                                      libor_curve._dfs,
@@ -675,15 +675,15 @@ class CDS:
         year_fracs = self._accrual_factors
         teff = (eff - valuation_date) / gDaysInYear
 
-        valueRPV01 = _risky_pv01_NUMBA(teff,
-                                      accrual_factorPCDToNow,
-                                      np.array(paymentTimes),
-                                      np.array(year_fracs),
-                                      libor_curve._times,
-                                      libor_curve._dfs,
-                                      issuer_curve._times,
-                                      issuer_curve._values,
-                                      pv01_method)
+        valueRPV01 = _risky_pv01_numba(teff,
+                                       accrual_factorPCDToNow,
+                                       np.array(paymentTimes),
+                                       np.array(year_fracs),
+                                       libor_curve._times,
+                                       libor_curve._dfs,
+                                       issuer_curve._times,
+                                       issuer_curve._values,
+                                       pv01_method)
 
         fullRPV01 = valueRPV01[0]
         cleanRPV01 = valueRPV01[1]
@@ -847,7 +847,7 @@ class CDS:
         valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]
         precision = "12.6f"
 
-        s += tableToString(header, valueTable, precision)
+        s += table_to_string(header, valueTable, precision)
 
         return s
 

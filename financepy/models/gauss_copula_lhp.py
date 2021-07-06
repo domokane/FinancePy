@@ -15,12 +15,12 @@ from ..utils.error import FinError
 
 
 @njit(fastmath=True, cache=True)
-def trSurvProbLHP(k1,
-                  k2,
-                  num_credits,
-                  survival_probabilities,
-                  recovery_rates,
-                  beta):
+def tr_surv_prob_lhp(k1,
+                     k2,
+                     num_credits,
+                     survival_probabilities,
+                     recovery_rates,
+                     beta):
     """ Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the large portfolio limit which
     assumes a homogenous portfolio with an infinite number of credits. This
@@ -55,7 +55,7 @@ def trSurvProbLHP(k1,
 
 
 @njit(fastmath=True, cache=True)
-def portfolioCDF_LHP(k, num_credits, qvector, recovery_rates, beta, num_points):
+def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta, num_points):
 
     p = 0.0
     portfolioEL = 0.0
@@ -118,7 +118,7 @@ def exp_min_lk(k, p, r, n, beta):
 
 
 @njit(fastmath=True, cache=True)
-def LHPDensity(k, p, r, beta):
+def lhp_density(k, p, r, beta):
 
     if beta == 0.0:
         beta = 0.0000000001
@@ -152,7 +152,7 @@ def LHPDensity(k, p, r, beta):
 
 
 @njit(fastmath=True, cache=True)
-def LHPAnalyticalDensityBaseCorr(k, p, r, beta, dbeta_dk):
+def lhp_analytical_density_base_corr(k, p, r, beta, dbeta_dk):
 
     if beta == 0:
         beta = 0.0000000001
@@ -184,7 +184,7 @@ def LHPAnalyticalDensityBaseCorr(k, p, r, beta, dbeta_dk):
 
 
 @njit(fastmath=True, cache=True)
-def LHPAnalyticalDensity(k, p, r, beta):
+def lhp_analytical_density(k, p, r, beta):
 
     if beta == 0.0:
         beta = 1e-8
@@ -209,9 +209,9 @@ def LHPAnalyticalDensity(k, p, r, beta):
 
 ###############################################################################
 
-
+"""
 @njit(fastmath=True, cache=True)
-def ExpMinLK(k, p, r, n, beta):
+def exp_min_lk(k, p, r, n, beta):
 
     if abs(beta) > 1.0:
         raise FinError("Beta > 100%")
@@ -235,12 +235,12 @@ def ExpMinLK(k, p, r, n, beta):
     el = (1.0 - r) * M(c, -a, -beta) + k * N(a)
 
     return el
-
+"""
 ###############################################################################
 
 
 @njit(fastmath=True, cache=True)
-def probLGreaterThanK(K, P, R, beta):
+def prob_l_greater_than_k(K, P, R, beta):
     c = normpdf(P)
     arga = K / (1.0 - R)
     a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))

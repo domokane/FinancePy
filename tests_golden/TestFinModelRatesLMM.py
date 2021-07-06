@@ -3,19 +3,19 @@
 ##############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.lmm_mc import LMMStickyCapletPricer
-from financepy.models.lmm_mc import LMMRatchetCapletPricer
-from financepy.models.lmm_mc import LMMFwdFwdCorrelation
-from financepy.models.lmm_mc import LMMSwapPricer
-from financepy.models.lmm_mc import LMMPriceCapsBlack
-from financepy.models.lmm_mc import LMMCapFlrPricer
-from financepy.models.lmm_mc import LMMSwaptionVolApprox
-from financepy.models.lmm_mc import LMMSimSwaptionVol
-from financepy.models.lmm_mc import LMMSwaptionPricer
-from financepy.models.lmm_mc import LMMSimulateFwdsMF
-from financepy.models.lmm_mc import LMMSimulateFwds1F
-from financepy.models.lmm_mc import LMMSimulateFwdsNF
-from financepy.utils.helpers import checkVectorDifferences
+from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
+from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
+from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
+from financepy.models.lmm_mc import lmm_swap_pricer
+from financepy.models.lmm_mc import lmm_price_caps_black
+from financepy.models.lmm_mc import lmm_cap_flr_pricer
+from financepy.models.lmm_mc import lmm_swaption_vol_approx
+from financepy.models.lmm_mc import lmm_sim_swaption_vol
+from financepy.models.lmm_mc import lmm_swaption_pricer
+from financepy.models.lmm_mc import lmm_simulate_fwds_mf
+from financepy.models.lmm_mc import lmm_simulate_fwds_1f
+from financepy.models.lmm_mc import lmm_simulate_fwds_nf
+from financepy.utils.helpers import check_vector_differences
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -281,13 +281,13 @@ def test_HullBookExamples():
     gammas1F = np.array(gammas1FList)
 
     # One factor model
-    fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
-                               gammas1F, taus, useSobol, seed)
+    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraireIndex, fwd0,
+                                  gammas1F, taus, useSobol, seed)
 
 #    LMMPrintForwards(fwds1F)
 
-    vRatchetCaplets = LMMRatchetCapletPricer(spread, numFwds, num_paths,
-                                             fwd0, fwds1F, taus) * 100.0
+    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
+                                                fwd0, fwds1F, taus) * 100.0
 
     hullRatchetCaplets1F = [0.00, 0.196, 0.207, 0.201, 0.194, 0.187,
                             0.1890, 0.172, 0.167, 0.160, 0.153]
@@ -298,10 +298,10 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vRatchetCaplets)
         testCases.print("HULL GETS:", hullRatchetCaplets1F)
 
-    checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
+    check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
-    vStickyCaplets = LMMStickyCapletPricer(spread, numFwds, num_paths,
-                                           fwd0, fwds1F, taus) * 100.0
+    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
+                                              fwd0, fwds1F, taus) * 100.0
 
     hullStickyCaplets1F = [0.0, 0.196, 0.336, 0.412, 0.458, 0.484,
                            0.498, 0.502, 0.501, 0.497, 0.488]
@@ -311,7 +311,7 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vStickyCaplets)
         testCases.print("HULL GETS:", hullStickyCaplets1F)
 
-    checkVectorDifferences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
+    check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
     numFactors = 1
     lambdas1FList = [[0.0, 0.1550, 0.2064, 0.1721, 0.1722, 0.1525,
@@ -319,11 +319,11 @@ def test_HullBookExamples():
     lambdas1F = np.array(lambdas1FList)
 
     # One factor model
-    fwdsMF = LMMSimulateFwdsMF(numFwds, numFactors, num_paths, numeraireIndex,
-                               fwd0, lambdas1F, taus, useSobol, seed)
+    fwdsMF = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+                                  fwd0, lambdas1F, taus, useSobol, seed)
 
-    vRatchetCaplets = LMMRatchetCapletPricer(spread, numFwds, num_paths,
-                                             fwd0, fwdsMF, taus) * 100.0
+    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
+                                                fwd0, fwdsMF, taus) * 100.0
 
     hullRatchetCaplets1F = [0.0, 0.196, 0.207, 0.201, 0.194, 0.187,
                             0.1890, 0.172, 0.167, 0.160, 0.153]
@@ -333,15 +333,15 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vRatchetCaplets)
         testCases.print("HULL GETS:", hullRatchetCaplets1F)
 
-    checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
+    check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
-    vStickyCaplets = LMMStickyCapletPricer(spread, numFwds, num_paths,
-                                           fwd0, fwdsMF, taus) * 100.0
+    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
+                                              fwd0, fwdsMF, taus) * 100.0
 
     hullStickyCaplets1F = [0.00, 0.196, 0.336, 0.412, 0.458, 0.484, 0.498,
                            0.502, 0.501, 0.497, 0.488]
 
-    checkVectorDifferences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
+    check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
     if verbose:
         testCases.banner("STICKY RATCHET - NUM FACTORS 1")
@@ -356,11 +356,11 @@ def test_HullBookExamples():
     lambdas2F = np.array(lambdas2FList)
 
     # Two factor model
-    fwds2F = LMMSimulateFwdsMF(numFwds, numFactors, num_paths, numeraireIndex,
-                               fwd0, lambdas2F, taus, useSobol, seed)
+    fwds2F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+                                  fwd0, lambdas2F, taus, useSobol, seed)
 
-    vRatchetCaplets = LMMRatchetCapletPricer(spread, numFwds, num_paths,
-                                             fwd0, fwds2F, taus) * 100.0
+    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
+                                                fwd0, fwds2F, taus) * 100.0
     hullRatchetCaplets2F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
                             0.189, 0.180, 0.174, 0.168, 0.162]
 
@@ -369,10 +369,10 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vRatchetCaplets)
         testCases.print("HULL GETS:", hullRatchetCaplets2F)
 
-    checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
+    check_vector_differences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
 
-    vStickyCaplets = LMMStickyCapletPricer(spread, numFwds, num_paths,
-                                           fwd0, fwds2F, taus) * 100.0
+    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
+                                              fwd0, fwds2F, taus) * 100.0
 
     hullStickyCaplets2F = [0.00, 0.196, 0.334, 0.413, 0.462, 0.492,
                            0.512, 0.520, 0.523, 0.523, 0.519]
@@ -382,7 +382,7 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vStickyCaplets)
         testCases.print("HULL GETS:", hullStickyCaplets2F)
 
-    checkVectorDifferences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
+    check_vector_differences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
 
     numFactors = 3
     lambdas3FList = [[0.00, 0.1365, 0.1928, 0.1672, 0.1698, 0.1485,
@@ -394,24 +394,24 @@ def test_HullBookExamples():
     lambdas3F = np.array(lambdas3FList)
 
     # Three factor model
-    fwds3F = LMMSimulateFwdsMF(numFwds, numFactors, num_paths, numeraireIndex,
-                               fwd0, lambdas3F, taus, useSobol, seed)
+    fwds3F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+                                  fwd0, lambdas3F, taus, useSobol, seed)
 
     hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
                             0.189, 0.180, 0.174, 0.168, 0.162]
 
-    vRatchetCaplets = LMMRatchetCapletPricer(spread, numFwds, num_paths,
-                                             fwd0, fwds3F, taus) * 100.0
+    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
+                                                fwd0, fwds3F, taus) * 100.0
 
     if verbose:
         testCases.banner("RATCHET - NUM FACTORS:3")
         testCases.print("FINANCEPY GETS:", vRatchetCaplets)
         testCases.print("HULL GETS:", hullRatchetCaplets3F)
 
-    checkVectorDifferences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
+    check_vector_differences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
 
-    vStickyCaplets = LMMStickyCapletPricer(spread, numFwds, num_paths,
-                                           fwd0, fwds3F, taus) * 100.0
+    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
+                                              fwd0, fwds3F, taus) * 100.0
 
     hullStickyCaplets3F = [0.00, 0.195, 0.336, 0.418, 0.472, 0.506,
                            0.524, 0.533, 0.537, 0.537, 0.534]
@@ -421,7 +421,7 @@ def test_HullBookExamples():
         testCases.print("FINANCEPY GETS:", vStickyCaplets)
         testCases.print("HULL GETS:", hullStickyCaplets3F)
 
-    checkVectorDifferences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
+    check_vector_differences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
 
 ###############################################################################
 
@@ -460,7 +460,7 @@ def fwdfwdCorrelation(fwds):
     num_paths = len(fwds)
     numFwds = len(fwds[0])
     start = time.time()
-    fwdCorr = LMMFwdFwdCorrelation(numFwds, num_paths, 1, fwds)
+    fwdCorr = lmm_fwd_fwd_correlation(numFwds, num_paths, 1, fwds)
     end = time.time()
 #    print("CORR Period:", end - start)
 #    print(fwdCorr)

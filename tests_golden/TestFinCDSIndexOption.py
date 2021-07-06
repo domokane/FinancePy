@@ -214,7 +214,7 @@ def test_full_priceCDSIndexOption():
             indexSpreads = [index / 10000.0] * 4
 
             indexPortfolio = CDSIndexPortfolio()
-            adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
+            adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
                 valuation_date,
                 issuer_curves,
                 indexSpreads,

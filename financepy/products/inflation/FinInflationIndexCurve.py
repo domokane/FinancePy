@@ -6,11 +6,11 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.helpers import label_to_string
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 from ...utils.helpers import check_argument_types
-from ...utils.date import daysInMonth
+from ...utils.date import days_in_month
 from ...utils.global_vars import gDaysInYear
 
 ###############################################################################
@@ -48,14 +48,14 @@ class FinInflationIndexCurve():
         self._lagInMonths = lagInMonths
         self._baseDate = indexDates[0]
 
-        self._indexTimes = timesFromDates(indexDates, self._baseDate)
+        self._indexTimes = times_from_dates(indexDates, self._baseDate)
 
-        if testMonotonicity(self._indexTimes) is False:
+        if test_monotonicity(self._indexTimes) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
 ###############################################################################
 
-    def indexValue(self, dt: Date):
+    def index_value(self, dt: Date):
         """ Calculate index value by interpolating the CPI curve """
 
         lagMonthsAgoDt = dt.add_months(-self._lagInMonths)
@@ -77,7 +77,7 @@ class FinInflationIndexCurve():
         d = dt._d
         m = dt._m
         y = dt._y       
-        numDays = daysInMonth(m, y)
+        numDays = days_in_month(m, y)
         v = cpiFirstValue + (d - 1) * (cpiSecondValue - cpiFirstValue) / numDays       
         return v
 
@@ -86,8 +86,8 @@ class FinInflationIndexCurve():
     def index_ratio(self, dt: Date):
         """ Calculate index value by interpolating the CPI curve """
 
-        vt = self.indexValue(dt)
-        v0 = self.indexValue(self._baseDate)
+        vt = self.index_value(dt)
+        v0 = self.index_value(self._baseDate)
         index_ratio = vt / v0
         return index_ratio
 

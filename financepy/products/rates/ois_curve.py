@@ -131,7 +131,7 @@ class OISCurve(DiscountCurve):
     def _build_curve(self):
         """ Build curve based on interpolation. """
             
-        self._buildCurveUsing1DSolver()
+        self._build_curve_using_1d_solver()
 
 ###############################################################################
 
@@ -304,7 +304,7 @@ class OISCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveUsing1DSolver(self):
+    def _build_curve_using_1d_solver(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
@@ -371,7 +371,7 @@ class OISCurve(DiscountCurve):
 
 ###############################################################################
 
-    def _buildCurveLinearSwapRateInterpolation(self):
+    def _build_curve_linear_swap_rate_interpolation(self):
         """ Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. """
@@ -536,7 +536,7 @@ class OISCurve(DiscountCurve):
 
 ###############################################################################
 
-    # def overnightRate(self,
+    # def overnight_rate(self,
     #                   settlement_date: Date,
     #                   start_date: Date,
     #                   maturity_date: (Date, list),

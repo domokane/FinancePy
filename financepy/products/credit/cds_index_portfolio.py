@@ -74,11 +74,11 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def intrinsic_protectionLegPV(self,
-                                  valuation_date,
-                                  step_in_date,
-                                  maturity_date,
-                                  issuer_curves):
+    def intrinsic_protection_leg_pv(self,
+                                    valuation_date,
+                                    step_in_date,
+                                    maturity_date,
+                                    issuer_curves):
         """ Calculation of intrinsic protection leg value of the CDS portfolio
         by taking the average sum the protection legs of each contract. """
 
@@ -112,10 +112,10 @@ class CDSIndexPortfolio:
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spread. """
 
-        intrinsic_prot_pv = self.intrinsic_protectionLegPV(valuation_date,
-                                                         step_in_date,
-                                                         maturity_date,
-                                                         issuer_curves)
+        intrinsic_prot_pv = self.intrinsic_protection_leg_pv(valuation_date,
+                                                             step_in_date,
+                                                             maturity_date,
+                                                             issuer_curves)
 
         intrinsic_rpv01 = self.intrinsic_rpv01(valuation_date,
                                                step_in_date,
@@ -152,11 +152,11 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def totalSpread(self,
-                    valuation_date,
-                    step_in_date,
-                    maturity_date,
-                    issuer_curves):
+    def total_spread(self,
+                     valuation_date,
+                     step_in_date,
+                     maturity_date,
+                     issuer_curves):
         """ Calculates the total CDS spread of the CDS portfolio by summing
         over all of the issuers and adding the spread with no weights. """
 
@@ -385,15 +385,15 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def hazardRateAdjustIntrinsic(self,
-                                  valuation_date,
-                                  issuer_curves,
-                                  index_coupons,
-                                  indexUpfronts,
-                                  indexMaturityDates,
-                                  indexRecoveryRate,
-                                  tolerance=1e-6,
-                                  maxIterations=100):
+    def hazard_rate_adjust_intrinsic(self,
+                                     valuation_date,
+                                     issuer_curves,
+                                     index_coupons,
+                                     indexUpfronts,
+                                     indexMaturityDates,
+                                     indexRecoveryRate,
+                                     tolerance=1e-6,
+                                     maxIterations=100):
         """ Adjust individual CDS discount to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish
         CDS curve bootstrap required when a spread adjustment is made."""

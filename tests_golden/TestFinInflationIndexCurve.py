@@ -27,10 +27,10 @@ def test_FinInflationIndexCurve():
 
     testCases.header("LABEL", "VALUE")
 
-    value = curve.indexValue(refDate)
-    value = curve.indexValue(refDate)
-    value = curve.indexValue(refDate)
-    value = curve.indexValue(refDate)
+    value = curve.index_value(refDate)
+    value = curve.index_value(refDate)
+    value = curve.index_value(refDate)
+    value = curve.index_value(refDate)
 
     testCases.print(refDate, value)
 

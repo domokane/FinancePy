@@ -74,11 +74,11 @@ class SwapFloatLeg:
         self._year_fracs = []
         self._accrued_days = []
 
-        self.generatePaymentDates()
+        self.generate_payment_dates()
 
 ###############################################################################
 
-    def generatePaymentDates(self):
+    def generate_payment_dates(self):
         """ Generate the floating leg payment dates and accrual factors. The
         coupons cannot be generated yet as we do not have the index curve. """
 

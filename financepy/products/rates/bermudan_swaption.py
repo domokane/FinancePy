@@ -164,7 +164,7 @@ class IborBermudanSwaption:
 
         if isinstance(model, BDTTree) or isinstance(model, BKTree) or isinstance(model, HWTree):
 
-            model.buildTree(tmat, df_times, df_values)
+            model.build_tree(tmat, df_times, df_values)
 
             v = model.bermudan_swaption(texp,
                                         tmat,
@@ -186,7 +186,7 @@ class IborBermudanSwaption:
 
 ###############################################################################
 
-    def printSwaptionValue(self):
+    def print_swaption_value(self):
 
         print("SWAP PV01:", self._pv01)
 

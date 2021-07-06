@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import set_date_format
 from financepy.utils.date import DateFormatTypes
-from financepy.utils.date import Date, dateRange
+from financepy.utils.date import Date, date_range
 import numpy as np
 import time
 
@@ -90,21 +90,21 @@ def test_DateRange():
 
     end_date = start_date.add_days(3)
     tenor = "Default"
-    testCases.print(tenor, dateRange(start_date, end_date))
+    testCases.print(tenor, date_range(start_date, end_date))
 
     end_date = start_date.add_days(20)
     tenor = "1W"
-    testCases.print(tenor, dateRange(start_date, end_date, tenor))
+    testCases.print(tenor, date_range(start_date, end_date, tenor))
 
     tenor = "7D"
-    testCases.print(tenor, dateRange(start_date, end_date, tenor))
+    testCases.print(tenor, date_range(start_date, end_date, tenor))
 
     testCases.header("Case", "Dates")
 
     case = "Same start_date"
-    testCases.print(case, dateRange(start_date, start_date))
+    testCases.print(case, date_range(start_date, start_date))
     case = "start_date before end_date"
-    testCases.print(case, dateRange(end_date, start_date))
+    testCases.print(case, date_range(end_date, start_date))
 
 ###############################################################################
 
@@ -231,52 +231,52 @@ def test_IntraDay():
 def test_DateEOM():
 
     dt = Date(29, 2, 2000)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(28, 2, 2001)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(29, 2, 2004)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(28, 2, 2005)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(31, 3, 2003)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(30, 4, 2004)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(31, 5, 2004)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(31, 12, 2010)
-    assert(dt.isEOM() == True)
+    assert(dt.is_eom() == True)
 
     dt = Date(2, 2, 2000)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(24, 2, 2001)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(22, 2, 2004)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(1, 2, 2005)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(1, 3, 2003)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(3, 4, 2004)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(5, 5, 2004)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
     dt = Date(7, 12, 2010)
-    assert(dt.EOM().isEOM() == True)
+    assert(dt.eom().is_eom() == True)
 
 ###############################################################################
 

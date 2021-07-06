@@ -86,8 +86,8 @@ class FinFixedIborXCcySwap:
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
         # which cash flows are in the future and value the swap
-        self._generateFixedLegPaymentDates()
-        self._generateFloatLegPaymentDates()
+        self._generate_fixed_leg_payment_dates()
+        self._generate_float_leg_payment_dates()
 
         self._adjustedMaturityDate = self._adjustedFixedDates[-1]
 
@@ -114,7 +114,7 @@ class FinFixedIborXCcySwap:
         self._valuation_date = None
         self._fixedStartIndex = None
 
-        self._calcFixedLegFlows()
+        self._calc_fixed_leg_flows()
 
 ##########################################################################
 
@@ -146,7 +146,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def _generateFixedLegPaymentDates(self):
+    def _generate_fixed_leg_payment_dates(self):
         """ Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjustedFixedDates = FinSchedule(
@@ -159,7 +159,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def _generateFloatLegPaymentDates(self):
+    def _generate_float_leg_payment_dates(self):
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjustedFloatDates = FinSchedule(
@@ -172,7 +172,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def fixedDates(self):
+    def fixed_dates(self):
         """ return a vector of the fixed leg payment dates """
         if self._adjustedFixedDates is None:
             raise FinError("Fixed dates have not been generated")
@@ -181,7 +181,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def floatDates(self):
+    def float_dates(self):
         """ return a vector of the fixed leg payment dates """
         if self._adjustedFloatDates is None:
             raise FinError("Float dates have not been generated")
@@ -281,7 +281,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def _calcFixedLegFlows(self):
+    def _calc_fixed_leg_flows(self):
 
         self._fixedYearFracs = []
         self._fixedFlows = []
@@ -300,10 +300,10 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def cashSettledPV01(self,
-                        valuation_date,
-                        flatSwapRate,
-                        frequencyType):
+    def cash_settled_pv01(self,
+                          valuation_date,
+                          flatSwapRate,
+                          frequencyType):
         """ Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
         used in the pricing of a cash-settled swaption in the IborSwaption
@@ -490,7 +490,7 @@ class FinFixedIborXCcySwap:
 
 ##########################################################################
 
-    def printFixedLegFlows(self):
+    def print_fixed_leg_flows(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

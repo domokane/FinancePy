@@ -178,12 +178,12 @@ class CDSIndexOption:
 
         expH = (h1 + h2) / num_credits
 
-        x = self._solveForX(valuation_date,
-                            sigma,
-                            c,
-                            indexRecovery,
-                            libor_curve,
-                            expH)
+        x = self._solve_for_x(valuation_date,
+                              sigma,
+                              c,
+                              indexRecovery,
+                              libor_curve,
+                              expH)
 
         v = self._calc_index_payer_option_price(valuation_date,
                                                 x,
@@ -203,13 +203,13 @@ class CDSIndexOption:
 
 ###############################################################################
 
-    def _solveForX(self,
-                   valuation_date,
-                   sigma,
-                   index_coupon,
-                   indexRecovery,
-                   libor_curve,
-                   expH):
+    def _solve_for_x(self,
+                     valuation_date,
+                     sigma,
+                     index_coupon,
+                     indexRecovery,
+                     libor_curve,
+                     expH):
         """ Function to solve for the arbitrage free """
         x1 = 0.0
         x2 = 0.9999

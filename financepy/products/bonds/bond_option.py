@@ -113,7 +113,7 @@ class BondOption():
             exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
-        model.buildTree(tmat, df_times, df_values)
+        model.build_tree(tmat, df_times, df_values)
 
         v = model.bond_option(texp, self._strike_price, self._face_amount,
                               coupon_times, coupon_flows, exercise_type)

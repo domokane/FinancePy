@@ -35,7 +35,7 @@ def func_name():
     return traceback.extract_stack(None, 2)[0][2]
 
 
-def suppressTraceback():
+def suppress_traceback():
 #    print(sys.tracebacklimit)
 #    print(ipython.showtrackeback)
 

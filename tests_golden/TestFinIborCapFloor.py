@@ -227,7 +227,7 @@ def test_FinIborCapFloorVolCurve():
 
     # Value cap using a single flat cap volatility
     tcap = (maturity_date - valuation_date) / gDaysInYear
-    vol = volCurve.capVol(maturity_date)
+    vol = volCurve.cap_vol(maturity_date)
     model = Black(vol)
     valueCap = capFloor.value(valuation_date, libor_curve, model)
 #    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
@@ -240,11 +240,11 @@ def test_FinIborCapFloorVolCurve():
     for capletEndDate in capFloor._capFloorLetDates[2:]:
         vol = volCurve.caplet_vol(capletEndDate)
         modelCaplet = Black(vol)
-        vCaplet = capFloor.valueCapletFloorLet(valuation_date,
-                                               capletStartDate,
-                                               capletEndDate,
-                                               libor_curve,
-                                               modelCaplet)
+        vCaplet = capFloor.value_caplet_floor_let(valuation_date,
+                                                  capletStartDate,
+                                                  capletEndDate,
+                                                  libor_curve,
+                                                  modelCaplet)
 
         vCaplets += vCaplet
         testCases.print("%12s" % capletStartDate,
@@ -289,11 +289,11 @@ def test_FinIborCapletHull():
     capletStartDate = valuation_date.add_tenor("1Y")
     capletEndDate = capletStartDate.add_tenor("3M")
 
-    vCaplet = capFloor.valueCapletFloorLet(valuation_date,
-                                           capletStartDate,
-                                           capletEndDate,
-                                           libor_curve,
-                                           model)
+    vCaplet = capFloor.value_caplet_floor_let(valuation_date,
+                                              capletStartDate,
+                                              capletEndDate,
+                                              libor_curve,
+                                              model)
 
     # Cannot match Hull due to dates being adjusted
     testCases.header("CORRECT PRICE", "MODEL_PRICE")

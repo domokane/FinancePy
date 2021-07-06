@@ -8,7 +8,7 @@ from scipy import optimize
 
 from ..utils.global_types import FinOptionTypes
 from ..utils.global_vars import gSmall
-from ..utils.math import NVect, NPrimeVect
+from ..utils.math import n_vect, n_prime_vect
 from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton, newton_secant
 
@@ -39,7 +39,7 @@ def bs_value(s, t, k, r, q, v, option_type_value):
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
     
-    value = phi * ss * NVect(phi*d1) - phi * kk * NVect(phi*d2)    
+    value = phi * ss * n_vect(phi * d1) - phi * kk * n_vect(phi * d2)
     return value
 
 ###############################################################################
@@ -64,7 +64,7 @@ def bs_delta(s, t, k, r, q, v, option_type_value):
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    delta = phi * np.exp(-q*t) * NVect(phi*d1)
+    delta = phi * np.exp(-q*t) * n_vect(phi * d1)
     return delta
 
 ###############################################################################
@@ -83,7 +83,7 @@ def bs_gamma(s, t, k, r, q, v, option_type_value):
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    gamma = np.exp(-q*t) * NPrimeVect(d1) / s / vsqrtT
+    gamma = np.exp(-q*t) * n_prime_vect(d1) / s / vsqrtT
     return gamma
 
 ###############################################################################
@@ -103,7 +103,7 @@ def bs_vega(s, t, k, r, q, v, option_type_value):
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    vega = ss * sqrtT * NPrimeVect(d1)
+    vega = ss * sqrtT * n_prime_vect(d1)
     return vega
 
 ###############################################################################
@@ -131,9 +131,9 @@ def bs_theta(s, t, k, r, q, v, option_type_value):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    theta = - ss * NPrimeVect(d1) * v / 2.0 / sqrtT
-    theta = theta - phi * r * k * np.exp(-r*t) * NVect(phi*d2)
-    theta = theta + phi * q * ss * NVect(phi*d1)
+    theta = - ss * n_prime_vect(d1) * v / 2.0 / sqrtT
+    theta = theta - phi * r * k * np.exp(-r*t) * n_vect(phi * d2)
+    theta = theta + phi * q * ss * n_vect(phi * d1)
     return theta
 
 ###############################################################################
@@ -161,7 +161,7 @@ def bs_rho(s, t, k, r, q, v, option_type_value):
     kk = k * np.exp(-r*t)
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
-    rho = phi * k * t * np.exp(-r*t) * NVect(phi*d2)
+    rho = phi * k * t * np.exp(-r*t) * n_vect(phi * d2)
     return rho
 
 ###############################################################################
@@ -199,7 +199,7 @@ def _fvega(sigma, args):
 
 @vectorize([float64(float64, float64, float64, float64, 
                     float64, int64)], fastmath=True, cache=True)
-def bsIntrinsic(s, t, k, r, q, option_type_value):
+def bs_intrinsic(s, t, k, r, q, option_type_value):
     """ Calculate the Black-Scholes implied volatility of a European 
     vanilla option using Newton with a fallback to bisection. """
 
@@ -217,7 +217,7 @@ def bsIntrinsic(s, t, k, r, q, option_type_value):
 
 #@vectorize([float64(float64, float64, float64, float64, float64, float64, 
 #                    int64)], fastmath=True, cache=True,  forceobj=True)
-def bsImpliedVolatility(s, t, k, r, q, price, option_type_value):
+def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     """ Calculate the Black-Scholes implied volatility of a European 
     vanilla option using Newton with a fallback to bisection. """
 
@@ -358,7 +358,7 @@ def _fcall(si, *args):
 
     obj_fn = si - k
     obj_fn = obj_fn - bs_value(si, t, k, r, q, v, +1)
-    obj_fn = obj_fn - (1.0 - np.exp(-q*t) * NVect(d1)) * si / q2
+    obj_fn = obj_fn - (1.0 - np.exp(-q*t) * n_vect(d1)) * si / q2
     return obj_fn
 
 ###############################################################################
@@ -383,7 +383,7 @@ def _fput(si, *args):
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     obj_fn = si - k
     obj_fn = obj_fn - bs_value(si, t, k, r, q, v, -1)
-    obj_fn = obj_fn - (1.0 - np.exp(-q*t) * NVect(-d1)) * si / q1
+    obj_fn = obj_fn - (1.0 - np.exp(-q*t) * n_vect(-d1)) * si / q1
     return obj_fn
 
 ###############################################################################
@@ -391,7 +391,7 @@ def _fput(si, *args):
 ###############################################################################
 
 @njit(fastmath=True)
-def bawValue(s, t, k, r, q, v, phi):
+def baw_value(s, t, k, r, q, v, phi):
     """ American Option Pricing Approximation using the Barone-Adesi-Whaley
     approximation for the Black Scholes Model """
 
@@ -415,7 +415,7 @@ def bawValue(s, t, k, r, q, v, phi):
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar/k) + (b + v*v/ 2.0) * t) / (v * np.sqrt(t))
         q2 = (-1.0 * (W - 1.0) + np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
-        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * NVect(d1))
+        A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * n_vect(d1))
 
         if s < sstar:
             return bs_value(s, t, k, r, q, v, +1) + A2 * ((s/sstar)**q2)
@@ -439,7 +439,7 @@ def bawValue(s, t, k, r, q, v, phi):
         K = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
         q1 = (-1.0 * (W - 1.0) - np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
-        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * NVect(-d1))
+        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * n_vect(-d1))
 
         if s > sstar:
             return bs_value(s, t, k, r, q, v, -1) + a1 * ((s/sstar)**q1)
@@ -463,6 +463,6 @@ if __name__ == '__main__':
     for t in [0.1, 0.5]:
         for v in [0.15, 0.25, 0.35]:
             for s in [90.0, 100.0, 110.0]:
-                bawPrice = bawValue(s, t, k, r, q, v, +1)
+                bawPrice = baw_value(s, t, k, r, q, v, +1)
                 print("%9.5f %9.5f %9.5f %9.5f"% (s, t, v, bawPrice))
 

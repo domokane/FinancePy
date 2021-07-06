@@ -10,7 +10,7 @@ from math import sqrt
 from ...models.gauss_copula_onefactor import tranch_surv_prob_gaussian
 from ...models.gauss_copula_onefactor import tranche_surv_prob_adj_binomial
 from ...models.gauss_copula_onefactor import tranche_surv_prob_recursion
-from ...models.gauss_copula_lhp import trSurvProbLHP
+from ...models.gauss_copula_lhp import tr_surv_prob_lhp
 
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
@@ -194,9 +194,9 @@ class CDSTranche:
                     beta_vector2,
                     num_points)
             elif model == FinLossDistributionBuilder.LHP:
-                qt1[i] = trSurvProbLHP(
+                qt1[i] = tr_surv_prob_lhp(
                     0.0, k1, num_credits, qVector, recovery_rates, beta1)
-                qt2[i] = trSurvProbLHP(
+                qt2[i] = tr_surv_prob_lhp(
                     0.0, k2, num_credits, qVector, recovery_rates, beta2)
             else:
                 raise FinError(

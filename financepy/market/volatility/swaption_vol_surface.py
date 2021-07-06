@@ -13,7 +13,7 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
-from ...models.option_implied_dbn import optionImpliedDbn
+from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
@@ -23,12 +23,12 @@ from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.volatility_fns import vol_function_clark
-from ...models.volatility_fns import vol_Function_bloomberg
+from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi
 from ...models.volatility_fns import vol_function_ssvi
 from ...models.sabr import vol_function_sabr
-from ...models.sabr import vol_function_sabr_BETA_HALF
-from ...models.sabr import vol_function_sabr_BETA_ONE
+from ...models.sabr import vol_function_sabr_beta_half
+from ...models.sabr import vol_function_sabr_beta_one
 
 from ...models.volatility_fns import FinVolFunctionTypes
 
@@ -85,7 +85,7 @@ from ...utils.global_types import FinSolverTypes
 ###############################################################################
 
 # @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-# def _interpolateGap(k, strikes, gaps):
+# def _interpolate_gap(k, strikes, gaps):
 
 #     if k <= strikes[0]:
 #         return 0.0
@@ -205,13 +205,13 @@ def vol_function(vol_function_type_value, params, f, k, t):
         vol = vol_function_clark(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = vol_function_sabr_BETA_ONE(params, f, k, t)
+        vol = vol_function_sabr_beta_one(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = vol_function_sabr_BETA_HALF(params, f, k, t)
+        vol = vol_function_sabr_beta_half(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
-        vol = vol_Function_bloomberg(params, f, k, t)
+        vol = vol_function_bloomberg(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
         vol = vol_function_sabr(params, f, k, t)
@@ -611,8 +611,8 @@ class SwaptionVolSurface():
 
 ###############################################################################
         
-    # def volatilityFromDeltaDate(self, callDelta, expiry_date, 
-    #                             deltaMethod = None):
+    # def volatility_from_delta_date(self, callDelta, expiry_date,
+    #                                deltaMethod = None):
     #     """ Interpolates the Black-Scholes volatility from the volatility
     #     surface given a call option delta and expiry date. Linear interpolation
     #     is done in variance space. The smile strikes at bracketed dates are 

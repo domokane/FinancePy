@@ -52,14 +52,14 @@ def _f(s0, *args):
 
 
 @njit(fastmath=True, cache=True, nogil=True)
-def _valueOnce(stock_price,
-               r,
-               q,
-               volatility,
-               t1, t2,
-               option_type1, option_type2,
-               k1, k2,
-               num_steps):
+def _value_once(stock_price,
+                r,
+                q,
+                volatility,
+                t1, t2,
+                option_type1, option_type2,
+                k1, k2,
+                num_steps):
 
     if num_steps < 3:
         num_steps = 3
@@ -289,12 +289,12 @@ class EquityCompoundOption(EquityOption):
             self._cOptionType == FinOptionTypes.AMERICAN_PUT or\
                 self._uOptionType == FinOptionTypes.AMERICAN_PUT:
 
-            v = self._valueTree(valuation_date,
-                                stock_price,
-                                discount_curve,
-                                dividend_curve,
-                                model,
-                                num_steps)
+            v = self._value_tree(valuation_date,
+                                 stock_price,
+                                 discount_curve,
+                                 dividend_curve,
+                                 model,
+                                 num_steps)
 
             return v[0]
 
@@ -318,13 +318,13 @@ class EquityCompoundOption(EquityOption):
         kc = self._cStrikePrice
         ku = self._uStrikePrice
 
-        sstar = self._impliedStockPrice(s0,
-                                        self._cExpiryDate,
-                                        self._uExpiryDate,
-                                        kc,
-                                        ku,
-                                        self._uOptionType,
-                                        ru, q, model)
+        sstar = self._implied_stock_price(s0,
+                                          self._cExpiryDate,
+                                          self._uExpiryDate,
+                                          kc,
+                                          ku,
+                                          self._uOptionType,
+                                          ru, q, model)
 
         a1 = (log(s0 / sstar) + (ru - q + (v**2) / 2.0) * tc) / v / sqrt(tc)
         a2 = a1 - v * sqrt(tc)
@@ -360,13 +360,13 @@ class EquityCompoundOption(EquityOption):
 
 ###############################################################################
 
-    def _valueTree(self,
-                   valuation_date,
-                   stock_price,
-                   discount_curve,
-                   dividend_curve,
-                   model,
-                   num_steps=200):
+    def _value_tree(self,
+                    valuation_date,
+                    stock_price,
+                    discount_curve,
+                    dividend_curve,
+                    model,
+                    num_steps=200):
         """ This function is called if the option has American features. """
 
         if valuation_date > self._cExpiryDate:
@@ -385,31 +385,31 @@ class EquityCompoundOption(EquityOption):
 
         volatility = model._volatility
 
-        v1 = _valueOnce(stock_price,
-                        r,
-                        q,
-                        volatility,
-                        tc, tu,
-                        self._cOptionType,
-                        self._uOptionType,
-                        self._cStrikePrice,
-                        self._uStrikePrice,
-                        num_steps)
+        v1 = _value_once(stock_price,
+                         r,
+                         q,
+                         volatility,
+                         tc, tu,
+                         self._cOptionType,
+                         self._uOptionType,
+                         self._cStrikePrice,
+                         self._uStrikePrice,
+                         num_steps)
 
         return v1
 
 ###############################################################################
 
-    def _impliedStockPrice(self,
-                           stock_price,
-                           expiry_date1,
-                           expiry_date2,
-                           strike_price1,
-                           strike_price2,
-                           option_type2,
-                           interest_rate,
-                           dividend_yield,
-                           model):
+    def _implied_stock_price(self,
+                             stock_price,
+                             expiry_date1,
+                             expiry_date2,
+                             strike_price1,
+                             strike_price2,
+                             option_type2,
+                             interest_rate,
+                             dividend_yield,
+                             model):
 
         option = EquityVanillaOption(expiry_date2, strike_price2, option_type2)
 
