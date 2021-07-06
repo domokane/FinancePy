@@ -1,20 +1,20 @@
-from .FinEquityAsianOption import *
-from .FinEquityAmericanOption import *
-from .FinEquityBarrierOption import *
-from .FinEquityBasketOption import *
-from .FinEquityBinomialTree import *
-from .FinEquityChooserOption import *
-from .FinEquityCliquetOption import *
-from .FinEquityCompoundOption import *
-from .FinEquityDigitalOption import *
-from .FinEquityFixedLookbackOption import *
-from .FinEquityFloatLookbackOption import *
-from .FinEquityModelTypes import *
-from .FinEquityOption import *
-from .FinEquityRainbowOption import *
-from .FinEquityVanillaOption import *
-from .FinEquityVarianceSwap import *
-from .FinEquityOneTouchOption import *
+from .equity_asian_option import *
+from .equity_american_option import *
+from .equity_barrier_option import *
+from .equity_basket_option import *
+from .equity_binomial_tree import *
+from .equity_chooser_option import *
+from .equity_cliquet_option import *
+from .equity_compound_option import *
+from .equity_digital_option import *
+from .equity_fixed_lookback_option import *
+from .equity_float_lookback_option import *
+from .equity_model_types import *
+from .equity_option import *
+from .equity_rainbow_option import *
+from .equity_vanilla_option import *
+from .equity_variance_swap import *
+from .equity_one_touch_option import *
 
 
-# dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
+# dividend_curve = FinDiscountCurveFlat(valuation_date, dividend_yield)

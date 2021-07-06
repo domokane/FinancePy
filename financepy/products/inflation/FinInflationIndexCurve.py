@@ -4,25 +4,25 @@
 
 import numpy as np
 
-from ...finutils.FinError import FinError
-from ...finutils.FinDate import FinDate
-from ...finutils.FinMath import testMonotonicity
-from ...finutils.FinHelperFunctions import labelToString
-from ...finutils.FinHelperFunctions import timesFromDates
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import daysInMonth
-from ...finutils.FinGlobalVariables import gDaysInYear
+from ...utils.error import FinError
+from ...utils.date import Date
+from ...utils.math import test_monotonicity
+from ...utils.helpers import label_to_string
+from ...utils.helpers import times_from_dates
+from ...utils.helpers import check_argument_types
+from ...utils.date import days_in_month
+from ...utils.global_vars import gDaysInYear
 
 ###############################################################################
 
 class FinInflationIndexCurve():
-    ''' This is a curve calculated from a set of dates and CPI-like numbers. It
+    """ This is a curve calculated from a set of dates and CPI-like numbers. It
     should start at the issue date of the bond (or index). It also requires a
     lag in months. Here is a reference to the CPI curve used for TIPS.
     
     https://www.treasury.gov/about/organizational-structure/offices/Domestic-Finance/Documents/tips-presentation.pdf
     
-    '''
+    """
 
 ###############################################################################
 
@@ -31,7 +31,7 @@ class FinInflationIndexCurve():
                  indexValues: (list, np.ndarray),
                  lagInMonths: int = 3):
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
         # Validate curve
         if len(indexDates) == 0:
@@ -48,20 +48,20 @@ class FinInflationIndexCurve():
         self._lagInMonths = lagInMonths
         self._baseDate = indexDates[0]
 
-        self._indexTimes = timesFromDates(indexDates, self._baseDate)
+        self._indexTimes = times_from_dates(indexDates, self._baseDate)
 
-        if testMonotonicity(self._indexTimes) is False:
+        if test_monotonicity(self._indexTimes) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
 ###############################################################################
 
-    def indexValue(self, dt: FinDate):
-        ''' Calculate index value by interpolating the CPI curve '''
+    def index_value(self, dt: Date):
+        """ Calculate index value by interpolating the CPI curve """
 
-        lagMonthsAgoDt = dt.addMonths(-self._lagInMonths)
+        lagMonthsAgoDt = dt.add_months(-self._lagInMonths)
         
-        cpiFirstDate = FinDate(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y) 
-        cpiSecondDate = cpiFirstDate.addMonths(1)
+        cpiFirstDate = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
+        cpiSecondDate = cpiFirstDate.add_months(1)
         
         cpiFirstTime = (cpiFirstDate - self._baseDate) / gDaysInYear
         cpiSecondTime = (cpiSecondDate - self._baseDate) / gDaysInYear
@@ -77,32 +77,32 @@ class FinInflationIndexCurve():
         d = dt._d
         m = dt._m
         y = dt._y       
-        numDays = daysInMonth(m, y)
+        numDays = days_in_month(m, y)
         v = cpiFirstValue + (d - 1) * (cpiSecondValue - cpiFirstValue) / numDays       
         return v
 
 ###############################################################################
 
-    def indexRatio(self, dt: FinDate):
-        ''' Calculate index value by interpolating the CPI curve '''
+    def index_ratio(self, dt: Date):
+        """ Calculate index value by interpolating the CPI curve """
 
-        vt = self.indexValue(dt)
-        v0 = self.indexValue(self._baseDate)
-        indexRatio = vt / v0
-        return indexRatio
+        vt = self.index_value(dt)
+        v0 = self.index_value(self._baseDate)
+        index_ratio = vt / v0
+        return index_ratio
 
 ###############################################################################
 
     def __repr__(self):
 
-        s = labelToString("OBJECT TYPE", type(self).__name__)
-        s += labelToString("BASE DATE", self._baseDate)
-        s += labelToString("INDEX LAG", self._lagInMonths)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("BASE DATE", self._baseDate)
+        s += label_to_string("INDEX LAG", self._lagInMonths)
 
-        s += labelToString("DATES", "ZERO RATES")
-        numPoints = len(self._indexValues)
-        for i in range(0, numPoints):
-            s += labelToString("%12s" % self._indexDates[i],
+        s += label_to_string("DATES", "ZERO RATES")
+        num_points = len(self._indexValues)
+        for i in range(0, num_points):
+            s += label_to_string("%12s" % self._indexDates[i],
                                "%10.7f" % self._indexValues[i])
 
         return s
@@ -110,7 +110,7 @@ class FinInflationIndexCurve():
 ###############################################################################
 
     def _print(self):
-        ''' Simple print function for backward compatibility. '''
+        """ Simple print function for backward compatibility. """
         print(self)
 
 ###############################################################################

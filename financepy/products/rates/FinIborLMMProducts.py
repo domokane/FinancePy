@@ -6,116 +6,116 @@
 # TODO: Extend to allow two fixed legs in underlying swap
 # TODO: Cash settled swaptions
 
-''' This module implements the LMM in the spot measure. It combines both model
+""" This module implements the LMM in the spot measure. It combines both model
 and product specific code - I am not sure if it is better to separate these. At
 the moment this seems to work ok.
 
-THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE. '''
+THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE. """
 
 import numpy as np
 
-from ...finutils.FinCalendar import FinCalendarTypes
-from ...finutils.FinCalendar import FinBusDayAdjustTypes
-from ...finutils.FinCalendar import FinDateGenRuleTypes
-from ...finutils.FinDayCount import FinDayCountTypes
-from ...finutils.FinFrequency import FinFrequencyTypes
-from ...finutils.FinDayCount import FinDayCount
-from ...finutils.FinSchedule import FinSchedule
-from ...finutils.FinError import FinError
-from ...finutils.FinHelperFunctions import checkArgumentTypes
-from ...finutils.FinDate import FinDate
+from ...utils.calendar import CalendarTypes
+from ...utils.calendar import BusDayAdjustTypes
+from ...utils.calendar import DateGenRuleTypes
+from ...utils.day_count import DayCountTypes
+from ...utils.frequency import FrequencyTypes
+from ...utils.day_count import DayCount
+from ...utils.schedule import Schedule
+from ...utils.error import FinError
+from ...utils.helpers import check_argument_types
+from ...utils.date import Date
 
-from ...models.FinModelRatesLMM import LMMSimulateFwds1F
-from ...models.FinModelRatesLMM import LMMSimulateFwdsMF
-from ...models.FinModelRatesLMM import LMMSimulateFwdsNF
-from ...models.FinModelRatesLMM import FinRateModelLMMModelTypes
-from ...models.FinModelRatesLMM import LMMCapFlrPricer
+from ...models.lmm_mc import lmm_simulate_fwds_1f
+from ...models.lmm_mc import lmm_simulate_fwds_mf
+from ...models.lmm_mc import lmm_simulate_fwds_nf
+from ...models.lmm_mc import ModelLMMModelTypes
+from ...models.lmm_mc import lmm_cap_flr_pricer
 
-from ...finutils.FinGlobalVariables import gDaysInYear
-from ...finutils.FinMath import ONE_MILLION
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
 
-from ...finutils.FinGlobalTypes import FinSwapTypes
-from ...finutils.FinGlobalTypes import FinCapFloorTypes
+from ...utils.global_types import SwapTypes
+from ...utils.global_types import FinCapFloorTypes
 
-from financepy.market.volatility.FinIborCapVolCurve import FinIborCapVolCurve
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 ###############################################################################
 
 
 class FinIborLMMProducts():
-    ''' This is the class for pricing Ibor products using the LMM. '''
+    """ This is the class for pricing Ibor products using the LMM. """
 
     def __init__(self,
-                 settlementDate: FinDate,
-                 maturityDate: FinDate,
-                 floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                 floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                 calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                 busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                 dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Create a European-style swaption by defining the exercise date of
+                 settlement_date: Date,
+                 maturity_date: Date,
+                 float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+        """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
-        floating leg payment schedules. '''
+        floating leg payment schedules. """
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if settlementDate > maturityDate:
+        if settlement_date > maturity_date:
             raise FinError("Settlement date must be before maturity date")
 
-        ''' Set up the grid for the Ibor rates that are to be simulated. These
+        """ Set up the grid for the Ibor rates that are to be simulated. These
         must be consistent with the floating rate leg of the product that is to
-        be priced. '''
+        be priced. """
 
-        self._startDate = settlementDate
-        self._gridDates = FinSchedule(settlementDate,
-                                      maturityDate,
-                                      floatFrequencyType,
-                                      calendarType,
-                                      busDayAdjustType,
-                                      dateGenRuleType)._generate()
+        self._start_date = settlement_date
+        self._gridDates = Schedule(settlement_date,
+                                   maturity_date,
+                                   float_frequency_type,
+                                   calendar_type,
+                                   bus_day_adjust_type,
+                                   date_gen_rule_type)._generate()
 
-        self._accrualFactors = []
-        self._floatDayCountType = floatDayCountType
+        self._accrual_factors = []
+        self._float_day_count_type = float_day_count_type
 
-        basis = FinDayCount(self._floatDayCountType)
-        prevDt = self._gridDates[0]
+        basis = DayCount(self._float_day_count_type)
+        prev_dt = self._gridDates[0]
 
         self._gridTimes = [0.0]
 
-        for nextDt in self._gridDates[1:]:
-            tau = basis.yearFrac(prevDt, nextDt)[0]
-            t = (nextDt - self._gridDates[0]) / gDaysInYear
-            self._accrualFactors.append(tau)
+        for swap_start_date in self._gridDates[1:]:
+            tau = basis.year_frac(prev_dt, next_dt)[0]
+            t = (next_dt - self._gridDates[0]) / gDaysInYear
+            self._accrual_factors.append(tau)
             self._gridTimes.append(t)
-            prevDt = nextDt
+            prev_dt = next_dt
 
 #        print(self._gridTimes)
-        self._accrualFactors = np.array(self._accrualFactors)
-        self._numForwards = len(self._accrualFactors)
+        self._accrual_factors = np.array(self._accrual_factors)
+        self._numForwards = len(self._accrual_factors)
         self._fwds = None
 
 #        print("Num FORWARDS", self._numForwards)
 
 ###############################################################################
 
-    def simulate1F(self,
-                   discountCurve,
-                   volCurve: FinIborCapVolCurve,
-                   numPaths: int = 1000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
-        ''' Run the one-factor simulation of the evolution of the forward
-        Ibors to generate and store all of the Ibor forward rate paths. '''
+    def simulate_1f(self,
+                    discount_curve,
+                    volCurve: IborCapVolCurve,
+                    num_paths: int = 1000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
+        """ Run the one-factor simulation of the evolution of the forward
+        Ibors to generate and store all of the Ibor forward rate paths. """
 
-        if numPaths < 2 or numPaths > 1000000:
+        if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discountCurve._valuationDate != self._startDate:
+        if discount_curve._valuation_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
-        self._numPaths = numPaths
+        self._num_paths = num_paths
         self._numeraireIndex = numeraireIndex
         self._useSobol = useSobol
 
@@ -125,56 +125,56 @@ class FinIborLMMProducts():
         self._forwardCurve = []
 
         for i in range(1, numGridPoints):
-            startDate = self._gridDates[i-1]
-            endDate = self._gridDates[i]
-            fwdRate = discountCurve.fwdRate(startDate,
-                                            endDate,
-                                            self._floatDayCountType)
-            self._forwardCurve.append(fwdRate)
+            start_date = self._gridDates[i-1]
+            end_date = self._gridDates[i]
+            fwd_rate = discount_curve.fwd_rate(start_date,
+                                            end_date,
+                                            self._float_day_count_type)
+            self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
 
         gammas = np.zeros(numGridPoints)
         for ix in range(1, numGridPoints):
             dt = self._gridDates[ix]
-            gammas[ix] = volCurve.capletVol(dt)
+            gammas[ix] = volCurve.caplet_vol(dt)
 
-        self._fwds = LMMSimulateFwds1F(self._numForwards,
-                                       numPaths,
-                                       numeraireIndex,
-                                       self._forwardCurve,
-                                       gammas,
-                                       self._accrualFactors,
-                                       useSobol,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_1f(self._numForwards,
+                                          num_paths,
+                                          numeraireIndex,
+                                          self._forwardCurve,
+                                          gammas,
+                                          self._accrual_factors,
+                                          useSobol,
+                                          seed)
 
 ###############################################################################
 
-    def simulateMF(self,
-                   discountCurve,
-                   numFactors: int,
-                   lambdas: np.ndarray,
-                   numPaths: int = 10000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
-        ''' Run the simulation to generate and store all of the Ibor forward
+    def simulate_mf(self,
+                    discount_curve,
+                    numFactors: int,
+                    lambdas: np.ndarray,
+                    num_paths: int = 10000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
+        """ Run the simulation to generate and store all of the Ibor forward
         rate paths. This is a multi-factorial version so the user must input
         a numpy array consisting of a column for each factor and the number of
         rows must equal the number of grid times on the underlying simulation
-        grid. CHECK THIS. '''
+        grid. CHECK THIS. """
 
-#        checkArgumentTypes(self.__init__, locals())
+#        check_argument_types(self.__init__, locals())
 
-        if numPaths < 2 or numPaths > 1000000:
+        if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discountCurve._curveDate != self._startDate:
+        if discount_curve._curve_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         print("LEN LAMBDAS", len(lambdas))
         print("LEN", len(lambdas[0]))
-        # We pass a vector of vol curves, one for each factor
+        # We pass a vector of vol discount, one for each factor
         if numFactors != len(lambdas):
             raise FinError("Lambda doesn't have specified number of factors.")
 
@@ -182,7 +182,7 @@ class FinIborLMMProducts():
         if numRows != self._numForwards+1:
             raise FinError("Vol Components needs same number of rows as grid")
 
-        self._numPaths = numPaths
+        self._num_paths = num_paths
         self._numeraireIndex = numeraireIndex
         self._useSobol = useSobol
 
@@ -190,51 +190,51 @@ class FinIborLMMProducts():
         self._forwardCurve = []
 
         for i in range(1, self._numForwards):
-            startDate = self._gridDates[i-1]
-            endDate = self._gridDates[i]
-            fwdRate = discountCurve.fwdRate(startDate, endDate,
-                                            self._floatDayCountType)
-            self._forwardCurve.append(fwdRate)
+            start_date = self._gridDates[i-1]
+            end_date = self._gridDates[i]
+            fwd_rate = discount_curve.fwd_rate(start_date, end_date,
+                                            self._float_day_count_type)
+            self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
 
-        self._fwds = LMMSimulateFwdsMF(self._numForwards,
-                                       numFactors,
-                                       numPaths,
-                                       numeraireIndex,
-                                       self._forwardCurve,
-                                       lambdas,
-                                       self._accrualFactors,
-                                       useSobol,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_mf(self._numForwards,
+                                          numFactors,
+                                          num_paths,
+                                          numeraireIndex,
+                                          self._forwardCurve,
+                                          lambdas,
+                                          self._accrual_factors,
+                                          useSobol,
+                                          seed)
 
 ###############################################################################
 
-    def simulateNF(self,
-                   discountCurve,
-                   volCurve: FinIborCapVolCurve,
-                   correlationMatrix: np.ndarray,
-                   modelType: FinRateModelLMMModelTypes,
-                   numPaths: int = 1000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
-        ''' Run the simulation to generate and store all of the Ibor forward
+    def simulate_nf(self,
+                    discount_curve,
+                    volCurve: IborCapVolCurve,
+                    correlationMatrix: np.ndarray,
+                    modelType: ModelLMMModelTypes,
+                    num_paths: int = 1000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
+        """ Run the simulation to generate and store all of the Ibor forward
         rate paths using a full factor reduction of the fwd-fwd correlation
-        matrix using Cholesky decomposition.'''
+        matrix using Cholesky decomposition."""
 
-        checkArgumentTypes(self.__init__, locals())
+        check_argument_types(self.__init__, locals())
 
-        if numPaths < 2 or numPaths > 1000000:
+        if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if isinstance(modelType, FinRateModelLMMModelTypes) is False:
+        if isinstance(modelType, ModelLMMModelTypes) is False:
             raise FinError("Model type must be type FinRateModelLMMModelTypes")
 
-        if discountCurve.curveDate != self._startDate:
+        if discount_curve.curve_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
-        self._numPaths = numPaths
+        self._num_paths = num_paths
         self._volCurves = volCurve
         self._correlationMatrix = correlationMatrix
         self._modelType = modelType
@@ -247,49 +247,49 @@ class FinIborLMMProducts():
         self._forwardCurve = []
 
         for i in range(1, numGridPoints):
-            startDate = self._gridDates[i-1]
-            endDate = self._gridDates[i]
-            fwdRate = discountCurve.forwardRate(startDate,
-                                                endDate,
-                                                self._floatDayCountType)
-            self._forwardCurve.append(fwdRate)
+            start_date = self._gridDates[i-1]
+            end_date = self._gridDates[i]
+            fwd_rate = discount_curve.forward_rate(start_date,
+                                                end_date,
+                                                self._float_day_count_type)
+            self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
 
         zetas = np.zeros(numGridPoints)
         for ix in range(1, numGridPoints):
             dt = self._gridDates[ix]
-            zetas[ix] = volCurve.capletVol(dt)
+            zetas[ix] = volCurve.caplet_vol(dt)
 
         # This function does not use Sobol - TODO
-        self._fwds = LMMSimulateFwdsNF(self._numForwards,
-                                       numPaths,
-                                       self._forwardCurve,
-                                       zetas,
-                                       correlationMatrix,
-                                       self._accrualFactors,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_nf(self._numForwards,
+                                          num_paths,
+                                          self._forwardCurve,
+                                          zetas,
+                                          correlationMatrix,
+                                          self._accrual_factors,
+                                          seed)
 
 ###############################################################################
 
-    def valueSwaption(self,
-                      settlementDate: FinDate,
-                      exerciseDate: FinDate,
-                      maturityDate: FinDate,
-                      swaptionType: FinSwapTypes,
-                      fixedCoupon: float,
-                      fixedFrequencyType: FinFrequencyTypes,
-                      fixedDayCountType: FinDayCountTypes,
-                      notional: float = ONE_MILLION,
-                      floatFrequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                      floatDayCountType: FinDayCountTypes = FinDayCountTypes.THIRTY_E_360,
-                      calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                      busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                      dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Value a swaption in the LMM model using simulated paths of the
+    def value_swaption(self,
+                       settlement_date: Date,
+                       exercise_date: Date,
+                       maturity_date: Date,
+                       swaptionType: SwapTypes,
+                       fixed_coupon: float,
+                       fixed_frequency_type: FrequencyTypes,
+                       fixed_day_count_type: DayCountTypes,
+                       notional: float = ONE_MILLION,
+                       float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                       float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                       calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                       bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                       date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+        """ Value a swaption in the LMM model using simulated paths of the
         forward curve. This relies on pricing the fixed leg of the swap and
         assuming that the floating leg will be worth par. As a result we only
-        need simulate Ibors with the frequency of the fixed leg. '''
+        need simulate Ibors with the frequency of the fixed leg. """
 
         # Note that the simulation time steps run all the way out to the last
         # forward rate. However we only really need the forward rates at the
@@ -299,12 +299,12 @@ class FinIborLMMProducts():
         # generated, the speed of pricing is not affected so this is not
         # strictly an urgent issue.
 
-        swaptionFloatDates = FinSchedule(settlementDate,
-                                         maturityDate,
-                                         floatFrequencyType,
-                                         calendarType,
-                                         busDayAdjustType,
-                                         dateGenRuleType)._generate()
+        swaptionFloatDates = Schedule(settlement_date,
+                                      maturity_date,
+                                      float_frequency_type,
+                                      calendar_type,
+                                      bus_day_adjust_type,
+                                      date_gen_rule_type)._generate()
 
         for swaptionDt in swaptionFloatDates:
             foundDt = False
@@ -315,12 +315,12 @@ class FinIborLMMProducts():
             if foundDt is False:
                 raise FinError("Swaption float leg not on grid.")
 
-        swaptionFixedDates = FinSchedule(settlementDate,
-                                         maturityDate,
-                                         fixedFrequencyType,
-                                         calendarType,
-                                         busDayAdjustType,
-                                         dateGenRuleType)._generate()
+        swaptionFixedDates = Schedule(settlement_date,
+                                      maturity_date,
+                                      fixed_frequency_type,
+                                      calendar_type,
+                                      bus_day_adjust_type,
+                                      date_gen_rule_type)._generate()
 
         for swaptionDt in swaptionFixedDates:
             foundDt = False
@@ -335,13 +335,13 @@ class FinIborLMMProducts():
         b = 0
 
         for gridDt in self._gridDates:
-            if gridDt == exerciseDate:
+            if gridDt == exercise_date:
                 break
             else:
                 a += 1
 
         for gridDt in self._gridDates:
-            if gridDt == maturityDate:
+            if gridDt == maturity_date:
                 break
             else:
                 b += 1
@@ -349,33 +349,33 @@ class FinIborLMMProducts():
         if b == 0:
             raise FinError("Swaption swap maturity date is today.")
 
-#        numPaths = 1000
-#        v = LMMSwaptionPricer(fixedCoupon, a, b, numPaths,
+#        num_paths = 1000
+#        v = LMMSwaptionPricer(fixed_coupon, a, b, num_paths,
 #                              fwd0, fwds, taus, isPayer)
         v = 0.0
         return v
 
 ###############################################################################
 
-    def valueCapFloor(self,
-                      settlementDate: FinDate,
-                      maturityDate: FinDate,
-                      capFloorType: FinCapFloorTypes,
-                      capFloorRate: float,
-                      frequencyType: FinFrequencyTypes = FinFrequencyTypes.QUARTERLY,
-                      dayCountType: FinDayCountTypes = FinDayCountTypes.ACT_360,
-                      notional: float = ONE_MILLION,
-                      calendarType: FinCalendarTypes = FinCalendarTypes.WEEKEND,
-                      busDayAdjustType: FinBusDayAdjustTypes = FinBusDayAdjustTypes.FOLLOWING,
-                      dateGenRuleType: FinDateGenRuleTypes = FinDateGenRuleTypes.BACKWARD):
-        ''' Value a cap or floor in the LMM. '''
+    def value_cap_floor(self,
+                        settlement_date: Date,
+                        maturity_date: Date,
+                        capFloorType: FinCapFloorTypes,
+                        capFloorRate: float,
+                        frequencyType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                        day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                        notional: float = ONE_MILLION,
+                        calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                        bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                        date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+        """ Value a cap or floor in the LMM. """
 
-        capFloorDates = FinSchedule(settlementDate,
-                                    maturityDate,
-                                    frequencyType,
-                                    calendarType,
-                                    busDayAdjustType,
-                                    dateGenRuleType)._generate()
+        capFloorDates = Schedule(settlement_date,
+                                 maturity_date,
+                                 frequencyType,
+                                 calendar_type,
+                                 bus_day_adjust_type,
+                                 date_gen_rule_type)._generate()
 
         for capFloorletDt in capFloorDates:
             foundDt = False
@@ -387,7 +387,7 @@ class FinIborLMMProducts():
                 raise FinError("CapFloor date not on grid.")
 
         numFowards = len(capFloorDates)
-        numPaths = self._numPaths
+        num_paths = self._num_paths
         K = capFloorRate
         isCap = 0
         if capFloorType == FinCapFloorTypes.CAP:
@@ -395,9 +395,9 @@ class FinIborLMMProducts():
 
         fwd0 = self._forwardCurve
         fwds = self._fwds
-        taus = self._accrualFactors
+        taus = self._accrual_factors
 
-        v = LMMCapFlrPricer(numFowards, numPaths, K, fwd0, fwds, taus, isCap)
+        v = lmm_cap_flr_pricer(numFowards, num_paths, K, fwd0, fwds, taus, isCap)
 
         # Sum the cap/floorlets to get cap/floor value
         v_capFloor = 0.0
@@ -409,7 +409,7 @@ class FinIborLMMProducts():
 ###############################################################################
 
     def __repr__(self):
-        ''' Function to allow us to print the LMM Products details. '''
+        """ Function to allow us to print the LMM Products details. """
 
         s = "Function not written"
         return s
@@ -417,7 +417,7 @@ class FinIborLMMProducts():
 ###############################################################################
 
     def _print(self):
-        ''' Alternative print method. '''
+        """ Alternative print method. """
 
         print(self)
 
