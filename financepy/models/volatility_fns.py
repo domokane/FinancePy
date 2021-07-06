@@ -217,7 +217,7 @@ def ssvi_local_varg(x, gamma, sigma, rho, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def volFunctionSSVI(params, f, k, t):
+def vol_function_ssvi(params, f, k, t):
     ''' Volatility Function proposed by Gatheral in 2004.'''
 
     gamma = params[0]

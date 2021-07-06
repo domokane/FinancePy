@@ -201,7 +201,7 @@ def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use
 
     if option_type == FinOptionTypes.EUROPEAN_CALL.value:
 
-        for i in prange(0, num_paths):
+        for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff1 += max(s_1 - K, 0.0)
@@ -209,7 +209,7 @@ def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use
 
     elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
 
-        for i in prange(0, num_paths):
+        for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
             s_2 = ss * exp(-g[i] * vsqrtt)
             payoff1 += max(K - s_1, 0.0)

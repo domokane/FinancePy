@@ -168,7 +168,7 @@ def bs_rho(s, t, k, r, q, v, option_type_value):
 
 @vectorize([float64(float64, float64, float64, float64,
                     float64, float64, int64)], fastmath=True, cache=True)
-def bsVanna(s, t, k, r, q, v, option_type_value):
+def bs_vanna(s, t, k, r, q, v, option_type_value):
     """ Price a derivative using Black-Scholes model. """
 
     k = np.maximum(k, gSmall)

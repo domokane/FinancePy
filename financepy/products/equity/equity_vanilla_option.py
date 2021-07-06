@@ -33,8 +33,6 @@ from ...models.black_scholes_mc import _value_mc_numba_only
 from ...models.black_scholes_mc import _value_mc_numpy_only
 from ...models.black_scholes_mc import _value_mc_numba_parallel
 
-from ...utils.math import N
-
 ###############################################################################
 
 
@@ -394,11 +392,11 @@ class EquityVanillaOption():
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
-              model: Model): 
+              model: Model):
         """ Calculate the analytical vanna of a European vanilla option. """
 
         if type(valuation_date) == Date:
-            texp = (self._expiryDate - valuation_date) / gDaysInYear
+            texp = (self._expiry_date - valuation_date) / gDaysInYear
         else:
             texp = valuation_date
 
@@ -411,18 +409,18 @@ class EquityVanillaOption():
         s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 
-        df = discount_curve.df(self._expiryDate)
+        df = discount_curve.df(self._expiry_date)
         r = -np.log(df)/texp
 
-        dq = dividend_curve.df(self._expiryDate)
+        dq = dividend_curve.df(self._expiry_date)
         q = -np.log(dq)/texp
 
-        k = self._strikePrice
+        k = self._strike_price
 
         if isinstance(model, BlackScholes):
 
             v = model._volatility
-            vanna = bs_vanna(s0, texp, k, r, q, v, self._optionType.value)
+            vanna = bs_vanna(s0, texp, k, r, q, v, self._option_type.value)
 
         else:
             raise FinError("Unknown Model Type")
