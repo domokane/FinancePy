@@ -39,10 +39,10 @@ def test_FinNumbaNumpySpeed(useSobol):
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
     call_option = EquityVanillaOption(expiry_date, 100.0,
-                                     FinOptionTypes.EUROPEAN_CALL)
+                                      FinOptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price, discount_curve,
-                             dividend_yield, model)
+                              dividend_yield, model)
 
     num_points = 20
     v_exact = [value] * num_points
@@ -276,10 +276,10 @@ def test_FinNumbaNumbaParallel(useSobol):
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
     call_option = EquityVanillaOption(expiry_date, 100.0,
-                                     FinOptionTypes.EUROPEAN_CALL)
+                                      FinOptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price, discount_curve,
-                             dividend_yield, model)
+                              dividend_yield, model)
 
     num_points = 20
     v_exact = [value] * num_points

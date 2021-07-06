@@ -564,31 +564,43 @@ class EquityVolSurface:
     def _build_vol_surface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
-        s = self._stock_price
-
-        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
-            num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
-            num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
-            num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
-            num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
-            num_parameters = 4
-        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
-            num_parameters = 5
-        elif self._volatility_function_type == FinVolFunctionTypes.SVI:
-            num_parameters = 5
-        elif self._volatility_function_type == FinVolFunctionTypes.SSVI:
-            num_parameters = 5
-        else:
-            print(self._volatility_function_type)
-            raise FinError("Unknown Model Type")
+        s = self._stockPrice
 
         numExpiryDates = self._numExpiryDates
 
-        self._parameters = np.zeros([numExpiryDates, num_parameters])
+        if self._volatilityFunctionType == FinVolFunctionTypes.CLARK:
+            numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_ONE:
+            numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR_BETA_HALF:
+            numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.BBG:
+            numParameters = 3
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SABR:
+            numParameters = 4
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.CLARK5:
+            numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SVI:
+            numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+        elif self._volatilityFunctionType == FinVolFunctionTypes.SSVI:
+            numParameters = 5
+            self._parameters = np.zeros([numExpiryDates, numParameters])      
+            self._parameters[:, 0] = 0.2 # sigma
+            self._parameters[:, 1] = 0.8 # gamma
+            self._parameters[:, 2] = -0.7 # rho
+            self._parameters[:, 3] = 0.3
+            self._parameters[:, 4] = 0.048            
+        else:
+            print(self._volatilityFunctionType)
+            raise FinError("Unknown Model Type")
+
         self._texp = np.zeros(numExpiryDates)
 
         self._F0T = np.zeros(numExpiryDates)

@@ -21,6 +21,7 @@ from ...models.black_scholes_analytic import bs_delta
 from ...models.black_scholes_analytic import bs_vega
 from ...models.black_scholes_analytic import bs_gamma
 from ...models.black_scholes_analytic import bs_rho
+from ...models.black_scholes_analytic import bs_vanna
 from ...models.black_scholes_analytic import bs_theta
 from ...models.black_scholes_analytic import bs_implied_volatility
 from ...models.black_scholes_analytic import bs_intrinsic
@@ -385,6 +386,48 @@ class EquityVanillaOption():
             raise FinError("Unknown Model Type")
 
         return rho
+
+###############################################################################
+
+    def vanna(self,
+              valuation_date: Date,
+              stock_price: float,
+              discount_curve: DiscountCurve,
+              dividend_curve: DiscountCurve,
+              model: Model): 
+        """ Calculate the analytical vanna of a European vanilla option. """
+
+        if type(valuation_date) == Date:
+            texp = (self._expiryDate - valuation_date) / gDaysInYear
+        else:
+            texp = valuation_date
+
+        if np.any(stock_price <= 0.0):
+            raise FinError("Stock price must be greater than zero.")
+
+        if np.any(texp < 0.0):
+            raise FinError("Time to expiry must be positive.")
+
+        s0 = stock_price
+        texp = np.maximum(texp, 1e-10)
+
+        df = discount_curve.df(self._expiryDate)
+        r = -np.log(df)/texp
+
+        dq = dividend_curve.df(self._expiryDate)
+        q = -np.log(dq)/texp
+
+        k = self._strikePrice
+
+        if isinstance(model, BlackScholes):
+
+            v = model._volatility
+            vanna = bs_vanna(s0, texp, k, r, q, v, self._optionType.value)
+
+        else:
+            raise FinError("Unknown Model Type")
+
+        return vanna
 
 ###############################################################################
 
