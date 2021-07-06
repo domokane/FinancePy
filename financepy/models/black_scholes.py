@@ -12,8 +12,8 @@ from ..utils.error import FinError
 from ..utils.helpers import check_argument_types
 
 from .model import Model
-from .equity_crr_tree import crrTreeValAvg
-from .black_scholes_analytic import bawValue
+from .equity_crr_tree import crr_tree_val_avg
+from .black_scholes_analytic import baw_value
 from .black_scholes_analytic import bs_value
 
 from enum import Enum
@@ -65,10 +65,10 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crrTreeValAvg(spotPrice, risk_free_rate, dividendRate,
-                                  self._volatility, self._num_steps_per_year,
-                                  time_to_expiry, option_type.value,
-                                  strike_price)['value']
+                v = crr_tree_val_avg(spotPrice, risk_free_rate, dividendRate,
+                                     self._volatility, self._num_steps_per_year,
+                                     time_to_expiry, option_type.value,
+                                     strike_price)['value']
 
                 return v
 
@@ -89,18 +89,18 @@ class BlackScholes(Model):
                 elif option_type == FinOptionTypes.AMERICAN_PUT:
                     phi = -1
 
-                v = bawValue(spotPrice, time_to_expiry, strike_price,
-                             risk_free_rate, dividendRate, self._volatility,
-                             phi)
+                v = baw_value(spotPrice, time_to_expiry, strike_price,
+                              risk_free_rate, dividendRate, self._volatility,
+                              phi)
 
                 return v
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crrTreeValAvg(spotPrice, risk_free_rate, dividendRate,
-                                  self._volatility, self._num_steps_per_year,
-                                  time_to_expiry, option_type.value,
-                                  strike_price)['value']
+                v = crr_tree_val_avg(spotPrice, risk_free_rate, dividendRate,
+                                     self._volatility, self._num_steps_per_year,
+                                     time_to_expiry, option_type.value,
+                                     strike_price)['value']
 
                 return v
 

@@ -23,7 +23,7 @@ def _func_name():
 
 ###############################################################################
 
-def gridIndex(t, gridTimes):
+def grid_index(t, gridTimes):
     n = len(gridTimes)
     for i in range(0, n):
         gridTime = gridTimes[i]
@@ -37,7 +37,7 @@ def gridIndex(t, gridTimes):
 ###############################################################################
 
 
-def beta_vectorToCorrMatrix(betas):
+def beta_vector_to_corr_matrix(betas):
     """ Convert a one-factor vector of factor weights to a square correlation
     matrix. """
 
@@ -55,8 +55,8 @@ def beta_vectorToCorrMatrix(betas):
 ###############################################################################
 
 
-def pv01Times(t: float,
-              f: float):
+def pv01_times(t: float,
+               f: float):
     """ Calculate a bond style pv01 by calculating remaining coupon times for a
     bond with t years to maturity and a coupon frequency of f. The order of the
     list is reverse time order - it starts with the last coupon date and ends
@@ -75,9 +75,9 @@ def pv01Times(t: float,
 ###############################################################################
 
 
-def timesFromDates(dt: (Date, list),
-                   valuation_date: Date,
-                   day_count_type: DayCountTypes = None):
+def times_from_dates(dt: (Date, list),
+                     valuation_date: Date,
+                     day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
     times from the valuation date. The output is always a numpy vector of times
@@ -123,9 +123,9 @@ def timesFromDates(dt: (Date, list),
 ###############################################################################
 
 
-def checkVectorDifferences(x: np.ndarray,
-                           y: np.ndarray,
-                           tol: float = 1e-6):
+def check_vector_differences(x: np.ndarray,
+                             y: np.ndarray,
+                             tol: float = 1e-6):
     """ Compare two vectors elementwise to see if they are more different than
     tolerance. """
 
@@ -143,7 +143,7 @@ def checkVectorDifferences(x: np.ndarray,
 ###############################################################################
 
 
-def checkDate(d: Date):
+def check_date(d: Date):
     """ Check that input d is a Date. """
 
     if isinstance(d, Date) is False:
@@ -292,7 +292,7 @@ def frange(start: int,
 
 
 @njit(fastmath=True, cache=True)
-def normaliseWeights(wtVector: np.ndarray):
+def normalise_weights(wtVector: np.ndarray):
     """ Normalise a vector of weights so that they sum up to 1.0. """
 
     n = len(wtVector)
@@ -334,9 +334,9 @@ def label_to_string(label: str,
 ###############################################################################
 
 
-def tableToString(header: str,
-                  valueTable,
-                  floatPrecision="10.7f"):
+def table_to_string(header: str,
+                    valueTable,
+                    floatPrecision="10.7f"):
     """ Format a 2D array into a table-like string. """
     if (len(valueTable) == 0 or type(valueTable) is not list):
         print(len(valueTable))
@@ -360,7 +360,7 @@ def tableToString(header: str,
 ###############################################################################
 
 
-def toUsableType(t):
+def to_usable_type(t):
     """ Convert a type such that it can be used with `isinstance` """
     if hasattr(t, '__origin__'):
         origin = t.__origin__
@@ -369,13 +369,13 @@ def toUsableType(t):
             return (list, np.ndarray)
         elif origin is Union:
             types = t.__args__
-            return tuple(toUsableType(tp) for tp in types)
+            return tuple(to_usable_type(tp) for tp in types)
     else:
         # t is a normal type
         if t is float:
             return (int, float, np.float64)
         if isinstance(t, tuple):
-            return tuple(toUsableType(tp) for tp in t)
+            return tuple(to_usable_type(tp) for tp in t)
 
     return t
 
@@ -384,7 +384,7 @@ def toUsableType(t):
 
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-def uniformToDefaultTime(u, t, v):
+def uniform_to_default_time(u, t, v):
     """ Fast mapping of a uniform random variable to a default time given a
     survival probability curve. """
 
@@ -423,9 +423,9 @@ def uniformToDefaultTime(u, t, v):
 # THIS IS NOT USED
 
 @njit(fastmath=True, cache=True)
-def accruedTree(gridTimes: np.ndarray,
-                gridFlows: np.ndarray,
-                face: float):
+def accrued_tree(gridTimes: np.ndarray,
+                 gridFlows: np.ndarray,
+                 face: float):
     """ Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
@@ -474,7 +474,7 @@ def check_argument_types(func, values):
     will not be checked. """
     for valueName, annotationType in func.__annotations__.items():
         value = values[valueName]
-        usableType = toUsableType(annotationType)
+        usableType = to_usable_type(annotationType)
         if (not isinstance(value, usableType)):
             print("ERROR with function arguments for", func.__name__)
             print("This is in module", func.__module__)

@@ -5,15 +5,15 @@
 from numba import njit, float64, int64
 import numpy as np
 
-from ..utils.math import pairGCD
+from ..utils.math import pair_gcd
 
 ###############################################################################
 
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
-def indepLossDbnHeterogeneousAdjBinomial(num_credits,
-                                         condProbs,
-                                         loss_ratio):
+def indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
+                                              condProbs,
+                                              loss_ratio):
 
     # Algorithm due to D. O'Kane.
 
@@ -86,7 +86,7 @@ def indepLossDbnHeterogeneousAdjBinomial(num_credits,
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def portfolioGCD(actualLosses):
+def portfolio_gcd(actualLosses):
 
     num_credits = len(actualLosses)
     scaling = 1000000
@@ -95,7 +95,7 @@ def portfolioGCD(actualLosses):
 
     for iCredit in range(1, num_credits):
         num2 = int(actualLosses[iCredit] * scaling)
-        temp = pairGCD(temp, num2)
+        temp = pair_gcd(temp, num2)
 
     portfolioGCD = float(temp / scaling)
     return portfolioGCD
@@ -104,9 +104,9 @@ def portfolioGCD(actualLosses):
 
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
-def indepLossDbnRecursionGCD(num_credits,
-                             condDefaultProbs,
-                             lossUnits):
+def indep_loss_dbn_recursion_gcd(num_credits,
+                                 condDefaultProbs,
+                                 lossUnits):
 
     numLossUnits = 1
     for i in range(0, len(lossUnits)):

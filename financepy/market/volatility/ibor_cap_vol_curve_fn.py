@@ -32,7 +32,7 @@ class IborCapVolCurveFn():
 
 ###############################################################################
 
-    def capFloorletVol(self, dt):
+    def cap_floorlet_vol(self, dt):
         """ Return the caplet volatility. """
 
         if isinstance(dt, Date):

@@ -7,7 +7,7 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date, fromDatetime
+from financepy.utils.date import Date, from_datetime
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -241,7 +241,7 @@ def test_Bond():
         for _, bond in bondDataFrame.iterrows():
             date_string = bond['maturity']
             matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-            maturityDt = fromDatetime(matDatetime)
+            maturityDt = from_datetime(matDatetime)
             issueDt = Date(maturityDt._d, maturityDt._m, 2000)
 
             coupon = bond['coupon'] / 100.0

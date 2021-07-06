@@ -15,7 +15,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...utils.math import NVect
+from ...utils.math import n_vect
 
 
 ###############################################################################
@@ -97,14 +97,14 @@ class EquityDigitalOption(EquityOption):
 
         if self._underlying_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-                v = np.exp(-r * t) * NVect(d2)
+                v = np.exp(-r * t) * n_vect(d2)
             elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-                v = np.exp(-r * t) * NVect(-d2)
+                v = np.exp(-r * t) * n_vect(-d2)
         elif self._underlying_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
             if self._option_type == FinOptionTypes.EUROPEAN_CALL:
-                v = S0 * np.exp(-q * t) * NVect(d1)
+                v = S0 * np.exp(-q * t) * n_vect(d1)
             elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
-                v = S0 * np.exp(-q * t) * NVect(-d1)
+                v = S0 * np.exp(-q * t) * n_vect(-d1)
         else:
             raise FinError("Unknown underlying type.")
 

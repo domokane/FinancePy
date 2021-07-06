@@ -9,7 +9,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
-from ...utils.helpers import input_time, tableToString
+from ...utils.helpers import input_time, table_to_string
 from ...utils.day_count import DayCount
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
@@ -228,7 +228,7 @@ class CDSCurve:
         header = "TIME,SURVIVAL_PROBABILITY"
         valueTable = [self._times, self._values]
         precision = "10.7f"
-        s += tableToString(header, valueTable, precision)
+        s += table_to_string(header, valueTable, precision)
         return s
 
 ###############################################################################

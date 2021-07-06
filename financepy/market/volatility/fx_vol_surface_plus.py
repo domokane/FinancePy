@@ -13,7 +13,7 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
-from ...models.option_implied_dbn import optionImpliedDbn
+from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
@@ -22,11 +22,11 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
-from ...models.volatility_fns import vol_Function_bloomberg
+from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.sabr import vol_function_sabr
-from ...models.sabr import vol_function_sabr_BETA_ONE
-from ...models.sabr import vol_function_sabr_BETA_HALF
+from ...models.sabr import vol_function_sabr_beta_one
+from ...models.sabr import vol_function_sabr_beta_half
 
 from ...models.volatility_fns import FinVolFunctionTypes
 
@@ -83,7 +83,7 @@ def _g(K, *args):
 ###############################################################################
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-def _interpolateGap(k, strikes, gaps):
+def _interpolate_gap(k, strikes, gaps):
 
     if k <= strikes[0]:
         return 0.0
@@ -286,7 +286,7 @@ def _obj(params, *args):
 
 # THIS FUNCTION IS NOT USED CURRENTLY
 @njit(fastmath=True) #, cache=True)
-def _objGAP(gaps, *args):
+def _obj_gap(gaps, *args):
     """ Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the vol_type_value
@@ -598,7 +598,7 @@ def _solve_to_horizon(s, t, rd, rf,
                 K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
                 delta_method_value, vol_type_value, params)
     
-        opt = minimize(_objGAP, ginits, args, method="Nelder-Mead", tol=tol)
+        opt = minimize(_obj_gap, ginits, args, method="Nelder-Mead", tol=tol)
         xopt = opt.x
         gaps = np.array(xopt)
         
@@ -664,7 +664,7 @@ def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
     if len(strikes) == 1:
         gapK = 0.0
     else:
-        gapK = _interpolateGap(k, strikes, gaps)
+        gapK = _interpolate_gap(k, strikes, gaps)
 
     if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
         vol = vol_function_clark(params, f, k, t) + gapK
@@ -673,13 +673,13 @@ def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
         vol = vol_function_sabr(params, f, k, t)  + gapK
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = vol_function_sabr_BETA_HALF(params, f, k, t)  + gapK
+        vol = vol_function_sabr_beta_half(params, f, k, t) + gapK
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = vol_function_sabr_BETA_ONE(params, f, k, t)  + gapK
+        vol = vol_function_sabr_beta_one(params, f, k, t) + gapK
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
-        vol = vol_Function_bloomberg(params, f, k, t) + gapK
+        vol = vol_function_bloomberg(params, f, k, t) + gapK
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
         vol = vol_function_clark(params, f, k, t)  + gapK
@@ -1177,8 +1177,8 @@ class FXVolSurfacePlus():
 
 ###############################################################################
         
-    def volatilityFromDeltaDate(self, callDelta, expiry_date,
-                                deltaMethod = None):
+    def volatility_from_delta_date(self, callDelta, expiry_date,
+                                   deltaMethod = None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are 
@@ -2075,7 +2075,7 @@ class FXVolSurfacePlus():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._spot_fx_rate, t, rd, rf, Ks, vols)
+            density = option_implied_dbn(self._spot_fx_rate, t, rd, rf, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)

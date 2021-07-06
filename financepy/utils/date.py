@@ -347,7 +347,7 @@ class Date():
 
     ###########################################################################
 
-    def isEOM(self):
+    def is_eom(self):
         """ returns True if this date falls on a month end. """
 
         y = self._y
@@ -367,7 +367,7 @@ class Date():
 
     ###########################################################################
 
-    def EOM(self):
+    def eom(self):
         """ returns last date of month of this date. """
 
         y = self._y
@@ -882,9 +882,9 @@ class Date():
 ###############################################################################
 
 
-def dailyWorkingDaySchedule(self,
-                            start_date: Date,
-                            end_date: Date):
+def daily_working_day_schedule(self,
+                               start_date: Date,
+                               end_date: Date):
     """ Returns a list of working dates between start_date and end_date.
     This function should be replaced by dateRange once add_tenor allows
     for working days. """
@@ -910,7 +910,7 @@ def datediff(d1: Date,
 ###############################################################################
 
 
-def fromDatetime(dt: Date):
+def from_datetime(dt: Date):
     """ Construct a Date from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. """
 
@@ -920,7 +920,7 @@ def fromDatetime(dt: Date):
 ###############################################################################
 
 
-def daysInMonth(m, y):
+def days_in_month(m, y):
     """ Get the number of days in the month (1-12) of a given year y. """
 
     if m < 1 or m > 12:
@@ -934,9 +934,9 @@ def daysInMonth(m, y):
 ###############################################################################
 
 
-def dateRange(start_date: Date,
-              end_date: Date,
-              tenor: str = "1D"):
+def date_range(start_date: Date,
+               end_date: Date,
+               tenor: str = "1D"):
     """ Returns a list of dates between start_date (inclusive)
     and end_date (inclusive). The tenor represents the distance between two
     consecutive dates and is set to daily by default. """
@@ -957,7 +957,7 @@ def dateRange(start_date: Date,
 ###############################################################################
 
 
-def testType():
+def test_type():
     global gDateFormatType
     print("TEST TYPE", gDateFormatType)
 

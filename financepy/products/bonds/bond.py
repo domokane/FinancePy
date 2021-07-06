@@ -124,7 +124,7 @@ class Bond:
         self._alpha = 0.0
 
         self._calculate_flow_dates()
-        self._calculateFlows()
+        self._calculate_flows()
 
     ###########################################################################
 
@@ -146,7 +146,7 @@ class Bond:
 
     ###########################################################################
 
-    def _calculateFlows(self):
+    def _calculate_flows(self):
         """ Determine the bond cash flow payment amounts without principal """
 
         self._flow_amounts = [0.0]

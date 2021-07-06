@@ -95,7 +95,7 @@ class FinIborIborSwap:
 
 ##########################################################################
 
-    def _generatePayFloatLegPaymentDates(self, freq_type):
+    def _generate_pay_float_leg_payment_dates(self, freq_type):
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         

@@ -5,7 +5,7 @@
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.zero_curve import BondZeroCurve
 from financepy.products.bonds.bond import Bond
-from financepy.utils.date import Date, fromDatetime
+from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 import datetime as dt
@@ -38,7 +38,7 @@ def test_BondZeroCurve():
     for _, bondRow in bondDataFrame.iterrows():
         date_string = bondRow['maturity']
         matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = fromDatetime(matDatetime)
+        maturityDt = from_datetime(matDatetime)
         issueDt = Date(maturityDt._d, maturityDt._m, 2000)
         coupon = bondRow['coupon']/100.0
         clean_price = bondRow['mid']
@@ -56,7 +56,7 @@ def test_BondZeroCurve():
 
         date_string = bond['maturity']
         matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = fromDatetime(matDatetime)
+        maturityDt = from_datetime(matDatetime)
         zero_rate = bondCurve.zero_rate(maturityDt)
         testCases.print(maturityDt, zero_rate)
 

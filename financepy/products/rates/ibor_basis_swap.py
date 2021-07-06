@@ -133,7 +133,7 @@ class IborBasisSwap:
 
 ###############################################################################
 
-    def printFloatLeg1PV(self):
+    def print_float_leg_1_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
@@ -141,7 +141,7 @@ class IborBasisSwap:
 
 ###############################################################################
 
-    def printFloatLeg2PV(self):
+    def print_float_leg_2_pv(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

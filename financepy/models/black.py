@@ -8,7 +8,7 @@
 import numpy as np
 from numba import njit, float64, float64
 
-from ..utils.math import NVect, NPrimeVect
+from ..utils.math import n_vect, n_prime_vect
 from ..utils.global_vars import gSmall
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinOptionTypes
@@ -19,7 +19,7 @@ from ..utils.error import FinError
 ###############################################################################
 
 @njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
-def calculateD1D2(f, t, k, v):
+def calculate_d1_d2(f, t, k, v):
 
     t = np.maximum(t, gSmall)
     vol = np.maximum(v, gSmall)
@@ -69,12 +69,12 @@ class Black():
         k = strike_rate
         v = self._volatility
         
-        [d1, d2] = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculate_d1_d2(f, t, k, v)
         
         if call_or_put == FinOptionTypes.EUROPEAN_CALL:
-            value = df * (f * NVect(d1) - k * NVect(d2))
+            value = df * (f * n_vect(d1) - k * n_vect(d2))
         elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
-            value = df * (k * NVect(-d2) - f * NVect(-d1))
+            value = df * (k * n_vect(-d2) - f * n_vect(-d1))
         else:
             raise FinError("Option type must be a European Call or Put")
 
@@ -97,12 +97,12 @@ class Black():
         k = strike_rate
         v = self._volatility
 
-        [d1, d2] = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculate_d1_d2(f, t, k, v)
 
         if call_or_put == FinOptionTypes.EUROPEAN_CALL:
-            delta = df * NVect(d1)
+            delta = df * n_vect(d1)
         elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
-            delta = - df * NVect(-d1)
+            delta = - df * n_vect(-d1)
         else:
             raise FinError("Option type must be a European Call or Put")
 
@@ -125,10 +125,10 @@ class Black():
         k = strike_rate
         v = self._volatility
 
-        [d1, d2] = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculate_d1_d2(f, t, k, v)
 
         sqrtT = np.sqrt(t)
-        gamma = df * NPrimeVect(d1) / (f * v * sqrtT)
+        gamma = df * n_prime_vect(d1) / (f * v * sqrtT)
         return gamma
 
 ###############################################################################
@@ -149,16 +149,16 @@ class Black():
         v = self._volatility
         r = -np.log(df)/t
 
-        [d1, d2] = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculate_d1_d2(f, t, k, v)
 
         sqrtT = np.sqrt(t)
 
         if call_or_put == FinOptionTypes.EUROPEAN_CALL:
-            theta = df * (-(f * v * NPrimeVect(d1)) / (2*sqrtT) + r * f * NVect(d1)
-                          - r * k * NVect(d2))        
+            theta = df * (-(f * v * n_prime_vect(d1)) / (2 * sqrtT) + r * f * n_vect(d1)
+                          - r * k * n_vect(d2))
         elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
-            theta = df * (-(f * v * NPrimeVect(d1)) / (2*sqrtT) - r * f * NVect(-d1)
-                          + r * k * NVect(-d2))
+            theta = df * (-(f * v * n_prime_vect(d1)) / (2 * sqrtT) - r * f * n_vect(-d1)
+                          + r * k * n_vect(-d2))
         else:
             raise FinError("Option type must be a European Call or Put")
 
@@ -181,12 +181,12 @@ class Black():
         v = self._volatility
         sqrtT = np.sqrt(t)
         
-        [d1, d2] = calculateD1D2(f, t, k, v)
+        [d1, d2] = calculate_d1_d2(f, t, k, v)
         
         if call_or_put == FinOptionTypes.EUROPEAN_CALL:
-            vega = df * f * sqrtT * NPrimeVect(d1)
+            vega = df * f * sqrtT * n_prime_vect(d1)
         elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
-            vega = df * f * sqrtT * NPrimeVect(d1)
+            vega = df * f * sqrtT * n_prime_vect(d1)
         else:
             raise FinError("Option type must be a European Call or Put")
 

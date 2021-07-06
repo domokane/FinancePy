@@ -76,11 +76,11 @@ class SwapFixedLeg:
         self._accrued_days = []
         self._rates = []
 
-        self.generatePayments()
+        self.generate_payments()
 
 ###############################################################################
 
-    def generatePayments(self):
+    def generate_payments(self):
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
         # which cash flows are in the future and value the swap

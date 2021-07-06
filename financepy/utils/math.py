@@ -73,7 +73,7 @@ def scale(x: np.ndarray,
 
 
 @njit(boolean(float64[:]), fastmath=True, cache=True)
-def testMonotonicity(x: np.ndarray):
+def test_monotonicity(x: np.ndarray):
     """ Check that an array of doubles is monotonic and strictly increasing."""
     for i in range(1, len(x)):
         if x[i] <= x[i-1]:
@@ -84,9 +84,9 @@ def testMonotonicity(x: np.ndarray):
 
 
 @njit(fastmath=True, cache=True)
-def testRange(x: np.ndarray,
-              lower: float,
-              upper: float):
+def test_range(x: np.ndarray,
+               lower: float,
+               upper: float):
     """ Check that all of the values of an array fall between a lower and
     upper bound. """
     for i in range(0, len(x)):
@@ -205,8 +205,8 @@ def covar(a: np.ndarray,
 
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
-def pairGCD(v1: float,
-            v2: float):
+def pair_gcd(v1: float,
+             v2: float):
     """ Determine the Greatest Common Divisor of two integers using Euclid's
     algorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine
     to see if I should not be declaring inputs as integers for NUMBA. """
@@ -301,13 +301,13 @@ def N(x):
 ###############################################################################
 
 @vectorize([float64(float64)], fastmath=True, cache=True)
-def NVect(x):
+def n_vect(x):
     return N(x)
 
 ###############################################################################
 
 @vectorize([float64(float64)], fastmath=True, cache=True)
-def NPrimeVect(x):
+def n_prime_vect(x):
     return nprime(x)
 
 ###############################################################################
@@ -602,7 +602,7 @@ def phi2(h1, hk, r):
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
             bv = 0.13298076 * h6 * ab * \
-                N(-h6) - exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
+                 N(-h6) - exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
 
             for i in range(0, 5):
                 r1 = r3 * x[i]
@@ -634,7 +634,7 @@ def cholesky(rho):
 
 
 @njit(fastmath=True, cache=True)
-def corr_matrixGenerator(rho, n):
+def corr_matrix_generator(rho, n):
     """ Utility function to generate a full rank n x n correlation matrix with
     a flat correlation structure and value rho. """
 

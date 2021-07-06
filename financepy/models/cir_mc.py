@@ -85,7 +85,7 @@ def variancer(r0, a, b, sigma, t):
         float64),
     fastmath=True,
     cache=True)
-def zeroPrice(r0, a, b, sigma, t):
+def zero_price(r0, a, b, sigma, t):
     """ Price of a zero coupon bond in CIR model. """
     h = np.sqrt(a * a + 2.0 * sigma * sigma)
     denom = 2.0 * h + (a + h) * (np.exp(h * t) - 1.0)
@@ -140,7 +140,7 @@ def draw(rt, a, b, sigma, dt):
         float64,
         int64,
         int64))
-def rate_path_MC(r0, a, b, sigma, t, dt, seed, scheme):
+def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     """ Generate a path of CIR rates using a number of numerical schemes. """
 
     np.random.seed(seed)
@@ -240,7 +240,7 @@ def rate_path_MC(r0, a, b, sigma, t, dt, seed, scheme):
         int64,
         int64,
         int64))
-def zeroPrice_MC(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
+def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
     """ Determine the CIR zero price using Monte Carlo. """
 
     if t == 0.0:

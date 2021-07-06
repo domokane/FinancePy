@@ -252,7 +252,7 @@ def test_performCDSIndexHazardRateAdjustment():
     start = time.time()
 
     indexPortfolio = CDSIndexPortfolio()
-    adjustedIssuerCurves = indexPortfolio.hazardRateAdjustIntrinsic(
+    adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
         valuation_date,
         issuer_curves,
         index_coupons,

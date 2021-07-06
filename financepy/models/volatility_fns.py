@@ -58,7 +58,7 @@ def vol_function_clark(params, f, k, t):
 
 @njit(float64(float64[:], float64, float64, float64), 
       fastmath=True, cache=True)
-def vol_Function_bloomberg(params, f, k, t):
+def vol_function_bloomberg(params, f, k, t):
     """ Volatility Function similar to the one used by Bloomberg. It is 
     a quadratic function in the spot delta of the option. It can therefore 
     go negative so it requires a good initial guess when performing the 
@@ -122,17 +122,17 @@ def vol_function_svi(params, f, k, t):
 ###############################################################################
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
-def phiSSVI(theta, gamma): 
+def phi_ssvi(theta, gamma):
     phi = (1.0/gamma/theta) * (1.0 - (1.0 - np.exp(-gamma*theta))/gamma/theta)
     return phi
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def SSVI(x, gamma, sigma, rho, t):
+def ssvi(x, gamma, sigma, rho, t):
     """ This is the total variance w = sigma(t) x sigma(t) (0,t) x t """ 
     
     theta = sigma * sigma * t
-    p = phiSSVI(theta, gamma)
+    p = phi_ssvi(theta, gamma)
     px = p * x
     g = px + rho
     v = 0.5 * theta * (1. + rho * px + np.sqrt(g**2  + 1. - rho * rho))
@@ -140,10 +140,10 @@ def SSVI(x, gamma, sigma, rho, t):
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def SSVI1(x, gamma, sigma, rho, t):
+def ssvi1(x, gamma, sigma, rho, t):
     # First derivative with respect to x
     theta = sigma * sigma * t
-    p = phiSSVI(theta, gamma)
+    p = phi_ssvi(theta, gamma)
     px = p * x
     v = 0.5 * theta * p * (px + rho * np.sqrt(px**2 + 2. * px * rho + 1.) + rho)
     v = v / np.sqrt(px**2 + 2. * px * rho + 1.)
@@ -151,10 +151,10 @@ def SSVI1(x, gamma, sigma, rho, t):
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def SSVI2(x, gamma, sigma, rho, t):
+def ssvi2(x, gamma, sigma, rho, t):
     # Second derivative with respect to x
     theta = sigma * sigma * t
-    p = phiSSVI(theta, gamma)
+    p = phi_ssvi(theta, gamma)
     px = p * x
     v = 0.5 * theta * p * p * (1. - rho * rho) 
     v =v / ((px**2 + 2. * px * rho + 1.) * np.sqrt(px**2 + 2. * px * rho + 1.))
@@ -162,20 +162,20 @@ def SSVI2(x, gamma, sigma, rho, t):
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def SSVIt(x, gamma, sigma, rho, t):
+def ssvit(x, gamma, sigma, rho, t):
     # First derivative with respect to t, by central difference
     eps = 0.0001
-    ssvitplus = SSVI(x, gamma, sigma, rho, t + eps)
-    ssvitminus = SSVI(x, gamma, sigma, rho, t - eps)
+    ssvitplus = ssvi(x, gamma, sigma, rho, t + eps)
+    ssvitminus = ssvi(x, gamma, sigma, rho, t - eps)
     deriv = (ssvitplus - ssvitminus) / 2.0/ eps
     return deriv  
                    
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def g(x, gamma, sigma, rho, t):
-    w = SSVI(x, gamma, sigma, rho, t)
-    w1 = SSVI1(x, gamma, sigma, rho, t)
-    w2 = SSVI2(x, gamma, sigma, rho, t)
+    w = ssvi(x, gamma, sigma, rho, t)
+    w1 = ssvi1(x, gamma, sigma, rho, t)
+    w2 = ssvi2(x, gamma, sigma, rho, t)
     xwv = x * w1 / w
     v = (1. - 0.5 * xwv) **2 - 0.25 * w1 * w1 * (0.25 + 1. / w) + 0.5 * w2
     return v
@@ -183,23 +183,23 @@ def g(x, gamma, sigma, rho, t):
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
 def dminus(x, gamma, sigma, rho, t):
-    vsqrt = np.sqrt(SSVI(x, gamma, sigma, rho, t))
+    vsqrt = np.sqrt(ssvi(x, gamma, sigma, rho, t))
     v = -x / vsqrt - 0.5 * vsqrt
     return v
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def densitySSVI(x, gamma, sigma, rho, t):
+def density_ssvi(x, gamma, sigma, rho, t):
     dm = dminus(x, gamma, sigma, rho, t)
     v = g(x, gamma, sigma, rho, t) * np.exp(-0.5 * dm * dm)
-    v = v / np.sqrt(2. * np.pi * SSVI(x, gamma, sigma, rho, t))
+    v = v / np.sqrt(2. * np.pi * ssvi(x, gamma, sigma, rho, t))
     return v
 
 @njit(float64(float64, float64, float64, float64, float64), 
       fastmath=True, cache=True)
-def SSVI_LocalVarg(x, gamma, sigma, rho, t):
+def ssvi_local_varg(x, gamma, sigma, rho, t):
     # Compute the equivalent SSVI local variance 
-    num = SSVIt(x, gamma, sigma, rho, t) 
+    num = ssvit(x, gamma, sigma, rho, t)
     den = g(x, gamma, sigma, rho, t)
     var = num/den
     return var
@@ -214,7 +214,7 @@ def vol_function_ssvi(params, f, k, t):
     rho = params[2]
     x = np.log(f/k)
 
-    vart = SSVI_LocalVarg(x, gamma, sigma, rho, t)    
+    vart = ssvi_local_varg(x, gamma, sigma, rho, t)
     sigma = np.sqrt(vart)
     return sigma
 

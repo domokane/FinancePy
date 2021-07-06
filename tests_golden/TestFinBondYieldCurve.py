@@ -10,7 +10,7 @@ sys.path.append("..")
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date, fromDatetime
+from financepy.utils.date import Date, from_datetime
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.yield_curve import BondYieldCurve
 from financepy.products.bonds.yield_curve_model import CurveFitPolynomial
@@ -45,7 +45,7 @@ def test_BondYieldCurve():
 
         date_string = bond['maturity']
         matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = fromDatetime(matDatetime)
+        maturityDt = from_datetime(matDatetime)
         issueDt = Date(maturityDt._d, maturityDt._m, 2000)
         coupon = bond['coupon']/100.0
         clean_price = bond['mid']

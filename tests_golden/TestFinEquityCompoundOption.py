@@ -57,8 +57,8 @@ def test_EquityCompoundOption():
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model)
 
-                values = cmpdOption._valueTree(valuation_date, stock_price, discount_curve,
-                                               dividend_curve, model, num_steps)
+                values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+                                                dividend_curve, model, num_steps)
 
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
                                 num_steps, value, values[0])
@@ -85,8 +85,8 @@ def test_EquityCompoundOption():
                 value = cmpdOption.value(valuation_date, stock_price, discount_curve,
                                          dividend_curve, model, num_steps)
 
-                values = cmpdOption._valueTree(valuation_date, stock_price, discount_curve,
-                                               dividend_curve, model, num_steps)
+                values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+                                                dividend_curve, model, num_steps)
 
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
                                 num_steps, value, values[0])
@@ -134,9 +134,9 @@ def test_EquityCompoundOption():
                     dividend_curve,
                     model)
 
-                values = cmpdOption._valueTree(valuation_date, stock_price,
-                                               discount_curve, dividend_curve,
-                                               model)
+                values = cmpdOption._value_tree(valuation_date, stock_price,
+                                                discount_curve, dividend_curve,
+                                                model)
 
                 diff = value - values[0]
 

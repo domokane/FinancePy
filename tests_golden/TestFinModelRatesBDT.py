@@ -102,7 +102,7 @@ def test_BDTExampleOne():
     dfs = np.array(dfs)
 
     model = BDTTree(yieldVol, num_time_steps)
-    model.buildTree(tmat, years, dfs)
+    model.build_tree(tmat, years, dfs)
 
 ###############################################################################
 
@@ -172,7 +172,7 @@ def test_BDTExampleTwo():
     treeVector = []
     for num_time_steps in num_steps_list:
         model = BDTTree(sigma, num_time_steps)
-        model.buildTree(tmat, times, dfs)
+        model.build_tree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
                               face, coupon_times, coupon_flows, exercise_type)
 
@@ -261,7 +261,7 @@ def test_BDTExampleThree():
                     settlement_date, curve)
 
                 model = BDTTree(sigma, num_time_steps)
-                model.buildTree(tmat, times, dfs)
+                model.build_tree(tmat, times, dfs)
 
                 v = model.bermudan_swaption(texp,
                                             tmat,

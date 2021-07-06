@@ -96,15 +96,15 @@ def _payoff_value(s, payoff_type, payoff_params):
 
 
 @njit(fastmath=True, cache=True)
-def _valueOnce(stock_price,
-               r,
-               q,
-               volatility,
-               num_steps,
-               time_to_expiry,
-               payoff_type,
-               exercise_type,
-               payoff_params):
+def _value_once(stock_price,
+                r,
+                q,
+                volatility,
+                num_steps,
+                time_to_expiry,
+                payoff_type,
+                exercise_type,
+                payoff_params):
 
     if num_steps < 3:
         num_steps = 3
@@ -223,26 +223,26 @@ class EquityBinomialTree():
         dq = dividend_curve.df(expiry_date)
         q = -np.log(dq)/texp
 
-        price1 = _valueOnce(stock_price,
-                            r,
-                            q,
-                            volatility,
-                            num_steps,
-                            texp,
-                            payoff_type,
-                            exercise_type,
-                            payoff_params)
+        price1 = _value_once(stock_price,
+                             r,
+                             q,
+                             volatility,
+                             num_steps,
+                             texp,
+                             payoff_type,
+                             exercise_type,
+                             payoff_params)
 
         # Can I reuse the same tree ?
-        price2 = _valueOnce(stock_price,
-                            r,
-                            q,
-                            volatility,
-                            num_steps + 1,
-                            texp,
-                            payoff_type,
-                            exercise_type,
-                            payoff_params)
+        price2 = _value_once(stock_price,
+                             r,
+                             q,
+                             volatility,
+                             num_steps + 1,
+                             texp,
+                             payoff_type,
+                             exercise_type,
+                             payoff_params)
 
         price = (price1 + price2) / 2.0
 

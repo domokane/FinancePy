@@ -9,9 +9,9 @@ import numpy as np
 
 from ..utils.math import norminvcdf, N, INVROOT2PI
 from ..utils.error import FinError
-from .loss_dbn_builder import indepLossDbnRecursionGCD
-from .loss_dbn_builder import indepLossDbnHeterogeneousAdjBinomial
-from .loss_dbn_builder import portfolioGCD
+from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
+from .loss_dbn_builder import indep_loss_dbn_heterogeneous_adj_binomial
+from .loss_dbn_builder import portfolio_gcd
 
 ###############################################################################
 
@@ -63,9 +63,9 @@ def loss_dbn_recursion_gcd(num_credits,
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
 
-        indepDbn = indepLossDbnRecursionGCD(num_credits,
-                                            condDefaultProbs,
-                                            lossUnits)
+        indepDbn = indep_loss_dbn_recursion_gcd(num_credits,
+                                                condDefaultProbs,
+                                                lossUnits)
 
         gaussWt = np.exp(-(z*z)/2.0)
 
@@ -169,7 +169,7 @@ def tranche_surv_prob_recursion(k1,
     if commonRecoveryFlag == 1:
         gcd = lossAmounts[0]
     else:
-        gcd = portfolioGCD(lossAmounts)
+        gcd = portfolio_gcd(lossAmounts)
 
     lossUnits = np.zeros(num_credits)
     numLossUnits = 1  # this is the zero loss
@@ -317,9 +317,9 @@ def loss_dbn_hetero_adj_binomial(num_credits,
             argz = (thresholds[iCredit] - beta * z) / denom
             condDefaultProbs[iCredit] = N(argz)
 
-        indepDbn = indepLossDbnHeterogeneousAdjBinomial(num_credits,
-                                                        condDefaultProbs,
-                                                        loss_ratio)
+        indepDbn = indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
+                                                             condDefaultProbs,
+                                                             loss_ratio)
 
         gaussWt = np.exp(-(z**2) / 2.0)
 

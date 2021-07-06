@@ -14,15 +14,15 @@ bump = 1e-4
 
 @njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
                  float64, int64), fastmath=True, cache=True)
-def crrTreeVal(stock_price,
-               ccInterestRate,  # continuously compounded
-               ccDividendRate,  # continuously compounded
-               volatility,  # Black scholes volatility
-               num_steps_per_year,
-               time_to_expiry,
-               option_type,
-               strike_price,
-               isEven):
+def crr_tree_val(stock_price,
+                 ccInterestRate,  # continuously compounded
+                 ccDividendRate,  # continuously compounded
+                 volatility,  # Black scholes volatility
+                 num_steps_per_year,
+                 time_to_expiry,
+                 option_type,
+                 strike_price,
+                 isEven):
     """ Value an American option using a Binomial Treee """
 
     num_steps = int(num_steps_per_year * time_to_expiry)
@@ -144,36 +144,36 @@ def crrTreeVal(stock_price,
 ###############################################################################
 
 
-def crrTreeValAvg(stock_price,
-                  ccInterestRate,  # continuously compounded
-                  ccDividendRate,  # continuously compounded
-                  volatility,  # Black scholes volatility
-                  num_steps_per_year,
-                  time_to_expiry,
-                  option_type,
-                  strike_price):
+def crr_tree_val_avg(stock_price,
+                     ccInterestRate,  # continuously compounded
+                     ccDividendRate,  # continuously compounded
+                     volatility,  # Black scholes volatility
+                     num_steps_per_year,
+                     time_to_expiry,
+                     option_type,
+                     strike_price):
     """ Calculate the average values off the tree using an even and an odd
     number of time steps. """
 
-    value1 = crrTreeVal(stock_price,
-                        ccInterestRate,
-                        ccDividendRate,
-                        volatility,
-                        num_steps_per_year,
-                        time_to_expiry,
-                        option_type,
-                        strike_price,
-                        1)  # even
+    value1 = crr_tree_val(stock_price,
+                          ccInterestRate,
+                          ccDividendRate,
+                          volatility,
+                          num_steps_per_year,
+                          time_to_expiry,
+                          option_type,
+                          strike_price,
+                          1)  # even
 
-    value2 = crrTreeVal(stock_price,
-                        ccInterestRate,
-                        ccDividendRate,
-                        volatility,
-                        num_steps_per_year,
-                        time_to_expiry,
-                        option_type,
-                        strike_price,
-                        0)  # odd
+    value2 = crr_tree_val(stock_price,
+                          ccInterestRate,
+                          ccDividendRate,
+                          volatility,
+                          num_steps_per_year,
+                          time_to_expiry,
+                          option_type,
+                          strike_price,
+                          0)  # odd
 
     v = (value1 + value2) / 2.0
     res = {'value': v[0], 'delta': v[1], 'gamma': v[2], 'theta': v[3]}

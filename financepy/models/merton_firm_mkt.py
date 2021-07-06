@@ -112,12 +112,12 @@ class MertonFirmMkt(MertonFirm):
             raise FinError("Len mu must be 1 or maximum length of arrays")
 
         self._nmax = nmax
-        self._solveForAssetValueAndVol()
+        self._solve_for_asset_value_and_vol()
         self._D = self.debt_value()
 
 ###############################################################################
 
-    def _solveForAssetValueAndVol(self):
+    def _solve_for_asset_value_and_vol(self):
 
         self._A = []
         self._vA = []

@@ -66,7 +66,7 @@ errorStr = "In averaging period so need to enter accrued average."
 
 
 @njit(cache=True, fastmath=True)
-def _value_mc_NUMBA(t0,
+def _value_mc_numba(t0,
                     t,
                     tau,
                     K,
@@ -150,7 +150,7 @@ def _value_mc_NUMBA(t0,
 
 
 @njit(cache=True, fastmath=True)
-def _value_mc_fast_NUMBA(t0: float,
+def _value_mc_fast_numba(t0: float,
                          t: float,
                          tau: float,
                          K: float,
@@ -238,7 +238,7 @@ def _value_mc_fast_NUMBA(t0: float,
 
 
 @njit(cache=True, fastmath=True)
-def _value_mc_fast_CV_NUMBA(t0, t, tau, K, n, option_type, stock_price,
+def _value_mc_fast_cv_numba(t0, t, tau, K, n, option_type, stock_price,
                             interest_rate, dividend_yield, volatility, num_paths,
                             seed, accruedAverage, v_g_exact):
 
@@ -396,28 +396,28 @@ class EquityAsianOption:
             raise FinError("Value date after expiry date.")
 
         if method == AsianOptionValuationMethods.GEOMETRIC:
-            v = self._valueGeometric(valuation_date,
-                                     stock_price,
-                                     discount_curve,
-                                     dividend_curve,
-                                     model,
-                                     accruedAverage)
+            v = self._value_geometric(valuation_date,
+                                      stock_price,
+                                      discount_curve,
+                                      dividend_curve,
+                                      model,
+                                      accruedAverage)
 
         elif method == AsianOptionValuationMethods.TURNBULL_WAKEMAN:
-            v = self._valueTurnbullWakeman(valuation_date,
-                                           stock_price,
-                                           discount_curve,
-                                           dividend_curve,
-                                           model,
-                                           accruedAverage)
+            v = self._value_turnbull_wakeman(valuation_date,
+                                             stock_price,
+                                             discount_curve,
+                                             dividend_curve,
+                                             model,
+                                             accruedAverage)
 
         elif method == AsianOptionValuationMethods.CURRAN:
-            v = self._valueCurran(valuation_date,
-                                  stock_price,
-                                  discount_curve,
-                                  dividend_curve,
-                                  model,
-                                  accruedAverage)
+            v = self._value_curran(valuation_date,
+                                   stock_price,
+                                   discount_curve,
+                                   dividend_curve,
+                                   model,
+                                   accruedAverage)
         else:
             raise FinError("Unknown valuation model")
 
@@ -425,8 +425,8 @@ class EquityAsianOption:
 
 ###############################################################################
 
-    def _valueGeometric(self, valuation_date, stock_price, discount_curve,
-                        dividend_curve, model, accruedAverage):
+    def _value_geometric(self, valuation_date, stock_price, discount_curve,
+                         dividend_curve, model, accruedAverage):
         """ This option valuation is based on paper by Kemna and Vorst 1990. It
         calculates the Geometric Asian option price which is a lower bound on
         the Arithmetic option price. This should not be used as a valuation
@@ -492,8 +492,8 @@ class EquityAsianOption:
 
 ###############################################################################
 
-    def _valueCurran(self, valuation_date, stock_price, discount_curve,
-                     dividend_curve, model, accruedAverage):
+    def _value_curran(self, valuation_date, stock_price, discount_curve,
+                      dividend_curve, model, accruedAverage):
         """ Valuation of an Asian option using the result by Vorst. """
 
         if valuation_date > self._expiry_date:
@@ -558,8 +558,8 @@ class EquityAsianOption:
 
 ###############################################################################
 
-    def _valueTurnbullWakeman(self, valuation_date, stock_price, discount_curve,
-                              dividend_curve, model, accruedAverage):
+    def _value_turnbull_wakeman(self, valuation_date, stock_price, discount_curve,
+                                dividend_curve, model, accruedAverage):
         """ Asian option valuation based on paper by Turnbull and Wakeman 1991
         which uses the edgeworth expansion to find the first two moments of the
         arithmetic average. """
@@ -668,7 +668,7 @@ class EquityAsianOption:
         K = self._strike_price
         n = self._num_observations
 
-        v = _value_mc_NUMBA(t0, texp, tau, K, n, self._option_type,
+        v = _value_mc_numba(t0, texp, tau, K, n, self._option_type,
                             stock_price,
                             r,
                             q,
@@ -706,7 +706,7 @@ class EquityAsianOption:
 
         volatility = model._volatility
 
-        v = _value_mc_fast_NUMBA(t0, texp, tau,
+        v = _value_mc_fast_numba(t0, texp, tau,
                                  K, n, self._option_type,
                                  stock_price,
                                  r,
@@ -747,14 +747,14 @@ class EquityAsianOption:
         volatility = model._volatility
 
         # For control variate we price a Geometric average option exactly
-        v_g_exact = self._valueGeometric(valuation_date,
-                                         stock_price,
-                                         discount_curve,
-                                         dividend_curve,
-                                         model,
-                                         accruedAverage)
+        v_g_exact = self._value_geometric(valuation_date,
+                                          stock_price,
+                                          discount_curve,
+                                          dividend_curve,
+                                          model,
+                                          accruedAverage)
 
-        v = _value_mc_fast_CV_NUMBA(t0,
+        v = _value_mc_fast_cv_numba(t0,
                                     texp,
                                     tau,
                                     K,

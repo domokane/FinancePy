@@ -37,7 +37,7 @@ def test_FinProcessSimulator():
     scheme = FinGBMNumericalScheme.NORMAL
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.GBM,
         t,
         model_params,
@@ -59,7 +59,7 @@ def test_FinProcessSimulator():
     scheme = FinGBMNumericalScheme.ANTITHETIC
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.GBM,
         t,
         model_params,
@@ -83,7 +83,7 @@ def test_FinProcessSimulator():
     scheme = FinHestonNumericalScheme.EULER
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.HESTON,
         t,
         model_params,
@@ -107,7 +107,7 @@ def test_FinProcessSimulator():
     scheme = FinHestonNumericalScheme.EULERLOG
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.HESTON,
         t,
         model_params,
@@ -131,7 +131,7 @@ def test_FinProcessSimulator():
     scheme = FinHestonNumericalScheme.QUADEXP
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.HESTON,
         t,
         model_params,
@@ -153,7 +153,7 @@ def test_FinProcessSimulator():
     scheme = FinVasicekNumericalScheme.NORMAL
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.VASICEK,
         t,
         model_params,
@@ -175,7 +175,7 @@ def test_FinProcessSimulator():
     scheme = FinVasicekNumericalScheme.ANTITHETIC
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.VASICEK,
         t,
         model_params,
@@ -197,7 +197,7 @@ def test_FinProcessSimulator():
     scheme = FinCIRNumericalScheme.MILSTEIN
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
-    paths = modelSim.getProcess(
+    paths = modelSim.get_process(
         FinProcessTypes.CIR,
         t,
         model_params,

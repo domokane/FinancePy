@@ -41,7 +41,7 @@ def test_ShiftedSABR():
 
     # SABR equivalent to lognormal (Black) model (i.e. beta = 1, rho = 0, nu = 0, shift = 0)
     modelSABR_01 = SABRShifted(0.0, 1.0, 0.0, 0.0, 0.0)
-    modelSABR_01.setAlphaFromBlackVol(strikeVol, f, k, texp)
+    modelSABR_01.set_alpha_from_black_vol(strikeVol, f, k, texp)
 
     impliedLognormalVol = modelSABR_01.black_vol(f, k, texp)
     impliedATMLognormalVol = modelSABR_01.black_vol(k, k, texp)
@@ -53,7 +53,7 @@ def test_ShiftedSABR():
 
     # Volatility: pure SABR dynamics
     modelSABR_02 = SABRShifted(alpha, beta, rho, nu, shift)
-    modelSABR_02.setAlphaFromBlackVol(strikeVol, f, k, texp)
+    modelSABR_02.set_alpha_from_black_vol(strikeVol, f, k, texp)
 
     impliedLognormalVol = modelSABR_02.black_vol(f, k, texp)
     impliedATMLognormalVol = modelSABR_02.black_vol(k, k, texp)

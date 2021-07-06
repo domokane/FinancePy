@@ -101,7 +101,7 @@ class IborCapFloor():
 
 ###############################################################################
 
-    def _generateDates(self):
+    def _generate_dates(self):
 
         schedule = Schedule(self._start_date,
                             self._maturity_date,
@@ -119,7 +119,7 @@ class IborCapFloor():
         the volatility of the Ibor rate to the cap start date. """
 
         self._valuation_date = valuation_date
-        self._generateDates()
+        self._generate_dates()
 
         self._day_counter = DayCount(self._day_count_type)
         num_options = len(self._capFloorLetDates)
@@ -186,11 +186,11 @@ class IborCapFloor():
 
             intrinsic_value *= self._notional
 
-            capFloorLetValue = self.valueCapletFloorLet(valuation_date,
-                                                        start_date,
-                                                        end_date,
-                                                        libor_curve,
-                                                        model)
+            capFloorLetValue = self.value_caplet_floor_let(valuation_date,
+                                                           start_date,
+                                                           end_date,
+                                                           libor_curve,
+                                                           model)
 
             capFloorValue += capFloorLetValue
 
@@ -205,12 +205,12 @@ class IborCapFloor():
 
 ###############################################################################
 
-    def valueCapletFloorLet(self,
-                            valuation_date,
-                            capletStartDate,
-                            capletEndDate,
-                            libor_curve,
-                            model):
+    def value_caplet_floor_let(self,
+                               valuation_date,
+                               capletStartDate,
+                               capletEndDate,
+                               libor_curve,
+                               model):
         """ Value the caplet or floorlet using a specific model. """
 
         texp = (capletStartDate - self._start_date) / gDaysInYear
@@ -282,8 +282,8 @@ class IborCapFloor():
             df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.optionOnZCB(texp, tmat, strike_price, face_amount,
-                                  df_times, df_values)
+            v = model.option_on_zcb(texp, tmat, strike_price, face_amount,
+                                    df_times, df_values)
 
             # we divide by alpha to offset the multiplication above
             if self._option_type == FinCapFloorTypes.CAP:

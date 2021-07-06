@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 
 from ...utils.date import Date
-from ...utils.math import scale, testMonotonicity
+from ...utils.math import scale, test_monotonicity
 from ...utils.global_vars import gDaysInYear
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import input_time
-from ...utils.helpers import tableToString
+from ...utils.helpers import table_to_string
 from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
@@ -64,7 +64,7 @@ class BondZeroCurve(DiscountCurve):
             times.append(tmat)
 
         times = np.array(times)
-        if testMonotonicity(times) is False:
+        if test_monotonicity(times) is False:
             raise FinError("Times are not sorted in increasing order")
 
         self._yearsToMaturity = np.array(times)
@@ -188,7 +188,7 @@ class BondZeroCurve(DiscountCurve):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         valueTable = [self._times, self._values]
         precision = "10.7f"
-        s += tableToString(header, valueTable, precision)
+        s += table_to_string(header, valueTable, precision)
         return s
 
 ###############################################################################

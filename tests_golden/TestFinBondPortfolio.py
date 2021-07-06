@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
-from financepy.utils.date import Date, fromDatetime
+from financepy.utils.date import Date, from_datetime
 import os
 import datetime as dt
 
@@ -39,7 +39,7 @@ def test_BondPortfolio():
 
             date_string = bond['maturity']
             matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-            maturityDt = fromDatetime(matDatetime)
+            maturityDt = from_datetime(matDatetime)
             issueDt = Date(maturityDt._d, maturityDt._m, 2000)
             coupon = bond['coupon']/100.0
             clean_price = bond['mid']

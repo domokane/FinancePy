@@ -40,7 +40,7 @@ def test_HullWhiteExampleOne():
     num_time_steps = 3
     model = HWTree(sigma, a, num_time_steps)
     treeMat = (end_date - start_date)/gDaysInYear
-    model.buildTree(treeMat, times, dfs)
+    model.build_tree(treeMat, times, dfs)
 #   print_tree(model._Q)
 #   print("")
 #   print_tree(model._rt)
@@ -78,7 +78,7 @@ def test_HullWhiteExampleTwo():
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)
-    vAnal = model.optionOnZCB(texp, tmat, strike, face, times, dfs)
+    vAnal = model.option_on_zcb(texp, tmat, strike, face, times, dfs)
 
     # Test convergence
     num_steps_list = range(100, 500, 100)
@@ -95,12 +95,12 @@ def test_HullWhiteExampleTwo():
         start = time.time()
 
         model = HWTree(sigma, a, num_time_steps)
-        model.buildTree(texp, times, dfs)
-        vTree1 = model.optionOnZeroCouponBond_Tree(texp, tmat, strike, face)
+        model.build_tree(texp, times, dfs)
+        vTree1 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
 
         model = HWTree(sigma, a, num_time_steps+1)
-        model.buildTree(texp, times, dfs)
-        vTree2 = model.optionOnZeroCouponBond_Tree(texp, tmat, strike, face)
+        model.build_tree(texp, times, dfs)
+        vTree2 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
 
         end = time.time()
         period = end-start
@@ -170,9 +170,9 @@ def test_HullWhiteBondOption():
     num_steps_list = range(50, 500, 50)
     texp = (expiry_date - settlement_date)/gDaysInYear
 
-    vJam = model.europeanBondOptionJamshidian(texp, strike_price, face,
-                                              coupon_times, coupon_flows,
-                                              times, dfs)
+    vJam = model.european_bond_option_jamshidian(texp, strike_price, face,
+                                                 coupon_times, coupon_flows,
+                                                 times, dfs)
 
     testCases.banner(
         "Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry.")
@@ -185,7 +185,7 @@ def test_HullWhiteBondOption():
         start = time.time()
         model = HWTree(sigma, a, num_time_steps,
                        FinHWEuropeanCalcType.EXPIRY_ONLY)
-        model.buildTree(texp, times, dfs)
+        model.build_tree(texp, times, dfs)
 
         exercise_type = FinExerciseTypes.EUROPEAN
 
@@ -194,7 +194,7 @@ def test_HullWhiteBondOption():
 
         model = HWTree(sigma, a, num_time_steps,
                        FinHWEuropeanCalcType.EXPIRY_TREE)
-        model.buildTree(texp, times, dfs)
+        model.build_tree(texp, times, dfs)
 
         v2 = model.bond_option(texp, strike_price, face,
                                coupon_times, coupon_flows, exercise_type)
@@ -328,11 +328,11 @@ def test_HullWhiteCallableBond():
 
         start = time.time()
         model = HWTree(sigma, a, num_time_steps)
-        model.buildTree(tmat, times, dfs)
+        model.build_tree(tmat, times, dfs)
 
-        v2 = model.callablePuttableBond_Tree(coupon_times, coupon_flows,
-                                             call_times, call_prices,
-                                             put_times, put_prices, 100.0)
+        v2 = model.callable_puttable_bond_tree(coupon_times, coupon_flows,
+                                               call_times, call_prices,
+                                               put_times, put_prices, 100.0)
 
         end = time.time()
         period = end-start

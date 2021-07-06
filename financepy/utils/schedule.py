@@ -147,7 +147,7 @@ class Schedule:
                 next_date = next_date.add_months(-num_months)
 
                 if self._end_of_month_flag is True:
-                    next_date = next_date.EOM()
+                    next_date = next_date.eom()
 
                 flow_num += 1
 

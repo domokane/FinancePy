@@ -8,9 +8,9 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
-from ...utils.math import testMonotonicity
+from ...utils.math import test_monotonicity
 from ...utils.helpers import label_to_string
-from ...utils.helpers import timesFromDates
+from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
 from .interpolator import InterpTypes, FinInterpolator
@@ -70,9 +70,9 @@ class DiscountCurveZeros(DiscountCurve):
         self._zero_rates = np.array(zero_rates)
         self._zero_dates = zero_dates
 
-        self._times = timesFromDates(zero_dates, valuation_date, day_count_type)
+        self._times = times_from_dates(zero_dates, valuation_date, day_count_type)
 
-        if testMonotonicity(self._times) is False:
+        if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
         dfs = self._zero_to_df(self._valuation_date,

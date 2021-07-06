@@ -66,17 +66,17 @@ def payoff_value(s, payoff_typeValue, payoff_params):
 ###############################################################################
 
 
-def value_mcFast(t,
-                 stock_prices,
-                 discount_curve,
-                 dividend_yields,
-                 volatilities,
-                 betas,
-                 num_assets,
-                 payoff_type,
-                 payoff_params,
-                 num_paths=10000,
-                 seed=4242):
+def value_mc_fast(t,
+                  stock_prices,
+                  discount_curve,
+                  dividend_yields,
+                  volatilities,
+                  betas,
+                  num_assets,
+                  payoff_type,
+                  payoff_params,
+                  num_paths=10000,
+                  seed=4242):
 
     np.random.seed(seed)
     df = discount_curve._df(t)
@@ -271,17 +271,17 @@ class FXRainbowOption(EquityOption):
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        v = value_mcFast(t,
-                         stock_prices,
-                         discount_curve,
-                         dividend_yields,
-                         volatilities,
-                         betas,
-                         self._num_assets,
-                         self._payoff_type,
-                         self._payoff_params,
-                         num_paths,
-                         seed)
+        v = value_mc_fast(t,
+                          stock_prices,
+                          discount_curve,
+                          dividend_yields,
+                          volatilities,
+                          betas,
+                          self._num_assets,
+                          self._payoff_type,
+                          self._payoff_params,
+                          num_paths,
+                          seed)
 
         return v
 

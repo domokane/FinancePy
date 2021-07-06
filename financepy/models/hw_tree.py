@@ -37,7 +37,7 @@ class FinHWEuropeanCalcType(Enum):
 ###############################################################################
 
 
-def optionExerciseTypesToInt(optionExerciseType):
+def option_exercise_types_to_int(optionExerciseType):
 
     if optionExerciseType == FinExerciseTypes.EUROPEAN:
         return 1
@@ -52,7 +52,7 @@ def optionExerciseTypesToInt(optionExerciseType):
 
 
 @njit(fastmath=True, cache=True)
-def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
+def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
     """ Forward discount factor as seen at some time t which may be in the
     future for payment at time T where Rt is the delta-period short rate
     seen at time t and pt is the discount factor to time t, ptd is the one
@@ -79,7 +79,7 @@ def P_Fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
 
 
 @njit(fastmath=True, cache=True)
-def buildTree_Fast(a, sigma, tree_times, num_time_steps, discount_factors):
+def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     """ Fast tree construction using Numba. """
     treeMaturity = tree_times[-1]
     dt = treeMaturity / (num_time_steps+1)
@@ -163,20 +163,20 @@ def buildTree_Fast(a, sigma, tree_times, num_time_steps, discount_factors):
 
 
 @njit(fastmath=True, cache=True)
-def americanBondOption_Tree_Fast(texp,
-                                 strike_price,
-                                 face_amount,
-                                 coupon_times,
-                                 couponAmounts,
-                                 exercise_typeInt,
-                                 _sigma,
-                                 _a,
-                                 _Q,
-                                 _pu, _pm, _pd,
-                                 _rt,
-                                 _dt,
-                                 _tree_times,
-                                 _df_times, _df_values):
+def american_bond_option_tree_fast(texp,
+                                   strike_price,
+                                   face_amount,
+                                   coupon_times,
+                                   couponAmounts,
+                                   exercise_typeInt,
+                                   _sigma,
+                                   _a,
+                                   _Q,
+                                   _pu, _pm, _pd,
+                                   _rt,
+                                   _dt,
+                                   _tree_times,
+                                   _df_times, _df_values):
     """ Value an option on a bond with coupons that can have European or
     American exercise. Some minor issues to do with handling coupons on
     the option expiry date need to be solved. """
@@ -277,7 +277,7 @@ def americanBondOption_Tree_Fast(texp,
             tflow = coupon_times[i]
             if tflow >= texp:
                 ptflow = _uinterpolate(tflow, _df_times, _df_values, interp)
-                zcb = P_Fast(texp, tflow, rt, dt, ptexp, ptdelta, ptflow,
+                zcb = p_fast(texp, tflow, rt, dt, ptexp, ptdelta, ptflow,
                              _sigma, _a)
                 cpn = couponAmounts[i]
                 bondPrice += cpn * face_amount * zcb
@@ -599,12 +599,12 @@ def bermudan_swaption_tree_fast(texp, tmat, strike_price, face_amount,
 
 
 @njit(fastmath=True, cache=True)
-def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
-                                   call_times, call_prices,
-                                   put_times, put_prices, face,
-                                   _sigma, _a, _Q,  # IS SIGMA USED ?
-                                   _pu, _pm, _pd, _rt, _dt, _tree_times,
-                                   _df_times, _df_values):
+def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+                                     call_times, call_prices,
+                                     put_times, put_prices, face,
+                                     _sigma, _a, _Q,  # IS SIGMA USED ?
+                                     _pu, _pm, _pd, _rt, _dt, _tree_times,
+                                     _df_times, _df_values):
     """ Value an option on a bond with coupons that can have European or
     American exercise. Some minor issues to do with handling coupons on
     the option expiry date need to be solved. """
@@ -781,7 +781,7 @@ def callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
 ###############################################################################
 
 
-def fwdFullBondPrice(rt, *args):
+def fwd_full_bond_price(rt, *args):
     """ Price a coupon bearing bond on the option expiry date and return
     the difference from a strike price. This is used in a root search to
     find the future expiry time short rate that makes the bond price equal
@@ -812,7 +812,7 @@ def fwdFullBondPrice(rt, *args):
 
         if tcpn >= texp:  # CHECK IF IT SHOULD BE >=
             ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
-            zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
+            zcb = p_fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
                          self._sigma, self._a)
             pv = pv + zcb * cpn
 #            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
@@ -872,10 +872,10 @@ class HWTree():
 
 ###############################################################################
 
-    def optionOnZCB(self,
-                    texp, tmat,
-                    strike, face_amount,
-                    df_times, df_values):
+    def option_on_zcb(self,
+                      texp, tmat,
+                      strike, face_amount,
+                      df_times, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
@@ -903,21 +903,21 @@ class HWTree():
 
         h = np.log((face_amount*ptmat)/(strike * ptexp)) / \
             sigmap + sigmap / 2.0
-        callValue = face_amount * ptmat * N(h) - strike * ptexp * N(h-sigmap)
-        putValue = strike * ptexp * N(-h+sigmap) - face_amount * ptmat * N(-h)
+        callValue = face_amount * ptmat * N(h) - strike * ptexp * N(h - sigmap)
+        putValue = strike * ptexp * N(-h + sigmap) - face_amount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
 
-    def europeanBondOptionJamshidian(self,
-                                     texp,
-                                     strike_price,
-                                     face,
-                                     cpn_times,
-                                     cpn_amounts,
-                                     df_times,
-                                     df_values):
+    def european_bond_option_jamshidian(self,
+                                        texp,
+                                        strike_price,
+                                        face,
+                                        cpn_times,
+                                        cpn_amounts,
+                                        df_times,
+                                        df_values):
         """ Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero coupon bonds with the
         short rate that would make the bond option be at the money forward. """
@@ -930,7 +930,7 @@ class HWTree():
         # Can I improve on this initial guess ?
         x0 = 0.05
 
-        rstar = optimize.newton(fwdFullBondPrice, x0=x0, fprime=None,
+        rstar = optimize.newton(fwd_full_bond_price, x0=x0, fprime=None,
                                 args=argtuple, tol=1e-10, maxiter=50,
                                 fprime2=None)
 
@@ -953,11 +953,11 @@ class HWTree():
 
                 ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
 
-                strike = P_Fast(texp, tcpn, rstar, dt, ptexp, ptdelta,
+                strike = p_fast(texp, tcpn, rstar, dt, ptexp, ptdelta,
                                 ptcpn, self._sigma, self._a)
 
-                v = self.optionOnZCB(texp, tcpn, strike, 1.0,
-                                     df_times, df_values)
+                v = self.option_on_zcb(texp, tcpn, strike, 1.0,
+                                       df_times, df_values)
 
                 call = v['call']
                 put = v['put']
@@ -972,12 +972,12 @@ class HWTree():
 
 ###############################################################################
 
-    def europeanBondOptionExpiryOnly(self,
-                                     texp,
-                                     strike_price,
-                                     face_amount,
-                                     cpn_times,
-                                     cpn_amounts):
+    def european_bond_option_expiry_only(self,
+                                         texp,
+                                         strike_price,
+                                         face_amount,
+                                         cpn_times,
+                                         cpn_amounts):
         """ Price a European option on a coupon-paying bond using a tree to
         generate short rates at the expiry date and then to use the analytical
         solution of zero coupon bond prices in the HW model to calculate the
@@ -1016,7 +1016,7 @@ class HWTree():
                     ptcpn = _uinterpolate(tcpn, self._df_times, self._dfs,
                                           interp)
 
-                    zcb = P_Fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
+                    zcb = p_fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
                                  self._sigma, self._a)
 
                     pv += cpn * zcb
@@ -1044,11 +1044,11 @@ class HWTree():
 
 ###############################################################################
 
-    def optionOnZeroCouponBond_Tree(self,
-                                    texp,
-                                    tmat,
-                                    strike_price,
-                                    face_amount):
+    def option_on_zero_coupon_bond_tree(self,
+                                        texp,
+                                        tmat,
+                                        strike_price,
+                                        face_amount):
         """ Price an option on a zero coupon bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build. """
 
@@ -1082,7 +1082,7 @@ class HWTree():
             q = self._Q[expiryStep, k]
             rt = self._rt[expiryStep, k]
 
-            zcb = P_Fast(texp, tmat,
+            zcb = p_fast(texp, tmat,
                          rt, dt, ptexp, ptdelta, ptmat,
                          self._sigma, self._a)
 
@@ -1101,7 +1101,7 @@ class HWTree():
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
 
-        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
+        exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
         tmat = coupon_times[-1]
 
@@ -1134,30 +1134,30 @@ class HWTree():
         maturity. For European bond options, Jamshidian's model is
         faster and is used instead i.e. not this function. """
 
-        exercise_typeInt = optionExerciseTypesToInt(exercise_type)
+        exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
         if exercise_typeInt == 1:
 
             if self._europeanCalcType == FinHWEuropeanCalcType.JAMSHIDIAN:
 
-                v = self.europeanBondOptionJamshidian(texp,
-                                                      strike_price,
-                                                      face_amount,
-                                                      coupon_times,
-                                                      coupon_flows,
-                                                      self._df_times,
-                                                      self._dfs)
+                v = self.european_bond_option_jamshidian(texp,
+                                                         strike_price,
+                                                         face_amount,
+                                                         coupon_times,
+                                                         coupon_flows,
+                                                         self._df_times,
+                                                         self._dfs)
 
                 callValue = v['call']
                 putValue = v['put']
 
             elif self._europeanCalcType == FinHWEuropeanCalcType.EXPIRY_ONLY:
 
-                v = self.europeanBondOptionExpiryOnly(texp,
-                                                      strike_price,
-                                                      face_amount,
-                                                      coupon_times,
-                                                      coupon_flows)
+                v = self.european_bond_option_expiry_only(texp,
+                                                          strike_price,
+                                                          face_amount,
+                                                          coupon_times,
+                                                          coupon_flows)
 
                 callValue = v['call']
                 putValue = v['put']
@@ -1165,16 +1165,16 @@ class HWTree():
             elif self._europeanCalcType == FinHWEuropeanCalcType.EXPIRY_TREE:
 
                 callValue, putValue \
-                    = americanBondOption_Tree_Fast(texp,
-                                                   strike_price, face_amount,
-                                                   coupon_times, coupon_flows,
-                                                   exercise_typeInt,
-                                                   self._sigma, self._a,
-                                                   self._Q,
-                                                   self._pu, self._pm, self._pd,
-                                                   self._rt, self._dt,
-                                                   self._tree_times,
-                                                   self._df_times, self._dfs)
+                    = american_bond_option_tree_fast(texp,
+                                                     strike_price, face_amount,
+                                                     coupon_times, coupon_flows,
+                                                     exercise_typeInt,
+                                                     self._sigma, self._a,
+                                                     self._Q,
+                                                     self._pu, self._pm, self._pd,
+                                                     self._rt, self._dt,
+                                                     self._tree_times,
+                                                     self._df_times, self._dfs)
 
             else:
                 raise FinError("Unknown HW model implementation choice.")
@@ -1182,29 +1182,29 @@ class HWTree():
         else:
 
             callValue, putValue \
-                = americanBondOption_Tree_Fast(texp,
-                                               strike_price, face_amount,
-                                               coupon_times, coupon_flows,
-                                               exercise_typeInt,
-                                               self._sigma, self._a,
-                                               self._Q,
-                                               self._pu, self._pm, self._pd,
-                                               self._rt, self._dt,
-                                               self._tree_times,
-                                               self._df_times, self._dfs)
+                = american_bond_option_tree_fast(texp,
+                                                 strike_price, face_amount,
+                                                 coupon_times, coupon_flows,
+                                                 exercise_typeInt,
+                                                 self._sigma, self._a,
+                                                 self._Q,
+                                                 self._pu, self._pm, self._pd,
+                                                 self._rt, self._dt,
+                                                 self._tree_times,
+                                                 self._df_times, self._dfs)
 
         return {'call': callValue, 'put': putValue}
 
 ###############################################################################
 
-    def callablePuttableBond_Tree(self,
-                                  coupon_times,
-                                  coupon_flows,
-                                  call_times,
-                                  call_prices,
-                                  put_times,
-                                  put_prices,
-                                  face_amount):
+    def callable_puttable_bond_tree(self,
+                                    coupon_times,
+                                    coupon_flows,
+                                    call_times,
+                                    call_prices,
+                                    put_times,
+                                    put_prices,
+                                    face_amount):
         """ Value an option on a bond with coupons that can have European or
         American exercise. Some minor issues to do with handling coupons on
         the option expiry date need to be solved. Also this function should be
@@ -1219,23 +1219,23 @@ class HWTree():
         call_prices = np.array(call_prices)
         put_prices = np.array(put_prices)
 
-        v = callablePuttableBond_Tree_Fast(coupon_times, coupon_flows,
-                                           call_times, call_prices,
-                                           put_times, put_prices,
-                                           face_amount,
-                                           self._sigma, self._a,
-                                           self._Q,
-                                           self._pu, self._pm, self._pd,
-                                           self._rt, self._dt,
-                                           self._tree_times,
-                                           self._df_times, self._dfs)
+        v = callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+                                             call_times, call_prices,
+                                             put_times, put_prices,
+                                             face_amount,
+                                             self._sigma, self._a,
+                                             self._Q,
+                                             self._pu, self._pm, self._pd,
+                                             self._rt, self._dt,
+                                             self._tree_times,
+                                             self._df_times, self._dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}
 
 ###############################################################################
 
-    def df_Tree(self, tmat):
+    def df_tree(self, tmat):
         """ Discount factor as seen from now to time tmat as long as the time
         is on the tree grid. """
 
@@ -1259,7 +1259,7 @@ class HWTree():
 
 ###############################################################################
 
-    def buildTree(self, treeMat, df_times, df_values):
+    def build_tree(self, treeMat, df_times, df_values):
         """ Build the trinomial tree. """
 
         if isinstance(df_times, np.ndarray) is False:
@@ -1288,8 +1288,8 @@ class HWTree():
         self._dfs = df_values
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
-            = buildTree_Fast(self._a, self._sigma,
-                             tree_times, self._num_time_steps, dfTree)
+            = build_tree_fast(self._a, self._sigma,
+                              tree_times, self._num_time_steps, dfTree)
 
         return
 

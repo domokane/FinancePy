@@ -52,7 +52,7 @@ class MertonFirm():
 
 ###############################################################################
 
-    def assetValue(self):
+    def asset_value(self):
         """ Calculate the asset value. """
 
         return self._A

@@ -41,7 +41,7 @@ def test_BKExampleOne():
     num_time_steps = 3
     tmat = (end_date - start_date)/gDaysInYear
     model = BKTree(sigma, a, num_time_steps)
-    model.buildTree(tmat, times, dfs)
+    model.build_tree(tmat, times, dfs)
 
     # Agrees with Figure 28.10 - Not exact as we have dt not exactly 0.50
     if num_time_steps < 5:
@@ -111,7 +111,7 @@ def test_BKExampleTwo():
     num_time_steps = 26
 
     model = BKTree(sigma, a, num_time_steps)
-    model.buildTree(tmat, times, dfs)
+    model.build_tree(tmat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
     v = model.bond_option(texp, strike_price, face, coupon_times,
                           coupon_flows, exercise_type)
@@ -125,7 +125,7 @@ def test_BKExampleTwo():
     for num_time_steps in num_steps_list:
         start = time.time()
         model = BKTree(sigma, a, num_time_steps)
-        model.buildTree(tmat, times, dfs)
+        model.build_tree(tmat, times, dfs)
         v = model.bond_option(texp, strike_price,
                               face, coupon_times, coupon_flows, exercise_type)
         end = time.time()

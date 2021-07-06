@@ -27,7 +27,7 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def prob_loss_gt_K(self, K):
+    def prob_loss_gt_k(self, K):
         """ Returns P(L>K) where L is the portfolio loss given by model. """
         if K < (1.0 - self._R0) * self._H0:
             raise FinError("Function does not work when K<(1-R0)H0")
@@ -65,7 +65,7 @@ class LHPlusModel():
 
 ###############################################################################
 
-    def exp_min_lkIntegral(self, K, dK):
+    def exp_min_lk_integral(self, K, dK):
 
         k0 = 0.0
         num_steps = int(K / dK)
@@ -77,7 +77,7 @@ class LHPlusModel():
 
         for _ in range(0, num_steps):
             k0 += dK
-            cdf1 = self.prob_loss_gt_K(k0)
+            cdf1 = self.prob_loss_gt_k(k0)
             pdf = cdf0 - cdf1
             cdf0 = cdf1
             checkSum += pdf
@@ -120,7 +120,7 @@ class LHPlusModel():
         el3 = -K * (M(c0, a, self._beta0) - N(a))
         el4 = - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
         term1 = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
-            - phi3(a, c, c0, r12, r13, r23)
+                - phi3(a, c, c0, r12, r13, r23)
         el5 = - (1.0 - self._R) * self._H * term1
 
         elk1k2 = el1 + el2 + el3 + el4 + el5
@@ -160,7 +160,7 @@ class LHPlusModel():
         el1 = el1 - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
 
         term = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
-            - phi3(a, c, c0, r12, r13, r23)
+               - phi3(a, c, c0, r12, r13, r23)
 
         el1 = el1 - (1.0 - self._R) * self._H * term
         return el1
@@ -173,8 +173,8 @@ class LHPlusModel():
             raise FinError("tranche_survival_prob: Same strikes")
 
         dk = 0.00001
-        elK2 = self.exp_min_lkIntegral(k2, dk)
-        elK1 = self.exp_min_lkIntegral(k1, dk)
+        elK2 = self.exp_min_lk_integral(k2, dk)
+        elK1 = self.exp_min_lk_integral(k1, dk)
         q = 1.0 - (elK2 - elK1) / (k2 - k1)
         return q
 

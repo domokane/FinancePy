@@ -51,7 +51,7 @@ def variancer(a, b, sigma, t):
 
 
 @njit(fastmath=True, cache=True)
-def zeroPrice(r0, a, b, sigma, t):
+def zero_price(r0, a, b, sigma, t):
     B = (1.0 - exp(-a * t)) / a
     A = exp((b - sigma * sigma / 2.0 / a / a) *
             (B - t) - B * B * sigma * sigma / 4.0 / a)
@@ -62,7 +62,7 @@ def zeroPrice(r0, a, b, sigma, t):
 
 
 @njit(float64[:](float64, float64, float64, float64, float64, float64, int64))
-def rate_path_MC(r0, a, b, sigma, t, dt, seed):
+def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -88,7 +88,7 @@ def rate_path_MC(r0, a, b, sigma, t, dt, seed):
 
 @njit(float64(float64, float64, float64, float64, float64,
       float64, int64, int64), fastmath=True, cache=True)
-def zeroPrice_MC(r0, a, b, sigma, t, dt, num_paths, seed):
+def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
 
     np.random.seed(seed)
     num_steps = int(t / dt)

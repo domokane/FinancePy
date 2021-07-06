@@ -26,7 +26,7 @@ def test_FinIborFuture():
         fut = IborFuture(todayDate, i, "3M")
         testCases.print(fut)
 
-        fra = fut.toFRA(0.020, 0.0)
+        fra = fut.to_fra(0.020, 0.0)
         testCases.print(fra)
 
 ###############################################################################

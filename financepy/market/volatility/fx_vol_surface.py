@@ -13,7 +13,7 @@ from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.global_types import FinOptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
-from ...models.option_implied_dbn import optionImpliedDbn
+from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
 from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
@@ -22,11 +22,11 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
-from ...models.volatility_fns import vol_Function_bloomberg
+from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import FinVolFunctionTypes
 from ...models.sabr import vol_function_sabr
-from ...models.sabr import vol_function_sabr_BETA_ONE
-from ...models.sabr import vol_function_sabr_BETA_HALF
+from ...models.sabr import vol_function_sabr_beta_one
+from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
@@ -66,7 +66,7 @@ def g(K, *args):
 ###############################################################################
 # Do not cache this function
 @njit(fastmath=True) #, cache=True)
-def objFAST(params, *args):
+def obj_fast(params, *args):
     """ Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by cvec
     """
@@ -113,19 +113,19 @@ def objFAST(params, *args):
     # Match the risk reversal volatility    
     ###########################################################################
 
-    K_25D_C = solver_for_smile_strikeFAST(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value, 
-                                      vol_type_value, +0.2500,
-                                      delta_method_value, K_25D_C_MS,
-                                      params)
+    K_25D_C = solver_for_smile_strike_fast(s, t, rd, rf,
+                                           FinOptionTypes.EUROPEAN_CALL.value,
+                                           vol_type_value, +0.2500,
+                                           delta_method_value, K_25D_C_MS,
+                                           params)
  
     sigma_K_25D_C = vol_function(vol_type_value, params, f, K_25D_C, t)
 
-    K_25D_P = solver_for_smile_strikeFAST(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
-                                      vol_type_value, -0.2500,
-                                      delta_method_value, K_25D_P_MS,
-                                      params)
+    K_25D_P = solver_for_smile_strike_fast(s, t, rd, rf,
+                                           FinOptionTypes.EUROPEAN_PUT.value,
+                                           vol_type_value, -0.2500,
+                                           delta_method_value, K_25D_P_MS,
+                                           params)
 
     sigma_K_25D_P = vol_function(vol_type_value, params, f, K_25D_P, t)
 
@@ -141,12 +141,12 @@ def objFAST(params, *args):
 # This function cannot be jitted until the scipy minimisation has been replaced
 # with a jittable function
 
-def solveToHorizonFAST(s, t, 
-                       rd, rf, 
-                       K_ATM, atm_vol,
-                       ms25DVol, rr25DVol, 
-                       delta_method_value, vol_type_value,
-                       xopt):
+def solve_to_horizon_fast(s, t,
+                          rd, rf,
+                          K_ATM, atm_vol,
+                          ms25DVol, rr25DVol,
+                          delta_method_value, vol_type_value,
+                          xopt):
 
     c0 = xopt
 
@@ -186,22 +186,22 @@ def solveToHorizonFAST(s, t,
             V_25D_MS,
             delta_method_value, rr25DVol, vol_type_value)
 
-    opt = minimize(objFAST, c0, fargs, method="CG", tol=tol)
+    opt = minimize(obj_fast, c0, fargs, method="CG", tol=tol)
     xopt = opt.x
 
     params = np.array(xopt)
 
-    K_25D_C = solver_for_smile_strikeFAST(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value, 
-                                      vol_type_value, +0.2500,
-                                      delta_method_value, K_25D_C_MS,
-                                      params)
+    K_25D_C = solver_for_smile_strike_fast(s, t, rd, rf,
+                                           FinOptionTypes.EUROPEAN_CALL.value,
+                                           vol_type_value, +0.2500,
+                                           delta_method_value, K_25D_C_MS,
+                                           params)
  
-    K_25D_P = solver_for_smile_strikeFAST(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
-                                      vol_type_value, -0.2500,
-                                      delta_method_value, K_25D_P_MS,
-                                      params)
+    K_25D_P = solver_for_smile_strike_fast(s, t, rd, rf,
+                                           FinOptionTypes.EUROPEAN_PUT.value,
+                                           vol_type_value, -0.2500,
+                                           delta_method_value, K_25D_P_MS,
+                                           params)
     
     ret = (params, K_25D_C_MS, K_25D_P_MS, K_25D_C, K_25D_P)
     return ret
@@ -221,13 +221,13 @@ def vol_function(vol_function_type_value, params, f, k, t):
         vol = vol_function_sabr(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
-        vol = vol_function_sabr_BETA_ONE(params, f, k, t)
+        vol = vol_function_sabr_beta_one(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
-        vol = vol_function_sabr_BETA_HALF(params, f, k, t)
+        vol = vol_function_sabr_beta_half(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
-        vol = vol_Function_bloomberg(params, f, k, t)
+        vol = vol_function_bloomberg(params, f, k, t)
         return vol
     elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
         vol = vol_function_clark(params, f, k, t)
@@ -267,13 +267,13 @@ def delta_fit(K, *args):
 # Unable to cache this function due to dynamic globals warning. Revisit.
 @njit(float64(float64, float64, float64, float64, int64, int64, float64, 
               int64, float64, float64[:]), fastmath=True)
-def solver_for_smile_strikeFAST(s, t, rd, rf,
-                            option_type_value,
-                            volatilityTypeValue,
-                            delta_target,
-                            delta_method_value,
-                            initialGuess,
-                            parameters):
+def solver_for_smile_strike_fast(s, t, rd, rf,
+                                 option_type_value,
+                                 volatilityTypeValue,
+                                 delta_target,
+                                 delta_method_value,
+                                 initialGuess,
+                                 parameters):
     """ Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
     strike. """
@@ -681,10 +681,10 @@ class FXVolSurface():
 
 #            print(t, rd, rf, K_ATM, atm_vol, ms25DVol, rr25DVol)
 
-            res = solveToHorizonFAST(s, t, rd, rf, K_ATM, 
-                                   atm_vol, ms25DVol, rr25DVol,
-                                   delta_method_value, vol_type_value,
-                                   x_inits[i])
+            res = solve_to_horizon_fast(s, t, rd, rf, K_ATM,
+                                        atm_vol, ms25DVol, rr25DVol,
+                                        delta_method_value, vol_type_value,
+                                        x_inits[i])
 
             (self._parameters[i,:], 
              self._K_25D_C_MS[i], self._K_25D_P_MS[i], 
@@ -1036,8 +1036,8 @@ class FXVolSurface():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = optionImpliedDbn(self._spot_fx_rate, texp,
-                                       rd, rf, Ks, vols)
+            density = option_implied_dbn(self._spot_fx_rate, texp,
+                                         rd, rf, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)

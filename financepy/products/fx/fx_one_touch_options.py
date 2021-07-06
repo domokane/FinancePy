@@ -17,7 +17,7 @@ from ...models.gbm_process_simulator import getPaths
 
 from numba import njit
 
-from ...utils.math import NVect
+from ...utils.math import n_vect
 
 ###############################################################################
 # TODO: Implement Sobol random numbers
@@ -43,7 +43,7 @@ class TouchOptionPayoffTypes(Enum):
 
 
 @njit(fastmath=True, cache=True)
-def _barrierPayOneAtHitPVDown(s, H, r, dt):
+def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
     """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
     num_paths, num_time_steps = s.shape
     pv = 0.0
@@ -67,7 +67,7 @@ def _barrierPayOneAtHitPVDown(s, H, r, dt):
 
 
 @njit(fastmath=True, cache=True)
-def _barrierPayOneAtHitPVUp(s, H, r, dt):
+def _barrier_pay_one_at_hit_pv_up(s, H, r, dt):
     """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
     num_paths, num_time_steps = s.shape
@@ -92,7 +92,7 @@ def _barrierPayOneAtHitPVUp(s, H, r, dt):
 
 
 @njit(fastmath=True, cache=True)
-def _barrierPayAssetAtExpiryDownOut(s, H):
+def _barrier_pay_asset_at_expiry_down_out(s, H):
     """ Pay $1 if the stock crosses the barrier H from above. PV payment. """
     num_paths, num_time_steps = s.shape
     pv = 0.0
@@ -114,7 +114,7 @@ def _barrierPayAssetAtExpiryDownOut(s, H):
 
 
 @njit(fastmath=True, cache=True)
-def _barrierPayAssetAtExpiryUpOut(s, H):
+def _barrier_pay_asset_at_expiry_up_out(s, H):
     """ Pay $1 if the stock crosses the barrier H from below. PV payment. """
 
     num_paths, num_time_steps = s.shape
@@ -214,8 +214,8 @@ class FXOneTouchOption(EquityOption):
 
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -227,8 +227,8 @@ class FXOneTouchOption(EquityOption):
 
             eta = -1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -241,8 +241,8 @@ class FXOneTouchOption(EquityOption):
             eta = 1.0
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -255,8 +255,8 @@ class FXOneTouchOption(EquityOption):
             eta = -1.0
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
-            A5_1 = np.power(H/s0, mu + lam) * NVect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * NVect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -270,8 +270,8 @@ class FXOneTouchOption(EquityOption):
             phi = -1.0
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 + B4)
             return v
 
@@ -286,8 +286,8 @@ class FXOneTouchOption(EquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 + B4)
             return v
 
@@ -302,8 +302,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-rf*t)
-            A2 = s0 * dq * NVect(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
+            A2 = s0 * dq * n_vect(phi * x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
             v = (A2 + A4)
             return v
 
@@ -318,8 +318,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-rf*t)
-            A2 = s0 * dq * NVect(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
+            A2 = s0 * dq * n_vect(phi * x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
             v = (A2 + A4)
             return v
 
@@ -334,8 +334,8 @@ class FXOneTouchOption(EquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 - B4)
             return v
 
@@ -350,8 +350,8 @@ class FXOneTouchOption(EquityOption):
 
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * NVect(phi*x2 - phi*v*sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * NVect(eta*y2-eta*v*sqrtT)
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 - B4)
             return v
 
@@ -367,8 +367,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-rf*t)
-            A2 = s0 * dq * NVect(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
+            A2 = s0 * dq * n_vect(phi * x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
             v = (A2 - A4)
             return v
 
@@ -384,8 +384,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             dq = np.exp(-rf*t)
-            A2 = s0 * dq * NVect(phi*x2)
-            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * NVect(eta*y2)
+            A2 = s0 * dq * n_vect(phi * x2)
+            A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
             v = (A2 - A4)
             return v
 
@@ -438,7 +438,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrierPayOneAtHitPVDown(s, H, rd, dt)
+            v = _barrier_pay_one_at_hit_pv_down(s, H, rd, dt)
             v = v * X
             return v
 
@@ -448,7 +448,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrierPayOneAtHitPVUp(s, H, rd, dt)
+            v = _barrier_pay_one_at_hit_pv_up(s, H, rd, dt)
             v = v * X
             return v
 
@@ -458,7 +458,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayOneAtHitPVDown(s, H, rd, dt) * H
+            v = _barrier_pay_one_at_hit_pv_down(s, H, rd, dt) * H
             return v
 
         elif self._option_type == TouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_HIT:
@@ -467,7 +467,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayOneAtHitPVUp(s, H, rd, dt) * H
+            v = _barrier_pay_one_at_hit_pv_up(s, H, rd, dt) * H
             return v
 
         elif self._option_type == TouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
@@ -476,7 +476,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Barrier has  ALREADY been crossed.")
 
-            v = _barrierPayOneAtHitPVDown(s, H, 0.0, dt)
+            v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt)
             v = v * X * np.exp(-rd*t)
             return v
 
@@ -486,7 +486,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrierPayOneAtHitPVUp(s, H, 0.0, dt)
+            v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt)
             v = v * X * np.exp(-rd*t)
             return v
 
@@ -496,7 +496,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayOneAtHitPVDown(s, H, 0.0, dt) * H
+            v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt) * H
             return v
 
         elif self._option_type == TouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_EXPIRY:
@@ -505,7 +505,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayOneAtHitPVUp(s, H, 0.0, dt) * H
+            v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt) * H
             return v
 
         elif self._option_type == TouchOptionPayoffTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
@@ -514,7 +514,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrierPayOneAtHitPVDown(s, H, 0.0, dt)
+            v = 1.0 - _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt)
             v = v * X * np.exp(-rd*t)
             return v
 
@@ -524,7 +524,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrierPayOneAtHitPVUp(s, H, 0.0, dt)
+            v = 1.0 - _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt)
             v = v * X * np.exp(-rd*t)
             return v
 
@@ -534,7 +534,7 @@ class FXOneTouchOption(EquityOption):
             if s0 <= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayAssetAtExpiryDownOut(s, H)
+            v = _barrier_pay_asset_at_expiry_down_out(s, H)
             v = v * np.exp(-rd*t)
             return v
 
@@ -544,7 +544,7 @@ class FXOneTouchOption(EquityOption):
             if s0 >= H:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrierPayAssetAtExpiryUpOut(s, H)
+            v = _barrier_pay_asset_at_expiry_up_out(s, H)
             v = v * np.exp(-rd*t)
             return v
         else:

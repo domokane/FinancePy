@@ -106,7 +106,7 @@ class FXFixedLookbackOption:
                     term = expbt * N(d1)
                 else:
                     term = (-(s0 / k)**(-w)) * N(d1 - 2.0 *
-                                                 b * sqrt(t) / v) + expbt*N(d1)
+                                                 b * sqrt(t) / v) + expbt * N(d1)
 
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
@@ -120,7 +120,7 @@ class FXFixedLookbackOption:
                     term = expbt * N(e1)
                 else:
                     term = (-(s0 / smax)**(-w)) * \
-                        N(e1 - 2.0*b*sqrt(t) / v) + expbt * N(e1)
+                           N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
 
                 v = df * (smax - k) + s0 * dq * N(e1) - \
                     smax * df * N(e2) + s0 * df * u * term
@@ -137,7 +137,7 @@ class FXFixedLookbackOption:
                     term = -expbt * N(-f1)
                 else:
                     term = ((s0 / smin)**(-w)) * N(-f1 + 2.0 *
-                                             b * sqrt(t) / v) - expbt * N(-f1)
+                                                   b * sqrt(t) / v) - expbt * N(-f1)
 
                 v = df * (k - smin) - s0 * dq * N(-f1) + \
                     smin * df * N(-f2) + s0 * df * u * term

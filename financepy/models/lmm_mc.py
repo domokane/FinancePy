@@ -37,7 +37,7 @@ class ModelLMMModelTypes(Enum):
 ###############################################################################
 
 
-def LMMPrintForwards(fwds):
+def lmm_print_forwards(fwds):
     """ Helper function to display the simulated Ibor rates. """
 
     num_paths = len(fwds)
@@ -66,7 +66,7 @@ def LMMPrintForwards(fwds):
 
 @njit(float64(int64, int64, float64[:], float64[:], float64[:], float64[:, :]),
       cache=True, fastmath=True, parallel=useParallel)
-def LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, rho):
+def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
     """ Implements Rebonato's approximation for the swap rate volatility to be
     used when pricing a swaption that expires in period a for a swap maturing
     at the end of period b taking into account the forward volatility term
@@ -139,7 +139,7 @@ def LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, rho):
 
 @njit(float64(int64, int64, float64[:], float64[:, :, :], float64[:]),
       cache=True, fastmath=True, parallel=useParallel)
-def LMMSimSwaptionVol(a, b, fwd0, fwds, taus):
+def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
     """ Calculates the swap rate volatility using the forwards generated in the
     simulation to see how it compares to Rebonatto estimate. """
 
@@ -191,7 +191,7 @@ def LMMSimSwaptionVol(a, b, fwd0, fwds, taus):
 
 @njit(float64[:, :](int64, int64, int64, float64[:, :, :]),
       cache=True, fastmath=True, parallel=useParallel)
-def LMMFwdFwdCorrelation(numForwards, num_paths, iTime, fwds):
+def lmm_fwd_fwd_correlation(numForwards, num_paths, iTime, fwds):
     """ Extract forward forward correlation matrix at some future time index
     from the simulated forward rates and return the matrix. """
 
@@ -241,7 +241,7 @@ def LMMFwdFwdCorrelation(numForwards, num_paths, iTime, fwds):
 
 @njit(float64[:](float64[:], float64[:], int64, float64, float64[:]),
       cache=True, fastmath=True)
-def LMMPriceCapsBlack(fwd0, volCaplet, p, K, taus):
+def lmm_price_caps_black(fwd0, volCaplet, p, K, taus):
     """ Price a strip of capfloorlets using Black's model using the time grid
     of the LMM model. The prices can be compared with the LMM model prices. """
 
@@ -275,7 +275,7 @@ def LMMPriceCapsBlack(fwd0, volCaplet, p, K, taus):
 
 
 @njit(float64[:, :](float64[:, :], int64), cache=True, fastmath=True)
-def subMatrix(t, N):
+def sub_matrix(t, N):
     """ Returns a submatrix of correlation matrix at later time step in the LMM
     simulation which is then used to generate correlated Gaussian RVs. """
 
@@ -292,7 +292,7 @@ def subMatrix(t, N):
 
 
 @njit(float64[:, :](float64[:, :]), cache=True, fastmath=True)
-def CholeskyNP(rho):
+def cholesky_np(rho):
     """ Numba-compliant wrapper around Numpy cholesky function. """
     chol = np.linalg.cholesky(rho)
     return chol
@@ -303,7 +303,7 @@ def CholeskyNP(rho):
 @jit(float64[:, :, :](int64, int64, float64[:], float64[:], float64[:, :],
                       float64[:], int64),
      cache=True, fastmath=True, parallel=useParallel)
-def LMMSimulateFwdsNF(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
+def lmm_simulate_fwds_nf(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
     """ Full N-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure given an initial forward curve, volatility term structure and
     full rank correlation structure. Cholesky decomposition is used to extract
@@ -332,9 +332,9 @@ def LMMSimulateFwdsNF(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
     factors = [None]  # from 0 to p-1
 
     for ix in range(1, numForwards):  # from 1 to p-1
-        matrix = subMatrix(correl, ix - 1)
+        matrix = sub_matrix(correl, ix - 1)
         corr.append(matrix)
-        chol = CholeskyNP(matrix)
+        chol = cholesky_np(matrix)
         factors.append(chol)
 
     ###########################################################################
@@ -408,8 +408,8 @@ def LMMSimulateFwdsNF(numForwards, num_paths, fwd0, zetas, correl, taus, seed):
 
 @njit(float64[:, :, :](int64, int64, int64, float64[:], float64[:], float64[:],
                        int64, int64), cache=True, fastmath=True, parallel=useParallel)
-def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
-                      taus, useSobol, seed):
+def lmm_simulate_fwds_1f(numForwards, num_paths, numeraireIndex, fwd0, gammas,
+                         taus, useSobol, seed):
     """ One factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility term structure. The 3D matrix of forward rates by path, time
@@ -511,8 +511,8 @@ def LMMSimulateFwds1F(numForwards, num_paths, numeraireIndex, fwd0, gammas,
 @jit(float64[:, :, :](int64, int64, int64, int64, float64[:], float64[:, :],
                       float64[:], int64, int64),
      cache=True, fastmath=True, parallel=useParallel)
-def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
-                      lambdas, taus, useSobol, seed):
+def lmm_simulate_fwds_mf(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
+                         lambdas, taus, useSobol, seed):
     """ Multi-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility factor term structure. The 3D matrix of forward rates by path,
@@ -616,7 +616,7 @@ def LMMSimulateFwdsMF(numForwards, numFactors, num_paths, numeraireIndex, fwd0,
 @njit(float64[:](int64, int64, float64, float64[:], float64[:, :, :],
                  float64[:], int64),
       cache=True, fastmath=True, parallel=useParallel)
-def LMMCapFlrPricer(numForwards, num_paths, K, fwd0, fwds, taus, isCap):
+def lmm_cap_flr_pricer(numForwards, num_paths, K, fwd0, fwds, taus, isCap):
     """ Function to price a strip of cap or floorlets in accordance with the
     simulated forward curve dynamics. """
 
@@ -677,7 +677,7 @@ def LMMCapFlrPricer(numForwards, num_paths, K, fwd0, fwds, taus, isCap):
 
 @njit(float64(float64, int64, int64, float64[:], float64[:, :, :],
               float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMSwapPricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
     """ Function to reprice a basic swap using the simulated forward Ibors.
     """
 
@@ -745,7 +745,7 @@ def LMMSwapPricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
 
 @njit(float64(float64, int64, int64, int64, float64[:], float64[:, :, :],
               float64[:], int64), cache=True, fastmath=True, parallel=useParallel)
-def LMMSwaptionPricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
+def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
     """ Function to price a European swaption using the simulated forward
     discount. """
 
@@ -806,7 +806,7 @@ def LMMSwaptionPricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
 
 @njit(float64[:](float64, int64, int64, float64[:], float64[:, :, :],
                  float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMRatchetCapletPricer(spread, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_ratchet_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a ratchet using the simulated Ibor rates."""
 
     maxPaths = len(fwds)
@@ -862,7 +862,7 @@ def LMMRatchetCapletPricer(spread, num_periods, num_paths, fwd0, fwds, taus):
 
 @njit(float64(int64, float64, int64, int64, float64[:], float64[:, :, :],
               float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMFlexiCapPricer(maxCaplets, K, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_flexi_cap_pricer(maxCaplets, K, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a flexicap using the simulated Ibor rates."""
 
     maxPaths = len(fwds)
@@ -926,7 +926,7 @@ def LMMFlexiCapPricer(maxCaplets, K, num_periods, num_paths, fwd0, fwds, taus):
 
 @njit(float64[:](float64, int64, int64, float64[:], float64[:, :, :],
                  float64[:]), cache=True, fastmath=True, parallel=useParallel)
-def LMMStickyCapletPricer(spread, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a sticky cap using the simulated Ibor rates. """
 
     maxPaths = len(fwds)

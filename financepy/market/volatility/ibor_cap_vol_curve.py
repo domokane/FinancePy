@@ -76,11 +76,11 @@ class IborCapVolCurve():
 
         self._day_count_type = day_count_type
 
-        self.generateCapletVols()
+        self.generate_caplet_vols()
 
 ###############################################################################
 
-    def generateCapletVols(self):
+    def generate_caplet_vols(self):
         """ Bootstrap caplet volatilities from cap volatilities using similar
         notation to Hull's book (page 32.11). The first volatility in the
         vector of caplet vols is zero. """
@@ -152,7 +152,7 @@ class IborCapVolCurve():
 
 ###############################################################################
 
-    def capVol(self, dt):
+    def cap_vol(self, dt):
         """ Return the cap flat volatility for a specific cap maturity date for
         the last caplet/floorlet in the cap/floor. The volatility interpolation
         is piecewise flat. """

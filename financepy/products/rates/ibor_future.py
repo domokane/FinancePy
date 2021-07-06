@@ -58,12 +58,12 @@ class IborFuture:
 
 ###############################################################################
 
-    def toFRA(self, futures_price, convexity):
+    def to_fra(self, futures_price, convexity):
         """ Convert the futures contract to a FinIborFRA object so it can be
         used to boostrap a Ibor curve. For this we need to adjust the futures
         rate using the convexity correction. """
 
-        fraRate = self.FRARate(futures_price, convexity)
+        fraRate = self.fra_rate(futures_price, convexity)
 
         fra = IborFRA(self._delivery_date,
                       self._endOfInterestPeriod,
@@ -76,14 +76,14 @@ class IborFuture:
 
 ###############################################################################
 
-    def futuresRate(self, futures_price):
+    def futures_rate(self, futures_price):
         """ Calculate implied futures rate from the futures price."""
         futuresRate = (100.0 - futures_price) / 100.0
         return futuresRate
 
 ###############################################################################
 
-    def FRARate(self, futures_price, convexity):
+    def fra_rate(self, futures_price, convexity):
         """ Convert futures price and convexity to a FRA rate using the BBG
         negative convexity (in percent). This is then divided by 100 before
         being added to the futures rate. """

@@ -25,11 +25,11 @@ from ...utils.error import FinError
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
-from ...models.lmm_mc import LMMSimulateFwds1F
-from ...models.lmm_mc import LMMSimulateFwdsMF
-from ...models.lmm_mc import LMMSimulateFwdsNF
+from ...models.lmm_mc import lmm_simulate_fwds_1f
+from ...models.lmm_mc import lmm_simulate_fwds_mf
+from ...models.lmm_mc import lmm_simulate_fwds_nf
 from ...models.lmm_mc import ModelLMMModelTypes
-from ...models.lmm_mc import LMMCapFlrPricer
+from ...models.lmm_mc import lmm_cap_flr_pricer
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import ONE_MILLION
@@ -99,13 +99,13 @@ class FinIborLMMProducts():
 
 ###############################################################################
 
-    def simulate1F(self,
-                   discount_curve,
-                   volCurve: IborCapVolCurve,
-                   num_paths: int = 1000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
+    def simulate_1f(self,
+                    discount_curve,
+                    volCurve: IborCapVolCurve,
+                    num_paths: int = 1000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
         """ Run the one-factor simulation of the evolution of the forward
         Ibors to generate and store all of the Ibor forward rate paths. """
 
@@ -139,25 +139,25 @@ class FinIborLMMProducts():
             dt = self._gridDates[ix]
             gammas[ix] = volCurve.caplet_vol(dt)
 
-        self._fwds = LMMSimulateFwds1F(self._numForwards,
-                                       num_paths,
-                                       numeraireIndex,
-                                       self._forwardCurve,
-                                       gammas,
-                                       self._accrual_factors,
-                                       useSobol,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_1f(self._numForwards,
+                                          num_paths,
+                                          numeraireIndex,
+                                          self._forwardCurve,
+                                          gammas,
+                                          self._accrual_factors,
+                                          useSobol,
+                                          seed)
 
 ###############################################################################
 
-    def simulateMF(self,
-                   discount_curve,
-                   numFactors: int,
-                   lambdas: np.ndarray,
-                   num_paths: int = 10000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
+    def simulate_mf(self,
+                    discount_curve,
+                    numFactors: int,
+                    lambdas: np.ndarray,
+                    num_paths: int = 10000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
         """ Run the simulation to generate and store all of the Ibor forward
         rate paths. This is a multi-factorial version so the user must input
         a numpy array consisting of a column for each factor and the number of
@@ -198,27 +198,27 @@ class FinIborLMMProducts():
 
         self._forwardCurve = np.array(self._forwardCurve)
 
-        self._fwds = LMMSimulateFwdsMF(self._numForwards,
-                                       numFactors,
-                                       num_paths,
-                                       numeraireIndex,
-                                       self._forwardCurve,
-                                       lambdas,
-                                       self._accrual_factors,
-                                       useSobol,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_mf(self._numForwards,
+                                          numFactors,
+                                          num_paths,
+                                          numeraireIndex,
+                                          self._forwardCurve,
+                                          lambdas,
+                                          self._accrual_factors,
+                                          useSobol,
+                                          seed)
 
 ###############################################################################
 
-    def simulateNF(self,
-                   discount_curve,
-                   volCurve: IborCapVolCurve,
-                   correlationMatrix: np.ndarray,
-                   modelType: ModelLMMModelTypes,
-                   num_paths: int = 1000,
-                   numeraireIndex: int = 0,
-                   useSobol: bool = True,
-                   seed: int = 42):
+    def simulate_nf(self,
+                    discount_curve,
+                    volCurve: IborCapVolCurve,
+                    correlationMatrix: np.ndarray,
+                    modelType: ModelLMMModelTypes,
+                    num_paths: int = 1000,
+                    numeraireIndex: int = 0,
+                    useSobol: bool = True,
+                    seed: int = 42):
         """ Run the simulation to generate and store all of the Ibor forward
         rate paths using a full factor reduction of the fwd-fwd correlation
         matrix using Cholesky decomposition."""
@@ -262,30 +262,30 @@ class FinIborLMMProducts():
             zetas[ix] = volCurve.caplet_vol(dt)
 
         # This function does not use Sobol - TODO
-        self._fwds = LMMSimulateFwdsNF(self._numForwards,
-                                       num_paths,
-                                       self._forwardCurve,
-                                       zetas,
-                                       correlationMatrix,
-                                       self._accrual_factors,
-                                       seed)
+        self._fwds = lmm_simulate_fwds_nf(self._numForwards,
+                                          num_paths,
+                                          self._forwardCurve,
+                                          zetas,
+                                          correlationMatrix,
+                                          self._accrual_factors,
+                                          seed)
 
 ###############################################################################
 
-    def valueSwaption(self,
-                      settlement_date: Date,
-                      exercise_date: Date,
-                      maturity_date: Date,
-                      swaptionType: SwapTypes,
-                      fixed_coupon: float,
-                      fixed_frequency_type: FrequencyTypes,
-                      fixed_day_count_type: DayCountTypes,
-                      notional: float = ONE_MILLION,
-                      float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                      float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                      calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                      bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                      date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+    def value_swaption(self,
+                       settlement_date: Date,
+                       exercise_date: Date,
+                       maturity_date: Date,
+                       swaptionType: SwapTypes,
+                       fixed_coupon: float,
+                       fixed_frequency_type: FrequencyTypes,
+                       fixed_day_count_type: DayCountTypes,
+                       notional: float = ONE_MILLION,
+                       float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                       float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                       calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                       bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                       date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a swaption in the LMM model using simulated paths of the
         forward curve. This relies on pricing the fixed leg of the swap and
         assuming that the floating leg will be worth par. As a result we only
@@ -357,17 +357,17 @@ class FinIborLMMProducts():
 
 ###############################################################################
 
-    def valueCapFloor(self,
-                      settlement_date: Date,
-                      maturity_date: Date,
-                      capFloorType: FinCapFloorTypes,
-                      capFloorRate: float,
-                      frequencyType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                      day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                      notional: float = ONE_MILLION,
-                      calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                      bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                      date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+    def value_cap_floor(self,
+                        settlement_date: Date,
+                        maturity_date: Date,
+                        capFloorType: FinCapFloorTypes,
+                        capFloorRate: float,
+                        frequencyType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                        day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                        notional: float = ONE_MILLION,
+                        calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                        bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                        date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a cap or floor in the LMM. """
 
         capFloorDates = Schedule(settlement_date,
@@ -397,7 +397,7 @@ class FinIborLMMProducts():
         fwds = self._fwds
         taus = self._accrual_factors
 
-        v = LMMCapFlrPricer(numFowards, num_paths, K, fwd0, fwds, taus, isCap)
+        v = lmm_cap_flr_pricer(numFowards, num_paths, K, fwd0, fwds, taus, isCap)
 
         # Sum the cap/floorlets to get cap/floor value
         v_capFloor = 0.0

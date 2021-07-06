@@ -22,15 +22,15 @@ from ...models.black_scholes_analytic import bs_vega
 from ...models.black_scholes_analytic import bs_gamma
 from ...models.black_scholes_analytic import bs_rho
 from ...models.black_scholes_analytic import bs_theta
-from ...models.black_scholes_analytic import bsImpliedVolatility
-from ...models.black_scholes_analytic import bsIntrinsic
+from ...models.black_scholes_analytic import bs_implied_volatility
+from ...models.black_scholes_analytic import bs_intrinsic
 
 
-from ...models.black_scholes_mc import _value_mc_NONUMBA_NONUMPY
-from ...models.black_scholes_mc import _value_mc_NUMPY_NUMBA
-from ...models.black_scholes_mc import _value_mc_NUMBA_ONLY
-from ...models.black_scholes_mc import _value_mc_NUMPY_ONLY
-from ...models.black_scholes_mc import _value_mc_NUMBA_PARALLEL
+from ...models.black_scholes_mc import _value_mc_nonumba_nonumpy
+from ...models.black_scholes_mc import _value_mc_numpy_numba
+from ...models.black_scholes_mc import _value_mc_numba_only
+from ...models.black_scholes_mc import _value_mc_numpy_only
+from ...models.black_scholes_mc import _value_mc_numba_parallel
 
 from ...utils.math import N
 
@@ -121,8 +121,8 @@ class EquityVanillaOption():
 
         k = self._strike_price
 
-        intrinsic_value = bsIntrinsic(s0, texp, k, r, q,
-                                      self._option_type.value)
+        intrinsic_value = bs_intrinsic(s0, texp, k, r, q,
+                                       self._option_type.value)
 
         intrinsic_value = intrinsic_value * self._num_options
         return intrinsic_value
@@ -412,14 +412,14 @@ class EquityVanillaOption():
         k = self._strike_price
         s0 = stock_price
 
-        sigma = bsImpliedVolatility(s0, texp, k, r, q, price,
-                                    self._option_type.value)
+        sigma = bs_implied_volatility(s0, texp, k, r, q, price,
+                                      self._option_type.value)
 
         return sigma
 
 ###############################################################################
 
-    def value_mc_NUMPY_ONLY(self,
+    def value_mc_numpy_only(self,
                             valuation_date: Date,
                             stock_price: float,
                             discount_curve: DiscountCurve,
@@ -439,7 +439,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMPY_ONLY(stock_price,
+        v = _value_mc_numpy_only(stock_price,
                                  texp,
                                  self._strike_price,
                                  self._option_type.value,
@@ -454,7 +454,7 @@ class EquityVanillaOption():
 
 ###############################################################################
 
-    def value_mc_NUMBA_ONLY(self,
+    def value_mc_numba_only(self,
                             valuation_date: Date,
                             stock_price: float,
                             discount_curve: DiscountCurve,
@@ -474,7 +474,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMBA_ONLY(stock_price,
+        v = _value_mc_numba_only(stock_price,
                                  texp,
                                  self._strike_price,
                                  self._option_type.value,
@@ -489,7 +489,7 @@ class EquityVanillaOption():
 
 ###############################################################################
 
-    def value_mc_NUMBA_PARALLEL(self,
+    def value_mc_numba_parallel(self,
                                 valuation_date: Date,
                                 stock_price: float,
                                 discount_curve: DiscountCurve,
@@ -509,7 +509,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMBA_PARALLEL(stock_price,
+        v = _value_mc_numba_parallel(stock_price,
                                      texp,
                                      self._strike_price,
                                      self._option_type.value,
@@ -526,7 +526,7 @@ class EquityVanillaOption():
 
 ###############################################################################
 
-    def value_mc_NUMPY_NUMBA(self,
+    def value_mc_numpy_numba(self,
                              valuation_date: Date,
                              stock_price: float,
                              discount_curve: DiscountCurve,
@@ -546,7 +546,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMPY_NUMBA(stock_price,
+        v = _value_mc_numpy_numba(stock_price,
                                   texp,
                                   self._strike_price,
                                   self._option_type.value,
@@ -561,7 +561,7 @@ class EquityVanillaOption():
 
 ###############################################################################
 
-    def value_mc_NONUMBA_NONUMPY(self,
+    def value_mc_nonumba_nonumpy(self,
                                  valuation_date: Date,
                                  stock_price: float,
                                  discount_curve: DiscountCurve,
@@ -581,7 +581,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NONUMBA_NONUMPY(stock_price,
+        v = _value_mc_nonumba_nonumpy(stock_price,
                                       texp,
                                       self._strike_price,
                                       self._option_type.value,
@@ -618,7 +618,7 @@ class EquityVanillaOption():
 
         vol = model._volatility
 
-        v = _value_mc_NUMBA_ONLY(stock_price,
+        v = _value_mc_numba_only(stock_price,
                                  texp,
                                  self._strike_price,
                                  self._option_type.value,

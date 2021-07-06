@@ -185,12 +185,12 @@ def test_bloombergPricingExample():
     fut = IborFuture(valuation_date, 6); futs.append(fut)
 
     fras = [None]*6
-    fras[0] = futs[0].toFRA(97.6675, -0.00005)
-    fras[1] = futs[1].toFRA(97.5200, -0.00060)
-    fras[2] = futs[2].toFRA(97.3550, -0.00146)
-    fras[3] = futs[3].toFRA(97.2450, -0.00263)
-    fras[4] = futs[4].toFRA(97.1450, -0.00411)
-    fras[5] = futs[5].toFRA(97.0750, -0.00589)
+    fras[0] = futs[0].to_fra(97.6675, -0.00005)
+    fras[1] = futs[1].to_fra(97.5200, -0.00060)
+    fras[2] = futs[2].to_fra(97.3550, -0.00146)
+    fras[3] = futs[3].to_fra(97.2450, -0.00263)
+    fras[4] = futs[4].to_fra(97.1450, -0.00411)
+    fras[5] = futs[5].to_fra(97.0750, -0.00589)
 
     accrual = DayCountTypes.THIRTY_E_360
     freq = FrequencyTypes.SEMI_ANNUAL
