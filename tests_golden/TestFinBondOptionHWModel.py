@@ -455,15 +455,41 @@ def test_BondOptionZEROVOLConvergence():
 ###############################################################################
 
 def test_BondOptionDerivaGem():
+
+    # See https://github.com/domokane/FinancePy/issues/98
     
-    settlementDate = Date(1, 12, 2019)
-    issueDate = Date(1, 12, 2018)
-    expiryDate = settlementDate.add_tenor("18m")
-    maturityDate = settlementDate.add_tenor("10Y")
+    settlement_date = Date(1, 12, 2019)
+
+    rate = 0.05
+    dcType = DayCountTypes.THIRTY_360_BOND
+    fixedFreq = FrequencyTypes.SEMI_ANNUAL
+    discount_curve = DiscountCurveFlat(settlement_date, rate, fixedFreq, dcType)
+
+    issue_date = Date(1, 12, 2018)
+    expiry_date = settlement_date.add_tenor("18m")
+    maturity_date = settlement_date.add_tenor("10Y")
+
     coupon = 0.05
     freqType = FrequencyTypes.SEMI_ANNUAL
-    accrualType = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType)
+    accrualType = DayCountTypes.THIRTY_360_BOND
+    bond = Bond(issue_date, maturity_date, coupon, freqType, accrualType)
+    strike_price = 100.0
+    face = 100.0
+
+    europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face, FinOptionTypes.EUROPEAN_CALL)
+    cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
+    fp = bond.full_price_from_discount_curve(expiry_date, discount_curve)
+#    print("Fixed Income Clean Price: %9.3f"% cp)
+#    print("Fixed Income Full  Price: %9.3f"% fp)
+
+    num_steps= 500
+    sigma = 0.0125
+    a = 0.1
+    modelHW = HWTree(sigma, a, num_steps)
+
+    ec = europeanCallBondOption.value(settlement_date, discount_curve, modelHW)
+
+    ###########################################################################
 
     couponTimes = []
     couponFlows = []
@@ -475,22 +501,20 @@ def test_BondOptionDerivaGem():
         pcd = bond._flow_dates[i-1]
         ncd = bond._flow_dates[i]
 
-        if ncd > settlementDate:
+        if ncd > settlement_date:
             
             if len(couponTimes) == 0:
-                flowTime = (pcd - settlementDate) / gDaysInYear
+                flowTime = (pcd - settlement_date) / gDaysInYear
                 couponTimes.append(flowTime)
                 couponFlows.append(cpn)
                 
-            flowTime = (ncd - settlementDate) / gDaysInYear
+            flowTime = (ncd - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
     couponTimes = np.array(couponTimes)
     couponFlows = np.array(couponFlows)
 
-    strikePrice = 100.0
-    face = 100.0
     y = 0.05
     times = np.linspace(0, 10, 21)
     dfs = np.power(1+y/2, -times*2)
@@ -500,23 +524,24 @@ def test_BondOptionDerivaGem():
     model = HWTree(sigma, a, None)
 
     #  Test convergence
-    texp = (expiryDate - settlementDate)/gDaysInYear
-    tmat = (maturityDate - settlementDate)/gDaysInYear
+    texp = (expiry_date - settlement_date)/gDaysInYear
+    tmat = (maturity_date - settlement_date)/gDaysInYear
 
     # Jamshidian approach
-    vjam = model.european_bond_option_jamshidian(texp, strikePrice, face,
+    vjam = model.european_bond_option_jamshidian(texp, strike_price, face,
                                                  couponTimes, couponFlows,
                                                  times, dfs)
-    print("Jamshidian:", vjam)
+    # print("Jamshidian:", vjam)
     
     model._num_time_steps = 100
     model.build_tree(tmat, times, dfs)
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    vHW = model.bond_option(texp, strikePrice, face,
+    vHW = model.bond_option(texp, strike_price, face,
                             couponTimes, couponFlows, exerciseType)
 
-    print("Full Tree:", vHW)
+    # print("Full Tree:", vHW)
+
 
 ###############################################################################
 
