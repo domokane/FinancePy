@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..\\")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from financepy.utils.global_types import FinOptionTypes
@@ -12,12 +15,13 @@ from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_types import FinExerciseTypes
+
 import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -450,10 +454,77 @@ def test_BondOptionZEROVOLConvergence():
 
 ###############################################################################
 
+def test_BondOptionDerivaGem():
+    
+    settlementDate = Date(1, 12, 2019)
+    issueDate = Date(1, 12, 2018)
+    expiryDate = settlementDate.add_tenor("18m")
+    maturityDate = settlementDate.add_tenor("10Y")
+    coupon = 0.05
+    freqType = FrequencyTypes.SEMI_ANNUAL
+    accrualType = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType)
 
-test_BondOptionZEROVOLConvergence()
-test_BondOption()
-test_BondOptionEuropeanConvergence()
-test_BondOptionAmericanConvergenceONE()
-test_BondOptionAmericanConvergenceTWO()
-testCases.compareTestCases()
+    couponTimes = []
+    couponFlows = []
+    cpn = bond._coupon/bond._frequency
+
+    numFlows = len(bond._flow_dates)
+    for i in range(0, numFlows):
+
+        pcd = bond._flow_dates[i-1]
+        ncd = bond._flow_dates[i]
+
+        if ncd > settlementDate:
+            
+            if len(couponTimes) == 0:
+                flowTime = (pcd - settlementDate) / gDaysInYear
+                couponTimes.append(flowTime)
+                couponFlows.append(cpn)
+                
+            flowTime = (ncd - settlementDate) / gDaysInYear
+            couponTimes.append(flowTime)
+            couponFlows.append(cpn)
+
+    couponTimes = np.array(couponTimes)
+    couponFlows = np.array(couponFlows)
+
+    strikePrice = 100.0
+    face = 100.0
+    y = 0.05
+    times = np.linspace(0, 10, 21)
+    dfs = np.power(1+y/2, -times*2)
+
+    sigma = 0.0125
+    a = 0.1
+    model = HWTree(sigma, a, None)
+
+    #  Test convergence
+    texp = (expiryDate - settlementDate)/gDaysInYear
+    tmat = (maturityDate - settlementDate)/gDaysInYear
+
+    # Jamshidian approach
+    vjam = model.european_bond_option_jamshidian(texp, strikePrice, face,
+                                                 couponTimes, couponFlows,
+                                                 times, dfs)
+    print("Jamshidian:", vjam)
+    
+    model._num_time_steps = 100
+    model.build_tree(tmat, times, dfs)
+    exerciseType = FinExerciseTypes.EUROPEAN
+
+    vHW = model.bond_option(texp, strikePrice, face,
+                            couponTimes, couponFlows, exerciseType)
+
+    print("Full Tree:", vHW)
+
+###############################################################################
+
+test_BondOptionDerivaGem()
+
+# test_BondOptionZEROVOLConvergence()
+# test_BondOption()
+# test_BondOptionEuropeanConvergence()
+# test_BondOptionAmericanConvergenceONE()
+# test_BondOptionAmericanConvergenceTWO()
+# testCases.compareTestCases()

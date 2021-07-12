@@ -802,6 +802,8 @@ def fwd_full_bond_price(rt, *args):
     ptexp = _uinterpolate(texp, df_times, df_values, interp)
     ptdelta = _uinterpolate(tdelta, df_times, df_values, interp)
 
+#    print("TEXP", texp, ptexp)
+    
     num_flows = len(cpn_times)
     pv = 0.0
 
@@ -810,7 +812,7 @@ def fwd_full_bond_price(rt, *args):
         tcpn = cpn_times[i]
         cpn = cpn_amounts[i]
 
-        if tcpn >= texp:  # CHECK IF IT SHOULD BE >=
+        if tcpn > texp:
             ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
             zcb = p_fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
                          self._sigma, self._a)
@@ -823,7 +825,7 @@ def fwd_full_bond_price(rt, *args):
 #    print("TCPN", tcpn, "ZCB", zcb, "PRI", 1.0, "PV", pv)
 
     accd = accrued_interpolator(texp, cpn_times, cpn_amounts)
-
+#    print("Accrued:", accd)
 #    print("texp:", texp)
 #    print("cpn_times:", cpn_times)
 #    print("cpn_amounts:", cpn_amounts)
@@ -922,6 +924,9 @@ class HWTree():
         deconstruction of the bond into a strip of zero coupon bonds with the
         short rate that would make the bond option be at the money forward. """
 
+#        print(df_times)
+#        print(df_values)
+
         num_coupons = len(cpn_times)
 
         argtuple = (self, texp, cpn_times, cpn_amounts,
@@ -948,7 +953,7 @@ class HWTree():
 
             tcpn = cpn_times[i]
             cpn = cpn_amounts[i]
-
+            
             if tcpn >= texp:  # coupons on the expiry date are included
 
                 ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
