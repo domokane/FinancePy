@@ -33,7 +33,7 @@ from ...utils.global_types import FinCapFloorTypes, FinOptionTypes
 from enum import Enum
 
 
-class FinIborCapFloorModelTypes(Enum):
+class IborCapFloorModelTypes(Enum):
     BLACK = 1
     SHIFTED_BLACK = 2
     SABR = 3
@@ -61,7 +61,7 @@ class IborCapFloor():
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Initialise FinIborCapFloor object. """
+        """ Initialise IborCapFloor object. """
 
         check_argument_types(self.__init__, locals())
 

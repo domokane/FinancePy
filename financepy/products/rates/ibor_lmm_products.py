@@ -42,7 +42,7 @@ from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 ###############################################################################
 
 
-class FinIborLMMProducts():
+class IborLMMProducts():
     """ This is the class for pricing Ibor products using the LMM. """
 
     def __init__(self,

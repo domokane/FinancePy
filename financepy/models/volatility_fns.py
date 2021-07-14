@@ -14,7 +14,7 @@ from ..utils.error import FinError
 
 from enum import Enum
 
-class FinVolFunctionTypes(Enum):
+class VolFunctionTypes(Enum):
     CLARK = 0
     SABR = 1
     SABR_BETA_ONE = 2

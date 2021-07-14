@@ -8,4 +8,4 @@ This folder contains a set of credit-related assets ranging from CDS to CDS opti
 * CDSTranche is a synthetic CDO tranche. This is a financial derivative which takes a loss if the total loss on the portfolio exceeds a lower threshold K1 and which is wiped out if it exceeds a higher threshold K2. The value depends on the default correlation between the assets in the portfolio of credits. This also includes a valuation model based on the Gaussian copula model.
 
 ### FinCDSCurve
-This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a FinIborSingleCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.
+This is a curve that has been calibrated to fit the market term structure of CDS contracts given a recovery rate assumption and a IborSingleCurve discount curve. It also contains a IborCurve object for discounting. It has methods for fitting the curve and also for extracting survival probabilities.

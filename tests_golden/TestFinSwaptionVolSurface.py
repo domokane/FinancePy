@@ -4,7 +4,7 @@
 
 import time
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.models.volatility_fns import VolFunctionTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -72,7 +72,7 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         divRate = 0.010  # USD
         dividend_curve = DiscountCurveFlat(valuation_date, divRate)
 
-        vol_functionType = FinVolFunctionTypes.SABR_BETA_HALF
+        vol_functionType = VolFunctionTypes.SABR_BETA_HALF
 
         swaptionSurface = SwaptionVolSurface(valuation_date,
                                              exercise_dates,

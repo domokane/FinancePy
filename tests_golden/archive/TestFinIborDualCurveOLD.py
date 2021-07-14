@@ -25,8 +25,8 @@ from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.interpolator import InterpTypes
 
-from financepy.products.rates.FinIborSingleCurveOLD import FinIborSingleCurveOLD
-from financepy.products.rates.FinIborDualCurveOLD import FinIborDualCurveOLD
+from financepy.products.rates.IborSingleCurveOLD import IborSingleCurveOLD
+from financepy.products.rates.IborDualCurveOLD import IborDualCurveOLD
 from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.ois import OIS
 
@@ -220,7 +220,7 @@ def test_bloombergPricingExample():
     swap = IborSwapOLD(settlement_date, "40Y", fixed_leg_type, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = IborSwapOLD(settlement_date, "50Y", fixed_leg_type, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type, True)
+    libor_curve = IborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type, True)
 
     principal = 0.0
     testCases.banner("======================================================")
@@ -244,7 +244,7 @@ def test_bloombergPricingExample():
     oisCurve = buildOIS(valuation_date)
 #    print(oisCurve)
 
-    liborDualCurve = FinIborDualCurveOLD(valuation_date, oisCurve, depos, fras, swaps,
+    liborDualCurve = IborDualCurveOLD(valuation_date, oisCurve, depos, fras, swaps,
                                          InterpTypes.FLAT_FWD_RATES, True)
 #    print(liborDualCurve) 
     
@@ -370,7 +370,7 @@ def test_swapValuationExample():
     iborFras = fras.copy()
     ibor_swaps = swaps.copy()
     
-    iborCurve = FinIborSingleCurve(valuation_date, iborDepos, iborFras, ibor_swaps, interp_type)
+    iborCurve = IborSingleCurve(valuation_date, iborDepos, iborFras, ibor_swaps, interp_type)
     v1 = offMarketSwap.value(valuation_date, iborCurve, iborCurve, -0.268/100.0)    
 
     testCases.banner("DERISCOPE EXAMPLE REPLICATION")    
@@ -436,7 +436,7 @@ def test_swapValuationExample():
     
 #    oisCurveFF = FinOISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interp_type)
     
-    iborDualCurve = FinIborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, ibor_swaps, interp_type)
+    iborDualCurve = IborDualCurve(valuation_date, oisCurveFF, iborDepos, iborFras, ibor_swaps, interp_type)
     
 #    v2 = offMarketSwap.value(valuation_date, oisCurveFF, iborDualCurve, -0.268/100.0)
     

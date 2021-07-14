@@ -380,7 +380,7 @@ class EquityAsianOption:
               accruedAverage: float = None):
         """ Calculate the value of an Asian option using one of the specified
         analytical approximations for an average rate option. These are the
-        three enumerated values in the enum FinAsianOptionValuationMethods. The
+        three enumerated values in the enum AsianOptionValuationMethods. The
         choices of approximation are (i) GEOMETRIC - the average is a geometric
         one as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
         this is a value based on an edgeworth expansion of the moments of the

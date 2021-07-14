@@ -5,7 +5,7 @@
 import time
 import matplotlib.pyplot as plt
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.models.volatility_fns import VolFunctionTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
@@ -56,7 +56,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = FinVolFunctionTypes.CLARK
+        vol_functionType = VolFunctionTypes.CLARK
 
         fxMarket = FXVolSurface(valuation_date,
                                 spot_fx_rate,
@@ -77,7 +77,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
         # for atmMethod in FinFXATMMethod:
         #     for deltaMethod in FinFXDeltaMethod:
-        #         for vol_functionType in FinVolFunctionTypes:
+        #         for vol_functionType in VolFunctionTypes:
 
         #             fxMarket = FinFXVolSurface(valuation_date,
         #                                        spot_fx_rate,

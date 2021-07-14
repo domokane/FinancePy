@@ -37,7 +37,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
                 dfs: np.ndarray,  # Vector of discount factors
                 method: int):  # Interpolation method which is value of enum
     """ Fast interpolation of discount factors at time x given discount factors
-    at times provided using one of the methods in the enum FinInterpTypes. The
+    at times provided using one of the methods in the enum InterpTypes. The
     value of x can be an array so that the function is vectorised. """
 
     if type(t) is float or type(t) is np.float64:
@@ -232,7 +232,7 @@ class FinInterpolator():
 
             self._interp_fn = PchipInterpolator(self._times, zero_rates)
 
-        # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+        # if self._interp_type == InterpTypes.FINCUBIC_LOG_DISCOUNT:
 
         #     """ Second derivatives at left is zero and first derivative at
         #     right is clamped to zero. """
@@ -272,7 +272,7 @@ class FinInterpolator():
             self._interp_fn = CubicSpline(self._times, zero_rates,
                                           bc_type='natural')
 
-    #        elif self._interp_type  == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+    #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
     #
     #            logDfs = np.log(self._dfs)
     #            self._interp_fn = interp1d(self._times, logDfs,
@@ -283,7 +283,7 @@ class FinInterpolator():
     def interpolate(self,
                     t: float):
         """ Interpolation of discount factors at time x given discount factors
-        at times provided using one of the methods in the enum FinInterpTypes.
+        at times provided using one of the methods in the enum InterpTypes.
         The value of x can be an array so that the function is vectorised. """
 
         if self._dfs is None:
@@ -319,7 +319,7 @@ class FinInterpolator():
 
             out = np.exp(-tvec * self._interp_fn(tvec))
 
-        # if self._interp_type == FinInterpTypes.FINCUBIC_LOG_DISCOUNT:
+        # if self._interp_type == InterpTypes.FINCUBIC_LOG_DISCOUNT:
 
         #     out = np.exp(self._interp_fn(tvec))
 
@@ -335,7 +335,7 @@ class FinInterpolator():
 
             out = np.exp(-tvec * self._interp_fn(tvec))
 
-        #        elif self._interp_type == FinInterpTypes.LINEAR_LOG_DISCOUNT:
+        #        elif self._interp_type == InterpTypes.LINEAR_LOG_DISCOUNT:
         #
         #            out = np.exp(self._interp_fn(tvec))
 

@@ -30,7 +30,7 @@ PLOT_GRAPHS = False
 ###############################################################################
 
 
-def test_FinOISFRAsOnly():
+def test_OISFRAsOnly():
 
     # TO DO FIX THIS
     valuation_date = Date(23, 2, 2018)
@@ -78,7 +78,7 @@ def test_FinOISFRAsOnly():
 ###############################################################################
 
 
-def test_FinOISDepositsFRAsSwaps():
+def test_OISDepositsFRAsSwaps():
 
     valuation_date = Date(18, 9, 2019)
 
@@ -257,7 +257,7 @@ def futureToFRARate(price, convexity):
 ###############################################################################
 
 
-def test_FinOISDepositsFuturesSwaps():
+def test_OISDepositsFuturesSwaps():
 
     spot_date = Date(6, 6, 2018)
     spot_days = 0
@@ -318,7 +318,7 @@ def test_FinOISDepositsFuturesSwaps():
     notional = 1000000
     float_spread = 0.0
     floatDCCType = DayCountTypes.ACT_360
-    calendar_type = CalendarTypes.US
+    calendar_type = CalendarTypes.UNITED_STATES
     busDayAdjustRule = BusDayAdjustTypes.PRECEDING
 
     swap_rate = 0.02776305
@@ -589,8 +589,8 @@ def test_bloombergPricingExample():
 
 test_bloombergPricingExample()
 # test_derivativePricingExample()
-# test_FinOISFRAsOnly()
-# test_FinOISDepositsFRAsSwaps()
-# test_FinOISDepositsFuturesSwaps()
+# test_OISFRAsOnly()
+# test_OISDepositsFRAsSwaps()
+# test_OISDepositsFuturesSwaps()
 
 testCases.compareTestCases()

@@ -12,7 +12,7 @@ import numpy as np
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
 from financepy.products.equity.FinEquityVanillaOption import FinEquityVanillaOption
 from financepy.market.curves.FinDiscountCurveFlat import FinDiscountCurveFlat
-from financepy.models.FinModelBlackScholes import FinModelBlackScholes
+from financepy.models.BlackScholes import BlackScholes
 from financepy.finutils.FinDate import FinDate
 from financepy.finutils.FinError import FinError
 
@@ -30,7 +30,7 @@ def test_FinEquityVanillaOption():
     volatility = 0.30
     interestRate = 0.05
     dividendYield = 0.01
-    model = FinModelBlackScholes(volatility)
+    model = BlackScholes(volatility)
     discountCurve = FinDiscountCurveFlat(valueDate, interestRate)
     dividendCurve = FinDiscountCurveFlat(valueDate, dividendYield)
 
@@ -186,7 +186,7 @@ def testImpliedVolatility_NEW():
     
     for vol in sigmas:
 
-        model = FinModelBlackScholes(vol)
+        model = BlackScholes(vol)
 
         for timeToExpiry in timesToExpiry:     
 

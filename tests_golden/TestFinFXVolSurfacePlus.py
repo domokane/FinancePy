@@ -5,7 +5,7 @@
 import time
 import matplotlib.pyplot as plt
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.models.volatility_fns import VolFunctionTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
@@ -63,7 +63,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = FinVolFunctionTypes.CLARK5
+        vol_functionType = VolFunctionTypes.CLARK5
         alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -134,7 +134,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
     deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-    vol_functionType = FinVolFunctionTypes.CLARK5
+    vol_functionType = VolFunctionTypes.CLARK5
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
                                     spot_fx_rate,
@@ -206,7 +206,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.FORWARD_DELTA  # THIS IS DIFFERENT
-        vol_functionType = FinVolFunctionTypes.CLARK5
+        vol_functionType = VolFunctionTypes.CLARK5
         alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -344,7 +344,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = FinVolFunctionTypes.CLARK
+        vol_functionType = VolFunctionTypes.CLARK
         alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -438,7 +438,7 @@ def test_FinFXMktVolSurface5(verboseCalibration):
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = FinVolFunctionTypes.CLARK
+        vol_functionType = VolFunctionTypes.CLARK
         alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
         fxMarketPlus = FXVolSurfacePlus(valuation_date,

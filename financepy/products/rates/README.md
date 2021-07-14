@@ -11,7 +11,7 @@ This is the basic Ibor instrument in which a party borrows an amount for a speci
 This is a class to handle interest rate futures contracts. This is an exchange-traded contract
 to receive or pay Ibor on a specified future date. It can be used to build the Liboir term structure.
 
-### FinIborFRA
+### IborFRA
 
 This is a class to manage Forward Rate Agreements (FRAs) in which one party agrees to lock in a forward Ibor rate.
 
@@ -25,7 +25,7 @@ This is a contract to exchange fixed rate coupons for floating Ibor rates. This 
 
 This is a contract to exchange fixed rate coupons for floating Ibor rates. This class has functionality to value the swap contract and to calculate its risk.
 
-### FinIborIborSwap - IN PROGRESS
+### IborIborSwap - IN PROGRESS
 
 This is a contract to exchange IBOR rates with different terms, also known as a basis swap. This class has functionality to value the swap contract and to calculate its risk.
 
@@ -33,7 +33,7 @@ This is a contract to exchange IBOR rates with different terms, also known as a 
 
 This is an OIS, a contract to exchange fixed rate coupons for the overnight index rate. This class has functionality to value the swap contract and to calculate its risk.
 
-### FinIborOISwap - IN PROGRESS
+### IborOISwap - IN PROGRESS
 
 This is a contract to exchange overnight index rates for Ibor rates. This class has functionality to value the swap contract and to calculate its risk.
 
@@ -43,7 +43,7 @@ This is a contract to exchange overnight index rates for Ibor rates. This class 
 
 This is a contract to exchange fixed rate coupons in two different currencies. This class has functionality to value the swap contract and to calculate its risk.
 
-### FinIborIborCcySwap - IN PROGRESS
+### IborIborCcySwap - IN PROGRESS
 
 This is a contract to exchange IBOR coupons in two different currencies. This class has functionality to value the swap contract and to calculate its risk.
 
@@ -55,13 +55,13 @@ This is a contract to exchange the daily compounded Overnight index swap rate fo
 
 This is a discount curve that is extracted by bootstrapping a set of OIS rates. The internal representation of the curve are discount factors on each of the OIS dates. Between these dates, discount factors are interpolated according to a specified scheme.
 
-### FinIborSingleCurve
+### IborSingleCurve
 
 This is a discount curve that is extracted by bootstrapping a set of Ibor deposits, Ibor FRAs and Ibor swap prices. The internal representation of the curve are discount factors on each of the deposit, FRA and swap maturity dates. Between these dates, discount factors are interpolated according to a specified scheme - see below.
 
 ## Options
 
-### FinIborCapFloor
+### IborCapFloor
 
 ### IborSwaption
 

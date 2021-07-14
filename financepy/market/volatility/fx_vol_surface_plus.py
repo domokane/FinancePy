@@ -23,12 +23,12 @@ from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
-from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import VolFunctionTypes
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_one
 from ...models.sabr import vol_function_sabr_beta_half
 
-from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import VolFunctionTypes
 
 from ...utils.math import norminvcdf
 
@@ -666,22 +666,22 @@ def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
     else:
         gapK = _interpolate_gap(k, strikes, gaps)
 
-    if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
+    if vol_function_type_value == VolFunctionTypes.CLARK.value:
         vol = vol_function_clark(params, f, k, t) + gapK
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR.value:
         vol = vol_function_sabr(params, f, k, t)  + gapK
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_HALF.value:
         vol = vol_function_sabr_beta_half(params, f, k, t) + gapK
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_ONE.value:
         vol = vol_function_sabr_beta_one(params, f, k, t) + gapK
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
+    elif vol_function_type_value == VolFunctionTypes.BBG.value:
         vol = vol_function_bloomberg(params, f, k, t) + gapK
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
+    elif vol_function_type_value == VolFunctionTypes.CLARK5.value:
         vol = vol_function_clark(params, f, k, t)  + gapK
         return vol
     else:
@@ -847,7 +847,7 @@ class FXVolSurfacePlus():
     prices of FX options at different strikes and expiry tenors. The
     calibration inputs are the ATM and 25 and 10 Delta volatilities in terms of
     the market strangle amd risk reversals. There is a choice of volatility
-    function from cubic in delta to full SABR. Check out FinVolFunctionTypes.
+    function from cubic in delta to full SABR. Check out VolFunctionTypes.
     Parameter alpha [0,1] is used to interpolate between fitting only 25D when
     alpha=0 to fitting only 10D when alpha=1.0. Alpha=0.5 assigns equal weights
     A vol function with more parameters will give a better fit. Of course. But 
@@ -870,7 +870,7 @@ class FXVolSurfacePlus():
                  alpha: float,
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
-                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.CLARK,
+                 volatility_function_type:VolFunctionTypes=VolFunctionTypes.CLARK,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD,
                  tol:float=1e-8):
         """ Create the FinFXVolSurfacePlus object by passing in market vol data
@@ -1302,17 +1302,17 @@ class FXVolSurfacePlus():
         s = self._spot_fx_rate
         num_vol_curves = self._num_vol_curves
 
-        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == VolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == VolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == VolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == VolFunctionTypes.CLARK5:
             num_parameters = 5
         else:
             print(self._volatility_function_type)
@@ -1419,7 +1419,7 @@ class FXVolSurfacePlus():
             s50 = atm_vol                   # ATM
             s90 = atm_vol + ms10 - rr10/2.0 # 10D Put (90D Call)
 
-            if self._volatility_function_type == FinVolFunctionTypes.CLARK:
+            if self._volatility_function_type == VolFunctionTypes.CLARK:
 
                 # Our preference is to fit to the 10D wings first
                 if self._useMS10DVol is False:
@@ -1435,7 +1435,7 @@ class FXVolSurfacePlus():
                     c2 = np.log(s10*s90/atm_vol/atm_vol) / 0.32
                     x_init = [c0, c1, c2]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR:
+            elif self._volatility_function_type == VolFunctionTypes.SABR:
                 # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
@@ -1445,7 +1445,7 @@ class FXVolSurfacePlus():
 
                 x_init = [alpha, beta, rho, nu]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
+            elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_ONE:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 beta = 1.0 # FIXED
@@ -1454,7 +1454,7 @@ class FXVolSurfacePlus():
 
                 x_init = [alpha, rho, nu]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
+            elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_HALF:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 beta = 0.50 # FIXED
@@ -1463,7 +1463,7 @@ class FXVolSurfacePlus():
  
                 x_init = [alpha, rho, nu]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.BBG:
+            elif self._volatility_function_type == VolFunctionTypes.BBG:
 
                 # Our preference is to fit to the 10D wings first
                 if self._useMS10DVol is False:
@@ -1479,7 +1479,7 @@ class FXVolSurfacePlus():
 
                 x_init = [a, b, c]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
+            elif self._volatility_function_type == VolFunctionTypes.CLARK5:
 
                 # Our preference is to fit to the 10D wings first
                 if self._useMS10DVol is False:

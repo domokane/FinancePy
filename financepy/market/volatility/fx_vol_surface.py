@@ -23,7 +23,7 @@ from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
-from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import VolFunctionTypes
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_one
 from ...models.sabr import vol_function_sabr_beta_half
@@ -214,22 +214,22 @@ def vol_function(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
     
-    if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
+    if vol_function_type_value == VolFunctionTypes.CLARK.value:
         vol = vol_function_clark(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR.value:
         vol = vol_function_sabr(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_ONE.value:
         vol = vol_function_sabr_beta_one(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_HALF.value:
         vol = vol_function_sabr_beta_half(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
+    elif vol_function_type_value == VolFunctionTypes.BBG.value:
         vol = vol_function_bloomberg(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
+    elif vol_function_type_value == VolFunctionTypes.CLARK5.value:
         vol = vol_function_clark(params, f, k, t)
         return vol
     else:
@@ -394,7 +394,7 @@ class FXVolSurface():
                  riskReversal25DeltaVols: (list, np.ndarray),
                  atmMethod:FinFXATMMethod=FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  deltaMethod:FinFXDeltaMethod=FinFXDeltaMethod.SPOT_DELTA,
-                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.CLARK):
+                 volatility_function_type:VolFunctionTypes=VolFunctionTypes.CLARK):
         """ Create the FinFXVolSurface object by passing in market vol data
         for ATM and 25 Delta Market Strangles and Risk Reversals. """
 
@@ -533,17 +533,17 @@ class FXVolSurface():
         s = self._spot_fx_rate
         num_vol_curves = self._num_vol_curves
 
-        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == VolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == VolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == VolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == VolFunctionTypes.CLARK5:
             num_parameters = 5
         else:
             print(self._volatility_function_type)
@@ -611,7 +611,7 @@ class FXVolSurface():
             s50 = atm_vol
             s75 = atm_vol + ms25 - rr25/2.0
 
-            if self._volatility_function_type == FinVolFunctionTypes.CLARK:
+            if self._volatility_function_type == VolFunctionTypes.CLARK:
 
                 # Fit to 25D
                 c0 = np.log(atm_vol)
@@ -619,7 +619,7 @@ class FXVolSurface():
                 c2 = 8.0 * np.log(s25*s75/atm_vol/atm_vol)
                 x_init = [c0, c1, c2]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR:
+            elif self._volatility_function_type == VolFunctionTypes.SABR:
                 # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
@@ -629,21 +629,21 @@ class FXVolSurface():
 
                 x_init = [alpha, beta, rho, nu]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
+            elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_ONE:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 x_init = [alpha, nu, rho]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
+            elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_HALF:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 x_init = [alpha, rho, nu]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.BBG:
+            elif self._volatility_function_type == VolFunctionTypes.BBG:
 
                 # BBG Params if we fit to 25D
                 a = 8.0*s75-16.0*s50+8.0*s25
@@ -652,7 +652,7 @@ class FXVolSurface():
 
                 x_init = [a, b, c]
 
-            elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
+            elif self._volatility_function_type == VolFunctionTypes.CLARK5:
 
                 # Fit to 25D
                 c0 = np.log(atm_vol)

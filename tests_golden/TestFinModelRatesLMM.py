@@ -73,7 +73,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = FinIborCapVolCurve(valuation_date,
+    volCurve = IborCapVolCurve(valuation_date,
                                    capVolDates,
                                    capVolatilities,
                                    day_count_type)

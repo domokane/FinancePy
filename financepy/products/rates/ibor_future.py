@@ -59,7 +59,7 @@ class IborFuture:
 ###############################################################################
 
     def to_fra(self, futures_price, convexity):
-        """ Convert the futures contract to a FinIborFRA object so it can be
+        """ Convert the futures contract to a IborFRA object so it can be
         used to boostrap a Ibor curve. For this we need to adjust the futures
         rate using the convexity correction. """
 

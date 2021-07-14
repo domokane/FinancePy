@@ -84,7 +84,7 @@ class InflationSwapCurve(DiscountCurve):
                  ibor_swaps: list,
                  interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
                  check_refit: bool = False):  # Set to True to test it works
-        """ Create an instance of a FinIbor curve given a valuation date and
+        """ Create an instance of a Ibor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a

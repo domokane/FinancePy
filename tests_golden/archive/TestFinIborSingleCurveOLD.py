@@ -15,7 +15,7 @@ from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.FinIborSingleCurveOLD import FinIborSingleCurveOLD
+from financepy.products.rates.IborSingleCurveOLD import IborSingleCurveOLD
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -78,7 +78,7 @@ def test_ibor_depositsOnly():
     fras = []
     swaps = []
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date,
+    libor_curve = IborSingleCurveOLD(valuation_date,
                                        depos,
                                        fras,
                                        swaps)
@@ -93,7 +93,7 @@ def test_ibor_depositsOnly():
 ###############################################################################
 
 
-def test_FinIborFRAsOnly():
+def test_IborFRAsOnly():
 
     # TO DO FIX THIS
     valuation_date = Date(23, 2, 2018)
@@ -128,7 +128,7 @@ def test_FinIborFRAsOnly():
     depos = []
     swaps = []
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date,
+    libor_curve = IborSingleCurveOLD(valuation_date,
                                        depos,
                                        fras,
                                        swaps)
@@ -295,7 +295,7 @@ def test_ibor_depositsFRAsSwaps():
                         fixedDCCType)
     swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date,
+    libor_curve = IborSingleCurveOLD(valuation_date,
                                        depos,
                                        fras,
                                        swaps)
@@ -410,7 +410,7 @@ def test_ibor_depositsFuturesSwaps():
     principal = 0.0
     float_spread = 0.0
     floatDCCType = DayCountTypes.ACT_360
-    calendar_type = CalendarTypes.US
+    calendar_type = CalendarTypes.UNITED_STATES
     busDayAdjustRule = BusDayAdjustTypes.PRECEDING
 
     swap_rate = 0.02776305
@@ -422,7 +422,7 @@ def test_ibor_depositsFuturesSwaps():
 
     swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(spot_date, depos, fras, swaps)
+    libor_curve = IborSingleCurveOLD(spot_date, depos, fras, swaps)
 
     times = np.linspace(0.0, 2.0, 25)
     dates = spot_date.add_years(times)
@@ -598,7 +598,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps,
+        _ = IborSingleCurveOLD(valuation_date, depos, fras, swaps,
                                   InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -607,7 +607,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps,
+        _ = IborSingleCurveOLD(valuation_date, depos, fras, swaps,
                                   InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -682,7 +682,7 @@ def test_bloombergPricingExample(interp_type):
     swap = IborSwapOLD(settlement_date, "40Y", fixed_leg_type, (2.96946+2.97354)/200, freq, accrual); swaps.append(swap)
     swap = IborSwapOLD(settlement_date, "50Y", fixed_leg_type, (2.91552+2.93748)/200, freq, accrual); swaps.append(swap)
 
-    libor_curve = FinIborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type)
+    libor_curve = IborSingleCurveOLD(valuation_date, depos, fras, swaps, interp_type)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
@@ -723,7 +723,7 @@ def test_bloombergPricingExample(interp_type):
 ###############################################################################
 
 if 1==0:
-    for interp_type in FinInterpTypes:
+    for interp_type in InterpTypes:
         start = time.time()
         test_bloombergPricingExample(interp_type)
         end = time.time()
@@ -732,7 +732,7 @@ if 1==0:
 test_bloombergPricingExample(InterpTypes.FLAT_FWD_RATES)
 test_derivativePricingExample()
 test_ibor_depositsOnly()
-test_FinIborFRAsOnly()
+test_IborFRAsOnly()
 test_ibor_depositsFRAsSwaps()
 test_ibor_depositsFuturesSwaps()
 

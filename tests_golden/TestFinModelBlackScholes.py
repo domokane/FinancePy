@@ -23,7 +23,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 # TODO Complete output of results to log files
 
 
-def testFinModelBlackScholes():
+def testBlackScholes():
 
     valuation_date = Date(8, 5, 2015)
     expiry_date = Date(15, 1, 2016)
@@ -92,15 +92,15 @@ def testFinModelBlackScholes():
 
     # for num_steps in num_steps_per_year:
 
-    #     modelTree = FinModelBlackScholes(volatility,
-    #                                      FinModelBlackScholesTypes.CRR_TREE,
+    #     modelTree = BlackScholes(volatility,
+    #                                      BlackScholesTypes.CRR_TREE,
     #                                      {'num_steps_per_year':num_steps})
 
-    #     modelAnal = FinModelBlackScholes(volatility,
-    #                                      FinModelBlackScholesTypes.ANALYTICAL)
+    #     modelAnal = BlackScholes(volatility,
+    #                                      BlackScholesTypes.ANALYTICAL)
 
-    #     modelBAW = FinModelBlackScholes(volatility,
-    #                                     FinModelBlackScholesTypes.BARONE_ADESI)
+    #     modelBAW = BlackScholes(volatility,
+    #                                     BlackScholesTypes.BARONE_ADESI)
 
     #     v_am = amOption.value(valuation_date, stock_price, discount_curve,
     #                           dividend_yield, modelTree)
@@ -131,5 +131,5 @@ def testFinModelBlackScholes():
 ###############################################################################
 
 
-testFinModelBlackScholes()
+testBlackScholes()
 testCases.compareTestCases()

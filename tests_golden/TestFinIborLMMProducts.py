@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
-from financepy.products.rates.FinIborLMMProducts import FinIborLMMProducts
+from financepy.products.rates.ibor_lmm_products import IborLMMProducts
 from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
@@ -160,9 +160,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     capVol = 15.54
 
-#     liborCap = FinIborCapFloor(settlement_date,
+#     liborCap = IborCapFloor(settlement_date,
 #                                 capMaturityDate,
-#                                 FinIborCapFloorTypes.CAP,
+#                                 IborCapFloorTypes.CAP,
 #                                 capFloorRate,
 #                                 None,
 #                                 FrequencyTypes.ANNUAL,
@@ -175,7 +175,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # LMM VALUATION
 #     ###########################################################################
 
-#     lmmProducts = FinIborLMMProducts(settlement_date,
+#     lmmProducts = IborLMMProducts(settlement_date,
 #                                       capMaturityDate,
 #                                       freq_type,
 #                                       day_count_type)
@@ -198,7 +198,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolatilities = np.array(capVolatilities)/100.0
 
 #     day_count_type = DayCountTypes.ACT_ACT_ISDA
-#     volCurve = FinIborCapVolCurve(valuation_date,
+#     volCurve = IborCapVolCurve(valuation_date,
 #                                    capVolDates,
 #                                    capVolatilities,
 #                                    day_count_type)
@@ -224,7 +224,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #         v_lmm = lmmProducts.valueCapFloor(settlement_date,
 #                                           capMaturityDate,
-#                                           FinIborCapFloorTypes.CAP,
+#                                           IborCapFloorTypes.CAP,
 #                                           capFloorRate,
 #                                           FrequencyTypes.ANNUAL,
 #                                           DayCountTypes.ACT_360)

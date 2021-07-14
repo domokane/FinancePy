@@ -2,16 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..//")
+
 import time
 import matplotlib.pyplot as plt
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import FinVolFunctionTypes
+from financepy.models.volatility_fns import VolFunctionTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -57,7 +58,7 @@ def test_equity_vol_surface(verboseCalibration):
     q = 0.010  # USD
     dividend_curve = DiscountCurveFlat(valuation_date, q)
 
-    vol_functionType = FinVolFunctionTypes.SVI
+    vol_functionType = VolFunctionTypes.SVI
 
     equitySurface = EquityVolSurface(valuation_date,
                                      stock_price,

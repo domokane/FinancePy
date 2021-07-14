@@ -779,7 +779,7 @@ def test_bloombergPricingExample(interp_type):
 
 
 if 1 == 0:
-    for interp_type in FinInterpTypes:
+    for interp_type in InterpTypes:
         start = time.time()
         test_bloombergPricingExample(interp_type)
         end = time.time()

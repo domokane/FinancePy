@@ -239,7 +239,7 @@ class IborSingleCurve(DiscountCurve):
         if num_fras > 0:
             for fra in ibor_fras:
                 if isinstance(fra, IborFRA) is False:
-                    raise FinError("FRA is not of type FinIborFRA")
+                    raise FinError("FRA is not of type IborFRA")
 
                 startDt = fra._start_date
                 if startDt < self._valuation_date:

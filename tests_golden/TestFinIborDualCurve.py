@@ -609,7 +609,7 @@ def test_swapValuationExample():
     oisFras = fras.copy()
     oisSwaps = swaps.copy()
 
-#    oisCurveFF = FinOISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interp_type)
+#    oisCurveFF = OISCurve(valuation_date, oisDepos, oisFras, oisSwaps, interp_type)
 
     iborDualCurve = IborDualCurve(
         valuation_date, oisCurveFF, iborDepos, iborFras, ibor_swaps, interp_type)

@@ -476,7 +476,8 @@ def test_BondOptionDerivaGem():
     strike_price = 100.0
     face = 100.0
 
-    europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face, FinOptionTypes.EUROPEAN_CALL)
+    europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face, 
+                                        FinOptionTypes.EUROPEAN_CALL)
     cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
     fp = bond.full_price_from_discount_curve(expiry_date, discount_curve)
 #    print("Fixed Income Clean Price: %9.3f"% cp)
@@ -547,9 +548,9 @@ def test_BondOptionDerivaGem():
 
 test_BondOptionDerivaGem()
 
-# test_BondOptionZEROVOLConvergence()
-# test_BondOption()
-# test_BondOptionEuropeanConvergence()
-# test_BondOptionAmericanConvergenceONE()
-# test_BondOptionAmericanConvergenceTWO()
-# testCases.compareTestCases()
+test_BondOptionZEROVOLConvergence()
+test_BondOption()
+test_BondOptionEuropeanConvergence()
+test_BondOptionAmericanConvergenceONE()
+test_BondOptionAmericanConvergenceTWO()
+testCases.compareTestCases()

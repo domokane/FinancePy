@@ -42,7 +42,7 @@ def notebook_run_new(notebook_filepathname):
         out = None
         msg = 'Error executing the notebook "%s".\n\n' % filename
         msg += 'See notebook "%s" for the traceback.' % notebook_filename_out
-#        print(msg)
+        print(msg)
 
         with open(notebook_filename_out, mode='w', encoding='utf-8') as f:
             nbformat.write(nb, f)

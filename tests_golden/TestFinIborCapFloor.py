@@ -83,7 +83,7 @@ def test_ibor_depositsAndSwaps(valuation_date):
 ##########################################################################
 
 
-def test_FinIborCapFloor():
+def test_IborCapFloor():
 
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
@@ -176,7 +176,7 @@ def test_FinIborCapFloor():
 ###############################################################################
 
 
-def test_FinIborCapFloorVolCurve():
+def test_IborCapFloorVolCurve():
     """ Aim here is to price cap and caplets using cap and caplet vols and to
     demonstrate they are the same - NOT SURE THAT HULLS BOOKS FORMULA WORKS FOR
     OPTIONS. """
@@ -260,7 +260,7 @@ def test_FinIborCapFloorVolCurve():
 ###############################################################################
 
 
-def test_FinIborCapletHull():
+def test_IborCapletHull():
 
     #  Hull Page 703, example 29.3
     todayDate = Date(20, 6, 2019)
@@ -302,7 +302,7 @@ def test_FinIborCapletHull():
 ###############################################################################
 
 
-def test_FinIborCapFloorQLExample():
+def test_IborCapFloorQLExample():
 
     valuation_date = Date(14, 6, 2016)
 
@@ -357,8 +357,8 @@ def test_FinIborCapFloorQLExample():
 ###############################################################################
 
 
-test_FinIborCapletHull()
-test_FinIborCapFloorVolCurve()
-test_FinIborCapFloor()
-test_FinIborCapFloorQLExample()
+test_IborCapletHull()
+test_IborCapFloorVolCurve()
+test_IborCapFloor()
+test_IborCapFloorQLExample()
 testCases.compareTestCases()

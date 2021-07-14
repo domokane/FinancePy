@@ -21,7 +21,7 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.black_scholes import BlackScholes
 
-from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import VolFunctionTypes
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi
@@ -30,7 +30,7 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
 
-from ...models.volatility_fns import FinVolFunctionTypes
+from ...models.volatility_fns import VolFunctionTypes
 
 from ...utils.math import norminvcdf
 
@@ -201,28 +201,28 @@ def vol_function(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """
 
-    if vol_function_type_value == FinVolFunctionTypes.CLARK.value:
+    if vol_function_type_value == VolFunctionTypes.CLARK.value:
         vol = vol_function_clark(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_ONE.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_ONE.value:
         vol = vol_function_sabr_beta_one(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR_BETA_HALF.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR_BETA_HALF.value:
         vol = vol_function_sabr_beta_half(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.BBG.value:
+    elif vol_function_type_value == VolFunctionTypes.BBG.value:
         vol = vol_function_bloomberg(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SABR.value:
+    elif vol_function_type_value == VolFunctionTypes.SABR.value:
         vol = vol_function_sabr(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.CLARK5.value:
+    elif vol_function_type_value == VolFunctionTypes.CLARK5.value:
         vol = vol_function_clark(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SVI.value:
+    elif vol_function_type_value == VolFunctionTypes.SVI.value:
         vol = vol_function_svi(params, f, k, t)
         return vol
-    elif vol_function_type_value == FinVolFunctionTypes.SSVI.value:
+    elif vol_function_type_value == VolFunctionTypes.SSVI.value:
         vol = vol_function_ssvi(params, f, k, t)
         return vol
     else:
@@ -385,7 +385,7 @@ class SwaptionVolSurface():
     """ Class to perform a calibration of a chosen parametrised surface to the
     prices of swaptions at different expiry dates and swap tenors. There is a 
     choice of volatility function from cubic in delta to full SABR and SSVI. 
-    Check out FinVolFunctionTypes. Visualising the volatility curve is useful. 
+    Check out VolFunctionTypes. Visualising the volatility curve is useful. 
     Also, there is no guarantee that the implied pdf will be positive."""
 
     def __init__(self,
@@ -394,7 +394,7 @@ class SwaptionVolSurface():
                  fwd_swap_rates: (list, np.ndarray),
                  strike_grid: (np.ndarray),
                  volatility_grid: (np.ndarray),
-                 volatility_function_type:FinVolFunctionTypes=FinVolFunctionTypes.SABR,
+                 volatility_function_type:VolFunctionTypes=VolFunctionTypes.SABR,
                  finSolverType:FinSolverTypes=FinSolverTypes.NELDER_MEAD):
         """ Create the FinSwaptionVolSurface object by passing in market vol 
         data for a list of strikes and expiry dates. """
@@ -733,21 +733,21 @@ class SwaptionVolSurface():
     def _build_vol_surface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
-        if self._volatility_function_type == FinVolFunctionTypes.CLARK:
+        if self._volatility_function_type == VolFunctionTypes.CLARK:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_ONE:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR_BETA_HALF:
+        elif self._volatility_function_type == VolFunctionTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.BBG:
+        elif self._volatility_function_type == VolFunctionTypes.BBG:
             num_parameters = 3
-        elif self._volatility_function_type == FinVolFunctionTypes.SABR:
+        elif self._volatility_function_type == VolFunctionTypes.SABR:
             num_parameters = 4
-        elif self._volatility_function_type == FinVolFunctionTypes.CLARK5:
+        elif self._volatility_function_type == VolFunctionTypes.CLARK5:
             num_parameters = 5
-        elif self._volatility_function_type == FinVolFunctionTypes.SVI:
+        elif self._volatility_function_type == VolFunctionTypes.SVI:
             num_parameters = 5
-        elif self._volatility_function_type == FinVolFunctionTypes.SSVI:
+        elif self._volatility_function_type == VolFunctionTypes.SSVI:
             num_parameters = 5
         else:
             print(self._volatility_function_type)
