@@ -28,7 +28,7 @@ from ...utils.math import n_vect
 class FinTouchOptionPayoffTypes(Enum):
     DOWN_AND_IN_CASH_AT_HIT = 1,         # S0>H pays $1 at hit time from above
     UP_AND_IN_CASH_AT_HIT = 2,           # S0<H pays $1 at hit time from below
-    DOWN_AND_IN_CASH_AT_EXPIRY = 3,      # S0>H pays $1 at T if hit from below
+    DOWN_AND_IN_CASH_AT_EXPIRY = 3,      # S0>H pays $1 at T if hit from above
     UP_AND_IN_CASH_AT_EXPIRY = 4,        # S0<H pays $1 at T if hit from below
     DOWN_AND_OUT_CASH_OR_NOTHING = 5,    # S0>H pays $1 at T if S>H for all t<T
     UP_AND_OUT_CASH_OR_NOTHING = 6,      # S0<H pays $1 at T if S<H for all t<T
@@ -205,6 +205,8 @@ class EquityOneTouchOption(EquityOption):
             print("mu", mu)
             print("lam", lam)
 
+        # Reference Option Pricing Formulas by Espen Gaarder Haug. Page 176.
+
         if self._option_type == FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
@@ -214,8 +216,7 @@ class EquityOneTouchOption(EquityOption):
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
-                                                     z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 

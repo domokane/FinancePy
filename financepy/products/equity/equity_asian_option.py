@@ -323,7 +323,11 @@ def _value_mc_fast_cv_numba(t0, t, tau, K, n, option_type, stock_price,
 
     # Now we do the control variate adjustment
     m = covar(payoff_a, payoff_a)
-    lam = m[0][1] / m[1][1]
+
+    if np.abs(m[1][1]) < 1e-10:
+        lam = 0.0
+    else:
+        lam = m[0][1] / m[1][1]
 
     payoff_a_mean = np.mean(payoff_a)
     payoff_g_mean = np.mean(payoff_g)
@@ -472,6 +476,9 @@ class EquityAsianOption:
         meanGeo = (r - q - sigSq / 2.0) * (t0 + (texp - t0) / 2.0)
         varGeo = sigSq * (t0 + (texp - t0) * (2 * n - 1) / (6 * n))
         EG = S0 * np.exp(meanGeo + varGeo / 2.0)
+
+        if np.abs(varGeo) < 1e-10:
+            raise FinError("Asian option geometric variance is zero.")
 
         d1 = (meanGeo + np.log(S0 / K) + varGeo) / np.sqrt(varGeo)
         d2 = d1 - np.sqrt(varGeo)
