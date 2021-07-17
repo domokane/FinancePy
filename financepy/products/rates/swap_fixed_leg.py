@@ -103,6 +103,7 @@ class SwapFixedLeg:
         self._startAccruedDates = []
         self._endAccruedDates = []
         self._payment_dates = []
+        self._payments = []
         self._year_fracs = []
         self._accrued_days = []
         self._rates = []

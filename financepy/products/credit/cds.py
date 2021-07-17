@@ -429,13 +429,24 @@ class CDS:
 
         for depo in new_issuer_curve._libor_curve._usedDeposits:
             depo._deposit_rate += bump
+
         for fra in new_issuer_curve._libor_curve._usedFRAs:
             fra._fraRate += bump
+
         for swap in new_issuer_curve._libor_curve._usedSwaps:
-            swap._fixed_leg._coupon += bump
+            cpn = swap._fixed_leg._coupon
+            swap._fixed_leg._coupon = cpn + bump
+
+            # Need to regenerate fixed leg payments with bumped coupon
+            # I could call swap._fixed_leg.generate_payments() but it is 
+            # overkill as it has to do all the schedule generation which is 
+            # not needed as the dates are unchanged
+            num_payments = len(swap._fixed_leg._payments)
+            for i in range(0, num_payments):
+                old_pmt = swap._fixed_leg._payments[i]
+                swap._fixed_leg._payments[i] = old_pmt * (cpn + bump) / cpn  
 
         new_issuer_curve._libor_curve._build_curve()
-
         new_issuer_curve._build_curve()
 
         v1 = self.value(valuation_date,
