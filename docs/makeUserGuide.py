@@ -9,6 +9,7 @@ import sys
 import subprocess
 import shutil
 import fileinput
+from re import sub
 
 with open("../version.py", "r") as fh:
     version_number = fh.read()
@@ -50,6 +51,8 @@ def parseMarkdown(lines):
     for line in lines:
 
         lineFound = False
+
+        line = sub("_", "\\_", line)
 
         if line[0] == "*":
             lineFound = True
