@@ -258,13 +258,14 @@ def buildChapter(folderName):
     f.writelines(readMeLines)
     f.close()
 
-    modules = glob.glob(folderName + "//Fin*.py")
+    modules = glob.glob(folderName + "//*.py")
 
     for module in modules:
         moduleName = module.split("\\")[-1]
+        escapedModuleName = sub("_", "\\_", moduleName[0:-3])
         f = open(userGuideFileName, 'a')
         f.write("\\newpage\n")
-        f.write("\\section{" + moduleName[0:-3] + "}\n")
+        f.write("\\section{" + escapedModuleName + "}\n")
         f.write("\n")
         f.close()
         parseModule(module)
@@ -273,10 +274,11 @@ def buildChapter(folderName):
 
     for module in modules:
         moduleName = module.split("\\")[-1]
+        escapedModuleName = sub("_", "\\_", moduleName[0:-3])
         f = open(userGuideFileName, 'a')
         f.write("\n")
         f.write("\\newpage\n")
-        f.write("\\section{" + moduleName[0:-3] + "}\n")
+        f.write("\\section{" + escapedModuleName + "}\n")
         f.write("\n")
         f.close()
         parseModule(module)
@@ -291,6 +293,9 @@ def parseModule(moduleName):
     f = open(moduleName, 'r', encoding="utf8")
     lines = f.readlines()
     f.close()
+
+    lines = [sub(r"\\", r"\\\\", line) for line in lines]
+    lines = [sub("_", "\\_", line) for line in lines]
 
     numEnums = 0
     numClasses = 0
@@ -391,7 +396,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find(""""") > 0:
+        if line.find('"""') > 0:
             startCommentRow = rowNum
             startComment = True
             startLine = rowNum + 1
@@ -399,7 +404,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find(""""") > 0:
+        if line.find('"""') > 0:
             endCommentRow = rowNum
             endComment = True
             break
@@ -414,8 +419,8 @@ def parseClass(lines, startLine, endLine):
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
 
+            line = line.replace('"""', "")
             line = line.replace("'", "")
-            line = line.replace("_", r"\_")
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
@@ -440,7 +445,6 @@ def parseClass(lines, startLine, endLine):
         for rowNum in range(startLine, endLine):
             row = lines[rowNum]
             row = row.replace(" ", "")
-            row = row.replace("_", r"\_")
             row = row.replace("!", "")
             row = row.replace("<", "")
             row = row.replace(">", "")
@@ -489,7 +493,8 @@ def parseClass(lines, startLine, endLine):
 
     # Remove inheritance name from className
     endClassName = className.find("(")
-    className = className[:endClassName]
+    if (endClassName != -1):
+        className = className[:endClassName]
 
     for c in range(0, numClassFunctions):
         newLines += parseFunction(lines,
@@ -524,8 +529,6 @@ def parseFunction(lines, startLine, endLine, className=""):
     if functionName[0] == "_" and functionName != "__init__":
         return ""
 
-    functionName = functionName.replace("_", r"\_")
-
     # Functions beginning with underscores ('_') are not to be parsed
     isPrivate = (functionLine.find("def _") != -1)
     if isPrivate and functionName != r"\_\_init\_\_":
@@ -556,9 +559,9 @@ def parseFunction(lines, startLine, endLine, className=""):
     # Replace `__init__` with className and remove `self` from signatures
     if className != "":
         # Replace '__init__' with the function's class name
-        if functionName == r"\_\_init\_\_":
+        if functionName == "\\_\\_init\\_\\_":
             functionName = className
-            functionSignature = functionSignature.replace("__init__",
+            functionSignature = functionSignature.replace("\\_\\_init\\_\\_",
                                                           className)
 
             functionSignature = functionSignature.replace("def ", "")
@@ -582,7 +585,6 @@ def parseFunction(lines, startLine, endLine, className=""):
     functionComment = ""
     startCommentRow = startLine+1
     endCommentRow = startLine
-    startComment = False
     endComment = False
 
     for rowNum in range(startLine+1, endLine):
@@ -595,7 +597,6 @@ def parseFunction(lines, startLine, endLine, className=""):
                 commentInit = '"""'
 
             startCommentRow = rowNum
-            startComment = True
             for rowNum in range(rowNum+1, endLine):
                 line = lines[rowNum]
                 if line.find(commentInit) > 0:
@@ -605,34 +606,37 @@ def parseFunction(lines, startLine, endLine, className=""):
             break
 
         if line.count("'''") == 2 or line.count('"""') == 2:
+            if line.count("'''") == 2:
+                commentInit = "'''"
+            else:
+                commentInit = '"""'
+
             startCommentRow = rowNum
             endCommentRow = rowNum
-            startComment = True
             endComment = True
             break
-
-    if startComment is False and endComment is False:
-        # assume it's a one-line comment
-        endCommentRow = startCommentRow
-        endComment = True
 
     if endComment:
         #  print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
-            line = line.replace("_", r"\_")
-            line = line.replace("'''", "")
-            line = line.replace('"""', '')
+            line = line.replace("$", "\\$")
+            line = line.replace(commentInit, "")
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
             # This is because we remove trailing whitespace
             functionComment += line + " "
 
-    if functionComment == " ":
+
+    if functionComment == "":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
     paramDescription = extractParams(functionSignature)
+
+    # Inside lstlisting, backslashes used for escaping are interpreted as backslashes
+    # However, must be after `extractParams` where escaping is required
+    functionSignature = functionSignature.replace("\\_", "_")
 
     # LATEX FORMATTING
     if className != "":
@@ -677,7 +681,6 @@ def parseEnum(lines, startLine, endLine):
         n = line.find("=")
         if n != -1:
             enumType = line[0:n]
-            enumType = enumType.replace("_", r"\_")
             enumTypes.append(enumType)
         else:
             break
@@ -704,8 +707,6 @@ def extractParams(functionSignature):
     argument's name, type, description and default value"""
     # A good example to look at for testing is `BondConvertible`
 
-    functionSignature = functionSignature.replace("\\", "\\textbackslash ")
-    functionSignature = functionSignature.replace("_", "\_")
     functionSignature = functionSignature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
