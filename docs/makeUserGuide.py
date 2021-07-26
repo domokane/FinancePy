@@ -396,7 +396,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find(""""") > 0:
+        if line.find('"""') > 0:
             startCommentRow = rowNum
             startComment = True
             startLine = rowNum + 1
@@ -404,7 +404,7 @@ def parseClass(lines, startLine, endLine):
 
     for rowNum in range(startLine, commentEndLine):
         line = lines[rowNum]
-        if line.find(""""") > 0:
+        if line.find('"""') > 0:
             endCommentRow = rowNum
             endComment = True
             break
@@ -419,6 +419,7 @@ def parseClass(lines, startLine, endLine):
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
 
+            line = line.replace('"""', "")
             line = line.replace("'", "")
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
@@ -584,7 +585,6 @@ def parseFunction(lines, startLine, endLine, className=""):
     functionComment = ""
     startCommentRow = startLine+1
     endCommentRow = startLine
-    startComment = False
     endComment = False
 
     for rowNum in range(startLine+1, endLine):
@@ -597,7 +597,6 @@ def parseFunction(lines, startLine, endLine, className=""):
                 commentInit = '"""'
 
             startCommentRow = rowNum
-            startComment = True
             for rowNum in range(rowNum+1, endLine):
                 line = lines[rowNum]
                 if line.find(commentInit) > 0:
@@ -607,31 +606,30 @@ def parseFunction(lines, startLine, endLine, className=""):
             break
 
         if line.count("'''") == 2 or line.count('"""') == 2:
+            if line.count("'''") == 2:
+                commentInit = "'''"
+            else:
+                commentInit = '"""'
+
             startCommentRow = rowNum
             endCommentRow = rowNum
-            startComment = True
             endComment = True
             break
-
-    if startComment is False and endComment is False:
-        # assume it's a one-line comment
-        endCommentRow = startCommentRow
-        endComment = True
 
     if endComment:
         #  print(startCommentRow, endCommentRow)
         for rowNum in range(startCommentRow, endCommentRow + 1):
             line = lines[rowNum]
             line = line.replace("$", "\\$")
-            line = line.replace("'''", "")
-            line = line.replace('"""', '')
+            line = line.replace(commentInit, "")
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
             # This is because we remove trailing whitespace
             functionComment += line + " "
 
-    if functionComment == " ":
+
+    if functionComment == "":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
     paramDescription = extractParams(functionSignature)
