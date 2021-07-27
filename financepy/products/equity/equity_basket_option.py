@@ -13,7 +13,7 @@ from ...utils.global_vars import gDaysInYear
 from ...models.gbm_process_simulator import FinGBMProcess
 
 from ...utils.error import FinError
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.helpers import _func_name
 from ...utils.date import Date
@@ -34,7 +34,7 @@ class EquityBasketOption:
     def __init__(self,
                  expiry_date: Date,
                  strike_price: float,
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  num_assets: int):
         """ Define the EquityBasket option by specifying its expiry date,
         its strike price, whether it is a put or call, and the number of
@@ -168,10 +168,10 @@ class EquityBasketOption:
         d1 = (lnS0k + (mu + vhat2 / 2.0) * texp) / den
         d2 = (lnS0k + (mu - vhat2 / 2.0) * texp) / den
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             v = smean * np.exp(-qhat * texp) * N(d1)
             v = v - self._strike_price * np.exp(-r * texp) * N(d2)
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             v = self._strike_price * np.exp(-r * texp) * N(-d2)
             v = v - smean * np.exp(-qhat * texp) * N(-d1)
         else:
@@ -237,9 +237,9 @@ class EquityBasketOption:
                                       corr_matrix,
                                       seed)
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(Sall, axis=1) - k, 0.0)
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(k - np.mean(Sall, axis=1), 0.0)
         else:
             raise FinError("Unknown option type.")

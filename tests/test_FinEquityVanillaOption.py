@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
@@ -11,9 +11,9 @@ from financepy.utils.date import Date
 
 expiryDate = Date(1, 7, 2015)
 call_option = EquityVanillaOption(
-    expiryDate, 100.0, FinOptionTypes.EUROPEAN_CALL)
+    expiryDate, 100.0, OptionTypes.EUROPEAN_CALL)
 put_option = EquityVanillaOption(
-    expiryDate, 100.0, FinOptionTypes.EUROPEAN_PUT)
+    expiryDate, 100.0, OptionTypes.EUROPEAN_PUT)
 
 valueDate = Date(1, 1, 2015)
 stockPrice = 100

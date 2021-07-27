@@ -5,7 +5,7 @@
 import numpy as np
 from numba import float64, int64, vectorize, njit
 
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 from ..utils.global_vars import gSmall
 from ..utils.math import n_vect, n_prime_vect
 from ..utils.error import FinError
@@ -21,9 +21,9 @@ from ..utils.solver_1d import bisection, newton, newton_secant
 def bs_value(s, t, k, r, q, v, option_type_value):
     """ Price a derivative using Black-Scholes model. """
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
-    elif option_type_value == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
@@ -49,9 +49,9 @@ def bs_value(s, t, k, r, q, v, option_type_value):
 def bs_delta(s, t, k, r, q, v, option_type_value):
     """ Price a derivative using Black-Scholes model. """
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = +1.0
-    elif option_type_value == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
@@ -114,9 +114,9 @@ def bs_vega(s, t, k, r, q, v, option_type_value):
 def bs_theta(s, t, k, r, q, v, option_type_value):
     """ Price a derivative using Black-Scholes model. """
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
-    elif option_type_value == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
@@ -144,9 +144,9 @@ def bs_theta(s, t, k, r, q, v, option_type_value):
 def bs_rho(s, t, k, r, q, v, option_type_value):
     """ Price a derivative using Black-Scholes model. """
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = 1.0
-    elif option_type_value == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
@@ -227,7 +227,7 @@ def bs_intrinsic(s, t, k, r, q, option_type_value):
 
     fwd = s * np.exp((r-q)*t)
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
     else:
         intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
@@ -245,7 +245,7 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
 
     fwd = s * np.exp((r-q)*t)
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
     else:
         intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
@@ -256,15 +256,15 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     # Flip ITM call option to be OTM put and vice-versa using put call parity
     if intrinsic_value > 0.0:
 
-        if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+        if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             price = price - (divAdjStockPrice - k * df)
-            option_type_value = FinOptionTypes.EUROPEAN_PUT.value
+            option_type_value = OptionTypes.EUROPEAN_PUT.value
         else:
             price = price + (divAdjStockPrice - k * df)
-            option_type_value = FinOptionTypes.EUROPEAN_CALL.value
+            option_type_value = OptionTypes.EUROPEAN_CALL.value
 
         # Update intrinsic based on new option type
-        if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+        if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             intrinsic_value = np.exp(-r*t) * max(fwd - k, 0.0)
         else:
             intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
@@ -280,7 +280,7 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     # Some approximations which might be used later
     ###########################################################################
 
-    if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         C = price
     else:
         C = price + (divAdjStockPrice - k * df)

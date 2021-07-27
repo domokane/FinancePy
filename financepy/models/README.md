@@ -12,18 +12,17 @@ Also, Numba is used extensively, resulting in code speedups of between x 10 and 
 
 # Generic Arbitrage-Free Models
 There are the following arbitrage-free models:
-* Black is Black's model for pricing forward starting contracts (in the forward measure) assuming the forward is lognormally distributed.
-* BlackShifted is Black's model for pricing forward starting contracts (in the forward measure) assuming the forward plus a shift is lognormally distributed. CHECK
-* Bachelier prices options assuming the underlying evolves according to a Gaussian (normal) process.
-* SABR Model is a stochastic volatility model for forward values with a closed form approximate solution for the implied volatility. It is widely used for pricing European style interest rate options, specifically caps and floors and also swaptions.
-* SABRShifted is a stochastic volatility model for forward value with a closed form approximate solution for the implied volatility. It is widely used for pricing European style interest rate options, specifically caps and floors and also swaptions.
+* black is Black's model for pricing forward starting contracts (in the forward measure) assuming the forward is lognormally distributed.
+* black_shifted is Black's model for pricing forward starting contracts (in the forward measure) assuming the forward plus a shift is lognormally distributed. CHECK
+* bachelier prices options assuming the underlying evolves according to a Gaussian (normal) process.
+* sabr is a stochastic volatility model for forward values with a closed form approximate solution for the implied volatility. It is widely used for pricing European style interest rate options, specifically caps and floors and also swaptions.
+* sabr_shifted is a stochastic volatility model for forward value with a closed form approximate solution for the implied volatility. It is widely used for pricing European style interest rate options, specifically caps and floors and also swaptions.
 
 The following asset-specific models have been implemented:
 
 # Equity Models
-* HestonModel 
-* HestonModelProcess
-* ProcessSimulator
+* heston_model 
+* process_simulator
 
 # Interest Rate Models
 

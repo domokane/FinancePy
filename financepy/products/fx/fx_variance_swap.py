@@ -8,7 +8,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from .fx_vanilla_option import FXVanillaOption
 from ...models.black_scholes import BlackScholes
 
@@ -121,8 +121,8 @@ class FinFXVarianceSwap:
         self._num_put_options = num_put_options
         self._num_call_options = num_call_options
 
-        call_type = FinOptionTypes.EUROPEAN_CALL
-        put_type = FinOptionTypes.EUROPEAN_PUT
+        call_type = OptionTypes.EUROPEAN_CALL
+        put_type = OptionTypes.EUROPEAN_PUT
 
         tmat = (self._maturity_date - valuation_date)/gDaysInYear
 

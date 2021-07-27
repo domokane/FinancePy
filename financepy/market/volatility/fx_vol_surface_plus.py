@@ -11,7 +11,7 @@ from numba import njit, float64, int64
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
@@ -161,14 +161,14 @@ def _obj(params, *args):
                                            f, K_25D_C_MS, t)
     
         V_25D_C_MS = bs_value(s, t, K_25D_C_MS, rd, rf, sigma_K_25D_C_MS,
-                             FinOptionTypes.EUROPEAN_CALL.value)
+                             OptionTypes.EUROPEAN_CALL.value)
     
         sigma_K_25D_P_MS = vol_function(vol_type_value, params,
                                            strikesNULL, gapsNULL,
                                            f, K_25D_P_MS, t)
     
         V_25D_P_MS = bs_value(s, t, K_25D_P_MS, rd, rf, sigma_K_25D_P_MS,
-                             FinOptionTypes.EUROPEAN_PUT.value)
+                             OptionTypes.EUROPEAN_PUT.value)
     
         V_25D_MS = V_25D_C_MS + V_25D_P_MS
         term25D_1 = (V_25D_MS - V_25D_MS_target)**2
@@ -184,7 +184,7 @@ def _obj(params, *args):
     if target25DRRVol > -999.0:
 
         K_25D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                          FinOptionTypes.EUROPEAN_CALL.value,
+                                          OptionTypes.EUROPEAN_CALL.value,
                                           vol_type_value, +0.2500,
                                           delta_method_value, K_25D_C_MS,
                                           params, strikesNULL, gapsNULL)
@@ -194,7 +194,7 @@ def _obj(params, *args):
                                         f, K_25D_C, t)
     
         K_25D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                          FinOptionTypes.EUROPEAN_PUT.value,
+                                          OptionTypes.EUROPEAN_PUT.value,
                                           vol_type_value, -0.2500,
                                           delta_method_value, K_25D_P_MS,
                                           params, strikesNULL, gapsNULL)
@@ -221,14 +221,14 @@ def _obj(params, *args):
                                            f, K_10D_C_MS, t)
     
         V_10D_C_MS = bs_value(s, t, K_10D_C_MS, rd, rf, sigma_K_10D_C_MS,
-                             FinOptionTypes.EUROPEAN_CALL.value)
+                             OptionTypes.EUROPEAN_CALL.value)
     
         sigma_K_10D_P_MS = vol_function(vol_type_value, params,
                                            strikesNULL, gapsNULL,
                                            f, K_10D_P_MS, t)
     
         V_10D_P_MS = bs_value(s, t, K_10D_P_MS, rd, rf, sigma_K_10D_P_MS,
-                             FinOptionTypes.EUROPEAN_PUT.value)
+                             OptionTypes.EUROPEAN_PUT.value)
     
         V_10D_MS = V_10D_C_MS + V_10D_P_MS
         term10D_1 = (V_10D_MS - V_10D_MS_target)**2
@@ -244,7 +244,7 @@ def _obj(params, *args):
     if target10DRRVol > -999.0:
 
         K_10D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                          FinOptionTypes.EUROPEAN_CALL.value,
+                                          OptionTypes.EUROPEAN_CALL.value,
                                           vol_type_value, +0.1000,
                                           delta_method_value, K_10D_C_MS,
                                           params, strikesNULL, gapsNULL)
@@ -254,7 +254,7 @@ def _obj(params, *args):
                                         f, K_10D_C, t)
     
         K_10D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                          FinOptionTypes.EUROPEAN_PUT.value,
+                                          OptionTypes.EUROPEAN_PUT.value,
                                           vol_type_value, -0.1000,
                                           delta_method_value, K_10D_P_MS,
                                           params, strikesNULL, gapsNULL)
@@ -338,7 +338,7 @@ def _obj_gap(gaps, *args):
     print("sigma_K_25D_C_MS", sigma_K_25D_C_MS)
 
     V_25D_C_MS = bs_value(s, t, K_25D_C_MS, rd, rf, sigma_K_25D_C_MS,
-                         FinOptionTypes.EUROPEAN_CALL.value)
+                         OptionTypes.EUROPEAN_CALL.value)
 
     sigma_K_25D_P_MS = vol_function(vol_type_value, params, strikes, gaps,
                                        f, K_25D_P_MS, t)
@@ -346,7 +346,7 @@ def _obj_gap(gaps, *args):
     print("sigma_K_25D_P_MS", sigma_K_25D_P_MS)
 
     V_25D_P_MS = bs_value(s, t, K_25D_P_MS, rd, rf, sigma_K_25D_P_MS,
-                         FinOptionTypes.EUROPEAN_PUT.value)
+                         OptionTypes.EUROPEAN_PUT.value)
 
     V_25D_MS = V_25D_C_MS + V_25D_P_MS
     term25D_1 = (V_25D_MS - V_25D_MS_target)**2
@@ -356,7 +356,7 @@ def _obj_gap(gaps, *args):
     ###########################################################################
 
     K_25D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, +0.2500,
                                       delta_method_value, K_25D_C_MS,
                                       params, strikes, gaps)
@@ -367,7 +367,7 @@ def _obj_gap(gaps, *args):
     print("sigma_K_25D_C", sigma_K_25D_C)
 
     K_25D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
+                                      OptionTypes.EUROPEAN_PUT.value,
                                       vol_type_value, -0.2500,
                                       delta_method_value, K_25D_P_MS,
                                       params, strikes, gaps)
@@ -390,7 +390,7 @@ def _obj_gap(gaps, *args):
     print("sigma_K_10D_C_MS", sigma_K_10D_C_MS)
 
     V_10D_C_MS = bs_value(s, t, K_10D_C_MS, rd, rf, sigma_K_10D_C_MS,
-                         FinOptionTypes.EUROPEAN_CALL.value)
+                         OptionTypes.EUROPEAN_CALL.value)
 
     sigma_K_10D_P_MS = vol_function(vol_type_value, params, strikes, gaps,
                                        f, K_10D_P_MS, t)
@@ -398,7 +398,7 @@ def _obj_gap(gaps, *args):
     print("sigma_K_10D_P_MS", sigma_K_10D_P_MS)
 
     V_10D_P_MS = bs_value(s, t, K_10D_P_MS, rd, rf, sigma_K_10D_P_MS,
-                         FinOptionTypes.EUROPEAN_PUT.value)
+                         OptionTypes.EUROPEAN_PUT.value)
 
     V_10D_MS = V_10D_C_MS + V_10D_P_MS
     term10D_1 = (V_10D_MS - V_10D_MS_target)**2
@@ -408,7 +408,7 @@ def _obj_gap(gaps, *args):
     ###########################################################################
 
     K_10D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, +0.1000,
                                       delta_method_value, K_10D_C_MS,
                                       params, strikes, gaps)
@@ -421,7 +421,7 @@ def _obj_gap(gaps, *args):
     print("INIT K_10D_P_MS", K_10D_P_MS)
 
     K_10D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
+                                      OptionTypes.EUROPEAN_PUT.value,
                                       vol_type_value, -0.1000,
                                       delta_method_value, K_10D_P_MS,
                                       params, strikes, gaps)
@@ -477,23 +477,23 @@ def _solve_to_horizon(s, t, rd, rf,
         vol_25D_MS = atm_vol + ms25DVol
     
         K_25D_C_MS = solve_for_strike(s, t, rd, rf,
-                                    FinOptionTypes.EUROPEAN_CALL.value,
+                                    OptionTypes.EUROPEAN_CALL.value,
                                     +0.2500,
                                     delta_method_value,
                                     vol_25D_MS)
     
         K_25D_P_MS = solve_for_strike(s, t, rd, rf,
-                                    FinOptionTypes.EUROPEAN_PUT.value,
+                                    OptionTypes.EUROPEAN_PUT.value,
                                     -0.2500,
                                     delta_method_value,
                                     vol_25D_MS)
     
         # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
         V_25D_C_MS = bs_value(s, t, K_25D_C_MS, rd, rf, vol_25D_MS,
-                             FinOptionTypes.EUROPEAN_CALL.value)
+                             OptionTypes.EUROPEAN_CALL.value)
     
         V_25D_P_MS = bs_value(s, t, K_25D_P_MS, rd, rf, vol_25D_MS,
-                             FinOptionTypes.EUROPEAN_PUT.value)
+                             OptionTypes.EUROPEAN_PUT.value)
     
         # Market price of strangle in the domestic currency
         V_25D_MS = V_25D_C_MS + V_25D_P_MS
@@ -514,23 +514,23 @@ def _solve_to_horizon(s, t, rd, rf,
         vol_10D_MS = atm_vol + ms10DVol
     
         K_10D_C_MS = solve_for_strike(s, t, rd, rf,
-                                    FinOptionTypes.EUROPEAN_CALL.value,
+                                    OptionTypes.EUROPEAN_CALL.value,
                                     +0.1000,
                                     delta_method_value,
                                     vol_10D_MS)
     
         K_10D_P_MS = solve_for_strike(s, t, rd, rf,
-                                    FinOptionTypes.EUROPEAN_PUT.value,
+                                    OptionTypes.EUROPEAN_PUT.value,
                                     -0.1000,
                                     delta_method_value,
                                     vol_10D_MS)
     
         # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
         V_10D_C_MS = bs_value(s, t, K_10D_C_MS, rd, rf, vol_10D_MS,
-                             FinOptionTypes.EUROPEAN_CALL.value)
+                             OptionTypes.EUROPEAN_CALL.value)
     
         V_10D_P_MS = bs_value(s, t, K_10D_P_MS, rd, rf, vol_10D_MS,
-                             FinOptionTypes.EUROPEAN_PUT.value)
+                             OptionTypes.EUROPEAN_PUT.value)
     
         # Market price of strangle in the domestic currency
         V_10D_MS = V_10D_C_MS + V_10D_P_MS
@@ -619,13 +619,13 @@ def _solve_to_horizon(s, t, rd, rf,
         K_25D_P_MS = K_ATM
 
     K_25D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, +0.2500,
                                       delta_method_value, K_25D_C_MS,
                                       params, strikes, gaps)
 
     K_25D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
+                                      OptionTypes.EUROPEAN_PUT.value,
                                       vol_type_value, -0.2500,
                                       delta_method_value, K_25D_P_MS,
                                       params, strikes, gaps)
@@ -635,13 +635,13 @@ def _solve_to_horizon(s, t, rd, rf,
         K_10D_P_MS = K_ATM
 
     K_10D_C = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, +0.1000,
                                       delta_method_value, K_10D_C_MS,
                                       params, strikes, gaps)
 
     K_10D_P = _solver_for_smile_strike(s, t, rd, rf,
-                                      FinOptionTypes.EUROPEAN_PUT.value,
+                                      OptionTypes.EUROPEAN_PUT.value,
                                       vol_type_value, -0.1000,
                                       delta_method_value, K_10D_P_MS,
                                       params, strikes, gaps)
@@ -786,7 +786,7 @@ def solve_for_strike(spot_fx_rate,
         domDF = np.exp(-rd*tdel)
         forDF = np.exp(-rf*tdel)
 
-        if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+        if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             phi = +1.0
         else:
             phi = -1.0
@@ -803,7 +803,7 @@ def solve_for_strike(spot_fx_rate,
         domDF = np.exp(-rd*tdel)
         forDF = np.exp(-rf*tdel)
 
-        if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+        if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             phi = +1.0
         else:
             phi = -1.0
@@ -1138,7 +1138,7 @@ class FXVolSurfacePlus():
         initialGuess = self._K_ATM[index0]
 
         K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
-                                  FinOptionTypes.EUROPEAN_CALL.value,
+                                  OptionTypes.EUROPEAN_CALL.value,
                                   vol_type_value, callDelta,
                                   delta_method_value,
                                   initialGuess,
@@ -1151,7 +1151,7 @@ class FXVolSurfacePlus():
             K1 = _solver_for_smile_strike(s, texp,
                                       self._rd[index1], 
                                       self._rf[index1],
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, callDelta,
                                       delta_method_value,
                                       initialGuess,
@@ -1241,7 +1241,7 @@ class FXVolSurfacePlus():
         initialGuess = self._K_ATM[index0]
 
         K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
-                                  FinOptionTypes.EUROPEAN_CALL.value,
+                                  OptionTypes.EUROPEAN_CALL.value,
                                   vol_type_value, callDelta,
                                   delta_method_value,
                                   initialGuess,
@@ -1258,7 +1258,7 @@ class FXVolSurfacePlus():
             K1 = _solver_for_smile_strike(s, texp,
                                       self._rd[index1], 
                                       self._rf[index1],
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, callDelta,
                                       delta_method_value,
                                       initialGuess,
@@ -1590,14 +1590,14 @@ class FXVolSurfacePlus():
             call = FXVanillaOption(expiry_date,
                                    K_dummy,
                                    self._currency_pair,
-                                   FinOptionTypes.EUROPEAN_CALL,
+                                   OptionTypes.EUROPEAN_CALL,
                                    1.0,
                                    self._notional_currency, )
 
             put = FXVanillaOption(expiry_date,
                                   K_dummy,
                                   self._currency_pair,
-                                  FinOptionTypes.EUROPEAN_PUT,
+                                  OptionTypes.EUROPEAN_PUT,
                                   1.0,
                                   self._notional_currency)
 

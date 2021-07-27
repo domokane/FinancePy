@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.models.sabr import SABR
 from financepy.models.sabr import vol_function_sabr
 import numpy as np
@@ -54,8 +54,8 @@ def test_SABR_Calibration():
     r = 0.03
     texp = 2.0
 
-    call_optionType = FinOptionTypes.EUROPEAN_CALL
-    put_optionType = FinOptionTypes.EUROPEAN_PUT
+    call_optionType = OptionTypes.EUROPEAN_CALL
+    put_optionType = OptionTypes.EUROPEAN_PUT
 
     df = np.exp(-r * texp)
 

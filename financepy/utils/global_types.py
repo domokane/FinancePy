@@ -16,7 +16,7 @@ class FinLongShort(Enum):
 ###############################################################################
 
 
-class FinOptionTypes(Enum):
+class OptionTypes(Enum):
     EUROPEAN_CALL = 1
     EUROPEAN_PUT = 2
     AMERICAN_CALL = 3

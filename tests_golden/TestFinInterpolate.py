@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.interpolator import FinInterpolator, InterpTypes
+from financepy.market.curves.interpolator import Interpolator, InterpTypes
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -43,7 +43,7 @@ def test_FinInterpolate():
         yInterpValues = []
         start = time.time()
 
-        interpolator = FinInterpolator(interp_type)
+        interpolator = Interpolator(interp_type)
         interpolator.fit(xValues, yValues)
 
         for x in xInterpolateValues:
@@ -65,7 +65,7 @@ def test_FinInterpolate():
     n = 10000
 
     testCases.header("LABEL", "TIME")
-    interpolator = FinInterpolator(interp_type)
+    interpolator = Interpolator(interp_type)
     interpolator.fit(xp, yp)
 
     start = time.time()

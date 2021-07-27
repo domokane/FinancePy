@@ -194,7 +194,7 @@ def _vinterpolate(xValues,
 ###############################################################################
 
 
-class FinInterpolator():
+class Interpolator():
 
     def __init__(self,
                  interpolatorType: InterpTypes):

@@ -11,7 +11,7 @@ from numba import njit, float64, int64
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...models.option_implied_dbn import option_implied_dbn
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
@@ -413,7 +413,7 @@ class EquityVolSurface:
     #     initialGuess = self._K_ATM[index0]
 
     #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
-    #                               FinOptionTypes.EUROPEAN_CALL.value,
+    #                               OptionTypes.EUROPEAN_CALL.value,
     #                               vol_type_value, callDelta,
     #                               delta_method_value,
     #                               initialGuess,
@@ -426,7 +426,7 @@ class EquityVolSurface:
     #         K1 = _solver_for_smile_strike(s, texp,
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
-    #                                   FinOptionTypes.EUROPEAN_CALL.value,
+    #                                   OptionTypes.EUROPEAN_CALL.value,
     #                                   vol_type_value, callDelta,
     #                                   delta_method_value,
     #                                   initialGuess,
@@ -514,7 +514,7 @@ class EquityVolSurface:
                                   texp,
                                   self._r[index0],
                                   self._q[index0],
-                                  FinOptionTypes.EUROPEAN_CALL.value,
+                                  OptionTypes.EUROPEAN_CALL.value,
                                   vol_type_value, callDelta,
                                   initialGuess,
                                   self._parameters[index0])
@@ -527,7 +527,7 @@ class EquityVolSurface:
             K1 = _solver_for_smile_strike(s, texp,
                                       self._r[index1], 
                                       self._q[index1],
-                                      FinOptionTypes.EUROPEAN_CALL.value,
+                                      OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, callDelta,
                                       initialGuess,
                                       self._parameters[index1])

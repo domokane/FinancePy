@@ -2,18 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
 from financepy.products.equity.equity_asian_option import EquityAsianOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 import time
-
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -47,7 +46,7 @@ def testConvergence():
     asianOption = EquityAsianOption(startAveragingDate,
                                     expiry_date,
                                     K,
-                                    FinOptionTypes.EUROPEAN_CALL,
+                                    OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
     testCases.header(
@@ -159,7 +158,7 @@ def testTimeEvolution():
     asianOption = EquityAsianOption(startAveragingDate,
                                     expiry_date,
                                     K,
-                                    FinOptionTypes.EUROPEAN_CALL,
+                                    OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
     testCases.header(
@@ -287,7 +286,7 @@ def testMCTimings():
     asianOption = EquityAsianOption(startAveragingDate,
                                     expiry_date,
                                     K,
-                                    FinOptionTypes.EUROPEAN_CALL,
+                                    OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
     testCases.header(

@@ -9,7 +9,7 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
 from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.models.process_simulator import FinProcessTypes
+from financepy.models.process_simulator import ProcessTypes
 import sys
 sys.path.append("..")
 
@@ -31,7 +31,7 @@ def test_EquityBarrierOption():
 
     drift = interest_rate - dividend_yield
     scheme = FinGBMNumericalScheme.NORMAL
-    process_type = FinProcessTypes.GBM
+    process_type = ProcessTypes.GBM
 
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)

@@ -4,10 +4,10 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.process_simulator import FinProcessSimulator
-from financepy.models.process_simulator import FinProcessTypes
+from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import FinHestonNumericalScheme
-from financepy.models.process_simulator import FinCIRNumericalScheme
+from financepy.models.process_simulator import CIRNumericalScheme
 from financepy.models.process_simulator import FinVasicekNumericalScheme
 import sys
 sys.path.append("..")
@@ -38,7 +38,7 @@ def test_FinProcessSimulator():
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.GBM,
+        ProcessTypes.GBM,
         t,
         model_params,
         numAnnSteps,
@@ -60,7 +60,7 @@ def test_FinProcessSimulator():
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.GBM,
+        ProcessTypes.GBM,
         t,
         model_params,
         numAnnSteps,
@@ -84,7 +84,7 @@ def test_FinProcessSimulator():
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.HESTON,
+        ProcessTypes.HESTON,
         t,
         model_params,
         numAnnSteps,
@@ -108,7 +108,7 @@ def test_FinProcessSimulator():
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.HESTON,
+        ProcessTypes.HESTON,
         t,
         model_params,
         numAnnSteps,
@@ -132,7 +132,7 @@ def test_FinProcessSimulator():
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.HESTON,
+        ProcessTypes.HESTON,
         t,
         model_params,
         numAnnSteps,
@@ -154,7 +154,7 @@ def test_FinProcessSimulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.VASICEK,
+        ProcessTypes.VASICEK,
         t,
         model_params,
         numAnnSteps,
@@ -176,7 +176,7 @@ def test_FinProcessSimulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.VASICEK,
+        ProcessTypes.VASICEK,
         t,
         model_params,
         numAnnSteps,
@@ -194,11 +194,11 @@ def test_FinProcessSimulator():
     kappa = 0.50
     theta = 0.05
     sigma = 0.90
-    scheme = FinCIRNumericalScheme.MILSTEIN
+    scheme = CIRNumericalScheme.MILSTEIN
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        FinProcessTypes.CIR,
+        ProcessTypes.CIR,
         t,
         model_params,
         numAnnSteps,

@@ -4,7 +4,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black
 import sys
 import numpy as np
@@ -24,8 +24,8 @@ def test_Black():
 
     testCases.header("ITEM", "CALL", "PUT")
 
-    call_optionType = FinOptionTypes.EUROPEAN_CALL
-    put_optionType = FinOptionTypes.EUROPEAN_PUT
+    call_optionType = OptionTypes.EUROPEAN_CALL
+    put_optionType = OptionTypes.EUROPEAN_PUT
 
     df = np.exp(-riskFreeIR * time_to_expiry)
     model = Black(volatility)

@@ -8,7 +8,7 @@ from math import exp, log, pi
 import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
 
 from ..utils.global_vars import gDaysInYear
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
 
@@ -194,9 +194,9 @@ class Heston():
                            seed,
                            schemeValue)
 
-        if option._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if option._option_type == OptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(sPaths[:, -1] - K, 0.0)
-        elif option._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif option._option_type == OptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - sPaths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")

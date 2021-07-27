@@ -7,7 +7,7 @@ from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_fixed_lookback_option import FXFixedLookbackOption
 from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 import time
 
 import sys
@@ -46,7 +46,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
             option = FXFloatLookbackOption(expiry_date, option_type)
@@ -91,7 +91,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
             option = FXFloatLookbackOption(expiry_date, option_type)
@@ -136,7 +136,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
             option = FXFloatLookbackOption(expiry_date, option_type)
@@ -181,7 +181,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
             option = FXFloatLookbackOption(expiry_date, option_type)
@@ -233,7 +233,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
     k = 95.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
@@ -281,7 +281,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
     k = 100.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
@@ -329,7 +329,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
     k = 105.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
@@ -377,7 +377,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
     k = 95.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
@@ -425,7 +425,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
     k = 100.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
@@ -473,7 +473,7 @@ def test_EquityLookBackOption():
         "DIFF",
         "TIME")
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
     k = 105.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:

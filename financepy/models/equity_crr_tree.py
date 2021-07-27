@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 
 import numpy as np
 from numba import njit, float64, int64
@@ -79,13 +79,13 @@ def crr_tree_val(stock_price,
 
         s = stock_values[index + iNode]
 
-        if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+        if option_type == OptionTypes.EUROPEAN_CALL.value:
             option_values[index + iNode] = np.maximum(s - strike_price, 0.0)
-        elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+        elif option_type == OptionTypes.EUROPEAN_PUT.value:
             option_values[index + iNode] = np.maximum(strike_price - s, 0.0)
-        elif option_type == FinOptionTypes.AMERICAN_CALL.value:
+        elif option_type == OptionTypes.AMERICAN_CALL.value:
             option_values[index + iNode] = np.maximum(s - strike_price, 0.0)
-        elif option_type == FinOptionTypes.AMERICAN_PUT.value:
+        elif option_type == OptionTypes.AMERICAN_PUT.value:
             option_values[index + iNode] = np.maximum(strike_price - s, 0.0)
 
     # begin backward steps from expiry to value date
@@ -99,13 +99,13 @@ def crr_tree_val(stock_price,
 
             exerciseValue = 0.0
 
-            if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+            if option_type == OptionTypes.EUROPEAN_CALL.value:
                 exerciseValue = 0.0
-            elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+            elif option_type == OptionTypes.EUROPEAN_PUT.value:
                 exerciseValue = 0.0
-            elif option_type == FinOptionTypes.AMERICAN_CALL.value:
+            elif option_type == OptionTypes.AMERICAN_CALL.value:
                 exerciseValue = np.maximum(s - strike_price, 0.0)
-            elif option_type == FinOptionTypes.AMERICAN_PUT.value:
+            elif option_type == OptionTypes.AMERICAN_PUT.value:
                 exerciseValue = np.maximum(strike_price - s, 0.0)
 
             nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
@@ -119,13 +119,13 @@ def crr_tree_val(stock_price,
             futureExpectedValue += (1.0 - probs[iTime]) * vDn
             holdValue = periodDiscountFactors[iTime] * futureExpectedValue
 
-            if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+            if option_type == OptionTypes.EUROPEAN_CALL.value:
                 option_values[index + iNode] = holdValue
-            elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+            elif option_type == OptionTypes.EUROPEAN_PUT.value:
                 option_values[index + iNode] = holdValue
-            elif option_type == FinOptionTypes.AMERICAN_CALL.value:
+            elif option_type == OptionTypes.AMERICAN_CALL.value:
                 option_values[index + iNode] = np.maximum(exerciseValue, holdValue)
-            elif option_type == FinOptionTypes.AMERICAN_PUT.value:
+            elif option_type == OptionTypes.AMERICAN_PUT.value:
                 option_values[index + iNode] = np.maximum(exerciseValue, holdValue)
 
     # We calculate all of the important Greeks in one go

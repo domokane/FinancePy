@@ -7,7 +7,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-from ...utils.global_types import FinOptionTypes, FinExerciseTypes
+from ...utils.global_types import OptionTypes, FinExerciseTypes
 from ...products.bonds.bond import Bond
 
 from enum import Enum
@@ -41,7 +41,7 @@ class BondOption():
                  expiry_date: Date,
                  strike_price: float,
                  face_amount: float,
-                 option_type: FinOptionTypes):
+                 option_type: OptionTypes):
 
         check_argument_types(self.__init__, locals())
 
@@ -108,8 +108,8 @@ class BondOption():
 
         exercise_type = FinExerciseTypes.AMERICAN
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL \
-                or self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        if self._option_type == OptionTypes.EUROPEAN_CALL \
+                or self._option_type == OptionTypes.EUROPEAN_PUT:
             exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
@@ -118,11 +118,11 @@ class BondOption():
         v = model.bond_option(texp, self._strike_price, self._face_amount,
                               coupon_times, coupon_flows, exercise_type)
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL \
-                or self._option_type == FinOptionTypes.AMERICAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL \
+                or self._option_type == OptionTypes.AMERICAN_CALL:
             return v['call']
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT \
-                or self._option_type == FinOptionTypes.AMERICAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT \
+                or self._option_type == OptionTypes.AMERICAN_PUT:
             return v['put']
         else:
             print(self._option_type)

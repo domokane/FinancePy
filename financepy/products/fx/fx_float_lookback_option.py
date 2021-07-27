@@ -12,7 +12,7 @@ from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.fx.fx_option import FXOption
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...market.curves.discount_curve import DiscountCurve
 
 
@@ -37,7 +37,7 @@ class FXFloatLookbackOption(FXOption):
 
     def __init__(self,
                  expiry_date: Date,
-                 option_type: FinOptionTypes):
+                 option_type: OptionTypes):
         """ Create the FX Float Look Back Option by specifying the expiry
         date and the option type. """
 
@@ -71,12 +71,12 @@ class FXFloatLookbackOption(FXOption):
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > s0:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < s0:
                 raise FinError(
@@ -93,7 +93,7 @@ class FXFloatLookbackOption(FXOption):
         expbt = np.exp(b * t)
 
         # Taken from Haug Page 142
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
 
             a1 = (np.log(s0 / smin) + (b + (v ** 2) / 2.0) * t) / v / np.sqrt(t)
             a2 = a1 - v * np.sqrt(t)
@@ -108,7 +108,7 @@ class FXFloatLookbackOption(FXOption):
 
             v = s0 * dq * N(a1) - smin * df * N(a2) + s0 * df * u * term
 
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
             b1 = (np.log(s0 / smax) + (b + (v ** 2) / 2.0) * t) / v / np.sqrt(t)
             b2 = b1 - v * np.sqrt(t)
@@ -156,12 +156,12 @@ class FXFloatLookbackOption(FXOption):
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < stock_price:
                 raise FinError(
@@ -181,11 +181,11 @@ class FXFloatLookbackOption(FXOption):
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
-        if option_type == FinOptionTypes.EUROPEAN_CALL:
+        if option_type == OptionTypes.EUROPEAN_CALL:
             SMin = np.min(Sall, axis=1)
             SMin = np.minimum(SMin, smin)
             payoff = np.maximum(Sall[:, -1] - SMin, 0.0)
-        elif option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif option_type == OptionTypes.EUROPEAN_PUT:
             SMax = np.max(Sall, axis=1)
             SMax = np.maximum(SMax, smax)
             payoff = np.maximum(SMax - Sall[:, -1], 0.0)

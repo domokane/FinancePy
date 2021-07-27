@@ -13,7 +13,7 @@ from ...utils.helpers import label_to_string
 from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
-from .interpolator import InterpTypes, FinInterpolator
+from .interpolator import InterpTypes, Interpolator
 
 
 ###############################################################################
@@ -82,7 +82,7 @@ class DiscountCurveZeros(DiscountCurve):
                              self._day_count_type)
 
         self._dfs = np.array(dfs)
-        self._interpolator = FinInterpolator(self._interp_type)
+        self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
 # ###############################################################################

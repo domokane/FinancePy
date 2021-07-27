@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.models.sabr_shifted import SABRShifted
 import numpy as np
 import sys
@@ -34,8 +34,8 @@ def test_ShiftedSABR():
     r = 0.03
     texp = 2.0
 
-    call_optionType = FinOptionTypes.EUROPEAN_CALL
-    put_optionType = FinOptionTypes.EUROPEAN_PUT
+    call_optionType = OptionTypes.EUROPEAN_CALL
+    put_optionType = OptionTypes.EUROPEAN_PUT
 
     df = np.exp(-r * texp)
 

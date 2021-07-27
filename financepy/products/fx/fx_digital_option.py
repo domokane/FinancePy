@@ -14,7 +14,7 @@ from ...utils.date import Date
 # from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 
 ###############################################################################
 
@@ -25,7 +25,7 @@ class FXDigitalOption:
                  expiry_date: Date,
                  strike_price: float,  # 1 unit of foreign in domestic
                  currency_pair: str,  # FORDOM
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  notional: float,
                  prem_currency: str):
         """ Create the FX Digital Option object. Inputs include expiry date,
@@ -98,16 +98,16 @@ class FXDigitalOption:
             mu = rd - rf
             d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den
 
-            if self._option_type == FinOptionTypes.DIGITAL_CALL and \
+            if self._option_type == OptionTypes.DIGITAL_CALL and \
                     self._forName == self._prem_currency:
                 v = S0 * exp(-rf * tdel) * N(d2)
-            elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
+            elif self._option_type == OptionTypes.DIGITAL_PUT and \
                     self._forName == self._prem_currency:
                 v = S0 * exp(-rf * tdel) * N(-d2)
-            if self._option_type == FinOptionTypes.DIGITAL_CALL and \
+            if self._option_type == OptionTypes.DIGITAL_CALL and \
                     self._domName == self._prem_currency:
                 v = exp(-rd * tdel) * N(d2)
-            elif self._option_type == FinOptionTypes.DIGITAL_PUT and \
+            elif self._option_type == OptionTypes.DIGITAL_PUT and \
                     self._domName == self._prem_currency:
                 v = exp(-rd * tdel) * N(-d2)
             else:

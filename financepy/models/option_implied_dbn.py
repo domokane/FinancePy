@@ -7,7 +7,7 @@
 import numpy as np
 from numba import njit, float64
 
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 
 from .black_scholes_analytic import bs_value
@@ -41,7 +41,7 @@ def option_implied_dbn(s, t, r, q, strikes, sigmas):
         strike = strikes[ik]        
         sigma = sigmas[ik]
         v = bs_value(s, t, strike, r, q, sigma,
-                    FinOptionTypes.EUROPEAN_CALL.value)
+                    OptionTypes.EUROPEAN_CALL.value)
         values[ik] = v
         
     # Calculate the density rho(K) dK

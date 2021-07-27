@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_compound_option import EquityCompoundOption
 import sys
 sys.path.append("..")
@@ -43,11 +43,11 @@ def test_EquityCompoundOption():
                      "TreeSteps", "Exact", "TreeValue")
 
     for option_type1 in [
-            FinOptionTypes.EUROPEAN_CALL,
-            FinOptionTypes.EUROPEAN_PUT]:
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT]:
         for option_type2 in [
-                FinOptionTypes.EUROPEAN_CALL,
-                FinOptionTypes.EUROPEAN_PUT]:
+                OptionTypes.EUROPEAN_CALL,
+                OptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                               expiry_date2, option_type2, k2)
@@ -71,11 +71,11 @@ def test_EquityCompoundOption():
                      "TreeSteps", "Exact", "TreeValue")
 
     for option_type1 in [
-            FinOptionTypes.AMERICAN_CALL,
-            FinOptionTypes.AMERICAN_PUT]:
+            OptionTypes.AMERICAN_CALL,
+            OptionTypes.AMERICAN_PUT]:
         for option_type2 in [
-                FinOptionTypes.AMERICAN_CALL,
-                FinOptionTypes.AMERICAN_PUT]:
+                OptionTypes.AMERICAN_CALL,
+                OptionTypes.AMERICAN_PUT]:
 
             cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                               expiry_date2, option_type2, k2)
@@ -97,11 +97,11 @@ def test_EquityCompoundOption():
                      "TreeValue", "Diff", "DELTA", "GAMMA", "THETA")
 
     for option_type1 in [
-            FinOptionTypes.EUROPEAN_CALL,
-            FinOptionTypes.EUROPEAN_PUT]:
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT]:
         for option_type2 in [
-                FinOptionTypes.EUROPEAN_CALL,
-                FinOptionTypes.EUROPEAN_PUT]:
+                OptionTypes.EUROPEAN_CALL,
+                OptionTypes.EUROPEAN_PUT]:
 
             cmpdOption = EquityCompoundOption(
                 expiry_date1, option_type1, k1,

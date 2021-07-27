@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 import time
 
@@ -35,7 +35,7 @@ def testEquityAmericanOption():
     testCases.banner("================== EUROPEAN PUT =======================")
 
     put_option = EquityAmericanOption(
-        expiry_date, strike_price, FinOptionTypes.EUROPEAN_PUT)
+        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
 
     model = BlackScholes(volatility,
                          BlackScholesTypes.CRR_TREE,
@@ -54,7 +54,7 @@ def testEquityAmericanOption():
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
     option = EquityAmericanOption(
-        expiry_date, strike_price, FinOptionTypes.EUROPEAN_PUT)
+        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
 
     testCases.header("OPTION_TYPE", "NUMSTEPS",
                      "VALUE DELTA GAMMA THETA", "TIME")
@@ -79,7 +79,7 @@ def testEquityAmericanOption():
     option = EquityAmericanOption(
         expiry_date,
         strike_price,
-        FinOptionTypes.AMERICAN_PUT)
+        OptionTypes.AMERICAN_PUT)
 
     testCases.header(
         "OPTION_TYPE",
@@ -106,7 +106,7 @@ def testEquityAmericanOption():
     call_option = EquityAmericanOption(
         expiry_date,
         strike_price,
-        FinOptionTypes.EUROPEAN_CALL)
+        OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
@@ -123,7 +123,7 @@ def testEquityAmericanOption():
     option = EquityAmericanOption(
         expiry_date,
         strike_price,
-        FinOptionTypes.EUROPEAN_CALL)
+        OptionTypes.EUROPEAN_CALL)
 
     testCases.header(
         "OPTION_TYPE",
@@ -152,7 +152,7 @@ def testEquityAmericanOption():
         "TIME")
 
     option = EquityAmericanOption(expiry_date, strike_price,
-                                  FinOptionTypes.AMERICAN_CALL)
+                                  OptionTypes.AMERICAN_CALL)
 
     for num_steps in num_steps_list:
 

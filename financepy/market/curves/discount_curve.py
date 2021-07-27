@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from .interpolator import FinInterpolator, InterpTypes, interpolate
+from .interpolator import Interpolator, InterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -78,7 +78,7 @@ class DiscountCurve:
         self._interp_type = interp_type
         self._freq_type = FrequencyTypes.CONTINUOUS
         self._day_count_type = None  # Not needed for this curve
-        self._interpolator = FinInterpolator(self._interp_type)
+        self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
     ###############################################################################

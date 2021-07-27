@@ -10,7 +10,7 @@ from ...utils.date import Date
 from ...utils.math import nprime
 from ...utils.global_vars import gDaysInYear, gSmall
 from ...utils.error import FinError
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 #from ...products.fx.FinFXModelTypes import FinFXModel
 #from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 #from ...products.fx.FinFXModelTypes import FinFXModelSABR
@@ -184,7 +184,7 @@ class FXVanillaOption():
                  # 1 unit of foreign in domestic
                  strike_fx_rate: (float, np.ndarray),
                  currency_pair: str,  # FORDOM
-                 option_type: (FinOptionTypes, list),
+                 option_type: (OptionTypes, list),
                  notional: float,
                  prem_currency: str,
                  spot_days: int = 0):
@@ -229,10 +229,10 @@ class FXVanillaOption():
 
         self._notional = notional
 
-        if option_type != FinOptionTypes.EUROPEAN_CALL and \
-           option_type != FinOptionTypes.EUROPEAN_PUT and\
-           option_type != FinOptionTypes.AMERICAN_CALL and \
-           option_type != FinOptionTypes.AMERICAN_PUT:
+        if option_type != OptionTypes.EUROPEAN_CALL and \
+           option_type != OptionTypes.EUROPEAN_PUT and\
+           option_type != OptionTypes.AMERICAN_CALL and \
+           option_type != OptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type:" + option_type)
 
         self._option_type = option_type
@@ -295,24 +295,24 @@ class FXVanillaOption():
 
             v = np.maximum(volatility, 1e-10)
 
-            if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+            if self._option_type == OptionTypes.EUROPEAN_CALL:
 
                 vdf = bs_value(S0, texp, K, rd, rf, v,
-                               FinOptionTypes.EUROPEAN_CALL.value)
+                               OptionTypes.EUROPEAN_CALL.value)
 
-            elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+            elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
                 vdf = bs_value(S0, texp, K, rd, rf, v,
-                               FinOptionTypes.EUROPEAN_PUT.value)
+                               OptionTypes.EUROPEAN_PUT.value)
 
-            elif self._option_type == FinOptionTypes.AMERICAN_CALL:
+            elif self._option_type == OptionTypes.AMERICAN_CALL:
                 num_steps_per_year = 100
                 vdf = crr_tree_val_avg(S0, rd, rf, volatility, num_steps_per_year,
-                                       texp, FinOptionTypes.AMERICAN_CALL.value, K)['value']
-            elif self._option_type == FinOptionTypes.AMERICAN_PUT:
+                                       texp, OptionTypes.AMERICAN_CALL.value, K)['value']
+            elif self._option_type == OptionTypes.AMERICAN_PUT:
                 num_steps_per_year = 100
                 vdf = crr_tree_val_avg(S0, rd, rf, volatility, num_steps_per_year,
-                                       texp, FinOptionTypes.AMERICAN_PUT.value, K)['value']
+                                       texp, OptionTypes.AMERICAN_PUT.value, K)['value']
             else:
                 raise FinError("Unknown option type")
 
@@ -641,11 +641,11 @@ class FXVanillaOption():
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
-            if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+            if self._option_type == OptionTypes.EUROPEAN_CALL:
                 v = - S0 * np.exp(-rf * t) * nprime(d1) * vol / 2.0 / sqrtT
                 v = v + rf * S0 * np.exp(-rf * t) * N(d1)
                 v = v - rd * K * np.exp(-rd * t) * N(d2)
-            elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+            elif self._option_type == OptionTypes.EUROPEAN_PUT:
                 v = - S0 * np.exp(-rf * t) * nprime(d1) * vol / 2.0 / sqrtT
                 v = v + rd * K * np.exp(-rd * t) * N(-d2)
                 v = v - rf * S0 * np.exp(-rf * t) * N(-d1)
@@ -718,10 +718,10 @@ class FXVanillaOption():
         s_1 = s * m
         s_2 = s / m
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             payoff_a_1 = np.maximum(s_1 - K, 0.0)
             payoff_a_2 = np.maximum(s_2 - K, 0.0)
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             payoff_a_1 = np.maximum(K - s_1, 0.0)
             payoff_a_2 = np.maximum(K - s_2, 0.0)
         else:

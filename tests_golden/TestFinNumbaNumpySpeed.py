@@ -7,7 +7,7 @@ from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
     call_option = EquityVanillaOption(expiry_date, 100.0,
-                                      FinOptionTypes.EUROPEAN_CALL)
+                                      OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price, discount_curve,
                               dividend_yield, model)
@@ -276,7 +276,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
     call_option = EquityVanillaOption(expiry_date, 100.0,
-                                      FinOptionTypes.EUROPEAN_CALL)
+                                      OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price, discount_curve,
                               dividend_yield, model)

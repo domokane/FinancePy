@@ -8,7 +8,7 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholesTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -34,8 +34,8 @@ def testBlackScholes():
     interest_rate = 0.001
     dividend_yield = 0.0163
 
-    option_type = FinOptionTypes.AMERICAN_CALL
-    euOptionType = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.AMERICAN_CALL
+    euOptionType = OptionTypes.EUROPEAN_CALL
 
     amOption = EquityAmericanOption(expiry_date, strike_price,
                                     option_type)

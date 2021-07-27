@@ -11,7 +11,7 @@ from ...utils.date import Date
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.global_vars import gDaysInYear
-from ...market.curves.interpolator import InterpTypes, FinInterpolator
+from ...market.curves.interpolator import InterpTypes, Interpolator
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...products.rates.ibor_deposit import IborDeposit
@@ -310,7 +310,7 @@ class OISCurve(DiscountCurve):
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. """
 
-        self._interpolator = FinInterpolator(self._interp_type)
+        self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
         self._dfs = np.array([])
 
@@ -376,7 +376,7 @@ class OISCurve(DiscountCurve):
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. """
 
-        self._interpolator = FinInterpolator(self._interp_type)
+        self._interpolator = Interpolator(self._interp_type)
 
         self._times = np.array([])
         self._dfs = np.array([])

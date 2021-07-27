@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 import numpy as np
 
@@ -50,7 +50,7 @@ def test_EquityBasketOption():
     for beta in betaList:
         for num_paths in [10000]:
             call_option = EquityBasketOption(
-                expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
+                expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -98,7 +98,7 @@ def test_EquityBasketOption():
         for num_paths in [10000]:
 
             call_option = EquityBasketOption(
-                expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, num_assets)
+                expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -145,7 +145,7 @@ def test_EquityBasketOption():
     for beta in betaList:
         for num_paths in [10000]:
             call_option = EquityBasketOption(
-                expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
+                expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -191,7 +191,7 @@ def test_EquityBasketOption():
         for num_paths in [10000]:
 
             call_option = EquityBasketOption(
-                expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, num_assets)
+                expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 

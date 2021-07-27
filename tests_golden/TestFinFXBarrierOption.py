@@ -9,7 +9,7 @@ from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.models.process_simulator import FinProcessTypes
+from financepy.models.process_simulator import ProcessTypes
 import sys
 sys.path.append("..")
 
@@ -34,7 +34,7 @@ def test_FinFXBarrierOption():
 
     drift = dom_interest_rate - forInterestRate
     scheme = FinGBMNumericalScheme.ANTITHETIC
-    process_type = FinProcessTypes.GBM
+    process_type = ProcessTypes.GBM
     dom_discount_curve = DiscountCurveFlat(valuation_date, dom_interest_rate)
     for_discount_curve = DiscountCurveFlat(valuation_date, forInterestRate)
     model = BlackScholes(volatility)

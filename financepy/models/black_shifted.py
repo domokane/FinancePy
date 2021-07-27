@@ -7,7 +7,7 @@
 import numpy as np
 
 from ..utils.helpers import label_to_string
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 
 from ..utils.math import N
 
@@ -55,9 +55,9 @@ class BlackShifted():
         d1 = d1 / (vol * sqrtT)
         d2 = d1 - vol * sqrtT
 
-        if call_or_put == FinOptionTypes.EUROPEAN_CALL:
+        if call_or_put == OptionTypes.EUROPEAN_CALL:
             return df * ((f+s) * N(d1) - (k + s) * N(d2))
-        elif call_or_put == FinOptionTypes.EUROPEAN_PUT:
+        elif call_or_put == OptionTypes.EUROPEAN_PUT:
             return df * ((k+s) * N(-d2) - (f + s) * N(-d1))
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")

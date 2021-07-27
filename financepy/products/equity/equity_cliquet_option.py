@@ -8,7 +8,7 @@ import numpy as np
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
@@ -36,7 +36,7 @@ class EquityCliquetOption(EquityOption):
     def __init__(self,
                  start_date: Date,
                  final_expiry_date: Date,
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -48,8 +48,8 @@ class EquityCliquetOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != FinOptionTypes.EUROPEAN_CALL and \
-           option_type != FinOptionTypes.EUROPEAN_PUT:
+        if option_type != OptionTypes.EUROPEAN_CALL and \
+           option_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
         if final_expiry_date < start_date:
@@ -92,8 +92,8 @@ class EquityCliquetOption(EquityOption):
         self._dfs = []
         self._actualDates = []
 
-        CALL = FinOptionTypes.EUROPEAN_CALL
-        PUT = FinOptionTypes.EUROPEAN_PUT
+        CALL = OptionTypes.EUROPEAN_CALL
+        PUT = OptionTypes.EUROPEAN_PUT
 
         if isinstance(model, BlackScholes):
 

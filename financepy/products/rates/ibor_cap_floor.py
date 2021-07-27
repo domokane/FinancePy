@@ -26,7 +26,7 @@ from ...models.bachelier import Bachelier
 from ...models.sabr import SABR
 from ...models.sabr_shifted import SABRShifted
 from ...models.hw_tree import HWTree
-from ...utils.global_types import FinCapFloorTypes, FinOptionTypes
+from ...utils.global_types import FinCapFloorTypes, OptionTypes
 
 ##########################################################################
 
@@ -230,46 +230,46 @@ class IborCapFloor():
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_CALL)
+                                               OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_PUT)
+                                               OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, BlackShifted):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_CALL)
+                                               OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_PUT)
+                                               OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, Bachelier):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_CALL)
+                                               OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_PUT)
+                                               OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABR):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_CALL)
+                                               OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_PUT)
+                                               OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABRShifted):
 
             if self._option_type == FinCapFloorTypes.CAP:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_CALL)
+                                               OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
                 capFloorLetValue = model.value(f, k, texp, df,
-                                               FinOptionTypes.EUROPEAN_PUT)
+                                               OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, HWTree):
 

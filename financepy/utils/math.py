@@ -24,7 +24,7 @@ ONE_BILLION = 1000000000
 def accrued_interpolator(tset: float,  # Settlement time in years
                         coupon_times: np.ndarray,
                         couponAmounts: np.ndarray):
-    """ Fast calulation of accrued interest using an Actual/Actual type of
+    """ Fast calculation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
     num_coupons = len(coupon_times)

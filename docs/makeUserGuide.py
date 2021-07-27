@@ -164,7 +164,7 @@ def buildHead():
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName, 'w')
+    f = open(userGuideFileName, 'w', encoding="utf-8")
     f.writelines(lines)
     f.close()
 
@@ -177,7 +177,7 @@ def buildTail():
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName, 'a')
+    f = open(userGuideFileName, 'a', encoding="utf-8")
     f.writelines(lines)
     f.close()
 
@@ -194,7 +194,7 @@ def buildIntro(introfile):
 
     parsedLines = parseMarkdown(lines)
 
-    f = open(userGuideFileName, 'a')
+    f = open(userGuideFileName, 'a', encoding="utf-8")
 
     f.write("\\chapter{Introduction to FinancePy}")
     f.writelines(parsedLines)
@@ -210,7 +210,7 @@ def buildChapter(folderName):
     print("Building chapter in folder:", folderName)
 
     readMeFile = folderName + "//" + "README.md"
-    f = open(readMeFile, 'r', encoding="utf8")
+    f = open(readMeFile, 'r', encoding="utf-8")
     readMeLines = f.readlines()
     f.close()
 
@@ -224,7 +224,7 @@ def buildChapter(folderName):
 #    newLines.append("\\section{Introduction}")
 #    newLines.append("\n")
 
-    f = open(userGuideFileName, 'a')
+    f = open(userGuideFileName, 'a', encoding="utf-8")
     f.writelines(newLines)
     f.close()
 
@@ -254,7 +254,7 @@ def buildChapter(folderName):
 
     readMeLines = parseMarkdown(readMeLines)
 
-    f = open(userGuideFileName, 'a')
+    f = open(userGuideFileName, 'a', encoding="utf-8")
     f.writelines(readMeLines)
     f.close()
 
@@ -263,7 +263,7 @@ def buildChapter(folderName):
     for module in modules:
         moduleName = module.split("\\")[-1]
         escapedModuleName = sub("_", "\\_", moduleName[0:-3])
-        f = open(userGuideFileName, 'a')
+        f = open(userGuideFileName, 'a', encoding="utf-8")
         f.write("\\newpage\n")
         f.write("\\section{" + escapedModuleName + "}\n")
         f.write("\n")
@@ -275,7 +275,7 @@ def buildChapter(folderName):
     for module in modules:
         moduleName = module.split("\\")[-1]
         escapedModuleName = sub("_", "\\_", moduleName[0:-3])
-        f = open(userGuideFileName, 'a')
+        f = open(userGuideFileName, 'a', encoding="utf-8")
         f.write("\n")
         f.write("\\newpage\n")
         f.write("\\section{" + escapedModuleName + "}\n")
@@ -290,7 +290,7 @@ def parseModule(moduleName):
     """ Parse a module looking for classes, functions and classes for
     enumerated types. Functions inside classes are parsed inside the class. """
     print(moduleName)
-    f = open(moduleName, 'r', encoding="utf8")
+    f = open(moduleName, 'r', encoding="utf-8")
     lines = f.readlines()
     f.close()
 
@@ -330,7 +330,7 @@ def parseModule(moduleName):
 
     # print("startClassLines", startClassLines)
 
-    f = open(userGuideFileName, 'a')
+    f = open(userGuideFileName, 'a', encoding="utf-8")
 
     for c in range(0, numEnums):
         newLines = parseEnum(lines, startEnumLines[c], startEnumLines[c + 1])

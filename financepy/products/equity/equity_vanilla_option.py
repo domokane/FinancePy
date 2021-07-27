@@ -10,7 +10,7 @@ from numba import njit
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -76,15 +76,15 @@ class EquityVanillaOption():
     def __init__(self,
                  expiry_date: (Date, list),
                  strike_price: (float, np.ndarray),
-                 option_type: (FinOptionTypes, list),
+                 option_type: (OptionTypes, list),
                  num_options: float = 1.0):
         """ Create the Equity Vanilla option object by specifying the expiry
         date, the option strike, the option type and the number of options. """
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != FinOptionTypes.EUROPEAN_CALL and \
-           option_type != FinOptionTypes.EUROPEAN_PUT:
+        if option_type != OptionTypes.EUROPEAN_CALL and \
+           option_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
         self._expiry_date = expiry_date

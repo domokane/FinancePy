@@ -7,7 +7,7 @@ from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 import sys
 sys.path.append("..")
 
@@ -51,7 +51,7 @@ def test_EquityDigitalOption():
     for num_paths in num_paths_list:
 
         call_option = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
             valuation_date,
             stock_price,
@@ -89,7 +89,7 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         call_option = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
             valuation_date,
             stock_price,
@@ -126,7 +126,7 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         put_option = EquityDigitalOption(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_PUT, underlying_type)
+            expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type)
         value = put_option.value(
             valuation_date,
             stock_price,

@@ -12,7 +12,7 @@ from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...market.curves.discount_curve import DiscountCurve
 
 ##########################################################################
@@ -33,7 +33,7 @@ class FXFixedLookbackOption:
 
     def __init__(self,
                  expiry_date: Date,
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  optionStrike: float):
         """ Create option with expiry date, option type and the option strike
         """
@@ -70,12 +70,12 @@ class FXFixedLookbackOption:
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             smax = stock_min_max
             if smax < s0:
                 raise FinError(
                     "The Smax value must be >= the stock price.")
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             smin = stock_min_max
             if smin > s0:
                 raise FinError(
@@ -94,7 +94,7 @@ class FXFixedLookbackOption:
         expbt = exp(b * t)
 
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
 
             if k > smax:
                 d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
@@ -125,7 +125,7 @@ class FXFixedLookbackOption:
                 v = df * (smax - k) + s0 * dq * N(e1) - \
                     smax * df * N(e2) + s0 * df * u * term
 
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
             if k >= smin:
                 f1 = (log(s0 / smin) + (b + v * v / 2.0) * t) / v / sqrt(t)
@@ -194,12 +194,12 @@ class FXFixedLookbackOption:
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             smax = spot_fx_rateMinMax
             if smax < S0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             smin = spot_fx_rateMinMax
             if smin > S0:
                 raise FinError(
@@ -219,12 +219,12 @@ class FXFixedLookbackOption:
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
-        if option_type == FinOptionTypes.EUROPEAN_CALL:
+        if option_type == OptionTypes.EUROPEAN_CALL:
             SMax = np.max(Sall, axis=1)
             smaxs = np.ones(num_paths) * smax
             payoff = np.maximum(SMax - k, 0.0)
             payoff = np.maximum(payoff, smaxs - k)
-        elif option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif option_type == OptionTypes.EUROPEAN_PUT:
             SMin = np.min(Sall, axis=1)
             smins = np.ones(num_paths) * smin
             payoff = np.maximum(k - SMin, 0.0)

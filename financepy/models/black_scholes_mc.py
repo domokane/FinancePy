@@ -7,7 +7,7 @@
 import numpy as np
 
 from numba import njit, float64, int64, prange
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 from ..models.sobol import get_gaussian_sobol
 from math import exp
@@ -32,7 +32,7 @@ def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, us
 
     ss = s * exp((mu - v2 / 2.0) * t)
 
-    if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
@@ -40,7 +40,7 @@ def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, us
             payoff += max(s_1 - K, 0.0)
             payoff += max(s_2 - K, 0.0)
 
-    elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
@@ -77,10 +77,10 @@ def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
     s_2 = ss / m
 
     # Not sure if it is correct to do antithetics with sobols but why not ?
-    if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1 - K, 0.0)
         payoff_a_2 = np.maximum(s_2 - K, 0.0)
-    elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(K - s_1, 0.0)
         payoff_a_2 = np.maximum(K - s_2, 0.0)
     else:
@@ -115,10 +115,10 @@ def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, useSob
     s_2 = ss / m
 
     # Not sure if it is correct to do antithetics with sobols but why not ?
-    if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1 - K, 0.0)
         payoff_a_2 = np.maximum(s_2 - K, 0.0)
-    elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(K - s_1, 0.0)
         payoff_a_2 = np.maximum(K - s_2, 0.0)
     else:
@@ -150,7 +150,7 @@ def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
 
-    if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             gg = g[i]
@@ -159,7 +159,7 @@ def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
             payoff += max(s_1 - K, 0.0)
             payoff += max(s_2 - K, 0.0)
 
-    elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             gg = g[i]
@@ -199,7 +199,7 @@ def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use
     payoff1 = 0.0
     payoff2 = 0.0
 
-    if option_type == FinOptionTypes.EUROPEAN_CALL.value:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)
@@ -207,7 +207,7 @@ def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use
             payoff1 += max(s_1 - K, 0.0)
             payoff2 += max(s_2 - K, 0.0)
 
-    elif option_type == FinOptionTypes.EUROPEAN_PUT.value:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * vsqrtt)

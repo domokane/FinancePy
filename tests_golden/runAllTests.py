@@ -2,12 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 import glob
-import sys
+
 from os.path import dirname, basename, join
-sys.path.append("..")
 
 # This only works if I have an init.py in the parent folder
 

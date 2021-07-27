@@ -11,7 +11,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 import time
 import numpy as np
 import sys
@@ -59,7 +59,7 @@ def test_FinFXVanillaOptionWystupExample1():
     call_option = FXVanillaOption(expiry_date,
                                  strike_fx_rate,
                                  currency_pair,
-                                 FinOptionTypes.EUROPEAN_CALL,
+                                 OptionTypes.EUROPEAN_CALL,
                                  notional,
                                  "EUR", 2)
 
@@ -74,7 +74,7 @@ def test_FinFXVanillaOptionWystupExample1():
     call_option = FXVanillaOption(expiry_date,
                                  strike_fx_rate,
                                  currency_pair,
-                                 FinOptionTypes.EUROPEAN_CALL,
+                                 OptionTypes.EUROPEAN_CALL,
                                  notional,
                                  "USD", 2)
 
@@ -132,7 +132,7 @@ def test_FinFXVanillaOptionWystupExample2():
     call_option = FXVanillaOption(expiry_date,
                                  strike_fx_rate,
                                  currency_pair,
-                                 FinOptionTypes.EUROPEAN_PUT,
+                                 OptionTypes.EUROPEAN_PUT,
                                  notional,
                                  "EUR", 2)
 
@@ -205,7 +205,7 @@ def test_FinFXVanillaOptionBloombergExample():
     call_option = FXVanillaOption(expiry_date,
                                  strike_fx_rate,
                                  currency_pair,
-                                 FinOptionTypes.EUROPEAN_CALL,
+                                 OptionTypes.EUROPEAN_CALL,
                                  notional,
                                  notional_currency, 2)
 
@@ -252,7 +252,7 @@ def test_FinFXVanillaOptionHullExample():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.EUROPEAN_CALL,
+                                     OptionTypes.EUROPEAN_CALL,
                                      1000000,
                                      "USD")
 
@@ -290,7 +290,7 @@ def test_FinFXVanillaOptionHullExample():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.EUROPEAN_CALL,
+                                     OptionTypes.EUROPEAN_CALL,
                                      1000000,
                                      "USD")
 
@@ -324,7 +324,7 @@ def test_FinFXVanillaOptionHullExample():
         put_option = FXVanillaOption(expiry_date,
                                     strike_fx_rate,
                                     "EURUSD",
-                                    FinOptionTypes.EUROPEAN_PUT,
+                                    OptionTypes.EUROPEAN_PUT,
                                     1000000,
                                     "USD")
 
@@ -362,7 +362,7 @@ def test_FinFXVanillaOptionHullExample():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.EUROPEAN_CALL,
+                                     OptionTypes.EUROPEAN_CALL,
                                      1000000,
                                      "USD")
         value = call_option.value(
@@ -406,7 +406,7 @@ def test_FinFXVanillaOptionHullExample():
         put_option = FXVanillaOption(expiry_date,
                                     strike_fx_rate,
                                     "EURUSD",
-                                    FinOptionTypes.EUROPEAN_PUT,
+                                    OptionTypes.EUROPEAN_PUT,
                                     1000000,
                                     "USD")
 
@@ -449,7 +449,7 @@ def test_FinFXVanillaOptionHullExample():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.EUROPEAN_CALL,
+                                     OptionTypes.EUROPEAN_CALL,
                                      1000000,
                                      "USD")
 

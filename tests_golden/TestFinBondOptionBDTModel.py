@@ -4,7 +4,7 @@
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.bdt_tree import BDTTree
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.day_count import DayCountTypes
@@ -52,7 +52,7 @@ def test_BondOption():
 
     strikes = [80, 90, 100, 110, 120]
 
-    option_type = FinOptionTypes.EUROPEAN_CALL
+    option_type = OptionTypes.EUROPEAN_CALL
 
     testCases.header("LABEL", "VALUE")
 
@@ -86,7 +86,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    option_type = FinOptionTypes.AMERICAN_CALL
+    option_type = OptionTypes.AMERICAN_CALL
 
     price = bond.full_price_from_discount_curve(
         settlement_date, discount_curve)
@@ -117,7 +117,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    option_type = FinOptionTypes.EUROPEAN_PUT
+    option_type = OptionTypes.EUROPEAN_PUT
 
     price = bond.full_price_from_discount_curve(
         settlement_date, discount_curve)
@@ -144,7 +144,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    option_type = FinOptionTypes.AMERICAN_PUT
+    option_type = OptionTypes.AMERICAN_PUT
 
     price = bond.full_price_from_discount_curve(
         settlement_date, discount_curve)
@@ -202,25 +202,25 @@ def test_BondOptionAmericanConvergenceONE():
 
         start = time.time()
 
-        option_type = FinOptionTypes.AMERICAN_PUT
+        option_type = OptionTypes.AMERICAN_PUT
         bond_option1 = BondOption(
             bond, expiry_date, strike_price, face, option_type)
         model = BDTTree(sigma, num_time_steps)
         v1put = bond_option1.value(settlement_date, discount_curve, model)
 
-        option_type = FinOptionTypes.EUROPEAN_PUT
+        option_type = OptionTypes.EUROPEAN_PUT
         bond_option2 = BondOption(
             bond, expiry_date, strike_price, face, option_type)
         model = BDTTree(sigma, num_time_steps)
         v2put = bond_option2.value(settlement_date, discount_curve, model)
 
-        option_type = FinOptionTypes.AMERICAN_CALL
+        option_type = OptionTypes.AMERICAN_CALL
         bond_option1 = BondOption(
             bond, expiry_date, strike_price, face, option_type)
         model = BDTTree(sigma, num_time_steps)
         v1call = bond_option1.value(settlement_date, discount_curve, model)
 
-        option_type = FinOptionTypes.EUROPEAN_CALL
+        option_type = OptionTypes.EUROPEAN_CALL
         bond_option2 = BondOption(
             bond, expiry_date, strike_price, face, option_type)
         model = BDTTree(sigma, num_time_steps)
@@ -274,7 +274,7 @@ def test_BondOptionAmericanConvergenceTWO():
         K = 100.0
         bkModel = BDTTree(sigma, 100)
         europeanCallBondOption = BondOption(bond, expiry_date, K, face,
-                                            FinOptionTypes.EUROPEAN_CALL)
+                                            OptionTypes.EUROPEAN_CALL)
 
         v_ec = europeanCallBondOption.value(settlement_date, discount_curve,
                                             model)
@@ -290,22 +290,22 @@ def test_BondOptionAmericanConvergenceTWO():
         start = time.time()
 
         europeanCallBondOption = BondOption(bond, expiry_date, K, face,
-                                            FinOptionTypes.EUROPEAN_CALL)
+                                            OptionTypes.EUROPEAN_CALL)
         v_ec = europeanCallBondOption.value(settlement_date, discount_curve,
                                             bkModel)
 
         americanCallBondOption = BondOption(bond, expiry_date, K, face,
-                                            FinOptionTypes.AMERICAN_CALL)
+                                            OptionTypes.AMERICAN_CALL)
         v_ac = americanCallBondOption.value(settlement_date, discount_curve,
                                             bkModel)
 
         europeanPutBondOption = BondOption(bond, expiry_date, K, face,
-                                           FinOptionTypes.EUROPEAN_PUT)
+                                           OptionTypes.EUROPEAN_PUT)
         v_ep = europeanPutBondOption.value(settlement_date, discount_curve,
                                            bkModel)
 
         americanPutBondOption = BondOption(bond, expiry_date, K, face,
-                                           FinOptionTypes.AMERICAN_PUT)
+                                           OptionTypes.AMERICAN_PUT)
         v_ap = americanPutBondOption.value(settlement_date, discount_curve,
                                            bkModel)
 
@@ -393,22 +393,22 @@ def test_BondOptionZEROVOLConvergence():
             sigma = 0.0000001
             model = BDTTree(sigma, num_steps)
 
-            option_type = FinOptionTypes.EUROPEAN_CALL
+            option_type = OptionTypes.EUROPEAN_CALL
             bond_option1 = BondOption(
                 bond, expiry_date, strike_price, face, option_type)
             v1 = bond_option1.value(settlement_date, discount_curve, model)
 
-            option_type = FinOptionTypes.AMERICAN_CALL
+            option_type = OptionTypes.AMERICAN_CALL
             bond_option2 = BondOption(
                 bond, expiry_date, strike_price, face, option_type)
             v2 = bond_option2.value(settlement_date, discount_curve, model)
 
-            option_type = FinOptionTypes.EUROPEAN_PUT
+            option_type = OptionTypes.EUROPEAN_PUT
             bond_option3 = BondOption(
                 bond, expiry_date, strike_price, face, option_type)
             v3 = bond_option3.value(settlement_date, discount_curve, model)
 
-            option_type = FinOptionTypes.AMERICAN_PUT
+            option_type = OptionTypes.AMERICAN_PUT
             bond_option4 = BondOption(
                 bond, expiry_date, strike_price, face, option_type)
             v4 = bond_option4.value(settlement_date, discount_curve, model)

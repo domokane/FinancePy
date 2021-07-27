@@ -13,7 +13,7 @@ from ...utils.math import covar
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
 
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
@@ -133,10 +133,10 @@ def _value_mc_numba(t0,
         s_1_arithmetic /= n
         s_2_arithmetic /= n
 
-        if option_type == FinOptionTypes.EUROPEAN_CALL:
+        if option_type == OptionTypes.EUROPEAN_CALL:
             payoff_a += max(s_1_arithmetic - K, 0.0)
             payoff_a += max(s_2_arithmetic - K, 0.0)
-        elif option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif option_type == OptionTypes.EUROPEAN_PUT:
             payoff_a += max(K - s_1_arithmetic, 0.0)
             payoff_a += max(K - s_2_arithmetic, 0.0)
         else:
@@ -155,7 +155,7 @@ def _value_mc_fast_numba(t0: float,
                          tau: float,
                          K: float,
                          n: int,
-                         option_type: FinOptionTypes,
+                         option_type: int,
                          stock_price: float,
                          interest_rate: float,
                          dividend_yield: float,
@@ -221,10 +221,10 @@ def _value_mc_fast_numba(t0: float,
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
-    if option_type == FinOptionTypes.EUROPEAN_CALL:
+    if option_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
-    elif option_type == FinOptionTypes.EUROPEAN_PUT:
+    elif option_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
         payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
     else:
@@ -305,12 +305,12 @@ def _value_mc_fast_cv_numba(t0, t, tau, K, n, option_type, stock_price,
         s_2_arithmetic[ip] /= n
         s_2_geometric[ip] = np.exp(ln_s_2_geometric[ip] / n)
 
-    if option_type == FinOptionTypes.EUROPEAN_CALL:
+    if option_type == OptionTypes.EUROPEAN_CALL:
         payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
         payoff_g_1 = np.maximum(s_1_geometric - K, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
         payoff_g_2 = np.maximum(s_2_geometric - K, 0.0)
-    elif option_type == FinOptionTypes.EUROPEAN_PUT:
+    elif option_type == OptionTypes.EUROPEAN_PUT:
         payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
         payoff_g_1 = np.maximum(K - s_1_geometric, 0.0)
         payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
@@ -355,7 +355,7 @@ class EquityAsianOption:
                  startAveragingDate: Date,
                  expiry_date: Date,
                  strike_price: float,
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  numberOfObservations: int = 100):
         """ Create an EquityAsian option object which takes a start date for
         the averaging, an expiry date, a strike price, an option type and a
@@ -486,9 +486,9 @@ class EquityAsianOption:
         # the Geometric price is the lower bound
         call_g = np.exp(-r * texp) * (EG * N(d1) - K * N(d2))
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             v = call_g
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             put_g = call_g - (EG - K) * np.exp(-r * texp)
             v = put_g
         else:
@@ -553,9 +553,9 @@ class EquityAsianOption:
               texp / 2.0) / (sigmaA*np.sqrt(texp))
         d2 = d1 - sigmaA * np.sqrt(texp)
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             v = np.exp(-r * texp) * (FA * N(d1) - K * N(d2))
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             v = np.exp(-r * texp) * (K * N(-d2) - FA * N(-d1))
         else:
             return None
@@ -628,10 +628,10 @@ class EquityAsianOption:
         d1 = (np.log(F0 / K) + sigma2 * texp / 2) / sigma / np.sqrt(texp)
         d2 = d1 - sigma * np.sqrt(texp)
 
-        if self._option_type == FinOptionTypes.EUROPEAN_CALL:
+        if self._option_type == OptionTypes.EUROPEAN_CALL:
             call = np.exp(-r * texp) * (F0 * N(d1) - K * N(d2))
             v = call
-        elif self._option_type == FinOptionTypes.EUROPEAN_PUT:
+        elif self._option_type == OptionTypes.EUROPEAN_PUT:
             put = np.exp(-r * texp) * (K * N(-d2) - F0 * N(-d1))
             v = put
         else:
@@ -714,7 +714,7 @@ class EquityAsianOption:
         volatility = model._volatility
 
         v = _value_mc_fast_numba(t0, texp, tau,
-                                 K, n, self._option_type,
+                                 K, n, self._option_type.value,
                                  stock_price,
                                  r,
                                  q,

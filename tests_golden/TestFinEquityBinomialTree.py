@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
 from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
@@ -46,7 +46,7 @@ def test_FinBinomialTree():
     put_option = EquityVanillaOption(
         expiry_date,
         strike_price,
-        FinOptionTypes.EUROPEAN_PUT)
+        OptionTypes.EUROPEAN_PUT)
     value = put_option.value(valuation_date, stock_price,
                             discount_curve, dividend_curve, model)
     delta = put_option.delta(valuation_date, stock_price,
@@ -116,7 +116,7 @@ def test_FinBinomialTree():
     call_option = EquityVanillaOption(
         expiry_date,
         strike_price,
-        FinOptionTypes.EUROPEAN_CALL)
+        OptionTypes.EUROPEAN_CALL)
     value = call_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
     delta = call_option.delta(valuation_date, stock_price,

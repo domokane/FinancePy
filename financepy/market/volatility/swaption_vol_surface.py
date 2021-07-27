@@ -11,7 +11,7 @@ from numba import jit, njit, float64, int64
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
@@ -325,7 +325,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #         domDF = np.exp(-rd*tdel)
 #         forDF = np.exp(-rf*tdel)
 
-#         if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+#         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
@@ -342,7 +342,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #         domDF = np.exp(-rd*tdel)
 #         forDF = np.exp(-rf*tdel)
 
-#         if option_type_value == FinOptionTypes.EUROPEAN_CALL.value:
+#         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
@@ -572,7 +572,7 @@ class SwaptionVolSurface():
     #     initialGuess = self._K_ATM[index0]
 
     #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
-    #                               FinOptionTypes.EUROPEAN_CALL.value,
+    #                               OptionTypes.EUROPEAN_CALL.value,
     #                               vol_type_value, callDelta,
     #                               delta_method_value,
     #                               initialGuess,
@@ -585,7 +585,7 @@ class SwaptionVolSurface():
     #         K1 = _solver_for_smile_strike(s, texp,
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
-    #                                   FinOptionTypes.EUROPEAN_CALL.value,
+    #                                   OptionTypes.EUROPEAN_CALL.value,
     #                                   vol_type_value, callDelta,
     #                                   delta_method_value,
     #                                   initialGuess,
@@ -675,7 +675,7 @@ class SwaptionVolSurface():
     #     initialGuess = self._K_ATM[index0]
 
     #     K0 = _solver_for_smile_strike(s, texp, self._rd[index0], self._rf[index0],
-    #                               FinOptionTypes.EUROPEAN_CALL.value,
+    #                               OptionTypes.EUROPEAN_CALL.value,
     #                               vol_type_value, callDelta,
     #                               delta_method_value,
     #                               initialGuess,
@@ -692,7 +692,7 @@ class SwaptionVolSurface():
     #         K1 = _solver_for_smile_strike(s, texp,
     #                                   self._rd[index1], 
     #                                   self._rf[index1],
-    #                                   FinOptionTypes.EUROPEAN_CALL.value,
+    #                                   OptionTypes.EUROPEAN_CALL.value,
     #                                   vol_type_value, callDelta,
     #                                   delta_method_value,
     #                                   initialGuess,

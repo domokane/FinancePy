@@ -15,7 +15,7 @@ from ..utils.helpers import label_to_string
 ###############################################################################
 
 
-class FinProcessTypes(Enum):
+class ProcessTypes(Enum):
     GBM = 1
     CIR = 2
     HESTON = 3
@@ -40,13 +40,13 @@ class FinProcessSimulator():
             num_paths,
             seed):
 
-        if process_type == FinProcessTypes.GBM:
+        if process_type == ProcessTypes.GBM:
             (stock_price, drift, volatility, scheme) = model_params
             paths = get_gbm_paths(num_paths, numAnnSteps, t, drift,
                                   stock_price, volatility, scheme.value, seed)
             return paths
 
-        elif process_type == FinProcessTypes.HESTON:
+        elif process_type == ProcessTypes.HESTON:
             (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = model_params
             paths = get_heston_paths(num_paths,
                                      numAnnSteps,
@@ -62,7 +62,7 @@ class FinProcessSimulator():
                                      seed)
             return paths
 
-        elif process_type == FinProcessTypes.VASICEK:
+        elif process_type == ProcessTypes.VASICEK:
             (r0, kappa, theta, sigma, scheme) = model_params
             paths = get_vasicek_paths(
                 num_paths,
@@ -76,7 +76,7 @@ class FinProcessSimulator():
                 seed)
             return paths
 
-        elif process_type == FinProcessTypes.CIR:
+        elif process_type == ProcessTypes.CIR:
             (r0, kappa, theta, sigma, scheme) = model_params
             paths = get_cir_paths(num_paths, numAnnSteps, t,
                                   r0, kappa, theta, sigma, scheme.value, seed)
@@ -317,7 +317,7 @@ def get_vasicek_paths(num_paths,
 ###############################################################################
 
 
-class FinCIRNumericalScheme(Enum):
+class CIRNumericalScheme(Enum):
     EULER = 1
     LOGNORMAL = 2
     MILSTEIN = 3
@@ -344,7 +344,7 @@ def get_cir_paths(num_paths,
     rate_path = np.empty(shape=(num_paths, num_steps + 1))
     rate_path[:, 0] = r0
 
-    if scheme == FinCIRNumericalScheme.EULER.value:
+    if scheme == CIRNumericalScheme.EULER.value:
         sigmasqrt_dt = sigma * sqrt(dt)
         for iPath in range(0, num_paths):
             r = r0
@@ -356,7 +356,7 @@ def get_cir_paths(num_paths,
                     sigmasqrt_dt * z[iStep - 1] * sqrtrplus
                 rate_path[iPath, iStep] = r
 
-    elif scheme == FinCIRNumericalScheme.LOGNORMAL.value:
+    elif scheme == CIRNumericalScheme.LOGNORMAL.value:
         x = exp(-kappa * dt)
         y = 1.0 - x
         for iPath in range(0, num_paths):
@@ -369,7 +369,7 @@ def get_cir_paths(num_paths,
                 r = mean * exp(-0.5 * sig * sig + sig * z[iStep - 1])
                 rate_path[iPath, iStep] = r
 
-    elif scheme == FinCIRNumericalScheme.MILSTEIN.value:
+    elif scheme == CIRNumericalScheme.MILSTEIN.value:
         sigmasqrt_dt = sigma * sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
         for iPath in range(0, num_paths):
@@ -382,7 +382,7 @@ def get_cir_paths(num_paths,
                 r = r + sigma2dt * (z[iStep - 1]**2 - 1.0)
                 rate_path[iPath, iStep] = r
 
-    elif scheme == FinCIRNumericalScheme.KAHLJACKEL.value:
+    elif scheme == CIRNumericalScheme.KAHLJACKEL.value:
         bhat = theta - sigma * sigma / 4.0 / kappa
         sqrt_dt = sqrt(dt)
         for iPath in range(0, num_paths):

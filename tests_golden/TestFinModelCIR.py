@@ -3,7 +3,7 @@
 ###############################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.cir_mc import FinCIRNumericalScheme
+from financepy.models.cir_mc import CIRNumericalScheme
 from financepy.models.cir_mc import zero_price_mc, zero_price
 import numpy as np
 import time
@@ -52,7 +52,7 @@ def test_FinModelRatesCIR():
             dt,
             num_paths,
             seed,
-            FinCIRNumericalScheme.EULER.value)
+            CIRNumericalScheme.EULER.value)
         p_MC2 = zero_price_mc(
             r0,
             a,
@@ -62,7 +62,7 @@ def test_FinModelRatesCIR():
             dt,
             num_paths,
             seed,
-            FinCIRNumericalScheme.LOGNORMAL.value)
+            CIRNumericalScheme.LOGNORMAL.value)
         p_MC3 = zero_price_mc(
             r0,
             a,
@@ -72,7 +72,7 @@ def test_FinModelRatesCIR():
             dt,
             num_paths,
             seed,
-            FinCIRNumericalScheme.MILSTEIN.value)
+            CIRNumericalScheme.MILSTEIN.value)
         p_MC4 = zero_price_mc(
             r0,
             a,
@@ -82,7 +82,7 @@ def test_FinModelRatesCIR():
             dt,
             num_paths,
             seed,
-            FinCIRNumericalScheme.KAHLJACKEL.value)
+            CIRNumericalScheme.KAHLJACKEL.value)
         p_MC5 = zero_price_mc(
             r0,
             a,
@@ -92,7 +92,7 @@ def test_FinModelRatesCIR():
             dt,
             num_paths,
             seed,
-            FinCIRNumericalScheme.EXACT.value)
+            CIRNumericalScheme.EXACT.value)
         end = time.time()
         elapsed = end - start
         testCases.print(t, elapsed, p, p_MC1, p_MC2, p_MC3, p_MC4, p_MC5)

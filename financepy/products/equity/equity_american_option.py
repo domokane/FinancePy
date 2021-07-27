@@ -8,7 +8,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
-from ...utils.global_types import FinOptionTypes
+from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
@@ -29,7 +29,7 @@ class EquityAmericanOption(EquityOption):
     def __init__(self,
                  expiry_date: Date,
                  strike_price: float,
-                 option_type: FinOptionTypes,
+                 option_type: OptionTypes,
                  num_options: float = 1.0):
         """ Class for American style options on simple vanilla calls and puts.
         Specify the expiry date, strike price, whether the option is a call or
@@ -37,10 +37,10 @@ class EquityAmericanOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != FinOptionTypes.EUROPEAN_CALL and \
-            option_type != FinOptionTypes.EUROPEAN_PUT and \
-            option_type != FinOptionTypes.AMERICAN_CALL and \
-                option_type != FinOptionTypes.AMERICAN_PUT:
+        if option_type != OptionTypes.EUROPEAN_CALL and \
+            option_type != OptionTypes.EUROPEAN_PUT and \
+            option_type != OptionTypes.AMERICAN_CALL and \
+                option_type != OptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
         self._expiry_date = expiry_date

@@ -6,7 +6,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 import numpy as np
 
@@ -57,7 +57,7 @@ def test_FinFXAmericanOption():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      currency_pair,
-                                     FinOptionTypes.EUROPEAN_CALL,
+                                     OptionTypes.EUROPEAN_CALL,
                                      1000000,
                                      "USD")
 
@@ -70,7 +70,7 @@ def test_FinFXAmericanOption():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.AMERICAN_CALL,
+                                     OptionTypes.AMERICAN_CALL,
                                      1000000,
                                      "USD")
 
@@ -88,7 +88,7 @@ def test_FinFXAmericanOption():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.EUROPEAN_PUT,
+                                     OptionTypes.EUROPEAN_PUT,
                                      1000000,
                                      "USD")
 
@@ -101,7 +101,7 @@ def test_FinFXAmericanOption():
         call_option = FXVanillaOption(expiry_date,
                                      strike_fx_rate,
                                      "EURUSD",
-                                     FinOptionTypes.AMERICAN_PUT,
+                                     OptionTypes.AMERICAN_PUT,
                                      1000000,
                                      "USD")
 

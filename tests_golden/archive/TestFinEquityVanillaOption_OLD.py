@@ -7,7 +7,7 @@ import time
 import sys
 sys.path.append("..")
 
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.EquityVanillaOptionOLD import EquityVanillaOptionOLD
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
@@ -37,7 +37,7 @@ def test_EquityVanillaOptionFactored():
     for num_paths in num_paths_list:
 
         call_option = EquityVanillaOptionOLD(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL)
+            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
         value = call_option.value(valuation_date, stock_price, discount_curve,
                                  dividend_yield, model)
         start = time.time()
@@ -60,7 +60,7 @@ def test_EquityVanillaOptionFactored():
     for stock_price in stock_prices:
 
         call_option = EquityVanillaOptionOLD(expiry_date, 100.0,
-                                            FinOptionTypes.EUROPEAN_CALL)
+                                            OptionTypes.EUROPEAN_CALL)
 
         value = call_option.value(valuation_date, stock_price, discount_curve,
                                  dividend_yield, model)
@@ -90,7 +90,7 @@ def test_EquityVanillaOptionFactored():
     for stock_price in stock_prices:
 
         put_option = EquityVanillaOptionOLD(expiry_date, 100.0,
-                                           FinOptionTypes.EUROPEAN_PUT)
+                                           OptionTypes.EUROPEAN_PUT)
 
         value = put_option.value(valuation_date, stock_price, discount_curve,
                                 dividend_yield, model)
@@ -119,7 +119,7 @@ def test_EquityVanillaOptionFactored():
     for stock_price in stock_prices:
 
         call_option = EquityVanillaOptionOLD(expiry_date, 100.0,
-                                            FinOptionTypes.EUROPEAN_CALL)
+                                            OptionTypes.EUROPEAN_CALL)
         value = call_option.value(valuation_date, stock_price, discount_curve,
                                  dividend_yield, model)
         delta = call_option.delta(valuation_date, stock_price, discount_curve,
@@ -140,7 +140,7 @@ def test_EquityVanillaOptionFactored():
     for stock_price in stock_prices:
         
         put_option = EquityVanillaOptionOLD(expiry_date, 100.0,
-                                           FinOptionTypes.EUROPEAN_PUT)
+                                           OptionTypes.EUROPEAN_PUT)
 
         value = put_option.value(valuation_date, stock_price, discount_curve,
                                  dividend_yield, model)
@@ -162,7 +162,7 @@ def test_EquityVanillaOptionFactored():
 
     for stock_price in stock_prices:
         call_option = EquityVanillaOptionOLD(
-            expiry_date, 100.0, FinOptionTypes.EUROPEAN_CALL)
+            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
         value = call_option.value(
             valuation_date,
             stock_price,

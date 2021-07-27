@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from ..utils.global_types import FinOptionTypes
+from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 
 from ..utils.helpers import check_argument_types
@@ -47,10 +47,10 @@ class BlackScholes(Model):
               strike_price: float,
               risk_free_rate: float,
               dividendRate: float,
-              option_type: FinOptionTypes):
+              option_type: OptionTypes):
 
-        if option_type == FinOptionTypes.EUROPEAN_CALL \
-                or option_type == FinOptionTypes.EUROPEAN_PUT:
+        if option_type == OptionTypes.EUROPEAN_CALL \
+                or option_type == OptionTypes.EUROPEAN_PUT:
 
             if self._implementationType is BlackScholesTypes.DEFAULT:
                 self._implementationType = BlackScholesTypes.ANALYTICAL
@@ -76,17 +76,17 @@ class BlackScholes(Model):
 
                 raise FinError("Implementation not available for this product")
 
-        elif option_type == FinOptionTypes.AMERICAN_CALL \
-                or option_type == FinOptionTypes.AMERICAN_PUT:
+        elif option_type == OptionTypes.AMERICAN_CALL \
+                or option_type == OptionTypes.AMERICAN_PUT:
 
             if self._implementationType is BlackScholesTypes.DEFAULT:
                 self._implementationType = BlackScholesTypes.CRR_TREE
 
             if self._implementationType == BlackScholesTypes.BARONE_ADESI:
 
-                if option_type == FinOptionTypes.AMERICAN_CALL:
+                if option_type == OptionTypes.AMERICAN_CALL:
                     phi = +1
-                elif option_type == FinOptionTypes.AMERICAN_PUT:
+                elif option_type == OptionTypes.AMERICAN_PUT:
                     phi = -1
 
                 v = baw_value(spotPrice, time_to_expiry, strike_price,
