@@ -307,23 +307,23 @@ def _initialize_simplex(x0, bounds):
 ###############################################################################
 
 @njit(cache=True, fastmath=True)
-def _check_params(ρ, χ, γ, σ, bounds, n):
+def _check_params(rho, chi, v, sigma, bounds, n):
     """
     Checks whether the parameters for the Nelder-Mead algorithm are valid.
     JIT-compiled in `nopython` mode using Numba.
 
     Parameters
     ----------
-    ρ : scalar(float)
+    rho : scalar(float)
         Reflection parameter. Must be strictly greater than 0.
 
-    χ : scalar(float)
+    chi : scalar(float)
         Expansion parameter. Must be strictly greater than max(1, roh).
 
-    γ : scalar(float)
+    v : scalar(float)
         Contraction parameter. Must be stricly between 0 and 1.
 
-    σ : scalar(float)
+    sigma : scalar(float)
         Shrinkage parameter. Must be strictly between 0 and 1.
 
     bounds: ndarray(float, ndim=2)
@@ -333,15 +333,15 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
         Number of independent variables.
 
     """
-    if ρ < 0:
+    if rho < 0:
         raise ValueError("roh must be strictly greater than 0.")
-    if χ < 1:
+    if chi < 1:
         raise ValueError("chi must be strictly greater than 1.")
-    if χ < ρ:
+    if chi < rho:
         raise ValueError("chi must be strictly greater than roh.")
-    if γ < 0 or γ > 1:
+    if v < 0 or v > 1:
         raise ValueError("v must be strictly between 0 and 1.")
-    if σ < 0 or σ > 1:
+    if sigma < 0 or sigma > 1:
         raise ValueError("sigma must be strictly between 0 and 1.")
 
     if not (bounds.shape == (0, 2) or bounds.shape == (n, 2)):

@@ -870,4 +870,4 @@ if 1 == 1:
 #    print("Moving ", pdfFileName1, " to ", pdfFileName2)
 #    shutil.move(pdfFileName1, pdfFileName2)
 #    print(pdfFileName2)
-#    open_file(pdfFileName2)
+    open_file(pdfFileName1)
