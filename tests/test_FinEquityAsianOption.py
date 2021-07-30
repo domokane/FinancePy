@@ -7,7 +7,7 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
 from financepy.products.equity.equity_asian_option import EquityAsianOption
-from financepy.utils.global_types import FinOptionTypes
+from financepy.utils.global_types import OptionTypes
 
 
 valuation_date = Date(1, 1, 2014)
@@ -30,7 +30,7 @@ dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 asianOption = EquityAsianOption(startAveragingDate,
                                 expiry_date,
                                 K,
-                                FinOptionTypes.EUROPEAN_CALL,
+                                OptionTypes.EUROPEAN_CALL,
                                 num_observations)
 
 
