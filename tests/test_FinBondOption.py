@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
@@ -158,3 +159,70 @@ def test_american_put_bdt():
     v = bond_option.value(settlement_date, discount_curve, model)
 
     assert round(v, 4) == 0.6141
+
+
+# Results different from TestFinBondOptionHWModel.py
+# because tmat != 10.0
+def test_european_call_hw():
+    option_type = OptionTypes.EUROPEAN_CALL
+    strike_price = 100
+    num_time_steps = 100
+
+    bond_option = BondOption(
+        bond, expiry_date, strike_price, face, option_type)
+
+    sigma = 0.01
+    a = 0.1
+    model = HWTree(sigma, a, num_time_steps)
+
+    v = bond_option.value(settlement_date, discount_curve, model)
+
+    assert round(v, 4) == 1.8809
+
+
+def test_american_call_hw():
+    option_type = OptionTypes.AMERICAN_CALL
+    strike_price = 100
+
+    bond_option = BondOption(
+        bond, expiry_date, strike_price, face, option_type)
+
+    sigma = 0.01
+    a = 0.1
+    model = HWTree(sigma, a)
+
+    v = bond_option.value(settlement_date, discount_curve, model)
+
+    assert round(v, 4) == 2.0443
+
+
+def test_european_put_hw():
+    option_type = OptionTypes.EUROPEAN_PUT
+    strike_price = 100
+
+    bond_option = BondOption(
+        bond, expiry_date, strike_price, face, option_type)
+
+    sigma = 0.01
+    a = 0.1
+    model = HWTree(sigma, a)
+
+    v = bond_option.value(settlement_date, discount_curve, model)
+
+    assert round(v, 4) == 2.2767
+
+
+def test_american_put_hw():
+    option_type = OptionTypes.AMERICAN_PUT
+    strike_price = 100
+
+    bond_option = BondOption(
+        bond, expiry_date, strike_price, face, option_type)
+
+    sigma = 0.02
+    a = 0.1
+    model = HWTree(sigma, a)
+
+    v = bond_option.value(settlement_date, discount_curve, model)
+
+    assert round(v, 4) == 4.7948
