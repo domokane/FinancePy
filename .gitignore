@@ -1,4 +1,5 @@
 # .gitignore
+.python-version
 
 # VISUAL CODE
 .vs
