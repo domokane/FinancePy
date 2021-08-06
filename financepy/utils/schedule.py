@@ -35,7 +35,7 @@ class Schedule:
                  end_of_month_flag: bool = False,  # All flow dates are EOM if True
                  first_date=None,  # First coupon date
                  next_to_last_date=None):  # Penultimate coupon date
-        """ Create FinSchedule object which calculates a sequence of dates
+        """ Create Schedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps. 
 
         If the date gen rule type is FORWARD we get the unadjusted dates by stepping 
