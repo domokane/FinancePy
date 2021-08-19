@@ -17,11 +17,7 @@ from ...utils.FinGlobalTypes import SwapTypes
 ##########################################################################
 
 
-<<<<<<< HEAD:financepy/products/funding/swaps/FinFixedFixedXCcySwap.py
 class FinFixedFixedXCcySwap
-=======
-class IborIborXCcySwap
->>>>>>> ed91bdf6a5ec6bafba2e43c453c92605e2d6d9ac:financepy/products/funding/IborIborXCcySwap.py
     """ Class for managing a cross currency swap contract. This is a contract
     in which a fixed or floating payment leg in one currency is exchanged for a
     series of fixed or floating rates in a second currency. There is an
