@@ -10,38 +10,8 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.global_types import SwapTypes
-"""
-BANNER,BLOOMBERG CITIGROUP FRN EXAMPLE
-HEADER,FIELD,VALUE,
-RESULTS,Discount Margin (bp) = ,103.19847467,
-RESULTS,Full Price = ,97.02662156,
-RESULTS,Last Coupon Date = ,10-MAY-2017,
-RESULTS,Accrued Days = ,71,
-RESULTS,Accrued Amount = ,2336.21555556,
-RESULTS,Dollar Principal = ,967930.00000000,
-RESULTS,Dollar Rate Duration = ,5.11480985,
-RESULTS,Modified Rate Duration = ,0.05271553,
-RESULTS,Macauley Duration = ,0.05300765,
-RESULTS,Convexity = ,0.00005558,
-RESULTS,Dollar Credit Duration = ,401.06359017,
-RESULTS,Modified Credit Duration = ,4.13354174,
 
-BANNER,BLOOMBERG CITIGROUP FRN EXAMPLE II
-HEADER,FIELD,VALUE,
-RESULTS,Discount Margin (bp) = ,123.06229098,
-RESULTS,Full Price = ,93.13148611,
-RESULTS,Last Coupon Date = ,03-FEB-2014,
-RESULTS,Accrued Days = ,55,
-RESULTS,Accrued Amount = ,514.86111111,
-RESULTS,Dollar Principal = ,930800.00000000,
-RESULTS,Dollar Rate Duration = ,31.89582765,
-RESULTS,Modified Rate Duration = ,0.34248168,
-RESULTS,Macauley Duration = ,0.34516609,
-RESULTS,Convexity = ,0.00234587,
-RESULTS,Principal = ,930800.00000000,
-RESULTS,Dollar Credit Duration = ,563.26238203,
-RESULTS,Modified Credit Duration = ,6.04803387,
-"""
+
 def test_bond_frn_1():
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     issue_date = Date(10, 11, 2010)
