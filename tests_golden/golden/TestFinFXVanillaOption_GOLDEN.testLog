@@ -1,4 +1,4 @@
-File Created on:20210714_160827
+File Created on:20210819_164002
 HEADER,value,delta,
 RESULTS,{'v': 0.02512517720225808, 'cash_dom': 25125.17720225808, 'cash_for': 20937.6476685484, 'pips_dom': 0.02512517720225808, 'pips_for': 0.01675011813483872, 'pct_dom': 0.020100141761806464, 'pct_for': 0.0209376476685484, 'not_dom': 1250000.0, 'not_for': 1000000.0, 'ccy_dom': 'USD', 'ccy_for': 'EUR'},{'pips_spot_delta': 0.3314616345790836, 'pips_fwd_delta': 0.34155614418366054, 'pct_spot_delta_prem_adj': 0.31052398691053523, 'pct_fwd_delta_prem_adj': 0.3199808502132836},
 HEADER,value,delta,

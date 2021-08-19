@@ -83,9 +83,15 @@ class EquityVanillaOption():
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != OptionTypes.EUROPEAN_CALL and \
-           option_type != OptionTypes.EUROPEAN_PUT:
-            raise FinError("Unknown Option Type" + str(option_type))
+        if isinstance(option_type, OptionTypes):
+            option_type_value = option_type.value
+        elif isinstance(option_type, list):
+            option_type_value = []
+            for opt in option_type:
+                option_type_value.append(opt.value)
+            option_type_value = np.array(option_type_value)
+
+        self._option_type_value = option_type_value
 
         self._expiry_date = expiry_date
         self._strike_price = strike_price
@@ -102,12 +108,22 @@ class EquityVanillaOption():
                   dividend_curve: DiscountCurve):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
-        if type(valuation_date) == Date:
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if isinstance(self._expiry_date, Date):
             texp = (self._expiry_date - valuation_date) / gDaysInYear
+        elif isinstance(self._expiry_date, list):
+            texp = []
+            for expDate in self._expiry_date:
+                t = (expDate - valuation_date) / gDaysInYear
+            texp.append(t)
+            texp = np.array(texp)
         else:
             texp = valuation_date
 
         self._texp = texp
+
 
         s0 = stock_price
         texp = np.maximum(texp, 1e-10)
@@ -121,7 +137,7 @@ class EquityVanillaOption():
         k = self._strike_price
 
         intrinsic_value = bs_intrinsic(s0, texp, k, r, q,
-                                       self._option_type.value)
+                                       self._option_type_value)
 
         intrinsic_value = intrinsic_value * self._num_options
         return intrinsic_value
@@ -136,8 +152,17 @@ class EquityVanillaOption():
               model: Model):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
-        if type(valuation_date) == Date:
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if isinstance(self._expiry_date, Date):
             texp = (self._expiry_date - valuation_date) / gDaysInYear
+        elif isinstance(self._expiry_date, list):
+            texp = []
+            for expDate in self._expiry_date:
+                t = (expDate - valuation_date) / gDaysInYear
+            texp.append(t)
+            texp = np.array(texp)
         else:
             texp = valuation_date
 
@@ -164,7 +189,7 @@ class EquityVanillaOption():
         if isinstance(model, BlackScholes):
 
             v = model._volatility
-            value = bs_value(s0, texp, k, r, q, v, self._option_type.value)
+            value = bs_value(s0, texp, k, r, q, v, self._option_type_value)
 
         else:
             raise FinError("Unknown Model Type")
@@ -209,7 +234,7 @@ class EquityVanillaOption():
         if isinstance(model, BlackScholes):
 
             v = model._volatility
-            delta = bs_delta(s0, texp, k, r, q, v, self._option_type.value)
+            delta = bs_delta(s0, texp, k, r, q, v, self._option_type_value)
 
         else:
             raise FinError("Unknown Model Type")
@@ -252,7 +277,7 @@ class EquityVanillaOption():
         if isinstance(model, BlackScholes):
 
             v = model._volatility
-            gamma = bs_gamma(s0, texp, k, r, q, v, self._option_type.value)
+            gamma = bs_gamma(s0, texp, k, r, q, v, self._option_type_value)
 
         else:
             raise FinError("Unknown Model Type")
@@ -294,7 +319,7 @@ class EquityVanillaOption():
         if isinstance(model, BlackScholes):
 
             v = model._volatility
-            vega = bs_vega(s0, texp, k, r, q, v, self._option_type.value)
+            vega = bs_vega(s0, texp, k, r, q, v, self._option_type_value)
 
         else:
             raise FinError("Unknown Model Type")
@@ -334,10 +359,8 @@ class EquityVanillaOption():
         k = self._strike_price
 
         if isinstance(model, BlackScholes):
-
             v = model._volatility
-            theta = bs_theta(s0, texp, k, r, q, v, self._option_type.value)
-
+            theta = bs_theta(s0, texp, k, r, q, v, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
 
@@ -376,10 +399,8 @@ class EquityVanillaOption():
         k = self._strike_price
 
         if isinstance(model, BlackScholes):
-
             v = model._volatility
-            rho = bs_rho(s0, texp, k, r, q, v, self._option_type.value)
-
+            rho = bs_rho(s0, texp, k, r, q, v, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
 
@@ -418,10 +439,8 @@ class EquityVanillaOption():
         k = self._strike_price
 
         if isinstance(model, BlackScholes):
-
             v = model._volatility
-            vanna = bs_vanna(s0, texp, k, r, q, v, self._option_type.value)
-
+            vanna = bs_vanna(s0, texp, k, r, q, v, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
 
@@ -454,7 +473,7 @@ class EquityVanillaOption():
         s0 = stock_price
 
         sigma = bs_implied_volatility(s0, texp, k, r, q, price,
-                                      self._option_type.value)
+                                      self._option_type_value)
 
         return sigma
 
@@ -518,7 +537,7 @@ class EquityVanillaOption():
         v = _value_mc_numba_only(stock_price,
                                  texp,
                                  self._strike_price,
-                                 self._option_type.value,
+                                 self._option_type_value,
                                  r,
                                  q,
                                  vol,
@@ -553,7 +572,7 @@ class EquityVanillaOption():
         v = _value_mc_numba_parallel(stock_price,
                                      texp,
                                      self._strike_price,
-                                     self._option_type.value,
+                                     self._option_type_value,
                                      r,
                                      q,
                                      vol,
@@ -590,7 +609,7 @@ class EquityVanillaOption():
         v = _value_mc_numpy_numba(stock_price,
                                   texp,
                                   self._strike_price,
-                                  self._option_type.value,
+                                  self._option_type_value,
                                   r,
                                   q,
                                   vol,
@@ -662,7 +681,7 @@ class EquityVanillaOption():
         v = _value_mc_numba_only(stock_price,
                                  texp,
                                  self._strike_price,
-                                 self._option_type.value,
+                                 self._option_type_value,
                                  r,
                                  q,
                                  vol,
@@ -678,7 +697,7 @@ class EquityVanillaOption():
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("STRIKE PRICE", self._strike_price)
-        s += label_to_string("OPTION TYPE", self._option_type)
+        s += label_to_string("OPTION TYPE VALUE", self._option_type)
         s += label_to_string("NUMBER", self._num_options, "")
         return s
 
