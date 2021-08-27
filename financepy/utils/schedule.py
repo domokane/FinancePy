@@ -32,7 +32,7 @@ class Schedule:
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  adjust_termination_date: bool = True,  # Default is to adjust
-                 end_of_month_flag: bool = False,  # All flow dates are EOM if True
+                 end_of_month: bool = False,  # All flow dates are EOM if True
                  first_date=None,  # First coupon date
                  next_to_last_date=None):  # Penultimate coupon date
         """ Create Schedule object which calculates a sequence of dates
@@ -103,11 +103,11 @@ class Schedule:
 
         self._adjust_termination_date = adjust_termination_date
 
-        if end_of_month_flag is True:
-            self._end_of_month_flag = True
+        if end_of_month is True:
+            self._end_of_month = True
         else:
-            self._end_of_month_flag = False
-
+            self._end_of_month = False
+        
         self._adjusted_dates = None
 
         self._generate()
@@ -144,9 +144,10 @@ class Schedule:
             while next_date > self._effective_date:
 
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.add_months(-num_months)
+                tot_num_months = num_months * (1 + flow_num)
+                next_date = self._termination_date.add_months(-tot_num_months)
 
-                if self._end_of_month_flag is True:
+                if self._end_of_month is True:
                     next_date = next_date.eom()
 
                 flow_num += 1
@@ -181,7 +182,8 @@ class Schedule:
 
             while next_date < self._termination_date:
                 unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.add_months(num_months)
+                tot_num_months = num_months * (flow_num)
+                next_date = self._effective_date.add_months(tot_num_months)
                 flow_num = flow_num + 1
 
             # The effective date is not adjusted as it is given
@@ -242,7 +244,7 @@ class Schedule:
         s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
         s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
         s += label_to_string("ADJUST TERM DATE", self._adjust_termination_date)
-        s += label_to_string("END OF MONTH", self._end_of_month_flag, "")
+        s += label_to_string("END OF MONTH", self._end_of_month, "")
 
         if 1 == 0:
             if len(self._adjusted_dates) > 0:
