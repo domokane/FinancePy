@@ -164,6 +164,39 @@ def test_FinFloatOISLeg():
 
 ###############################################################################
 
+def swapFixedLegMonthEnds():
+    
+    # Written in response to github issue that has been solved
+
+    fixedleg_1 = SwapFixedLeg(effective_date=Date(30,8,2021), 
+                              end_date='2Y',
+                              leg_type=SwapTypes.PAY, 
+                              freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              day_count_type=DayCountTypes.THIRTY_E_360,   
+                              calendar_type=CalendarTypes.UNITED_STATES,
+                              coupon=0.0, 
+                              end_of_month=False)
+    
+    fixedleg_2 = SwapFixedLeg(effective_date=Date(30,8,2021), 
+                              end_date='3Y',
+                              leg_type=SwapTypes.PAY,      
+                              freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              day_count_type=DayCountTypes.THIRTY_E_360,
+                              calendar_type=CalendarTypes.UNITED_STATES,
+                              coupon=0.0,
+                              end_of_month=False)
+    
+    fixedleg_1.generate_payments()
+    fixedleg_2.generate_payments()
+    
+    print("leg_1")
+    fixedleg_1.print_payments()
+    print("leg_2")
+    fixedleg_2.print_payments()
+    
+###############################################################################
+
+# swapFixedLegMonthEnds()
 
 # Ibor Swap
 test_FinFixedIborSwapLeg()
