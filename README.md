@@ -1,6 +1,6 @@
 [![unit test action](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml/badge.svg)](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml)
 
-https://github.com/domokane/FinancePy/blob/master/images/logo.jpg
+![alt text](./images/logo.jpg?raw=true)
 
 # Latest News
 
