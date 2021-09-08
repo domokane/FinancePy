@@ -32,14 +32,19 @@ def test_call_option():
 
 
 def test_greeks():
+
     delta = call_option.delta(valueDate, stockPrice,
                               discountCurve, dividendCurve, model)
+
     vega = call_option.vega(valueDate, stockPrice,
                             discountCurve, dividendCurve, model)
+
     theta = call_option.theta(valueDate, stockPrice,
                               discountCurve, dividendCurve, model)
+
     rho = call_option.rho(valueDate, stockPrice,
                           discountCurve, dividendCurve, model)
+
     assert [round(x, 4) for x in (delta, vega, theta, rho)] == \
         [0.5762, 27.4034, -10.1289, 23.9608]
 
