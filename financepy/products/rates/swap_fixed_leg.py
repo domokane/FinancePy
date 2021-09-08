@@ -83,12 +83,12 @@ class SwapFixedLeg:
 ###############################################################################
 
     def generate_payments(self):
-        # These are generated immediately as they are for the entire
-        # life of the swap. Given a valuation date we can determine
-        # which cash flows are in the future and value the swap
-        # The schedule allows for a specified lag in the payment date
-        # Nothing is paid on the swap effective date and so the first payment
-        # date is the first actual payment date
+        ''' These are generated immediately as they are for the entire
+        life of the swap. Given a valuation date we can determine
+        which cash flows are in the future and value the swap
+        The schedule allows for a specified lag in the payment date
+        Nothing is paid on the swap effective date and so the first payment
+        date is the first actual payment date. '''
 
         schedule = Schedule(self._effective_date,
                             self._termination_date,

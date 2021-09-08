@@ -34,7 +34,8 @@ class SwapFloatLeg:
                  payment_lag: int= 0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 end_of_month:bool = False):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional.  """
@@ -66,6 +67,7 @@ class SwapFloatLeg:
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
         self._date_gen_rule_type = date_gen_rule_type
+        self._end_of_month = end_of_month
 
         self._startAccruedDates = []
         self._endAccruedDates = []
@@ -82,12 +84,15 @@ class SwapFloatLeg:
         """ Generate the floating leg payment dates and accrual factors. The
         coupons cannot be generated yet as we do not have the index curve. """
 
-        scheduleDates = Schedule(self._effective_date,
-                                 self._termination_date,
-                                 self._freq_type,
-                                 self._calendar_type,
-                                 self._bus_day_adjust_type,
-                                 self._date_gen_rule_type)._generate()
+        schedule = Schedule(self._effective_date,
+                            self._termination_date,
+                            self._freq_type,
+                            self._calendar_type,
+                            self._bus_day_adjust_type,
+                            self._date_gen_rule_type, 
+                            end_of_month=self._end_of_month)
+
+        scheduleDates = schedule._adjusted_dates
 
         if len(scheduleDates) < 2:
             raise FinError("Schedule has none or only one date")
