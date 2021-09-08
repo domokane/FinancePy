@@ -220,8 +220,7 @@ def swapFloatLeg():
     
 ###############################################################################
 
-swapFloatLeg()
-
+# swapFloatLeg()
 # swapFixedLegMonthEnds()
 
 # Ibor Swap
