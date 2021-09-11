@@ -1,5 +1,7 @@
 [![unit test action](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml/badge.svg)](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml)
 
+![alt text](./images/logo.jpg?raw=true)
+
 # Latest News
 
 I have just pushed a pep8 version of the library. It will be released as the 0.20 version of financepy very soon. Function names will change. Please see code.
@@ -67,7 +69,7 @@ Contact me at quant@financepy.com.
 
 The underlying Python library is split into a number of major modules:
 
-* Finutils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
+* Utils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
 * Market - These are modules that capture the market information used to value a security. These include interest rate and credit curves, volatility surfaces and prices.
 * Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models.
 * Products - These are the actual securities and range from Government bonds to Bermudan swaptions.

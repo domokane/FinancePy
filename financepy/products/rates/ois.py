@@ -185,7 +185,8 @@ class OIS:
 
         dfT = oisCurve.df(self._maturity_date)
         floatLegPV = (df0 - dfT) 
-        floatLegPV /= self._fixed_leg._notional
+# Removed the next line as it seems unneccesary
+#        floatLegPV /= self._fixed_leg._notional
         cpn = floatLegPV / pv01           
         return cpn
 
