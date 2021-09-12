@@ -68,7 +68,7 @@ def test_nelson_siegel_svensson():
     assert round(fittedCurve._curveFit._beta2, 4) == -0.0433
     assert round(fittedCurve._curveFit._beta3, 4) == -0.0523
     assert round(fittedCurve._curveFit._beta4, 4) == -0.0376
-    assert round(fittedCurve._curveFit._tau1, 4) == 3.1775
+    assert round(fittedCurve._curveFit._tau1, 3) == 3.177
     assert round(fittedCurve._curveFit._tau2, 4) == 100.0000
 
 def test_interpolated_yield():
