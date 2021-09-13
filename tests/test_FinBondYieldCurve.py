@@ -55,10 +55,10 @@ def test_nelson_siegel():
     curveFitMethod = CurveFitNelsonSiegel()
     fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    assert round(fittedCurve._curveFit._beta1, 4) == -0.0937
-    assert round(fittedCurve._curveFit._beta2, 4) == 0.0921
-    assert round(fittedCurve._curveFit._beta3, 4) == 0.2588
-    assert round(fittedCurve._curveFit._tau, 4) == 35.7856
+    assert round(fittedCurve._curveFit._beta1, 3) == -0.094
+    assert round(fittedCurve._curveFit._beta2, 3) == 0.092
+    assert round(fittedCurve._curveFit._beta3, 3) == 0.259
+    assert round(fittedCurve._curveFit._tau, 3) == 35.786
 
 def test_nelson_siegel_svensson():
     curveFitMethod = CurveFitNelsonSiegelSvensson()
