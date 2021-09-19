@@ -378,3 +378,37 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
         issuer_curves.append(issuer_curve)
 
     return issuer_curves
+
+
+def loadHomogeneousCDSCurves(valuation_date,
+                             libor_curve,
+                             cdsSpread3Y,
+                             cdsSpread5Y,
+                             cdsSpread7Y,
+                             cdsSpread10Y,
+                             num_credits):
+
+    maturity3Y = valuation_date.next_cds_date(36)
+    maturity5Y = valuation_date.next_cds_date(60)
+    maturity7Y = valuation_date.next_cds_date(84)
+    maturity10Y = valuation_date.next_cds_date(120)
+
+    recovery_rate = 0.40
+
+    cds3Y = CDS(valuation_date, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(valuation_date, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(valuation_date, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(valuation_date, maturity10Y, cdsSpread10Y)
+
+    contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
+
+    issuer_curve = CDSCurve(valuation_date,
+                            contracts,
+                            libor_curve,
+                            recovery_rate)
+
+    issuer_curves = []
+    for _ in range(0, num_credits):
+        issuer_curves.append(issuer_curve)
+
+    return issuer_curves
