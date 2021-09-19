@@ -103,6 +103,24 @@ def buildIssuerCurve(tradeDate, libor_curve):
     return issuer_curve
 
 
+def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
+
+    valuation_date = tradeDate.add_days(1)
+
+    cdsMarketContracts = []
+
+    maturity_date = Date(29, 6, 2010)
+    cds = CDS(valuation_date, maturity_date, spread)
+    cdsMarketContracts.append(cds)
+
+    issuer_curve = CDSCurve(valuation_date,
+                            cdsMarketContracts,
+                            libor_curve,
+                            recovery_rate)
+
+    return issuer_curve
+
+
 def loadHomogeneousSpreadCurves(valuation_date,
                                 libor_curve,
                                 cdsSpread3Y,
