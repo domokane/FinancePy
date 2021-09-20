@@ -83,7 +83,7 @@ class IborLMMProducts():
 
         self._gridTimes = [0.0]
 
-        for swap_start_date in self._gridDates[1:]:
+        for next_dt in self._gridDates[1:]:
             tau = basis.year_frac(prev_dt, next_dt)[0]
             t = (next_dt - self._gridDates[0]) / gDaysInYear
             self._accrual_factors.append(tau)

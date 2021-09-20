@@ -12,7 +12,6 @@ from numba import jit, njit, float64, int64
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
 from ...utils.math import heaviside
-from ...utils.helpers import label_to_string
 
 ###############################################################################
 

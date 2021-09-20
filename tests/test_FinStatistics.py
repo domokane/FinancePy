@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.utils.stats import mean, stdev, stderr, var, moment, correlation
+from financepy.utils.stats import mean, stdev, correlation
 import numpy as np
 seed = 1972
 np.random.seed(seed)

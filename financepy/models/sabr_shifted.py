@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-from numba import njit, float64
+from numba import njit
 from scipy.optimize import minimize
 
 from ..utils.global_types import OptionTypes

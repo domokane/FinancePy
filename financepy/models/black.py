@@ -6,7 +6,7 @@
 # TODO Fix this
 
 import numpy as np
-from numba import njit, float64, float64
+from numba import njit, float64
 
 from ..utils.math import n_vect, n_prime_vect
 from ..utils.global_vars import gSmall
