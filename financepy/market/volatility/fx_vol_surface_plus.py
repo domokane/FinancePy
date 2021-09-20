@@ -28,8 +28,6 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_one
 from ...models.sabr import vol_function_sabr_beta_half
 
-from ...models.volatility_fns import VolFunctionTypes
-
 from ...utils.math import norminvcdf
 
 from ...models.black_scholes_analytic import bs_value

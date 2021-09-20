@@ -10,7 +10,6 @@ from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
-from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
 import sys
