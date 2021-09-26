@@ -686,6 +686,7 @@ class Date():
         newDates = []
 
         for tenStr in tenor:
+
             tenStr = tenStr.upper()
             DAYS = 1
             WEEKS = 2
@@ -727,6 +728,13 @@ class Date():
             elif periodType == MONTHS:
                 for _ in range(0, num_periods):
                     newDate = newDate.add_months(1)
+
+                # in case we landed on a 28th Feb and lost the month day we add this logic    
+                y = newDate._y
+                m = newDate._m
+                d = min(self._d, newDate.eom()._d)
+                newDate = Date(d, m, y)
+
             elif periodType == YEARS:
                 for _ in range(0, num_periods):
                     newDate = newDate.add_months(12)
@@ -962,3 +970,4 @@ def test_type():
     print("TEST TYPE", gDateFormatType)
 
 ###############################################################################
+

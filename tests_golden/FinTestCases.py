@@ -309,20 +309,37 @@ class FinTestCases():
 
         for colNum in range(0, numCols):
 
-            if compareFields[colNum] != goldenFields[colNum]:
+            if len(self._headerFields) <= colNum:
+                 self.printLog("ERROR: Mismatch in headers. Rerun!")
+                 return (0, numErrors)
 
-                if len(self._headerFields) <= colNum:
-                    self.printLog("ERROR: Mismatch in headers. Rerun GOLDEN!")
-                    return (0, numErrors)
+            timeColumn = False
+            if self._headerFields[colNum] == "TIME":
+                timeColumn = True
 
-                if self._headerFields[colNum] == "TIME":
-                    time1 = float(goldenFields[colNum])
+            compareField = compareFields[colNum]
+            goldenField = goldenFields[colNum]
+            
+            if compareField != goldenField:
+
+                # Only reject with tolerance of 1e-8 - OK for finance!
+                tol = 1e-4
+                compareFlag = compareField.replace(".","").isnumeric()
+                goldenFlag = goldenField.replace(".","").isnumeric()
+                
+                if compareFlag is True and goldenFlag is True\
+                    and timeColumn is False:
+                   
+                    compareValue = float(compareField)
+                    goldenValue = float(goldenField)
+                    err = compareValue - goldenValue
                     
-#                    if isinstance(compareFields[colNum], str):
-#                        self.printLog("Row# ", rowNum,
-#                              " WARNING: The field in the new log is not a time")
-                        
-
+                    if abs(err) > tol:
+                        numErrors += 1
+#                        print("OK:", compareValue, goldenValue, numErrors)
+                    
+                if timeColumn is True:
+                    time1 = float(goldenFields[colNum])
                     time2 = float(compareFields[colNum])
                     change = (time2 / abs(time1 + 1e-10) - 1.0) * 100.0
 
@@ -332,8 +349,6 @@ class FinTestCases():
                               % change, " percent.")
 
                     numWarnings += 1
-                else:
-                    numErrors += 1
 
         return (numWarnings, numErrors)
 

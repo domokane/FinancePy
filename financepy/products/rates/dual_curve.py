@@ -274,7 +274,12 @@ class IborDualCurve(DiscountCurve):
         self._usedDeposits = ibor_deposits
         self._usedFRAs = ibor_fras
         self._usedSwaps = ibor_swaps
-        self._day_count_type = None
+        
+        # Need the floating leg basis for the curve
+        if len(self._usedSwaps) > 0:
+            self._day_count_type = ibor_swaps[0]._float_leg._day_count_type
+        else:
+            self._day_count_type = None
 
 ###############################################################################
 

@@ -17,7 +17,7 @@ from .black_scholes_analytic import bs_value
 ###############################################################################
 
 @njit(float64[:](float64, float64, float64, float64, float64[:], 
-                 float64[:]), cache=True)
+                 float64[:]), cache=True, fastmath=True)
 def option_implied_dbn(s, t, r, q, strikes, sigmas):
     """ This function calculates the option smile/skew-implied probability
     density function times the interval width. """

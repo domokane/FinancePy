@@ -3,7 +3,7 @@
 ###############################################################################
 
 
-from math import exp, sqrt, fabs, log
+# from math import exp, sqrt, fabs, log
 from numba import njit, boolean, int64, float64, vectorize
 import numpy as np
 from .error import FinError
@@ -284,7 +284,7 @@ def N(x):
     a5 = 1.330274429
     g = 0.2316419
 
-    k = 1.0 / (1.0 + g * fabs(x))
+    k = 1.0 / (1.0 + g * np.abs(x))
     k2 = k * k
     k3 = k2 * k
     k4 = k3 * k
@@ -292,7 +292,7 @@ def N(x):
 
     if x >= 0.0:
         c = (a1 * k + a2 * k2 + a3 * k3 + a4 * k4 + a5 * k5)
-        phi = 1.0 - c * exp(-x*x/2.0) * INVROOT2PI
+        phi = 1.0 - c * np.exp(-x*x/2.0) * INVROOT2PI
     else:
         phi = 1.0 - N(-x)
 
@@ -325,16 +325,16 @@ def normcdf_integrate(x: float):
     InvRoot2Pi = 0.3989422804014327
 
     x = lower
-    fx = exp(-x * x / 2.0)
+    fx = np.exp(-x * x / 2.0)
     integral = fx / 2.0
 
     for _ in range(0, num_steps - 1):
         x = x + dx
-        fx = exp(-x * x / 2.0)
+        fx = np.exp(-x * x / 2.0)
         integral += fx
 
     x = x + dx
-    fx = exp(-x * x / 2.0)
+    fx = np.exp(-x * x / 2.0)
     integral += fx / 2.0
     integral *= InvRoot2Pi * dx
     return integral
@@ -393,7 +393,7 @@ def normcdf_slow(z: float):
             b = bm
             bm = t * b - bp + a[24 - i]
 
-        p = exp(-xa * xa) * (bm - bp) / 4
+        p = np.exp(-xa * xa) * (bm - bp) / 4
 
     if z > 0:
         p = 1.0 - p
@@ -453,8 +453,8 @@ def phi3(b1: float,
     dx = (upperlimit - lowerLimit) / num_points
     x = lowerLimit
 
-    r12p = sqrt(1.0 - r12 * r12)
-    r13p = sqrt(1.0 - r13 * r13)
+    r12p = np.sqrt(1.0 - r12 * r12)
+    r13p = np.sqrt(1.0 - r13 * r13)
     r123 = (r23 - r12 * r13) / r12p / r13p
 
     v = 0.0
@@ -522,7 +522,7 @@ def norminvcdf(p):
 
     if p < p_low:
         # Rational approximation for lower region
-        q = sqrt(-2.0 * log(p))
+        q = np.sqrt(-2.0 * np.log(p))
         inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
                     * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
     elif p <= p_high:
@@ -533,7 +533,7 @@ def norminvcdf(p):
             q / (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1.0)
     elif p < 1.0:
         # Rational approximation for upper region
-        q = sqrt(-2.0 * log(1 - p))
+        q = np.sqrt(-2.0 * np.log(1 - p))
         inverseCDF = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
                        * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
 
@@ -575,41 +575,41 @@ def phi2(h1, hk, r):
     h12 = (h1 * h1 + h2 * h2) * 0.5
     bv = 0.0
 
-    if fabs(r) < 0.7 or fabs(h1) > 35 or fabs(h2) > 35:
+    if np.abs(r) < 0.7 or np.abs(h1) > 35 or np.abs(h2) > 35:
 
         h3 = h1 * h2
 
         for i in range(0, 5):
             r1 = r * x[i]
             rr2 = 1.0 - r1 * r1
-            bv = bv + w[i] * exp((r1 * h3 - h12) / rr2) / sqrt(rr2)
+            bv = bv + w[i] * np.exp((r1 * h3 - h12) / rr2) / np.sqrt(rr2)
 
         bv = N(h1) * N(h2) + r * bv
     else:
         r2 = 1.0 - r * r
-        r3 = sqrt(r2)
+        r3 = np.sqrt(r2)
 
         if r < 0.0:
             h2 = -h2
 
         h3 = h1 * h2
-        h7 = exp(-h3 * 0.5)
+        h7 = np.exp(-h3 * 0.5)
 
         if r2 != 0.0:
-            h6 = abs(h1 - h2)
+            h6 = np.abs(h1 - h2)
             h5 = h6 * h6 * 0.5
             h6 = h6 / r3
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
             bv = 0.13298076 * h6 * ab * \
-                 N(-h6) - exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
+                 N(-h6) - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
 
             for i in range(0, 5):
                 r1 = r3 * x[i]
                 rr = r1 * r1
-                r2 = sqrt(1.0 - rr)
-                bv = bv - w[i] * exp(-h5 / rr) * \
-                    (exp(-h3 / (1.0 + r2)) / r2 / h7 - 1.0 - aa * rr)
+                r2 = np.sqrt(1.0 - rr)
+                bv = bv - w[i] * np.exp(-h5 / rr) * \
+                    (np.exp(-h3 / (1.0 + r2)) / r2 / h7 - 1.0 - aa * rr)
 
         if r > 0.0:
             bv = bv * r3 * h7 + N(min(h1, h2))

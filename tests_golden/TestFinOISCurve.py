@@ -132,7 +132,7 @@ def test_OISDepositsFRAsSwaps():
 #                        fixedDCCType)
 #    swaps.append(swap)
 
-    fixed_leg_type = Finfixed_leg_types.PAY
+    fixed_leg_type = SwapTypes.PAY
     maturity_date = settleDt.add_months(36)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
                fixedFreqType,
@@ -395,7 +395,7 @@ def test_derivativePricingExample():
     day_count_type = DayCountTypes.THIRTY_E_360_ISDA
 #    day_count_type = DayCountTypes.ACT_360
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_leg_type = Finfixed_leg_types.PAY
+    fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.0058
     swap = OIS(settleDt, "1Y", fixed_leg_type,
@@ -563,22 +563,21 @@ def test_bloombergPricingExample():
     oisCurve = OISCurve(valuation_date, depos, fras, swaps)
 
 #    swaps[0]._fixed_leg.print_valuation()
-#    swaps[0]._floatLeg.print_valuation()
+#    swaps[0]._float_leg.print_valuation()
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
-    principal = 0.0
 
     testCases.header("VALUATION TO TODAY DATE", " PV")
     testCases.print("VALUE:", swaps[0].value(valuation_date, oisCurve, None))
     testCases.print(
         "FIXED:", -swaps[0]._fixed_leg.value(valuation_date, oisCurve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         valuation_date, oisCurve, None))
 
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     testCases.print("VALUE:", swaps[0].value(settleDt, oisCurve, None))
     testCases.print("FIXED:", -swaps[0]._fixed_leg.value(settleDt, oisCurve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         settleDt, oisCurve, None))
 
     # swaps[0].print_fixed_leg_pv()

@@ -2,7 +2,7 @@
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
 ###############################################################################
 
-from numba import njit
+from numba import njit, jit
 import numpy as np
 import operator
 
@@ -34,10 +34,10 @@ def _results(r):
 # DO NOT TOUCH THIS FUNCTION AS IT IS USED IN FX VOL CALIBRATION !!!!!!!!!
 # IT NEEDS TO PASS IN ARGS AS A TUPLE AS ONE OF THE ARGS IS AN NDARRAY
 ###############################################################################
+# UNABLE TO NJIT THIS DUE TO ERROR
 
-@njit(fastmath=True, cache=True)
-def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
-                  disp=True):
+@jit(fastmath=True, cache=True, forceobj=True)
+def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     """
     Find a zero from the secant method using the jitted version of
     Scipy's secant method.
