@@ -7,6 +7,7 @@ from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.credit.cds_curve import CDSCurve
+from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -412,3 +413,226 @@ def loadHomogeneousCDSCurves(valuation_date,
         issuer_curves.append(issuer_curve)
 
     return issuer_curves
+
+
+def buildIborSingleCurve(valuation_date):
+
+    settlement_date = valuation_date.add_days(2)
+    dcType = DayCountTypes.ACT_360
+
+    depos = []
+    fras = []
+    swaps = []
+
+    maturity_date = settlement_date.add_months(1)
+    depo1 = IborDeposit(valuation_date, maturity_date, -0.00251, dcType)
+    depos.append(depo1)
+
+    # Series of 1M futures
+    start_date = settlement_date.next_imm_date()
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.0023, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00234, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00225, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00226, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00219, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00213, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00186, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00189, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00175, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00143, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00126, dcType)
+    fras.append(fra)
+
+    start_date = start_date.add_months(1)
+    end_date = start_date.add_months(1)
+    fra = IborFRA(start_date, end_date, -0.00126, dcType)
+    fras.append(fra)
+
+    ###########################################################################
+    ###########################################################################
+    ###########################################################################
+    ###########################################################################
+
+    fixedFreq = FrequencyTypes.ANNUAL
+    dcType = DayCountTypes.THIRTY_E_360
+    fixed_leg_type = SwapTypes.PAY
+
+    #######################################
+    maturity_date = settlement_date.add_months(24)
+    swap_rate = -0.001506
+    swap1 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap1)
+
+    #######################################
+    maturity_date = settlement_date.add_months(36)
+    swap_rate = -0.000185
+    swap2 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap2)
+
+    #######################################
+    maturity_date = settlement_date.add_months(48)
+    swap_rate = 0.001358
+    swap3 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap3)
+
+    #######################################
+    maturity_date = settlement_date.add_months(60)
+    swap_rate = 0.0027652
+    swap4 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap4)
+
+    #######################################
+    maturity_date = settlement_date.add_months(72)
+    swap_rate = 0.0041539
+    swap5 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap5)
+
+    #######################################
+    maturity_date = settlement_date.add_months(84)
+    swap_rate = 0.0054604
+    swap6 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap6)
+
+    #######################################
+    maturity_date = settlement_date.add_months(96)
+    swap_rate = 0.006674
+    swap7 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap7)
+
+    #######################################
+    maturity_date = settlement_date.add_months(108)
+    swap_rate = 0.007826
+    swap8 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap8)
+
+    #######################################
+    maturity_date = settlement_date.add_months(120)
+    swap_rate = 0.008821
+    swap9 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                     swap_rate, fixedFreq, dcType)
+    swaps.append(swap9)
+
+    #######################################
+    maturity_date = settlement_date.add_months(132)
+    swap_rate = 0.0097379
+    swap10 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap10)
+
+    #######################################
+    maturity_date = settlement_date.add_months(144)
+    swap_rate = 0.0105406
+    swap11 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap11)
+
+    #######################################
+    maturity_date = settlement_date.add_months(180)
+    swap_rate = 0.0123927
+    swap12 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap12)
+
+    #######################################
+    maturity_date = settlement_date.add_months(240)
+    swap_rate = 0.0139882
+    swap13 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap13)
+
+    #######################################
+    maturity_date = settlement_date.add_months(300)
+    swap_rate = 0.0144972
+    swap14 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap14)
+
+    #######################################
+    maturity_date = settlement_date.add_months(360)
+    swap_rate = 0.0146081
+    swap15 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap15)
+
+    #######################################
+    maturity_date = settlement_date.add_months(420)
+    swap_rate = 0.01461897
+    swap16 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap16)
+
+    #######################################
+    maturity_date = settlement_date.add_months(480)
+    swap_rate = 0.014567455
+    swap17 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap17)
+
+    #######################################
+    maturity_date = settlement_date.add_months(540)
+    swap_rate = 0.0140826
+    swap18 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap18)
+
+    #######################################
+    maturity_date = settlement_date.add_months(600)
+    swap_rate = 0.01436822
+    swap19 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+                      swap_rate, fixedFreq, dcType)
+    swaps.append(swap19)
+
+    ########################################
+
+    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+
+    return libor_curve
