@@ -10,7 +10,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
-from ...utils.helpers import check_argument_types
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
@@ -65,12 +65,12 @@ class OIS:
                  termination_date_or_tenor: (Date, str),  # Date contract ends
                  fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
-                 fixedFreqType: FrequencyTypes,
+                 fixed_freq_type: FrequencyTypes,
                  fixed_day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  payment_lag: int = 0,  # Number of days after period payment occurs
                  float_spread: float = 0.0,
-                 floatFreqType: FrequencyTypes = FrequencyTypes.ANNUAL,
+                 float_freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
                  float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -100,9 +100,9 @@ class OIS:
 
         self._effective_date = effective_date
 
-        floatLegType = SwapTypes.PAY
+        float_leg_type = SwapTypes.PAY
         if fixed_leg_type == SwapTypes.PAY:
-            floatLegType = SwapTypes.RECEIVE
+            float_leg_type = SwapTypes.RECEIVE
 
         principal = 0.0
 
@@ -110,7 +110,7 @@ class OIS:
                                        self._termination_date,
                                        fixed_leg_type,
                                        fixed_coupon,
-                                       fixedFreqType,
+                                       fixed_freq_type,
                                        fixed_day_count_type,
                                        notional,
                                        principal,
@@ -119,11 +119,11 @@ class OIS:
                                        bus_day_adjust_type,
                                        date_gen_rule_type)
 
-        self._floatLeg = SwapFloatLeg(effective_date,
+        self._float_leg = SwapFloatLeg(effective_date,
                                       self._termination_date,
-                                      floatLegType,
+                                      float_leg_type,
                                       float_spread,
-                                      floatFreqType,
+                                      float_freq_type,
                                       float_day_count_type,
                                       notional,
                                       principal,
@@ -136,18 +136,18 @@ class OIS:
 
     def value(self,
               valuation_date: Date,
-              oisCurve: DiscountCurve,
-              firstFixingRate=None):
+              ois_curve: DiscountCurve,
+              first_fixing_rate=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
 
         fixed_leg_value = self._fixed_leg.value(valuation_date,
-                                             oisCurve)
+                                                ois_curve)
 
-        float_leg_value = self._floatLeg.value(valuation_date,
-                                             oisCurve,
-                                             oisCurve,
-                                             firstFixingRate)
+        float_leg_value = self._float_leg.value(valuation_date,
+                                                ois_curve,
+                                                ois_curve,
+                                                first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
         return value
@@ -157,16 +157,16 @@ class OIS:
     def pv01(self, valuation_date, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
-        pv = self._fixed_leg.value(valuation_date, discount_curve)
-        
-        # Needs to be positive even if it is a payer leg
-        pv = np.abs(pv)
+        pv = self._fixed_leg.value(valuation_date, discount_curve)        
         pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
+
+        # Needs to be positive even if it is a payer leg and/or coupon < 0
+        pv01 = np.abs(pv01)
         return pv01
 
 ##########################################################################
 
-    def swap_rate(self, valuation_date, oisCurve):
+    def swap_rate(self, valuation_date, ois_curve, first_fixing_rate = None):
         """ Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -174,20 +174,14 @@ class OIS:
         factor. If the swap fixed leg has begun then we have a spot
         starting swap. """
 
-        pv01 = self.pv01(valuation_date, oisCurve)
+        pv01 = self.pv01(valuation_date, ois_curve)
 
-        if valuation_date < self._effective_date:
-            df0 = oisCurve.df(self._effective_date)
-        else:
-            df0 = oisCurve.df(valuation_date)
-
-        floatLegPV = 0.0
-
-        dfT = oisCurve.df(self._maturity_date)
-        floatLegPV = (df0 - dfT) 
-# Removed the next line as it seems unneccesary
-#        floatLegPV /= self._fixed_leg._notional
-        cpn = floatLegPV / pv01           
+        float_leg_value = self._float_leg.value(valuation_date,
+                                             ois_curve,
+                                             ois_curve,
+                                             first_fixing_rate)
+        
+        cpn = float_leg_value / pv01           
         return cpn
 
 ###############################################################################
@@ -204,7 +198,7 @@ class OIS:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg.print_valuation()
+        self._float_leg.print_valuation()
 
 ###############################################################################
 
@@ -213,8 +207,7 @@ class OIS:
         the dates and sizes of the promised fixed leg flows. """
 
         self._fixed_leg.print_payments()
-        
-        self._floatLeg.print_payments()
+        self._float_leg.print_payments()
 
 ##########################################################################
 
@@ -222,7 +215,7 @@ class OIS:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._fixed_leg.__repr__()
         s += "\n"
-        s += self._floatLeg.__repr__()
+        s += self._float_leg.__repr__()
         return s
 
 ###############################################################################

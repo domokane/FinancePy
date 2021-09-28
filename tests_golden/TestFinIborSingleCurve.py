@@ -740,7 +740,7 @@ def test_bloombergPricingExample(interp_type):
         valuation_date, libor_curve, libor_curve, None))
     testCases.print(
         "FIXED:", -swaps[0]._fixed_leg.value(valuation_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         valuation_date, libor_curve, libor_curve, None))
 
     # Pay fixed so make fixed leg value negative
@@ -749,7 +749,7 @@ def test_bloombergPricingExample(interp_type):
         settlement_date, libor_curve, libor_curve, None))
     testCases.print(
         "FIXED:", -swaps[0]._fixed_leg.value(settlement_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         settlement_date, libor_curve, libor_curve, None))
 
     # swaps[0].print_fixed_leg_pv()

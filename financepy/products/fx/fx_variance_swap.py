@@ -133,7 +133,7 @@ class FinFXVarianceSwap:
         q = - np.log(dq)/tmat
 
         s0 = stock_price
-        g = np.exp(r*tmat)
+        g = np.exp((r-q)*tmat)
         fwd = stock_price * g
 
         # This fixes the centre strike of the replication options

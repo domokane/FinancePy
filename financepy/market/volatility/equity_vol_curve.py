@@ -6,7 +6,6 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.math import test_monotonicity
-from ...utils.helpers import label_to_string
 
 ###############################################################################
 # TODO: This should be deleted and replaced with equity_vol_surface

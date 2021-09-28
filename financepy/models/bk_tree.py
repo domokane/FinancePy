@@ -760,7 +760,7 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
 ###############################################################################
 
 
-@njit(fastmath=True)
+@njit(fastmath=True, cache=True)
 def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     """ Calibrate the tree to a term structure of interest rates. """
 

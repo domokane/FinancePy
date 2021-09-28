@@ -134,7 +134,7 @@ class EquityVarianceSwap:
         q = - log(dq)/tmat
 
         s0 = stock_price
-        g = exp(r*tmat)
+        g = exp((r-q)*tmat)
         fwd = stock_price * g
 
         # This fixes the centre strike of the replication options

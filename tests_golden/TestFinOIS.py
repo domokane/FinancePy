@@ -54,7 +54,8 @@ def test_FinFixedOIS():
 
     valuation_date = effective_date
     marketRate = 0.05
-    oisCurve = DiscountCurveFlat(valuation_date, marketRate,
+    oisCurve = DiscountCurveFlat(valuation_date, 
+                                 marketRate,
                                  FrequencyTypes.ANNUAL)
 
     v = ois.value(effective_date, oisCurve)
@@ -62,7 +63,7 @@ def test_FinFixedOIS():
 #    print(v)
 
 #    ois._fixed_leg.print_valuation()
-#    ois._floatLeg.print_valuation()
+#    ois._float_leg.print_valuation()
 
     testCases.header("LABEL", "VALUE")
     testCases.print("SWAP_VALUE", v)

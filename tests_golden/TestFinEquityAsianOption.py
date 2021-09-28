@@ -2,14 +2,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import time
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+import time
 
 import sys
 sys.path.append("..")

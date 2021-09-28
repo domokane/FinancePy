@@ -96,7 +96,7 @@ class IborSwap:
                                        bus_day_adjust_type,
                                        date_gen_rule_type)
 
-        self._floatLeg = SwapFloatLeg(effective_date,
+        self._float_leg = SwapFloatLeg(effective_date,
                                       self._termination_date,
                                       float_leg_type,
                                       float_spread,
@@ -125,7 +125,7 @@ class IborSwap:
         fixed_leg_value = self._fixed_leg.value(valuation_date,
                                                 discount_curve)
 
-        float_leg_value = self._floatLeg.value(valuation_date,
+        float_leg_value = self._float_leg.value(valuation_date,
                                                discount_curve,
                                                index_curve,
                                                firstFixingRate)
@@ -139,10 +139,9 @@ class IborSwap:
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
         pv = self._fixed_leg.value(valuation_date, discount_curve)
-
-        # Needs to be positive even if it is a payer leg
-        pv = np.abs(pv)
         pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
+        # Needs to be positive even if it is a payer leg
+        pv01 = np.abs(pv01)
         return pv01
 
     ###########################################################################
@@ -177,7 +176,7 @@ class IborSwap:
             df_t = discount_curve.df(self._maturity_date)
             float_leg_pv = (df0 - df_t)
         else:
-            float_leg_pv = self._floatLeg.value(valuation_date,
+            float_leg_pv = self._float_leg.value(valuation_date,
                                                 discount_curve,
                                                 index_curve,
                                                 first_fixing)
@@ -239,7 +238,7 @@ class IborSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg.print_valuation()
+        self._float_leg.print_valuation()
 
     ###########################################################################
 
@@ -248,7 +247,7 @@ class IborSwap:
         the dates and sizes of the promised fixed leg flows. """
 
         self._fixed_leg.print_payments()
-        self._floatLeg.print_payments()
+        self._float_leg.print_payments()
 
     ###########################################################################
 
@@ -257,7 +256,7 @@ class IborSwap:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self._fixed_leg.__repr__()
         s += "\n"
-        s += self._floatLeg.__repr__()
+        s += self._float_leg.__repr__()
         return s
 
     ###########################################################################

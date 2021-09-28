@@ -196,16 +196,16 @@ def swapFixedLegMonthEnds():
 
 ###############################################################################
 
-def swapFloatLeg():
+def test_swapFloatLeg():
     
-    date = Date(1, 9, 2021)
+    effective_date = Date(1, 9, 2021)
     
-    fixedleg_2 = SwapFixedLeg(effective_date=date, end_date='3y',
+    fixedleg_2 = SwapFixedLeg(effective_date, end_date='3y',
     leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
     day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
     coupon=0)
     
-    floatleg_2 = SwapFloatLeg(effective_date=date, end_date='3y',
+    floatleg_2 = SwapFloatLeg(effective_date, end_date='3y',
     leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
     day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
     spread=0)
@@ -213,14 +213,18 @@ def swapFloatLeg():
     fixedleg_2.generate_payments()
     floatleg_2.generate_payment_dates()
     
-    print("leg_2")
-    fixedleg_2.print_payments()
-    print("fleg_2")
-    floatleg_2.print_payments()
+    discount_curve = DiscountCurveFlat(effective_date, 0.05, day_count_type = DayCountTypes.THIRTY_E_360)
+    index_curve = DiscountCurveFlat(effective_date, 0.05, day_count_type=DayCountTypes.ACT_ACT_ISDA)
+
+    floatleg_2.value(effective_date, discount_curve, index_curve)
+    #print("leg_2")
+    #fixedleg_2.print_payments()
+    #print("fleg_2")
+    #floatleg_2.print_payments()
     
 ###############################################################################
 
-# swapFloatLeg()
+test_swapFloatLeg()
 # swapFixedLegMonthEnds()
 
 # Ibor Swap

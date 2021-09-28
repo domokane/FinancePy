@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from numba import njit, float64, int64, prange
+from numba import njit, float64, int64
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 from ..models.sobol import get_gaussian_sobol

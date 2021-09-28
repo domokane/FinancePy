@@ -300,7 +300,12 @@ class OISCurve(DiscountCurve):
         self._usedDeposits = oisDeposits
         self._usedFRAs = oisFRAs
         self._usedSwaps = oisSwaps
-        self._day_count_type = None
+
+       # Need the floating leg basis for the curve
+        if len(self._usedSwaps) > 0:
+            self._day_count_type = oisSwaps[0]._float_leg._day_count_type
+        else:
+            self._day_count_type = None
 
 ###############################################################################
 

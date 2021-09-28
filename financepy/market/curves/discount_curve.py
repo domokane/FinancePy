@@ -77,7 +77,8 @@ class DiscountCurve:
         self._dfs = np.array(self._dfs)
         self._interp_type = interp_type
         self._freq_type = FrequencyTypes.CONTINUOUS
-        self._day_count_type = None  # Not needed for this curve
+        # This needs to be thought about - I just assign an arbitrary value
+        self._day_count_type = DayCountTypes.ACT_ACT_ISDA
         self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
@@ -280,11 +281,13 @@ class DiscountCurve:
     ###############################################################################
 
     def df(self,
-           dt: (list, Date)):
+           dt: (list, Date),
+           day_count = DayCountTypes.ACT_ACT_ISDA):
         """ Function to calculate a discount factor from a date or a
-        vector of dates. """
+        vector of dates. The day count determines how dates get converted to 
+        years. I allow this to default to ACT_ACT_ISDA unless specified. """
 
-        times = times_from_dates(dt, self._valuation_date, self._day_count_type)
+        times = times_from_dates(dt, self._valuation_date, day_count)
         dfs = self._df(times)
 
         if isinstance(dfs, float):

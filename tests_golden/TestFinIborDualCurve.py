@@ -260,7 +260,7 @@ def test_bloombergPricingExample():
         valuation_date, libor_curve, libor_curve, None))
     testCases.print("FIXED:", swaps[0]._fixed_leg.value(
         valuation_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         valuation_date, libor_curve, libor_curve, None))
 
     testCases.banner("======================================================")
@@ -270,7 +270,7 @@ def test_bloombergPricingExample():
         settlement_date, libor_curve, libor_curve, None))
     testCases.print("FIXED:", swaps[0]._fixed_leg.value(
         settlement_date, libor_curve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         settlement_date, libor_curve, libor_curve, None))
     testCases.banner("======================================================")
 
@@ -291,7 +291,7 @@ def test_bloombergPricingExample():
         valuation_date, oisCurve, liborDualCurve, None))
     testCases.print("FIXED:", swaps[0]._fixed_leg.value(
         valuation_date, oisCurve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         valuation_date, oisCurve, libor_curve, None))
 
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
@@ -299,7 +299,7 @@ def test_bloombergPricingExample():
         settlement_date, oisCurve, liborDualCurve, None))
     testCases.print("FIXED:", swaps[0]._fixed_leg.value(
         settlement_date, oisCurve))
-    testCases.print("FLOAT:", swaps[0]._floatLeg.value(
+    testCases.print("FLOAT:", swaps[0]._float_leg.value(
         settlement_date, oisCurve, liborDualCurve, None, ))
 
 #    swaps[0].print_fixed_leg_pv()

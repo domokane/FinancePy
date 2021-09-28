@@ -160,6 +160,9 @@ class SwapFloatLeg:
         numPayments = len(self._payment_dates)
         firstPayment = False
 
+        index_basis = index_curve._day_count_type
+        index_day_counter = DayCount(index_basis)
+
         for iPmnt in range(0, numPayments):
 
             pmntDate = self._payment_dates[iPmnt]
@@ -168,7 +171,10 @@ class SwapFloatLeg:
 
                 startAccruedDt = self._startAccruedDates[iPmnt]
                 endAccruedDt = self._endAccruedDates[iPmnt]
-                alpha = self._year_fracs[iPmnt]
+                pay_alpha = self._year_fracs[iPmnt]
+
+                (index_alpha, num, _) = index_day_counter.year_frac(startAccruedDt,
+                                                              endAccruedDt)
 
                 if firstPayment is False and firstFixingRate is not None:
 
@@ -179,9 +185,9 @@ class SwapFloatLeg:
                     
                     dfStart = index_curve.df(startAccruedDt)
                     dfEnd = index_curve.df(endAccruedDt)
-                    fwd_rate = (dfStart / dfEnd - 1.0) / alpha
+                    fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
 
-                pmntAmount = (fwd_rate + self._spread) * alpha * notional
+                pmntAmount = (fwd_rate + self._spread) * pay_alpha * notional
 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
