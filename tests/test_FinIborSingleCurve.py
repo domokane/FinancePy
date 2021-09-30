@@ -127,7 +127,7 @@ def test_bloombergPricingExample():
         valuation_date, libor_curve, libor_curve, None), 4) == 0.0
     assert round(-swaps[0]._fixed_leg.value(
         valuation_date, libor_curve), 4) == 53707.6667
-    assert round(swaps[0]._floatLeg.value(
+    assert round(swaps[0]._float_leg.value(
         valuation_date, libor_curve, libor_curve, None), 4) == 53707.6667
 
 
@@ -136,5 +136,5 @@ def test_bloombergPricingExample():
         settlement_date, libor_curve, libor_curve, None), 4) == 0.0
     assert round(-swaps[0]._fixed_leg.value(
         settlement_date, libor_curve), 4) == 53714.5507
-    assert round(swaps[0]._floatLeg.value(
+    assert round(swaps[0]._float_leg.value(
         settlement_date, libor_curve, libor_curve, None), 4) == 53714.5507
