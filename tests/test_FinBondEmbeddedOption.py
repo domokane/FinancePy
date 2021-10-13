@@ -69,7 +69,7 @@ def test_matlab_bk():
 
     v = puttableBond_matlab.value(settlement_date_matlab, discount_curve_matlab, model)
 
-    assert round(v['bondwithoption'], 4) == 102.3625
+    assert round(v['bondwithoption'], 4) == 102.3508
     assert round(v['bondpure'], 4) == 102.0746
 
 
@@ -81,7 +81,7 @@ def test_matlab_hw():
 
     v = puttableBond_matlab.value(settlement_date_matlab, discount_curve_matlab, model)
 
-    assert round(v['bondwithoption'], 4) == 102.8835
+    assert round(v['bondwithoption'], 4) == 102.8733
     assert round(v['bondpure'], 4) == 102.0746
 
 
