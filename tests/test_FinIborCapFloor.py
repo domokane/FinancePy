@@ -84,12 +84,12 @@ def test_cap():
     cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
     cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
     cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-    assert round(cvalue1, 4) == 28889.4749
-    assert round(cvalue2, 4) == 28889.4786
-    assert round(cvalue3, 4) == 28889.4749
-    assert round(cvalue4, 4) == 28889.4749
-    assert round(cvalue5, 4) == 82372.5602
-    assert round(cvalue6, 4) == 28889.6059
+    assert round(cvalue1, 4) == 28889.2445
+    assert round(cvalue2, 4) == 28889.2482
+    assert round(cvalue3, 4) == 28889.2445
+    assert round(cvalue4, 4) == 28889.2445
+    assert round(cvalue5, 4) == 82406.6040
+    assert round(cvalue6, 4) == 28889.3760
 
     k = 0.05
     capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
@@ -99,12 +99,12 @@ def test_cap():
     cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
     cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
     cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-    assert round(cvalue1, 4) == 1905.2017
-    assert round(cvalue2, 4) == 2399.3613
-    assert round(cvalue3, 4) == 517.3468
-    assert round(cvalue4, 4) == 570.1663
-    assert round(cvalue5, 4) == 63678.3351
-    assert round(cvalue6, 4) == 1910.2105
+    assert round(cvalue1, 4) == 1904.9614
+    assert round(cvalue2, 4) == 2399.1333
+    assert round(cvalue3, 4) == 516.9324
+    assert round(cvalue4, 4) == 569.7861
+    assert round(cvalue5, 4) == 63709.5424
+    assert round(cvalue6, 4) == 1910.0023
 
     k = 0.08
     capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
@@ -114,12 +114,12 @@ def test_cap():
     cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
     cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
     cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-    assert round(cvalue1, 4) == 3.1029
-    assert round(cvalue2, 4) == 21.3032
+    assert round(cvalue1, 4) == 3.0923
+    assert round(cvalue2, 4) == 21.2585
     assert round(cvalue3, 4) == 0.0023
-    assert round(cvalue4, 4) == 0.0188
-    assert round(cvalue5, 4) == 53619.2435
-    assert round(cvalue6, 4) == 0.1585
+    assert round(cvalue4, 4) == 0.0187
+    assert round(cvalue5, 4) == 53647.5908
+    assert round(cvalue6, 4) == 0.1578
 
 def test_floor():
     capFloorType = FinCapFloorTypes.FLOOR
@@ -136,8 +136,8 @@ def test_floor():
     assert round(cvalue2, 4) == 0.0037
     assert round(cvalue3, 4) == 0.0
     assert round(cvalue4, 4) == 0.0
-    assert round(cvalue5, 4) == 51898.5945
-    assert round(cvalue6, 4) == 0.1310
+    assert round(cvalue5, 4) == 51868.1540
+    assert round(cvalue6, 4) == 0.1316
 
     k = 0.05
     capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
@@ -147,12 +147,12 @@ def test_floor():
     cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
     cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
     cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-    assert round(cvalue1, 4) == 2089.4335
-    assert round(cvalue2, 4) == 2583.5931
-    assert round(cvalue3, 4) == 701.5785
-    assert round(cvalue4, 4) == 754.3981
-    assert round(cvalue5, 4) == 62278.0760
-    assert round(cvalue6, 4) == 2094.4423
+    assert round(cvalue1, 4) == 2089.3995
+    assert round(cvalue2, 4) == 2583.5715
+    assert round(cvalue3, 4) == 701.3705
+    assert round(cvalue4, 4) == 754.2243
+    assert round(cvalue5, 4) == 62244.0904
+    assert round(cvalue6, 4) == 2094.4405
 
     k = 0.08
     capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
@@ -162,9 +162,9 @@ def test_floor():
     cvalue4 = capfloor.value(valuation_date, libor_curve, model4)
     cvalue5 = capfloor.value(valuation_date, libor_curve, model5)
     cvalue6 = capfloor.value(valuation_date, libor_curve, model6)
-    assert round(cvalue1, 4) == 29261.0413
-    assert round(cvalue2, 4) == 29279.2416
-    assert round(cvalue3, 4) == 29257.9407
-    assert round(cvalue4, 4) == 29257.9572
-    assert round(cvalue5, 4) == 81292.6910
-    assert round(cvalue6, 4) == 29258.0969
+    assert round(cvalue1, 4) == 29261.2132
+    assert round(cvalue2, 4) == 29279.3794
+    assert round(cvalue3, 4) == 29258.1231
+    assert round(cvalue4, 4) == 29258.1395
+    assert round(cvalue5, 4) == 81255.1368
+    assert round(cvalue6, 4) == 29258.2786

@@ -66,7 +66,7 @@ def test_LiborSwap():
     libor_curve = buildIborSingleCurve(valuation_date)
     v = swap.value(settlement_date, libor_curve, libor_curve, firstFixing)
 
-    assert round(v, 4) == 392684.3518
+    assert round(v, 4) == 318901.6015
 
 
 def test_dp_example():
@@ -112,4 +112,4 @@ def test_dp_example():
     v = swap.value(valuation_date, curve, curve)
 
     # This is essentially zero
-    assert round(v * 1000, 4) == 5.8536
+    assert round(v * 1000, 4) == 785300.0566

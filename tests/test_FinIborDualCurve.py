@@ -262,13 +262,13 @@ def test_bloombergPricingExample():
     assert round(swaps[0].value(
         valuation_date, oisCurve, liborDualCurve, None), 4) == 0.0
     assert round(swaps[0]._fixed_leg.value(
-        valuation_date, oisCurve), 4) == -55524.5647
+        valuation_date, oisCurve), 4) == -55524.5642
     assert round(swaps[0]._float_leg.value(
-        valuation_date, oisCurve, liborDualCurve, None), 4) == 55524.5647
+        valuation_date, oisCurve, liborDualCurve, None), 4) == 55524.5642
 
     assert round(swaps[0].value(
         settlement_date, oisCurve, liborDualCurve, None), 4) == 0.0
     assert round(swaps[0]._fixed_leg.value(
-        settlement_date, oisCurve), 4) == -55524.5714
+        settlement_date, oisCurve), 4) == -55524.5709
     assert round(swaps[0]._float_leg.value(
-        settlement_date, oisCurve, liborDualCurve, None), 4) == 55524.5714
+        settlement_date, oisCurve, liborDualCurve, None), 4) == 55524.5709
