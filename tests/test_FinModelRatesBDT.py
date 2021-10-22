@@ -67,7 +67,7 @@ def test_BDTExampleTwo():
     curve = DiscountCurve(settlement_date, dates, dfs)
 
     price = bond.clean_price_from_discount_curve(settlement_date, curve)
-    assert round(price, 4) == 99.5087
+    assert round(price, 4) == 99.5420
 
     sigma = 0.20
 
@@ -147,7 +147,7 @@ def test_BDTExampleThree():
                                 coupon_flows,
                                 exercise_type)
 
-    assert round(price, 5) == 100.00236
+    assert round(price, 5) == 100.01832
     assert round(v['pay']*100, 2) == 0.00
     assert round(v['rec']*100, 2) == 8883.21
 
@@ -195,6 +195,6 @@ def test_BDTExampleThree():
                                 coupon_flows,
                                 exercise_type)
 
-    assert round(price, 5) == 100.04782
+    assert round(price, 5) == 100.08625
     assert round(v['pay']*100, 2) == 263.28
     assert round(v['rec']*100, 2) == 7437.00
