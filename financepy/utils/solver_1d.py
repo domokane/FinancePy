@@ -36,7 +36,7 @@ def _results(r):
 ###############################################################################
 # UNABLE TO NJIT THIS DUE TO ERROR
 
-@jit(fastmath=True, cache=True, forceobj=False)
+@njit(fastmath=True, cache=True)
 def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     """
     Find a zero from the secant method using the jitted version of
