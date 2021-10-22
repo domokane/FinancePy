@@ -61,7 +61,7 @@ def test_homogeneous():
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
 
-    assert round(intrinsicSpd, 4) == 23.9776
+    assert round(intrinsicSpd, 4) == 23.9775
 
     method = FinLossDistributionBuilder.RECURSION
     v = tranche1.value_bc(
@@ -73,7 +73,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 582.5017
+    assert round(v[3] * 10000, 4) == 582.5015
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(
@@ -85,7 +85,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 29.9538
+    assert round(v[3] * 10000, 4) == 29.9536
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche5.value_bc(
@@ -109,7 +109,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 39.9628
+    assert round(v[3] * 10000, 4) == 39.9626
 
 
 def test_heterogeneous():
@@ -135,7 +135,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 868.4221
+    assert round(v[3] * 10000, 4) == 868.4220
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(
@@ -147,7 +147,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 173.3474
+    assert round(v[3] * 10000, 4) == 173.3458
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche4.value_bc(
@@ -159,7 +159,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 12.3536
+    assert round(v[3] * 10000, 4) == 12.3538
 
     method = FinLossDistributionBuilder.LHP
     v = tranche6.value_bc(

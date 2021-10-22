@@ -40,8 +40,8 @@ def test_cds_index():
     assert round(spd, 4) == 48.3748
 
     v = cdsIndexContract.value(valuation_date, issuer_curve, cdsRecovery)
-    assert round(v['full_pv'], 4) == 27021.6925
-    assert round(v['clean_pv'], 4) == 32577.2481
+    assert round(v['full_pv'], 4) == 27019.7241
+    assert round(v['clean_pv'], 4) == 32575.2797
 
     p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
     assert round(p, 4) == 99.6742
@@ -54,8 +54,8 @@ def test_cds_index():
 
     prot_pv = cdsIndexContract.protection_leg_pv(
         valuation_date, issuer_curve, cdsRecovery)
-    assert round(prot_pv, 4) == 188172.9971
+    assert round(prot_pv, 4) == 188161.5557
 
     premPV = cdsIndexContract.premium_leg_pv(
         valuation_date, issuer_curve, cdsRecovery)
-    assert round(premPV, 4) == 161151.3045
+    assert round(premPV, 4) == 161141.8315
