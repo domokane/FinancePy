@@ -120,7 +120,7 @@ def test_FinFloatIborLeg():
 
     v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
                            firstFixing)
-    assert round(v, 4) == -2009704.1335
+    assert round(v, 4) == -2009695.8385
 
 
 def test_FinFloatOISLeg():
@@ -158,4 +158,4 @@ def test_FinFloatOISLeg():
 
     v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
                            firstFixing)
-    assert round(v, 4) == -2013264.9465
+    assert round(v, 4) == -2038364.5665

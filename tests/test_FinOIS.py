@@ -48,4 +48,4 @@ def test_FinFixedOIS():
                                  FrequencyTypes.ANNUAL)
 
     v = ois.value(effective_date, oisCurve)
-    assert round(v, 4) == 40784.0037
+    assert round(v, 4) == 43915.6019
