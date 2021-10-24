@@ -55,7 +55,7 @@ def test_FinFXMktVolSurface1(capsys):
                             deltaMethod,
                             vol_functionType)
 
-    fxMarket.check_calibration(verboseCalibration)
+    fxMarket.check_calibration(verboseCalibration, tol=1e-5)
     captured = capsys.readouterr()
     assert captured.out == ""
 
