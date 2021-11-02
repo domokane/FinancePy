@@ -4,7 +4,7 @@
 
 # Latest News
 
-I have just pushed a pep8 version of the library. It will be released as the 0.20 version of financepy very soon. Function names will change. Please see code.
+A new version 0.204 has just been released that can be installed via pip.
 
 # Quick Start Guide
 
