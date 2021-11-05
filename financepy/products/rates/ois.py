@@ -181,7 +181,7 @@ class OIS:
                                              ois_curve,
                                              first_fixing_rate)
         
-        cpn = float_leg_value / pv01           
+        cpn = float_leg_value / pv01 / self._fixed_leg._notional        
         return cpn
 
 ###############################################################################
