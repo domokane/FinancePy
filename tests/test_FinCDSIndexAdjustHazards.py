@@ -105,7 +105,6 @@ def test_performCDSIndexHazardRateAdjustment():
                                                 maturity10Y,
                                                 issuer_curves) * 10000.0
 
-
     assert round(intrinsicSpd3Y, 4) == 19.6789
     assert round(intrinsicSpd5Y, 4) == 35.5393
     assert round(intrinsicSpd7Y, 4) == 49.0120

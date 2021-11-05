@@ -13,6 +13,7 @@ def vol_skew(K, atm_vol, atmK, skew):
     v = atm_vol + skew * (K-atmK)
     return v
 
+
 def test_equity_variance_swap():
     start_date = Date(20, 3, 2018)
     tenor = "3M"

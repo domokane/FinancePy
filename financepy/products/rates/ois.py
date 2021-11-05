@@ -22,11 +22,12 @@ from .swap_float_leg import SwapFloatLeg
 
 from enum import Enum
 
+
 class FinCompoundingTypes(Enum):
-     COMPOUNDED = 1
-     OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
-     AVERAGED = 3
-     AVERAGED_DAILY = 4
+    COMPOUNDED = 1
+    OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
+    AVERAGED = 3
+    AVERAGED_DAILY = 4
 
 
 ###############################################################################
@@ -40,7 +41,7 @@ class OIS:
     NOTE: This class is almost identical to IborSwap but will possibly
     deviate as distinctions between the two become clear to me. If not they 
     will be converged (or inherited) to avoid duplication.
-    
+
     The contract lasts from a start date to a specified maturity date.
     The fixed coupon is the OIS fixed rate for the corresponding tenor which is
     set at contract initiation.
@@ -89,11 +90,12 @@ class OIS:
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(termination_date_or_tenor)
+            self._termination_date = effective_date.add_tenor(
+                termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -120,17 +122,17 @@ class OIS:
                                        date_gen_rule_type)
 
         self._float_leg = SwapFloatLeg(effective_date,
-                                      self._termination_date,
-                                      float_leg_type,
-                                      float_spread,
-                                      float_freq_type,
-                                      float_day_count_type,
-                                      notional,
-                                      principal,
-                                      payment_lag,
-                                      calendar_type,
-                                      bus_day_adjust_type,
-                                      date_gen_rule_type)
+                                       self._termination_date,
+                                       float_leg_type,
+                                       float_spread,
+                                       float_freq_type,
+                                       float_day_count_type,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
 ###############################################################################
 
@@ -151,13 +153,13 @@ class OIS:
 
         value = fixed_leg_value + float_leg_value
         return value
-            
+
 ##########################################################################
 
     def pv01(self, valuation_date, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
-        pv = self._fixed_leg.value(valuation_date, discount_curve)        
+        pv = self._fixed_leg.value(valuation_date, discount_curve)
         pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
 
         # Needs to be positive even if it is a payer leg and/or coupon < 0
@@ -166,7 +168,7 @@ class OIS:
 
 ##########################################################################
 
-    def swap_rate(self, valuation_date, ois_curve, first_fixing_rate = None):
+    def swap_rate(self, valuation_date, ois_curve, first_fixing_rate=None):
         """ Calculate the fixed leg coupon that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -177,11 +179,11 @@ class OIS:
         pv01 = self.pv01(valuation_date, ois_curve)
 
         float_leg_value = self._float_leg.value(valuation_date,
-                                             ois_curve,
-                                             ois_curve,
-                                             first_fixing_rate)
-        
-        cpn = float_leg_value / pv01 / self._fixed_leg._notional        
+                                                ois_curve,
+                                                ois_curve,
+                                                first_fixing_rate)
+
+        cpn = float_leg_value / pv01 / self._fixed_leg._notional
         return cpn
 
 ###############################################################################
@@ -226,4 +228,3 @@ class OIS:
         print(self)
 
 ###############################################################################
-

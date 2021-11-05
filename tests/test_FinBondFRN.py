@@ -36,18 +36,18 @@ def test_bond_frn_1():
     settlement_date = Date(21, 7, 2017)
 
     dm = bond.discount_margin(settlement_date,
-                             resetIbor,
-                             current_ibor,
-                             future_ibors,
-                             clean_price)
+                              resetIbor,
+                              current_ibor,
+                              future_ibors,
+                              clean_price)
 
     assert round(dm * 10000, 4) == 103.1985
 
     full_price = bond.full_price_from_dm(settlement_date,
-                                     resetIbor,
-                                     current_ibor,
-                                     future_ibors,
-                                     dm)
+                                         resetIbor,
+                                         current_ibor,
+                                         future_ibors,
+                                         dm)
 
     assert round(full_price, 4) == 97.0266
 
@@ -69,52 +69,53 @@ def test_bond_frn_1():
     assert round(principal, 4) == 967930.0000
 
     duration = bond.dollar_duration(settlement_date,
-                                   resetIbor,
-                                   current_ibor,
-                                   future_ibors,
-                                   dm)
+                                    resetIbor,
+                                    current_ibor,
+                                    future_ibors,
+                                    dm)
 
     assert round(duration, 4) == 5.1148
 
     modified_duration = bond.modified_duration(settlement_date,
-                                                 resetIbor,
-                                                 current_ibor,
-                                                 future_ibors,
-                                                 dm)
+                                               resetIbor,
+                                               current_ibor,
+                                               future_ibors,
+                                               dm)
 
     assert round(modified_duration, 4) == 0.0527
 
     macauley_duration = bond.macauley_duration(settlement_date,
-                                                 resetIbor,
-                                                 current_ibor,
-                                                 future_ibors,
-                                                 dm)
+                                               resetIbor,
+                                               current_ibor,
+                                               future_ibors,
+                                               dm)
 
     assert round(macauley_duration, 4) == 0.0530
 
     convexity = bond.convexity_from_dm(settlement_date,
-                                     resetIbor,
-                                     current_ibor,
-                                     future_ibors,
-                                     dm)
+                                       resetIbor,
+                                       current_ibor,
+                                       future_ibors,
+                                       dm)
 
     assert round(convexity, 8) == 0.00005558
 
     duration = bond.dollar_credit_duration(settlement_date,
-                                         resetIbor,
-                                         current_ibor,
-                                         future_ibors,
-                                         dm)
+                                           resetIbor,
+                                           current_ibor,
+                                           future_ibors,
+                                           dm)
 
     assert round(duration, 4) == 401.0636
 
     modified_duration = bond.modified_credit_duration(settlement_date,
-                                                   resetIbor,
-                                                   current_ibor,
-                                                   future_ibors,
-                                                   dm)
+                                                      resetIbor,
+                                                      current_ibor,
+                                                      future_ibors,
+                                                      dm)
 
     assert round(modified_duration, 4) == 4.1335
+
 
 def test_bond_frn_2():
     # https://ebrary.net/14293/economics/actual_floater
@@ -139,18 +140,18 @@ def test_bond_frn_2():
     future_ibors = 0.03295
 
     dm = bond.discount_margin(settlement_date,
-                             resetIbor,
-                             current_ibor,
-                             future_ibors,
-                             clean_price)
+                              resetIbor,
+                              current_ibor,
+                              future_ibors,
+                              clean_price)
 
     assert round(dm * 10000, 4) == 123.0623
-    
+
     full_price = bond.full_price_from_dm(settlement_date,
-                                     resetIbor,
-                                     current_ibor,
-                                     future_ibors,
-                                     dm)
+                                         resetIbor,
+                                         current_ibor,
+                                         future_ibors,
+                                         dm)
 
     assert round(full_price, 4) == 93.1315
 
@@ -172,34 +173,34 @@ def test_bond_frn_2():
     assert round(principal, 4) == 930800.0000
 
     duration = bond.dollar_duration(settlement_date,
-                                       resetIbor,
-                                       current_ibor,
-                                       future_ibors,
-                                       dm)
+                                    resetIbor,
+                                    current_ibor,
+                                    future_ibors,
+                                    dm)
 
     assert round(duration, 4) == 31.8958
 
     modified_duration = bond.modified_duration(settlement_date,
-                                                 resetIbor,
-                                                 current_ibor,
-                                                 future_ibors,
-                                                 dm)
+                                               resetIbor,
+                                               current_ibor,
+                                               future_ibors,
+                                               dm)
 
     assert round(modified_duration, 4) == 0.3425
 
     macauley_duration = bond.macauley_duration(settlement_date,
-                                                 resetIbor,
-                                                 current_ibor,
-                                                 future_ibors,
-                                                 dm)
+                                               resetIbor,
+                                               current_ibor,
+                                               future_ibors,
+                                               dm)
 
     assert round(macauley_duration, 4) == 0.3452
 
     convexity = bond.convexity_from_dm(settlement_date,
-                                     resetIbor,
-                                     current_ibor,
-                                     future_ibors,
-                                     dm)
+                                       resetIbor,
+                                       current_ibor,
+                                       future_ibors,
+                                       dm)
 
     assert round(convexity, 4) == 0.0023
 
@@ -212,17 +213,17 @@ def test_bond_frn_2():
     assert round(principal, 4) == 930800.0000
 
     duration = bond.dollar_credit_duration(settlement_date,
-                                         resetIbor,
-                                         current_ibor,
-                                         future_ibors,
-                                         dm)
+                                           resetIbor,
+                                           current_ibor,
+                                           future_ibors,
+                                           dm)
 
     assert round(duration, 4) == 563.2624
 
     modified_duration = bond.modified_credit_duration(settlement_date,
-                                                   resetIbor,
-                                                   current_ibor,
-                                                   future_ibors,
-                                                   dm)
+                                                      resetIbor,
+                                                      current_ibor,
+                                                      future_ibors,
+                                                      dm)
 
     assert round(modified_duration, 4) == 6.0480

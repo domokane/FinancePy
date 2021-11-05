@@ -119,7 +119,7 @@ class FXFloatLookbackOption(FXOption):
                 term = expbt * N(b1)
             else:
                 term = (-(s0 / smax) ** (-w)) * \
-                       N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
+                    N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
 
             v = smax * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
 

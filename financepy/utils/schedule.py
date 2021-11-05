@@ -26,7 +26,8 @@ class Schedule:
 
     def __init__(self,
                  effective_date: Date,  # Also known as the start date
-                 termination_date: Date,  # This is UNADJUSTED (set flag to adjust it)
+                 # This is UNADJUSTED (set flag to adjust it)
+                 termination_date: Date,
                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -107,7 +108,7 @@ class Schedule:
             self._end_of_month = True
         else:
             self._end_of_month = False
-        
+
         self._adjusted_dates = None
 
         self._generate()
@@ -198,8 +199,8 @@ class Schedule:
         if self._adjusted_dates[0] < self._effective_date:
             self._adjusted_dates[0] = self._effective_date
 
-        # The market standard for swaps is not to adjust the termination date 
-        # unless it is specified in the contract. It is standard for CDS. 
+        # The market standard for swaps is not to adjust the termination date
+        # unless it is specified in the contract. It is standard for CDS.
         # We change it if the adjust_termination_date flag is True.
         if self._adjust_termination_date is True:
             self._termination_date = calendar.adjust(self._termination_date,
@@ -254,7 +255,7 @@ class Schedule:
             if len(self._adjusted_dates) > 1:
                 s += "\n"
                 s += label_to_string("FLW", self._adjusted_dates[1:], "",
-                                   listFormat=True)
+                                     listFormat=True)
 
         return s
 

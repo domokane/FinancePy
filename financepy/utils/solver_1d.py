@@ -2,6 +2,7 @@
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
 ###############################################################################
 
+from collections import namedtuple
 from numba import njit, jit
 import numpy as np
 import operator
@@ -18,23 +19,24 @@ _iter = 100
 _xtol = 2e-12
 _rtol = 4*np.finfo(float).eps
 
-from collections import namedtuple
 
 results = namedtuple('results', 'root function_calls iterations converged')
 
 ###############################################################################
 
+
 @njit(cache=True, fastmath=True)
 def _results(r):
     r"""Select from a tuple of(root, funccalls, iterations, flag)"""
     x, funcalls, iterations, flag = r
-    return x# results(x, funcalls, iterations, flag == 0)
+    return x  # results(x, funcalls, iterations, flag == 0)
 
 ###############################################################################
 # DO NOT TOUCH THIS FUNCTION AS IT IS USED IN FX VOL CALIBRATION !!!!!!!!!
 # IT NEEDS TO PASS IN ARGS AS A TUPLE AS ONE OF THE ARGS IS AN NDARRAY
 ###############################################################################
 # UNABLE TO NJIT THIS DUE TO ERROR
+
 
 @njit(fastmath=True, cache=True)
 def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
@@ -87,7 +89,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     status = _ECONVERR
 
     p1 = x0 * (1.0 + eps)
-    
+
     if p1 > 0.0:
         p1 = p1 + eps
     else:
@@ -102,7 +104,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
         p0, p1, q0, q1 = p1, p0, q1, q0
 
     for _ in range(maxiter):
-        
+
         if q1 == q0:
             if p1 != p0:
                 raise FinError("Tolerance reached")
@@ -133,13 +135,15 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
 
 ###############################################################################
 
-#@jit
+# @jit
+
+
 def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
            fprime2=None, x1=None, rtol=0.0, full_output=False, disp=False):
     """
-    
+
     TAKEN FROM SCIPY
-    
+
     Find a zero of a real or complex function using the Newton-Raphson
     (or secant or Halley's) method.
     Find a zero of the function `func` given a nearby starting point `x0`.
@@ -283,7 +287,7 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
     >>> ax.set_ylabel('$x$ where $f(x, a)=0$')
     >>> plt.show()
     """
-    
+
     if tol <= 0.0:
         raise FinError("tol too small")
 
@@ -351,7 +355,7 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
             if q1 == q0:
                 if p1 != p0:
                     if disp:
-                        print("Tolerance reached. Failed to converge after ", 
+                        print("Tolerance reached. Failed to converge after ",
                               str(itr+1), "iterations, value is ", str(p1))
                     return None
                 p = (p1 + p0) / 2.0
@@ -375,6 +379,7 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
     return p
 
 ###############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def brent_max(func, a, b, args, xtol=1e-5, maxiter=500):
@@ -525,7 +530,9 @@ def brent_max(func, a, b, args, xtol=1e-5, maxiter=500):
 
 ###############################################################################
 
-#@jit(fastmath=True, cache=True)
+# @jit(fastmath=True, cache=True)
+
+
 def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
     """ Bisection algorithm. You need to supply root brackets x1 and x2. """
 
@@ -551,12 +558,12 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
 
         xmid = (x1 + x2)/2.0
         fmid = func(xmid, args)
-        
+
         if f1 * fmid < 0:
             x2 = xmid
         else:
             x1 = xmid
-        
+
         if np.abs(fmid) < xtol:
             return xmid
 
@@ -564,10 +571,11 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
     return None
 
 ###############################################################################
-## https://github.com/linesd/minimize/blob/master/optimizer/minimize.py
+# https://github.com/linesd/minimize/blob/master/optimizer/minimize.py
 
-# The function uses conjugate gradients and approximate linesearches based 
+# The function uses conjugate gradients and approximate linesearches based
 # on polynomial interpolation with Wolfe-Powel conditions
+
 
 @njit(cache=True, fastmath=True)
 def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, concise=False):
@@ -656,8 +664,8 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
     while i < abs(length):  # while not finished
         i += (length > 0)  # count iterations
 
-        X0 = X;
-        F0 = f0;
+        X0 = X
+        F0 = f0
         dF0 = df0  # copy current vals
         M = MAX if length > 0 else min(MAX, -length - i)
 
@@ -676,7 +684,8 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
                     f3, df3 = f(X + x3 * s, *list(*fargs))
                     df3 = df3.reshape(-1, 1)
                     if np.isnan(f3) or np.isinf(f3) or np.any(np.isnan(df3) + np.isinf(df3)):
-                        raise Exception('Either nan or inf in function eval or gradients')
+                        raise Exception(
+                            'Either nan or inf in function eval or gradients')
                     success = True
                 except:  # catch any error occuring in f
                     x3 = (x2 + x3) / 2  # bisect and try again
@@ -696,11 +705,15 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
             x2 = x3
             f2 = f3
             d2 = d3  # move point 3 to point 2
-            A = 6 * (f1 - f2) + 3 * (d2 + d1) * (x2 - x1)  # make cubic extrapolation
+            A = 6 * (f1 - f2) + 3 * (d2 + d1) * \
+                (x2 - x1)  # make cubic extrapolation
             B = 3 * (f2 - f1) - (2 * d1 + d2) * (x2 - x1)
-            x3 = x1 - d1 * (x2 - x1) ** 2 / (B + np.sqrt(B * B - A * d1 * (x2 - x1)))  # num. error possible, ok!
+            # num. error possible, ok!
+            x3 = x1 - d1 * (x2 - x1) ** 2 / \
+                (B + np.sqrt(B * B - A * d1 * (x2 - x1)))
 
-            if np.iscomplex(x3) or np.isnan(x3) or np.isinf(x3) or x3 < 0:  # num prob | wrong sign
+            # num prob | wrong sign
+            if np.iscomplex(x3) or np.isnan(x3) or np.isinf(x3) or x3 < 0:
                 x3 = x2 * EXT
             elif x3 > x2 * EXT:
                 x3 = x2 * EXT
@@ -719,16 +732,20 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
                 d2 = d3  # move point 3 to point 2
 
             if f4 > f0:
-                x3 = x2 - (0.5 * d2 * (x4 - x2) ** 2) / (f4 - f2 - d2 * (x4 - x2))  # quadratic interpolation
+                x3 = x2 - (0.5 * d2 * (x4 - x2) ** 2) / (f4 - f2 -
+                                                         d2 * (x4 - x2))  # quadratic interpolation
             else:
-                A = 6 * (f2 - f4) / (x4 - x2) + 3 * (d4 + d2)  # cubic interpolation
+                A = 6 * (f2 - f4) / (x4 - x2) + 3 * \
+                    (d4 + d2)  # cubic interpolation
                 B = 3 * (f4 - f2) - (2 * d2 + d4) * (x4 - x2)
-                x3 = x2 + (np.sqrt(B * B - A * d2 * (x4 - x2) ** 2) - B) / A  # num. error possible, ok!
+                # num. error possible, ok!
+                x3 = x2 + (np.sqrt(B * B - A * d2 * (x4 - x2) ** 2) - B) / A
 
             if np.isnan(x3) or np.isinf(x3):
                 x3 = (x2 + x4) / 2  # if we had a numerical problem then bisect
 
-            x3 = max(min(x3, x4 - INT * (x4 - x2)), x2 + INT * (x4 - x2))  # don't accept too close
+            x3 = max(min(x3, x4 - INT * (x4 - x2)), x2 +
+                     INT * (x4 - x2))  # don't accept too close
             f3, df3 = f(X + x3 * s, *list(fargs))
             df3 = df3.reshape(-1, 1)
 
@@ -748,20 +765,23 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
             Xd.append(X)  # update variables
             if verbose:
                 print('%s %6i;  Value %4.6e\r' % (S, i, f0))
-            s = (df3.T @ df3 - df0.T @ df3) / (df0.T @ df0) * s - df3  # Polack-Ribiere CG direction
+            s = (df3.T @ df3 - df0.T @ df3) / (df0.T @ df0) * \
+                s - df3  # Polack-Ribiere CG direction
             df0 = df3  # swap derivatives
             d3 = d0
             d0 = df0.T @ s
             if d0 > 0:  # new slope must be negative
-                s = -df0.reshape(-1, 1);
+                s = -df0.reshape(-1, 1)
                 d0 = -s.T @ s  # otherwise use steepest direction
-            x3 = x3 * min(RATIO, d3 / (d0 - np.finfo(np.double).tiny))  # slope ratio but max RATIO
+            # slope ratio but max RATIO
+            x3 = x3 * min(RATIO, d3 / (d0 - np.finfo(np.double).tiny))
             ls_failed = False  # this line search did not fail
         else:
             X = X0
             f0 = F0
             df0 = dF0  # restore best point so far
-            if ls_failed or i > abs(length):  # line search failed twice in a row
+            # line search failed twice in a row
+            if ls_failed or i > abs(length):
                 break  # or we ran out of time, so we give up
             s = -df0.reshape(-1, 1)
             d0 = -s.T @ s  # try steepest
@@ -771,7 +791,9 @@ def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, 
     if concise:
         convergence = fX[-1]  # return only the minimum function value
     else:
-        convergence = np.hstack((np.array(fX).reshape(-1, 1), np.array(Xd)[:, :, 0]))  # bundle convergence info
+        # bundle convergence info
+        convergence = np.hstack(
+            (np.array(fX).reshape(-1, 1), np.array(Xd)[:, :, 0]))
 
     Xs = X  # solution
 

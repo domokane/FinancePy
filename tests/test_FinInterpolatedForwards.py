@@ -18,6 +18,7 @@ curve_date = Date(1, 1, 2019)
 tDates = curve_date.add_years(tValues)
 tInterpDates = curve_date.add_years(tInterpValues)
 
+
 def test_FinInterpolatedForwards():
     interp_type = InterpTypes.FLAT_FWD_RATES
     discount_curve = DiscountCurve(
@@ -25,10 +26,10 @@ def test_FinInterpolatedForwards():
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.949, 0.932, 0.916, 0.901, 0.885, 0.869, 0.855,
-        0.840, 0.825, 0.811, 0.792, 0.773, 0.755, 0.737, 0.720, 0.703, 0.687,
-        0.670, 0.654, 0.638, 0.622, 0.607, 0.592, 0.577, 0.563, 0.549, 0.536,
-        0.523, 0.510, 0.497, 0.485, 0.473, 0.461, 0.450, 0.439, 0.428, 0.417,
-        0.407, 0.397, 0.387, 0.378, 0.368, 0.359, 0.350, 0.342, 0.333]
+         0.840, 0.825, 0.811, 0.792, 0.773, 0.755, 0.737, 0.720, 0.703, 0.687,
+         0.670, 0.654, 0.638, 0.622, 0.607, 0.592, 0.577, 0.563, 0.549, 0.536,
+         0.523, 0.510, 0.497, 0.485, 0.473, 0.461, 0.450, 0.439, 0.428, 0.417,
+         0.407, 0.397, 0.387, 0.378, 0.368, 0.359, 0.350, 0.342, 0.333]
 
     interp_type = InterpTypes.LINEAR_FWD_RATES
     discount_curve = DiscountCurve(

@@ -20,8 +20,8 @@ conversion_ratio = 38.4615  # adjust for face
 face = 1000.0
 
 call_dates = [Date(20, 3, 2007),
-                 Date(15, 3, 2012),
-                 Date(15, 3, 2017)]
+              Date(15, 3, 2012),
+              Date(15, 3, 2017)]
 call_price = 1100
 call_prices = np.array([call_price, call_price, call_price])
 
@@ -33,16 +33,16 @@ put_prices = np.array([putPrice, putPrice, putPrice])
 accrualBasis = DayCountTypes.ACT_365F
 
 bond = BondConvertible(maturity_date,
-                              coupon,
-                              freq_type,
-                              start_convert_date,
-                              conversion_ratio,
-                              call_dates,
-                              call_prices,
-                              put_dates,
-                              put_prices,
-                              accrualBasis,
-                              face)
+                       coupon,
+                       freq_type,
+                       start_convert_date,
+                       conversion_ratio,
+                       call_dates,
+                       call_prices,
+                       put_dates,
+                       put_prices,
+                       accrualBasis,
+                       face)
 
 settlement_date = Date(31, 12, 2003)
 stock_price = 28.5
@@ -65,10 +65,11 @@ dividend_dates = [Date(20, 3, 2007),
                   Date(15, 3, 2022)]
 rate = 0.04
 discount_curve = DiscountCurveFlat(settlement_date,
-                                       rate,
-                                       FrequencyTypes.CONTINUOUS)
+                                   rate,
+                                   FrequencyTypes.CONTINUOUS)
 credit_spread = 0.00
 recovery_rate = 0.40
+
 
 def test_calls_or_puts():
     dividend_yields = [0.00] * 16

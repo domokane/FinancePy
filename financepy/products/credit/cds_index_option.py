@@ -237,7 +237,7 @@ class CDSIndexOption:
         for _ in range(0, jmax):
             dx = dx * 0.5
             xmid = rtb + dx
-            fmid = self._calc_obj_func(xmid, valuation_date, sigma, 
+            fmid = self._calc_obj_func(xmid, valuation_date, sigma,
                                        index_coupon,
                                        indexRecovery, libor_curve) - expH
             if fmid <= 0.0:

@@ -128,8 +128,8 @@ class IborLMMProducts():
             start_date = self._gridDates[i-1]
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.fwd_rate(start_date,
-                                            end_date,
-                                            self._float_day_count_type)
+                                               end_date,
+                                               self._float_day_count_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -193,7 +193,7 @@ class IborLMMProducts():
             start_date = self._gridDates[i-1]
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.fwd_rate(start_date, end_date,
-                                            self._float_day_count_type)
+                                               self._float_day_count_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -250,8 +250,8 @@ class IborLMMProducts():
             start_date = self._gridDates[i-1]
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.forward_rate(start_date,
-                                                end_date,
-                                                self._float_day_count_type)
+                                                   end_date,
+                                                   self._float_day_count_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -397,7 +397,8 @@ class IborLMMProducts():
         fwds = self._fwds
         taus = self._accrual_factors
 
-        v = lmm_cap_flr_pricer(numFowards, num_paths, K, fwd0, fwds, taus, isCap)
+        v = lmm_cap_flr_pricer(numFowards, num_paths, K,
+                               fwd0, fwds, taus, isCap)
 
         # Sum the cap/floorlets to get cap/floor value
         v_capFloor = 0.0

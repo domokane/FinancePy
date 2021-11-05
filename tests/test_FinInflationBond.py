@@ -89,9 +89,9 @@ def test_FinInflationBondBBG():
     assert round(clean_price, 4) == 116.6923
 
     principal = bond.inflation_principal(settlement_date,
-                                        ytm,
-                                        refCPIValue,
-                                        YTMCalcType.US_TREASURY)
+                                         ytm,
+                                         refCPIValue,
+                                         YTMCalcType.US_TREASURY)
 
     assert round(principal, 4) == 116.7116
 
@@ -106,7 +106,6 @@ def test_FinInflationBondBBG():
 
     conv = bond.convexity_from_ytm(settlement_date, ytm)
     assert round(conv, 4) == 0.1020
-
 
 
 def test_FinInflationBondStack():

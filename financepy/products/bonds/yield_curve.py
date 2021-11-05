@@ -51,7 +51,8 @@ class BondYieldCurve():
 
         yearsToMaturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_date-settlement_date)/gDaysInYear
+            years_to_maturity = (bond._maturity_date -
+                                 settlement_date)/gDaysInYear
             yearsToMaturities.append(years_to_maturity)
         self._yearsToMaturity = np.array(yearsToMaturities)
 

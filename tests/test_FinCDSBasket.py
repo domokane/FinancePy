@@ -28,7 +28,8 @@ issuer_curves = issuer_curves[0:num_credits]
 
 seed = 1967
 basket = CDSBasket(valuation_date,
-                    basketMaturity)
+                   basketMaturity)
+
 
 def test_inhomogeneous_curve():
     intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
@@ -66,18 +67,18 @@ def test_gaussian_copula():
     corr_matrix = corr_matrix_generator(rho, num_credits)
 
     v1 = basket.value_gaussian_mc(valuation_date,
-                                    ntd,
-                                    issuer_curves,
-                                    corr_matrix,
-                                    libor_curve,
-                                    num_trials,
-                                    seed)
+                                  ntd,
+                                  issuer_curves,
+                                  corr_matrix,
+                                  libor_curve,
+                                  num_trials,
+                                  seed)
 
     v2 = basket.value_1f_gaussian_homo(valuation_date,
-                                        ntd,
-                                        issuer_curves,
-                                        beta_vector,
-                                        libor_curve)
+                                       ntd,
+                                       issuer_curves,
+                                       beta_vector,
+                                       libor_curve)
     assert round(v1[2] * 10000, 4) == 149.9644
     assert round(v2[3] * 10000, 4) == 159.021
 
@@ -88,18 +89,18 @@ def test_gaussian_copula():
     corr_matrix = corr_matrix_generator(rho, num_credits)
 
     v1 = basket.value_gaussian_mc(valuation_date,
-                                    ntd,
-                                    issuer_curves,
-                                    corr_matrix,
-                                    libor_curve,
-                                    num_trials,
-                                    seed)
+                                  ntd,
+                                  issuer_curves,
+                                  corr_matrix,
+                                  libor_curve,
+                                  num_trials,
+                                  seed)
 
     v2 = basket.value_1f_gaussian_homo(valuation_date,
-                                        ntd,
-                                        issuer_curves,
-                                        beta_vector,
-                                        libor_curve)
+                                       ntd,
+                                       issuer_curves,
+                                       beta_vector,
+                                       libor_curve)
     assert round(v1[2] * 10000, 4) == 15.4566
     assert round(v2[3] * 10000, 4) == 16.4308
 
@@ -114,13 +115,13 @@ def test_student_t():
     corr_matrix = corr_matrix_generator(rho, num_credits)
 
     v = basket.value_student_t_mc(valuation_date,
-                                ntd,
-                                issuer_curves,
-                                corr_matrix,
-                                doF,
-                                libor_curve,
-                                num_trials,
-                                seed)
+                                  ntd,
+                                  issuer_curves,
+                                  corr_matrix,
+                                  doF,
+                                  libor_curve,
+                                  num_trials,
+                                  seed)
 
     assert round(v[2] * 10000, 4) == 132.0799
 
@@ -130,12 +131,12 @@ def test_student_t():
     corr_matrix = corr_matrix_generator(rho, num_credits)
 
     v = basket.value_student_t_mc(valuation_date,
-                                ntd,
-                                issuer_curves,
-                                corr_matrix,
-                                doF,
-                                libor_curve,
-                                num_trials,
-                                seed)
+                                  ntd,
+                                  issuer_curves,
+                                  corr_matrix,
+                                  doF,
+                                  libor_curve,
+                                  num_trials,
+                                  seed)
 
     assert round(v[2] * 10000, 4) == 26.2872

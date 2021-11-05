@@ -394,21 +394,23 @@ def test_par_spread():
         issuer_curve1,
         cdsRecovery) * 10000.0
     assert round(spd, 4) == 399.9992
-    
+
     spd = cds_contract2.par_spread(
         valuation_date2,
         issuer_curve2,
         cdsRecovery) * 10000.0
     assert round(spd, 4) == 98.5268
 
+
 def test_value():
     v = cds_contract1.value(valuation_date1, issuer_curve1, cdsRecovery)
     assert round(v['full_pv'], 4) == 168552.827
     assert round(v['clean_pv'], 4) == 170677.827
-    
+
     v = cds_contract2.value(valuation_date2, issuer_curve2, cdsRecovery)
     assert round(v['full_pv'], 4) == -200111.1901
     assert round(v['clean_pv'], 4) == -191777.8568
+
 
 def test_clean_price():
     p = cds_contract1.clean_price(valuation_date1, issuer_curve1, cdsRecovery)
@@ -417,6 +419,7 @@ def test_clean_price():
     p = cds_contract2.clean_price(valuation_date2, issuer_curve2, cdsRecovery)
     assert round(p, 4) == 119.0221
 
+
 def test_accrued_days():
     accrued_days = cds_contract1.accrued_days()
     assert accrued_days == 51.0
@@ -424,12 +427,14 @@ def test_accrued_days():
     accrued_days = cds_contract2.accrued_days()
     assert accrued_days == 60.0
 
+
 def test_accrued_interest():
     accrued_interest = cds_contract1.accrued_interest()
     assert accrued_interest == -2125.0
 
     accrued_interest = cds_contract2.accrued_interest()
     assert round(accrued_interest, 4) == -8333.3333
+
 
 def test_protection_leg_pv():
     prot_pv = cds_contract1.protection_leg_pv(
@@ -440,6 +445,7 @@ def test_protection_leg_pv():
         valuation_date2, issuer_curve2, cdsRecovery)
     assert round(prot_pv, 4) == 47064.832
 
+
 def test_premium_leg_pv():
     premPV = cds_contract1.premium_leg_pv(
         valuation_date1, issuer_curve1, cdsRecovery)
@@ -449,12 +455,13 @@ def test_premium_leg_pv():
         valuation_date2, issuer_curve2, cdsRecovery)
     assert round(premPV, 4) == 247176.0221
 
+
 def test_value_approx():
-    
+
     v_approx = cds_contract1.value_fast_approx(valuation_date1,
-                                              r1,
-                                              mktSpread1,
-                                              cdsRecovery)
+                                               r1,
+                                               mktSpread1,
+                                               cdsRecovery)
     print(valuation_date1, r1, mktSpread1, cdsRecovery)
     assert round(v_approx[0], 4) == 165262.8062
     assert round(v_approx[1], 4) == 167387.8062
@@ -462,14 +469,10 @@ def test_value_approx():
     assert round(v_approx[3], 4) == -71.4881
 
     v_approx = cds_contract2.value_fast_approx(valuation_date2,
-                                              r2,
-                                              mktSpread2,
-                                              cdsRecovery)
+                                               r2,
+                                               mktSpread2,
+                                               cdsRecovery)
     assert round(v_approx[0], 4) == -195853.3675
     assert round(v_approx[1], 4) == -187520.0342
     assert round(v_approx[2], 4) == 534.9973
     assert round(v_approx[3], 4) == 44.6327
-
-
-
-

@@ -36,6 +36,7 @@ face = 100.0
 
 num_time_steps = 100
 
+
 def test_european_call_bk():
     option_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100

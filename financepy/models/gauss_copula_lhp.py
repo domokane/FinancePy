@@ -209,6 +209,7 @@ def lhp_analytical_density(k, p, r, beta):
 
 ###############################################################################
 
+
 """
 @njit(fastmath=True, cache=True)
 def exp_min_lk(k, p, r, n, beta):

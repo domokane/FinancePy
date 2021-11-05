@@ -16,8 +16,9 @@ def test_year_frace_THIRTY_360_BOND():
     day_count_type = DayCountTypes.THIRTY_360_BOND
     day_count = DayCount(day_count_type)
     answer = day_count.year_frac(start, end, end, finFreq)
-    
+
     assert round(answer[0], 4) == 0.3889
+
 
 def test_year_frace_THIRTY_E_360():
     day_count_type = DayCountTypes.THIRTY_E_360
@@ -26,12 +27,14 @@ def test_year_frace_THIRTY_E_360():
 
     assert round(answer[0], 4) == 0.3889
 
+
 def test_year_frace_THIRTY_E_360_ISDA():
     day_count_type = DayCountTypes.THIRTY_E_360_ISDA
     day_count = DayCount(day_count_type)
     answer = day_count.year_frac(start, end, end, finFreq)
 
     assert round(answer[0], 4) == 0.3889
+
 
 def test_year_frace_THIRTY_E_PLUS_360():
     day_count_type = DayCountTypes.THIRTY_E_PLUS_360
@@ -40,12 +43,14 @@ def test_year_frace_THIRTY_E_PLUS_360():
 
     assert round(answer[0], 4) == 0.3889
 
+
 def test_year_frace_ACT_ACT_ISDA():
     day_count_type = DayCountTypes.ACT_ACT_ISDA
     day_count = DayCount(day_count_type)
     answer = day_count.year_frac(start, end, end, finFreq)
 
     assert round(answer[0], 4) == 0.3836
+
 
 def test_year_frace_ACT_ACT_ICMA():
     day_count_type = DayCountTypes.ACT_ACT_ICMA
@@ -54,12 +59,14 @@ def test_year_frace_ACT_ACT_ICMA():
 
     assert round(answer[0], 4) == 1.0000
 
+
 def test_year_frace_ACT_365F():
     day_count_type = DayCountTypes.ACT_365F
     day_count = DayCount(day_count_type)
     answer = day_count.year_frac(start, end, end, finFreq)
 
     assert round(answer[0], 4) == 0.3836
+
 
 def test_year_frace_ACT_360():
     day_count_type = DayCountTypes.ACT_360
@@ -68,12 +75,14 @@ def test_year_frace_ACT_360():
 
     assert round(answer[0], 4) == 0.3889
 
+
 def test_year_frace_ACT_365L():
     day_count_type = DayCountTypes.ACT_365L
     day_count = DayCount(day_count_type)
     answer = day_count.year_frac(start, end, end, finFreq)
 
     assert round(answer[0], 4) == 0.3836
+
 
 def test_year_frace_SIMPLE():
     day_count_type = DayCountTypes.SIMPLE

@@ -17,9 +17,11 @@ from os.path import dirname, join
 
 print("Looking in folder:", dirname(__file__))
 
-notebooks = sorted(glob.glob(join(dirname(__file__), "./products/*/*.ipynb"), recursive=True))
+notebooks = sorted(
+    glob.glob(join(dirname(__file__), "./products/*/*.ipynb"), recursive=True))
 
 ###############################################################################
+
 
 def notebook_run_new(notebook_filepathname):
     """Execute a notebook via nbconvert and collect output.
@@ -34,7 +36,7 @@ def notebook_run_new(notebook_filepathname):
     ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
 
     notebook_filename_out = dirname + "\ERROR_" + filename
- 
+
     try:
         out = ep.preprocess(nb, {'metadata': {'path': "./"}})
     except CellExecutionError:
@@ -51,12 +53,13 @@ def notebook_run_new(notebook_filepathname):
 
 ###############################################################################
 
+
 print("Starting")
 n = 0
 m = len(notebooks)
 print(n, m)
 for notebook in notebooks[n:m+1]:
     dirname, filename = os.path.split(notebook)
-    print("Checking Notebook" , filename, "which is", n+1 , "of", m)
+    print("Checking Notebook", filename, "which is", n+1, "of", m)
     notebook_run_new(notebook)
     n = n + 1

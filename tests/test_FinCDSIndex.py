@@ -28,10 +28,10 @@ long_protection = True
 index_coupon = 0.004
 
 cdsIndexContract = CDS(step_in_date,
-                        maturity_date,
-                        index_coupon,
-                        notional,
-                        long_protection)
+                       maturity_date,
+                       index_coupon,
+                       notional,
+                       long_protection)
 
 
 def test_cds_index():

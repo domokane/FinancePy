@@ -42,7 +42,7 @@ def test_american_put():
 
     value = put_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
-    
+
     assert round(value, 4) == 7.2583
 
 
@@ -52,7 +52,7 @@ def test_european_call():
 
     value = call_option.value(valuation_date, stock_price,
                               discount_curve, dividend_curve, model)
-    
+
     assert round(value, 4) == 8.0345
 
 

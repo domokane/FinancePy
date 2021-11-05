@@ -166,7 +166,8 @@ def bermudan_swaption_tree_fast(texp, tmat,
     ###########################################################################
 
     fixed_legFlows = np.zeros(num_time_steps)
-    float_leg_values = np.ones(num_time_steps)  # Initialise it with ones CHANGE
+    # Initialise it with ones CHANGE
+    float_leg_values = np.ones(num_time_steps)
     num_coupons = len(coupon_times)
 
     # swap fixed leg flows go all the way out to the swap maturity date

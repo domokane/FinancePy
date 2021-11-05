@@ -18,26 +18,28 @@ try:
 except:
     pass
 
+
 def _hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                     exception_only=False, running_compiled_code=False):
     etype, value, _ = sys.exc_info()
     if ipython is not None:
         msg = ipython._showtraceback(etype, value,
-                                 ipython.InteractiveTB.get_exception_only(
-                                     etype, value))
+                                     ipython.InteractiveTB.get_exception_only(
+                                         etype, value))
     else:
         msg = None
     return msg
 
 ##############################################################################
 
+
 def func_name():
     return traceback.extract_stack(None, 2)[0][2]
 
 
 def suppress_traceback():
-#    print(sys.tracebacklimit)
-#    print(ipython.showtrackeback)
+    #    print(sys.tracebacklimit)
+    #    print(ipython.showtrackeback)
 
     sys.tracebacklimit = 0
     ipython.showtraceback = _hide_traceback

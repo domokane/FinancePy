@@ -111,9 +111,9 @@ def test_FinInflationBondBBG():
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
     principal = bond.inflation_principal(settlement_date,
-                                        ytm,
-                                        refCPIValue,
-                                        YTMCalcType.US_TREASURY)
+                                         ytm,
+                                         refCPIValue,
+                                         YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 
@@ -319,9 +319,9 @@ def test_FinInflationBondStack():
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
     principal = bond.inflation_principal(settlement_date,
-                                        ytm,
-                                        refCPIValue,
-                                        YTMCalcType.US_TREASURY)
+                                         ytm,
+                                         refCPIValue,
+                                         YTMCalcType.US_TREASURY)
 
     testCases.print("Inflation Principal = ", principal)
 

@@ -2,6 +2,7 @@
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
 ###############################################################################
 
+from collections import namedtuple
 import numpy as np
 from numba import njit
 
@@ -15,7 +16,6 @@ _iter = 100
 _xtol = 2e-12
 _rtol = 4*np.finfo(float).eps
 
-from collections import namedtuple
 
 results = namedtuple('results', 'root function_calls iterations converged')
 
@@ -25,7 +25,9 @@ results = namedtuple('results', 'root function_calls iterations converged')
 # An alternative optimizer when calibrating FX vol surface, which is faster than CG (although converges less often)
 
 # Numba has issues caching this
-@njit(fastmath=True)#, cache=True)
+
+
+@njit(fastmath=True)  # , cache=True)
 def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                 tol_x=1e-10, max_iter=1000, roh=1., chi=2., v=0.5, sigma=0.5):
     """
@@ -136,7 +138,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
     vertices = _initialize_simplex(x0, bounds)
 
-    #results = _nelder_mead_algorithm(fun, vertices, bounds, args=args,
+    # results = _nelder_mead_algorithm(fun, vertices, bounds, args=args,
     #                                 tol_f=tol_f, tol_x=tol_x,
     #                                 max_iter=max_iter)
 
@@ -227,14 +229,14 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                 shrink = True
                 for i in sort_ind[1:]:
                     vertices[i] = vertices[best_val_idx] + sigma * \
-                                  (vertices[i] - vertices[best_val_idx])
+                        (vertices[i] - vertices[best_val_idx])
                     # f_val[i] = _bounded_fun(fun, bounds, vertices[i], args=args)
                     f_val[i] = fun(vertices[i], *args)
                 sort_ind[1:] = f_val[sort_ind[1:]].argsort() + 1
 
                 x_bar = vertices[best_val_idx] + sigma * \
-                        (x_bar - vertices[best_val_idx]) + \
-                        (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
+                    (x_bar - vertices[best_val_idx]) + \
+                    (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
 
                 LV_ratio *= sigma_n
 
@@ -263,6 +265,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     return vertices[sort_ind[0]]
 
 ###############################################################################
+
 
 @njit(cache=True, fastmath=True)
 def _initialize_simplex(x0, bounds):
@@ -305,6 +308,7 @@ def _initialize_simplex(x0, bounds):
     return vertices
 
 ###############################################################################
+
 
 @njit(cache=True, fastmath=True)
 def _check_params(rho, chi, v, sigma, bounds, n):
@@ -351,6 +355,7 @@ def _check_params(rho, chi, v, sigma, bounds, n):
 
 ###############################################################################
 
+
 @njit(cache=True, fastmath=True)
 def _check_bounds(x, bounds):
     """
@@ -371,7 +376,7 @@ def _check_bounds(x, bounds):
         `True` if `x` is within `bounds`, `False` otherwise.
 
     """
-        
+
     if bounds.shape == (0, 2):
         return True
     else:

@@ -130,7 +130,6 @@ def test_bloombergPricingExample():
     assert round(swaps[0]._float_leg.value(
         valuation_date, libor_curve, libor_curve, None), 4) == 53707.6667
 
-
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(
         settlement_date, libor_curve, libor_curve, None), 4) == 0.0

@@ -41,7 +41,6 @@ def test_european():
     assert round(value, 4) == 4.6039
     assert round(values[0], 4) == 4.5587
 
-
     option_type1 = OptionTypes.EUROPEAN_CALL
     option_type2 = OptionTypes.EUROPEAN_PUT
 
@@ -98,7 +97,6 @@ def test_american():
     assert round(value, 4) == 4.5587
     assert round(values[0], 4) == 4.5587
 
-
     option_type1 = OptionTypes.AMERICAN_CALL
     option_type2 = OptionTypes.AMERICAN_PUT
 
@@ -144,9 +142,9 @@ def test_greeks():
     option_type1 = OptionTypes.EUROPEAN_CALL
     option_type2 = OptionTypes.EUROPEAN_PUT
     cmpdOption = EquityCompoundOption(
-                expiry_date1, option_type1, k1,
-                expiry_date2, option_type2, k2)
-    
+        expiry_date1, option_type1, k1,
+        expiry_date2, option_type2, k2)
+
     delta = cmpdOption.delta(
         valuation_date,
         stock_price,

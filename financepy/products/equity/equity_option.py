@@ -102,7 +102,7 @@ class EquityOption:
 
         vega = (vBumped - v) / bump
         return vega
-    
+
 ##############################################################################
 
     def vanna(self,
@@ -114,18 +114,18 @@ class EquityOption:
         """ Calculation of option vanna by perturbing delta with respect to the
         stock price volatility. """
 
-        delta = self.delta(valuation_date, 
-                           stock_price, 
+        delta = self.delta(valuation_date,
+                           stock_price,
                            discount_curve,
-                           dividend_curve, 
+                           dividend_curve,
                            model)
 
         model = BlackScholes(model._volatility + bump)
 
-        deltaBumped = self.delta(valuation_date, 
-                                 stock_price, 
+        deltaBumped = self.delta(valuation_date,
+                                 stock_price,
                                  discount_curve,
-                                 dividend_curve, 
+                                 dividend_curve,
                                  model)
 
         vanna = (deltaBumped - delta) / bump

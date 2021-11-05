@@ -3,6 +3,7 @@
 ###############################################################################
 
 # THIS IS IN PROGRESS
+from scipy.optimize._differentiable_functions import ScalarFunction
 from numba import njit, boolean, int64, float64, vectorize
 import numpy as np
 
@@ -25,6 +26,7 @@ import numpy as np
 
 Inf = np.inf
 _epsilon = 1e-20
+
 
 def fmin_cg(f, x0, fprime=None, fargs=(), gtol=1e-5, norm=Inf, epsilon=_epsilon,
             maxiter=None, full_output=0, disp=1, retall=0, callback=None):
@@ -181,6 +183,7 @@ def fmin_cg(f, x0, fprime=None, fargs=(), gtol=1e-5, norm=Inf, epsilon=_epsilon,
         else:
             return res['x']
 
+
 def _check_unknown_options(unknown_options):
     if unknown_options:
         msg = ", ".join(map(str, unknown_options.keys()))
@@ -188,9 +191,7 @@ def _check_unknown_options(unknown_options):
         # called from another function in SciPy. Level 4 is the first
         # level in user code.
         print("Unknown solver options")
-        
 
-from scipy.optimize._differentiable_functions import ScalarFunction
 
 def _prepare_scalar_function(fun, x0, jac=None, args=(), bounds=None,
                              epsilon=None, finite_diff_rel_step=None,
@@ -285,6 +286,7 @@ def vecnorm(x, ord=2):
         return np.amin(np.abs(x))
     else:
         return np.sum(np.abs(x)**ord, axis=0)**(1.0 / ord)
+
 
 class OptimizeResult(dict):
     """ Represents the optimization result.
@@ -384,6 +386,7 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
         raise _LineSearchError()
 
     return ret
+
 
 def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
                  gtol=1e-5, norm=Inf, eps=_epsilon, maxiter=None,
@@ -489,9 +492,9 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
 
         try:
             alpha_k, fc, gc, old_fval, old_old_fval, gfkp1 = \
-                     _line_search_wolfe12(f, myfprime, xk, pk, gfk, old_fval,
-                                          old_old_fval, c2=0.4, amin=1e-100, amax=1e100,
-                                          extra_condition=descent_condition)
+                _line_search_wolfe12(f, myfprime, xk, pk, gfk, old_fval,
+                                     old_old_fval, c2=0.4, amin=1e-100, amax=1e100,
+                                     extra_condition=descent_condition)
         except _LineSearchError:
             # Line search failed to find a better solution.
             warnflag = 2
@@ -501,7 +504,8 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
         if alpha_k == cached_step[0]:
             alpha_k, xk, pk, gfk, gnorm = cached_step
         else:
-            alpha_k, xk, pk, gfk, gnorm = polak_ribiere_powell_step(alpha_k, gfkp1)
+            alpha_k, xk, pk, gfk, gnorm = polak_ribiere_powell_step(
+                alpha_k, gfkp1)
 
         if retall:
             allvecs.append(xk)

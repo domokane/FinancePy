@@ -65,7 +65,8 @@ class IborSwap:
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(termination_date_or_tenor)
+            self._termination_date = effective_date.add_tenor(
+                termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
@@ -97,17 +98,17 @@ class IborSwap:
                                        date_gen_rule_type)
 
         self._float_leg = SwapFloatLeg(effective_date,
-                                      self._termination_date,
-                                      float_leg_type,
-                                      float_spread,
-                                      float_freq_type,
-                                      float_day_count_type,
-                                      notional,
-                                      principal,
-                                      payment_lag,
-                                      calendar_type,
-                                      bus_day_adjust_type,
-                                      date_gen_rule_type)
+                                       self._termination_date,
+                                       float_leg_type,
+                                       float_spread,
+                                       float_freq_type,
+                                       float_day_count_type,
+                                       notional,
+                                       principal,
+                                       payment_lag,
+                                       calendar_type,
+                                       bus_day_adjust_type,
+                                       date_gen_rule_type)
 
     ###########################################################################
 
@@ -126,9 +127,9 @@ class IborSwap:
                                                 discount_curve)
 
         float_leg_value = self._float_leg.value(valuation_date,
-                                               discount_curve,
-                                               index_curve,
-                                               firstFixingRate)
+                                                discount_curve,
+                                                index_curve,
+                                                firstFixingRate)
 
         value = fixed_leg_value + float_leg_value
         return value
@@ -177,9 +178,9 @@ class IborSwap:
             float_leg_pv = (df0 - df_t)
         else:
             float_leg_pv = self._float_leg.value(valuation_date,
-                                                discount_curve,
-                                                index_curve,
-                                                first_fixing)
+                                                 discount_curve,
+                                                 index_curve,
+                                                 first_fixing)
 
             float_leg_pv /= self._fixed_leg._notional
 

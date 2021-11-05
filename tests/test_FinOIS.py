@@ -41,7 +41,6 @@ def test_FinFixedOIS():
               floatFreqType,
               floatDayCount)
 
-
     valuation_date = effective_date
     marketRate = 0.05
     oisCurve = DiscountCurveFlat(valuation_date, marketRate,

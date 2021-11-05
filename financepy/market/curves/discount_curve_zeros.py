@@ -70,16 +70,17 @@ class DiscountCurveZeros(DiscountCurve):
         self._zero_rates = np.array(zero_rates)
         self._zero_dates = zero_dates
 
-        self._times = times_from_dates(zero_dates, valuation_date, day_count_type)
+        self._times = times_from_dates(
+            zero_dates, valuation_date, day_count_type)
 
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
         dfs = self._zero_to_df(self._valuation_date,
-                             self._zero_rates,
-                             self._times,
-                             self._freq_type,
-                             self._day_count_type)
+                               self._zero_rates,
+                               self._times,
+                               self._freq_type,
+                               self._day_count_type)
 
         self._dfs = np.array(dfs)
         self._interpolator = Interpolator(self._interp_type)
@@ -118,7 +119,7 @@ class DiscountCurveZeros(DiscountCurve):
         num_points = len(self._times)
         for i in range(0, num_points):
             s += label_to_string("%12s" % self._zero_dates[i],
-                               "%10.7f" % self._zero_rates[i])
+                                 "%10.7f" % self._zero_rates[i])
 
         return s
 
@@ -129,4 +130,3 @@ class DiscountCurveZeros(DiscountCurve):
         print(self)
 
 ###############################################################################
-

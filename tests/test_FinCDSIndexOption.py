@@ -95,7 +95,6 @@ def test_full_priceCDSIndexOption():
         index_curve = CDSCurve(valuation_date, cds_contracts,
                                libor_curve, indexRecovery)
 
-
         indexSpreads = [index / 10000.0] * 4
 
         indexPortfolio = CDSIndexPortfolio()
@@ -107,7 +106,6 @@ def test_full_priceCDSIndexOption():
             indexMaturityDates,
             indexRecovery,
             tolerance)
-
 
         #######################################################################
 
@@ -121,10 +119,10 @@ def test_full_priceCDSIndexOption():
             valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
 
         v_pay_2, v_rec_2 = option.value_adjusted_black(valuation_date,
-                                                        index_curve,
-                                                        indexRecovery,
-                                                        libor_curve,
-                                                        volatility)
+                                                       index_curve,
+                                                       indexRecovery,
+                                                       libor_curve,
+                                                       volatility)
 
         assert round(v_pay_1, 1) == results[0]
         assert round(v_rec_1, 1) == results[1]

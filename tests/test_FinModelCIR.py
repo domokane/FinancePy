@@ -19,17 +19,17 @@ seed = 1968
 
 def test_model_CIR():
     p = zero_price(r0, a, b, sigma, t)
-    p_MC1 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, 
-        CIRNumericalScheme.EULER.value)
-    p_MC2 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, 
-        CIRNumericalScheme.LOGNORMAL.value)
-    p_MC3 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, 
-        CIRNumericalScheme.MILSTEIN.value)
-    p_MC4 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, 
-        CIRNumericalScheme.KAHLJACKEL.value)
-    p_MC5 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, 
-        CIRNumericalScheme.EXACT.value)
-    
+    p_MC1 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed,
+                          CIRNumericalScheme.EULER.value)
+    p_MC2 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed,
+                          CIRNumericalScheme.LOGNORMAL.value)
+    p_MC3 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed,
+                          CIRNumericalScheme.MILSTEIN.value)
+    p_MC4 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed,
+                          CIRNumericalScheme.KAHLJACKEL.value)
+    p_MC5 = zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed,
+                          CIRNumericalScheme.EXACT.value)
+
     assert round(p, 4) == 0.7935
     assert round(p_MC1, 4) == 0.7913
     assert round(p_MC2, 4) == 0.7912

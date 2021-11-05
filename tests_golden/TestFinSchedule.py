@@ -350,13 +350,13 @@ def test_FinScheduleAlignment(eomFlag):
 
 #    print(sched1._adjusted_dates[-1])
 #    print(sched2._adjusted_dates[len(sched1._adjusted_dates)-1])
-    
+
 # THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
 
     compare = (
         sched1._adjusted_dates[-1] == sched2._adjusted_dates[len(sched1._adjusted_dates)-1])
- 
-    
+
+
 #    print(compare, eomFlag)
 #    assert(compare == eomFlag)
 

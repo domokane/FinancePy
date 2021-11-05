@@ -2,14 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from financepy.utils.error import FinError
+from enum import Enum
+import time
+from os.path import join, exists, split
 import sys
 sys.path.append("..")
 
-from os.path import join, exists, split
-import time
-
-from enum import Enum
-from financepy.utils.error import FinError
 
 class FinTestCaseMode(Enum):
     SAVE_TEST_CASES = 1
@@ -139,8 +138,8 @@ class FinTestCases():
 
         else:
 
-#            print("GENERATING NEW OUTPUT FOR MODULE", moduleFilename,
-#                "FOR COMPARISON.")
+            #            print("GENERATING NEW OUTPUT FOR MODULE", moduleFilename,
+            #                "FOR COMPARISON.")
 
             if exists(self._compareFilename) and self._carefulMode:
                 overwrite = input("File " + self._compareFilename +
@@ -234,13 +233,15 @@ class FinTestCases():
             return
 
         if not self._foldersExist:
-            self.printLog("Cannot print as GOLDEN and COMPARE folders do not exist")
+            self.printLog(
+                "Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
         self._headerFields = args
 
         if len(self._headerFields) == 0:
-            self.printLog("ERROR: Number of header fields must be greater than 0")
+            self.printLog(
+                "ERROR: Number of header fields must be greater than 0")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             filename = self._goldenFilename
@@ -290,7 +291,7 @@ class FinTestCases():
 
         if goldenFields[0] != compareFields[0]:
             self.printLog("ERROR: Mismatch in row types HEADER vs RESULT",
-                     goldenFields[0], compareFields[0])
+                          goldenFields[0], compareFields[0])
             numErrors += 1
             return (0, numErrors)
 
@@ -310,8 +311,8 @@ class FinTestCases():
         for colNum in range(0, numCols):
 
             if len(self._headerFields) <= colNum:
-                 self.printLog("ERROR: Mismatch in headers. Rerun!")
-                 return (0, numErrors)
+                self.printLog("ERROR: Mismatch in headers. Rerun!")
+                return (0, numErrors)
 
             timeColumn = False
             if self._headerFields[colNum] == "TIME":
@@ -319,25 +320,25 @@ class FinTestCases():
 
             compareField = compareFields[colNum]
             goldenField = goldenFields[colNum]
-            
+
             if compareField != goldenField:
 
                 # Only reject with tolerance of 1e-8 - OK for finance!
                 tol = 1e-4
-                compareFlag = compareField.replace(".","").isnumeric()
-                goldenFlag = goldenField.replace(".","").isnumeric()
-                
+                compareFlag = compareField.replace(".", "").isnumeric()
+                goldenFlag = goldenField.replace(".", "").isnumeric()
+
                 if compareFlag is True and goldenFlag is True\
-                    and timeColumn is False:
-                   
+                        and timeColumn is False:
+
                     compareValue = float(compareField)
                     goldenValue = float(goldenField)
                     err = compareValue - goldenValue
-                    
+
                     if abs(err) > tol:
                         numErrors += 1
 #                        print("OK:", compareValue, goldenValue, numErrors)
-                    
+
                 if timeColumn is True:
                     time1 = float(goldenFields[colNum])
                     time2 = float(compareFields[colNum])
@@ -345,8 +346,8 @@ class FinTestCases():
 
                     if abs(change) > 20.0:
                         self.printLog("Row# ", rowNum,
-                              " WARNING: Calculation time has changed by %5.2f"
-                              % change, " percent.")
+                                      " WARNING: Calculation time has changed by %5.2f"
+                                      % change, " percent.")
 
                     numWarnings += 1
 
@@ -356,7 +357,7 @@ class FinTestCases():
 
     def compareTestCases(self):
         """ Compare output of COMPARE mode to GOLDEN output """
-        
+
         self.startLog()
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
@@ -368,14 +369,15 @@ class FinTestCases():
             return
 
         self.printLog("EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: " +
-                 self._moduleName)
+                      self._moduleName)
 
         totalNumWarnings = 0
         totalNumErrors = 0
 
         # check golden file exists
         if exists(self._goldenFilename) is False:
-            print("No GOLDEN file exists. You need to change the mode to SAVE_TEST_CASES and then rerun.")
+            print(
+                "No GOLDEN file exists. You need to change the mode to SAVE_TEST_CASES and then rerun.")
             return
 
         # open golden file and load it up
@@ -423,24 +425,27 @@ class FinTestCases():
                     numErrors += 1
                 else:
                     self.printLog("Row# ", rowNum, " HEADER:  ==>",
-                             self._headerFields[0:-1])
+                                  self._headerFields[0:-1])
 
                 self.printLog("Row# ", rowNum, " GOLDEN : ==>", goldenRow[:-2])
-                self.printLog("Row# ", rowNum, " COMPARE: ==>", compareRow[:-2])
+                self.printLog("Row# ", rowNum,
+                              " COMPARE: ==>", compareRow[:-2])
                 self.printLog("")
 
             totalNumWarnings += numWarnings
             totalNumErrors += numErrors
 
         if numGoldenLines == minNumLines and numCompareLines > minNumLines:
-            self.printLog("ERROR:The COMPARE file is longer than the GOLDEN file")
+            self.printLog(
+                "ERROR:The COMPARE file is longer than the GOLDEN file")
 
 #            for rowNum in range(minNumLines,maxNumLines):
 #                numWarnings, numErrors = compareContents[rowNum]
 #                print(rowNum,"COMPARE: ==>",compareRow)
 
         if numCompareLines == minNumLines and numGoldenLines > minNumLines:
-            self.printLog("ERROR:The GOLDEN file is longer than the COMPARE file")
+            self.printLog(
+                "ERROR:The GOLDEN file is longer than the COMPARE file")
 
 #            for rowNum in range(minNumLines,maxNumLines):
 #                numWarnings, numErrors = compareContents[rowNum]
@@ -449,9 +454,9 @@ class FinTestCases():
 #        print("Analysis of", self._moduleName, "completed with",
 #              totalNumErrors, "errors and", totalNumWarnings, "warnings.")
 
-#        print("NUM LINES:", numCompareLines, 
+#        print("NUM LINES:", numCompareLines,
 #              "====>",
-#              "ERRORS:", totalNumErrors, 
+#              "ERRORS:", totalNumErrors,
 #              "WARNINGS:", totalNumWarnings)
 
         self.printLog("Analysis of ", self._moduleName, " completed with ",
@@ -460,7 +465,7 @@ class FinTestCases():
 
         self.printLog("NUM LINES:", numCompareLines,
                       "====>",
-                      "ERRORS:", totalNumErrors, 
+                      "ERRORS:", totalNumErrors,
                       " WARNINGS:", totalNumWarnings)
 
         self._globalNumErrors = totalNumErrors

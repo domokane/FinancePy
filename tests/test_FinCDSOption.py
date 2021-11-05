@@ -22,24 +22,24 @@ def test_cds_option():
 
     strike_result = [
         (100, 3.9975),
-        (150,1.5867),
-        (200,0.0956),
-        (300,0.0)
+        (150, 1.5867),
+        (200, 0.0956),
+        (300, 0.0)
     ]
 
     for strike, result in strike_result:
         cdsOption = CDSOption(expiry_date,
-                                maturity_date,
-                                strike / 10000.0,
-                                notional)
+                              maturity_date,
+                              strike / 10000.0,
+                              notional)
 
         v = cdsOption.value(valuation_date,
                             issuer_curve,
                             volatility)
 
         vol = cdsOption.implied_volatility(valuation_date,
-                                            issuer_curve,
-                                            v)
-        
+                                           issuer_curve,
+                                           v)
+
         assert round(v, 4) == result
         assert vol == 0.3

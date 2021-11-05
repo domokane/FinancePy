@@ -22,10 +22,14 @@ def test_merton():
                           assetGrowthRate,
                           equity_vol)
 
-    assert [round(x, 4) for x in model.debt_value()] == [3.7804, 3.3292, 3.3293, 3.0436, 3.7951]
-    assert [round(x*1e4, 4) for x in model.credit_spread()] == [64.6893, 0.2289, .0009, 1.2398, 25.7203]
-    assert [round(x, 4) for x in model.leverage()] ==  [1.6052, 1.7174, 2.0875, 1.8720, 1.5808]
-    assert [round(x*1e2, 4) for x in model.prob_default()] == [6.3791, .0768, 0.0005, 0.2622, 3.4408]
+    assert [round(x, 4) for x in model.debt_value()] == [
+        3.7804, 3.3292, 3.3293, 3.0436, 3.7951]
+    assert [round(x*1e4, 4) for x in model.credit_spread()
+            ] == [64.6893, 0.2289, .0009, 1.2398, 25.7203]
+    assert [round(x, 4) for x in model.leverage()] == [
+        1.6052, 1.7174, 2.0875, 1.8720, 1.5808]
+    assert [round(x*1e2, 4) for x in model.prob_default()
+            ] == [6.3791, .0768, 0.0005, 0.2622, 3.4408]
 
     assetValue = model._A
     assetVol = model._vA
@@ -37,11 +41,16 @@ def test_merton():
                        assetGrowthRate,
                        assetVol)
 
-    assert [round(x, 4) for x in model.debt_value()] == [3.7804, 3.3292, 3.3293, 3.0436, 3.7951]
-    assert [round(x*1e4, 4) for x in model.credit_spread()] == [64.6893, 0.2289, 0.0009, 1.2398, 25.7203]
-    assert [round(x, 4) for x in model.leverage()] == [1.6052, 1.7174, 2.0875, 1.8720, 1.5808]
-    assert [round(x*1e2, 4) for x in model.prob_default()] == [6.3791, 0.0768, 0.0005, 0.2622, 3.4408]
-    assert [round(x, 4) for x in model.dist_default()] == [1.5237, 3.1679, 4.4298, 2.7916, 1.8196]
+    assert [round(x, 4) for x in model.debt_value()] == [
+        3.7804, 3.3292, 3.3293, 3.0436, 3.7951]
+    assert [round(x*1e4, 4) for x in model.credit_spread()
+            ] == [64.6893, 0.2289, 0.0009, 1.2398, 25.7203]
+    assert [round(x, 4) for x in model.leverage()] == [
+        1.6052, 1.7174, 2.0875, 1.8720, 1.5808]
+    assert [round(x*1e2, 4) for x in model.prob_default()
+            ] == [6.3791, 0.0768, 0.0005, 0.2622, 3.4408]
+    assert [round(x, 4) for x in model.dist_default()] == [
+        1.5237, 3.1679, 4.4298, 2.7916, 1.8196]
 
     assetValue = 140.0
     bondFace = 100.0

@@ -215,7 +215,8 @@ class FXOneTouchOption(EquityOption):
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -228,7 +229,8 @@ class FXOneTouchOption(EquityOption):
             eta = -1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -242,7 +244,8 @@ class FXOneTouchOption(EquityOption):
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -256,7 +259,8 @@ class FXOneTouchOption(EquityOption):
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -271,7 +275,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
+                n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 + B4)
             return v
 
@@ -287,7 +292,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
+                n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 + B4)
             return v
 
@@ -335,7 +341,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
+                n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 - B4)
             return v
 
@@ -351,7 +358,8 @@ class FXOneTouchOption(EquityOption):
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
+                n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 - B4)
             return v
 
@@ -397,14 +405,14 @@ class FXOneTouchOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                stock_price: float,
-                domCurve: DiscountCurve,
-                forCurve: DiscountCurve,
-                model,
-                num_paths: int = 10000,
-                num_steps_per_year: int = 252,
-                seed: int = 4242):
+                 valuation_date: Date,
+                 stock_price: float,
+                 domCurve: DiscountCurve,
+                 forCurve: DiscountCurve,
+                 model,
+                 num_paths: int = 10000,
+                 num_steps_per_year: int = 252,
+                 seed: int = 4242):
         """ Touch Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Accuracy is not great when compared to the analytical
         result as we only observe the barrier a finite number of times. The

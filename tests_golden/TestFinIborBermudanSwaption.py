@@ -168,25 +168,25 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE BK MODEL ========")
@@ -232,25 +232,25 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE BK MODEL ========")
@@ -343,23 +343,23 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE BDT MODEL ========")
@@ -403,23 +403,23 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE BDT MODEL ========")
@@ -512,23 +512,23 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE HW MODEL ========")
@@ -571,23 +571,23 @@ def test_IborBermudanSwaptionBKModel():
     exercise_type = FinExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settlement_date,
-                                                    exercise_date,
-                                                    swapMaturityDate,
-                                                    fixed_leg_type,
-                                                    exercise_type,
-                                                    swapFixedCoupon,
-                                                    swapFixedFrequencyType,
-                                                    swapFixedDayCountType)
+                                                 exercise_date,
+                                                 swapMaturityDate,
+                                                 fixed_leg_type,
+                                                 exercise_type,
+                                                 swapFixedCoupon,
+                                                 swapFixedFrequencyType,
+                                                 swapFixedDayCountType)
 
     testCases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE HW MODEL ========")

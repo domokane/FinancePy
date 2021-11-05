@@ -56,7 +56,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)     
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_fra = fra.value(valuation_date, discount_curve, curve)
     v_fra /= fra._notional
     return v_fra
@@ -108,9 +108,9 @@ class IborDualCurve(DiscountCurve):
 ###############################################################################
 
     def _validate_inputs(self,
-                        ibor_deposits,
-                        ibor_fras,
-                        ibor_swaps):
+                         ibor_deposits,
+                         ibor_fras,
+                         ibor_swaps):
         """ Validate the inputs for each of the Ibor products. """
 
         num_depos = len(ibor_deposits)
@@ -157,7 +157,7 @@ class IborDualCurve(DiscountCurve):
                     raise FinError("Deposits must be in increasing maturity")
                 prev_dt = next_dt
 
-        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
+        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE
         # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
         # if num_depos > 1:
@@ -222,7 +222,8 @@ class IborDualCurve(DiscountCurve):
                 num_flows = len(swapCpnDates)
                 for iFlow in range(0, num_flows):
                     if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
-                        raise FinError("Swap coupons are not on the same date grid.")
+                        raise FinError(
+                            "Swap coupons are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -254,7 +255,7 @@ class IborDualCurve(DiscountCurve):
 
         # If both depos and swaps start after T, we need a rate to get them to
         # the first deposit. So we create a synthetic deposit rate contract.
-        
+
         if swap_start_date > self._valuation_date:
 
             if num_depos == 0:
@@ -274,7 +275,7 @@ class IborDualCurve(DiscountCurve):
         self._usedDeposits = ibor_deposits
         self._usedFRAs = ibor_fras
         self._usedSwaps = ibor_swaps
-        
+
         # Need the floating leg basis for the curve
         if len(self._usedSwaps) > 0:
             self._day_count_type = ibor_swaps[0]._float_leg._day_count_type
@@ -328,7 +329,8 @@ class IborDualCurve(DiscountCurve):
             else:
                 self._times = np.append(self._times, tmat)
                 self._dfs = np.append(self._dfs, dfMat)
-                argtuple = (self._discount_curve, self, self._valuation_date, fra)
+                argtuple = (self._discount_curve, self,
+                            self._valuation_date, fra)
                 dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
                                         args=argtuple, tol=swaptol,
                                         maxiter=50, fprime2=None)
@@ -505,7 +507,7 @@ class IborDualCurve(DiscountCurve):
                 raise FinError("Deposit not repriced.")
 
         for fra in self._usedFRAs:
-            v = fra.value(self._valuation_date, 
+            v = fra.value(self._valuation_date,
                           self._discount_curve, self) / fra._notional
             if abs(v) > fraTol:
                 print("Value", v)
@@ -550,7 +552,7 @@ class IborDualCurve(DiscountCurve):
 
         for i in range(0, num_points):
             s += label_to_string("% 10.6f" % self._times[i],
-                               "%12.10f" % self._dfs[i])
+                                 "%12.10f" % self._dfs[i])
         return s
 
 ###############################################################################

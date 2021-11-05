@@ -120,7 +120,7 @@ class FXFixedLookbackOption:
                     term = expbt * N(e1)
                 else:
                     term = (-(s0 / smax)**(-w)) * \
-                           N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
+                        N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
 
                 v = df * (smax - k) + s0 * dq * N(e1) - \
                     smax * df * N(e2) + s0 * df * u * term
@@ -164,15 +164,15 @@ class FXFixedLookbackOption:
 ###############################################################################
 
     def value_mc(self,
-                valuation_date: Date,
-                spot_fx_rate: float,  # FORDOM
-                domestic_curve: DiscountCurve,
-                foreign_curve: DiscountCurve,
-                volatility: float,
-                spot_fx_rateMinMax: float,
-                num_paths:int = 10000,
-                num_steps_per_year: int =252,
-                seed: int =4242):
+                 valuation_date: Date,
+                 spot_fx_rate: float,  # FORDOM
+                 domestic_curve: DiscountCurve,
+                 foreign_curve: DiscountCurve,
+                 volatility: float,
+                 spot_fx_rateMinMax: float,
+                 num_paths: int = 10000,
+                 num_steps_per_year: int = 252,
+                 seed: int = 4242):
         """ Value FX Fixed Lookback option using Monte Carlo. """
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
