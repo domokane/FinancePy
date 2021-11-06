@@ -86,7 +86,7 @@ def value_mc_fast(t,
 
     num_time_steps = 2
     Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
-                                t, mus, stock_prices, volatilities, betas, seed)
+                                  t, mus, stock_prices, volatilities, betas, seed)
 
     payoff = payoff_value(Sall, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
@@ -227,21 +227,21 @@ class FXRainbowOption(EquityOption):
 
         if self._payoff_type == FXRainbowOptionTypes.CALL_ON_MAXIMUM:
             v = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
-                - k * df * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+                - k * df * \
+                (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
         elif self._payoff_type == FXRainbowOptionTypes.CALL_ON_MINIMUM:
             v = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * np.sqrt(t), -rho2) \
                 - k * df * M(y1 - v1 * np.sqrt(t), y2 - v2 * np.sqrt(t), rho)
         elif self._payoff_type == FXRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrtt)
             cmax2 = s1 * dq1 * M(y1, d, rho1) \
-                    + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
-                    - k * df * (1.0 - M(-y1 + v1 * sqrtt, -y2 + v2 * sqrtt, rho))
+                + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
+                - k * df * (1.0 - M(-y1 + v1 * sqrtt, -y2 + v2 * sqrtt, rho))
             v = k * df - cmax1 + cmax2
         elif self._payoff_type == FXRainbowOptionTypes.PUT_ON_MINIMUM:
             cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrtt)
-            cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrtt
-                                                               , -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt,
-                                                                                     rho)
+            cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrtt, -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt,
+                                                                                                      rho)
             v = k * df - cmin1 + cmin2
         else:
             raise FinError("Unsupported FX Rainbow option type")

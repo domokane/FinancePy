@@ -9,7 +9,6 @@ from financepy.models.heston import Heston, HestonNumericalScheme
 import numpy as np
 
 
-
 # Reference see table 4.1 of Rouah book
 valuation_date = Date(1, 1, 2015)
 expiry_date = Date(1, 4, 2015)
@@ -26,8 +25,9 @@ num_steps = 100
 num_paths = 20000
 stock_price = 100.0
 
+
 def test_heston():
-    rho =  -0.90000
+    rho = -0.90000
     sigma = 0.75000
     strike_price = 105.00
     hestonModel = Heston(v0, kappa, theta, sigma, rho)

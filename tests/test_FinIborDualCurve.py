@@ -253,7 +253,6 @@ def test_bloombergPricingExample():
     assert round(swaps[0]._float_leg.value(
         settlement_date, libor_curve, libor_curve, None), 4) == 53714.5507
 
-
     oisCurve = buildOIS(valuation_date)
 
     liborDualCurve = IborDualCurve(valuation_date, oisCurve, depos, fras, swaps,

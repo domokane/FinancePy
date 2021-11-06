@@ -196,83 +196,85 @@ class EquityBarrierOption(EquityOption):
         if self._option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL:
             if h >= k:
                 c_do = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                       - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
+                    - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
                 price = c_do
             else:
                 c_di = s * dq * pow(hOverS, 2.0 * l) * N(y) \
-                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
+                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
                 price = c - c_di
         elif self._option_type == EquityBarrierTypes.DOWN_AND_IN_CALL:
             if h <= k:
                 c_di = s * dq * pow(hOverS, 2.0 * l) * N(y) \
-                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
+                    - k * df * pow(hOverS, 2.0 * l - 2.0) * N(y - sigmaRootT)
                 price = c_di
             else:
                 c_do = s * dq * N(x1) \
-                       - k * df * N(x1 - sigmaRootT) \
-                       - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
+                    - k * df * N(x1 - sigmaRootT) \
+                    - s * dq * pow(hOverS, 2.0 * l) * N(y1) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(y1 - sigmaRootT)
                 price = c - c_do
         elif self._option_type == EquityBarrierTypes.UP_AND_IN_CALL:
             if h >= k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                       - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                       (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c_ui
             else:
                 price = c
         elif self._option_type == EquityBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
                 c_ui = s * dq * N(x1) - k * df * N(x1 - sigmaRootT) \
-                       - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                       (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
+                    - s * dq * pow(hOverS, 2.0 * l) * (N(-y) - N(-y1)) \
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    (N(-y + sigmaRootT) - N(-y1 + sigmaRootT))
                 price = c - c_ui
             else:
                 price = 0.0
         elif self._option_type == EquityBarrierTypes.UP_AND_IN_PUT:
             if h > k:
                 p_ui = -s * dq * pow(hOverS, 2.0 * l) * N(-y) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
                 price = p_ui
             else:
                 p_uo = -s * dq * N(-x1) \
-                       + k * df * N(-x1 + sigmaRootT) \
-                       + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
-                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
+                    + k * df * N(-x1 + sigmaRootT) \
+                    + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    N(-y1 + sigmaRootT)
                 price = p - p_uo
         elif self._option_type == EquityBarrierTypes.UP_AND_OUT_PUT:
             if h >= k:
                 p_ui = -s * dq * pow(hOverS, 2.0 * l) * N(-y) \
-                       + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
+                    + k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y + sigmaRootT)
                 price = p - p_ui
             else:
                 p_uo = -s * dq * N(-x1) \
-                       + k * df * N(-x1 + sigmaRootT) \
-                       + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
-                       - k * df * pow(hOverS, 2.0 * l - 2.0) * N(-y1 + sigmaRootT)
+                    + k * df * N(-x1 + sigmaRootT) \
+                    + s * dq * pow(hOverS, 2.0 * l) * N(-y1) \
+                       - k * df * pow(hOverS, 2.0 * l - 2.0) * \
+                    N(-y1 + sigmaRootT)
                 price = p_uo
         elif self._option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT:
             if h >= k:
                 price = 0.0
             else:
                 p_di = -s * dq * N(-x1) \
-                       + k * df * N(-x1 + sigmaRootT) \
-                       + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
+                    + k * df * N(-x1 + sigmaRootT) \
+                    + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
                        - k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                       (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p - p_di
         elif self._option_type == EquityBarrierTypes.DOWN_AND_IN_PUT:
             if h >= k:
                 price = p
             else:
                 p_di = -s * dq * N(-x1) \
-                       + k * df * N(-x1 + sigmaRootT) \
-                       + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
+                    + k * df * N(-x1 + sigmaRootT) \
+                    + s * dq * pow(hOverS, 2.0 * l) * (N(y) - N(y1)) \
                        - k * df * pow(hOverS, 2.0 * l - 2.0) * \
-                       (N(y - sigmaRootT) - N(y1 - sigmaRootT))
+                    (N(y - sigmaRootT) - N(y1 - sigmaRootT))
                 price = p_di
         else:
             raise FinError("Unknown barrier option type." +

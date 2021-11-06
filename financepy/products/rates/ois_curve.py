@@ -42,12 +42,13 @@ def _fois(oir, *args):
         df = df * (1.0 + oir * year_frac)
 
     period = day_counter.year_frac(start_date, end_date)
-    
+
     ois_rate = (df - 1.0) / period
     diff = ois_rate - target_ois_rate
     return diff
 
 ###############################################################################
+
 
 def _f(df, *args):
     """ Root search objective function for OIS """
@@ -59,7 +60,7 @@ def _f(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)     
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_swap = swap.value(valuation_date, curve, None)
     notional = swap._fixed_leg._notional
     v_swap /= notional
@@ -77,7 +78,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)     
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_fra = fra.value(valuation_date, curve)
     v_fra /= fra._notional
     return v_fra
@@ -92,7 +93,7 @@ class OISCurve(DiscountCurve):
     curve date. Typically it is the date on which an amount of 1 unit paid
     has a present value of 1. This class inherits from FinDiscountCurve
     and so it has all of the methods that that class has.
-    
+
     The construction of the curve is assumed to depend on just the OIS curve, 
     i.e. it does not include information from Ibor-OIS basis swaps. For this
     reason I call it a one-curve.
@@ -130,15 +131,15 @@ class OISCurve(DiscountCurve):
 
     def _build_curve(self):
         """ Build curve based on interpolation. """
-            
+
         self._build_curve_using_1d_solver()
 
 ###############################################################################
 
     def _validate_inputs(self,
-                        oisDeposits,
-                        oisFRAs,
-                        oisSwaps):
+                         oisDeposits,
+                         oisFRAs,
+                         oisSwaps):
         """ Validate the inputs for each of the Libor products. """
 
         num_depos = len(oisDeposits)
@@ -185,7 +186,7 @@ class OISCurve(DiscountCurve):
                     raise FinError("Deposits must be in increasing maturity")
                 prev_dt = next_dt
 
-        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE 
+        # REMOVED THIS AS WE WANT TO ANCHOR CURVE AT VALUATION DATE
         # USE A SYNTHETIC DEPOSIT TO BRIDGE GAP FROM VALUE DATE TO SETTLEMENT DATE
         # Ensure that valuation date is on or after first deposit start date
         # Ensure that valuation date is on or after first deposit start date
@@ -530,7 +531,8 @@ class OISCurve(DiscountCurve):
 
         for swap in self._usedSwaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap._effective_date, self, self, None, principal=0.0)
+            v = swap.value(swap._effective_date, self,
+                           self, None, principal=0.0)
             v = v / swap._notional
             if abs(v) > swapTol:
                 print("Swap with maturity " + str(swap._maturity_date)
@@ -624,7 +626,7 @@ class OISCurve(DiscountCurve):
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
             s += label_to_string("% 10.6f" % self._times[i],
-                               "%12.10f" % self._dfs[i])
+                                 "%12.10f" % self._dfs[i])
 
         return s
 

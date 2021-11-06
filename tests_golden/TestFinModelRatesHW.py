@@ -96,11 +96,13 @@ def test_HullWhiteExampleTwo():
 
         model = HWTree(sigma, a, num_time_steps)
         model.build_tree(texp, times, dfs)
-        vTree1 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
+        vTree1 = model.option_on_zero_coupon_bond_tree(
+            texp, tmat, strike, face)
 
         model = HWTree(sigma, a, num_time_steps+1)
         model.build_tree(texp, times, dfs)
-        vTree2 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
+        vTree2 = model.option_on_zero_coupon_bond_tree(
+            texp, tmat, strike, face)
 
         end = time.time()
         period = end-start

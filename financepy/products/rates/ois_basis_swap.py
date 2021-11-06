@@ -24,17 +24,17 @@ class OISBasisSwap:
     floating leg payment of an overnight index swap. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
     from a start date to a specified maturity date.
-    
+
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the discount from
     which the implied index rates are extracted. """
-    
+
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
                  iborType: SwapTypes,
                  iborFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 iborDayCountType: DayCountTypes  = DayCountTypes.THIRTY_E_360,
+                 iborDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  iborSpread: float = 0.0,
                  oisFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  oisDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
@@ -58,11 +58,12 @@ class OISBasisSwap:
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(termination_date_or_tenor)
+            self._termination_date = effective_date.add_tenor(
+                termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -70,7 +71,7 @@ class OISBasisSwap:
         oisType = SwapTypes.PAY
         if iborType == SwapTypes.PAY:
             oisType = SwapTypes.RECEIVE
-        
+
         principal = 0.0
 
         self._floatIborLeg = SwapFloatLeg(effective_date,
@@ -118,8 +119,8 @@ class OISBasisSwap:
             indexOISCurve = discount_curve
 
         floatIborLegValue = self._floatIborLeg.value(valuation_date,
-                                                     discount_curve, 
-                                                     indexIborCurve, 
+                                                     discount_curve,
+                                                     indexIborCurve,
                                                      firstFixingRateLeg1)
 
         floatOISLegValue = self._floatOISLeg.value(valuation_date,

@@ -67,7 +67,6 @@ def test_call():
     assert round(valueAmerican, 4) == 0.0
     assert round(valueEuropean, 4) == 0.0
 
-
     spot_fx_rate = 1.2
 
     call_option = FXVanillaOption(expiry_date,
@@ -99,7 +98,6 @@ def test_call():
     diff = (valueAmerican - valueEuropean)
     assert round(valueAmerican, 4) == 0.0255
     assert round(valueEuropean, 4) == 0.0251
-
 
     spot_fx_rate = 1.9
 
@@ -167,7 +165,6 @@ def test_put():
     assert round(valueAmerican, 4) == 0.7500
     assert round(valueEuropean, 4) == 0.7339
 
-
     spot_fx_rate = 1.2
 
     call_option = FXVanillaOption(expiry_date,
@@ -199,7 +196,6 @@ def test_put():
     diff = (valueAmerican - valueEuropean)
     assert round(valueAmerican, 4) == 0.0798
     assert round(valueEuropean, 4) == 0.0797
-
 
     spot_fx_rate = 1.9
 

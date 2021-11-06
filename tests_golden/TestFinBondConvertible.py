@@ -3,19 +3,19 @@
 ###############################################################################
 
 # TODO
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.date import Date
+from financepy.products.bonds.bond_convertible import BondConvertible
 import time
 import numpy as np
 
 import sys
 sys.path.append("..")
 
-from financepy.products.bonds.bond_convertible import BondConvertible
-from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -34,45 +34,45 @@ def test_BondConvertible():
 
     call_price = 1100
     call_dates = [Date(20, 3, 2007),
-                 Date(15, 3, 2012),
-                 Date(15, 3, 2017)]
+                  Date(15, 3, 2012),
+                  Date(15, 3, 2017)]
     call_prices = np.array([call_price, call_price, call_price])
 
     putPrice = 90
     put_dates = [Date(20, 3, 2007),
-                Date(15, 3, 2012),
-                Date(15, 3, 2017)]
+                 Date(15, 3, 2012),
+                 Date(15, 3, 2017)]
     put_prices = np.array([putPrice, putPrice, putPrice])
 
     bond = BondConvertible(maturity_date,
-                              coupon,
-                              freq_type,
-                              start_convert_date,
-                              conversion_ratio,
-                              call_dates,
-                              call_prices,
-                              put_dates,
-                              put_prices,
-                              accrualBasis,
-                              face)
+                           coupon,
+                           freq_type,
+                           start_convert_date,
+                           conversion_ratio,
+                           call_dates,
+                           call_prices,
+                           put_dates,
+                           put_prices,
+                           accrualBasis,
+                           face)
 #    print(bond)
 
     dividend_dates = [Date(20, 3, 2007),
-                     Date(15, 3, 2008),
-                     Date(15, 3, 2009),
-                     Date(15, 3, 2010),
-                     Date(15, 3, 2011),
-                     Date(15, 3, 2012),
-                     Date(15, 3, 2013),
-                     Date(15, 3, 2014),
-                     Date(15, 3, 2015),
-                     Date(15, 3, 2016),
-                     Date(15, 3, 2017),
-                     Date(15, 3, 2018),
-                     Date(15, 3, 2019),
-                     Date(15, 3, 2020),
-                     Date(15, 3, 2021),
-                     Date(15, 3, 2022)]
+                      Date(15, 3, 2008),
+                      Date(15, 3, 2009),
+                      Date(15, 3, 2010),
+                      Date(15, 3, 2011),
+                      Date(15, 3, 2012),
+                      Date(15, 3, 2013),
+                      Date(15, 3, 2014),
+                      Date(15, 3, 2015),
+                      Date(15, 3, 2016),
+                      Date(15, 3, 2017),
+                      Date(15, 3, 2018),
+                      Date(15, 3, 2019),
+                      Date(15, 3, 2020),
+                      Date(15, 3, 2021),
+                      Date(15, 3, 2022)]
 
     dividend_yields = [0.00] * 16
     stock_price = 28.5

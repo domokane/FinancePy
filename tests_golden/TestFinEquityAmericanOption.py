@@ -42,13 +42,13 @@ def testEquityAmericanOption():
                          100)
 
     value = put_option.value(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     delta = put_option.delta(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     gamma = put_option.gamma(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     theta = put_option.theta(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
@@ -109,13 +109,13 @@ def testEquityAmericanOption():
         OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     delta = call_option.delta(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     gamma = call_option.gamma(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     theta = call_option.theta(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     testCases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)

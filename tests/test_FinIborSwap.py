@@ -20,7 +20,6 @@ from financepy.utils.math import ONE_MILLION
 import numpy as np
 
 
-
 def test_LiborSwap():
     # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve

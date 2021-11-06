@@ -26,6 +26,7 @@ bus_days_in_decade = {
     "CalendarTypes.UNITED_KINGDOM": 2527
 }
 
+
 def test_add_business_day():
     for calendar_type in CalendarTypes:
         num_days = bus_days_in_decade[str(calendar_type)]
@@ -35,4 +36,3 @@ def test_add_business_day():
 
         assert cal.add_business_days(start, num_days) == end, \
             f"Landed on incorrect business day using {calendar_type}"
-

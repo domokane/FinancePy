@@ -44,13 +44,13 @@ class FXOption:
         small bump and calculating the change in the option delta. """
 
         v = self.delta(valuation_date, stock_price, discount_curve, dividend_curve,
-            model)
+                       model)
 
         vBumpedDn = self.delta(valuation_date, stock_price + bump, discount_curve,
-            dividend_curve, model)
+                               dividend_curve, model)
 
         vBumpedUp = self.delta(valuation_date, stock_price + bump, discount_curve,
-            dividend_curve, model)
+                               dividend_curve, model)
 
         if type(v) is dict:
             num = (vBumpedUp['value'] - 2.0 * v['value'] + vBumpedDn['value'])

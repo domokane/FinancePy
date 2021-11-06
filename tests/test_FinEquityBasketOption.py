@@ -33,7 +33,7 @@ def test_homogeneous_call():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-                expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+        expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
     value = call_option.value(
         valuation_date,
         stock_prices,
@@ -41,7 +41,7 @@ def test_homogeneous_call():
         dividend_curves,
         volatilities,
         corr_matrix)
-    
+
     assert round(value, 4) == 13.6164
 
     value_mc = call_option.value_mc(
@@ -67,7 +67,7 @@ def test_homogeneous_put():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-                expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+        expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
     value = call_option.value(
         valuation_date,
         stock_prices,
@@ -75,7 +75,7 @@ def test_homogeneous_put():
         dividend_curves,
         volatilities,
         corr_matrix)
-    
+
     assert round(value, 4) == 9.7344
 
     value_mc = call_option.value_mc(
@@ -101,7 +101,7 @@ def test_inhomogeneous_call():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-                expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+        expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
     value = call_option.value(
         valuation_date,
         stock_prices,
@@ -109,7 +109,7 @@ def test_inhomogeneous_call():
         dividend_curves,
         volatilities,
         corr_matrix)
-    
+
     assert round(value, 4) == 13.6783
 
     value_mc = call_option.value_mc(
@@ -135,7 +135,7 @@ def test_inhomogeneous_put():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-                expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+        expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
     value = call_option.value(
         valuation_date,
         stock_prices,
@@ -143,7 +143,7 @@ def test_inhomogeneous_put():
         dividend_curves,
         volatilities,
         corr_matrix)
-    
+
     assert round(value, 4) == 7.9126
 
     value_mc = call_option.value_mc(

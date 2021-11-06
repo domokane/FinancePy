@@ -69,10 +69,9 @@ def test_european_call():
         stockMin,
         num_paths,
         num_steps_per_year)
-    
+
     assert round(value, 4) == 26.8608
     assert round(value_mc, 4) == 25.6946
-
 
 
 def test_european_put():

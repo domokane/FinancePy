@@ -59,6 +59,7 @@ def build_curve(valuation_date):
 
     return libor_curve
 
+
 todayDate = Date(20, 6, 2019)
 valuation_date = todayDate
 start_date = todayDate.add_weekdays(2)
@@ -120,6 +121,7 @@ def test_cap():
     assert round(cvalue4, 4) == 0.0187
     assert round(cvalue5, 4) == 53647.5908
     assert round(cvalue6, 4) == 0.1578
+
 
 def test_floor():
     capFloorType = FinCapFloorTypes.FLOOR

@@ -8,6 +8,7 @@ from enum import Enum
 
 ###############################################################################
 
+
 class CurrencyTypes(Enum):
     USD = 1
     EUR = 2

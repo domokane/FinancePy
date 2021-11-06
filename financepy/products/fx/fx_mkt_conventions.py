@@ -84,17 +84,17 @@ class FinFXDeltaMethod(Enum):
 
 
 prem_currency = {'EURUSD': 'USD',
-                'USDJPY': 'USD',
-                'EURJPY': 'EUR',
-                'USDCHF': 'USD',
-                'EURCHF': 'EUR',
-                'GBPUSD': 'USD',
-                'EURGBP': 'EUR',
-                'AUDUSD': 'USD',
-                'AUDJPY': 'AUD',
-                'USDCAD': 'USD',
-                'USDBRL': 'USD',
-                'USDMXN': 'USD'}
+                 'USDJPY': 'USD',
+                 'EURJPY': 'EUR',
+                 'USDCHF': 'USD',
+                 'EURCHF': 'EUR',
+                 'GBPUSD': 'USD',
+                 'EURGBP': 'EUR',
+                 'AUDUSD': 'USD',
+                 'AUDJPY': 'AUD',
+                 'USDCAD': 'USD',
+                 'USDBRL': 'USD',
+                 'USDMXN': 'USD'}
 
 deltaConvention = {'EURUSD': FinFXDeltaMethod.SPOT_DELTA,
                    'USDJPY': FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,

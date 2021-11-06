@@ -61,7 +61,7 @@ def test_FLAT_FWD_RATES():
 
 def test_LINEAR_FWD_RATES():
     interp_type = InterpTypes.LINEAR_FWD_RATES
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -86,7 +86,7 @@ def test_LINEAR_FWD_RATES():
 
 def test_LINEAR_ZERO_RATES():
     interp_type = InterpTypes.LINEAR_ZERO_RATES
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -108,9 +108,10 @@ def test_LINEAR_ZERO_RATES():
     assert round(x, 4) == 9.4737
     assert round(y_int, 4) == 0.4640
 
+
 def test_FINCUBIC_ZERO_RATES():
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -132,9 +133,10 @@ def test_FINCUBIC_ZERO_RATES():
     assert round(x, 4) == 5.7895
     assert round(y_int, 4) == 0.6007
 
+
 def test_NATCUBIC_LOG_DISCOUNT():
     interp_type = InterpTypes.NATCUBIC_LOG_DISCOUNT
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -156,9 +158,10 @@ def test_NATCUBIC_LOG_DISCOUNT():
     assert round(x, 4) == 7.3684
     assert round(y_int, 4) == 0.5355
 
+
 def test_NATCUBIC_ZERO_RATES():
     interp_type = InterpTypes.NATCUBIC_ZERO_RATES
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -180,9 +183,10 @@ def test_NATCUBIC_ZERO_RATES():
     assert round(x, 4) == 6.3158
     assert round(y_int, 4) == 0.5759
 
+
 def test_PCHIP_ZERO_RATES():
     interp_type = InterpTypes.PCHIP_ZERO_RATES
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -204,9 +208,10 @@ def test_PCHIP_ZERO_RATES():
     assert round(x, 4) == 5.2632
     assert round(y_int, 4) == 0.6244
 
+
 def test_PCHIP_LOG_DISCOUNT():
     interp_type = InterpTypes.PCHIP_LOG_DISCOUNT
-    
+
     interpolator = Interpolator(interp_type)
     interpolator.fit(xValues, yValues)
 
@@ -227,4 +232,3 @@ def test_PCHIP_LOG_DISCOUNT():
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 6.8421
     assert round(y_int, 4) == 0.5551
-

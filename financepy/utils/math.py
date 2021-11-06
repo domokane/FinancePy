@@ -22,8 +22,8 @@ ONE_BILLION = 1000000000
 
 @njit(fastmath=True, cache=True)
 def accrued_interpolator(tset: float,  # Settlement time in years
-                        coupon_times: np.ndarray,
-                        couponAmounts: np.ndarray):
+                         coupon_times: np.ndarray,
+                         couponAmounts: np.ndarray):
     """ Fast calculation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
@@ -34,7 +34,7 @@ def accrued_interpolator(tset: float,  # Settlement time in years
         pct = coupon_times[i - 1]
         nct = coupon_times[i]
         denom = (nct-pct)
-       
+
         if tset >= pct and tset < nct:
             accdFrac = (tset-pct) / denom
             accdCpn = accdFrac * couponAmounts[i]
@@ -45,7 +45,7 @@ def accrued_interpolator(tset: float,  # Settlement time in years
     print("t", tset)
     print("CPN TIMES", coupon_times)
     print("CPN AMNTS", couponAmounts)
- 
+
     raise FinError("Failed to calculate accrued")
 
 ###############################################################################
@@ -272,6 +272,7 @@ def normpdf(x: float):
 
 ###############################################################################
 
+
 @njit(float64(float64), fastmath=True, cache=True)
 def N(x):
     """ Fast Normal CDF function based on Hull OFAODS  4th Edition Page 252.
@@ -300,17 +301,20 @@ def N(x):
 
 ###############################################################################
 
+
 @vectorize([float64(float64)], fastmath=True, cache=True)
 def n_vect(x):
     return N(x)
 
 ###############################################################################
 
+
 @vectorize([float64(float64)], fastmath=True, cache=True)
 def n_prime_vect(x):
     return nprime(x)
 
 ###############################################################################
+
 
 @njit(float64(float64), fastmath=True, cache=True)
 def normcdf_integrate(x: float):
@@ -524,7 +528,7 @@ def norminvcdf(p):
         # Rational approximation for lower region
         q = np.sqrt(-2.0 * np.log(p))
         inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
-                    * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+                      * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5
@@ -542,6 +546,8 @@ def norminvcdf(p):
 ###############################################################################
 # This is used for consistency with Haug and its conciseness. Consider renaming
 # phi2 to M
+
+
 @njit(fastmath=True, cache=True)
 def M(a, b, c):
     return phi2(a, b, c)
@@ -602,7 +608,7 @@ def phi2(h1, hk, r):
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
             bv = 0.13298076 * h6 * ab * \
-                 N(-h6) - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
+                N(-h6) - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
 
             for i in range(0, 5):
                 r1 = r3 * x[i]

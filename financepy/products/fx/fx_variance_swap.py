@@ -104,15 +104,15 @@ class FinFXVarianceSwap:
 ###############################################################################
 
     def fair_strike(self,
-                   valuation_date,
-                   stock_price,
-                   dividend_curve,
-                   volatility_curve,
-                   num_call_options,
-                   num_put_options,
-                   strike_spacing,
-                   discount_curve,
-                   use_forward=True):
+                    valuation_date,
+                    stock_price,
+                    dividend_curve,
+                    volatility_curve,
+                    num_call_options,
+                    num_put_options,
+                    strike_spacing,
+                    discount_curve,
+                    use_forward=True):
         """ Calculate the implied variance according to the volatility surface
         using a static replication methodology with a specially weighted
         portfolio of put and call options across a range of strikes using the
@@ -247,6 +247,7 @@ class FinFXVarianceSwap:
 
 
 ###############################################################################
+
 
     def print_strikes(self):
 

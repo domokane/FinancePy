@@ -120,7 +120,7 @@ class LHPlusModel():
         el3 = -K * (M(c0, a, self._beta0) - N(a))
         el4 = - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
         term1 = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
-                - phi3(a, c, c0, r12, r13, r23)
+            - phi3(a, c, c0, r12, r13, r23)
         el5 = - (1.0 - self._R) * self._H * term1
 
         elk1k2 = el1 + el2 + el3 + el4 + el5
@@ -160,7 +160,7 @@ class LHPlusModel():
         el1 = el1 - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
 
         term = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
-               - phi3(a, c, c0, r12, r13, r23)
+            - phi3(a, c, c0, r12, r13, r23)
 
         el1 = el1 - (1.0 - self._R) * self._H * term
         return el1

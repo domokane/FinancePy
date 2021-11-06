@@ -63,17 +63,18 @@ class DiscountCurvePoly(DiscountCurve):
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dts, self._valuation_date, self._day_count_type)
+        dc_times = times_from_dates(
+            dts, self._valuation_date, self._day_count_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
         dfs = self._zero_to_df(self._valuation_date,
-                             zero_rates,
-                             dc_times,
-                             self._freq_type,
-                             self._day_count_type)
+                               zero_rates,
+                               dc_times,
+                               self._freq_type,
+                               self._day_count_type)
 
         # Convert these to zero rates in the required frequency and day count
         zero_rates = self._df_to_zero(dfs, dts, freq_type, day_count_type)
@@ -115,10 +116,10 @@ class DiscountCurvePoly(DiscountCurve):
 
         # Now get the discount factors using curve conventions
         dfs = self._zero_to_df(self._valuation_date,
-                             zero_rates,
-                             dc_times,
-                             self._freq_type,
-                             self._day_count_type)
+                               zero_rates,
+                               dc_times,
+                               self._freq_type,
+                               self._day_count_type)
 
         return dfs
 

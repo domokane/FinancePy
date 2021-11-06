@@ -21,7 +21,7 @@ class SwapFloatLeg:
     """ Class for managing the floating leg of a swap. A float leg consists of
     a sequence of flows calculated according to an ISDA schedule and with a 
     coupon determined by an index curve which changes over life of the swap."""
-    
+
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  end_date: (Date, str),  # Date contract ends
@@ -31,11 +31,11 @@ class SwapFloatLeg:
                  day_count_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  principal: float = 0.0,
-                 payment_lag: int= 0,
+                 payment_lag: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 end_of_month:bool = False):
+                 end_of_month: bool = False):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional.  """
@@ -49,7 +49,7 @@ class SwapFloatLeg:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -89,7 +89,7 @@ class SwapFloatLeg:
                             self._freq_type,
                             self._calendar_type,
                             self._bus_day_adjust_type,
-                            self._date_gen_rule_type, 
+                            self._date_gen_rule_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -118,13 +118,13 @@ class SwapFloatLeg:
                 payment_date = next_dt
             else:
                 payment_date = calendar.add_business_days(next_dt,
-                                                       self._payment_lag)
+                                                          self._payment_lag)
 
             self._payment_dates.append(payment_date)
 
             (year_frac, num, _) = day_counter.year_frac(prev_dt,
-                                                     next_dt)
-            
+                                                        next_dt)
+
             self._year_fracs.append(year_frac)
             self._accrued_days.append(num)
 
@@ -136,7 +136,7 @@ class SwapFloatLeg:
               valuation_date: Date,  # This should be the settlement date
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
-              firstFixingRate: float=None):
+              firstFixingRate: float = None):
         """ Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve as of the valuation date
         supplied. For an existing swap, the user must enter the next fixing
@@ -149,7 +149,7 @@ class SwapFloatLeg:
             index_curve = discount_curve
 
         self._rates = []
-        self._payments = []        
+        self._payments = []
         self._paymentDfs = []
         self._paymentPVs = []
         self._cumulativePVs = []
@@ -166,7 +166,7 @@ class SwapFloatLeg:
         for iPmnt in range(0, numPayments):
 
             pmntDate = self._payment_dates[iPmnt]
-            
+
             if pmntDate > valuation_date:
 
                 startAccruedDt = self._startAccruedDates[iPmnt]
@@ -174,7 +174,7 @@ class SwapFloatLeg:
                 pay_alpha = self._year_fracs[iPmnt]
 
                 (index_alpha, num, _) = index_day_counter.year_frac(startAccruedDt,
-                                                              endAccruedDt)
+                                                                    endAccruedDt)
 
                 if firstPayment is False and firstFixingRate is not None:
 
@@ -182,7 +182,7 @@ class SwapFloatLeg:
                     firstPayment = True
 
                 else:
-                    
+
                     dfStart = index_curve.df(startAccruedDt)
                     dfEnd = index_curve.df(endAccruedDt)
                     fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
@@ -239,7 +239,7 @@ class SwapFloatLeg:
         print(header)
 
         num_flows = len(self._payment_dates)
-        
+
         for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  " %
                   (self._payment_dates[iFlow],
@@ -247,7 +247,7 @@ class SwapFloatLeg:
                    self._endAccruedDates[iFlow],
                    self._accrued_days[iFlow],
                    self._year_fracs[iFlow]))
-            
+
 ###############################################################################
 
     def print_valuation(self):
@@ -270,7 +270,7 @@ class SwapFloatLeg:
         print(header)
 
         num_flows = len(self._payment_dates)
-        
+
         for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  %9.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
                   (self._payment_dates[iFlow],
@@ -279,7 +279,7 @@ class SwapFloatLeg:
                    self._accrued_days[iFlow],
                    self._year_fracs[iFlow],
                    self._rates[iFlow] * 100.0,
-                   self._payments[iFlow], 
+                   self._payments[iFlow],
                    self._paymentDfs[iFlow],
                    self._paymentPVs[iFlow],
                    self._cumulativePVs[iFlow]))

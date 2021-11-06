@@ -803,7 +803,7 @@ def fwd_full_bond_price(rt, *args):
     ptdelta = _uinterpolate(tdelta, df_times, df_values, interp)
 
 #    print("TEXP", texp, ptexp)
-    
+
     num_flows = len(cpn_times)
     pv = 0.0
 
@@ -906,7 +906,8 @@ class HWTree():
         h = np.log((face_amount*ptmat)/(strike * ptexp)) / \
             sigmap + sigmap / 2.0
         callValue = face_amount * ptmat * N(h) - strike * ptexp * N(h - sigmap)
-        putValue = strike * ptexp * N(-h + sigmap) - face_amount * ptmat * N(-h)
+        putValue = strike * ptexp * \
+            N(-h + sigmap) - face_amount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 
@@ -953,7 +954,7 @@ class HWTree():
 
             tcpn = cpn_times[i]
             cpn = cpn_amounts[i]
-            
+
             if tcpn >= texp:  # coupons on the expiry date are included
 
                 ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)

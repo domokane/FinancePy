@@ -222,9 +222,11 @@ class CDSTranche:
 
         protLegPV = self._cds_contract.protection_leg_pv(
             valuation_date, trancheCurve, curveRecovery)
-        risky_pv01 = self._cds_contract.risky_pv01(valuation_date, trancheCurve)['clean_rpv01']
+        risky_pv01 = self._cds_contract.risky_pv01(
+            valuation_date, trancheCurve)['clean_rpv01']
 
-        mtm = self._notional * (protLegPV - upfront - risky_pv01 * running_coupon)
+        mtm = self._notional * (protLegPV - upfront -
+                                risky_pv01 * running_coupon)
 
         if not self._long_protection:
             mtm *= -1.0

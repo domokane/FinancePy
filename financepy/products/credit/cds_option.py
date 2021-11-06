@@ -114,7 +114,8 @@ class CDSOption:
 
         strike = self._strike_coupon
         forward_spread = cds.par_spread(valuation_date, issuer_curve)
-        forward_rpv01 = cds.risky_pv01(valuation_date, issuer_curve)['full_rpv01']
+        forward_rpv01 = cds.risky_pv01(
+            valuation_date, issuer_curve)['full_rpv01']
 
         time_to_expiry = (self._expiry_date - valuation_date) / gDaysInYear
         logMoneyness = log(forward_spread / strike)

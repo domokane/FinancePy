@@ -172,5 +172,3 @@ def test_heterogeneous():
         num_points,
         method)
     assert round(v[3] * 10000, 4) == 0.3379
-
-

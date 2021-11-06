@@ -24,6 +24,7 @@ def test_bond_mortgage_repayment():
     assert round(mortgage._principal_remaining[i], 4) == 120816.6155
     assert round(mortgage._total_flows[i], 4) == 1285.5163
 
+
 def test_bond_mortgage_interest():
     mortgage.generate_flows(rate, BondMortgageTypes.INTEREST_ONLY)
     i = 10

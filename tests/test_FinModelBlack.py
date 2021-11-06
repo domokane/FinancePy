@@ -61,6 +61,7 @@ def test_gamma():
     assert round(gammaCall, 4) == 19.6594
     assert round(gammaPut, 4) == 19.6594
 
+
 def test_theta():
     thetaCall = model.theta(
         forward, strike, time_to_expiry, df, call_optionType)
@@ -85,4 +86,3 @@ def test_vega():
 
     assert round(vegaCall*10, 4) == 0.0909
     assert round(vegaPut*10, 4) == 0.0909
-

@@ -106,7 +106,6 @@ def test_pay():
     assert round(swap5, 4) == 125828.3435
     assert round(swap6, 4) == 126722.2275
 
-
     k = 0.035
     swaption = IborSwaption(settlement_date,
                             exercise_date,
@@ -129,7 +128,6 @@ def test_pay():
     assert round(swap5, 4) == 63234.7523
     assert round(swap6, 4) == 64128.6302
 
-
     k = 0.065
     swaption = IborSwaption(settlement_date,
                             exercise_date,
@@ -151,7 +149,6 @@ def test_pay():
     assert round(swap4, 4) == 59.6112
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
-
 
 
 def test_receive():
@@ -179,7 +176,6 @@ def test_receive():
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
 
-
     k = 0.05
     swaption = IborSwaption(settlement_date,
                             exercise_date,
@@ -201,7 +197,6 @@ def test_receive():
     assert round(swap4, 4) == 5385.7041
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 262.7794
-
 
     k = 0.08
     swaption = IborSwaption(settlement_date,

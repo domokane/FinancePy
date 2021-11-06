@@ -10,7 +10,6 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.products.fx.fx_forward import FXForward
 
 
-
 def test_FinFXForward():
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
@@ -76,4 +75,3 @@ def test_FinFXForward():
     assert fwdValue['not_for'] == 100.0
     assert fwdValue['ccy_dom'] == 'USD'
     assert fwdValue['ccy_for'] == 'EUR'
-

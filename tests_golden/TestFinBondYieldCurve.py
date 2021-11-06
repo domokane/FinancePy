@@ -2,23 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegelSvensson
+from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegel
+from financepy.products.bonds.yield_curve_model import CurveFitBSpline
+from financepy.products.bonds.yield_curve_model import CurveFitPolynomial
+from financepy.products.bonds.yield_curve import BondYieldCurve
+from financepy.products.bonds.bond import Bond
+from financepy.utils.date import Date, from_datetime
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
 import datetime as dt
 import os
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date, from_datetime
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.yield_curve import BondYieldCurve
-from financepy.products.bonds.yield_curve_model import CurveFitPolynomial
-from financepy.products.bonds.yield_curve_model import CurveFitBSpline
-from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegel
-from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegelSvensson
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
