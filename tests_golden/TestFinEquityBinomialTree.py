@@ -48,13 +48,13 @@ def test_FinBinomialTree():
         strike_price,
         OptionTypes.EUROPEAN_PUT)
     value = put_option.value(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     delta = put_option.delta(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     gamma = put_option.gamma(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     theta = put_option.theta(valuation_date, stock_price,
-                            discount_curve, dividend_curve, model)
+                             discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 
@@ -118,13 +118,13 @@ def test_FinBinomialTree():
         strike_price,
         OptionTypes.EUROPEAN_CALL)
     value = call_option.value(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     delta = call_option.delta(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     gamma = call_option.gamma(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     theta = call_option.theta(valuation_date, stock_price,
-                             discount_curve, dividend_curve, model)
+                              discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
 

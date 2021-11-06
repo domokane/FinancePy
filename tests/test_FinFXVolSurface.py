@@ -192,4 +192,3 @@ def test_FinFXMktVolSurface4(capsys):
     fxMarket.check_calibration(verboseCalibration)
     captured = capsys.readouterr()
     assert captured.out == ""
-

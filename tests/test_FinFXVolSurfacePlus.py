@@ -39,7 +39,7 @@ def test_FinFXMktVolSurface1(capsys):
     riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
     marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
     riskReversal10DeltaVols = [-1.258, -
-                                1.297, -1.332, -1.408, -1.359, -1.208]
+                               1.297, -1.332, -1.408, -1.359, -1.208]
 
     notional_currency = forName
 
@@ -208,7 +208,7 @@ def test_FinFXMktVolSurface4(capsys):
     riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
     marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
     riskReversal10DeltaVols = [-1.258, -
-                                1.297, -1.332, -1.408, -1.359, -1.208]
+                               1.297, -1.332, -1.408, -1.359, -1.208]
 
     marketStrangle25DeltaVols = None
     riskReversal25DeltaVols = None
@@ -269,7 +269,7 @@ def test_FinFXMktVolSurface5(capsys):
     riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
     marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
     riskReversal10DeltaVols = [-1.258, -
-                                1.297, -1.332, -1.408, -1.359, -1.208]
+                               1.297, -1.332, -1.408, -1.359, -1.208]
 
     marketStrangle10DeltaVols = None
     riskReversal10DeltaVols = None

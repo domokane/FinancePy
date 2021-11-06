@@ -12,6 +12,7 @@ freq = FrequencyTypes.SEMI_ANNUAL
 basis = DayCountTypes.ACT_ACT_ICMA
 issue_date = Date(15, 2, 2004)
 
+
 def test_bond_future_1():
     bond = Bond(issue_date, Date(15, 8, 2011), 0.0500, freq, basis)
 
@@ -31,6 +32,7 @@ def test_bond_future_1():
     cf = bondFutureContract.conversion_factor(bond)
 
     assert round(cf, 4) == 92.9688
+
 
 def test_bond_future_2():
     bond = Bond(issue_date, Date(15, 8, 2027), 0.0225, freq, basis)
@@ -65,9 +67,10 @@ def test_bond_future_2():
     assert round(pip, 4) == 9296237.6200
 
     tia = bondFutureContract.total_invoice_amount(
-            settlement_date, bond, futures_price)
+        settlement_date, bond, futures_price)
 
     assert round(tia, 4) == 9296580.0100
+
 
 def test_future_bond_ctd():
     first_delivery_date = Date(1, 12, 2017)

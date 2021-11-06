@@ -43,18 +43,19 @@ def is_last_day_of_feb(dt: Date):
 #    ACT_360 = 8
 #    ACT_365L = 9  # the 29 Feb is counted if it is in the date range
 ###############################################################################
-        
+
+
 class DayCountTypes(Enum):
-    THIRTY_360_BOND = 1  
-    THIRTY_E_360 = 2  
-    THIRTY_E_360_ISDA = 3  
-    THIRTY_E_PLUS_360 = 4  
-    ACT_ACT_ISDA = 5  
-    ACT_ACT_ICMA = 6  
-    ACT_365F = 7  
+    THIRTY_360_BOND = 1
+    THIRTY_E_360 = 2
+    THIRTY_E_360_ISDA = 3
+    THIRTY_E_PLUS_360 = 4
+    ACT_ACT_ISDA = 5
+    ACT_ACT_ICMA = 6
+    ACT_365F = 7
     ACT_360 = 8
     ACT_365L = 9
-    SIMPLE = 10 # actual divided by gDaysInYear
+    SIMPLE = 10  # actual divided by gDaysInYear
 
 ###############################################################################
 
@@ -75,11 +76,11 @@ class DayCount:
 ###############################################################################
 
     def year_frac(self,
-                 dt1: Date,  # Start of coupon period
-                 dt2: Date,  # Settlement (for bonds) or period end(swaps)
-                 dt3: Date = None,  # End of coupon period for accrued
-                 freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                 isTerminationDate: bool = False):  # Is dt2 a termination date
+                  dt1: Date,  # Start of coupon period
+                  dt2: Date,  # Settlement (for bonds) or period end(swaps)
+                  dt3: Date = None,  # End of coupon period for accrued
+                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+                  isTerminationDate: bool = False):  # Is dt2 a termination date
         """ This method performs two functions:
 
         1) It calculates the year fraction between dates dt1 and dt2 using the
@@ -95,7 +96,7 @@ class DayCount:
         then that is used in the calculation of the year frac. This avoids 
         discontinuities for short dated intra day products. It should not
         affect normal dates for which hh=mm=ss=0.
-        
+
         This seems like a useful source:
         https://www.eclipsesoftware.biz/DayCountConventions.html
         Wikipedia also has a decent survey of the conventions
@@ -123,7 +124,7 @@ class DayCount:
             if d1 == 31:
                 d1 = 30
 
-            if d2 == 31 and d1 == 30: 
+            if d2 == 31 and d1 == 30:
                 d2 = 30
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
@@ -274,7 +275,7 @@ class DayCount:
             return (acc_factor, num, den)
 
         elif self._type == DayCountTypes.SIMPLE:
-            
+
             num = dt2 - dt1
             den = gDaysInYear
             acc_factor = num / den

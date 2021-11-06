@@ -27,7 +27,6 @@ num_paths = 40000
 
 
 def test_value():
-    
 
     call_option = EquityDigitalOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
@@ -47,7 +46,8 @@ def test_value():
 
     assert round(value, 4) == 0.4693
     assert round(value_mc, 4) == 0.4694
-    
+
+
 def test_greeks():
     call_option = EquityDigitalOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
@@ -70,7 +70,7 @@ def test_greeks():
         discount_curve,
         dividend_curve,
         model)
-    
+
     assert round(delta, 4) == 0.0126
     assert round(vega, 4) == -0.3583
     assert round(theta, 4) == 0.0140

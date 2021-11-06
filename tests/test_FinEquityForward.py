@@ -7,6 +7,7 @@ from financepy.utils.global_types import FinLongShort
 from financepy.utils.date import Date
 from financepy.products.equity.equity_forward import EquityForward
 
+
 def test_equity_forward():
 
     valuation_date = Date(13, 2, 2018)

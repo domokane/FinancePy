@@ -55,7 +55,7 @@ class CurveFitNelsonSiegel():
         self._bounds = bounds
 
     def _interpolated_yield(self, t, beta1=None, beta2=None,
-                           beta3=None, tau=None):
+                            beta3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
@@ -113,7 +113,7 @@ class CurveFitNelsonSiegelSvensson():
         self._bounds = bounds
 
     def _interpolated_yield(self, t, beta1=None, beta2=None, beta3=None,
-                           beta4=None, tau1=None, tau2=None):
+                            beta4=None, tau1=None, tau2=None):
 
         # Careful if we get a time zero point
         t = np.maximum(t, 1e-10)

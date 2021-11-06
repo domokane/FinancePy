@@ -58,7 +58,8 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)
-        self._times = times_from_dates(dates, self._valuation_date, day_count_type)
+        self._times = times_from_dates(
+            dates, self._valuation_date, day_count_type)
 
 ###############################################################################
 
@@ -90,10 +91,10 @@ class DiscountCurveFlat(DiscountCurve):
                                     self._day_count_type)
 
         dfs = self._zero_to_df(self._valuation_date,
-                             self._flat_rate,
-                             dc_times,
-                             self._freq_type,
-                             self._day_count_type)
+                               self._flat_rate,
+                               dc_times,
+                               self._freq_type,
+                               self._day_count_type)
 
         if isinstance(dates, Date):
             return dfs[0]

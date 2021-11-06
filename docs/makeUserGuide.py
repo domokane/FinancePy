@@ -205,7 +205,7 @@ def buildIntro(introfile):
 
 def buildChapter(folderName):
     """ Parse a folder by loading up all of the modules in that folder that
-    start with the threee letters - Fin. """
+    start with the three letters - Fin. """
 
     print("Building chapter in folder:", folderName)
 
@@ -509,7 +509,7 @@ def parseClass(lines, startLine, endLine):
 
 
 def parseFunction(lines, startLine, endLine, className=""):
-    """ Given a set of lines and a start line I extract the function definiton
+    """ Given a set of lines and a start line I extract the function definition
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments."""
 
@@ -568,9 +568,11 @@ def parseFunction(lines, startLine, endLine, className=""):
 
             missingSpaces = len(className) - len("__init__")
             if (missingSpaces >= 0):
-                functionSignature = functionSignature.replace("\n ", "\n " + " " * (missingSpaces))
+                functionSignature = functionSignature.replace(
+                    "\n ", "\n " + " " * (missingSpaces))
             else:
-                functionSignature = functionSignature.replace("\n" + " " * (-missingSpaces), "\n")
+                functionSignature = functionSignature.replace(
+                    "\n" + " " * (-missingSpaces), "\n")
 
         # Remove 'self' and any whitespace following it
         functionSignature = functionSignature.replace("self", "")
@@ -627,7 +629,6 @@ def parseFunction(lines, startLine, endLine, className=""):
             line = line.lstrip()
             # This is because we remove trailing whitespace
             functionComment += line + " "
-
 
     if functionComment == "":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
@@ -710,7 +711,8 @@ def extractParams(functionSignature):
     functionSignature = functionSignature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = functionSignature.split("(", 1)[1].replace("):", "").strip()
+    stripedSignature = functionSignature.split(
+        "(", 1)[1].replace("):", "").strip()
     if stripedSignature == "":
         # The function has no parameters
         return ""

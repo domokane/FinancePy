@@ -18,6 +18,7 @@ from ..utils.error import FinError
 # TODO: Use Numba ?
 ###############################################################################
 
+
 @njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
 def calculate_d1_d2(f, t, k, v):
 
@@ -39,6 +40,7 @@ def calculate_d1_d2(f, t, k, v):
 
 ###############################################################################
 
+
 class Black():
     """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. """
@@ -54,7 +56,6 @@ class Black():
 
 ###############################################################################
 
-
     def value(self,
               forward_rate,   # Forward rate F
               strike_rate,    # Strike Rate K
@@ -68,9 +69,9 @@ class Black():
         t = time_to_expiry
         k = strike_rate
         v = self._volatility
-        
+
         [d1, d2] = calculate_d1_d2(f, t, k, v)
-        
+
         if call_or_put == OptionTypes.EUROPEAN_CALL:
             value = df * (f * n_vect(d1) - k * n_vect(d2))
         elif call_or_put == OptionTypes.EUROPEAN_PUT:
@@ -81,7 +82,6 @@ class Black():
         return value
 
 ###############################################################################
-
 
     def delta(self,
               forward_rate,   # Forward rate F
@@ -110,7 +110,6 @@ class Black():
 
 ###############################################################################
 
-
     def gamma(self,
               forward_rate,   # Forward rate F
               strike_rate,    # Strike Rate K
@@ -132,7 +131,6 @@ class Black():
         return gamma
 
 ###############################################################################
-
 
     def theta(self,
               forward_rate,   # Forward rate F
@@ -167,11 +165,11 @@ class Black():
 ###############################################################################
 
     def vega(self,
-              forward_rate,   # Forward rate F
-              strike_rate,    # Strike Rate K
-              time_to_expiry,  # Time to Expiry (years)
-              df,  # df RFR to expiry date
-              call_or_put):    # Call or put
+             forward_rate,   # Forward rate F
+             strike_rate,    # Strike Rate K
+             time_to_expiry,  # Time to Expiry (years)
+             df,  # df RFR to expiry date
+             call_or_put):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. """
 
@@ -180,9 +178,9 @@ class Black():
         k = strike_rate
         v = self._volatility
         sqrtT = np.sqrt(t)
-        
+
         [d1, d2] = calculate_d1_d2(f, t, k, v)
-        
+
         if call_or_put == OptionTypes.EUROPEAN_CALL:
             vega = df * f * sqrtT * n_prime_vect(d1)
         elif call_or_put == OptionTypes.EUROPEAN_PUT:

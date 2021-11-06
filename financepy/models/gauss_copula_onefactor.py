@@ -22,13 +22,14 @@ minZ = -6.0
 # Copula model as well as some approximations
 ###############################################################################
 
+
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
 def loss_dbn_recursion_gcd(num_credits,
-                        default_probs,
-                        lossUnits,
-                        beta_vector,
-                        num_integration_steps):
+                           default_probs,
+                           lossUnits,
+                           beta_vector,
+                           num_integration_steps):
     """ Full construction of the loss distribution of a portfolio of credits
     where losses have been calculate as number of units based on the GCD. """
 
@@ -81,12 +82,13 @@ def loss_dbn_recursion_gcd(num_credits,
 
 ###############################################################################
 
+
 @njit(float64[:](float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
 def homog_basket_loss_dbn(survival_probabilities,
-                             recovery_rates,
-                             beta_vector,
-                             num_integration_steps):
+                          recovery_rates,
+                          beta_vector,
+                          num_integration_steps):
     """ Calculate the loss distribution of a CDS default basket where the
     portfolio is equally weighted and the losses in the portfolio are homo-
     geneous i.e. the credits have the same recovery rates. """
@@ -119,10 +121,10 @@ def homog_basket_loss_dbn(survival_probabilities,
         default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
     lossDbn = loss_dbn_recursion_gcd(num_credits,
-                                  default_probs,
-                                  lossUnits,
-                                  beta_vector,
-                                  num_integration_steps)
+                                     default_probs,
+                                     lossUnits,
+                                     beta_vector,
+                                     num_integration_steps)
 
     return lossDbn
 
@@ -132,12 +134,12 @@ def homog_basket_loss_dbn(survival_probabilities,
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True)
 def tranche_surv_prob_recursion(k1,
-                        k2,
-                        num_credits,
-                        survival_probabilities,
-                        recovery_rates,
-                        beta_vector,
-                        num_integration_steps):
+                                k2,
+                                num_credits,
+                                survival_probabilities,
+                                recovery_rates,
+                                beta_vector,
+                                num_integration_steps):
     """ Get the tranche survival probability of a portfolio of credits in the
     one-factor GC model using a full recursion calculation of the loss
     distribution and survival probabilities to some time horizon. """
@@ -184,10 +186,10 @@ def tranche_surv_prob_recursion(k1,
         default_probs[iCredit] = 1.0 - survival_probabilities[iCredit]
 
     lossDbn = loss_dbn_recursion_gcd(num_credits,
-                                  default_probs,
-                                  lossUnits,
-                                  beta_vector,
-                                  num_integration_steps)
+                                     default_probs,
+                                     lossUnits,
+                                     beta_vector,
+                                     num_integration_steps)
 
     trancheEL = 0.0
     for iLossUnit in range(0, int(numLossUnits)):
@@ -227,12 +229,12 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True, cache=True)
 def tranch_surv_prob_gaussian(k1,
-                       k2,
-                       num_credits,
-                       survival_probabilities,
-                       recovery_rates,
-                       beta_vector,
-                       num_integration_steps):
+                              k2,
+                              num_credits,
+                              survival_probabilities,
+                              recovery_rates,
+                              beta_vector,
+                              num_integration_steps):
     """ Get the approximated tranche survival probability of a portfolio
     of credits in the one-factor GC model using a Gaussian fit of the
     conditional loss distribution and survival probabilities to some time
@@ -287,13 +289,14 @@ def tranch_surv_prob_gaussian(k1,
 
 ###############################################################################
 
+
 @njit(float64[:](int64, float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
 def loss_dbn_hetero_adj_binomial(num_credits,
-                                    default_probs,
-                                    loss_ratio,
-                                    beta_vector,
-                                    num_integration_steps):
+                                 default_probs,
+                                 loss_ratio,
+                                 beta_vector,
+                                 num_integration_steps):
     """ Get the portfolio loss distribution using the adjusted binomial
     approximation to the conditional loss distribution. """
 
@@ -339,12 +342,12 @@ def loss_dbn_hetero_adj_binomial(num_credits,
 @njit(float64(float64, float64, int64, float64[:], float64[:], float64[:],
               int64), fastmath=True, cache=True)
 def tranche_surv_prob_adj_binomial(k1,
-                          k2,
-                          num_credits,
-                          survival_probabilities,
-                          recovery_rates,
-                          beta_vector,
-                          num_integration_steps):
+                                   k2,
+                                   num_credits,
+                                   survival_probabilities,
+                                   recovery_rates,
+                                   beta_vector,
+                                   num_integration_steps):
     """ Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the adjusted binomial fit of the
     conditional loss distribution and survival probabilities to some time
@@ -373,10 +376,10 @@ def tranche_surv_prob_adj_binomial(k1,
             1.0 - recovery_rates[iCredit]) / num_credits / avgLoss
 
     lossDbn = loss_dbn_hetero_adj_binomial(num_credits,
-                                              default_probs,
-                                              loss_ratio,
-                                              beta_vector,
-                                              num_integration_steps)
+                                           default_probs,
+                                           loss_ratio,
+                                           beta_vector,
+                                           num_integration_steps)
     trancheEL = 0.0
     numLossUnits = num_credits + 1
     for iLossUnit in range(0, numLossUnits):

@@ -357,7 +357,7 @@ class IborSingleCurve(DiscountCurve):
             self._day_count_type = ibor_swaps[0]._float_leg._day_count_type
         else:
             self._day_count_type = None
-            
+
 ###############################################################################
 
     def _build_curve_using_1d_solver(self):

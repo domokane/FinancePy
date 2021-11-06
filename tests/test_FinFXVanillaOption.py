@@ -47,11 +47,11 @@ def test_FinFXVanillaOptionWystupExample1():
     # keeps the value unchanged
     notional = 1000000.0
     call_option = FXVanillaOption(expiry_date,
-                                 strike_fx_rate,
-                                 currency_pair,
-                                 OptionTypes.EUROPEAN_CALL,
-                                 notional,
-                                 "EUR", 2)
+                                  strike_fx_rate,
+                                  currency_pair,
+                                  OptionTypes.EUROPEAN_CALL,
+                                  notional,
+                                  "EUR", 2)
 
     value = call_option.value(
         1.0,
@@ -62,11 +62,11 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1250000.0
     call_option = FXVanillaOption(expiry_date,
-                                 strike_fx_rate,
-                                 currency_pair,
-                                 OptionTypes.EUROPEAN_CALL,
-                                 notional,
-                                 "USD", 2)
+                                  strike_fx_rate,
+                                  currency_pair,
+                                  OptionTypes.EUROPEAN_CALL,
+                                  notional,
+                                  "USD", 2)
 
     value = call_option.value(
         valuation_date,
@@ -134,11 +134,11 @@ def test_FinFXVanillaOptionWystupExample2():
     # keeps the value unchanged
     notional = 1000000.0
     call_option = FXVanillaOption(expiry_date,
-                                 strike_fx_rate,
-                                 currency_pair,
-                                 OptionTypes.EUROPEAN_PUT,
-                                 notional,
-                                 "EUR", 2)
+                                  strike_fx_rate,
+                                  currency_pair,
+                                  OptionTypes.EUROPEAN_PUT,
+                                  notional,
+                                  "EUR", 2)
 
     value = call_option.value(
         valuation_date,
@@ -220,11 +220,11 @@ def test_FinFXVanillaOptionBloombergExample():
     model = BlackScholes(volatility)
 
     call_option = FXVanillaOption(expiry_date,
-                                 strike_fx_rate,
-                                 currency_pair,
-                                 OptionTypes.EUROPEAN_CALL,
-                                 notional,
-                                 notional_currency, 2)
+                                  strike_fx_rate,
+                                  currency_pair,
+                                  OptionTypes.EUROPEAN_CALL,
+                                  notional,
+                                  notional_currency, 2)
 
     value = call_option.value(
         valuation_date,
@@ -274,11 +274,11 @@ def test_value_mc():
     strike_fx_rate = 1.6
 
     call_option = FXVanillaOption(expiry_date,
-                                    strike_fx_rate,
-                                    "EURUSD",
-                                    OptionTypes.EUROPEAN_CALL,
-                                    1000000,
-                                    "USD")
+                                  strike_fx_rate,
+                                  "EURUSD",
+                                  OptionTypes.EUROPEAN_CALL,
+                                  1000000,
+                                  "USD")
 
     value_mc = call_option.value_mc(
         valuation_date,
@@ -291,11 +291,11 @@ def test_value_mc():
     assert round(value_mc, 4) == 0.0429
 
     put_option = FXVanillaOption(expiry_date,
-                                strike_fx_rate,
-                                "EURUSD",
-                                OptionTypes.EUROPEAN_PUT,
-                                1000000,
-                                "USD")
+                                 strike_fx_rate,
+                                 "EURUSD",
+                                 OptionTypes.EUROPEAN_PUT,
+                                 1000000,
+                                 "USD")
 
     value_mc = put_option.value_mc(
         valuation_date,
@@ -323,11 +323,11 @@ def test_vega_theta():
     strike_fx_rate = 1.6
 
     call_option = FXVanillaOption(expiry_date,
-                                    strike_fx_rate,
-                                    "EURUSD",
-                                    OptionTypes.EUROPEAN_CALL,
-                                    1000000,
-                                    "USD")
+                                  strike_fx_rate,
+                                  "EURUSD",
+                                  OptionTypes.EUROPEAN_CALL,
+                                  1000000,
+                                  "USD")
 
     vega = call_option.vega(
         valuation_date,
@@ -346,6 +346,3 @@ def test_vega_theta():
         model)
 
     assert round(theta, 4) == -0.0504
-
-
-

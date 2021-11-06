@@ -41,7 +41,8 @@ class FinInflationSwap():
 
     def __init__(self,
                  start_date: Date,  # The date the FRA starts to accrue
-                 maturity_date_or_tenor: (Date, str),  # End of the Ibor rate period
+                 # End of the Ibor rate period
+                 maturity_date_or_tenor: (Date, str),
                  fraRate: float,  # The fixed contractual FRA rate
                  day_count_type: DayCountTypes,  # For interest period
                  notional: float = 100.0,
@@ -52,7 +53,7 @@ class FinInflationSwap():
 
         print("DO NOT USE")
         raise FinError("DO NOT USE")
-        
+
         check_argument_types(self.__init__, locals())
 
         self._calendar_type = calendar_type

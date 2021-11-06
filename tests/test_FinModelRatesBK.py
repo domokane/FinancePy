@@ -112,7 +112,7 @@ def test_BKExampleTwo():
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(tmat, times, dfs)
     v = model.bond_option(texp, strike_price,
-                            face, coupon_times, coupon_flows, exercise_type)
+                          face, coupon_times, coupon_flows, exercise_type)
     treeVector.append(v)
 
     assert round(v['call'], 4) == 0.6998

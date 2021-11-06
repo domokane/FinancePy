@@ -39,6 +39,7 @@ for _, bond in bondDataFrame.iterrows():
     bonds.append(bond)
     ylds.append(yld)
 
+
 def test_poly():
     curveFitMethod = CurveFitPolynomial(5)
     fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
@@ -51,6 +52,7 @@ def test_poly():
     assert round(coeffs[4] * 1e3, 4) == 1.3536
     assert round(coeffs[5] * 1e7, 4) == 4.1514
 
+
 def test_nelson_siegel():
     curveFitMethod = CurveFitNelsonSiegel()
     fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
@@ -59,6 +61,7 @@ def test_nelson_siegel():
     assert round(fittedCurve._curveFit._beta2, 3) == 0.092
     assert round(fittedCurve._curveFit._beta3, 3) == 0.259
     assert round(fittedCurve._curveFit._tau, 1) == 35.8
+
 
 def test_nelson_siegel_svensson():
     curveFitMethod = CurveFitNelsonSiegelSvensson()
@@ -70,6 +73,7 @@ def test_nelson_siegel_svensson():
     assert round(fittedCurve._curveFit._beta4, 4) == -0.0376
     assert round(fittedCurve._curveFit._tau1, 3) == 3.177
     assert round(fittedCurve._curveFit._tau2, 4) == 100.0000
+
 
 def test_interpolated_yield():
     curveFitMethod = CurveFitBSpline()

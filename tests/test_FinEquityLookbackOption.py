@@ -49,6 +49,7 @@ def test_european_call():
     assert round(value, 4) == 28.7477
     assert round(value_mc, 4) == 27.8592
 
+
 def test_european_put():
     option_type = OptionTypes.EUROPEAN_PUT
     k = 100.0

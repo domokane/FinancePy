@@ -46,7 +46,8 @@ class FinProcessSimulator():
             return paths
 
         elif process_type == ProcessTypes.HESTON:
-            (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = model_params
+            (stock_price, drift, v0, kappa, theta,
+             sigma, rho, scheme) = model_params
             paths = get_heston_paths(num_paths,
                                      numAnnSteps,
                                      t,
@@ -221,6 +222,7 @@ class FinGBMNumericalScheme(Enum):
 
 ###############################################################################
 
+
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, int64, int64), cache=True, fastmath=True)
 def get_gbm_paths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, seed):
@@ -270,6 +272,7 @@ class FinVasicekNumericalScheme(Enum):
     ANTITHETIC = 2
 
 ###############################################################################
+
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)
@@ -324,6 +327,7 @@ class CIRNumericalScheme(Enum):
     EXACT = 5  # SAMPLES EXACT DISTRIBUTION
 
 ###############################################################################
+
 
 @njit(float64[:, :](int64, int64, float64, float64, float64,
                     float64, float64, int64, int64), cache=True, fastmath=True)

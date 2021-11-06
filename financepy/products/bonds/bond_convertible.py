@@ -596,13 +596,13 @@ class BondConvertible:
 
         for i in range(0, len(self._call_dates)):
             s += label_to_string(self._call_dates[i],
-                               self._call_prices[i])
+                                 self._call_prices[i])
 
         s += label_to_string("PUT", "DATES")
 
         for i in range(0, len(self._put_dates)):
             s += label_to_string(self._put_dates[i],
-                               self._put_prices[i])
+                                 self._put_prices[i])
 
         return s
 

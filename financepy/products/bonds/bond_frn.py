@@ -85,7 +85,7 @@ class BondFRN:
     def _calculate_flow_dates(self):
         """ Determine the bond cashflow payment dates. """
 
-        # This should only be called once from init 
+        # This should only be called once from init
 
         calendar_type = CalendarTypes.NONE
         bus_day_rule_type = BusDayAdjustTypes.NONE
@@ -169,11 +169,11 @@ class BondFRN:
     ###############################################################################
 
     def dollar_duration(self,
-                       settlement_date: Date,
-                       next_coupon: float,
-                       current_ibor: float,
-                       future_ibor: float,
-                       dm: float):
+                        settlement_date: Date,
+                        next_coupon: float,
+                        current_ibor: float,
+                        future_ibor: float,
+                        dm: float):
         """ Calculate the risk or dP/dy of the bond by bumping. This is also
         known as the DV01 in Bloomberg. """
 
@@ -197,11 +197,11 @@ class BondFRN:
     ###############################################################################
 
     def dollar_credit_duration(self,
-                             settlement_date: Date,
-                             next_coupon: float,
-                             current_ibor: float,
-                             future_ibor: float,
-                             dm: float):
+                               settlement_date: Date,
+                               next_coupon: float,
+                               current_ibor: float,
+                               future_ibor: float,
+                               dm: float):
         """ Calculate the risk or dP/dy of the bond by bumping. """
 
         if dm > 10.0:
@@ -228,19 +228,19 @@ class BondFRN:
     ###############################################################################
 
     def macauley_duration(self,
-                             settlement_date: Date,
-                             next_coupon: float,
-                             current_ibor: float,
-                             future_ibor: float,
-                             dm: float):
+                          settlement_date: Date,
+                          next_coupon: float,
+                          current_ibor: float,
+                          future_ibor: float,
+                          dm: float):
         """ Calculate the Macauley duration of the FRN on a settlement date
         given its yield to maturity. """
 
         dd = self.dollar_duration(settlement_date,
-                                 next_coupon,
-                                 current_ibor,
-                                 future_ibor,
-                                 dm)
+                                  next_coupon,
+                                  current_ibor,
+                                  future_ibor,
+                                  dm)
 
         fp = self.full_price_from_dm(settlement_date,
                                      next_coupon,
@@ -254,11 +254,11 @@ class BondFRN:
     ###############################################################################
 
     def modified_duration(self,
-                             settlement_date: Date,
-                             next_coupon: float,
-                             current_ibor: float,
-                             future_ibor: float,
-                             dm: float):
+                          settlement_date: Date,
+                          next_coupon: float,
+                          current_ibor: float,
+                          future_ibor: float,
+                          dm: float):
         """ Calculate the modified duration of the bond on a settlement date
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
@@ -267,10 +267,10 @@ class BondFRN:
         margin. """
 
         dd = self.dollar_duration(settlement_date,
-                                 next_coupon,
-                                 current_ibor,
-                                 future_ibor,
-                                 dm)
+                                  next_coupon,
+                                  current_ibor,
+                                  future_ibor,
+                                  dm)
 
         fp = self.full_price_from_dm(settlement_date,
                                      next_coupon,
@@ -283,11 +283,11 @@ class BondFRN:
     ###############################################################################
 
     def modified_credit_duration(self,
-                               settlement_date: Date,
-                               next_coupon: float,
-                               current_ibor: float,
-                               future_ibor: float,
-                               dm: float):
+                                 settlement_date: Date,
+                                 next_coupon: float,
+                                 current_ibor: float,
+                                 future_ibor: float,
+                                 dm: float):
         """ Calculate the modified duration of the bond on a settlement date
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
@@ -296,10 +296,10 @@ class BondFRN:
         margin. """
 
         dd = self.dollar_credit_duration(settlement_date,
-                                       next_coupon,
-                                       current_ibor,
-                                       future_ibor,
-                                       dm)
+                                         next_coupon,
+                                         current_ibor,
+                                         future_ibor,
+                                         dm)
 
         fp = self.full_price_from_dm(settlement_date,
                                      next_coupon,
@@ -312,11 +312,11 @@ class BondFRN:
     ###############################################################################
 
     def convexity_from_dm(self,
-                        settlement_date: Date,
-                        next_coupon: float,
-                        current_ibor: float,
-                        future_ibor: float,
-                        dm: float):
+                          settlement_date: Date,
+                          next_coupon: float,
+                          current_ibor: float,
+                          future_ibor: float,
+                          dm: float):
         """ Calculate the bond convexity from the discount margin (DM) using a
         standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
@@ -350,11 +350,11 @@ class BondFRN:
     ###############################################################################
 
     def clean_price_from_dm(self,
-                          settlement_date: Date,
-                          next_coupon: float,
-                          current_ibor: float,
-                          future_ibor: float,
-                          dm: float):
+                            settlement_date: Date,
+                            next_coupon: float,
+                            current_ibor: float,
+                            future_ibor: float,
+                            dm: float):
         """ Calculate the bond clean price from the discount margin
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
@@ -380,11 +380,11 @@ class BondFRN:
     ###############################################################################
 
     def discount_margin(self,
-                       settlement_date: Date,
-                       next_coupon: float,
-                       current_ibor: float,
-                       future_ibor: float,
-                       clean_price: float):
+                        settlement_date: Date,
+                        next_coupon: float,
+                        current_ibor: float,
+                        future_ibor: float,
+                        clean_price: float):
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
@@ -444,7 +444,7 @@ class BondFRN:
     ###############################################################################
 
     def print_flows(self,
-                   settlement_date: Date):
+                    settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
         self._calculate_flow_dates()
@@ -459,7 +459,8 @@ class BondFRN:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("QUOTED MARGIN (bp)", self._quoted_margin * 10000.0)
+        s += label_to_string("QUOTED MARGIN (bp)",
+                             self._quoted_margin * 10000.0)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         s += label_to_string("FACE AMOUNT", self._face_amount)

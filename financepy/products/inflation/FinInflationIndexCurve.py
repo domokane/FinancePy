@@ -15,13 +15,14 @@ from ...utils.global_vars import gDaysInYear
 
 ###############################################################################
 
+
 class FinInflationIndexCurve():
     """ This is a curve calculated from a set of dates and CPI-like numbers. It
     should start at the issue date of the bond (or index). It also requires a
     lag in months. Here is a reference to the CPI curve used for TIPS.
-    
+
     https://www.treasury.gov/about/organizational-structure/offices/Domestic-Finance/Documents/tips-presentation.pdf
-    
+
     """
 
 ###############################################################################
@@ -59,13 +60,13 @@ class FinInflationIndexCurve():
         """ Calculate index value by interpolating the CPI curve """
 
         lagMonthsAgoDt = dt.add_months(-self._lagInMonths)
-        
+
         cpiFirstDate = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
         cpiSecondDate = cpiFirstDate.add_months(1)
-        
+
         cpiFirstTime = (cpiFirstDate - self._baseDate) / gDaysInYear
         cpiSecondTime = (cpiSecondDate - self._baseDate) / gDaysInYear
-       
+
         cpiFirstValue = np.interp(cpiFirstTime,
                                   self._indexTimes,
                                   self._indexValues)
@@ -73,12 +74,13 @@ class FinInflationIndexCurve():
         cpiSecondValue = np.interp(cpiSecondTime,
                                    self._indexTimes,
                                    self._indexValues)
-        
+
         d = dt._d
         m = dt._m
-        y = dt._y       
+        y = dt._y
         numDays = days_in_month(m, y)
-        v = cpiFirstValue + (d - 1) * (cpiSecondValue - cpiFirstValue) / numDays       
+        v = cpiFirstValue + (d - 1) * (cpiSecondValue -
+                                       cpiFirstValue) / numDays
         return v
 
 ###############################################################################
@@ -103,7 +105,7 @@ class FinInflationIndexCurve():
         num_points = len(self._indexValues)
         for i in range(0, num_points):
             s += label_to_string("%12s" % self._indexDates[i],
-                               "%10.7f" % self._indexValues[i])
+                                 "%10.7f" % self._indexValues[i])
 
         return s
 
@@ -114,4 +116,3 @@ class FinInflationIndexCurve():
         print(self)
 
 ###############################################################################
-

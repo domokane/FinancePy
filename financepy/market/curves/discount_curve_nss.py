@@ -88,16 +88,16 @@ class DiscountCurveNSS(DiscountCurve):
 
         # Now get the discount factors using curve conventions
         dfs = self._zero_to_df(self._valuation_date,
-                             zero_rates,
-                             dc_times,
-                             self._freq_type,
-                             self._day_count_type)
+                               zero_rates,
+                               dc_times,
+                               self._freq_type,
+                               self._day_count_type)
 
         # Convert these to zero rates in the required frequency and day count
         zero_rates = self._df_to_zero(dfs,
-                                    dates,
-                                    freq_type,
-                                    day_count_type)
+                                      dates,
+                                      freq_type,
+                                      day_count_type)
 
         if isinstance(dates, Date):
             return zero_rates[0]
@@ -142,10 +142,10 @@ class DiscountCurveNSS(DiscountCurve):
         zero_rates = self._zero_rate(dc_times)
 
         df = self._zero_to_df(self._valuation_date,
-                            zero_rates,
-                            dc_times,
-                            self._freq_type,
-                            self._day_count_type)
+                              zero_rates,
+                              dc_times,
+                              self._freq_type,
+                              self._day_count_type)
 
         if isinstance(dates, Date):
             return df[0]

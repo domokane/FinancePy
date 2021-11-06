@@ -32,7 +32,6 @@ def test_backward_frequencies():
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
-
     freq_type = FrequencyTypes.SEMI_ANNUAL
     schedule = Schedule(d1,
                         d2,
@@ -78,7 +77,6 @@ def test_forward_frequencies():
 
     d1 = Date(20, 6, 2018)
     d2 = Date(20, 6, 2020)
-
 
     freq_type = FrequencyTypes.ANNUAL
     schedule = Schedule(d1,
@@ -156,6 +154,7 @@ def test_backward_front_stub():
     adjusted_dates = schedule._adjusted_dates
     assert len(adjusted_dates) == 9
     check_frequency(schedule, start=1)
+
 
 def test_forward_end_stub():
     # FORWARD SHORT STUB AT END

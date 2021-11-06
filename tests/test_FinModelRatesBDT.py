@@ -78,7 +78,7 @@ def test_BDTExampleTwo():
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(tmat, times, dfs)
     v = model.bond_option(texp, strike_price,
-                            face, coupon_times, coupon_flows, exercise_type)
+                          face, coupon_times, coupon_flows, exercise_type)
 
     assert round(v['call'], 4) == 0.5043
     assert round(v['put'], 4) == 8.2242
@@ -102,7 +102,6 @@ def test_BDTExampleThree():
     face = 100.0
     # Andersen paper
     num_time_steps = 200
-
 
     exercise_type = FinExerciseTypes.EUROPEAN
     years_to_maturity = 4.0
@@ -150,7 +149,6 @@ def test_BDTExampleThree():
     assert round(price, 5) == 100.01832
     assert round(v['pay']*100, 2) == 0.00
     assert round(v['rec']*100, 2) == 8883.21
-
 
     exercise_type = FinExerciseTypes.BERMUDAN
     years_to_maturity = 10.0

@@ -33,6 +33,7 @@ strike = 100.0
 
 correlation = 0.39999960
 
+
 def test_call_on_max():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MAXIMUM
     payoff_params = [strike]
@@ -61,6 +62,7 @@ def test_call_on_max():
 
     assert round(v, 4) == 21.4034
     assert round(v_MC, 4) == 21.5586
+
 
 def test_call_on_min():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MINIMUM
@@ -91,6 +93,7 @@ def test_call_on_min():
     assert round(v, 4) == 5.7817
     assert round(v_MC, 4) == 5.8795
 
+
 def test_put_on_max():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MAXIMUM
     payoff_params = [strike]
@@ -119,6 +122,7 @@ def test_put_on_max():
 
     assert round(v, 4) == 4.6493
     assert round(v_MC, 4) == 4.6839
+
 
 def test_put_on_min():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MINIMUM
@@ -149,6 +153,7 @@ def test_put_on_min():
     assert round(v, 4) == 14.8750
     assert round(v_MC, 4) == 14.8747
 
+
 def test_call_on_nth():
     num_paths = 10000
     num_assets = 5
@@ -169,9 +174,9 @@ def test_call_on_nth():
         9.6716,
         4.7205,
         1.6182
-        ]
+    ]
 
-    for n in [1,2,3,4,5]:
+    for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
@@ -188,8 +193,9 @@ def test_call_on_nth():
             volatilities,
             corr_matrix,
             num_paths)
-        
+
         assert round(v_MC, 4) == expected_results[n-1]
+
 
 def test_put_on_nth():
     rainboxOptionValues = []
@@ -213,9 +219,9 @@ def test_put_on_nth():
         7.6921,
         13.2466,
         22.3467
-        ]
+    ]
 
-    for n in [1,2,3,4,5]:
+    for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
@@ -232,5 +238,5 @@ def test_put_on_nth():
             volatilities,
             corr_matrix,
             num_paths)
-        
+
         assert round(v_MC, 4) == expected_results[n-1]

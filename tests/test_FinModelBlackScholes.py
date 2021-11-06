@@ -29,24 +29,24 @@ amOption = EquityAmericanOption(expiry_date, strike_price,
                                 option_type)
 
 ameuOption = EquityAmericanOption(expiry_date, strike_price,
-                                    euOptionType)
+                                  euOptionType)
 
 euOption = EquityVanillaOption(expiry_date, strike_price,
-                                euOptionType)
+                               euOptionType)
 
 discount_curve = DiscountCurveFlat(valuation_date, interest_rate,
-                                    FrequencyTypes.CONTINUOUS,
-                                    DayCountTypes.ACT_365F)
+                                   FrequencyTypes.CONTINUOUS,
+                                   DayCountTypes.ACT_365F)
 
 dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield,
-                                    FrequencyTypes.CONTINUOUS,
-                                    DayCountTypes.ACT_365F)
+                                   FrequencyTypes.CONTINUOUS,
+                                   DayCountTypes.ACT_365F)
 
 num_steps_per_year = 400
 
 modelTree = BlackScholes(volatility,
-                            BlackScholesTypes.CRR_TREE,
-                            num_steps_per_year)
+                         BlackScholesTypes.CRR_TREE,
+                         num_steps_per_year)
 
 
 def test_black_scholes():

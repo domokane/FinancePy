@@ -14,13 +14,14 @@ from ..utils.error import FinError
 
 from enum import Enum
 
+
 class VolFunctionTypes(Enum):
     CLARK = 0
     SABR = 1
     SABR_BETA_ONE = 2
     SABR_BETA_HALF = 3
     BBG = 4
-    CLARK5= 5
+    CLARK5 = 5
     SVI = 6
     SSVI = 7
 
@@ -56,7 +57,7 @@ def vol_function_clark(params, f, k, t):
 ###############################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), 
+@njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def vol_function_bloomberg(params, f, k, t):
     """ Volatility Function similar to the one used by Bloomberg. It is 
@@ -65,7 +66,7 @@ def vol_function_bloomberg(params, f, k, t):
     fitting to avoid this happening. The first parameter is the quadratic 
     coefficient i.e. sigma(K) = a * D * D + b * D + c where a = params[0], 
     b = params[1], c = params[2] and D is the spot delta."""
- 
+
     num_params = len(params)
 
     # Rather than pass in the ATM vol, I imply it from the delta=0.50 curve
@@ -75,8 +76,8 @@ def vol_function_bloomberg(params, f, k, t):
         sigma += params[i] * ((0.50) ** pwr)
 
     vsqrtt = sigma * np.sqrt(t)
-    
-    d1 = np.log(f/k)/ vsqrtt + vsqrtt/2.0
+
+    d1 = np.log(f/k) / vsqrtt + vsqrtt/2.0
     delta = N(d1)
 
     v = 0.0
@@ -91,8 +92,9 @@ def vol_function_bloomberg(params, f, k, t):
 # Also, if I vectorise it it fails as it cannot handle a numpy array as input
 ###############################################################################
 
-@njit(float64(float64[:], float64, float64, float64), 
-           fastmath=True, cache=True)
+
+@njit(float64(float64[:], float64, float64, float64),
+      fastmath=True, cache=True)
 def vol_function_svi(params, f, k, t):
     """ Volatility Function proposed by Gatheral in 2004. Increasing a results 
     in a vertical translation of the smile in the positive direction. 
@@ -110,7 +112,7 @@ def vol_function_svi(params, f, k, t):
     m = params[3]
     sigma = params[4]
 
-    vart = a + b*(rho*(x-m)+np.sqrt((x-m)**2 + sigma*sigma))   
+    vart = a + b*(rho*(x-m)+np.sqrt((x-m)**2 + sigma*sigma))
     v = np.sqrt(vart/t)
     return v
 
@@ -121,53 +123,60 @@ def vol_function_svi(params, f, k, t):
 ###############################################################################
 ###############################################################################
 
+
 @njit(float64(float64, float64), fastmath=True, cache=True)
-def phi_ssvi(theta, gamma): 
-    
+def phi_ssvi(theta, gamma):
+
     if abs(gamma) < 1e-8:
         gamma = 1e-8
-        
+
     if abs(theta) < 1e-8:
         theta = 1e-8
-        
+
     phi = (1.0/gamma/theta) * (1.0 - (1.0 - np.exp(-gamma*theta))/gamma/theta)
     return phi
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def ssvi(x, gamma, sigma, rho, t):
-    """ This is the total variance w = sigma(t) x sigma(t) (0,t) x t """ 
-    
+    """ This is the total variance w = sigma(t) x sigma(t) (0,t) x t """
+
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
     px = p * x
     g = px + rho
-    v = 0.5 * theta * (1. + rho * px + np.sqrt(g**2  + 1. - rho * rho))
+    v = 0.5 * theta * (1. + rho * px + np.sqrt(g**2 + 1. - rho * rho))
     return v
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def ssvi1(x, gamma, sigma, rho, t):
     # First derivative with respect to x
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
     px = p * x
-    v = 0.5 * theta * p * (px + rho * np.sqrt(px**2 + 2. * px * rho + 1.) + rho)
+    v = 0.5 * theta * p * \
+        (px + rho * np.sqrt(px**2 + 2. * px * rho + 1.) + rho)
     v = v / np.sqrt(px**2 + 2. * px * rho + 1.)
     return v
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def ssvi2(x, gamma, sigma, rho, t):
     # Second derivative with respect to x
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
     px = p * x
-    v = 0.5 * theta * p * p * (1. - rho * rho) 
-    v =v / ((px**2 + 2. * px * rho + 1.) * np.sqrt(px**2 + 2. * px * rho + 1.))
+    v = 0.5 * theta * p * p * (1. - rho * rho)
+    v = v / ((px**2 + 2. * px * rho + 1.) *
+             np.sqrt(px**2 + 2. * px * rho + 1.))
     return v
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def ssvit(x, gamma, sigma, rho, t):
     # First derivative with respect to t, by central difference
@@ -175,30 +184,33 @@ def ssvit(x, gamma, sigma, rho, t):
     ssvitplus = ssvi(x, gamma, sigma, rho, t + eps)
     ssvitminus = ssvi(x, gamma, sigma, rho, t - eps)
     deriv = (ssvitplus - ssvitminus) / 2.0 / eps
-    return deriv  
-                   
-@njit(float64(float64, float64, float64, float64, float64), 
+    return deriv
+
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def g(x, gamma, sigma, rho, t):
     w = ssvi(x, gamma, sigma, rho, t)
-    
+
     if abs(w) < 1e-10:
         w = 1e-10
 
     w1 = ssvi1(x, gamma, sigma, rho, t)
     w2 = ssvi2(x, gamma, sigma, rho, t)
     xwv = x * w1 / w
-    v = (1. - 0.5 * xwv) **2 - 0.25 * w1 * w1 * (0.25 + 1. / w) + 0.5 * w2
-    return v 
-   
-@njit(float64(float64, float64, float64, float64, float64), 
+    v = (1. - 0.5 * xwv) ** 2 - 0.25 * w1 * w1 * (0.25 + 1. / w) + 0.5 * w2
+    return v
+
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def dminus(x, gamma, sigma, rho, t):
     vsqrt = np.sqrt(ssvi(x, gamma, sigma, rho, t))
     v = -x / vsqrt - 0.5 * vsqrt
     return v
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def density_ssvi(x, gamma, sigma, rho, t):
     dm = dminus(x, gamma, sigma, rho, t)
@@ -206,16 +218,18 @@ def density_ssvi(x, gamma, sigma, rho, t):
     v = v / np.sqrt(2. * np.pi * ssvi(x, gamma, sigma, rho, t))
     return v
 
-@njit(float64(float64, float64, float64, float64, float64), 
+
+@njit(float64(float64, float64, float64, float64, float64),
       fastmath=True, cache=True)
 def ssvi_local_varg(x, gamma, sigma, rho, t):
-    # Compute the equivalent SSVI local variance 
+    # Compute the equivalent SSVI local variance
     num = ssvit(x, gamma, sigma, rho, t)
     den = g(x, gamma, sigma, rho, t)
     var = num/den
     return var
 
-@njit(float64(float64[:], float64, float64, float64), 
+
+@njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)
 def vol_function_ssvi(params, f, k, t):
     ''' Volatility Function proposed by Gatheral in 2004.'''
@@ -223,11 +237,11 @@ def vol_function_ssvi(params, f, k, t):
     gamma = params[0]
     sigma = params[1]
     rho = params[2]
-    
+
     x = np.log(f/k)
 
-    vart = ssvi_local_varg(x, gamma, sigma, rho, t)    
-    
+    vart = ssvi_local_varg(x, gamma, sigma, rho, t)
+
     if vart < 0.0:
         vart = 0.0
 

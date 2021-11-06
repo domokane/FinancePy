@@ -21,7 +21,7 @@ class SwapFixedLeg:
     """ Class for managing the fixed leg of a swap. A fixed leg is a leg with
     a sequence of flows calculated according to an ISDA schedule and with a 
     coupon that is fixed over the life of the swap. """
-    
+
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  end_date: (Date, str),  # Date contract ends
@@ -34,8 +34,8 @@ class SwapFixedLeg:
                  payment_lag: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD, 
-                 end_of_month:bool = False):
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 end_of_month: bool = False):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional.  """
@@ -50,7 +50,7 @@ class SwapFixedLeg:
         calendar = Calendar(calendar_type)
 
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
@@ -95,7 +95,7 @@ class SwapFixedLeg:
                             self._freq_type,
                             self._calendar_type,
                             self._bus_day_adjust_type,
-                            self._date_gen_rule_type, 
+                            self._date_gen_rule_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -112,7 +112,7 @@ class SwapFixedLeg:
         self._rates = []
 
         prev_dt = scheduleDates[0]
-        
+
         day_counter = DayCount(self._day_count_type)
         calendar = Calendar(self._calendar_type)
 
@@ -125,12 +125,12 @@ class SwapFixedLeg:
                 payment_date = next_dt
             else:
                 payment_date = calendar.add_business_days(next_dt,
-                                                       self._payment_lag)
+                                                          self._payment_lag)
 
             self._payment_dates.append(payment_date)
 
             (year_frac, num, den) = day_counter.year_frac(prev_dt,
-                                                       next_dt)
+                                                          next_dt)
 
             self._rates.append(self._coupon)
 
@@ -151,7 +151,7 @@ class SwapFixedLeg:
         self._paymentDfs = []
         self._paymentPVs = []
         self._cumulativePVs = []
-                
+
         notional = self._notional
         dfValue = discount_curve.df(valuation_date)
         legPV = 0.0
@@ -160,23 +160,23 @@ class SwapFixedLeg:
         dfPmnt = 0.0
 
         for iPmnt in range(0, numPayments):
- 
+
             pmntDate = self._payment_dates[iPmnt]
-            pmntAmount= self._payments[iPmnt]
+            pmntAmount = self._payments[iPmnt]
 
             if pmntDate > valuation_date:
 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
                 legPV += pmntPV
-                
-                self._paymentDfs.append(dfPmnt)            
+
+                self._paymentDfs.append(dfPmnt)
                 self._paymentPVs.append(pmntAmount*dfPmnt)
                 self._cumulativePVs.append(legPV)
 
             else:
 
-                self._paymentDfs.append(0.0)            
+                self._paymentDfs.append(0.0)
                 self._paymentPVs.append(0.0)
                 self._cumulativePVs.append(0.0)
 
@@ -213,7 +213,7 @@ class SwapFixedLeg:
         print(header)
 
         num_flows = len(self._payment_dates)
-        
+
         for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  %8.6f  %11.2f" %
                   (self._payment_dates[iFlow],
@@ -246,7 +246,7 @@ class SwapFixedLeg:
         print(header)
 
         num_flows = len(self._payment_dates)
-        
+
         for iFlow in range(0, num_flows):
             print("%11s  %11s  %11s  %4d  %8.6f  %8.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
                   (self._payment_dates[iFlow],
@@ -255,7 +255,7 @@ class SwapFixedLeg:
                    self._accrued_days[iFlow],
                    self._year_fracs[iFlow],
                    self._rates[iFlow] * 100.0,
-                   self._payments[iFlow], 
+                   self._payments[iFlow],
                    self._paymentDfs[iFlow],
                    self._paymentPVs[iFlow],
                    self._cumulativePVs[iFlow]))

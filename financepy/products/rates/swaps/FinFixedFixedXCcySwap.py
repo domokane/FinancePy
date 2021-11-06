@@ -18,17 +18,17 @@ from ...utils.FinGlobalTypes import SwapTypes
 
 
 class FinFixedFixedXCcySwap
-    """ Class for managing a cross currency swap contract. This is a contract
+  """ Class for managing a cross currency swap contract. This is a contract
     in which a fixed or floating payment leg in one currency is exchanged for a
     series of fixed or floating rates in a second currency. There is an
     exchange of par. The contract is entered into at zero initial cost and it
     lasts from a start date to a specified maturity date.
-    
+
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount discount (one for each leg) which is separate
     from the curve from which the implied index rates are extracted. """
-    
-    def __init__(self,
+
+   def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
                  termination_date_or_tenor: (Date, str),  # Date contract ends
                  fixed_leg_type: SwapTypes,
@@ -56,11 +56,12 @@ class FinFixedFixedXCcySwap
         if type(termination_date_or_tenor) == Date:
             self._termination_date = termination_date_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(termination_date_or_tenor)
+            self._termination_date = effective_date.add_tenor(
+                termination_date_or_tenor)
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                             bus_day_adjust_type)
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -128,8 +129,8 @@ class FinFixedFixedXCcySwap
         discount curve. """
 
         fixed_leg_value = self.fixed_leg_value(valuation_date,
-                                           discount_curve,
-                                           principal)
+                                               discount_curve,
+                                               principal)
 
         float_leg_value = self.float_leg_value(valuation_date,
                                                discount_curve,
@@ -383,7 +384,8 @@ class FinFixedFixedXCcySwap
         prev_dt = self._adjustedFloatDates[start_index - 1]
         next_dt = self._adjustedFloatDates[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
-        df1_index = index_curve.df(self._effective_date)  # Cannot be pcd as has past
+        # Cannot be pcd as has past
+        df1_index = index_curve.df(self._effective_date)
         df2_index = index_curve.df(next_dt)
 
         float_rate = 0.0

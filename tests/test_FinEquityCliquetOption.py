@@ -9,6 +9,7 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 
+
 def test_EquityCliquetOption():
 
     start_date = Date(1, 1, 2014)

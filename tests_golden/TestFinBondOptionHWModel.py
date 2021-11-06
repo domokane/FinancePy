@@ -2,26 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import matplotlib.pyplot as plt
+import time
+import numpy as np
+from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.products.bonds.bond_option import BondOption
+from financepy.utils.global_types import OptionTypes
+from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..\\")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
-from financepy.utils.global_types import OptionTypes
-from financepy.products.bonds.bond_option import BondOption
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.date import Date
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.global_types import FinExerciseTypes
-
-import numpy as np
-import time
-import matplotlib.pyplot as plt
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -454,16 +451,18 @@ def test_BondOptionZEROVOLConvergence():
 
 ###############################################################################
 
+
 def test_BondOptionDerivaGem():
 
     # See https://github.com/domokane/FinancePy/issues/98
-    
+
     settlement_date = Date(1, 12, 2019)
 
     rate = 0.05
     dcType = DayCountTypes.THIRTY_360_BOND
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    discount_curve = DiscountCurveFlat(settlement_date, rate, fixedFreq, dcType)
+    discount_curve = DiscountCurveFlat(
+        settlement_date, rate, fixedFreq, dcType)
 
     issue_date = Date(1, 12, 2018)
     expiry_date = settlement_date.add_tenor("18m")
@@ -476,14 +475,14 @@ def test_BondOptionDerivaGem():
     strike_price = 100.0
     face = 100.0
 
-    europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face, 
+    europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face,
                                         OptionTypes.EUROPEAN_CALL)
     cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
     fp = bond.full_price_from_discount_curve(expiry_date, discount_curve)
 #    print("Fixed Income Clean Price: %9.3f"% cp)
 #    print("Fixed Income Full  Price: %9.3f"% fp)
 
-    num_steps= 500
+    num_steps = 500
     sigma = 0.0125
     a = 0.1
     modelHW = HWTree(sigma, a, num_steps)
@@ -503,12 +502,12 @@ def test_BondOptionDerivaGem():
         ncd = bond._flow_dates[i]
 
         if ncd > settlement_date:
-            
+
             if len(couponTimes) == 0:
                 flowTime = (pcd - settlement_date) / gDaysInYear
                 couponTimes.append(flowTime)
                 couponFlows.append(cpn)
-                
+
             flowTime = (ncd - settlement_date) / gDaysInYear
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
@@ -533,7 +532,7 @@ def test_BondOptionDerivaGem():
                                                  couponTimes, couponFlows,
                                                  times, dfs)
     # print("Jamshidian:", vjam)
-    
+
     model._num_time_steps = 100
     model.build_tree(tmat, times, dfs)
     exerciseType = FinExerciseTypes.EUROPEAN

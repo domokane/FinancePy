@@ -36,7 +36,8 @@ for _, bondRow in bondDataFrame.iterrows():
 
 bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
 
-def test_zero_cruve():
+def test_zero_curve():
+
     maturityDt = Date(7, 3, 2013)
     zero_rate = bondCurve.zero_rate(maturityDt)
     assert round(zero_rate, 4) == 0.0022
@@ -45,7 +46,6 @@ def test_zero_cruve():
     zero_rate = bondCurve.zero_rate(maturityDt)
     assert round(zero_rate, 4) == 0.0128
 
-    maturityDt = Date (22, 1, 2060)
+    maturityDt = Date(22, 1, 2060)
     zero_rate = bondCurve.zero_rate(maturityDt)
     assert round(zero_rate, 4) == 0.0351
-    

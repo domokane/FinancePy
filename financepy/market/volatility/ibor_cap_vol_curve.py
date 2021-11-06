@@ -191,7 +191,7 @@ class IborCapVolCurve():
             volCap = self._capSigmas[i]
             fwdIborVol = self._capletVols[i]
             s += label_to_string("%7.4f  %6.4f  %9.4f  %9.4f"
-                               % (t, tau, volCap*100.0, fwdIborVol*100.0))
+                                 % (t, tau, volCap*100.0, fwdIborVol*100.0))
 
         return s
 

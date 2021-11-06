@@ -4,18 +4,18 @@
 
 # TODO Set up test cases correctly
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.bonds.bond_annuity import BondAnnuity
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
 import sys
 sys.path.append("..")
 
-from financepy.utils.calendar import DateGenRuleTypes
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.products.bonds.bond_annuity import BondAnnuity
 
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -160,7 +160,7 @@ def test_BondAnnuity():
     basis_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(maturity_date,
-                          coupon, 
+                          coupon,
                           freq_type,
                           calendar_type,
                           bus_day_adjust_type,
@@ -197,7 +197,7 @@ def test_BondAnnuity():
                           date_gen_rule_type,
                           basis_type,
                           face)
-    
+
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")

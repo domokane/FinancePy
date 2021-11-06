@@ -124,7 +124,6 @@ class EquityVanillaOption():
 
         self._texp = texp
 
-
         s0 = stock_price
         texp = np.maximum(texp, 1e-10)
 

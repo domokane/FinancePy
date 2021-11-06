@@ -110,7 +110,7 @@ class EquityFloatLookbackOption(EquityOption):
                 term = - expbt * N(-a1)
             else:
                 term = ((s0 / smin)**(-w)) \
-                       * N(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * N(-a1)
+                    * N(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * N(-a1)
 
             v = s0 * dq * N(a1) - smin * df * N(a2) + s0 * df * u * term
 
@@ -125,7 +125,7 @@ class EquityFloatLookbackOption(EquityOption):
                 term = expbt * N(b1)
             else:
                 term = (-(s0 / smax)**(-w)) * \
-                       N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
+                    N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
 
             v = smax * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
 

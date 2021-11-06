@@ -12,6 +12,7 @@ bump = 1e-4
 ###############################################################################
 ###############################################################################
 
+
 @njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
                  float64, int64), fastmath=True, cache=True)
 def crr_tree_val(stock_price,
@@ -30,7 +31,7 @@ def crr_tree_val(stock_price,
     if num_steps < 30:
         num_steps = 30
 
-    ## OVERRIDE JUST TO SEE
+    # OVERRIDE JUST TO SEE
     num_steps = num_steps_per_year
 
     # if the number of steps is even but we want odd then make it odd
@@ -124,9 +125,11 @@ def crr_tree_val(stock_price,
             elif option_type == OptionTypes.EUROPEAN_PUT.value:
                 option_values[index + iNode] = holdValue
             elif option_type == OptionTypes.AMERICAN_CALL.value:
-                option_values[index + iNode] = np.maximum(exerciseValue, holdValue)
+                option_values[index +
+                              iNode] = np.maximum(exerciseValue, holdValue)
             elif option_type == OptionTypes.AMERICAN_PUT.value:
-                option_values[index + iNode] = np.maximum(exerciseValue, holdValue)
+                option_values[index +
+                              iNode] = np.maximum(exerciseValue, holdValue)
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]

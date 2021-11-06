@@ -31,12 +31,12 @@ class FinInflationBond(Bond):
                  accrual_type: DayCountTypes,
                  face_amount: float,
                  base_cpi_value: float,
-                 num_ex_dividend_days: int = 0): # Value of CPI index at bond issue date
+                 num_ex_dividend_days: int = 0):  # Value of CPI index at bond issue date
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
         The class inherits from Bond so has many similar functions. The YTM"""
-        
+
         check_argument_types(self.__init__, locals())
 
         if issue_date >= maturity_date:
@@ -49,9 +49,9 @@ class FinInflationBond(Bond):
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
-        self._baseCPIValue = base_cpi_value # CPI value at issue date of bond
+        self._baseCPIValue = base_cpi_value  # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted
-        self._redemption = 1.0 # Amount paid at maturity
+        self._redemption = 1.0  # Amount paid at maturity
         self._num_ex_dividend_days = num_ex_dividend_days
         self._inflation_accrued_interest = 0.0
 
@@ -62,17 +62,17 @@ class FinInflationBond(Bond):
         self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
-                   
+
         self._calculate_flow_dates()
         self._calculate_flows()
 
 ###############################################################################
 
     def inflation_principal(self,
-                           settlement_date: Date,
-                           ytm: float,
-                           reference_cpi: float,
-                           convention: YTMCalcType):
+                            settlement_date: Date,
+                            ytm: float,
+                            reference_cpi: float,
+                            convention: YTMCalcType):
         """ Calculate the principal value of the bond based on the face
         amount and the CPI growth. """
 
@@ -94,7 +94,8 @@ class FinInflationBond(Bond):
         price amount and the CPI growth to the last coupon date. """
 
         index_ratio = last_cpn_cpi / self._baseCPIValue
-        clean_price = self.clean_price_from_ytm(settlement_date, ytm, convention)
+        clean_price = self.clean_price_from_ytm(
+            settlement_date, ytm, convention)
         flat_price = clean_price * self._face_amount / self._par
         flat_price *= index_ratio
         return flat_price

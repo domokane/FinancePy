@@ -2,27 +2,24 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.models.bk_tree import BKTree
+from financepy.utils.global_types import SwapTypes
+from financepy.products.bonds.bond_callable import BondEmbeddedOption
+from financepy.products.bonds.bond import Bond
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import time
 
 import sys
 sys.path.append("..")
 
-from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
 
-from financepy.products.rates.ibor_swap import IborSwap
-
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond_callable import BondEmbeddedOption
-from financepy.utils.global_types import SwapTypes
-
-from financepy.models.bk_tree import BKTree
-
-from FinTestCases import FinTestCases, globalTestCaseMode
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
@@ -44,9 +41,12 @@ def test_BondEmbeddedOptionMATLAB():
     fixed_leg_type = SwapTypes.PAY
     dcType = DayCountTypes.THIRTY_E_360
     fixedFreq = FrequencyTypes.ANNUAL
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type, 0.0350, fixedFreq, dcType)
-    swap2 = IborSwap(settlement_date, "2Y", fixed_leg_type, 0.0400, fixedFreq, dcType)
-    swap3 = IborSwap(settlement_date, "3Y", fixed_leg_type, 0.0450, fixedFreq, dcType)
+    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+                     0.0350, fixedFreq, dcType)
+    swap2 = IborSwap(settlement_date, "2Y", fixed_leg_type,
+                     0.0400, fixedFreq, dcType)
+    swap3 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+                     0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
     discount_curve = IborSingleCurve(valuation_date, [], [], swaps)
 

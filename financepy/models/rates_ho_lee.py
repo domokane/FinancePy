@@ -86,8 +86,10 @@ class ModelRatesHoLee:
 
         h = np.log((face_amount*ptmat)/(strike_price*ptexp))/sigmap+sigmap/2.0
 
-        callValue = face_amount * ptmat * N(h) - strike_price * ptexp * N(h - sigmap)
-        putValue = strike_price * ptexp * N(-h + sigmap) - face_amount * ptmat * N(-h)
+        callValue = face_amount * ptmat * \
+            N(h) - strike_price * ptexp * N(h - sigmap)
+        putValue = strike_price * ptexp * \
+            N(-h + sigmap) - face_amount * ptmat * N(-h)
 
         return {'call': callValue, 'put': putValue}
 

@@ -164,31 +164,32 @@ def test_FinFloatOISLeg():
 
 ###############################################################################
 
+
 def swapFixedLegMonthEnds():
-    
+
     # Written in response to github issue that has been solved
 
-    fixedleg_1 = SwapFixedLeg(effective_date=Date(30,8,2021), 
+    fixedleg_1 = SwapFixedLeg(effective_date=Date(30, 8, 2021),
                               end_date='2Y',
-                              leg_type=SwapTypes.PAY, 
-                              freq_type=FrequencyTypes.SEMI_ANNUAL,
-                              day_count_type=DayCountTypes.THIRTY_E_360,   
-                              calendar_type=CalendarTypes.UNITED_STATES,
-                              coupon=0.0, 
-                              end_of_month=False)
-    
-    fixedleg_2 = SwapFixedLeg(effective_date=Date(30,8,2021), 
-                              end_date='3Y',
-                              leg_type=SwapTypes.PAY,      
+                              leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               day_count_type=DayCountTypes.THIRTY_E_360,
                               calendar_type=CalendarTypes.UNITED_STATES,
                               coupon=0.0,
                               end_of_month=False)
-    
+
+    fixedleg_2 = SwapFixedLeg(effective_date=Date(30, 8, 2021),
+                              end_date='3Y',
+                              leg_type=SwapTypes.PAY,
+                              freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              day_count_type=DayCountTypes.THIRTY_E_360,
+                              calendar_type=CalendarTypes.UNITED_STATES,
+                              coupon=0.0,
+                              end_of_month=False)
+
     fixedleg_1.generate_payments()
     fixedleg_2.generate_payments()
-    
+
     print("leg_1")
     fixedleg_1.print_payments()
     print("leg_2")
@@ -196,33 +197,37 @@ def swapFixedLegMonthEnds():
 
 ###############################################################################
 
+
 def test_swapFloatLeg():
-    
+
     effective_date = Date(1, 9, 2021)
-    
+
     fixedleg_2 = SwapFixedLeg(effective_date, end_date='3y',
-    leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
-    day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
-    coupon=0)
-    
+                              leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
+                              coupon=0)
+
     floatleg_2 = SwapFloatLeg(effective_date, end_date='3y',
-    leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
-    day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
-    spread=0)
-    
+                              leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
+                              spread=0)
+
     fixedleg_2.generate_payments()
     floatleg_2.generate_payment_dates()
-    
-    discount_curve = DiscountCurveFlat(effective_date, 0.05, day_count_type = DayCountTypes.THIRTY_E_360)
-    index_curve = DiscountCurveFlat(effective_date, 0.05, day_count_type=DayCountTypes.ACT_ACT_ISDA)
+
+    discount_curve = DiscountCurveFlat(
+        effective_date, 0.05, day_count_type=DayCountTypes.THIRTY_E_360)
+    index_curve = DiscountCurveFlat(
+        effective_date, 0.05, day_count_type=DayCountTypes.ACT_ACT_ISDA)
 
     floatleg_2.value(effective_date, discount_curve, index_curve)
-    #print("leg_2")
-    #fixedleg_2.print_payments()
-    #print("fleg_2")
-    #floatleg_2.print_payments()
-    
+    # print("leg_2")
+    # fixedleg_2.print_payments()
+    # print("fleg_2")
+    # floatleg_2.print_payments()
+
 ###############################################################################
+
 
 test_swapFloatLeg()
 # swapFixedLegMonthEnds()
