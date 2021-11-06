@@ -205,7 +205,7 @@ def buildIntro(introfile):
 
 def buildChapter(folderName):
     """ Parse a folder by loading up all of the modules in that folder that
-    start with the threee letters - Fin. """
+    start with the three letters - Fin. """
 
     print("Building chapter in folder:", folderName)
 
@@ -509,7 +509,7 @@ def parseClass(lines, startLine, endLine):
 
 
 def parseFunction(lines, startLine, endLine, className=""):
-    """ Given a set of lines and a start line I extract the function definiton
+    """ Given a set of lines and a start line I extract the function definition
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments."""
 
