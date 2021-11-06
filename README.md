@@ -6,6 +6,12 @@
 
 A new version 0.204 has just been released that can be installed via pip.
 
+# CONTRIBUTORS WANTED !
+
+If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. 
+
+If you are a user and require some additional functionality, then please add it as an issue.
+
 # Quick Start Guide
 
 FinancePy can be installed from pip using the following command:
