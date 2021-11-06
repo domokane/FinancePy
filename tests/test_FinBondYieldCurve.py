@@ -60,7 +60,7 @@ def test_nelson_siegel():
     assert round(fittedCurve._curveFit._beta1, 3) == -0.094
     assert round(fittedCurve._curveFit._beta2, 3) == 0.092
     assert round(fittedCurve._curveFit._beta3, 3) == 0.259
-    assert round(fittedCurve._curveFit._tau, 3) == 35.785
+    assert round(fittedCurve._curveFit._tau, 1) == 35.8
 
 
 def test_nelson_siegel_svensson():

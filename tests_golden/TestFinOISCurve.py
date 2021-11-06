@@ -242,7 +242,7 @@ def test_OISDepositsFRAsSwaps():
 # https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 ###############################################################################
 ###############################################################################
-# AGREEEMENT IS VERY CLOSE - NOT SURE ABOUT SIZE OF LAST PAYMENT ON FIXED LEG!
+# AGREEMENT IS VERY CLOSE - NOT SURE ABOUT SIZE OF LAST PAYMENT ON FIXED LEG!
 
 
 def futureToFRARate(price, convexity):
