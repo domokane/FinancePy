@@ -16,5 +16,5 @@ jobs:
           title: Fixes by autopep8 action
           body: This is an auto-generated PR with fixes by autopep8.
           labels: autopep8, automated pr
-          reviewers: peter-evans
+          reviewers: domokane
           branch: autopep8-patches
