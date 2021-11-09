@@ -6,9 +6,15 @@
 
 A new version 0.204 has just been released that can be installed via pip.
 
+# DISCLAIMER
+
+This software is distributed FREE & WITHOUT ANY WARRANTY. 
+
+Report any bugs or suggestions here as an issue. 
+
 # CONTRIBUTORS WANTED !
 
-If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. 
+If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. 
 
 If you are a user and require some additional functionality, then please add it as an issue.
 
@@ -68,8 +74,6 @@ Important Note:
 * IF YOU HAVE ANY PRICING OR RISK EXAMPLES YOU WOULD LIKE REPLICATED, SEND SCREENSHOTS OF ALL THE UNDERLYING DATA, MODEL DETAILS AND VALUATION.
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
-
-Contact me at quant@financepy.com.
 
 ## The Library Design
 
