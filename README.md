@@ -90,6 +90,8 @@ The interface to each product has a value() function that will take a model and 
 
 Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and 10 years of academic experience.
 
+Contact me at dominic.okane at edhec.edu.
+
 ## Dependencies
 
 FinancePy depends on Numpy, Numba, Scipy and basic python libraries such as os, sys and datetime.
