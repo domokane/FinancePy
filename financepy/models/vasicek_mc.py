@@ -87,7 +87,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
 
 @njit(float64(float64, float64, float64, float64, float64,
-      float64, int64, int64), fastmath=True, cache=True)
+              float64, int64, int64), fastmath=True, cache=True)
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
 
     np.random.seed(seed)

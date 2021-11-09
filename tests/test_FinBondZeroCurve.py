@@ -36,6 +36,7 @@ for _, bondRow in bondDataFrame.iterrows():
 
 bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
 
+
 def test_zero_curve():
 
     maturityDt = Date(7, 3, 2013)

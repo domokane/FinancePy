@@ -1,9 +1,7 @@
-name: Auto PEP8
-
+name: Auto format python code
 on: push
-
 jobs:
- autopep8:
+  autopep8:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -11,3 +9,12 @@ jobs:
         uses: peter-evans/autopep8@v1
         with:
           args: -r --in-place .
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: autopep8 action fixes
+          title: Fixes by autopep8 action
+          body: This is an auto-generated PR with fixes by autopep8.
+          labels: autopep8, automated pr
+          reviewers: domokane
+          branch: autopep8-patches
