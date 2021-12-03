@@ -56,8 +56,7 @@ def test_FinFXVanillaOptionWystupExample1():
                                   notional,
                                   "EUR", 2)
 
-    value = call_option.value(
-        1.0,
+    value = call_option.value(valuation_date,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
