@@ -2,14 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import numpy as np
+from financepy.models.cir_mc import zero_price_mc, zero_price
+from financepy.models.cir_mc import CIRNumericalScheme
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.cir_mc import CIRNumericalScheme
-from financepy.models.cir_mc import zero_price_mc, zero_price
-import numpy as np
-import time
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

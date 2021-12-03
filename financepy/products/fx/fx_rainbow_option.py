@@ -192,10 +192,12 @@ class FXRainbowOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if dom_discount_curve._valuation_date != valuation_date:
-            raise FinError("Domestic Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as option valuation date")
 
         if for_discount_curve._valuation_date != valuation_date:
-            raise FinError("Foreign Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Foreign Curve valuation date not same as option valuation date")
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")

@@ -2,30 +2,28 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.models.black import Black
+from financepy.models.black_shifted import BlackShifted
+from financepy.models.sabr import SABR
+from financepy.models.sabr_shifted import SABRShifted
+from financepy.models.hw_tree import HWTree
+from financepy.models.bk_tree import BKTree
+from financepy.models.bdt_tree import BDTTree
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.interpolator import InterpTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.models.bdt_tree import BDTTree
-from financepy.models.bk_tree import BKTree
-from financepy.models.hw_tree import HWTree
-from financepy.models.sabr_shifted import SABRShifted
-from financepy.models.sabr import SABR
-from financepy.models.black_shifted import BlackShifted
-from financepy.models.black import Black
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

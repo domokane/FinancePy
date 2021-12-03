@@ -65,10 +65,12 @@ class FXFloatLookbackOption(FXOption):
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve._valuation_date != valuation_date:
-            raise FinError("Domestic Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as option valuation date")
 
         if foreign_curve._valuation_date != valuation_date:
-            raise FinError("Foreign Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Foreign Curve valuation date not same as option valuation date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
 

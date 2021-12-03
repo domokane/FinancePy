@@ -2,18 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+from math import sqrt
+import numpy as np
+from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
+from financepy.products.equity.equity_rainbow_option import EquityRainbowOptionTypes
+from financepy.utils.helpers import beta_vector_to_corr_matrix
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.helpers import beta_vector_to_corr_matrix
-from financepy.products.equity.equity_rainbow_option import EquityRainbowOptionTypes
-from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
-import numpy as np
-from math import sqrt
-import time
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

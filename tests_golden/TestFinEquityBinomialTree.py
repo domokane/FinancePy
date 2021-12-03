@@ -2,20 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import numpy as np
+from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
+from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
+from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.utils.global_types import OptionTypes
+from financepy.utils.date import Date
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.utils.date import Date
-from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
-from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
-from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
-import numpy as np
-import time
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

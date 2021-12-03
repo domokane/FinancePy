@@ -73,10 +73,12 @@ class EquityFloatLookbackOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve._valuation_date != valuation_date:
-            raise FinError("Discount Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Discount Curve valuation date not same as option valuation date")
 
         if dividend_curve._valuation_date != valuation_date:
-            raise FinError("Dividend Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Dividend Curve valuation date not same as option valuation date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
         df = discount_curve.df(self._expiry_date)

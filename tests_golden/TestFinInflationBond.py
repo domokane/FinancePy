@@ -2,19 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.products.inflation.FinInflationBond import FinInflationBond
+from financepy.products.bonds import YTMCalcType
+from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
-from financepy.products.bonds import YTMCalcType
-from financepy.products.inflation.FinInflationBond import FinInflationBond
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

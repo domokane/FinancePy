@@ -2,12 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.utils.date import Date
+from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
-from financepy.utils.date import Date
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
