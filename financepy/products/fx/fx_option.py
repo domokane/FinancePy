@@ -89,17 +89,26 @@ class FXOption:
                        dividend_curve, model)
 
         next_date = valuation_date.add_days(1)
-        bump = 1.0 / gDaysInYear
 
+        discount_curve._valuation_date = next_date
+        dividend_curve._valuation_date = next_date
+        
         vBumped = self.value(next_date, stock_price, discount_curve,
                              dividend_curve, model)
+
+        bump = 1.0 / gDaysInYear
 
         if type(v) is dict:
             theta = (vBumped['value'] - v['value']) / bump
         else:
             theta = (vBumped - v) / bump
 
+        discount_curve._valuation_date = valuation_date
+        dividend_curve._valuation_date = valuation_date
+
         return theta
+
+##############################################################################
 
     def rho(self, valuation_date, stock_price, discount_curve, dividend_curve, model):
         """ Calculate the option rho (interest rate sensitivity) by perturbing

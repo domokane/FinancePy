@@ -286,8 +286,11 @@ class EquityCompoundOption(EquityOption):
         if isinstance(valuation_date, Date) == False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
-            raise FinError("Valuation date after expiry date.")
+        if valuation_date > self._cExpiryDate:
+            raise FinError("Valuation date after underlying expiry date.")
+
+        if valuation_date > self._uExpiryDate:
+            raise FinError("Valuation date after compound expiry date.")
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError("Discount Curve valuation date not same as option valuation date")
