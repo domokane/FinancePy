@@ -75,4 +75,3 @@ def test_greeks():
     assert round(delta, 4) == 0.0126
     assert round(vega, 4) == -0.3583
     assert round(theta, 4) == 0.0266
-    

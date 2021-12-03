@@ -56,10 +56,10 @@ def test_FinFXVanillaOptionWystupExample1():
                                   "EUR", 2)
 
     value = call_option.value(valuation_date,
-        spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
-        model)
+                              spot_fx_rate,
+                              dom_discount_curve,
+                              for_discount_curve,
+                              model)
 
     notional = 1250000.0
     call_option = FXVanillaOption(expiry_date,
