@@ -2,15 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

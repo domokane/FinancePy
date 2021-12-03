@@ -2,15 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.utils.date import Date
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.discount_curve import DiscountCurve
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.date import Date
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

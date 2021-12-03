@@ -178,10 +178,12 @@ class FXOneTouchOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if dom_discount_curve._valuation_date != valuation_date:
-            raise FinError("Domestic Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as option valuation date")
 
         if for_discount_curve._valuation_date != valuation_date:
-            raise FinError("Foreign Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Foreign Curve valuation date not same as option valuation date")
 
         DEBUG_MODE = False
 

@@ -2,16 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
+from financepy.utils.date import Date
+from financepy.models.volatility_fns import VolFunctionTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
+import time
 import sys
 sys.path.append("..")
-
-import time
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import VolFunctionTypes
-from financepy.utils.date import Date
-from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

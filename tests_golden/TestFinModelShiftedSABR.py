@@ -2,13 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.models.sabr_shifted import SABRShifted
+from financepy.utils.global_types import OptionTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import OptionTypes
-from financepy.models.sabr_shifted import SABRShifted
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

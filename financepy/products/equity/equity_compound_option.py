@@ -293,10 +293,12 @@ class EquityCompoundOption(EquityOption):
             raise FinError("Valuation date after compound expiry date.")
 
         if discount_curve._valuation_date != valuation_date:
-            raise FinError("Discount Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Discount Curve valuation date not same as option valuation date")
 
         if dividend_curve._valuation_date != valuation_date:
-            raise FinError("Dividend Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Dividend Curve valuation date not same as option valuation date")
 
         # If the option has any American feature then use the tree
         if self._cOptionType == OptionTypes.AMERICAN_CALL or\
