@@ -4,7 +4,7 @@
 
 # Latest News
 
-A new version 0.204 has just been released that can be installed via pip.
+2 November 2021: A new version 0.204 has just been released that can be installed via pip.
 
 # DISCLAIMER
 
