@@ -2,27 +2,24 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.utils.math import ONE_MILLION
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_fra import IborFRA
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.utils.global_types import SwapTypes
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.interpolator import InterpTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.global_types import SwapTypes
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.calendar import DateGenRuleTypes
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_fra import IborFRA
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.utils.math import ONE_MILLION
-
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

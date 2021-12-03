@@ -2,18 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import numpy as np
+from financepy.utils.global_types import OptionTypes
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.utils.date import Date
+from financepy.utils.error import FinError
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.error import FinError
-from financepy.utils.date import Date
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.global_types import OptionTypes
-import numpy as np
-import time
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -51,7 +51,7 @@ def test_EquityVanillaOption():
         duration = end - start
         testCases.print(num_paths, value, value_mc, duration)
 
-    
+
 ###############################################################################
 
     stock_prices = range(80, 120, 10)
@@ -248,7 +248,8 @@ def testImpliedVolatility_NEW():
 
 ###############################################################################
 
-if 1==1:
+
+if 1 == 1:
     valuation_date = Date(30, 11, 2021)
     expiry_date = valuation_date.add_years(1)
 
@@ -259,21 +260,22 @@ if 1==1:
     discount_curve = DiscountCurveFlat(valuation_date, 0.05)
     dividend_curve = DiscountCurveFlat(valuation_date, 0.0)
 
-    call_option = EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
+    call_option = EquityVanillaOption(
+        expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(expiry_date, 105.0, discount_curve, 
+    value = call_option.value(expiry_date, 105.0, discount_curve,
                               dividend_curve, model)
-    
+
     print(value)
 
 else:
     test_EquityVanillaOption()
-    
+
     start = time.time()
     testImpliedVolatility_NEW()
     end = time.time()
     elapsed = end - start
-    
+
     # print("Elapsed:", elapsed)
-    
+
     testCases.compareTestCases()

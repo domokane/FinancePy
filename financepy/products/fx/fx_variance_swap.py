@@ -70,7 +70,8 @@ class FinFXVarianceSwap:
             raise FinError("Valuation date after expiry date.")
 
         if libor_curve._valuation_date != valuation_date:
-            raise FinError("Domestic Curve valuation date not same as option valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as option valuation date")
 
         t1 = (valuation_date - self._effective_date) / gDaysInYear
         t2 = (self._maturity_date - self._effective_date) / gDaysInYear
@@ -256,7 +257,6 @@ class FinFXVarianceSwap:
 
 
 ###############################################################################
-
 
     def print_strikes(self):
 

@@ -2,27 +2,25 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import matplotlib.pyplot as plt
+import numpy as np
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.models.black import Black
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.models.bdt_tree import BDTTree
+from financepy.utils.helpers import print_tree
+from financepy.utils.global_types import FinExerciseTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import FinExerciseTypes
-from financepy.utils.helpers import print_tree
-from financepy.models.bdt_tree import BDTTree
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.models.black import Black
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.date import Date
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

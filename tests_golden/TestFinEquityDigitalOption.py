@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.utils.global_types import OptionTypes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
-from financepy.utils.global_types import OptionTypes
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

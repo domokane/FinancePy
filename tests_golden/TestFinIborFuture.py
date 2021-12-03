@@ -2,13 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.products.rates.ibor_future import IborFuture
+from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
-from financepy.products.rates.ibor_future import IborFuture
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -2,34 +2,32 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import numpy as np
+import time as time
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.black import Black
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.utils.helpers import check_vector_differences
+from financepy.models.lmm_mc import lmm_simulate_fwds_nf
+from financepy.models.lmm_mc import lmm_simulate_fwds_1f
+from financepy.models.lmm_mc import lmm_simulate_fwds_mf
+from financepy.models.lmm_mc import lmm_swaption_pricer
+from financepy.models.lmm_mc import lmm_sim_swaption_vol
+from financepy.models.lmm_mc import lmm_swaption_vol_approx
+from financepy.models.lmm_mc import lmm_cap_flr_pricer
+from financepy.models.lmm_mc import lmm_price_caps_black
+from financepy.models.lmm_mc import lmm_swap_pricer
+from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
+from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
+from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
-from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
-from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
-from financepy.models.lmm_mc import lmm_swap_pricer
-from financepy.models.lmm_mc import lmm_price_caps_black
-from financepy.models.lmm_mc import lmm_cap_flr_pricer
-from financepy.models.lmm_mc import lmm_swaption_vol_approx
-from financepy.models.lmm_mc import lmm_sim_swaption_vol
-from financepy.models.lmm_mc import lmm_swaption_pricer
-from financepy.models.lmm_mc import lmm_simulate_fwds_mf
-from financepy.models.lmm_mc import lmm_simulate_fwds_1f
-from financepy.models.lmm_mc import lmm_simulate_fwds_nf
-from financepy.utils.helpers import check_vector_differences
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black import Black
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-import time as time
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

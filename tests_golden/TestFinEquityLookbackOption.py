@@ -2,18 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
+from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
+from financepy.utils.global_types import OptionTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
-from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
-import time
-
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

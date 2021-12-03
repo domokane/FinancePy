@@ -2,22 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import time
+import numpy as np
+from financepy.utils.date import Date
+from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.helpers import print_tree
+from financepy.utils.global_types import FinExerciseTypes
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.global_types import FinExerciseTypes
-from financepy.utils.helpers import print_tree
-from financepy.utils.global_vars import gDaysInYear
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
-from financepy.utils.date import Date
-import numpy as np
-import time
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

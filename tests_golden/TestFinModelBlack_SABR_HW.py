@@ -2,15 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import matplotlib.pyplot as plt
+import numpy as np
+from financepy.models.sabr import SABR
+from financepy.models.sabr_shifted import SABRShifted
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.sabr_shifted import SABRShifted
-from financepy.models.sabr import SABR
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

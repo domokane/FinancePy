@@ -2,24 +2,21 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.black import Black
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.frequency import FrequencyTypes
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.utils.global_types import FinCapFloorTypes
+from financepy.products.rates.ibor_lmm_products import IborLMMProducts
+from financepy.products.rates.ibor_cap_floor import IborCapFloor
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.rates.ibor_cap_floor import IborCapFloor
-from financepy.products.rates.ibor_lmm_products import IborLMMProducts
-from financepy.utils.global_types import FinCapFloorTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black import Black
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-import numpy as np
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

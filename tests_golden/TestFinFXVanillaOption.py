@@ -2,21 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+from financepy.utils.global_types import OptionTypes
+from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.utils.global_types import OptionTypes
-import time
-import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -64,8 +63,8 @@ def test_FinFXVanillaOptionWystupExample1():
                                   notional,
                                   "EUR", 2)
 
-    value = call_option.value(valuation_date, spot_fx_rate, 
-                              dom_discount_curve, 
+    value = call_option.value(valuation_date, spot_fx_rate,
+                              dom_discount_curve,
                               for_discount_curve, model)
 
     notional = 1250000.0
