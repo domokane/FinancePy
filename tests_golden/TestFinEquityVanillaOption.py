@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.error import FinError
 from financepy.utils.date import Date
@@ -12,8 +15,6 @@ from financepy.utils.global_types import OptionTypes
 import numpy as np
 import time
 
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -41,15 +42,18 @@ def test_EquityVanillaOption():
 
         call_option = EquityVanillaOption(
             expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
+
         value = call_option.value(valuation_date, stock_price, discount_curve,
                                   dividend_curve, model)
         start = time.time()
+
         value_mc = call_option.value_mc(valuation_date, stock_price, discount_curve,
                                         dividend_curve, model, num_paths)
         end = time.time()
         duration = end - start
         testCases.print(num_paths, value, value_mc, duration)
 
+    
 ###############################################################################
 
     stock_prices = range(80, 120, 10)
@@ -246,14 +250,32 @@ def testImpliedVolatility_NEW():
 
 ###############################################################################
 
+if 1==1:
+    valuation_date = Date(30, 11, 2021)
+    expiry_date = valuation_date.add_years(1)
 
-test_EquityVanillaOption()
+    stock_price = 100
+    volatility = 0.20
+    model = BlackScholes(volatility)
 
-start = time.time()
-testImpliedVolatility_NEW()
-end = time.time()
-elapsed = end - start
+    discount_curve = DiscountCurveFlat(valuation_date, 0.05)
+    dividend_curve = DiscountCurveFlat(valuation_date, 0.0)
 
-# print("Elapsed:", elapsed)
+    call_option = EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 
-testCases.compareTestCases()
+    value = call_option.value(expiry_date, 105.0, discount_curve, 
+                              dividend_curve, model)
+    
+    print(value)
+
+else:
+    test_EquityVanillaOption()
+    
+    start = time.time()
+    testImpliedVolatility_NEW()
+    end = time.time()
+    elapsed = end - start
+    
+    # print("Elapsed:", elapsed)
+    
+    testCases.compareTestCases()

@@ -8,6 +8,12 @@ from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.utils.date import Date
 import numpy as np
+from financepy.market.volatility import *
+
+from financepy.utils import *
+from financepy.market.curves import *
+from financepy.products.equity import *
+from financepy.market.volatility import *
 
 import sys
 sys.path.append("..")
@@ -27,6 +33,7 @@ def volSkew(K, atm_vol, atmK, skew):
 
 def test_EquityVarianceSwap():
 
+    
     start_date = Date(20, 3, 2018)
     tenor = "3M"
     strike = 0.3*0.3

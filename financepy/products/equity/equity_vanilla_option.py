@@ -26,7 +26,6 @@ from ...models.black_scholes_analytic import bs_theta
 from ...models.black_scholes_analytic import bs_implied_volatility
 from ...models.black_scholes_analytic import bs_intrinsic
 
-
 from ...models.black_scholes_mc import _value_mc_nonumba_nonumpy
 from ...models.black_scholes_mc import _value_mc_numpy_numba
 from ...models.black_scholes_mc import _value_mc_numba_only
@@ -154,6 +153,12 @@ class EquityVanillaOption():
         if isinstance(valuation_date, Date) == False:
             raise FinError("Valuation date is not a Date")
 
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError("Discount Curve valuation date not same as option valuation date")
+
+        if dividend_curve._valuation_date != valuation_date:
+            raise FinError("Dividend Curve valuation date not same as option valuation date")
+
         if isinstance(self._expiry_date, Date):
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         elif isinstance(self._expiry_date, list):
@@ -177,7 +182,11 @@ class EquityVanillaOption():
 
         texp = np.maximum(texp, 1e-10)
 
-        df = discount_curve.df(self._expiry_date)
+        # Extract the discount. Adjust if the value date is not same as curve date
+        # I decided to put an error message - may reconsider
+        df_expiry = discount_curve.df(self._expiry_date)
+        # df_value = discount_curve.df(valuation_date)
+        # df = df_expiry / df_value
         r = -np.log(df)/texp
 
         dq = dividend_curve.df(self._expiry_date)
@@ -192,7 +201,7 @@ class EquityVanillaOption():
 
         else:
             raise FinError("Unknown Model Type")
-
+ 
         value = value * self._num_options
         return value
 
