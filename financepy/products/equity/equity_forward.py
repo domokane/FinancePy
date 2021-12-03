@@ -44,6 +44,18 @@ class EquityForward():
         """ Calculate the value of an equity forward contract from the stock
         price and discount and dividend discount. """
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError("Discount Curve valuation date not same as option valuation date")
+
+        if dividend_curve._valuation_date != valuation_date:
+            raise FinError("Dividend Curve valuation date not same as option valuation date")
+
         if type(valuation_date) == Date:
             t = (self._expiry_date - valuation_date) / gDaysInYear
         else:

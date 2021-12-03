@@ -15,8 +15,6 @@ from financepy.utils.global_types import OptionTypes
 import numpy as np
 import time
 
-
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

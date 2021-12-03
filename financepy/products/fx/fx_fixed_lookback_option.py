@@ -49,19 +49,31 @@ class FXFixedLookbackOption:
     def value(self,
               valuation_date: Date,
               stock_price: float,
-              domestic_curve: DiscountCurve,
-              foreign_curve: DiscountCurve,
+              dom_discount_curve: DiscountCurve,
+              for_discount_curve: DiscountCurve,
               volatility: float,
               stock_min_max: float):
         """ Value FX Fixed Lookback Option using Black Scholes model and
         analytical formulae. """
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
+
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = domestic_curve.df(self._expiry_date)
+        df = dom_discount_curve.df(self._expiry_date)
         r = -np.log(df)/t
 
-        dq = foreign_curve.df(self._expiry_date)
+        dq = for_discount_curve.df(self._expiry_date)
         q = -np.log(dq)/t
 
         v = volatility

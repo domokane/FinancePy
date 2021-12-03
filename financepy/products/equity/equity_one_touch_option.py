@@ -174,8 +174,17 @@ class EquityOneTouchOption(EquityOption):
 
         DEBUG_MODE = False
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
         if valuation_date > self._expiry_date:
-            raise FinError("Value date after expiry date.")
+            raise FinError("Valuation date after expiry date.")
+
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError("Discount Curve valuation date not same as option valuation date")
+
+        if dividend_curve._valuation_date != valuation_date:
+            raise FinError("Dividend Curve valuation date not same as option valuation date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
         t = max(t, 1e-6)

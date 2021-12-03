@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.rates.ois import OIS
 from financepy.products.rates.ois_curve import OISCurve
@@ -20,8 +23,6 @@ from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

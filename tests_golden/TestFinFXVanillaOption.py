@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -14,8 +17,6 @@ from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
 import time
 import numpy as np
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -63,12 +64,9 @@ def test_FinFXVanillaOptionWystupExample1():
                                   notional,
                                   "EUR", 2)
 
-    value = call_option.value(
-        1.0,
-        spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
-        model)
+    value = call_option.value(valuation_date, spot_fx_rate, 
+                              dom_discount_curve, 
+                              for_discount_curve, model)
 
     notional = 1250000.0
     call_option = FXVanillaOption(expiry_date,

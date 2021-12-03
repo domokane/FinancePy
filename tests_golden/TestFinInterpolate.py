@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.interpolator import Interpolator, InterpTypes
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -164,12 +164,24 @@ class FXOneTouchOption(EquityOption):
     def value(self,
               valuation_date: Date,
               spot_fx_rate: (float, np.ndarray),
-              domCurve: DiscountCurve,
-              forCurve: DiscountCurve,
+              dom_discount_curve: DiscountCurve,
+              for_discount_curve: DiscountCurve,
               model):
         """ FX One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
         Handles both cash-or-nothing and asset-or-nothing options."""
+
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
 
         DEBUG_MODE = False
 
@@ -187,9 +199,9 @@ class FXOneTouchOption(EquityOption):
 
         sqrtT = np.sqrt(t)
 
-        df = domCurve.df(self._expiry_date)
-        rd = domCurve.cc_rate(self._expiry_date)
-        rf = forCurve.cc_rate(self._expiry_date)
+        df = dom_discount_curve.df(self._expiry_date)
+        rd = dom_discount_curve.cc_rate(self._expiry_date)
+        rf = for_discount_curve.cc_rate(self._expiry_date)
 
         v = model._volatility
         v = max(v, 1e-6)

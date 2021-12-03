@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
@@ -10,9 +13,6 @@ from financepy.models.volatility_fns import VolFunctionTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 import matplotlib.pyplot as plt
 import time
-import sys
-sys.path.append("..//")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

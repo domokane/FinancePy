@@ -283,6 +283,18 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132. """
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError("Discount Curve valuation date not same as option valuation date")
+
+        if dividend_curve._valuation_date != valuation_date:
+            raise FinError("Dividend Curve valuation date not same as option valuation date")
+
         # If the option has any American feature then use the tree
         if self._cOptionType == OptionTypes.AMERICAN_CALL or\
             self._uOptionType == OptionTypes.AMERICAN_CALL or\

@@ -3,12 +3,14 @@
 # Guillaume Lefieux
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black
-import sys
 import numpy as np
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

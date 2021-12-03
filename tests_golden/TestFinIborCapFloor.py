@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.schedule import Schedule
@@ -30,10 +32,6 @@ from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.utils.global_types import FinCapFloorTypes
 import time
 import numpy as np
-
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

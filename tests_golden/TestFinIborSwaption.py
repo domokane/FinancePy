@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
@@ -22,9 +26,6 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 import numpy as np
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

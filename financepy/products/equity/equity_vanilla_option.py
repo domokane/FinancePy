@@ -153,6 +153,9 @@ class EquityVanillaOption():
         if isinstance(valuation_date, Date) == False:
             raise FinError("Valuation date is not a Date")
 
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
         if discount_curve._valuation_date != valuation_date:
             raise FinError("Discount Curve valuation date not same as option valuation date")
 
@@ -187,7 +190,7 @@ class EquityVanillaOption():
         df_expiry = discount_curve.df(self._expiry_date)
         # df_value = discount_curve.df(valuation_date)
         # df = df_expiry / df_value
-        r = -np.log(df)/texp
+        r = -np.log(df_expiry)/texp
 
         dq = dividend_curve.df(self._expiry_date)
         q = -np.log(dq)/texp

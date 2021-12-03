@@ -72,6 +72,18 @@ class FXBarrierOption(FXOption):
         # by Clewlow, Llanos and Strickland December 1994 which can be found at
         # https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
+
         K = self._strike_fx_rate
         S0 = spot_fx_rate
         h = self._barrier_level

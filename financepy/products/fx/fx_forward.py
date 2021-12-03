@@ -70,6 +70,18 @@ class FXForward:
         """ Calculate the value of an FX forward contract where the current
         FX rate is the spot_fx_rate. """
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
+
         if type(valuation_date) == Date:
             t = (self._expiry_date - valuation_date) / gDaysInYear
         else:

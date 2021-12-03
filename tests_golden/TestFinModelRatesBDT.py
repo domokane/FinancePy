@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.helpers import print_tree
@@ -19,9 +23,6 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 import numpy as np
 import matplotlib.pyplot as plt
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

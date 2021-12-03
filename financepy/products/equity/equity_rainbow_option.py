@@ -193,6 +193,15 @@ class EquityRainbowOption(EquityOption):
               volatilities: np.ndarray,
               corr_matrix: np.ndarray):
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError("Discount Curve valuation date not same as option valuation date")
+
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")
 

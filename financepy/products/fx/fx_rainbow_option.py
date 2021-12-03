@@ -179,12 +179,23 @@ class FXRainbowOption(EquityOption):
 
     def value(self,
               valuation_date,
-              expiry_date,
               stock_prices,
-              discount_curve,
-              dividend_yields,
+              dom_discount_curve,
+              for_discount_curve,
               volatilities,
               betas):
+
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -193,18 +204,18 @@ class FXRainbowOption(EquityOption):
             raise FinError("Value date after expiry date.")
 
         self.validate(stock_prices,
-                      dividend_yields,
+                      for_discount_curve,
                       volatilities,
                       betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
-        df = discount_curve._df(t)
+        df = dom_discount_curve._df(t)
         r = -np.log(df) / t
 
-        q1 = dividend_yields[0]
-        q2 = dividend_yields[1]
+        q1 = for_discount_curve[0]
+        q2 = for_discount_curve[1]
         rho = betas[0] ** 2
         s1 = stock_prices[0]
         s2 = stock_prices[1]

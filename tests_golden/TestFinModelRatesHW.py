@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import sys
+sys.path.append("..")
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.helpers import print_tree
@@ -14,9 +18,6 @@ from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from financepy.utils.date import Date
 import numpy as np
 import time
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

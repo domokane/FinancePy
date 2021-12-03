@@ -64,6 +64,18 @@ class FXDigitalOption:
         cash payout (puts) PLUS the fact that the cash payment can be in
         domestic or foreign currency. """
 
+        if isinstance(valuation_date, Date) == False:
+            raise FinError("Valuation date is not a Date")
+
+        if valuation_date > self._expiry_date:
+            raise FinError("Valuation date after expiry date.")
+
+        if dom_discount_curve._valuation_date != valuation_date:
+            raise FinError("Domestic Curve valuation date not same as option valuation date")
+
+        if for_discount_curve._valuation_date != valuation_date:
+            raise FinError("Foreign Curve valuation date not same as option valuation date")
+
         if type(valuation_date) == Date:
             spot_date = valuation_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear

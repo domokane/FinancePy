@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
@@ -9,8 +12,6 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
