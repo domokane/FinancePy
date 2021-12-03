@@ -92,7 +92,7 @@ class FXOption:
 
         discount_curve._valuation_date = next_date
         dividend_curve._valuation_date = next_date
-        
+
         vBumped = self.value(next_date, stock_price, discount_curve,
                              dividend_curve, model)
 
