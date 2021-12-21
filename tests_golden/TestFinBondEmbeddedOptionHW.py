@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
 from financepy.products.bonds.bond import Bond
@@ -16,8 +19,6 @@ from financepy.utils.global_types import SwapTypes
 import matplotlib.pyplot as plt
 import time
 
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
