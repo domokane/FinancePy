@@ -2,23 +2,21 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import matplotlib.pyplot as plt
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.models.hw_tree import HWTree
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_callable import BondEmbeddedOption
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.bonds.bond_callable import BondEmbeddedOption
-from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.models.hw_tree import HWTree
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import SwapTypes
-import matplotlib.pyplot as plt
-import time
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
