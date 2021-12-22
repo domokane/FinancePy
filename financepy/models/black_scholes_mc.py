@@ -179,7 +179,7 @@ def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
-              int64, int64, int64), fastmath=True, cache=True, parallel=True)
+              int64, int64, int64), fastmath=True, cache=True)
 def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
     # No use of Numpy vectorisation but NUMBA
 
