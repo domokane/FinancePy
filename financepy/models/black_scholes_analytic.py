@@ -7,7 +7,7 @@ from numba import float64, int64, vectorize, njit
 
 from ..utils.global_types import OptionTypes
 from ..utils.global_vars import gSmall
-from ..utils.math import n_vect, n_prime_vect
+from ..utils.math import N, n_vect, n_prime_vect
 from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton, newton_secant
 
@@ -27,6 +27,7 @@ def bs_value(s, t, k, r, q, v, option_type_value):
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
+        return 0.0
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -38,7 +39,8 @@ def bs_value(s, t, k, r, q, v, option_type_value):
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
 
-    value = phi * ss * n_vect(phi * d1) - phi * kk * n_vect(phi * d2)
+#    value = phi * ss * n_vect(phi * d1) - phi * kk * n_vect(phi * d2)
+    value = phi * ss * N(phi * d1) - phi * kk * N(phi * d2)
     return value
 
 ###############################################################################
@@ -55,6 +57,7 @@ def bs_delta(s, t, k, r, q, v, option_type_value):
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
+        return 0.0
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -118,8 +121,6 @@ def bs_theta(s, t, k, r, q, v, option_type_value):
         phi = 1.0
     elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
-    else:
-        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -148,8 +149,6 @@ def bs_rho(s, t, k, r, q, v, option_type_value):
         phi = 1.0
     elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
-    else:
-        raise FinError("Unknown option type value")
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)
@@ -432,9 +431,6 @@ def baw_value(s, t, k, r, q, v, phi):
             return bs_value(s, t, k, r, q, v, +1)
 
         argtuple = (t, k, r, q, v)
-
-#        sstar = optimize.newton(_fcall, x0=s, fprime=None, args=argtuple,
-#                                tol=1e-7, maxiter=50, fprime2=None)
 
         sstar = newton_secant(_fcall, x0=s, args=argtuple,
                               tol=1e-7, maxiter=50)

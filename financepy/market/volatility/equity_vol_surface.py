@@ -159,14 +159,14 @@ def vol_function(vol_function_type_value, params, f, k, t):
         vol = vol_function_ssvi(params, f, k, t)
         return vol
     else:
-        raise FinError("Unknown Model Type")
+        return 0.0
 
 ###############################################################################
 
 
 @njit(cache=True, fastmath=True)
 def _delta_fit(k, *args):
-    """ This is the objective function used in the determination of the 
+    """ This is the objective function used in the determination of the
     option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
     and high K. It speeds up the code as it allows initial values close to
@@ -194,8 +194,8 @@ def _delta_fit(k, *args):
 ###############################################################################
 
 
-@njit(float64(float64, float64, float64, float64, int64, int64, float64,
-              float64, float64[:]), fastmath=True)
+#@njit(float64(float64, float64, float64, float64, int64, int64, float64,
+#              float64, float64[:]), fastmath=True)
 def _solver_for_smile_strike(s, t, r, q,
                              option_type_value,
                              volatilityTypeValue,
@@ -225,8 +225,8 @@ def _solver_for_smile_strike(s, t, r, q,
 
 class EquityVolSurface:
     """ Class to perform a calibration of a chosen parametrised surface to the
-    prices of equity options at different strikes and expiry tenors. There is a 
-    choice of volatility function from cubic in delta to full SABR and SSVI. 
+    prices of equity options at different strikes and expiry tenors. There is0 
+    a choice of volatility function from cubic in delta to full SABR and SSVI. 
     Check out VolFunctionTypes. Visualising the volatility curve is useful. 
     Also, there is no guarantee that the implied pdf will be positive."""
 
@@ -278,12 +278,12 @@ class EquityVolSurface:
     def volatility_from_strike_date(self, K, expiry_date):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
-        is done in variance space. The smile strikes at bracketed dates are 
+        is done in variance space. The smile strikes at bracketed dates are
         determined by determining the strike that reproduces the provided delta
-        value. This uses the calibration delta convention, but it can be 
-        overriden by a provided delta convention. The resulting volatilities 
-        are then determined for each bracketing expiry time and linear 
-        interpolation is done in variance space and then converted back to a 
+        value. This uses the calibration delta convention, but it can be
+        overriden by a provided delta convention. The resulting volatilities
+        are then determined for each bracketing expiry time and linear
+        interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear

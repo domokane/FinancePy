@@ -8,3 +8,4 @@ from .fx_option import *
 from .fx_rainbow_option import *
 from .fx_vanilla_option import *
 from .fx_variance_swap import *
+from .fx_one_touch_option import *

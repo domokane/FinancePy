@@ -4,16 +4,16 @@
 
 
 import numpy as np
-from math import log, exp, sqrt
 
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
 from ...utils.global_vars import gDaysInYear
-from ...models.black_scholes import BlackScholes
 from ...utils.global_types import OptionTypes
-from .equity_vanilla_option import EquityVanillaOption
+from ...models.black_scholes import BlackScholes
 from ...utils.helpers import label_to_string, check_argument_types
+
+from .equity_vanilla_option import EquityVanillaOption
 
 ###############################################################################
 
@@ -99,7 +99,7 @@ class EquityVarianceSwap:
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
         b = f * dvol / dK
-        var = (atm_vol**2) * sqrt(1.0 + 3.0*tmat*(b**2))
+        var = (atm_vol**2) * np.sqrt(1.0 + 3.0*tmat*(b**2))
         return var
 
 ###############################################################################
@@ -128,13 +128,13 @@ class EquityVarianceSwap:
         tmat = (self._maturity_date - valuation_date)/gDaysInYear
 
         df = discount_curve._df(tmat)
-        r = - log(df)/tmat
+        r = - np.log(df)/tmat
 
         dq = dividend_curve._df(tmat)
-        q = - log(dq)/tmat
+        q = - np.log(dq)/tmat
 
         s0 = stock_price
-        g = exp((r-q)*tmat)
+        g = np.exp((r-q)*tmat)
         fwd = stock_price * g
 
         # This fixes the centre strike of the replication options
@@ -173,12 +173,12 @@ class EquityVarianceSwap:
 
         self._call_strikes = callK
 
-        optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - log(sstar/s0))/tmat
+        optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - np.log(sstar/s0))/tmat
 
         self._callWts = np.zeros(num_call_options)
         self._putWts = np.zeros(num_put_options)
 
-        def f(x): return (2.0/tmat)*((x-sstar)/sstar-log(x/sstar))
+        def f(x): return (2.0/tmat)*((x-sstar)/sstar-np.log(x/sstar))
 
         sumWts = 0.0
         for n in range(0, self._num_put_options):
@@ -236,7 +236,7 @@ class EquityVarianceSwap:
 
         if useLogs is True:
             for i in range(1, num_observations):
-                x = log(closePrices[i]/closePrices[i-1])
+                x = np.log(closePrices[i]/closePrices[i-1])
                 cumX2 += x*x
         else:
             for i in range(1, num_observations):
@@ -248,7 +248,6 @@ class EquityVarianceSwap:
 
 
 ###############################################################################
-
 
     def print_weights(self):
         """ Print the list of puts and calls used to replicate the static

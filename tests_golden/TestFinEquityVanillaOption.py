@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import time
 import numpy as np
 from financepy.utils.global_types import OptionTypes
@@ -11,8 +14,6 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.error import FinError
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -249,7 +250,7 @@ def testImpliedVolatility_NEW():
 ###############################################################################
 
 
-if 1 == 1:
+if 1 == 0:
     valuation_date = Date(30, 11, 2021)
     expiry_date = valuation_date.add_years(1)
 
@@ -263,10 +264,8 @@ if 1 == 1:
     call_option = EquityVanillaOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(expiry_date, 105.0, discount_curve,
+    value = call_option.value(valuation_date, 105.0, discount_curve,
                               dividend_curve, model)
-
-    print(value)
 
 else:
     test_EquityVanillaOption()

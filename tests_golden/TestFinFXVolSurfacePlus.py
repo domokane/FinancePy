@@ -2,7 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
@@ -12,12 +16,8 @@ from financepy.models.volatility_fns import VolFunctionTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 import matplotlib.pyplot as plt
 import time
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
-
 
 ###############################################################################
 
@@ -247,7 +247,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         strikes = np.linspace(1.0, 2.0, 20)
 
-        if 1 == 1:
+        if 1 == 0:
             volSurface = []
             for k in strikes:
                 volSmile = []
@@ -276,7 +276,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         deltas = np.linspace(0.10, 0.90, 17)
 
-        if 1 == 1:
+        if 1 == 0:
             volSurface = []
             for delta in deltas:
                 volSmile = []
@@ -371,7 +371,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         deltas = np.linspace(0.10, 0.90, 17)
 
-        if 1 == 1:
+        if 1 == 0:
             volSurface = []
             for delta in deltas:
                 volSmile = []
@@ -395,6 +395,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
             ax.set_zlabel('Volatility')
             plt.title("EURUSD Volatility Surface")
             plt.show()
+
 ###############################################################################
 
 

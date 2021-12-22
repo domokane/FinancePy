@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from numba import njit, float64, int64, prange
+from numba import njit, float64, int64
 
 from math import exp, sqrt
 
@@ -94,7 +94,7 @@ def value_mc4(s0, t, K, r, q, v, num_paths, seed):
 
 
 @njit(float64(float64, float64, float64, float64, float64, float64,
-              int64, int64), cache=True, fastmath=True, parallel=True)
+              int64, int64), cache=True, fastmath=True)
 def value_mc5(s0, t, K, r, q, v, num_paths, seed):
 
     vsqrtt = v * sqrt(t)
@@ -104,7 +104,7 @@ def value_mc5(s0, t, K, r, q, v, num_paths, seed):
     g = np.random.standard_normal(num_paths)
 
     payoff = 0.0
-    for i in prange(0, num_paths):
+    for i in range(0, num_paths):
         s = ss * exp(+g[i] * vsqrtt)
         payoff += max(s - K, 0.0)
 
