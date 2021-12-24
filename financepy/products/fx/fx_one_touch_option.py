@@ -14,6 +14,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths
+from ...products.fx.fx_option import FXOption
 
 from numba import njit
 
@@ -22,6 +23,7 @@ from ...utils.math import n_vect
 ###############################################################################
 # TODO: Implement Sobol random numbers
 # TODO: Improve convergence
+# TODO: Fix risk numbers
 ###############################################################################
 
 ###############################################################################
@@ -121,12 +123,12 @@ def _barrier_pay_asset_at_expiry_up_out(s, H):
 ###############################################################################
 
 
-class FXOneTouchOption():
+class FXOneTouchOption(FXOption):
     """ A FinFXOneTouchOption is an option in which the buyer receives one
     unit of currency if the FX rate touches a barrier at any time
-    before the option expiry date and zero otherwise. The single barrier 
-    payoff must define whether the option pays or cancels if the barrier is 
-    touched and also when the payment is made (at hit time or option expiry). 
+    before the option expiry date and zero otherwise. The single barrier
+    payoff must define whether the option pays or cancels if the barrier is
+    touched and also when the payment is made (at hit time or option expiry).
     All of these variants are members of the FinTouchOptionTypes type. """
 
     def __init__(self,
@@ -163,10 +165,10 @@ class FXOneTouchOption():
             raise FinError("Valuation date after expiry date.")
 
         if dom_discount_curve._valuation_date != valuation_date:
-            raise FinError("Domestic Curve valuation date not same as valuation date")
+            raise FinError("Domestic Curve date not same as valuation date")
 
         if for_discount_curve._valuation_date != valuation_date:
-            raise FinError("Foreign Curve valuation date not same as valuation date")
+            raise FinError("Foreign Curve date not same as valuation date")
 
         DEBUG_MODE = False
 
@@ -212,8 +214,7 @@ class FXOneTouchOption():
             eta = 1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
-                                                     z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -226,8 +227,7 @@ class FXOneTouchOption():
             eta = -1.0
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
-                                                     z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -241,8 +241,7 @@ class FXOneTouchOption():
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
-                                                     z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -256,8 +255,7 @@ class FXOneTouchOption():
             K = H
             z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
-                                                     z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -289,8 +287,7 @@ class FXOneTouchOption():
             x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
             y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
             B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
-                n_vect(eta * y2 - eta * v * sqrtT)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
             v = (B2 + B4)
             return v
 
@@ -430,6 +427,8 @@ class FXOneTouchOption():
         Carlo simulation. Accuracy is not great when compared to the analytical
         result as we only observe the barrier a finite number of times. The
         convergence is slow. """
+
+        print("THIS NEEDS TO BE CHECKED")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
 

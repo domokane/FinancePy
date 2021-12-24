@@ -31,7 +31,7 @@ def test_FinFXOneTouchOption():
     foreignRate = 0.03
 
     num_paths = 50000
-    num_steps_per_year = 252
+    num_steps_per_year = 252 * 2
 
     domCurve = DiscountCurveFlat(valuation_date, domesticRate)
     forCurve = DiscountCurveFlat(valuation_date, foreignRate)
@@ -72,7 +72,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-#        print(downType, v, v_mc)
+        print(downType, v, v_mc)
 
     spot_fx_rate = 0.950
     payment_size = 1.5
@@ -108,10 +108,89 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-#        print(upType, v, v_mc)
+        print(upType, v, v_mc)
+
+
+###############################################################################
+
+def test_BBGOneTouchOption():
+
+    # 1YR ONETOUCH ON EURUSD 
+
+    valuation_date = Date(3, 12, 2021)
+    expiry_date = Date(5, 12, 2022)
+    barrier_level = 1.1865  # THIS IS NUMBER OF DOLLARS PER EURO
+
+    spot_fx_rate = 1.1300 # EURUSD
+    volatility = 0.06075
+
+    model = BlackScholes(volatility)
+
+    forRate = 0.00593 # EUR
+    domRate = -0.00414 # USD
+
+    num_paths = 50000
+    num_steps_per_year = 252
+
+    domCurve = DiscountCurveFlat(valuation_date, domRate)
+    forCurve = DiscountCurveFlat(valuation_date, forRate)
+
+    payment_size = 1000000 # EUR
+
+    optionType = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
+
+    option = FXOneTouchOption(expiry_date,
+                              optionType,
+                              barrier_level,
+                              payment_size)
+
+    v = option.value(valuation_date,
+                     spot_fx_rate,
+                     domCurve,
+                     forCurve,
+                     model)
+
+    v_mc = option.value_mc(valuation_date,
+                           spot_fx_rate,
+                           domCurve,
+                           forCurve,
+                           model,
+                           num_steps_per_year,
+                           num_paths)
+
+    d = option.delta(valuation_date,
+                     spot_fx_rate,
+                     domCurve,
+                     forCurve,
+                     model)
+
+    g = option.gamma(valuation_date,
+                     spot_fx_rate,
+                     domCurve,
+                     forCurve,
+                     model)
+
+    v = option.vega(valuation_date,
+                     spot_fx_rate,
+                     domCurve,
+                     forCurve,
+                     model)
+
+    # I SHOULD GET 49.4934% OR 494,934 in EUR
+    # VEGA IS 68,777.26
+    # GAMMA IS 916,285
+    # DELTA IS -9560266
+    
+    print(optionType)
+    print("Value:", v)
+    print("Value MC:", v_mc)
+    print("Delta: ", d)
+    print("Gamma:", g)
+    print("Vega:", v)
 
 ###############################################################################
 
 
 test_FinFXOneTouchOption()
+test_BBGOneTouchOption()
 testCases.compareTestCases()

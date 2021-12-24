@@ -18,15 +18,22 @@ class FXOption:
 
 ###############################################################################
 
-    def delta(self, valuation_date, stock_price, discount_curve,
-              dividend_curve, model):
+    def delta(self, 
+              valuation_date,
+              spot_fx_rate,
+              discount_curve,
+              dividend_curve,
+              model):
         """ Calculate the option delta (FX rate sensitivity) by adding on a
         small bump and calculating the change in the option price. """
 
-        v = self.value(valuation_date, stock_price, discount_curve, dividend_curve,
+        v = self.value(valuation_date, spot_fx_rate, 
+                       discount_curve, dividend_curve,
                        model)
 
-        vBumped = self.value(valuation_date, stock_price + bump, discount_curve,
+        vBumped = self.value(valuation_date,
+                             spot_fx_rate + bump,
+                             discount_curve,
                              dividend_curve, model)
 
         if type(vBumped) is dict:
@@ -38,18 +45,18 @@ class FXOption:
 
 ###############################################################################
 
-    def gamma(self, valuation_date, stock_price, discount_curve, dividend_curve,
+    def gamma(self, valuation_date, spot_fx_rate, discount_curve, dividend_curve,
               model):
         """ Calculate the option gamma (delta sensitivity) by adding on a
         small bump and calculating the change in the option delta. """
 
-        v = self.delta(valuation_date, stock_price, discount_curve, dividend_curve,
+        v = self.delta(valuation_date, spot_fx_rate, discount_curve, dividend_curve,
                        model)
 
-        vBumpedDn = self.delta(valuation_date, stock_price + bump, discount_curve,
+        vBumpedDn = self.delta(valuation_date, spot_fx_rate + bump, discount_curve,
                                dividend_curve, model)
 
-        vBumpedUp = self.delta(valuation_date, stock_price + bump, discount_curve,
+        vBumpedUp = self.delta(valuation_date, spot_fx_rate + bump, discount_curve,
                                dividend_curve, model)
 
         if type(v) is dict:
@@ -62,30 +69,32 @@ class FXOption:
 
 ###############################################################################
 
-    def vega(self, valuation_date, stock_price, discount_curve, dividend_curve, model):
+    def vega(self, valuation_date, spot_fx_rate, discount_curve, dividend_curve, model):
         """ Calculate the option vega (volatility sensitivity) by adding on a
         small bump and calculating the change in the option price. """
 
-        v = self.value(valuation_date, stock_price, discount_curve, dividend_curve,
+        bump = 0.01
+
+        v = self.value(valuation_date, spot_fx_rate, discount_curve, dividend_curve,
                        model)
 
-        vp = self.value(valuation_date, stock_price, discount_curve, dividend_curve,
+        vp = self.value(valuation_date, spot_fx_rate, discount_curve, dividend_curve,
                         BlackScholes(model._volatility + bump))
 
         if type(v) is dict:
-            vega = (vp['value'] - v['value']) / bump
+            vega = (vp['value'] - v['value'])# / bump
         else:
-            vega = (vp - v) / bump
+            vega = (vp - v)# / bump
 
         return vega
 
 ###############################################################################
 
-    def theta(self, valuation_date, stock_price, discount_curve, dividend_curve, model):
+    def theta(self, valuation_date, spot_fx_rate, discount_curve, dividend_curve, model):
         """ Calculate the option theta (calendar time sensitivity) by moving
         forward one day and calculating the change in the option price. """
 
-        v = self.value(valuation_date, stock_price, discount_curve,
+        v = self.value(valuation_date, spot_fx_rate, discount_curve,
                        dividend_curve, model)
 
         next_date = valuation_date.add_days(1)
@@ -93,7 +102,7 @@ class FXOption:
         discount_curve._valuation_date = next_date
         dividend_curve._valuation_date = next_date
 
-        vBumped = self.value(next_date, stock_price, discount_curve,
+        vBumped = self.value(next_date, spot_fx_rate, discount_curve,
                              dividend_curve, model)
 
         bump = 1.0 / gDaysInYear
@@ -110,19 +119,19 @@ class FXOption:
 
 ##############################################################################
 
-    def rho(self, valuation_date, stock_price, discount_curve, dividend_curve, model):
+    def rho(self, valuation_date, spot_fx_rate, discount_curve, dividend_curve, model):
         """ Calculate the option rho (interest rate sensitivity) by perturbing
         the discount curve and revaluing. """
 
         v = self.value(
             valuation_date,
-            stock_price,
+            spot_fx_rate,
             discount_curve,
             dividend_curve,
             model)
         vBumped = self.value(
             valuation_date,
-            stock_price,
+            spot_fx_rate,
             discount_curve.bump(bump),
             dividend_curve,
             model)

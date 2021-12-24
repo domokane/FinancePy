@@ -92,6 +92,8 @@ class EquityOption:
              model):
         """ Calculation of option vega by perturbing vol and revaluation. """
 
+        bump = 0.01
+        
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividend_curve, model)
 
@@ -100,7 +102,7 @@ class EquityOption:
         vBumped = self.value(valuation_date, stock_price, discount_curve,
                              dividend_curve, model)
 
-        vega = (vBumped - v) / bump
+        vega = (vBumped - v) # / bump
         return vega
 
 ##############################################################################
@@ -179,7 +181,9 @@ class EquityOption:
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumped = self.value(valuation_date, stock_price, discount_curve.bump(bump),
+        vBumped = self.value(valuation_date,
+                             stock_price,
+                             discount_curve.bump(bump),
                              dividend_curve, model)
 
         rho = (vBumped - v) / bump
