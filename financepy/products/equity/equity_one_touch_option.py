@@ -25,23 +25,6 @@ from ...utils.math import n_vect
 # TODO: Improve convergence
 ###############################################################################
 
-'''
-class FinTouchOptionPayoffTypes(Enum):
-    DOWN_AND_IN_CASH_AT_HIT = 1,         # S0>H pays $1 at hit time from above
-    UP_AND_IN_CASH_AT_HIT = 2,           # S0<H pays $1 at hit time from below
-    DOWN_AND_IN_CASH_AT_EXPIRY = 3,      # S0>H pays $1 at T if hit from above
-    UP_AND_IN_CASH_AT_EXPIRY = 4,        # S0<H pays $1 at T if hit from below
-    DOWN_AND_OUT_CASH_OR_NOTHING = 5,    # S0>H pays $1 at T if S>H for all t<T
-    UP_AND_OUT_CASH_OR_NOTHING = 6,      # S0<H pays $1 at T if S<H for all t<T
-    DOWN_AND_IN_ASSET_AT_HIT = 7,        # S0>H pays H at hit time from above
-    UP_AND_IN_ASSET_AT_HIT = 8,          # S0>H pays H at hit time from below
-    DOWN_AND_IN_ASSET_AT_EXPIRY = 9,     # S0>H pays S(T) at T if S<H for t < T
-    UP_AND_IN_ASSET_AT_EXPIRY = 10,      # S0<H pays S(T) at T if S>H for t < T
-    DOWN_AND_OUT_ASSET_OR_NOTHING = 11,  # S0>H pays S(T) at T if S>H for t < T
-    UP_AND_OUT_ASSET_OR_NOTHING = 12     # S0<H pays S(T) at T if S<H for t < T
-'''
-###############################################################################
-
 
 @njit(fastmath=True, cache=True)
 def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
