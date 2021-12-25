@@ -115,7 +115,7 @@ def test_DOWN_AND_IN_CALL():
 
     assert round(value, 4) == 9.2270
     assert round(delta, 4) == 0.5868
-    assert round(vega, 4) == 37.9013
+    assert round(vega, 4) == 0.3791
     assert round(theta, 4) == -5.0924
 
 
@@ -158,7 +158,7 @@ def test_UP_AND_OUT_CALL():
 
     assert round(value, 4) == 0.0003
     assert round(delta, 4) == 0.0001
-    assert round(vega, 4) == 0.0143
+    assert round(vega, 4) == 0.0002
     assert round(theta, 4) == -0.0015
 
 
@@ -201,7 +201,7 @@ def test_UP_AND_IN_CALL():
 
     assert round(value, 4) == 9.2067
     assert round(delta, 4) == 0.5900
-    assert round(vega, 4) == 38.1213
+    assert round(vega, 4) == 0.3811
     assert round(theta, 4) == -5.1229
 
 
@@ -244,7 +244,7 @@ def test_UP_AND_OUT_PUT():
 
     assert round(value, 4) == 46.1145
     assert round(delta, 4) == -0.9796
-    assert round(vega, 4) == 0.1015
+    assert round(vega, 4) == 0.0013
     assert round(theta, 4) == 3.7654
 
 
@@ -287,7 +287,7 @@ def test_UP_AND_IN_PUT():
 
     assert round(value, 4) == 2.7444
     assert round(delta, 4) == 0.2102
-    assert round(vega, 4) == 26.5584
+    assert round(vega, 4) == 0.2680
     assert round(theta, 4) == -2.3502
 
 
@@ -373,5 +373,5 @@ def test_DOWN_AND_IN_PUT():
 
     assert round(value, 4) == 6.3301
     assert round(delta, 4) == -0.3934
-    assert round(vega, 4) == 37.9013
+    assert round(vega, 4) == 0.3791
     assert round(theta, 4) == -2.2964
