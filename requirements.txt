@@ -2,7 +2,7 @@
 numba==0.49      # fails on higher versions
 numpy==1.19.2
 scipy==1.5.2
-ipython==7.18.1
+ipython==7.31.1
 llvmlite==0.32.1
 matplotlib==3.3.2
 
