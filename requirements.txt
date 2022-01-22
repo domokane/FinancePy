@@ -4,7 +4,6 @@ scipy==1.5.2
 llvmlite==0.32.1
 matplotlib==3.3.2
 ipython>=7.31.1
-numpy>=1.21
-
+numpy==1.19.2
 
 
