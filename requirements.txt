@@ -1,6 +1,6 @@
 ##### Imports required by core library
 numba==0.49      # fails on higher versions
-numpy==1.19.2
+numpy==1.21.0
 scipy==1.5.2
 llvmlite==0.32.1
 matplotlib==3.3.2
