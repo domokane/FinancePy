@@ -17,7 +17,7 @@ from .black_scholes_analytic import bs_value
 ###############################################################################
 
 
-#@njit(float64[:](float64, float64, float64, float64, float64[:],
+# @njit(float64[:](float64, float64, float64, float64, float64[:],
 #                 float64[:]), cache=True, fastmath=True)
 def option_implied_dbn(s, t, r, q, strikes, sigmas):
     """ This function calculates the option smile/skew-implied probability
@@ -43,7 +43,7 @@ def option_implied_dbn(s, t, r, q, strikes, sigmas):
         sigma = sigmas[ik]
         v = bs_value(s, t, strike, r, q, sigma,
                      OptionTypes.EUROPEAN_CALL.value)
-        
+
         values[ik] = v
 
     # Calculate the density rho(K) dK

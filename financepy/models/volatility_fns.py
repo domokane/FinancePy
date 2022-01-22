@@ -30,7 +30,7 @@ class VolFunctionTypes(Enum):
 
 
 @jit(float64(float64[:], float64, float64, float64),
-      fastmath=True, cache=True)
+     fastmath=True, cache=True)
 def vol_function_clark(params, f, k, t):
     """ Volatility Function in book by Iain Clark generalised to allow for
     higher than quadratic power. Care needs to be taken to avoid overfitting.

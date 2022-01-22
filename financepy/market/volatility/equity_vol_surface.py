@@ -194,7 +194,7 @@ def _delta_fit(k, *args):
 ###############################################################################
 
 
-#@njit(float64(float64, float64, float64, float64, int64, int64, float64,
+# @njit(float64(float64, float64, float64, float64, int64, int64, float64,
 #              float64, float64[:]), fastmath=True)
 def _solver_for_smile_strike(s, t, r, q,
                              option_type_value,
