@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import time
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
@@ -10,8 +13,6 @@ from financepy.products.equity.equity_asian_option import AsianOptionValuationMe
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

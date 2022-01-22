@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 import time
 from financepy.products.credit.cds import CDS
@@ -21,8 +24,6 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

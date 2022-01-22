@@ -3,7 +3,7 @@
 ###############################################################################
 
 from collections import namedtuple
-from numba import njit, jit
+from numba import njit, jit, float64
 import numpy as np
 import operator
 

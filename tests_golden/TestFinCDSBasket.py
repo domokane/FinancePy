@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
 from financepy.models.gbm_process_simulator import get_paths_assets
@@ -18,9 +21,6 @@ from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 import time
 import numpy as np
 from os.path import dirname, join
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

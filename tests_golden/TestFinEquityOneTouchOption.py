@@ -2,14 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+
+import sys
+sys.path.append("..")
+
 from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
-from financepy.products.equity.equity_one_touch_option import FinTouchOptionPayoffTypes
+from financepy.utils.global_types import TouchOptionTypes
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -39,9 +42,9 @@ def test_EquityOneTouchOption():
 
     testCases.header("================================= CASH ONLY")
 
-    downTypes = [FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_HIT,
-                 FinTouchOptionPayoffTypes.DOWN_AND_IN_CASH_AT_EXPIRY,
-                 FinTouchOptionPayoffTypes.DOWN_AND_OUT_CASH_OR_NOTHING]
+    downTypes = [TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT,
+                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY,
+                 TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING]
 
     testCases.header("TYPE", "VALUE", "VALUE_MC")
 
@@ -73,9 +76,9 @@ def test_EquityOneTouchOption():
     stock_price = 95.0
     payment_size = 15.0
 
-    upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_HIT,
-               FinTouchOptionPayoffTypes.UP_AND_IN_CASH_AT_EXPIRY,
-               FinTouchOptionPayoffTypes.UP_AND_OUT_CASH_OR_NOTHING]
+    upTypes = [TouchOptionTypes.UP_AND_IN_CASH_AT_HIT,
+               TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY,
+               TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING]
 
     testCases.header("TYPE", "VALUE", "VALUE_MC")
 
@@ -110,9 +113,9 @@ def test_EquityOneTouchOption():
 
     testCases.banner("================= ASSET ONLY")
 
-    downTypes = [FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_HIT,
-                 FinTouchOptionPayoffTypes.DOWN_AND_IN_ASSET_AT_EXPIRY,
-                 FinTouchOptionPayoffTypes.DOWN_AND_OUT_ASSET_OR_NOTHING]
+    downTypes = [TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT,
+                 TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY,
+                 TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING]
 
     testCases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
@@ -141,9 +144,9 @@ def test_EquityOneTouchOption():
 
     stock_price = 95.0
 
-    upTypes = [FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_HIT,
-               FinTouchOptionPayoffTypes.UP_AND_IN_ASSET_AT_EXPIRY,
-               FinTouchOptionPayoffTypes.UP_AND_OUT_ASSET_OR_NOTHING]
+    upTypes = [TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT,
+               TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY,
+               TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING]
 
     for upType in upTypes:
 
