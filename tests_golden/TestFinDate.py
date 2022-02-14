@@ -231,55 +231,75 @@ def test_IntraDay():
 def test_DateEOM():
 
     dt = Date(29, 2, 2000)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(28, 2, 2001)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(29, 2, 2004)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(28, 2, 2005)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(31, 3, 2003)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(30, 4, 2004)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(31, 5, 2004)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(31, 12, 2010)
-    assert(dt.is_eom() == True)
+    assert(dt.is_eom() is True)
 
     dt = Date(2, 2, 2000)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(24, 2, 2001)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(22, 2, 2004)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(1, 2, 2005)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(1, 3, 2003)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(3, 4, 2004)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(5, 5, 2004)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
     dt = Date(7, 12, 2010)
-    assert(dt.eom().is_eom() == True)
+    assert(dt.eom().is_eom() is True)
 
 ###############################################################################
 
+import datetime
+from financepy.utils import from_datetime
+
+def test_add_weekdays():
+
+    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    next_weekday = from_datetime(today).add_weekdays(1)
+    last_weekday = from_datetime(today).add_weekdays(-1)
+    assert( (last_weekday == Date(11, 2, 2022)) is True)
+    assert( (next_weekday == Date(14, 2, 2022)) is True)
+
+    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    next_weekday = from_datetime(today).add_weekdays(7)
+    last_weekday = from_datetime(today).add_weekdays(-7)
+    assert( (last_weekday == Date(3, 2, 2022)) is True)
+    assert( (next_weekday == Date(22, 2, 2022)) is True)
+
+###############################################################################
+
+test_add_weekdays()
 
 start = time.time()
 

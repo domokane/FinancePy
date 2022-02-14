@@ -428,7 +428,7 @@ class Date():
 
     ###########################################################################
 
-    def add_weekdays(self,
+     def add_weekdays(self,
                      numDays: int):
         """ Returns a new date that is numDays working days after Date. Note
         that only weekends are taken into account. Other Holidays are not. If
@@ -437,6 +437,8 @@ class Date():
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE
 
+        end_date = self;
+        
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
@@ -444,21 +446,50 @@ class Date():
         numDays = abs(numDays)
 
         # 5 week days make up a week
-        numWeeks = int(numDays / 5)
-        remainingDays = numDays % 5
+        oldLogic = False
 
-        if (positiveNumDays):
-            if (self._weekday + remainingDays > self.FRI):
-                # add weekend
-                remainingDays += 2
-
-            return self.add_days(numWeeks * 7 + remainingDays)
-        else:
-            if (self._weekday - remainingDays < self.MON):
-                # add weekend
-                remainingDays += 2
-
+        if oldLogic is True:
+            numWeeks = int(numDays / 5)
+            remainingDays = numDays % 5
+            
+            if self._weekday == Date.SAT:
+                weekendAdjust = 1
+            elif self._weekday == Date.SUN:
+                weekendAdjust = 0
+            else:
+                weekendAdjust = 2
+    
+            if (positiveNumDays):
+                if (self._weekday + remainingDays > self.FRI):
+                    # add weekend
+                    remainingDays += weekendAdjust
+    
+                return self.add_days(numWeeks * 7 + remainingDays)
+            else:
+                if (self._weekday - remainingDays < self.MON):
+                    # add weekend
+                    remainingDays += weekendAdjust
+    
             return self.add_days(-(numWeeks * 7 + remainingDays))
+
+        else: # new logic
+
+            numDaysLeft = numDays
+            end_date = self
+            
+            while numDaysLeft > 0:
+
+                if positiveNumDays is True:
+                    end_date = end_date.add_days(1)
+                else:
+                    end_date = end_date.add_days(-1)
+
+                if end_date._weekday == Date.SAT or end_date._weekday == Date.SUN:
+                    pass
+                else:
+                    numDaysLeft -= 1
+
+            return end_date
 
     ###########################################################################
 
