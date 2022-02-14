@@ -2,18 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.error import FinError
+from financepy.utils.date import Date
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.utils.global_types import OptionTypes
+import numpy as np
+import time
 import sys
 sys.path.append("..")
-
-import time
-import numpy as np
-from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.utils.date import Date
-from financepy.utils.error import FinError
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

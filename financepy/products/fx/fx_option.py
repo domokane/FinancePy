@@ -18,7 +18,7 @@ class FXOption:
 
 ###############################################################################
 
-    def delta(self, 
+    def delta(self,
               valuation_date,
               spot_fx_rate,
               discount_curve,
@@ -27,7 +27,7 @@ class FXOption:
         """ Calculate the option delta (FX rate sensitivity) by adding on a
         small bump and calculating the change in the option price. """
 
-        v = self.value(valuation_date, spot_fx_rate, 
+        v = self.value(valuation_date, spot_fx_rate,
                        discount_curve, dividend_curve,
                        model)
 
@@ -82,9 +82,9 @@ class FXOption:
                         BlackScholes(model._volatility + bump))
 
         if type(v) is dict:
-            vega = (vp['value'] - v['value'])# / bump
+            vega = (vp['value'] - v['value'])  # / bump
         else:
-            vega = (vp - v)# / bump
+            vega = (vp - v)  # / bump
 
         return vega
 

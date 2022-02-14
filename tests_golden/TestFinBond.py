@@ -2,25 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import datetime as dt
+import os
+from financepy.utils.global_types import SwapTypes
+from financepy.products.bonds.bond import YTMCalcType
+from financepy.products.bonds.bond import Bond
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.utils.math import ONE_MILLION
+from financepy.utils.date import Date, from_datetime
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date, from_datetime
-from financepy.utils.math import ONE_MILLION
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond import YTMCalcType
-from financepy.utils.global_types import SwapTypes
-import os
-import datetime as dt
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

@@ -2,23 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.bdt_tree import BDTTree
+from financepy.models.hw_tree import HWTree
+from financepy.models.bk_tree import BKTree
+from financepy.models.black import Black
+from financepy.products.rates.bermudan_swaption import IborBermudanSwaption
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
 import sys
 sys.path.append("..")
-
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_types import SwapTypes
-from financepy.utils.global_types import FinExerciseTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.bermudan_swaption import IborBermudanSwaption
-from financepy.models.black import Black
-from financepy.models.bk_tree import BKTree
-from financepy.models.hw_tree import HWTree
-from financepy.models.bdt_tree import BDTTree
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

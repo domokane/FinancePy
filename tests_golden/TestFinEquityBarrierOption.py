@@ -2,17 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_barrier_option import EquityBarrierOption
+from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
+from financepy.models.process_simulator import FinGBMNumericalScheme
+from financepy.models.process_simulator import ProcessTypes
 import sys
 sys.path.append("..")
-
-from financepy.models.process_simulator import ProcessTypes
-from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
-from financepy.products.equity.equity_barrier_option import EquityBarrierOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

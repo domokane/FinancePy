@@ -437,8 +437,8 @@ class Date():
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE
 
-        end_date = self;
-        
+        end_date = self
+
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
@@ -451,32 +451,32 @@ class Date():
         if oldLogic is True:
             numWeeks = int(numDays / 5)
             remainingDays = numDays % 5
-            
+
             if self._weekday == Date.SAT:
                 weekendAdjust = 1
             elif self._weekday == Date.SUN:
                 weekendAdjust = 0
             else:
                 weekendAdjust = 2
-    
+
             if (positiveNumDays):
                 if (self._weekday + remainingDays > self.FRI):
                     # add weekend
                     remainingDays += weekendAdjust
-    
+
                 return self.add_days(numWeeks * 7 + remainingDays)
             else:
                 if (self._weekday - remainingDays < self.MON):
                     # add weekend
                     remainingDays += weekendAdjust
-    
+
             return self.add_days(-(numWeeks * 7 + remainingDays))
 
-        else: # new logic
+        else:  # new logic
 
             numDaysLeft = numDays
             end_date = self
-            
+
             while numDaysLeft > 0:
 
                 if positiveNumDays is True:

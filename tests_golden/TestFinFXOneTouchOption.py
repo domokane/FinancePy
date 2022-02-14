@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.fx import FXOneTouchOption
+from financepy.utils.global_types import TouchOptionTypes
 import sys
 sys.path.append("..")
 
-from financepy.utils.global_types import TouchOptionTypes
-from financepy.products.fx import FXOneTouchOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -115,19 +115,19 @@ def test_FinFXOneTouchOption():
 
 def test_BBGOneTouchOption():
 
-    # 1YR ONETOUCH ON EURUSD 
+    # 1YR ONETOUCH ON EURUSD
 
     valuation_date = Date(3, 12, 2021)
     expiry_date = Date(5, 12, 2022)
     barrier_level = 1.1865  # THIS IS NUMBER OF DOLLARS PER EURO
 
-    spot_fx_rate = 1.1300 # EURUSD
+    spot_fx_rate = 1.1300  # EURUSD
     volatility = 0.06075
 
     model = BlackScholes(volatility)
 
-    forRate = 0.00593 # EUR
-    domRate = -0.00414 # USD
+    forRate = 0.00593  # EUR
+    domRate = -0.00414  # USD
 
     num_paths = 50000
     num_steps_per_year = 252
@@ -135,7 +135,7 @@ def test_BBGOneTouchOption():
     domCurve = DiscountCurveFlat(valuation_date, domRate)
     forCurve = DiscountCurveFlat(valuation_date, forRate)
 
-    payment_size = 1000000 # EUR
+    payment_size = 1000000  # EUR
 
     optionType = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
 
@@ -171,16 +171,16 @@ def test_BBGOneTouchOption():
                      model)
 
     v = option.vega(valuation_date,
-                     spot_fx_rate,
-                     domCurve,
-                     forCurve,
-                     model)
+                    spot_fx_rate,
+                    domCurve,
+                    forCurve,
+                    model)
 
     # I SHOULD GET 49.4934% OR 494,934 in EUR
     # VEGA IS 68,777.26
     # GAMMA IS 916,285
     # DELTA IS -9560266
-    
+
     print(optionType)
     print("Value:", v)
     print("Value MC:", v_mc)

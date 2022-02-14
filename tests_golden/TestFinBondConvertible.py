@@ -2,19 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+from financepy.products.bonds.bond_convertible import BondConvertible
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
 
 # TODO
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.products.bonds.bond_convertible import BondConvertible
-import time
-import numpy as np
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

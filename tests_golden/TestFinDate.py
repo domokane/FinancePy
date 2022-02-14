@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import datetime
+from financepy.utils import from_datetime
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import set_date_format
 from financepy.utils.date import DateFormatTypes
@@ -280,24 +282,23 @@ def test_DateEOM():
 
 ###############################################################################
 
-import datetime
-from financepy.utils import from_datetime
 
 def test_add_weekdays():
 
-    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    today = datetime.date(2022, 2, 13)  # Sunday 13th Feb
     next_weekday = from_datetime(today).add_weekdays(1)
     last_weekday = from_datetime(today).add_weekdays(-1)
-    assert( (last_weekday == Date(11, 2, 2022)) is True)
-    assert( (next_weekday == Date(14, 2, 2022)) is True)
+    assert((last_weekday == Date(11, 2, 2022)) is True)
+    assert((next_weekday == Date(14, 2, 2022)) is True)
 
-    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    today = datetime.date(2022, 2, 13)  # Sunday 13th Feb
     next_weekday = from_datetime(today).add_weekdays(7)
     last_weekday = from_datetime(today).add_weekdays(-7)
-    assert( (last_weekday == Date(3, 2, 2022)) is True)
-    assert( (next_weekday == Date(22, 2, 2022)) is True)
+    assert((last_weekday == Date(3, 2, 2022)) is True)
+    assert((next_weekday == Date(22, 2, 2022)) is True)
 
 ###############################################################################
+
 
 test_add_weekdays()
 

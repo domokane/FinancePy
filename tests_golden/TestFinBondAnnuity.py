@@ -3,17 +3,16 @@
 ###############################################################################
 
 # TODO Set up test cases correctly
+from financepy.utils.calendar import DateGenRuleTypes
+from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.date import Date
+from financepy.products.bonds.bond_annuity import BondAnnuity
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.bonds.bond_annuity import BondAnnuity
-from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.calendar import DateGenRuleTypes
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
