@@ -50,9 +50,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 
@@ -81,9 +81,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 
@@ -111,9 +111,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 
@@ -141,9 +141,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 
@@ -171,9 +171,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 
@@ -201,9 +201,9 @@ def test_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     testCases.header("Date", "Flow")
-    num_flows = len(annuity._flow_dates)
+    num_flows = len(annuity._coupon_dates)
     for i in range(1, num_flows):
-        dt = annuity._flow_dates[i]
+        dt = annuity._coupon_dates[i]
         flow = annuity._flow_amounts[i]
         testCases.print(dt, flow)
 

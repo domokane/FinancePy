@@ -57,7 +57,7 @@ class FinInflationBond(Bond):
         self._num_ex_dividend_days = num_ex_dividend_days
         self._inflation_accrued_interest = 0.0
         self._calendar_type = calendar_type
-        self._flow_dates = []
+        self._coupon_dates = []
         self._flow_amounts = []
 
         self._settlement_date = Date(1, 1, 1900)
@@ -65,7 +65,7 @@ class FinInflationBond(Bond):
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-        self._calculate_flow_dates()
+        self._calculate_coupon_dates()
         self._calculate_flows()
 
 ###############################################################################

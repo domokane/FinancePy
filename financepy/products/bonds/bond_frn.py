@@ -53,7 +53,8 @@ class BondFRN:
                  quoted_margin: float,  # Fixed spread paid on top of index
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float = 100.0):
+                 face_amount: float = 100.0, 
+                 calendar_type:CalendarTypes = CalendarTypes.WEEKEND):
         """ Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
         the position and par is the notional on which price is quoted. """
@@ -65,36 +66,35 @@ class BondFRN:
         self._quoted_margin = quoted_margin
         self._freq_type = freq_type
         self._accrual_type = accrual_type
-        self._flow_dates = []
+        self._coupon_dates = []
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the position size
         self._par = 100.0  # This is how price is quoted
         self._redemption = 1.0  # This is amount paid at maturity TODO NOT USED
-
-        self._flow_dates = []
+        self._calendar_type = calendar_type
+        self._coupon_dates = []
         self._flow_amounts = []
 
         self._settlement_date = Date(1, 1, 1900)
         self._accrued_interest = None
         self._accrued_days = 0.0
 
-        self._calculate_flow_dates()
+        self._calculate_coupon_dates()
 
     ###############################################################################
 
-    def _calculate_flow_dates(self):
+    def _calculate_coupon_dates(self):
         """ Determine the bond cashflow payment dates. """
 
         # This should only be called once from init
 
-        calendar_type = CalendarTypes.NONE
         bus_day_rule_type = BusDayAdjustTypes.NONE
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
-        self._flow_dates = Schedule(self._issue_date,
+        self._coupon_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
-                                    calendar_type,
+                                    self._calendar_type,
                                     bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
@@ -118,7 +118,7 @@ class BondFRN:
         day_counter = DayCount(self._accrual_type)
 
         q = self._quoted_margin
-        num_flows = len(self._flow_dates)
+        num_flows = len(self._coupon_dates)
 
         # We discount using Libor over the period from settlement to the ncd
         (alpha, _, _) = day_counter.year_frac(settlement_date, self._ncd)
@@ -131,9 +131,9 @@ class BondFRN:
         # Now do all subsequent coupons that fall after the ncd
         for iFlow in range(1, num_flows):
 
-            if self._flow_dates[iFlow] > self._ncd:
-                pcd = self._flow_dates[iFlow - 1]
-                ncd = self._flow_dates[iFlow]
+            if self._coupon_dates[iFlow] > self._ncd:
+                pcd = self._coupon_dates[iFlow - 1]
+                ncd = self._coupon_dates[iFlow]
                 (alpha, _, _) = day_counter.year_frac(pcd, ncd)
 
                 df = df / (1.0 + alpha * (future_ibor + dm))
@@ -417,7 +417,7 @@ class BondFRN:
         previous coupon date and the settlement date. Ex-dividend dates are 
         not handled. Contact me if you need this functionality. """
 
-        num_flows = len(self._flow_dates)
+        num_flows = len(self._coupon_dates)
 
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -425,9 +425,9 @@ class BondFRN:
         dc = DayCount(self._accrual_type)
 
         for i in range(1, num_flows):
-            if self._flow_dates[i] > settlement_date:
-                self._pcd = self._flow_dates[i - 1]
-                self._ncd = self._flow_dates[i]
+            if self._coupon_dates[i] > settlement_date:
+                self._pcd = self._coupon_dates[i - 1]
+                self._ncd = self._coupon_dates[i]
                 break
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
@@ -447,11 +447,11 @@ class BondFRN:
                     settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        self._calculate_flow_dates()
-        for dt in self._flow_dates[1:-1]:
+        self._calculate_coupon_dates()
+        for dt in self._coupon_dates[1:-1]:
             print(dt)
 
-        print(self._flow_dates[-1])
+        print(self._coupon_dates[-1])
 
     ###############################################################################
 

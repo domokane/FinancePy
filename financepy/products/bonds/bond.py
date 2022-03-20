@@ -97,7 +97,7 @@ class Bond:
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  face_amount: float = 100.0, 
-                 calendar_type: CalendarTypes = CalendarTypes.NONE):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used 
@@ -119,30 +119,50 @@ class Bond:
         self._redemption = 1.0  # This is amount paid at maturity
         self._calendar_type = calendar_type
         
-        self._flow_dates = []
+        self._coupon_dates = []
+        self._payment_dates = [] # Actual payment dates are adjusted
         self._flow_amounts = []
 
         self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-        self._calculate_flow_dates()
+        self._calculate_coupon_dates()
         self._calculate_flows()
 
     ###########################################################################
 
-    def _calculate_flow_dates(self):
-        """ Determine the bond cash flow payment dates. Although payments are 
-        calculated as though coupon periods are the same length, payments that 
-        fall on a Saturday or Sunday can only be made on the next business day
+    def _calculate_coupon_dates(self):
+        """ Determine the bond coupon dates. Note that for analytical 
+        calculations these are not usually adjusted and so may fall on a 
+        weekend or holiday. 
         """
-
+            
         # This should only be called once from init
-
         bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
-        self._flow_dates = Schedule(self._issue_date,
+        self._coupon_dates = Schedule(self._issue_date,
+                                    self._maturity_date,
+                                    self._freq_type,
+                                    CalendarTypes.NONE,
+                                    bus_day_rule_type,
+                                    date_gen_rule_type)._generate()
+
+    ###########################################################################
+
+    def _calculate_payment_dates(self):
+        """ For the actual payment dates, they are adjusted 
+        and so we then use the calendar payment dates. Although payments are 
+        calculated as though coupon periods are the same length, payments that 
+        fall on a Saturday or Sunday can only be made on the next business day
+        """
+            
+        # This should only be called once from init
+        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
+        date_gen_rule_type = DateGenRuleTypes.BACKWARD
+
+        self._payment_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     self._calendar_type,
@@ -157,7 +177,7 @@ class Bond:
 
         self._flow_amounts = [0.0]
 
-        for _ in self._flow_dates[1:]:
+        for _ in self._coupon_dates[1:]:
             cpn = self._coupon / self._frequency
             self._flow_amounts.append(cpn)
 
@@ -185,7 +205,7 @@ class Bond:
 
         # n is the number of flows after the next coupon
         n = 0
-        for dt in self._flow_dates:
+        for dt in self._coupon_dates:
             if dt > settlement_date:
                 n += 1
         n = n - 1
@@ -354,7 +374,7 @@ class Bond:
         df = 1.0
         dfSettle = discount_curve.df(settlement_date)
 
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
 
             # coupons paid on the settlement date are included
             if dt >= settlement_date:
@@ -432,16 +452,16 @@ class Bond:
         calendar to be used - NONE means only calendar days, WEEKEND is only
         weekends or you can specify a country calendar for business days."""
 
-        num_flows = len(self._flow_dates)
+        num_flows = len(self._coupon_dates)
 
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for iFlow in range(1, num_flows):
             # coupons paid on a settlement date are paid
-            if self._flow_dates[iFlow] >= settlement_date:
-                self._pcd = self._flow_dates[iFlow - 1]
-                self._ncd = self._flow_dates[iFlow]
+            if self._coupon_dates[iFlow] >= settlement_date:
+                self._pcd = self._coupon_dates[iFlow - 1]
+                self._ncd = self._coupon_dates[iFlow]
                 break
 
         dc = DayCount(self._accrual_type)
@@ -487,7 +507,7 @@ class Bond:
         pvIbor = 0.0
         prev_date = self._pcd
 
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
 
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
@@ -533,7 +553,7 @@ class Bond:
         c = self._coupon
 
         pv = 0.0
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
 
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
@@ -596,8 +616,8 @@ class Bond:
 
     ###########################################################################
 
-    def flows(self,
-                    settlement_date: Date):
+    def coupon_dates(self,
+        settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -605,25 +625,25 @@ class Bond:
 
         flow_str = ""
         
-        for dt in self._flow_dates[1:-1]:
+        for dt in self._coupon_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 flow_str += ("%12s %12.2f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
         flow_str += ("%12s %12.2f \n" 
-                     % (self._flow_dates[-1], redemption_amount))
+                     % (self._coupon_dates[-1], redemption_amount))
 
         return flow_str
 
     ###########################################################################
 
-    def print_flows(self,
+    def print_coupon_dates(self,
                     settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
     
-        print(self.flows(settlement_date))
+        print(self.coupon_dates(settlement_date))
     
     ###########################################################################
 
@@ -650,7 +670,7 @@ class Bond:
         defaultingPrincipalPVPayStart = 0.0
         defaultingPrincipalPVPayEnd = 0.0
 
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
 
             # coupons paid on a settlement date are included
             if dt >= settlement_date:

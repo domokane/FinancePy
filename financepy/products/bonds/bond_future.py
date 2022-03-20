@@ -87,7 +87,7 @@ class BondFuture:
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accrued_interest is None:
-            bond.calculate_flow_dates(settlement_date)
+            bond.calculate_coupon_dates(settlement_date)
 
         accrued_interest = bond._accrued_interest
 

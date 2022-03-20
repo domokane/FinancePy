@@ -495,11 +495,11 @@ def test_BondOptionDerivaGem():
     couponFlows = []
     cpn = bond._coupon/bond._frequency
 
-    numFlows = len(bond._flow_dates)
+    numFlows = len(bond._coupon_dates)
     for i in range(0, numFlows):
 
-        pcd = bond._flow_dates[i-1]
-        ncd = bond._flow_dates[i]
+        pcd = bond._coupon_dates[i-1]
+        ncd = bond._coupon_dates[i]
 
         if ncd > settlement_date:
 

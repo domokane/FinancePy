@@ -34,7 +34,7 @@ class BondPortfolio:
 
         self._flow_amounts = [0.0]
 
-        for _ in self._flow_dates[1:]:
+        for _ in self._coupon_dates[1:]:
             cpn = self._coupon / self._frequency
             self._flow_amounts.append(cpn)
 
@@ -169,13 +169,13 @@ class BondPortfolio:
 
         flow = self._face_amount * self._coupon / self._frequency
 
-        for dt in self._flow_dates[1:-1]:
+        for dt in self._coupon_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 print("%12s" % dt, " %12.2f " % flow)
 
         redemption_amount = self._face_amount + flow
-        print("%12s" % self._flow_dates[-1], " %12.2f " % redemption_amount)
+        print("%12s" % self._coupon_dates[-1], " %12.2f " % redemption_amount)
 
 ###############################################################################
 
@@ -202,7 +202,7 @@ class BondPortfolio:
         defaultingPrincipalPVPayStart = 0.0
         defaultingPrincipalPVPayEnd = 0.0
 
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
 
             # coupons paid on a settlement date are included
             if dt >= settlement_date:

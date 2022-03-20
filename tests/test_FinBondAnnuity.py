@@ -37,10 +37,10 @@ def test_SemiAnnual_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     assert len(annuity._flow_amounts) == 2 * 1 + 1
-    assert len(annuity._flow_dates) == 2 * 1 + 1
+    assert len(annuity._coupon_dates) == 2 * 1 + 1
 
-    assert annuity._flow_dates[0] == settlement_date
-    assert annuity._flow_dates[-1] == maturity_date
+    assert annuity._coupon_dates[0] == settlement_date
+    assert annuity._coupon_dates[-1] == maturity_date
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 25278.0
@@ -75,10 +75,10 @@ def test_Quarterly_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     assert len(annuity._flow_amounts) == 10 * 4 + 1
-    assert len(annuity._flow_dates) == 10 * 4 + 1
+    assert len(annuity._coupon_dates) == 10 * 4 + 1
 
-    assert annuity._flow_dates[0] == settlement_date
-    assert annuity._flow_dates[-1] == maturity_date
+    assert annuity._coupon_dates[0] == settlement_date
+    assert annuity._coupon_dates[-1] == maturity_date
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 12778.0
@@ -112,10 +112,10 @@ def test_Monthly_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     assert len(annuity._flow_amounts) == 10*12 + 1
-    assert len(annuity._flow_dates) == 10*12 + 1
+    assert len(annuity._coupon_dates) == 10*12 + 1
 
-    assert annuity._flow_dates[0] == settlement_date
-    assert annuity._flow_dates[-1] == maturity_date
+    assert annuity._coupon_dates[0] == settlement_date
+    assert annuity._coupon_dates[-1] == maturity_date
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 4306.0
@@ -148,10 +148,10 @@ def test_ForwardGen_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     assert len(annuity._flow_amounts) == 10 * 1 + 1
-    assert len(annuity._flow_dates) == 10 * 1 + 1
+    assert len(annuity._coupon_dates) == 10 * 1 + 1
 
-    assert annuity._flow_dates[0] == settlement_date
-    assert annuity._flow_dates[-1] == maturity_date
+    assert annuity._coupon_dates[0] == settlement_date
+    assert annuity._coupon_dates[-1] == maturity_date
 
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 50833.0
@@ -184,10 +184,10 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
     annuity.calculate_payments(settlement_date)
 
     assert len(annuity._flow_amounts) == 10 * 2 + 1
-    assert len(annuity._flow_dates) == 10 * 2 + 1
+    assert len(annuity._coupon_dates) == 10 * 2 + 1
 
-    assert annuity._flow_dates[0] == settlement_date
-    assert annuity._flow_dates[-1] == maturity_date
+    assert annuity._coupon_dates[0] == settlement_date
+    assert annuity._coupon_dates[-1] == maturity_date
 
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 25417.0

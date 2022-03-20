@@ -16,6 +16,7 @@ from .equity_crr_tree import crr_tree_val_avg
 from .black_scholes_analytic import baw_value
 from .black_scholes_analytic import bs_value
 
+
 from enum import Enum
 
 

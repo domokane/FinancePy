@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
@@ -17,8 +20,6 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

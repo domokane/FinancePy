@@ -119,7 +119,7 @@ class BondEmbeddedOption:
         self._put_dates = put_dates
         self._put_prices = put_prices
         self._face_amount = face_amount
-        self._bond._calculate_flow_dates()
+        self._bond._calculate_coupon_dates()
 
 ###############################################################################
 
@@ -136,7 +136,7 @@ class BondEmbeddedOption:
         cpn_times = []
         cpn_amounts = []
 
-        for flow_date in self._bond._flow_dates[1:]:
+        for flow_date in self._bond._coupon_dates[1:]:
             if flow_date > settlement_date:
                 cpn_time = (flow_date - settlement_date) / gDaysInYear
                 cpn_times.append(cpn_time)

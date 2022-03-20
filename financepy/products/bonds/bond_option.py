@@ -69,13 +69,13 @@ class BondOption():
 
         # We need all of the flows in case the option is American
         # and some occur before expiry
-        flow_dates = self._bond._flow_dates
+        flow_dates = self._bond._coupon_dates
         flow_amounts = self._bond._flow_amounts
 
         coupon_times = []
         coupon_flows = []
 
-        num_flows = len(self._bond._flow_dates)
+        num_flows = len(self._bond._coupon_dates)
 
         # Want the first flow to be the previous coupon date
         # This is needed to calculate accrued correctly

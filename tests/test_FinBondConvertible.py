@@ -6,6 +6,9 @@
 import time
 import numpy as np
 
+import sys
+sys.path.append("..")
+
 from financepy.products.bonds.bond_convertible import BondConvertible
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes

@@ -62,17 +62,17 @@ def test_BKExampleTwo():
     coupon_times = []
     coupon_flows = []
     cpn = bond._coupon/bond._frequency
-    num_flows = len(bond._flow_dates)
+    num_flows = len(bond._coupon_dates)
 
     for i in range(1, num_flows):
-        pcd = bond._flow_dates[i-1]
-        ncd = bond._flow_dates[i]
+        pcd = bond._coupon_dates[i-1]
+        ncd = bond._coupon_dates[i]
         if pcd < settlement_date and ncd > settlement_date:
             flow_time = (pcd - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
-    for flow_date in bond._flow_dates:
+    for flow_date in bond._coupon_dates:
         if flow_date > settlement_date:
             flow_time = (flow_date - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)

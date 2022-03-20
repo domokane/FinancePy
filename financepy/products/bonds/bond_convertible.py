@@ -51,6 +51,7 @@ def _value_convertible(tmat,
                        recovery_rate,
                        # Tree details
                        num_steps_per_year):
+
     interp = InterpTypes.FLAT_FWD_RATES.value
 
     if len(coupon_times) > 0:
@@ -270,7 +271,8 @@ class BondConvertible:
                  put_dates: List[Date],  # list of put dates
                  put_prices: List[float],  # list of put prices
                  accrual_type: DayCountTypes,  # day count type for accrued
-                 face_amount: float = 100.0):  # face amount
+                 face_amount: float = 100.0, 
+                 calendar_types:CalendarTypes = CalendarTypes.WEEKEND):  # face amount
         """ Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all of
         the details regarding the conversion option including the list of the
@@ -287,6 +289,7 @@ class BondConvertible:
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
         self._freq_type = freq_type
+        self._calendar_type = calendar_types
 
         self._call_dates = call_dates
         self._call_prices = call_prices
@@ -327,7 +330,7 @@ class BondConvertible:
 
     ###############################################################################
 
-    def _calculate_flow_dates(self,
+    def _calculate_coupon_dates(self,
                               settlement_date: Date):
         """ Determine the convertible bond cash flow payment dates. """
 
@@ -336,19 +339,18 @@ class BondConvertible:
             return
 
         self._settlement_date = settlement_date
-        calendar_type = CalendarTypes.NONE
         bus_day_rule_type = BusDayAdjustTypes.NONE
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
-        self._flow_dates = Schedule(settlement_date,
+        self._coupon_dates = Schedule(settlement_date,
                                     self._maturity_date,
                                     self._freq_type,
-                                    calendar_type,
+                                    self._calendar_type,
                                     bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
-        self._pcd = self._flow_dates[0]
-        self._ncd = self._flow_dates[1]
+        self._pcd = self._coupon_dates[0]
+        self._ncd = self._coupon_dates[1]
         self.calc_accrued_interest(settlement_date)
 
     ###############################################################################
@@ -390,7 +392,7 @@ class BondConvertible:
         if stock_volatility <= 0.0:
             stock_volatility = 1e-10  # Avoid overflows in delta calc
 
-        self._calculate_flow_dates(settlement_date)
+        self._calculate_coupon_dates(settlement_date)
         tmat = (self._maturity_date - settlement_date) / gDaysInYear
         if tmat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
@@ -399,7 +401,7 @@ class BondConvertible:
         coupon_times = [0.0]
         coupon_flows = [0.0]
         cpn = self._coupon / self._frequency
-        for dt in self._flow_dates[1:]:
+        for dt in self._coupon_dates[1:]:
             flow_time = (dt - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
@@ -536,9 +538,9 @@ class BondConvertible:
     def accrued_days(self,
                      settlement_date: Date):
         """ Calculate number days from previous coupon date to settlement."""
-        self._calculate_flow_dates(settlement_date)
+        self._calculate_coupon_dates(settlement_date)
 
-        if len(self._flow_dates) <= 2:
+        if len(self._coupon_dates) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
 
         return settlement_date - self._pcd
@@ -551,9 +553,9 @@ class BondConvertible:
         previous coupon date and the settlement date. """
 
         if settlement_date != self._settlement_date:
-            self._calculate_flow_dates(settlement_date)
+            self._calculate_coupon_dates(settlement_date)
 
-        if len(self._flow_dates) == 0:
+        if len(self._coupon_dates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         dc = DayCount(self._accrual_type)
