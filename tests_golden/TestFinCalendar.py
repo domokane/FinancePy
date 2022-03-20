@@ -2,12 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

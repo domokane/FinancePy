@@ -11,6 +11,7 @@
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.calendar import CalendarTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ..bonds.bond import Bond, YTMCalcType
@@ -31,7 +32,8 @@ class FinInflationBond(Bond):
                  accrual_type: DayCountTypes,
                  face_amount: float,
                  base_cpi_value: float,
-                 num_ex_dividend_days: int = 0):  # Value of CPI index at bond issue date
+                 num_ex_dividend_days: int = 0, 
+                 calendar_type: CalendarTypes = CalendarTypes.NONE):  # Value of CPI index at bond issue date
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
@@ -54,7 +56,7 @@ class FinInflationBond(Bond):
         self._redemption = 1.0  # Amount paid at maturity
         self._num_ex_dividend_days = num_ex_dividend_days
         self._inflation_accrued_interest = 0.0
-
+        self._calendar_type = calendar_type
         self._flow_dates = []
         self._flow_amounts = []
 

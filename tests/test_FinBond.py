@@ -58,6 +58,9 @@ def test_bondtutor_example():
 
 
 def test_bloomberg_us_treasury_example():
+
+    # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
+    
     settlement_date = Date(21, 7, 2017)
     issue_date = Date(15, 5, 2010)
     maturity_date = Date(15, 5, 2027)

@@ -356,18 +356,19 @@ def test_Bond():
     coupon = 0.02375
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
+    face = 1000000.0
 
     bond = Bond(issue_date,
                 maturity_date,
                 coupon,
                 freq_type,
                 accrual_type,
-                face)
+                face, 
+                CalendarTypes.UNITED_STATES)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 99.7808417
-
+        
     yld = bond.current_yield(clean_price)
     testCases.print("Current Yield = ", yld)
 
@@ -383,10 +384,12 @@ def test_Bond():
                                  YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
+    full_price = bond.full_price_from_ytm(settlement_date, ytm, 
+                                          YTMCalcType.US_TREASURY)
     testCases.print("Full Price = ", full_price)
 
-    clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
+    clean_price = bond.clean_price_from_ytm(settlement_date, ytm,
+                                            YTMCalcType.US_TREASURY)
     testCases.print("Clean Price = ", clean_price)
 
     accrued_interest = bond._accrued_interest
@@ -395,9 +398,9 @@ def test_Bond():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    duration = bond.dollar_duration(settlement_date, ytm)
+    duration = bond.dollar_duration(settlement_date, ytm, YTMCalcType.US_STREET) 
     testCases.print("Dollar Duration = ", duration)
-
+    
     modified_duration = bond.modified_duration(settlement_date, ytm)
     testCases.print("Modified Duration = ", modified_duration)
 

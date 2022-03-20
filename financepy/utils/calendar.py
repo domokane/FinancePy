@@ -95,7 +95,7 @@ class Calendar:
                 "Need to pass FinCalendarType and not " +
                 str(calendar_type))
 
-        self._type = calendar_type
+        self._calendar_type = calendar_type
 
     ###########################################################################
 
@@ -107,6 +107,10 @@ class Calendar:
 
         if type(busDayConventionType) != BusDayAdjustTypes:
             raise FinError("Invalid type passed. Need FinBusDayConventionType")
+
+        # If calendar type is NONE then every day is a business day 
+        if self._calendar_type == CalendarTypes.NONE:
+            return dt
 
         if busDayConventionType == BusDayAdjustTypes.NONE:
             return dt
@@ -247,38 +251,38 @@ class Calendar:
         self._weekday = weekday
         self._dt = dt
 
-        if self._type == CalendarTypes.NONE:
+        if self._calendar_type == CalendarTypes.NONE:
             return self.holiday_none()
-        elif self._type == CalendarTypes.WEEKEND:
+        elif self._calendar_type == CalendarTypes.WEEKEND:
             return self.holiday_weekend()
-        elif self._type == CalendarTypes.AUSTRALIA:
+        elif self._calendar_type == CalendarTypes.AUSTRALIA:
             return self.holiday_australia()
-        elif self._type == CalendarTypes.CANADA:
+        elif self._calendar_type == CalendarTypes.CANADA:
             return self.holiday_canada()
-        elif self._type == CalendarTypes.FRANCE:
+        elif self._calendar_type == CalendarTypes.FRANCE:
             return self.holiday_france()
-        elif self._type == CalendarTypes.GERMANY:
+        elif self._calendar_type == CalendarTypes.GERMANY:
             return self.holiday_germany()
-        elif self._type == CalendarTypes.ITALY:
+        elif self._calendar_type == CalendarTypes.ITALY:
             return self.holiday_italy()
-        elif self._type == CalendarTypes.JAPAN:
+        elif self._calendar_type == CalendarTypes.JAPAN:
             return self.holiday_japan()
-        elif self._type == CalendarTypes.NEW_ZEALAND:
+        elif self._calendar_type == CalendarTypes.NEW_ZEALAND:
             return self.holiday_new_zealand()
-        elif self._type == CalendarTypes.NORWAY:
+        elif self._calendar_type == CalendarTypes.NORWAY:
             return self.holiday_norway()
-        elif self._type == CalendarTypes.SWEDEN:
+        elif self._calendar_type == CalendarTypes.SWEDEN:
             return self.holiday_sweden()
-        elif self._type == CalendarTypes.SWITZERLAND:
+        elif self._calendar_type == CalendarTypes.SWITZERLAND:
             return self.holiday_switzerland()
-        elif self._type == CalendarTypes.TARGET:
+        elif self._calendar_type == CalendarTypes.TARGET:
             return self.holiday_target()
-        elif self._type == CalendarTypes.UNITED_KINGDOM:
+        elif self._calendar_type == CalendarTypes.UNITED_KINGDOM:
             return self.holiday_united_kingdom()
-        elif self._type == CalendarTypes.UNITED_STATES:
+        elif self._calendar_type == CalendarTypes.UNITED_STATES:
             return self.holiday_united_states()
         else:
-            print(self._type)
+            print(self._calendar_type)
             raise FinError("Unknown calendar")
 
 ###############################################################################
@@ -1095,13 +1099,13 @@ class Calendar:
 ###############################################################################
 
     def __str__(self):
-        s = self._type.name
+        s = self._calendar_type.name
         return s
 
 ###############################################################################
 
     def __repr__(self):
-        s = self._type
+        s = self._calendar_type
         return s
 
 ###############################################################################

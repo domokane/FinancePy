@@ -96,10 +96,12 @@ class Bond:
                  coupon: float,  # Annualised bond coupon
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float = 100.0):
+                 face_amount: float = 100.0, 
+                 calendar_type: CalendarTypes = CalendarTypes.NONE):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
-        amount and the number of ex-dividend days. """
+        amount and the number of ex-dividend days. A calendar type is used 
+        to determine holidays from which coupon dates might be shifted."""
 
         check_argument_types(self.__init__, locals())
 
@@ -115,7 +117,8 @@ class Bond:
         self._face_amount = face_amount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0  # This is amount paid at maturity
-
+        self._calendar_type = calendar_type
+        
         self._flow_dates = []
         self._flow_amounts = []
 
@@ -129,25 +132,28 @@ class Bond:
     ###########################################################################
 
     def _calculate_flow_dates(self):
-        """ Determine the bond cash flow payment dates."""
+        """ Determine the bond cash flow payment dates. Although payments are 
+        calculated as though coupon periods are the same length, payments that 
+        fall on a Saturday or Sunday can only be made on the next business day
+        """
 
         # This should only be called once from init
 
-        calendar_type = CalendarTypes.NONE
-        bus_day_rule_type = BusDayAdjustTypes.NONE
+        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._flow_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
-                                    calendar_type,
+                                    self._calendar_type,
                                     bus_day_rule_type,
                                     date_gen_rule_type)._generate()
 
     ###########################################################################
 
     def _calculate_flows(self):
-        """ Determine the bond cash flow payment amounts without principal """
+        """ Determine the bond cash flow payment amounts without principal. 
+        There is no adjustment based on the adjusted payment dates. """
 
         self._flow_amounts = [0.0]
 
@@ -590,21 +596,35 @@ class Bond:
 
     ###########################################################################
 
-    def print_flows(self,
+    def flows(self,
                     settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
         flow = self._face_amount * self._coupon / self._frequency
 
+        flow_str = ""
+        
         for dt in self._flow_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
-                print("%12s" % dt, " %12.2f " % flow)
+                flow_str += ("%12s %12.2f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
-        print("%12s" % self._flow_dates[-1], " %12.2f " % redemption_amount)
+        flow_str += ("%12s %12.2f \n" 
+                     % (self._flow_dates[-1], redemption_amount))
 
+        return flow_str
+
+    ###########################################################################
+
+    def print_flows(self,
+                    settlement_date: Date):
+        """ Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond. """
+    
+        print(self.flows(settlement_date))
+    
     ###########################################################################
 
     def full_price_from_survival_curve(self,
@@ -685,7 +705,7 @@ class Bond:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("COUPON (%)", self._coupon*100.0)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         s += label_to_string("FACE AMOUNT", self._face_amount, "")
