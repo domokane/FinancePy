@@ -239,8 +239,8 @@ def bs_intrinsic(s, t, k, r, q, option_type_value):
 ###############################################################################
 
 
-@vectorize([float64(float64, float64, float64, float64, float64, float64,
-                    int64)], fastmath=True, cache=True,  forceobj=True)
+# @vectorize([float64(float64, float64, float64, float64, float64, float64,
+#                    int64)], fastmath=True, cache=True,  forceobj=True)
 def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     """ Calculate the Black-Scholes implied volatility of a European 
     vanilla option using Newton with a fallback to bisection. """
@@ -418,8 +418,7 @@ def _fput(si, *args):
 ###############################################################################
 
 
-@njit(float64(float64, float64, float64, float64,
-                    float64, float64, int64), fastmath=True, cache=True)
+@njit(fastmath=True)
 def baw_value(s, t, k, r, q, v, phi):
     """ American Option Pricing Approximation using the Barone-Adesi-Whaley
     approximation for the Black Scholes Model """
