@@ -1,6 +1,6 @@
 ##### Imports required by core library
 numba==0.55.2
-scipy==1.8.1
+scipy==1.7.3
 llvmlite==0.38.1
 ipython==7.34.0
 numpy==1.22.4
