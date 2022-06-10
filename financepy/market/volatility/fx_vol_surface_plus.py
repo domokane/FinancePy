@@ -289,7 +289,7 @@ def _obj(params, *args):
 # THIS FUNCTION IS NOT USED CURRENTLY
 
 
-@njit(fastmath=True)  # , cache=True)
+# @njit(fastmath=True)  # , cache=True)
 def _obj_gap(gaps, *args):
     """ Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
@@ -732,9 +732,9 @@ def _delta_fit(k, *args):
 ###############################################################################
 
 
-#@njit(float64(float64, float64, float64, float64, int64, int64, float64,
-#              int64, float64, float64[:], float64[:], float64[:]),
-#      fastmath=True)
+@njit(float64(float64, float64, float64, float64, int64, int64, float64,
+              int64, float64, float64[:], float64[:], float64[:]),
+      fastmath=True)
 def _solver_for_smile_strike(s, t, rd, rf,
                              option_type_value,
                              volatilityTypeValue,
@@ -1093,7 +1093,7 @@ class FXVolSurfacePlus():
 
     def delta_to_strike(self, callDelta, expiry_date, deltaMethod):
         """ Interpolates the strike at a delta and expiry date. Linear
-        interpolation is used in strike."""
+        time to expiry interpolation is used in strike."""
 
         texp = (expiry_date - self._valuation_date) / gDaysInYear
 
@@ -1175,7 +1175,7 @@ class FXVolSurfacePlus():
 
         if np.abs(t1-t0) > 1e-6:
 
-            K = ((texp-t0) * K1 + (t1-texp) * K0) / (K1 - K0)
+            K = ((texp-t0) * K1 + (t1-texp) * K0) / (t1 - t0)
 
         else:
 

@@ -186,7 +186,7 @@ def bs_vanna(s, t, k, r, q, v, option_type_value):
 
 ###############################################################################
 
-# @njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 
 
 def _f(sigma, args):
@@ -204,9 +204,8 @@ def _f(sigma, args):
     return obj
 
 ##############################################################################
-# @njit(fastmath=True, cache=True)
 
-
+@njit(fastmath=True, cache=True)
 def _fvega(sigma, args):
 
     s = args[0]
