@@ -128,8 +128,8 @@ def _solve_to_horizon(s, t, r, q,
 ###############################################################################
 
 
-#@njit(float64(int64, float64[:], float64, float64, float64),
-#      cache=True, fastmath=True)
+@njit(float64(int64, float64[:], float64, float64, float64),
+      cache=True, fastmath=True)
 def vol_function(vol_function_type_value, params, f, k, t):
     """ Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book. """

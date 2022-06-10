@@ -19,7 +19,8 @@ from ...utils.schedule import Schedule
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve_flat import DiscountCurve
 
-from ...models.black_scholes import bs_value, BlackScholes
+from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 
 ###############################################################################

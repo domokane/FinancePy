@@ -16,7 +16,7 @@ from ...utils.global_types import OptionTypes
 from ...market.curves.discount_curve_flat import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...models.black_scholes import bs_value
+from ...models.black_scholes_analytic import bs_value
 
 from scipy.stats import norm
 

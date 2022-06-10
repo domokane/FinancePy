@@ -12,7 +12,7 @@ from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
-
+from ...models.black_scholes_analytic import baw_value
 from ...models.model import Model
 
 ###############################################################################
@@ -89,7 +89,13 @@ class EquityAmericanOption(EquityOption):
         s = stock_price
         k = self._strike_price
 
-        v = model.value(s, texp, k, r, q, self._option_type)
+        phi = +1
+        if self._option_type == OptionTypes.AMERICAN_PUT:
+            phi = -1
+
+        v = baw_value(s, texp, k, r, q, model._volatility, phi)
+
+#        v = model.value(s, texp, k, r, q, self._option_type)
         v = v * self._num_options
 
         if isinstance(s, float):

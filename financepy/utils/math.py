@@ -267,8 +267,7 @@ def frange(start: int,
 def normpdf(x: float):
     """ Calculate the probability density function for a Gaussian (Normal)
     function at value x"""
-    InvRoot2Pi = 0.3989422804014327
-    return np.exp(-x * x / 2.0) * InvRoot2Pi
+    return np.exp(-x * x / 2.0) * INVROOT2PI
 
 ###############################################################################
 
@@ -326,7 +325,6 @@ def normcdf_integrate(x: float):
     upper = x
     num_steps = 10000
     dx = (upper - lower) / num_steps
-    InvRoot2Pi = 0.3989422804014327
 
     x = lower
     fx = np.exp(-x * x / 2.0)
@@ -340,7 +338,7 @@ def normcdf_integrate(x: float):
     x = x + dx
     fx = np.exp(-x * x / 2.0)
     integral += fx / 2.0
-    integral *= InvRoot2Pi * dx
+    integral *= INVROOT2PI * dx
     return integral
 
 ###############################################################################

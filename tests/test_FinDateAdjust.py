@@ -30,8 +30,8 @@ def test_date_adjust_no_adj():
 
     assert schedule._adjusted_dates == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
-            2, 3, 2009), Date(28, 8, 2009),
-        Date(1, 3, 2010), Date(30, 8, 2010), Date(28, 2, 2011)]
+            28, 2, 2009), Date(28, 8, 2009),
+        Date(28, 2, 2010), Date(28, 8, 2010), Date(28, 2, 2011)]
 
 
 def test_date_adjust_noweekend_following():

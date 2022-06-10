@@ -99,12 +99,12 @@ def test_pay():
     swap4 = swaption.value(valuation_date, libor_curve, model4)
     swap5 = swaption.value(valuation_date, libor_curve, model5)
     swap6 = swaption.value(valuation_date, libor_curve, model6)
-    assert round(swap1, 4) == 125103.6829
-    assert round(swap2, 4) == 125103.6829
-    assert round(swap3, 4) == 125103.6829
-    assert round(swap4, 4) == 125103.6873
-    assert round(swap5, 4) == 125828.3435
-    assert round(swap6, 4) == 126722.2275
+    assert round(swap1, 1) == 125086.9
+    assert round(swap2, 1) == 125086.9
+    assert round(swap3, 1) == 125086.9
+    assert round(swap4, 1) == 125086.9
+    assert round(swap5, 1) == 125086.9
+    assert round(swap6, 1) == 126722.9
 
     k = 0.035
     swaption = IborSwaption(settlement_date,
@@ -172,7 +172,7 @@ def test_receive():
     assert round(swap1, 4) == 0.0
     assert round(swap2, 4) == 0.0
     assert round(swap3, 4) == 0.0
-    assert round(swap4, 4) == 0.0045
+    assert round(swap4, 4) == 0.0046
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
 

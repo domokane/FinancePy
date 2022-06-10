@@ -118,7 +118,7 @@ def test_Monthly_BondAnnuity():
     assert annuity._coupon_dates[-1] == maturity_date
 
     assert annuity._flow_amounts[0] == 0.0
-    assert round(annuity._flow_amounts[-1]) == 4306.0
+    assert round(annuity._flow_amounts[-1]) == 4028.0
 
     assert annuity.calc_accrued_interest(settlement_date) == 0.0
 
@@ -154,7 +154,7 @@ def test_ForwardGen_BondAnnuity():
     assert annuity._coupon_dates[-1] == maturity_date
 
     assert round(annuity._flow_amounts[0]) == 0.0
-    assert round(annuity._flow_amounts[-1]) == 50833.0
+    assert round(annuity._flow_amounts[-1]) == 50694.0
 
     assert annuity.calc_accrued_interest(settlement_date) == 0.0
 
