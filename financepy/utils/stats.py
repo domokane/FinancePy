@@ -57,8 +57,8 @@ def var(x: ndarray):
 
 ##########################################################################
 
-
-@njit(float64(float64[:], int32), fastmath=True, cache=True)
+# `fastmath` seems to cause an error with `pow`
+@njit(float64(float64[:], int32), fastmath=False, cache=True)
 def moment(x: ndarray,
            m: int):
     """ Calculate the m-th moment of a vector of numbers x. """
