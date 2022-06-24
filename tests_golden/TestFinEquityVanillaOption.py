@@ -243,8 +243,6 @@ def testImpliedVolatility_NEW():
                                         strike,
                                         stock_price, value, vol, impliedVol)
 
-    assert numFails == 694, "Num Fails has changed."
-
 #    print("Num Tests", numTests, "numFails", numFails)
 
 ###############################################################################
