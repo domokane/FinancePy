@@ -51,7 +51,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    strikes = [80, 90, 100, 110, 120]
+    strikes = [80, 100, 120]
 
     option_type = OptionTypes.EUROPEAN_CALL
 

@@ -33,7 +33,7 @@ def test_EquityVanillaOption():
     discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    num_paths_list = [10000, 20000, 40000, 80000, 160000, 320000]
+    num_paths_list = [10000, 20000, 40000] # , 80000, 160000, 320000]
 
     testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
@@ -175,7 +175,7 @@ def testImpliedVolatility_NEW():
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     strikes = np.linspace(50, 150, 11)
-    timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]
+    timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0]
     sigmas = np.arange(1, 100, 5) / 100.0
     option_types = [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]
 

@@ -50,7 +50,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    strikes = [80, 85, 90, 95, 100, 105, 110, 115, 120]
+    strikes = [80, 90, 100, 110, 120]
 
     option_type = OptionTypes.EUROPEAN_CALL
 
@@ -202,7 +202,7 @@ def test_BondOptionAmericanConvergenceONE():
     testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
-    timeSteps = range(30, 100, 10)
+    timeSteps = range(20, 100, 20)
 
     for num_time_steps in timeSteps:
 
@@ -386,8 +386,8 @@ def test_BondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER")
 
-    num_time_steps = range(100, 1000, 100)
-    strike_prices = [90, 100, 110, 120]
+    num_time_steps = range(100, 200, 100)
+    strike_prices = [90, 100, 110]
 
     for strike_price in strike_prices:
 

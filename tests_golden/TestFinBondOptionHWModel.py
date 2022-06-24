@@ -49,7 +49,7 @@ def test_BondOption():
 
     ###########################################################################
 
-    strikes = [80, 85, 90, 95, 100, 105, 110, 115, 120]
+    strikes = [80, 90, 100, 110, 120]
 
     option_type = OptionTypes.EUROPEAN_CALL
 
@@ -59,7 +59,7 @@ def test_BondOption():
         settlement_date, discount_curve)
     testCases.print("Fixed Income Price:", price)
 
-    num_time_steps = 100
+    num_time_steps = 50
 
     testCases.banner("HW EUROPEAN CALL")
     testCases.header("STRIKE", "VALUE")
@@ -239,7 +239,7 @@ def test_BondOptionAmericanConvergenceONE():
     testCases.header("TIME", "N", "PUT_AMER", "PUT_EUR",
                      "CALL_AME", "CALL_EUR")
 
-    timeSteps = range(100, 500, 100)
+    timeSteps = range(100, 400, 100)
 
     for num_time_steps in timeSteps:
 
@@ -321,7 +321,7 @@ def test_BondOptionAmericanConvergenceTWO():
     vec_ep = []
     vec_ap = []
 
-    num_stepsVector = range(100, 500, 100)
+    num_stepsVector = range(100, 400, 100)
 
     for num_steps in num_stepsVector:
         hwModel = HWTree(sigma, a, num_steps)
@@ -409,8 +409,8 @@ def test_BondOptionZEROVOLConvergence():
                      "CALL_INT", "CALL_INT_PV", "CALL_EUR", "CALL_AMER",
                      "PUT_INT", "PUT_INT_PV", "PUT_EUR", "PUT_AMER")
 
-    num_time_steps = range(100, 1000, 100)
-    strike_prices = [90, 100, 110, 120]
+    num_time_steps = range(100, 400, 100)
+    strike_prices = [90, 120]
 
     for strike_price in strike_prices:
 

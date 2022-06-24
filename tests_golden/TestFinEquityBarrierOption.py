@@ -56,7 +56,7 @@ def test_EquityBarrierOption():
         "TIME")
 
     for option_type in EquityBarrierTypes:
-        for stock_price in range(80, 120, 10):
+        for stock_price in [80, 100, 120]:
 
             B = 110.0
             K = 100.0
@@ -92,7 +92,7 @@ def test_EquityBarrierOption():
                 diff,
                 time_elapsed)
 
-        for stock_price in range(80, 120, 10):
+        for stock_price in [80, 100, 120]:
 
             B = 100.0
             K = 110.0
@@ -132,7 +132,7 @@ def test_EquityBarrierOption():
 
 ##########################################################################
 
-    stock_prices = range(50, 150, 50)
+    stock_prices = [80, 100, 120]
     B = 105.0
 
     testCases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")

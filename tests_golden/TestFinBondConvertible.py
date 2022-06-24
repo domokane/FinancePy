@@ -91,7 +91,7 @@ def test_BondConvertible():
 
     testCases.header("TIME", "NUMSTEPS", "PRICE")
 
-    for num_steps_per_year in [5, 10, 20, 80]:
+    for num_steps_per_year in [5, 10, 20]:
         start = time.time()
         res = bond.value(settlement_date,
                          stock_price,

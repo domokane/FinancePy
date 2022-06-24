@@ -88,7 +88,7 @@ def test_BondEmbeddedOptionMATLAB():
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
 
-    timeSteps = range(50, 1000, 10)
+    timeSteps = range(50, 1000, 50)
     values = []
     for num_time_steps in timeSteps:
         model = HWTree(sigma, a, num_time_steps)
@@ -163,7 +163,7 @@ def test_BondEmbeddedOptionQUANTLIB():
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 1000, 100)
+    timeSteps = range(100, 200, 50)
     values = []
     for num_time_steps in timeSteps:
         model = HWTree(sigma, a, num_time_steps)

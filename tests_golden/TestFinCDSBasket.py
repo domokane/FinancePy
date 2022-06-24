@@ -207,7 +207,7 @@ def test_FinCDSBasket():
 
     testCases.header("LABELS", "VALUE")
 
-    if 1 == 0:
+    if 1 == 1:
         issuer_curves = loadHomogeneousSpreadCurves(valuation_date,
                                                     libor_curve,
                                                     spd3Y,
@@ -306,7 +306,7 @@ def test_FinCDSBasket():
         rho = beta ** 2
         corr_matrix = corr_matrix_generator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
-            for doF in [3, 6]:
+            for doF in [3, 4]:
                 start = time.time()
 
                 v = basket.value_student_t_mc(valuation_date,

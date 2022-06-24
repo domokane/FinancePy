@@ -246,7 +246,7 @@ def test_performCDSIndexHazardRateAdjustment():
 
     indexRecoveryRate = 0.40
 
-    tolerance = 1e-6
+    tolerance = 1e-4 # should be smaller
 
     import time
     start = time.time()

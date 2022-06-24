@@ -51,7 +51,7 @@ def test_FinFXBarrierOption():
         testCases.header("Type", "K", "B", "S", "Value",
                          "ValueMC", "TIME", "Diff")
 
-        for spot_fx_rate in range(60, 140, 10):
+        for spot_fx_rate in range(60, 140, 20):
             B = 110.0
             K = 100.0
 
@@ -76,7 +76,7 @@ def test_FinFXBarrierOption():
             testCases.print(option_type, K, B, spot_fx_rate, value, value_mc,
                             time_elapsed, diff)
 
-        for spot_fx_rate in range(60, 140, 10):
+        for spot_fx_rate in range(60, 140, 20):
             B = 100.0
             K = 110.0
 

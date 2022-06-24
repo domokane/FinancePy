@@ -60,7 +60,7 @@ def testEquityAmericanOption():
     testCases.header("OPTION_TYPE", "NUMSTEPS",
                      "VALUE DELTA GAMMA THETA", "TIME")
 
-    num_steps_list = [100, 200, 500, 1000, 2000]
+    num_steps_list = [100, 200, 1000]
 
     for num_steps in num_steps_list:
 

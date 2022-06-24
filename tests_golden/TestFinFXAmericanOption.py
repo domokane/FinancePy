@@ -50,7 +50,7 @@ def test_FinFXAmericanOption():
 
     testCases.header("SPOT FX RATE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 
-    spot_fx_rates = np.arange(50, 200, 10)/100.0
+    spot_fx_rates = np.arange(50, 200, 20)/100.0
 
     for spot_fx_rate in spot_fx_rates:
 

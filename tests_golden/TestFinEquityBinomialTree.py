@@ -36,7 +36,7 @@ def test_FinBinomialTree():
     discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
-    num_steps_list = [100, 500, 1000, 2000, 5000]
+    num_steps_list = [100, 500, 1000]
 
     strike_price = 50.0
 

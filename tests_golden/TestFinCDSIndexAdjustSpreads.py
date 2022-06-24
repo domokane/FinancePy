@@ -239,7 +239,7 @@ def test_CDSIndexAdjustSpreads():
                           Date(20, 12, 2016)]
     indexRecoveryRate = 0.40
 
-    tolerance = 1e-7
+    tolerance = 1e-4 # should be smaller
 
     import time
     start = time.time()
