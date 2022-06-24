@@ -734,7 +734,7 @@ def _delta_fit(k, *args):
 
 @njit(float64(float64, float64, float64, float64, int64, int64, float64,
               int64, float64, float64[:], float64[:], float64[:]),
-      fastmath=True, cache=True)
+      fastmath=True, cache=False)
 def _solver_for_smile_strike(s, t, rd, rf,
                              option_type_value,
                              volatilityTypeValue,
