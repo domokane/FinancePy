@@ -49,6 +49,7 @@ from enum import Enum
 
 
 class YTMCalcType(Enum):
+    ZERO = 0,
     UK_DMO = 1,
     US_STREET = 2,
     US_TREASURY = 3
@@ -110,8 +111,16 @@ class Bond:
 
         self._issue_date = issue_date
         self._maturity_date = maturity_date
+
+        if coupon == 0.0 and freq_type != FrequencyTypes.ZERO:
+            raise FinError("Zero coupon bonds must use ZERO for Frequency Type")
+
         self._coupon = coupon
         self._freq_type = freq_type
+
+        if coupon == 0.0 and accrual_type != accrual_type.ZERO:
+            raise FinError("Zero coupon bonds must use ZERO for Accrual Type")
+        
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
@@ -213,7 +222,22 @@ class Bond:
         if n < 0:
             raise FinError("No coupons left")
 
-        if convention == YTMCalcType.UK_DMO:
+        if c == 0.0:
+            
+            # A zero coupon bond has a price equal to the discounted principal
+            # assuming an annualised rate raised to the power of years
+            
+            dc = DayCount(self._accrual_type)
+            cal = Calendar(self._calendar_type)
+            
+            (acc_factor, num, _) = dc.year_frac(settlement_date,
+                                                self._maturity_date,
+                                                self._maturity_date,
+                                                self._freq_type)
+            
+            fp = 1.0 / (1.0 + ytm * acc_factor)
+            
+        elif convention == YTMCalcType.UK_DMO:
             if n == 0:
                 fp = (v ** (self._alpha)) * (self._redemption + c / f)
             else:

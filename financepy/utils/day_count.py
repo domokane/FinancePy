@@ -46,6 +46,7 @@ def is_last_day_of_feb(dt: Date):
 
 
 class DayCountTypes(Enum):
+    ZERO = 0 # zero coupon bond
     THIRTY_360_BOND = 1
     THIRTY_E_360 = 2
     THIRTY_E_360_ISDA = 3
@@ -275,6 +276,13 @@ class DayCount:
             return (acc_factor, num, den)
 
         elif self._type == DayCountTypes.SIMPLE:
+
+            num = dt2 - dt1
+            den = gDaysInYear
+            acc_factor = num / den
+            return (acc_factor, num, den)
+
+        elif self._type == DayCountTypes.ZERO:
 
             num = dt2 - dt1
             den = gDaysInYear

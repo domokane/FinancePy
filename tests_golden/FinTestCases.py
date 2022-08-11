@@ -2,12 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import sys
+sys.path.append("..")
+
 from financepy.utils.error import FinError
 from enum import Enum
 import time
 from os.path import join, exists, split
-import sys
-sys.path.append("..")
 
 
 class FinTestCaseMode(Enum):

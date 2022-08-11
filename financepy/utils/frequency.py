@@ -10,6 +10,7 @@ from enum import Enum
 
 
 class FrequencyTypes(Enum):
+    ZERO = 0
     SIMPLE = 0
     ANNUAL = 1
     SEMI_ANNUAL = 2
@@ -30,8 +31,8 @@ def annual_frequency(freq_type: FrequencyTypes):
 
     if freq_type == FrequencyTypes.CONTINUOUS:
         return -1
-    elif freq_type == FrequencyTypes.SIMPLE:
-        return 0.0
+    elif freq_type == FrequencyTypes.ZERO: # This means that there is no regular coupon I use 1 to avoid division by zero
+        return 1.0
     elif freq_type == FrequencyTypes.ANNUAL:
         return 1.0
     elif freq_type == FrequencyTypes.SEMI_ANNUAL:
