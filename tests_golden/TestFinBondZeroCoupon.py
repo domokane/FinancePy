@@ -42,7 +42,7 @@ def testBondZeroCoupon():
     clean_price = 99.7056
     ytm = bond.yield_to_maturity(settlement_date, 
                                  clean_price, 
-                                 YTMCalcType.US_STREET)
+                                 YTMCalcType.ZERO)
     
     testCases.header("YTM")
     testCases.print(ytm)

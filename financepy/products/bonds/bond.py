@@ -210,6 +210,10 @@ class Bond:
 
         f = annual_frequency(self._freq_type)
         c = self._coupon
+        
+        if c == 0.0 and convention != YTMCalcType.ZERO:
+            raise FinError("Zero coupon bonds require ZERO YTMCalcType")
+
         v = 1.0 / (1.0 + ytm / f)
 
         # n is the number of flows after the next coupon
@@ -222,7 +226,7 @@ class Bond:
         if n < 0:
             raise FinError("No coupons left")
 
-        if c == 0.0:
+        if convention == YTMCalcType.ZERO:
             
             # A zero coupon bond has a price equal to the discounted principal
             # assuming an annualised rate raised to the power of years
