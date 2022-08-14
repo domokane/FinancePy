@@ -561,7 +561,7 @@ def _solve_to_horizon(s, t, rd, rf,
             K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
             delta_method_value, vol_type_value, alpha)
 
-    # Nelmer-Mead (both SciPy & Numba) is quicker, but occasionally fails
+    # Nelder-Mead (both SciPy & Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:
