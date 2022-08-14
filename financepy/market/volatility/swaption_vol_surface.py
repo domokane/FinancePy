@@ -309,7 +309,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #                    volatility):
 #     """ This function determines the implied strike of an FX option
 #     given a delta and the other option details. It uses a one-dimensional
-#     Newton root search algorith to determine the strike that matches an
+#     Newton root search algorithm to determine the strike that matches an
 #     input volatility. """
 
 #     # =========================================================================
