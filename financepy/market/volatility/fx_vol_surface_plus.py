@@ -561,7 +561,7 @@ def _solve_to_horizon(s, t, rd, rf,
             K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
             delta_method_value, vol_type_value, alpha)
 
-    # Nelmer-Mead (both SciPy & Numba) is quicker, but occasionally fails
+    # Nelder-Mead (both SciPy & Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:
@@ -775,7 +775,7 @@ def solve_for_strike(spot_fx_rate,
                      volatility):
     """ This function determines the implied strike of an FX option
     given a delta and the other option details. It uses a one-dimensional
-    Newton root search algorith to determine the strike that matches an
+    Newton root search algorithm to determine the strike that matches an
     input volatility. """
 
     # =========================================================================
