@@ -9,6 +9,7 @@ from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
 
 
 def test_equity_vol_surface():
@@ -37,9 +38,11 @@ def test_equity_vol_surface():
 
     r = 0.020  # USD
     discount_curve = DiscountCurveFlat(value_dt, r)
+    # discount_curve = DiscountCurveFlat(value_dt, r, dc_type=DayCountTypes.SIMPLE)
 
     q = 0.010  # USD
     dividend_curve = DiscountCurveFlat(value_dt, q)
+    # dividend_curve = DiscountCurveFlat(value_dt, q, dc_type=DayCountTypes.SIMPLE)
 
     vol_functionType = VolFuncTypes.SVI
 
@@ -67,5 +70,5 @@ def test_equity_vol_surface():
     expiry_dt = expiry_dts[6]
     delta = 0.90
     vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
-    assert round(vol[0], 4) == 0.3498
-    assert round(vol[1], 4) == 2199.6665
+    assert round(vol[0], 4) == 0.3498 # 0.353 # 0.3498 VP TODO: had to rebase, not sure why. Investigate more. Interestingly the original numbers pass on github so restored them
+    assert round(vol[1], 4) == 2199.6665 # 2190.7766 # 2199.6665 VP TODO: had to rebase, not sure why. Investigate more. Interestingly the original numbers pass on github so restored them

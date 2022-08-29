@@ -8,6 +8,7 @@ from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
 from financepy.market.curves.discount_curve_pwf import DiscountCurvePWF
+from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
 from financepy.market.curves.discount_curve_ns import DiscountCurveNS
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -75,6 +76,9 @@ def test_FinDiscountCurves():
 
     finDiscountCurveZeros = DiscountCurveZeros(value_dt, dates, rates)
     curvesList.append(finDiscountCurveZeros)
+
+    finDiscountCurvePWFONF = DiscountCurvePWFONF(valuation_date, dates, rates)
+    curvesList.append(finDiscountCurvePWFONF)
 
     curveNames = []
     for curve in curvesList:
