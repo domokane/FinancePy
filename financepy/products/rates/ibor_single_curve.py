@@ -48,7 +48,7 @@ def _f(df, *args):
 
 
 def _g(df, *args):
-    """ Root search objective function for swaps """
+    """ Root search objective function for FRAs """
     curve = args[0]
     valuation_date = args[1]
     fra = args[2]
