@@ -5,6 +5,7 @@
 from numba import njit
 import numpy as np
 import datetime
+import math
 
 from financepy.utils.error import FinError
 
@@ -437,8 +438,8 @@ class Date():
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE
 
-        end_date = self;
-        
+        end_date = self
+
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
 
@@ -451,32 +452,32 @@ class Date():
         if oldLogic is True:
             numWeeks = int(numDays / 5)
             remainingDays = numDays % 5
-            
+
             if self._weekday == Date.SAT:
                 weekendAdjust = 1
             elif self._weekday == Date.SUN:
                 weekendAdjust = 0
             else:
                 weekendAdjust = 2
-    
+
             if (positiveNumDays):
                 if (self._weekday + remainingDays > self.FRI):
                     # add weekend
                     remainingDays += weekendAdjust
-    
+
                 return self.add_days(numWeeks * 7 + remainingDays)
             else:
                 if (self._weekday - remainingDays < self.MON):
                     # add weekend
                     remainingDays += weekendAdjust
-    
+
             return self.add_days(-(numWeeks * 7 + remainingDays))
 
-        else: # new logic
+        else:  # new logic
 
             numDaysLeft = numDays
             end_date = self
-            
+
             while numDaysLeft > 0:
 
                 if positiveNumDays is True:
@@ -751,14 +752,14 @@ class Date():
             newDate = Date(self._d, self._m, self._y)
 
             if periodType == DAYS:
-                for _ in range(0, num_periods):
-                    newDate = newDate.add_days(1)
+                for _ in range(0, abs(num_periods)):
+                    newDate = newDate.add_days(math.copysign(1, num_periods))
             elif periodType == WEEKS:
-                for _ in range(0, num_periods):
-                    newDate = newDate.add_days(7)
+                for _ in range(0, abs(num_periods)):
+                    newDate = newDate.add_days(math.copysign(7, num_periods))
             elif periodType == MONTHS:
-                for _ in range(0, num_periods):
-                    newDate = newDate.add_months(1)
+                for _ in range(0, abs(num_periods)):
+                    newDate = newDate.add_months(math.copysign(1, num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
                 y = newDate._y
@@ -767,8 +768,8 @@ class Date():
                 newDate = Date(d, m, y)
 
             elif periodType == YEARS:
-                for _ in range(0, num_periods):
-                    newDate = newDate.add_months(12)
+                for _ in range(0, abs(num_periods)):
+                    newDate = newDate.add_months(math.copysign(12, num_periods))
 
             newDates.append(newDate)
 
