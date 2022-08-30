@@ -92,7 +92,7 @@ The interface to each product has a value() function that will take a model and 
 
 ## Author
 
-Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and 10 years of academic experience.
+Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 15 years of academic experience.
 
 Contact me at dominic.okane at edhec.edu.
 
