@@ -6,7 +6,7 @@
 
 31-Aug-2022
 Version 0.240 has just been released and pushed to PyPI with changes
-- Negative terms (h/t Vladimir Piterbarg)
+- Negative terms in date class
 - Recovery rates do not default to standard value for CDS curves 
 
 # DISCLAIMER
