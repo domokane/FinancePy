@@ -44,10 +44,12 @@ def test_FinCDSCurve():
         cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
         cds_contracts.append(cds)
 
+    recovery_rate = 0.40
+
     issuer_curve = CDSCurve(curve_date,
                             cds_contracts,
                             libor_curve,
-                            recovery_rate=0.40,
+                            recovery_rate,
                             use_cache=False)
 
     assert round(issuer_curve._times[0], 4) == 0.0
@@ -60,20 +62,21 @@ def test_FinCDSCurve():
     i = 1
     maturity_date = curve_date.add_months(12 * i)
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve)
+    v = cds.value(curve_date, issuer_curve, recovery_rate)
     assert round(v['full_pv'] * 1000, 4) == 5.6028
     assert round(v['clean_pv'] * 1000, 4) == 5.6028
 
     i = 5
     maturity_date = curve_date.add_months(12 * i)
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve)
+    v = cds.value(curve_date, issuer_curve, recovery_rate)
     assert round(v['full_pv'] * 1000, 4) == 8.3480
     assert round(v['clean_pv'] * 1000, 4) == 8.3480
 
     i = 10
     maturity_date = curve_date.add_months(12 * i)
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve)
+    v = cds.value(curve_date, issuer_curve, recovery_rate)
     assert round(v['full_pv'] * 1000, 4) == -1.3178
     assert round(v['clean_pv'] * 1000, 4) == -1.3178
+
