@@ -389,9 +389,9 @@ class CDSIndexPortfolio:
                                      valuation_date,
                                      issuer_curves,
                                      index_coupons,
-                                     indexUpfronts,
-                                     indexMaturityDates,
-                                     indexRecoveryRate,
+                                     index_up_fronts,
+                                     index_maturity_dates,
+                                     index_recovery_rate,
                                      tolerance=1e-6,
                                      maxIterations=100):
         """ Adjust individual CDS discount to reprice CDS index prices.
@@ -403,22 +403,26 @@ class CDSIndexPortfolio:
             raise FinError("Number of credits must be greater than 1")
 
         libor_curve = issuer_curves[0]._libor_curve
-        numIndexMaturityPoints = len(index_coupons)
+        num_index_maturity_points = len(index_coupons)
+
         #        hazardRateMultipliers = [1.0] * numIndexMaturityPoints
-        adjustedIssuerCurves = []
+
+        adjusted_issuer_curves = []
 
         # making a copy of the issuer discount
         for issuer_curve in issuer_curves:
-            adjustedIssuerCurve = CDSCurve(valuation_date,
-                                           [],
-                                           libor_curve)
 
-            adjustedIssuerCurve._times = issuer_curve._times.copy()
-            adjustedIssuerCurve._values = issuer_curve._values.copy()
-            adjustedIssuerCurves.append(adjustedIssuerCurve)
+            adjusted_issuer_curve = CDSCurve(valuation_date,
+                                             [],
+                                             libor_curve, 
+                                             index_recovery_rate)
+
+            adjusted_issuer_curve._times = issuer_curve._times.copy()
+            adjusted_issuer_curve._values = issuer_curve._values.copy()
+            adjusted_issuer_curves.append(adjusted_issuer_curve)
 
         # We solve for each maturity point
-        for iMaturity in range(0, numIndexMaturityPoints):
+        for iMaturity in range(0, num_index_maturity_points):
 
             alpha = 1.0
             ratio = 1.0 + 2.0 * tolerance
@@ -435,26 +439,27 @@ class CDSIndexPortfolio:
                 sumProt = 0.0
 
                 for iCredit in range(0, num_credits):
-                    q1 = adjustedIssuerCurves[iCredit]._values[iMaturity]
-                    q2 = adjustedIssuerCurves[iCredit]._values[iMaturity + 1]
+                    q1 = adjusted_issuer_curves[iCredit]._values[iMaturity]
+                    q2 = adjusted_issuer_curves[iCredit]._values[iMaturity + 1]
                     q12 = q2 / q1
                     q12NEW = pow(q12, ratio)
                     q2NEW = q1 * q12NEW
 
-                    adjustedIssuerCurves[iCredit]._values[iMaturity + 1] = q2NEW
+                    adjusted_issuer_curves[iCredit]._values[iMaturity + 1] = q2NEW
 
-                    indexMaturityDate = indexMaturityDates[iMaturity]
+                    index_maturity_date = index_maturity_dates[iMaturity]
 
                     # the CDS spreads we extract here should be the index
                     # maturity dates
-                    cdsIndex = CDS(valuation_date, indexMaturityDate, 0, 1.0)
+                    cdsIndex = CDS(valuation_date, index_maturity_date, 0, 1.0)
 
                     indexProtPV = cdsIndex.protection_leg_pv(valuation_date,
-                                                             adjustedIssuerCurves[iCredit],
-                                                             indexRecoveryRate)
+                                                             adjusted_issuer_curves[iCredit],
+                                                             index_recovery_rate)
 
                     rpv01Ret = cdsIndex.risky_pv01(
-                        valuation_date, adjustedIssuerCurves[iCredit])
+                        valuation_date, 
+                        adjusted_issuer_curves[iCredit])
 
                     cleanRPV01 = rpv01Ret['clean_rpv01']
 
@@ -465,13 +470,13 @@ class CDSIndexPortfolio:
                 sumProt /= num_credits
                 sumPrem = sumRPV01 * index_coupons[iMaturity]
 
-                numerator = indexUpfronts[iMaturity] + sumPrem
+                numerator = index_up_fronts[iMaturity] + sumPrem
                 denominator = sumProt
 
                 ratio = numerator / denominator
                 alpha *= ratio
 
-        return adjustedIssuerCurves
+        return adjusted_issuer_curves
 
     ###########################################################################
 

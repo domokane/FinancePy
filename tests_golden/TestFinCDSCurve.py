@@ -65,11 +65,13 @@ def test_FinCDSCurve():
     for i in range(0, n):
         testCases.print(issuer_curve._times[i], issuer_curve._values[i])
 
+    recovery_rate = 0.40
+    
     testCases.header("CONTRACT", "VALUE")
     for i in range(1, 11):
         maturity_date = curve_date.add_months(12 * i)
         cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-        v = cds.value(curve_date, issuer_curve)
+        v = cds.value(curve_date, issuer_curve, recovery_rate)
         testCases.print(i, v)
 
     if 1 == 0:

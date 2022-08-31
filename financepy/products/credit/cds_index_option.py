@@ -131,7 +131,7 @@ class CDSIndexOption:
     def value_anderson(self,
                        valuation_date,
                        issuer_curves,
-                       indexRecovery,
+                       index_recovery,
                        sigma):
         """ This function values a CDS index option following approach by
         Anderson (2006). This ensures that a no-arbitrage relationship between
@@ -153,7 +153,8 @@ class CDSIndexOption:
             self._maturity_date,
             self._strike_coupon,
             1.0)
-        strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve)
+
+        strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve, index_recovery)
         strikeRPV01s = strikeCDS.risky_pv01(valuation_date, strikeCurve)
         qToExpiry = strikeCurve.survival_prob(time_to_expiry)
         strikeValue = (k - c) * strikeRPV01s['clean_rpv01']
@@ -181,7 +182,7 @@ class CDSIndexOption:
         x = self._solve_for_x(valuation_date,
                               sigma,
                               c,
-                              indexRecovery,
+                              index_recovery,
                               libor_curve,
                               expH)
 
@@ -191,7 +192,7 @@ class CDSIndexOption:
                                                 c,
                                                 strikeValue,
                                                 libor_curve,
-                                                indexRecovery)
+                                                index_recovery)
 
         v = v[1]
         v_pay = v * self._notional

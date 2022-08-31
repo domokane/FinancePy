@@ -329,7 +329,7 @@ class CDS:
     def value(self,
               valuation_date,
               issuer_curve,
-              contract_recovery_rate=standard_recovery_rate,
+              contract_recovery_rate, 
               pv01_method=0,
               prot_method=0,
               num_steps_per_year=25):
@@ -370,7 +370,7 @@ class CDS:
     def credit_dv01(self,
                     valuation_date,
                     issuer_curve,
-                    contract_recovery_rate=standard_recovery_rate,
+                    contract_recovery_rate,
                     pv01_method=0,
                     prot_method=0,
                     num_steps_per_year=25):
@@ -408,7 +408,7 @@ class CDS:
     def interest_dv01(self,
                       valuation_date: Date,
                       issuer_curve,
-                      contract_recovery_rate=standard_recovery_rate,
+                      contract_recovery_rate,
                       pv01_method: int = 0,
                       prot_method: int = 0,
                       num_steps_per_year: int = 25):
@@ -465,7 +465,7 @@ class CDS:
                                valuation_date,
                                settlement_date,
                                issuer_curve,
-                               contract_recovery_rate=standard_recovery_rate,
+                               contract_recovery_rate,
                                pv01_method=0,
                                prot_method=0,
                                num_steps_per_year=25):
@@ -489,7 +489,7 @@ class CDS:
     def clean_price(self,
                     valuation_date,
                     issuer_curve,
-                    contract_recovery_rate=standard_recovery_rate,
+                    contract_recovery_rate,
                     pv01_method=0,
                     prot_method=0,
                     num_steps_per_year=52):

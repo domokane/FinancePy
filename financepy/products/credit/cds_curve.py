@@ -23,14 +23,16 @@ def f(q, *args):
     """ Function that returns zero when the survival probability that gives a
     zero value of the CDS has been determined. """
 
-    self = args[0]
+    curve = args[0]
     valuation_date = args[1]
     cds = args[2]
-    num_points = len(self._times)
-    self._values[num_points - 1] = q
+    recovery_rate = args[3]
+
+    num_points = len(curve._times)
+    curve._values[num_points - 1] = q
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    obj_fn = cds.value(valuation_date, self)['clean_pv']
+    obj_fn = cds.value(valuation_date, curve, recovery_rate)['clean_pv']
     return obj_fn
 
 ###############################################################################
@@ -38,14 +40,15 @@ def f(q, *args):
 
 class CDSCurve:
     """ Generate a survival probability curve implied by the value of CDS
-    contracts given a Ibor curve and an assumed recovery rate. A scheme for
+    contracts given a Ibor curve and an assumed recovery rate. The recovery 
+    rate corresponds to the seniority of the debt for these CDS. A scheme for
     the interpolation of the survival probabilities is also required. """
 
     def __init__(self,
                  valuation_date: Date,
                  cds_contracts: list,
                  libor_curve,
-                 recovery_rate: float = 0.40,
+                 recovery_rate,
                  use_cache: bool = False,
                  interpolation_method: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Construct a credit curve from a sequence of maturity-ordered CDS
@@ -156,7 +159,10 @@ class CDSCurve:
 
             maturity_date = self._cds_contracts[i]._maturity_date
 
-            argtuple = (self, self._valuation_date, self._cds_contracts[i])
+            argtuple = (self, self._valuation_date, 
+                        self._cds_contracts[i],
+                        self._recovery_rate)
+
             tmat = (maturity_date - self._valuation_date) / gDaysInYear
             q = self._values[i]
 
