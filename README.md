@@ -2,9 +2,12 @@
 
 ![alt text](./images/logo.jpg?raw=true)
 
-# Latest News
+# Latest News and Versions
 
-2 November 2021: A new version 0.204 has just been released that can be installed via pip.
+31-Aug-2022
+Version 0.240 has just been released and pushed to PyPI with changes
+- Negative terms (h/t Vladimir Piterbarg)
+- Recovery rates do not default to standard value for CDS curves 
 
 # DISCLAIMER
 
