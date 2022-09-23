@@ -166,17 +166,27 @@ class Bond:
         calculated as though coupon periods are the same length, payments that 
         fall on a Saturday or Sunday can only be made on the next business day
         """
-            
-        # This should only be called once from init
-        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
-        date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
-        self._payment_dates = Schedule(self._issue_date,
-                                    self._maturity_date,
-                                    self._freq_type,
-                                    self._calendar_type,
-                                    bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+        # dates are adjusted forward to the next business day            
+        bus_day_adj_type = BusDayAdjustTypes.FOLLOWING
+        calendar = Calendar(self._calendar_type)
+
+        self._calculate_coupon_dates()
+
+        self._payment_dates = []
+
+        # Expect at least an issue date and a maturity date - if not - problem
+        if len(self._coupon_dates) < 2:
+            raise FinError("Unable to calculate payment dates with only one payment")
+
+        # I do not adjust the first date as it is the issue date
+        self._payment_dates.append(self._coupon_dates[0])
+
+        for cpn_date in self._coupon_dates[1:]:
+            pmt_date = calendar.adjust(cpn_date,
+                                       bus_day_adj_type)
+
+            self._payment_dates.append(pmt_date)
 
     ###########################################################################
 

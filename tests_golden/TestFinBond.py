@@ -515,10 +515,30 @@ def test_BondExDividend():
             settlement_date, exDivDays, calendar_type)
         testCases.print(settlement_date, accrued)
 
+###############################################################################
+
+def test_BondPaymentDates():
+    from financepy.products.bonds.bond import Bond
+    from financepy.utils import Date, DayCountTypes, FrequencyTypes
+    
+    bond = Bond(
+            issue_date=Date(7, 6, 2021),
+            maturity_date=Date(7, 6, 2031),
+            coupon=0.0341,
+            freq_type=FrequencyTypes.ANNUAL,
+            accrual_type=DayCountTypes.ACT_ACT_ISDA
+    )
+    bond._calculate_payment_dates()
+
+    if 1==0:
+        print(bond._flow_amounts)
+        print(bond._coupon_dates)
+        print(bond._payment_dates)
 
 ###############################################################################
 
 
 test_Bond()
 test_BondExDividend()
+test_BondPaymentDates()
 testCases.compareTestCases()
