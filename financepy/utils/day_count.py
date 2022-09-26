@@ -187,7 +187,7 @@ class DayCount:
             acc_factor = num / den
             return acc_factor, num, den
 
-        elif self._type == DayCountTypes.ACT_ACT_ISDA:
+        elif (self._type == DayCountTypes.ACT_ACT_ISDA) or (self._type == DayCountTypes.ZERO):
 
             if is_leap_year(y1):
                 denom1 = 366
@@ -276,13 +276,6 @@ class DayCount:
             return (acc_factor, num, den)
 
         elif self._type == DayCountTypes.SIMPLE:
-
-            num = dt2 - dt1
-            den = gDaysInYear
-            acc_factor = num / den
-            return (acc_factor, num, den)
-
-        elif self._type == DayCountTypes.ZERO:
 
             num = dt2 - dt1
             den = gDaysInYear
