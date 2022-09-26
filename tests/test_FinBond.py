@@ -3,6 +3,7 @@
 ##############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.frequency import FrequencyTypes
@@ -61,9 +62,8 @@ def test_bondtutor_example():
 
 
 def test_bloomberg_us_treasury_example():
-
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
-    
+
     settlement_date = Date(21, 7, 2017)
     issue_date = Date(15, 5, 2010)
     maturity_date = Date(15, 5, 2027)
@@ -173,3 +173,23 @@ def test_bloomberg_apple_corp_example():
 
     conv = bond.convexity_from_ytm(settlement_date, ytm)
     assert round(conv, 4) == 0.2302
+
+
+def test_zero_bond():
+    # A 3 months treasure with 0 coupon per year.
+    bill = Bond(
+        issue_date=Date(25, 7, 2022),
+        maturity_date=Date(24, 10, 2022),
+        coupon=0,
+        freq_type=FrequencyTypes.ZERO,
+        accrual_type=DayCountTypes.ZERO
+    )
+    settlement_date = Date(8, 8, 2022)
+
+    clean_price = 99.7056
+    calc_ytm = bill.yield_to_maturity(settlement_date, clean_price, YTMCalcType.ZERO) * 100
+    assert abs(calc_ytm - 1.3998) < 0.0002
+
+
+if __name__ == '__main__':
+    test_zero_bond()
