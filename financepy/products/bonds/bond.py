@@ -97,7 +97,8 @@ class Bond:
                  coupon: float,  # Annualised bond coupon
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float = 100.0, 
+                 face_amount: float = 100.0,  # Holding position of this bond.
+                 issue_price: float = 100.0,  # Price of issue, usually discounted(<100) for zero-coupon bond.
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
@@ -125,6 +126,7 @@ class Bond:
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted and amount at maturity
+        self._issue_price = issue_price  # Usually discounted(<100) for zero-coupon bond.
         self._redemption = 1.0  # This is amount paid at maturity
         self._calendar_type = calendar_type
         
@@ -461,7 +463,7 @@ class Bond:
             argtuple = (self, settlement_date, full_price, convention)
 
             ytm = optimize.newton(_f,
-                                  x0=0.05,  # guess initial value of 10%
+                                  x0=0.05,  # guess initial value of 5%
                                   fprime=None,
                                   args=argtuple,
                                   tol=1e-8,
@@ -516,7 +518,12 @@ class Bond:
             acc_factor = acc_factor - 1.0 / self._frequency
 
         self._alpha = 1.0 - acc_factor * self._frequency
-        self._accrued_interest = acc_factor * self._face_amount * self._coupon
+        if self._accrual_type == DayCountTypes.ZERO:
+            interest = (self._par - self._issue_price) * (settlement_date - self._issue_date) / \
+                       (self._maturity_date - self._issue_date)
+            self._accrued_interest = interest * self._face_amount / self._par
+        else:
+            self._accrued_interest = acc_factor * self._face_amount * self._coupon
         self._accrued_days = num
 
         return self._accrued_interest
