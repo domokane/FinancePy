@@ -10,8 +10,8 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.math import ONE_MILLION
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond import YTMCalcType
+from financepy.products.bonds.bond_zero import BondZero
+from financepy.products.bonds.bond import YTMCalcType, Bond
 
 
 def test_bondtutor_example():
@@ -177,19 +177,18 @@ def test_bloomberg_apple_corp_example():
 
 def test_zero_bond():
     # A 3 months treasure with 0 coupon per year.
-    bill = Bond(
+    bill = BondZero(
         issue_date=Date(25, 7, 2022),
         maturity_date=Date(24, 10, 2022),
-        coupon=0,
-        freq_type=FrequencyTypes.ZERO,
-        accrual_type=DayCountTypes.ZERO
+        face_amount=ONE_MILLION,
+        issue_price=99.6410
     )
     settlement_date = Date(8, 8, 2022)
 
-    clean_price = 99.7056
+    clean_price = 99.6504
     calc_ytm = bill.yield_to_maturity(settlement_date, clean_price, YTMCalcType.ZERO) * 100
-    assert abs(calc_ytm - 1.3998) < 0.0002
+    accrued_interest = bill.calc_accrued_interest(settlement_date)
+    assert abs(calc_ytm - 1.3997) < 0.0002
+    assert abs(accrued_interest - ONE_MILLION * 0.055231 / 100) < 0.01
 
 
-if __name__ == '__main__':
-    test_zero_bond()

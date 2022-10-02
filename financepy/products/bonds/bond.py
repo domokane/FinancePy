@@ -97,7 +97,7 @@ class Bond:
                  coupon: float,  # Annualised bond coupon
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float = 100.0, 
+                 face_amount: float = 100.0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
@@ -112,22 +112,20 @@ class Bond:
         self._issue_date = issue_date
         self._maturity_date = maturity_date
 
-        if coupon == 0.0 and freq_type != FrequencyTypes.ZERO:
-            raise FinError("Zero coupon bonds must use ZERO for Frequency Type")
+        if coupon == 0.0 or freq_type == FrequencyTypes.ZERO or accrual_type == accrual_type.ZERO:
+            raise FinError(f"Zero coupon bonds must use BondZero class. coupon:{coupon}. freq:{freq_type}" +
+                           f"accrual_type:{accrual_type}")
 
         self._coupon = coupon
         self._freq_type = freq_type
 
-        if coupon == 0.0 and accrual_type != accrual_type.ZERO:
-            raise FinError("Zero coupon bonds must use ZERO for Accrual Type")
-        
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
         self._face_amount = face_amount  # This is the bond holding size
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0  # This is amount paid at maturity
         self._calendar_type = calendar_type
-        
+
         self._coupon_dates = []
         self._payment_dates = [] # Actual payment dates are adjusted
         self._flow_amounts = []
@@ -146,7 +144,7 @@ class Bond:
         calculations these are not usually adjusted and so may fall on a 
         weekend or holiday. 
         """
-            
+
         # This should only be called once from init
         bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
@@ -220,9 +218,9 @@ class Bond:
 
         f = annual_frequency(self._freq_type)
         c = self._coupon
-        
-        if c == 0.0 and convention != YTMCalcType.ZERO:
-            raise FinError("Zero coupon bonds require ZERO YTMCalcType")
+
+        if convention == YTMCalcType.ZERO:
+            raise FinError("Zero coupon bonds must use BondZero class.")
 
         v = 1.0 / (1.0 + ytm / f)
 
@@ -236,22 +234,7 @@ class Bond:
         if n < 0:
             raise FinError("No coupons left")
 
-        if convention == YTMCalcType.ZERO:
-            
-            # A zero coupon bond has a price equal to the discounted principal
-            # assuming an annualised rate raised to the power of years
-            
-            dc = DayCount(self._accrual_type)
-            cal = Calendar(self._calendar_type)
-            
-            (acc_factor, num, _) = dc.year_frac(settlement_date,
-                                                self._maturity_date,
-                                                self._maturity_date,
-                                                self._freq_type)
-            
-            fp = 1.0 / (1.0 + ytm * acc_factor)
-            
-        elif convention == YTMCalcType.UK_DMO:
+        if convention == YTMCalcType.UK_DMO:
             if n == 0:
                 fp = (v ** (self._alpha)) * (self._redemption + c / f)
             else:
@@ -461,7 +444,7 @@ class Bond:
             argtuple = (self, settlement_date, full_price, convention)
 
             ytm = optimize.newton(_f,
-                                  x0=0.05,  # guess initial value of 10%
+                                  x0=0.05,  # guess initial value of 5%
                                   fprime=None,
                                   args=argtuple,
                                   tol=1e-8,
@@ -662,14 +645,14 @@ class Bond:
         flow = self._face_amount * self._coupon / self._frequency
 
         flow_str = ""
-        
+
         for dt in self._coupon_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 flow_str += ("%12s %12.2f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
-        flow_str += ("%12s %12.2f \n" 
+        flow_str += ("%12s %12.2f \n"
                      % (self._coupon_dates[-1], redemption_amount))
 
         return flow_str
@@ -680,9 +663,9 @@ class Bond:
                     settlement_date: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-    
+
         print(self.coupon_dates(settlement_date))
-    
+
     ###########################################################################
 
     def full_price_from_survival_curve(self,

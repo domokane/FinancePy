@@ -10,7 +10,7 @@ from enum import Enum
 
 
 class FrequencyTypes(Enum):
-    ZERO = 0
+    ZERO = -1
     SIMPLE = 0
     ANNUAL = 1
     SEMI_ANNUAL = 2
@@ -23,7 +23,7 @@ class FrequencyTypes(Enum):
 
 
 def annual_frequency(freq_type: FrequencyTypes):
-    """ This is a function that takes in a Frequency Type and returns an
+    """ This is a function that takes in a Frequency Type and returns a
     float value for the number of times a year a payment occurs."""
     if isinstance(freq_type, FrequencyTypes) is False:
         print("FinFrequency:", freq_type)

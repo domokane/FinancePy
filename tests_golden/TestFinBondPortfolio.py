@@ -34,7 +34,8 @@ def test_BondPortfolio():
     testCases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
 
     for accrual_type in DayCountTypes:
-
+        if accrual_type == DayCountTypes.ZERO:
+            continue
         for _, bond in bondDataFrame.iterrows():
 
             date_string = bond['maturity']

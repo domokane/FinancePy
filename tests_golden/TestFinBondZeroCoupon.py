@@ -3,49 +3,49 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond import YTMCalcType
+from financepy.products.bonds.bond_zero import BondZero
+from financepy.products.bonds.bond import Bond, YTMCalcType
 
 from financepy.products.bonds.zero_curve import BondZeroCurve
 
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import datetime as dt
-import os
+from financepy.utils.math import ONE_MILLION
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
 
+
 ###############################################################################
 
 def testBondZeroCoupon():
-    
     issue_date = Date(25, 7, 2022)
     maturity_date = Date(24, 10, 2022)
-    coupon = 0.0
-    freq_type = FrequencyTypes.ZERO
-    accrual_type = DayCountTypes.ZERO
-    
-    bond = Bond(issue_date,
-                maturity_date,
-                coupon,
-                freq_type,
-                accrual_type)
-    
+    face_amount = ONE_MILLION
+    issue_price = 99.6410
+
+    bond = BondZero(issue_date=issue_date,
+                    maturity_date=maturity_date,
+                    face_amount=face_amount,
+                    issue_price=issue_price)
+
     settlement_date = Date(8, 8, 2022)
-            
-    clean_price = 99.7056
-    ytm = bond.yield_to_maturity(settlement_date, 
-                                 clean_price, 
+
+    clean_price = 99.6504
+    ytm = bond.yield_to_maturity(settlement_date,
+                                 clean_price,
                                  YTMCalcType.ZERO)
-    
-    testCases.header("YTM")
-    testCases.print(ytm)
+    accrued_interest = bond.calc_accrued_interest(settlement_date)
+
+    testCases.header('YTM', 'accrued')
+    testCases.print(ytm, accrued_interest)
+
 
 ###############################################################################
 
