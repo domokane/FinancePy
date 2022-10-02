@@ -15,6 +15,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...products.bonds.bond import YTMCalcType
 
+###############################################################################
 
 def _f(y, *args):
     """ Function used to do root search in price to yield calculation. """
@@ -45,21 +46,25 @@ def _g(oas, *args):
 
 
 class BondZero:
-    """ A zero coupon bond is a bond which doesn't pay any periodic payments. Instead, it is issued in discount.
-    The entire face value of the bond is paid out at maturity. It is also known as a deep discount bond.
-    Accrued_interest = (par - issue price)*(settlement_date - issue_date)/(maturity_date - issue_date)
-    For bonds with coupons, refer to Bond.
+    """ A zero coupon bond is a bond which doesn't pay any periodic payments. 
+    Instead, it is issued at a discount. The entire face value of the bond is 
+    paid out at maturity. It is issued as a deep discount bond. 
+    
+    There is a special convention for accrued interest in which 
+    
+        Accrued_interest = (par - issue price) * D
+    
+    where D = (settlement_date - issue_date)/(maturity_date - issue_date).    
     """
 
     def __init__(self,
                  issue_date: Date,
                  maturity_date: Date,
-                 face_amount: float,  # Holding position of this bond.
-                 issue_price: float = 100.0,  # Price of issue, usually discounted(<100) for zero-coupon bond.
+                 face_amount: float,  # Amount repaid at maturity.
+                 issue_price: float = 100.0,  # Issue price usually discounted
                  ):
-        """ Create Bond object by providing the issue date, maturity Date,
-        the accrual convention type, face amount and issue price. A calendar type is used
-        to determine holidays from which coupon dates might be shifted."""
+        """ Create BondZero object by providing the issue date, maturity Date,
+        face amount and issue price. """
 
         check_argument_types(self.__init__, locals())
 
@@ -70,13 +75,13 @@ class BondZero:
         self._maturity_date = maturity_date
         self._accrual_type = DayCountTypes.ZERO
         self._face_amount = face_amount  # This is the bond holding size
-        self._issue_price = issue_price  # Price of issue, usually discounted(<100) for zero-coupon bond.
+        self._issue_price = issue_price  # Price of issue, usually discounted
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0  # This is amount paid at maturity
         self._freq_type = FrequencyTypes.ZERO
-        self._coupon_dates = [issue_date, maturity_date]  # The same structure as regular bonds.
-        self._payment_dates = [issue_date, maturity_date]  # The same structure as regular bonds.
-        self._flow_amounts = [0.0, 0.0]  # The same structure as regular bonds. No coupon at maturity.
+        self._coupon_dates = [issue_date, maturity_date]
+        self._payment_dates = [issue_date, maturity_date]
+        self._flow_amounts = [0.0, 0.0] # coupon payments are zero
 
         self._accrued_interest = None
         self._accrued_days = 0.0
@@ -93,7 +98,7 @@ class BondZero:
         a number of standard conventions for calculating the YTM. """
 
         if convention != YTMCalcType.ZERO:
-            raise FinError("Wrong YTMCalcType. This is a zero coupon bond." + str(convention))
+            raise FinError("Need to use YTMCalcType.ZERO for zero coupon bond")
 
         self.calc_accrued_interest(settlement_date)
 
