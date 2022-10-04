@@ -1,6 +1,7 @@
 This folder contains a suite of bond-related functionality across a set of files and classes. They are as follows:
 
 * Bond is a basic fixed coupon bond with all of the associated duration and convexity measures. It also includes some common spread measures such as the asset swap spread and the option adjusted spread.
+* BondZero is a zero coupon bond. This is a bond issued at a deep discount that matures at par. Accrued interest is calculated by interpolating the price growth.
 * BondAnnuity is a stream of cash flows that is generated and can be priced.
 * BondCallable is a bond that has embedded call and put options. A number of rate models pricing functions have been included to allow such bonds to be priced and risk-managed.
 * BondConvertible enables the pricing and risk-management of convertible bonds. The model is a binomial tree implementation of Black-Scholes which allows for discrete dividends, embedded puts and calls, and a delayed start of the conversion option.
