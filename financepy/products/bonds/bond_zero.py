@@ -11,6 +11,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...products.bonds.bond import YTMCalcType
@@ -41,9 +42,7 @@ def _g(oas, *args):
     obj_fn = px - price
     return obj_fn
 
-
 ###############################################################################
-
 
 class BondZero:
     """ A zero coupon bond is a bond which doesn't pay any periodic payments. 
@@ -81,7 +80,7 @@ class BondZero:
         self._freq_type = FrequencyTypes.ZERO
         self._coupon_dates = [issue_date, maturity_date]
         self._payment_dates = [issue_date, maturity_date]
-        self._flow_amounts = [0.0, 0.0] # coupon payments are zero
+        self._flow_amounts = [0.0, 0.0]  # coupon payments are zero
 
         self._accrued_interest = None
         self._accrued_days = 0.0
@@ -593,6 +592,40 @@ class BondZero:
         return clean_price
 
     ###########################################################################
+
+    def calc_ror(self,
+                 begin_date: Date,
+                 end_date: Date,
+                 begin_ytm: Date,
+                 end_ytm: Date,
+                 convention: YTMCalcType = YTMCalcType.US_STREET):
+        """
+        Calculate the rate of total return(capital return and interest) given a BUY YTM and a SELL YTM of this bond.
+        This function computes the full prices at buying and selling, plus the coupon payments during the period.
+        It returns a tuple which includes a simple rate of return, a compounded IRR and the PnL.
+        """
+        buy_price = self.full_price_from_ytm(begin_date, begin_ytm, convention)
+        sell_price = self.full_price_from_ytm(end_date, end_ytm, convention)
+        dates_cfs = zip(self._coupon_dates, self._flow_amounts)
+        # The coupon or par payments on buying date belong to the buyer.
+        # The coupon or par payments on selling date are given to the new buyer.
+        dates_cfs = [(d, c * self._par) for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
+        dates_cfs.append((begin_date, -buy_price))
+        dates_cfs.append((end_date, sell_price))
+        times_cfs = [((d - begin_date)/365, c) for (d, c) in dates_cfs]
+        pnl = sum(c for (t, c) in times_cfs)
+        simple_return = (pnl / buy_price) * 365 / (end_date - begin_date)
+        if simple_return > 2:  # in case brentq cannot find the root
+            irr = simple_return
+        else:
+            irr = optimize.brentq(npv,
+                                  a=-0.9999,  # f(a) and f(b) must have opposite signs
+                                  b=2,
+                                  xtol=1e-8,
+                                  args=(times_cfs,)
+                                  )
+
+        return simple_return, irr, pnl
 
     def __repr__(self):
 

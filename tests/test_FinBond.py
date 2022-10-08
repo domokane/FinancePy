@@ -192,3 +192,26 @@ def test_zero_bond():
     assert abs(accrued_interest - ONE_MILLION * 0.055231 / 100) < 0.01
 
 
+def test_bond_ror():
+    # A 10 year bond with 1 coupon per year. code: 210215
+    bond = Bond(
+        issue_date=Date(13, 9, 2021),
+        maturity_date=Date(13, 9, 2031),
+        coupon=0.0312,
+        freq_type=FrequencyTypes.ANNUAL,
+        accrual_type=DayCountTypes.ACT_ACT_ICMA
+    )
+    start_date = Date(8, 10, 2022)
+    end_date = Date(8, 12, 2023)
+    start_ytm = 0.03
+    end_ytm = 0.033
+    simple, irr, pnl = bond.calc_ror(start_date, end_date, start_ytm, end_ytm, YTMCalcType.US_STREET)
+    assert abs(simple * 100 - 1.2620) < 0.0001
+    assert abs(irr * 100 - 1.2685) < 0.0001
+
+
+if __name__ == "__main__":
+    test_bond_ror()
+
+
+

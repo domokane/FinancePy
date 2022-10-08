@@ -652,3 +652,15 @@ def corr_matrix_generator(rho, n):
     return corr_matrix
 
 ###############################################################################
+
+
+@njit(fastmath=True, cache=True)
+def npv(irr: float, times_cfs: list):
+    """
+    Function to calculate the npv given irr and cashflow. It can be used to do root search in IRR.
+    times_cfs is a list of tuples. The tuple is in the form of (years from first date, cashflow)
+    """
+    _npv = 0
+    for t, c in times_cfs:
+        _npv += c / ((1 + irr) ** t)
+    return _npv
