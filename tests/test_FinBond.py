@@ -194,7 +194,7 @@ def test_zero_bond():
 
 def test_bond_ror():
     test_case_file = 'test_cases_bond_ror.csv'
-    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    df = pd.read_csv('./tests/data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
     # A 10-year bond with 1 coupon per year. code: 210215
     bond = Bond(
         issue_date=Date(13, 9, 2021),
@@ -213,7 +213,7 @@ def test_bond_ror():
 
 def test_bond_zero_ror():
     test_case_file = 'test_cases_bond_zero_ror.csv'
-    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    df = pd.read_csv('./tests/data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(
         issue_date=Date(23, 7, 2021),
