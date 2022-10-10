@@ -3,8 +3,8 @@
 ##############################################################################
 
 import sys
-
 sys.path.append("..")
+import pandas as pd
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -193,7 +193,9 @@ def test_zero_bond():
 
 
 def test_bond_ror():
-    # A 10 year bond with 1 coupon per year. code: 210215
+    test_case_file = 'test_cases_bond_ror.csv'
+    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    # A 10-year bond with 1 coupon per year. code: 210215
     bond = Bond(
         issue_date=Date(13, 9, 2021),
         maturity_date=Date(13, 9, 2031),
@@ -201,17 +203,32 @@ def test_bond_ror():
         freq_type=FrequencyTypes.ANNUAL,
         accrual_type=DayCountTypes.ACT_ACT_ICMA
     )
-    start_date = Date(8, 10, 2022)
-    end_date = Date(8, 12, 2023)
-    start_ytm = 0.03
-    end_ytm = 0.033
-    simple, irr, pnl = bond.calc_ror(start_date, end_date, start_ytm, end_ytm, YTMCalcType.US_STREET)
-    assert abs(simple * 100 - 1.2620) < 0.0001
-    assert abs(irr * 100 - 1.2685) < 0.0001
+    for row in df.itertuples(index=False):
+        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
+        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
+        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
+        assert abs(simple - row.simple_return) < 0.00001
+        assert abs(irr - row.irr) < 0.00001
 
 
-if __name__ == "__main__":
-    test_bond_ror()
+def test_bond_zero_ror():
+    test_case_file = 'test_cases_bond_zero_ror.csv'
+    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    # A 1-year bond with zero coupon per year. code: 092103011
+    bond = BondZero(
+        issue_date=Date(23, 7, 2021),
+        maturity_date=Date(24, 8, 2022),
+        issue_price=97.67
+    )
+    for row in df.itertuples(index=False):
+        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
+        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
+        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
+        assert abs(simple - row.simple_return) < 0.00001
+        assert abs(irr - row.irr) < 0.00001
+
+
+
 
 
 

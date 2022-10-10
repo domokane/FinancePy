@@ -59,8 +59,8 @@ class BondZero:
     def __init__(self,
                  issue_date: Date,
                  maturity_date: Date,
-                 face_amount: float,  # Amount repaid at maturity.
-                 issue_price: float = 100.0,  # Issue price usually discounted
+                 issue_price: float,          # Issue price usually discounted
+                 face_amount: float = 100.0   # Amount repaid at maturity.
                  ):
         """ Create BondZero object by providing the issue date, maturity Date,
         face amount and issue price. """
@@ -596,9 +596,9 @@ class BondZero:
     def calc_ror(self,
                  begin_date: Date,
                  end_date: Date,
-                 begin_ytm: Date,
-                 end_ytm: Date,
-                 convention: YTMCalcType = YTMCalcType.US_STREET):
+                 begin_ytm: float,
+                 end_ytm: float,
+                 convention: YTMCalcType = YTMCalcType.ZERO):
         """
         Calculate the rate of total return(capital return and interest) given a BUY YTM and a SELL YTM of this bond.
         This function computes the full prices at buying and selling, plus the coupon payments during the period.
@@ -615,12 +615,15 @@ class BondZero:
         times_cfs = [((d - begin_date)/365, c) for (d, c) in dates_cfs]
         pnl = sum(c for (t, c) in times_cfs)
         simple_return = (pnl / buy_price) * 365 / (end_date - begin_date)
-        if simple_return > 2:  # in case brentq cannot find the root
+        brentq_up_bound = 5
+        brentq_down_bound = -0.9999
+        # in case brentq cannot find the irr root
+        if simple_return > brentq_up_bound or simple_return < brentq_down_bound:
             irr = simple_return
         else:
             irr = optimize.brentq(npv,
-                                  a=-0.9999,  # f(a) and f(b) must have opposite signs
-                                  b=2,
+                                  a=brentq_down_bound,  # f(a) and f(b) must have opposite signs
+                                  b=brentq_up_bound,
                                   xtol=1e-8,
                                   args=(times_cfs,)
                                   )
