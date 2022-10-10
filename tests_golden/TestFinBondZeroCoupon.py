@@ -3,7 +3,7 @@
 ###############################################################################
 
 import sys
-
+import pandas as pd
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -24,7 +24,7 @@ plotGraphs = False
 
 ###############################################################################
 
-def testBondZeroCoupon():
+def test_bond_zero():
     issue_date = Date(25, 7, 2022)
     maturity_date = Date(24, 10, 2022)
     face_amount = ONE_MILLION
@@ -47,7 +47,29 @@ def testBondZeroCoupon():
     testCases.print(ytm, accrued_interest)
 
 
+def test_bond_zero_ror():
+    test_case_file = 'test_cases_bond_zero_ror.csv'
+    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    # A 1-year bond with zero coupon per year. code: 092103011
+    bond = BondZero(
+        issue_date=Date(23, 7, 2021),
+        maturity_date=Date(24, 8, 2022),
+        issue_price=97.67
+    )
+    testCases.header('bond_code', 'buy_date', 'buy_ytm', 'buy_price', 'sell_date', 'sell_ytm', 'sell_price',
+                     'simple_return', 'irr')
+    for row in df.itertuples(index=False):
+        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
+        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
+        buy_price = bond.full_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.ZERO)
+        sell_price = bond.full_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.ZERO)
+        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
+        testCases.print(row.bond_code, buy_date, row.buy_ytm, buy_price, sell_date, row.sell_ytm, sell_price,
+                        simple, irr)
+
 ###############################################################################
 
-testBondZeroCoupon()
+
+test_bond_zero()
+test_bond_zero_ror()
 testCases.compareTestCases()
