@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import datetime
 import numpy as np
 import time
 
@@ -307,3 +308,9 @@ def test_datetime():
 
     dt = Date(30, 12, 2021)
     assert dt.datetime()
+
+def test_from_date():
+    y, m, d = 2022, 11, 8
+    dt1 = Date(d, m, y)
+    dt2 = Date.from_date(datetime.date(y, m, d))
+    assert dt1 == dt2

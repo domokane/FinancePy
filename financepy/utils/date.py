@@ -296,6 +296,16 @@ class Date():
 
     ###########################################################################
 
+    @classmethod
+    def from_date(cls, date: datetime.date):
+        """  Create a Date from a python datetime.date object.
+        Example Input:
+        start_date = Date.from_date(datetime.date(2022, 11, 8)) """
+
+        d, m, y = date.day, date.month, date.year
+        return cls(d, m, y)
+
+    ###########################################################################
     def _refresh(self):
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
