@@ -36,9 +36,10 @@ def _results(r):
 # IT NEEDS TO PASS IN ARGS AS A TUPLE AS ONE OF THE ARGS IS AN NDARRAY
 ###############################################################################
 # UNABLE TO NJIT THIS DUE TO ERROR
+# FIXED ERROR BY MAKING CACHE=FALSE!!!????
 
 
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=False)
 def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     """
     Find a zero from the secant method using the jitted version of

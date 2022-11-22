@@ -770,11 +770,12 @@ class Bond:
                                   a=brentq_down_bound,  # f(a) and f(b) must have opposite signs
                                   b=brentq_up_bound,
                                   xtol=1e-8,
-                                  args=(times_cfs,)
+                                  args=(np.array(times_cfs),)
                                   )
 
         return simple_return, irr, pnl
 
+    ###########################################################################
 
     def __repr__(self):
 

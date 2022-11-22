@@ -15,7 +15,6 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 import os

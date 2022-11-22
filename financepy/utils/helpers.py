@@ -474,9 +474,12 @@ def check_argument_types(func, values):
     as the function annotations. If a value has not been annotated, it
     will not be checked. """
     for valueName, annotationType in func.__annotations__.items():
+
         value = values[valueName]
         usableType = to_usable_type(annotationType)
+        
         if (not isinstance(value, usableType)):
+
             print("ERROR with function arguments for", func.__name__)
             print("This is in module", func.__module__)
             print("Please check inputs for argument >>", valueName, "<<")
