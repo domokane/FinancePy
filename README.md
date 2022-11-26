@@ -4,6 +4,11 @@
 
 # Latest News and Versions
 
+22 Nov 22
+Version 0.260 has been released and pushed to PyPI
+- Create Date from python datetime
+- Zero coupon bond class
+- Fixed bug in bond payment date
 
 31-Aug-2022
 Version 0.240 has just been released and pushed to PyPI with changes
