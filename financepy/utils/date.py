@@ -7,7 +7,8 @@ import numpy as np
 import datetime
 import math
 
-from financepy.utils.error import FinError
+# from financepy.utils.error import FinError
+from .error import FinError
 
 ###############################################################################
 

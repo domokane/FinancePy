@@ -89,11 +89,6 @@ class EquityAmericanOption(EquityOption):
         s = stock_price
         k = self._strike_price
 
-#        phi = +1
-#        if self._option_type == OptionTypes.AMERICAN_PUT:
-#            phi = -1
-#        v = baw_value(s, texp, k, r, q, model._volatility, phi)
-
         v = model.value(s, texp, k, r, q, self._option_type)
         v = v * self._num_options
 

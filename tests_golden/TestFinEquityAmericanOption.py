@@ -38,9 +38,11 @@ def testEquityAmericanOption():
     put_option = EquityAmericanOption(
         expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
 
+    num_steps = 4
+
     model = BlackScholes(volatility,
                          BlackScholesTypes.CRR_TREE,
-                         100)
+                         num_steps)
 
     value = put_option.value(valuation_date, stock_price,
                              discount_curve, dividend_curve, model)
@@ -168,7 +170,33 @@ def testEquityAmericanOption():
 
         end = time.time()
         duration = end - start
-        testCases.print("AMERICAN_CALL", num_steps, results, duration)
+        testCases.print("AMERICAN_TREE_CALL", num_steps, results, duration)
+
+    testCases.banner(
+        "================== AMERICAN PUT =======================")
+    testCases.header(
+        "OPTION_TYPE",
+        "NUMSTEPS",
+        "VALUE DELTA GAMMA THETA",
+        "TIME")
+
+    option = EquityAmericanOption(expiry_date, strike_price,
+                                  OptionTypes.AMERICAN_PUT)
+
+    for num_steps in num_steps_list:
+
+        model = BlackScholes(volatility,
+                             BlackScholesTypes.CRR_TREE,
+                             num_steps)
+
+        start = time.time()
+
+        results = option.value(valuation_date, stock_price, discount_curve,
+                               dividend_curve, model)
+
+        end = time.time()
+        duration = end - start
+        testCases.print("AMERICAN_TREE_PUT", num_steps, results, duration)
 
 #    FinTest.TestReport(filename)
 
