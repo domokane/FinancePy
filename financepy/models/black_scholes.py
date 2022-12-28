@@ -37,8 +37,8 @@ class BlackScholes(Model):
 
     def __init__(self,
                  volatility: (float, np.ndarray),
-                 implementationType: BlackScholesTypes,
-                 num_steps_per_year, 
+                 implementationType: BlackScholesTypes = BlackScholesTypes.DEFAULT,
+                 num_steps_per_year=52, 
                  num_paths=10000,
                  seed = 42, 
                  use_sobol = False):
