@@ -228,6 +228,35 @@ def test_bond_zero_ror():
         assert abs(irr - row.irr) < 0.00001
 
 
+def test_bond_cfets():
+    """
+    Test ytms of bonds in CFETS convention, especially for those in last coupon period and
+    have 2 or more coupon payments per year.
+    """
+    test_case_file = 'test_cases_bond_cfets.csv'
+    df = pd.read_csv('./tests/data/' + test_case_file, parse_dates=['settlement_date', 'issue_date', 'maturity_date'])
+    for row in df.itertuples(index=False):
+        bond = Bond(
+            issue_date=Date(row.issue_date.day, row.issue_date.month, row.issue_date.year),
+            maturity_date=Date(row.maturity_date.day, row.maturity_date.month, row.maturity_date.year),
+            coupon=row.coupon / 100,
+            freq_type=FrequencyTypes.ANNUAL if row.freq == 1 else FrequencyTypes.SEMI_ANNUAL,
+            accrual_type=DayCountTypes.ACT_ACT_ICMA
+        )
+        settlement_date = Date(row.settlement_date.day, row.settlement_date.month, row.settlement_date.year)
+        accrued_interest = bond.calc_accrued_interest(settlement_date)
+        clean_price = row.full_price - accrued_interest
+        calc_ytm = bond.yield_to_maturity(settlement_date, clean_price, YTMCalcType.CFETS) * 100
+        try:
+            assert abs(calc_ytm - row.ytm) < 0.0001
+        except:
+            print(bond)
+            print(clean_price)
+            print(settlement_date)
+            print(bond.coupon_dates(settlement_date))
+            print(f'calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}')
+            continue
+
 
 
 
