@@ -53,7 +53,8 @@ class YTMCalcType(Enum):
     ZERO = 0,
     UK_DMO = 1,
     US_STREET = 2,
-    US_TREASURY = 3
+    US_TREASURY = 3,
+    CFETS = 4  # China Foreign Exchange Trade System
 
 
 ###############################################################################
@@ -255,6 +256,21 @@ class Bond:
         elif convention == YTMCalcType.US_STREET:
             if n == 0:
                 vw = 1.0 / (1.0 + self._alpha * ytm / f)
+                fp = vw * (self._redemption + c / f)
+            else:
+                term1 = (c / f)
+                term2 = (c / f) * v
+                term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
+                term4 = self._redemption * (v ** n)
+                fp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
+        elif convention == YTMCalcType.CFETS:
+            if n == 0:
+                last_year = self._maturity_date.add_tenor("-12M")
+                alpha = 1 - (DayCount(DayCountTypes.ACT_365L).year_frac(last_year,
+                                                                        settlement_date,
+                                                                        self._maturity_date,
+                                                                        freq_type=FrequencyTypes.ANNUAL)[0])
+                vw = 1.0 / (1.0 + alpha * ytm)
                 fp = vw * (self._redemption + c / f)
             else:
                 term1 = (c / f)
