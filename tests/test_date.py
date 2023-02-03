@@ -309,8 +309,34 @@ def test_datetime():
     dt = Date(30, 12, 2021)
     assert dt.datetime()
 
+
 def test_from_date():
     y, m, d = 2022, 11, 8
     dt1 = Date(d, m, y)
     dt2 = Date.from_date(datetime.date(y, m, d))
     assert dt1 == dt2
+
+
+def test_list_of_date():
+    dates = [Date(1, 1, 2020),
+             Date(1, 2, 2020),
+             Date(4, 3, 2020),
+             Date(1, 1, 2021),
+             Date(1, 1, 2022),
+             ]
+
+    # Test logical operations
+    assert all(dates < Date(1, 1, 2023))
+    assert all(dates <= Date(1, 1, 2022))
+    assert all(dates > Date(1, 1, 1970))
+    assert all(dates >= Date(1, 1, 2020))
+    assert (dates >= Date(1, 1, 2021)) == [False, False, False, True, True]
+    assert (dates == Date(1, 1, 2020)) == [True, False, False, False, False]
+
+    # Test list of length 1
+    assert ([Date(1, 1, 2020)] == Date(1, 1, 2020)) == [True]
+    assert ([Date(1, 1, 2020)] == Date(1, 1, 1970)) == [False]
+
+    # Test finding date difference
+    assert (Date(1, 1, 2019) - dates) == [Date(1, 1, 2019) - d for d in dates]
+    assert (dates - Date(1, 1, 2019)) == [Date(1, 1, 2019) - d for d in dates]
