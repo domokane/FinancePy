@@ -195,8 +195,9 @@ def weekday(day_count):
 def vectorisation_helper(func):
     def wrapper(self_, other):
         if isinstance(other, Iterable):
-            f = partial(func, self_)
+            # Store the type of other, then cast the output to be the same type
             output_type = type(other)
+            f = partial(func, self_)
             return output_type(map(f, other))
         return func(self_, other)
     return wrapper
