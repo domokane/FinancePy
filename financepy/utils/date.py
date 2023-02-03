@@ -325,6 +325,9 @@ class Date():
     ###########################################################################
 
     def __gt__(self, other):
+        if isinstance(other, list):
+            return self._excel_date > np.array([o._excel_date for o in other])
+
         return self._excel_date > other._excel_date
 
     ###########################################################################
