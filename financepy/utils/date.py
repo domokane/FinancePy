@@ -363,6 +363,13 @@ class Date():
 
     ###########################################################################
 
+
+    @vectorisation_helper
+    def __rsub__(self, other):
+        return self._excel_date - other._excel_date
+
+    ###########################################################################
+
     @vectorisation_helper
     def __eq__(self, other):
         return self._excel_date == other._excel_date
