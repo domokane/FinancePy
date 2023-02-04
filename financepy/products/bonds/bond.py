@@ -98,11 +98,18 @@ class Bond:
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  face_amount: float = 100.0,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_rule_type: BusDayAdjustTypes =BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+        
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used 
-        to determine holidays from which coupon dates might be shifted."""
+        to determine holidays from which coupon dates might be shifted.
+        BusDayAdjustTypes are used to calculate the actual payment dates. 
+        DateGenRuleTypes are used to calculate coupon dates either from backward
+        from the maturity dates or forward from the issue date.
+        """
 
         check_argument_types(self.__init__, locals())
 
@@ -145,16 +152,13 @@ class Bond:
         weekend or holiday. 
         """
 
-        # This should only be called once from init
-        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
-        date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._coupon_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     CalendarTypes.NONE,
-                                    bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+                                    self._bus_day_rule_type,
+                                    self._date_gen_rule_type)._generate()
 
     ###########################################################################
 
