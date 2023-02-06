@@ -132,6 +132,9 @@ class Bond:
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._redemption = 1.0  # This is amount paid at maturity
         self._calendar_type = calendar_type
+        
+        self._bus_day_rule_type = bus_day_rule_type 
+        self._date_gen_rule_type = date_gen_rule_type
 
         self._coupon_dates = []
         self._payment_dates = []  # Actual payment dates are adjusted
