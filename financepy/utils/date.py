@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from collections.abc import Iterable
+from functools import partial
+
 from numba import njit
 import numpy as np
 import datetime
@@ -189,6 +192,18 @@ def weekday(day_count):
 ###############################################################################
 
 
+def vectorisation_helper(func):
+    def wrapper(self_, other):
+        if isinstance(other, Iterable):
+            # Store the type of other, then cast the output to be the same type
+            output_type = type(other)
+            f = partial(func, self_)
+            return output_type(map(f, other))
+        return func(self_, other)
+    return wrapper
+
+###############################################################################
+
 class Date():
     """ A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. """
@@ -319,31 +334,44 @@ class Date():
 
     ###########################################################################
 
-    def __lt__(self, other):
-        return self._excel_date < other._excel_date
-
-    ###########################################################################
-
+    @vectorisation_helper
     def __gt__(self, other):
         return self._excel_date > other._excel_date
 
     ###########################################################################
 
-    def __le__(self, other):
-        return self._excel_date <= other._excel_date
+    @vectorisation_helper
+    def __lt__(self, other):
+        return self._excel_date < other._excel_date
 
     ###########################################################################
 
+    @vectorisation_helper
     def __ge__(self, other):
         return self._excel_date >= other._excel_date
 
     ###########################################################################
 
+    @vectorisation_helper
+    def __le__(self, other):
+        return self._excel_date <= other._excel_date
+
+    ###########################################################################
+
+    @vectorisation_helper
     def __sub__(self, other):
         return self._excel_date - other._excel_date
 
     ###########################################################################
 
+
+    @vectorisation_helper
+    def __rsub__(self, other):
+        return self._excel_date - other._excel_date
+
+    ###########################################################################
+
+    @vectorisation_helper
     def __eq__(self, other):
         return self._excel_date == other._excel_date
 
