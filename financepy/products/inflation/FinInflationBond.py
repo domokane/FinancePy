@@ -34,6 +34,9 @@ class FinInflationBond(Bond):
                  base_cpi_value: float,
                  num_ex_dividend_days: int = 0, 
                  calendar_type: CalendarTypes = CalendarTypes.NONE):  # Value of CPI index at bond issue date
+        
+        super().__init__(self) #since we have overriden parent methods, we need to call super so that paren methods ara available here
+        
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations. 
