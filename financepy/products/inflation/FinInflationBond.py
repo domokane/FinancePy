@@ -35,7 +35,15 @@ class FinInflationBond(Bond):
                  num_ex_dividend_days: int = 0, 
                  calendar_type: CalendarTypes = CalendarTypes.NONE):  # Value of CPI index at bond issue date
         
-        super().__init__(self) #since we have overriden parent methods, we need to call super so that parent methods are available here
+        super().__init__(issue_date: Date,
+                 maturity_date: Date,
+                 coupon: float,  # Annualised bond coupon
+                 freq_type: FrequencyTypes,
+                 accrual_type: DayCountTypes,
+                 face_amount: float,
+                 calendar_type: CalendarTypes = CalendarTypes.NONE,
+                 bus_day_rule_type: BusDayAdjustTypes =BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD) #since we have overriden parent methods, we need to call super so that parent methods are available here
         
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
