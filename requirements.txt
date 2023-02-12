@@ -3,6 +3,6 @@ numba==0.55.2
 numpy==1.21.6
 scipy==1.7.3
 llvmlite==0.38.0
-ipython==7.34.0
+ipython==8.10.0
 matplotlib==3.5.2
 pandas==1.1.3
