@@ -227,8 +227,3 @@ def test_bond_zero_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
-
-
-
-
-

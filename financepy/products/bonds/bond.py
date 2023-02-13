@@ -108,6 +108,12 @@ class Bond:
         if issue_date >= maturity_date:
             raise FinError("Issue Date must preceded maturity date.")
 
+        # If the maturity date falls on the last day of the month we assume
+        # that earlier flows also fall on month ends
+        self._end_of_month = False
+        if maturity_date.is_eom():
+            self._end_of_month = True
+
         self._issue_date = issue_date
         self._maturity_date = maturity_date
 
@@ -153,7 +159,8 @@ class Bond:
                                     self._freq_type,
                                     CalendarTypes.NONE,
                                     bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+                                    date_gen_rule_type, 
+                                    end_of_month = self._end_of_month)._generate()
 
     ###########################################################################
 
