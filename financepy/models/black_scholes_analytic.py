@@ -481,9 +481,9 @@ def baw_value(s, t, k, r, q, v, phi):
 def bjerksund_stensland_value(s, t, k, r, q, v, option_type_value):
     """ Price American Option using the Bjerksund-Stensland
     approximation (1993) for the Black Scholes Model """
-    if option_type_value == 0:
+    if option_type_value == OptionTypes.AMERICAN_CALL.value:
         pass
-    elif option_type_value == 1:
+    elif option_type_value == OptionTypes.AMERICAN_PUT.value:
         # put-call transformation
         s, k, r, q = k, s, r-q, -q
     else:
