@@ -186,9 +186,8 @@ def bs_vanna(s, t, k, r, q, v, option_type_value):
 
 ###############################################################################
 
+
 @njit(fastmath=True, cache=True)
-
-
 def _f(sigma, args):
 
     s = args[0]
@@ -204,6 +203,7 @@ def _f(sigma, args):
     return obj
 
 ##############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def _fvega(sigma, args):
@@ -223,7 +223,7 @@ def _fvega(sigma, args):
 @vectorize([float64(float64, float64, float64, float64,
                     float64, int64)], fastmath=True, cache=True)
 def bs_intrinsic(s, t, k, r, q, option_type_value):
-    """ Calculate the Black-Scholes implied volatility of a European 
+    """ Calculate the Black-Scholes implied volatility of a European
     vanilla option using Newton with a fallback to bisection. """
 
     fwd = s * np.exp((r-q)*t)
@@ -241,7 +241,7 @@ def bs_intrinsic(s, t, k, r, q, option_type_value):
 # @vectorize([float64(float64, float64, float64, float64, float64, float64,
 #                    int64)], fastmath=True, cache=True,  forceobj=True)
 def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
-    """ Calculate the Black-Scholes implied volatility of a European 
+    """ Calculate the Black-Scholes implied volatility of a European
     vanilla option using Newton with a fallback to bisection. """
 
     fwd = s * np.exp((r-q)*t)
