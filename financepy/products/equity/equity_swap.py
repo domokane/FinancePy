@@ -46,8 +46,8 @@ class EquitySwap:
                  eq_leg_type: SwapTypes,
                  eq_freq_type: FrequencyTypes,
                  eq_day_count_type: DayCountTypes,
-                 underlying_price: float,  # Price at valuation date
-                 underlying_quantity: int = 1, # Quantity at valuation date
+                 underlying_strike: float,  # Price at valuation date
+                 underlying_quantity: float = 1.0, # Quantity at valuation date
                  eq_payment_lag: int = 0,
                  eq_return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
 
@@ -99,7 +99,7 @@ class EquitySwap:
                                          eq_leg_type,
                                          eq_freq_type,
                                          eq_day_count_type,
-                                         underlying_price,
+                                         underlying_strike,
                                          underlying_quantity,
                                          eq_payment_lag,
                                          eq_return_type,

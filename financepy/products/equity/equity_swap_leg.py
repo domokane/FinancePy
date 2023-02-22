@@ -13,6 +13,7 @@ from ...utils.schedule import Schedule
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.discount_curve_flat import DiscountCurveFlat
 
 ##########################################################################
 
@@ -20,7 +21,7 @@ from ...market.curves.discount_curve import DiscountCurve
 class SwapEquityLeg:
     """ Class for managing the equity leg of an equity swap. An equity leg is 
     a leg with a sequence of flows calculated according to an ISDA schedule 
-    and follows the economics of exposure to an equity name/index. 
+    and follows the economics of exposure to a forward equity name/index. 
     
     Specifics about the underlying are not necessary, because equity swap leg 
     can be treated as a collection of equity forwards under NPV valuation. 
@@ -32,8 +33,8 @@ class SwapEquityLeg:
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 underlying_price: float,  # Price at effective date
-                 underlying_quantity: int = 1, # Quantity at effective date
+                 underlying_strike: float,  # Price at effective date
+                 underlying_quantity: float = 1.0, # Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -70,9 +71,12 @@ class SwapEquityLeg:
         self._leg_type = leg_type
         self._freq_type = freq_type
         self._payment_lag = payment_lag
-        self._under_price = underlying_price
+        self._under_strike = underlying_strike
         self._under_quantity = underlying_quantity
         self._return_type = return_type
+
+        ## Assumed to be zero
+        self._principal = 0
         
         self._day_count_type = day_count_type
         self._calendar_type = calendar_type
@@ -164,6 +168,10 @@ class SwapEquityLeg:
 
         if index_curve is None:
             index_curve = discount_curve
+        
+        ## Assume a naive dividend curve if nothing provided
+        if dividend_curve is None:
+            dividend_curve = DiscountCurveFlat(effective_date, 0)
 
         self._rates = []
         self._payments = []
@@ -199,8 +207,9 @@ class SwapEquityLeg:
 
                     div_rate = firstFixingDivRate
                     if firstFixingDivRate is None:
-                        print("Warning: Fixing Div Rate is missing. Assuming zero!")
-                        div_rate = 0
+                        divStart = dividend_curve.df(startAccruedDt)
+                        divEnd = dividend_curve.df(endAccruedDt)
+                        div_rate = (divStart / divEnd - 1.0) / index_alpha
 
                 else:
                     dfStart = index_curve.df(startAccruedDt)
@@ -211,9 +220,9 @@ class SwapEquityLeg:
                     divEnd = dividend_curve.df(endAccruedDt)
                     div_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                ## Under NPV Valuation, equity swap is essentially a fwd rate
-                ## trade with a notional linked to the current value of equity.
-                ## Optional dividend curve may be included.
+                ## Under NPV Valuation, equity swap is essentially a collection
+                ## of fwd rate trades with a notional linked to the current 
+                ## value of equity. Optionally dividend curve may be included.
                 pmntAmount = (fwd_rate + div_rate) * pay_alpha * notional
                 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
@@ -337,4 +346,4 @@ class SwapEquityLeg:
 
     @property
     def _notional(self):
-        return self._under_price * self._under_quantity
+        return self._under_strike * self._under_quantity
