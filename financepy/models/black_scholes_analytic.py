@@ -477,6 +477,52 @@ def baw_value(s, t, k, r, q, v, phi):
 ###############################################################################
 
 
+@njit(fastmath=True)
+def bjerksund_stensland_value(s, t, k, r, q, v, option_type_value):
+    """ Price American Option using the Bjerksund-Stensland
+    approximation (1993) for the Black Scholes Model """
+    if option_type_value == 0:
+        pass
+    elif option_type_value == 1:
+        # put-call transformation
+        s, k, r, q = k, s, r-q, -q
+    else:
+        return 0.0
+
+    def phi(S, T, gamma, H, X):
+        """ The function corresponding to Eq.(13)
+        in Bjerksund-Stensland approximation (1993)"""
+        nonlocal r, q
+        lambda0 = (-r + gamma * q + 0.5 * gamma * (gamma - 1.0) * v**2) * T
+        d = - (np.log(S/H) + (q + (gamma - 0.5) * v**2) * T) / (v * np.sqrt(t))
+        kappa = (2.0 * gamma - 1.0) + (2.0 * q) / v**2
+        return (
+            np.exp(lambda0) * (S ** gamma)
+            * (N(d) - N(d - (2.0 * np.log(X/S)/v/np.sqrt(T))) * ((X/S)**kappa))
+        )
+    # calc trigger price x_t
+    beta = (0.5 - q/(v**2)) + np.sqrt((0.5 - q/(v**2))**2 + 2.0 * r/(v**2))
+    # avoid division by zero
+    if abs(r-q) < 1.e-10:
+        beta = 1.0
+        x_t = 1.e10
+    else:
+        b_infty = k * beta / (beta - 1.0)
+        b_0 = max(k, k * r/((r-q)))
+        h_t = -(q*t + 2.0 * v * np.sqrt(t)) * (b_0 / (b_infty - b_0))
+        x_t = b_0 + (b_infty - b_0) * (1.0 - np.exp(h_t))
+    # calc option value
+    alpha = (x_t - k) * x_t ** (-beta)
+    value = (
+        alpha * (s**beta) - alpha * phi(s, t, beta, x_t, x_t)
+        + phi(s, t, 1.0, x_t, x_t) - phi(s, t, 1.0, k, x_t)
+        - k * phi(s, t, 0.0, x_t, x_t) + k * phi(s, t, 0.0, k, x_t)
+    )
+    return value
+
+###############################################################################
+
+
 if __name__ == '__main__':
     # spot_price, strike_price, time_to_expiry, r, b, vol, phi
 
