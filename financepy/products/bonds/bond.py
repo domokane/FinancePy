@@ -423,8 +423,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on the settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 flow = self._coupon / self._frequency
                 pv = flow * df
@@ -505,8 +505,8 @@ class Bond:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for iFlow in range(1, num_flows):
-            # coupons paid on a settlement date are paid
-            if self._coupon_dates[iFlow] >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if self._coupon_dates[iFlow] > settlement_date:
                 self._pcd = self._coupon_dates[iFlow - 1]
                 self._ncd = self._coupon_dates[iFlow]
                 break
@@ -555,8 +555,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 pvIbor += df * self._coupon / self._frequency
 
@@ -601,8 +601,8 @@ class Bond:
         pv = 0.0
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 t = (dt - settlement_date) / gDaysInYear
 
                 t = np.maximum(t, gSmall)
@@ -672,8 +672,8 @@ class Bond:
         flow_str = ""
 
         for dt in self._coupon_dates[1:-1]:
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 flow_str += ("%12s %12.2f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
@@ -718,8 +718,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 
