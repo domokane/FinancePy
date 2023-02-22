@@ -475,8 +475,9 @@ def check_argument_types(func, values):
     will not be checked. """
     for valueName, annotationType in func.__annotations__.items():
 
-        value = values[valueName]
-        usableType = to_usable_type(annotationType)
+        if valueName in values:
+            value = values[valueName]
+            usableType = to_usable_type(annotationType)
         
         if (not isinstance(value, usableType)):
 
