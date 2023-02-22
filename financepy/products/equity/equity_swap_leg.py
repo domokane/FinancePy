@@ -22,7 +22,7 @@ class SwapEquityLeg:
     a leg with a sequence of flows calculated according to an ISDA schedule 
     and follows the economics of exposure to an equity name/index. 
     
-    Specifics about the underlyer are not necessary, because equity swap leg 
+    Specifics about the underlying are not necessary, because equity swap leg 
     can be treated as a collection of equity forwards under NPV valuation. 
     """
 
@@ -32,10 +32,9 @@ class SwapEquityLeg:
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 underlyer_price: float,  # Price at effective date
-                 underlyer_quantity: int = 1, # Quantity at effective date
+                 underlying_price: float,  # Price at effective date
+                 underlying_quantity: int = 1, # Quantity at effective date
                  payment_lag: int = 0,
-                 spread: float = 0.0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -43,7 +42,7 @@ class SwapEquityLeg:
                  end_of_month: bool = False):
         
         """ Create the equity leg of a swap contract giving the contract start
-        date, its maturity, underlyer current price, payment frequency, day
+        date, its maturity, underlying current price, payment frequency, day
         count convention and notional. """
 
         check_argument_types(self.__init__, locals())
@@ -59,18 +58,20 @@ class SwapEquityLeg:
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
         
-        if underlyer_quantity < 0:
+        if underlying_quantity < 0:
             ## Long/Short is defined by leg_type
             raise FinError("Quantity must be non-negative")
+        
+        if return_type != ReturnTypes.TOTAL_RETURN:
+            raise NotImplementedError("Return Type still not implemented")
 
         self._effective_date = effective_date
         self._termination_date = termination_date
         self._leg_type = leg_type
         self._freq_type = freq_type
         self._payment_lag = payment_lag
-        self._spread = spread
-        self._under_price = underlyer_price
-        self._under_quantity = underlyer_quantity
+        self._under_price = underlying_price
+        self._under_quantity = underlying_quantity
         self._return_type = return_type
         
         self._day_count_type = day_count_type
@@ -193,7 +194,6 @@ class SwapEquityLeg:
                                                                     endAccruedDt)
 
                 if firstPayment is False and firstFixingRate is not None:
-
                     fwd_rate = firstFixingRate
                     firstPayment = True
 
@@ -203,7 +203,6 @@ class SwapEquityLeg:
                         div_rate = 0
 
                 else:
-
                     dfStart = index_curve.df(startAccruedDt)
                     dfEnd = index_curve.df(endAccruedDt)
                     fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
@@ -213,8 +212,9 @@ class SwapEquityLeg:
                     div_rate = (divStart / divEnd - 1.0) / index_alpha
 
                 ## Under NPV Valuation, equity swap is essentially a fwd rate
-                ## trade with a notional linked to the current value of equity
-                pmntAmount = (fwd_rate + div_rate + self._spread) * pay_alpha * notional
+                ## trade with a notional linked to the current value of equity.
+                ## Optional dividend curve may be included.
+                pmntAmount = (fwd_rate + div_rate) * pay_alpha * notional
                 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt

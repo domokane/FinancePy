@@ -18,7 +18,6 @@ from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
 
-
 ###############################################################################
 
 
