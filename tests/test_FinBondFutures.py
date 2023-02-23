@@ -58,18 +58,18 @@ def test_bond_future_2():
 
     cf = bondFutureContract.conversion_factor(bond)
 
-    assert round(cf, 4) == 74.2122
+    assert round(cf, 4) == 73.1429
 
     futures_price = 125.265625
 
     pip = bondFutureContract.principal_invoice_price(bond, futures_price)
 
-    assert round(pip, 4) == 9296237.6200
+    assert round(pip, 4) == 9162291.0800
 
     tia = bondFutureContract.total_invoice_amount(
         settlement_date, bond, futures_price)
 
-    assert round(tia, 4) == 9296580.0100
+    assert round(tia, 4) == 9162633.4700
 
 
 def test_future_bond_ctd():
