@@ -442,7 +442,7 @@ def baw_value(s, t, k, r, q, v, phi):
         A2 = (sstar / q2) * (1.0 - np.exp(-q * t) * n_vect(d1))
 
         if s < sstar:
-            return bs_value(s, t, k, r, q, v, +1) + A2 * ((s/sstar)**q2)
+            return bs_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_CALL.value) + A2 * ((s/sstar)**q2)
         else:
             return s - k
 
@@ -466,7 +466,7 @@ def baw_value(s, t, k, r, q, v, phi):
         a1 = -(sstar / q1) * (1 - np.exp(-q * t) * n_vect(-d1))
 
         if s > sstar:
-            return bs_value(s, t, k, r, q, v, -1) + a1 * ((s/sstar)**q1)
+            return bs_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_PUT.value) + a1 * ((s/sstar)**q1)
         else:
             return k - s
 
