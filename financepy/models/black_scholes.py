@@ -14,8 +14,11 @@ from ..utils.helpers import check_argument_types
 from .model import Model
 from .equity_crr_tree import crr_tree_val_avg
 from .equity_lsmc import equity_lsmc
-from .black_scholes_analytic import baw_value
-from .black_scholes_analytic import bs_value
+from .black_scholes_analytic import (
+    bs_value,
+    baw_value,
+    bjerksund_stensland_value
+)
 
 
 from enum import Enum
@@ -27,6 +30,7 @@ class BlackScholesTypes(Enum):
     CRR_TREE = 2
     BARONE_ADESI = 3
     LSMC = 4
+    Bjerksund_Stensland = 5
 
 ###############################################################################
 
@@ -38,10 +42,10 @@ class BlackScholes(Model):
     def __init__(self,
                  volatility: (float, np.ndarray),
                  implementationType: BlackScholesTypes = BlackScholesTypes.DEFAULT,
-                 num_steps_per_year=52, 
+                 num_steps_per_year=52,
                  num_paths=10000,
-                 seed = 42, 
-                 use_sobol = False):
+                 seed=42,
+                 use_sobol=False):
 
         check_argument_types(self.__init__, locals())
 
@@ -70,11 +74,11 @@ class BlackScholes(Model):
 
             if self._implementationType == BlackScholesTypes.ANALYTICAL:
 
-                v = bs_value(spotPrice, 
-                             time_to_expiry, 
+                v = bs_value(spotPrice,
+                             time_to_expiry,
                              strike_price,
-                             risk_free_rate, 
-                             dividendRate, 
+                             risk_free_rate,
+                             dividendRate,
                              self._volatility,
                              option_type.value)
 
@@ -82,12 +86,12 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crr_tree_val_avg(spotPrice, 
-                                     risk_free_rate, 
+                v = crr_tree_val_avg(spotPrice,
+                                     risk_free_rate,
                                      dividendRate,
-                                     self._volatility, 
+                                     self._volatility,
                                      self._num_steps_per_year,
-                                     time_to_expiry, 
+                                     time_to_expiry,
                                      option_type.value,
                                      strike_price)['value']
 
@@ -110,11 +114,11 @@ class BlackScholes(Model):
                 elif option_type == OptionTypes.AMERICAN_PUT:
                     phi = -1
 
-                v = baw_value(spotPrice, 
-                              time_to_expiry, 
+                v = baw_value(spotPrice,
+                              time_to_expiry,
                               strike_price,
-                              risk_free_rate, 
-                              dividendRate, 
+                              risk_free_rate,
+                              dividendRate,
                               self._volatility,
                               phi)
 
@@ -122,12 +126,12 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.CRR_TREE:
 
-                v = crr_tree_val_avg(spotPrice, 
-                                     risk_free_rate, 
+                v = crr_tree_val_avg(spotPrice,
+                                     risk_free_rate,
                                      dividendRate,
-                                     self._volatility, 
+                                     self._volatility,
                                      self._num_steps_per_year,
-                                     time_to_expiry, 
+                                     time_to_expiry,
                                      option_type.value,
                                      strike_price)['value']
 
@@ -135,18 +139,27 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.LSMC:
 
-                v = equity_lsmc(spotPrice, 
-                                risk_free_rate, 
+                v = equity_lsmc(spotPrice,
+                                risk_free_rate,
                                 dividendRate,
-                                self._volatility, 
+                                self._volatility,
                                 self._num_steps_per_year,
                                 self._num_paths,
-                                time_to_expiry, 
+                                time_to_expiry,
                                 option_type.value,
-                                strike_price, 
-                                self._seed, 
+                                strike_price,
+                                self._seed,
                                 self._use_sobol)
 
+                return v
+            elif self._implementationType == BlackScholesTypes.Bjerksund_Stensland:
+                v = bjerksund_stensland_value(spotPrice,
+                                              time_to_expiry,
+                                              strike_price,
+                                              risk_free_rate,
+                                              dividendRate,
+                                              self._volatility,
+                                              option_type.value)
                 return v
 
             else:
