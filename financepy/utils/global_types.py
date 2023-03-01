@@ -31,6 +31,19 @@ class OptionTypes(Enum):
 ###############################################################################
 
 
+class EquityBarrierTypes(Enum):
+    DOWN_AND_OUT_CALL = 1
+    DOWN_AND_IN_CALL = 2
+    UP_AND_OUT_CALL = 3
+    UP_AND_IN_CALL = 4
+    UP_AND_OUT_PUT = 5
+    UP_AND_IN_PUT = 6
+    DOWN_AND_OUT_PUT = 7
+    DOWN_AND_IN_PUT = 8
+
+###############################################################################
+
+
 class FinCapFloorTypes(Enum):
     CAP = 1
     FLOOR = 2
