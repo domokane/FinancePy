@@ -4,7 +4,7 @@ from functools import partial
 
 import numpy as np
 
-from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix, sign
+from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
 
 class PUT_CALL(Enum):
     PUT = -1
@@ -167,7 +167,7 @@ def smooth_digital(xl, xu, strike):
 
 
 def digital(x, strike):
-    return 0.5 * (sign(x - strike) + 1)
+    return 0.5 * (np.sign(x - strike) + 1)
 
 
 def smooth_call(xl, xu, strike):

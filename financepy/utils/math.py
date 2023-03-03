@@ -727,12 +727,3 @@ def transpose_tridiagonal_matrix(A):
     out = np.zeros_like(A)
     out[:, 0], out[:, 1], out[:, 2] = A[:, 2], A[:, 1], A[:, 0]
     return out
-
-
-def sign(x):
-    if x < 0:
-        return -1
-    elif x > 0:
-        return 1
-    else:
-        return 0

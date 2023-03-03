@@ -33,6 +33,20 @@ def test_black_scholes_finite_difference():
     assert v == 0.07945913698961202
     smooth = 0
 
+    # dig
+    dig = 1
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+                                           num_std, num_t, num_s, update, num_pr)
+    assert v == 0.2153451094307548
+
+    #smooth dig
+    smooth = 1
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+                                           num_std, num_t, num_s, update, num_pr)
+    assert v == 0.22078914857802928
+    smooth = 0
+    dig = 0
+
     # European put
     pc = PUT_CALL.PUT.value
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
