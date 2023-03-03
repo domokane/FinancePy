@@ -64,11 +64,12 @@ def dxx(x):
     # we can use numpy roll without worrying about the end values
     dxl = (x - np.roll(x, 1))[1:-1]
     dxu = (np.roll(x, -1) - x)[1:-1]
-    out[1:-1] = np.array([1 / dxl,
-              -(1 / dxl + 1 / dxu),
-              1 / dxu]
-              ).T
-    out[1: -1] *= 2.0 / np.atleast_2d(dxl + dxu).T
+    intermediate_rows = np.array(
+        [2 / dxl,
+        -(2 / dxl + 2 / dxu),
+        2 / dxu]
+    ) / (dxu + dxl)
+    out[1:-1] = intermediate_rows.T
 
     # Last row
     out[n] = (0, 0, 0)

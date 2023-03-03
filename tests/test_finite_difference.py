@@ -1,3 +1,5 @@
+from pytest import approx
+
 from financepy.models.finite_difference import black_scholes_finite_difference, PUT_CALL, AMER_EURO
 
 def test_black_scholes_finite_difference():
@@ -24,26 +26,26 @@ def test_black_scholes_finite_difference():
     # European call
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                              num_std, num_t, num_s, update, num_pr)
-    assert v == 0.07939664662902503
+    assert v == approx(0.07939664662902503)
     
     # smooth
     smooth = 1
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.07945913698961202
+    assert v == approx(0.07945913698961202)
     smooth = 0
 
     # dig
     dig = 1
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.2153451094307548
+    assert v == approx(0.2153451094307548)
 
     #smooth dig
     smooth = 1
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.22078914857802928
+    assert v == approx(0.22078914857802928)
     smooth = 0
     dig = 0
 
@@ -51,16 +53,16 @@ def test_black_scholes_finite_difference():
     pc = PUT_CALL.PUT.value
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.2139059947533305
+    assert v == approx(0.2139059947533305)
 
     # American put
     ea = AMER_EURO.AMER.value
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.2165916613669189
+    assert v == approx(0.2165916613669189)
 
     # American call
     pc = PUT_CALL.CALL.value
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
-    assert v == 0.10259475990431438
+    assert v == approx(0.10259475990431438)
