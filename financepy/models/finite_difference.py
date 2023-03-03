@@ -6,13 +6,16 @@ import numpy as np
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
 
+
 class PUT_CALL(Enum):
     PUT = -1
     CALL = 1
 
+
 class AMER_EURO(Enum):
     EURO = 0
     AMER = 1
+
 
 def dx(x, wind=0):
     n = len(x) - 1
@@ -26,20 +29,24 @@ def dx(x, wind=0):
         out[0] /= dxu
 
     # Intermediate rows
-    for i in range(1, n):
-        dxl = x[i] - x[i - 1]
-        dxu = x[i + 1] - x[i]
-        if wind < 0:
-            out[i] = (-1, 1, 0)
-            out[i] /= dxl
-        elif wind == 0:
-            out[i] = (- dxu / dxl,
-                      dxu / dxl - dxl / dxu,
-                      dxl / dxu)
-            out[i] /= (dxl + dxu)
-        else:
-            out[i] = (0, -1, 1)
-            out[i] /= dxu
+    # Note: As first and last rows are handled separately,
+    # we can use numpy roll without worrying about the end values
+    dxl = (x - np.roll(x, 1))[1:-1]
+    dxu = (np.roll(x, -1) - x)[1:-1]
+    if wind < 0:
+        # (-1/dxl, 1/dxl, 0)
+        out[1:-1] = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
+    elif wind == 0:
+        intermediate_rows = np.array(
+            (- dxu / dxl,
+             dxu / dxl - dxl / dxu,
+             dxl / dxu
+             )
+        ) / (dxl + dxu)
+        out[1:-1] = intermediate_rows.T
+    else:
+        # (0, -1/dxu, 1/dxu)
+        out[1:-1] = np.array((np.zeros_like(dxu), -1 / dxu, 1 / dxu)).T
 
     # Last row
     if wind <= 0:
