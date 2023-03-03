@@ -664,3 +664,75 @@ def npv(irr: float, times_cfs: list):
     for t, c in times_cfs:
         _npv += c / ((1 + irr) ** t)
     return _npv
+
+
+def band_matrix_multiplication(A, m1, m2, b):
+    n = A.shape[0] - 1
+    x = np.zeros(n + 1)
+
+    for i in range(n + 1):
+        jl = max(0, i - m1)
+        ju = min(i + m2, n)
+        xi = 0
+
+        for j in range(jl, ju + 1):
+            k = j - i + m1
+            xi += A[i, k] * b[j]
+
+        x[i] = xi
+
+    return x
+
+
+def solve_tridiagonal_matrix(A, r):
+    """
+    Solve A u = r for vector u when A is tridiagonal
+
+    The matrix A is split into vectors a, b, and c contain the three
+    non-zero elements of each row of A, in order.
+    i.e. the vector b is the main diagonal of A, with a and c the elements
+    either side of the main diagonal.
+
+    Note that a[0] and c[-1] are not used, and so can be any value.
+    """
+    a, b, c = A.T
+
+    if b[0] == 0:
+        raise ValueError("First entry is zero, rewrite as set of N-1 equations")
+
+    n = len(a)  # Length of output vector
+    u = np.zeros(n)  # Output vector
+    gam = np.zeros(n)  # Workspace
+
+    bet = b[0]
+    u[0] = r[0] / bet
+
+    for j in range(1, n):
+        gam[j] = c[j - 1] / bet
+        bet = b[j] - a[j] * gam[j]
+        if bet == 0:
+            raise ValueError(
+                "Variable bet should be non-zero. "
+                "Perhaps this algorithm is not suited to the problem"
+            )
+        u[j] = (r[j] - a[j] * u[j - 1]) / bet
+
+    for j in range(n - 2, -1, -1):
+        u[j] -= gam[j + 1] * u[j + 1]
+
+    return u
+
+
+def transpose_tridiagonal_matrix(A):
+    out = np.zeros_like(A)
+    out[:, 0], out[:, 1], out[:, 2] = A[:, 2], A[:, 1], A[:, 0]
+    return out
+
+
+def sign(x):
+    if x < 0:
+        return -1
+    elif x > 0:
+        return 1
+    else:
+        return 0
