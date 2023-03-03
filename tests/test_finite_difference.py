@@ -73,4 +73,10 @@ def test_black_scholes_finite_difference():
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07834108133101789)
+
+    # wind=-1
+    wind = -1
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+                                           num_std, num_t, num_s, update, num_pr)
+    assert v == approx(0.08042112779963827)
     wind = 0
