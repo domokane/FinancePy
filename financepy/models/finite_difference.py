@@ -120,25 +120,21 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     return A
 
 
-def fd_roll_backwards(x, r, mu, var, dt, res, theta, update, Ai=np.array([]), Ae=np.array([]), wind=0):
+def fd_roll_backwards(res, theta, Ai=np.array([]), Ae=np.array([]), wind=0):
     num_vectors = len(res)
     mm = 1
 
     # Explicit case
     if theta != 1:
-        if update:
-            Ai = calculate_fd_matrix(x, r, mu, var, dt, 1 - theta, wind)
         for k in range(num_vectors):
-            res[k] = band_matrix_multiplication(Ai, mm, mm, res[k])
+            res[k] = band_matrix_multiplication(Ae, mm, mm, res[k])
 
     # Implicit case
     if theta != 0:
-        if update:
-            Ae = calculate_fd_matrix(x, r, mu, var, -dt, theta, wind)
         for k in range(num_vectors):
-            res[k] = solve_tridiagonal_matrix(Ae, res[k])
+            res[k] = solve_tridiagonal_matrix(Ai, res[k])
 
-    return res, Ai, Ae
+    return res
 
 
 def fd_roll_forwards(x, r, mu, var, dt, res, theta, update, Ai=np.array([]), Ae=np.array([]), wind=0):
@@ -242,8 +238,15 @@ def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, e
         Ai = np.array([])
         Ae = np.array([])
         for h in range(numt):
-            res, Ai, Ae = fd_roll_backwards(
-                s, r_, mu_, var_, dt, res, theta, update=update or h == 0, Ai=Ai, Ae=Ae, wind=wind)
+            if update or h == 0:
+                # explicit
+                if theta != 1:
+                    Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
+                # implicit
+                if theta != 0:
+                    Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
+
+            res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae, wind=wind)
             if ea == AMER_EURO.AMER.value:
                 for i in range(nums):
                     res[0][i] = max(res[0][i], res0[0][i])
