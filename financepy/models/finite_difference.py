@@ -1,5 +1,6 @@
 from enum import Enum
 from copy import copy
+from functools import partial
 
 import numpy as np
 
@@ -158,25 +159,59 @@ def fd_roll_forwards(res, theta, Ai=np.array([]), Ae=np.array([])):
 
 def smooth_digital(xl, xu, strike):
     if xu <= strike:
-        res = 0
+        return 0
     elif strike <= xl:
-        res = 1
+        return 1
     else:
-        res = (xu - strike) / (xu - xl)
+        return (xu - strike) / (xu - xl)
 
-    return res
+
+def digital(x, strike):
+    return 0.5 * (sign(x - strike) + 1)
 
 
 def smooth_call(xl, xu, strike):
     if xu <= strike:
-        res = 0
+        return 0
     elif strike <= xl:
-        res = 0.5 * (xl + xu) - strike
+        return 0.5 * (xl + xu) - strike
     else:
-        res = 0.5 * (xu - strike) ** 2 / (xu - xl)
+        return 0.5 * (xu - strike) ** 2 / (xu - xl)
+
+
+def initial_curve(s, strike, smooth, dig, pc):
+    nums = len(s)
+    res = np.zeros(nums)
+
+    # Handle first and last values separately
+    res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
+    res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
+
+    # Generate middle values (i.e. not first or last)
+    if not smooth:
+        if dig:
+            res[1:-1] = digital(s[1:-1], strike)
+        else:
+            res[1:-1] = s[1:-1] - strike
+            # Set negative values to zero
+            res[1:-1][res[1:-1] < 0] = 0
+    else:
+        # Set lower and upper bound for s.
+        # Note: As we are only interested in elements 1:-1 here,
+        # we can use roll without worrying about end values.
+        sl = 0.5 * (np.roll(s, 1) + s)
+        su = 0.5 * (s + np.roll(s, -1))
+
+        # Define the curve, fix the strike value, and map into res
+        func = smooth_digital if dig else smooth_call
+        func = partial(func, strike=strike)
+        res[1:-1] = list(map(func, sl[1:-1], su[1:-1]))
+
+    # Invert for put options
+    if pc == PUT_CALL.PUT.value:
+        res = 1 - res if dig else res - (s - strike)
 
     return res
-
 
 def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
                                     num_std, num_t, num_s, update, num_pr):
@@ -185,66 +220,51 @@ def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, e
     xl = -num_std * std
     xu = num_std * std
     d_x = (xu - xl) / max(1, num_s)
-    nums = num_s
-    if nums <= 0 or xl == xu:
-        nums = 1
-    else:
-        nums += 1
+    nums = 1 if num_s <= 0 or xl == xu else num_s + 1
 
     # Create sample set s
     s = np.zeros(nums)
     s[0] = s0 * np.exp(xl)
     ds = np.exp(d_x)
-
     for i in range(1, nums):
         s[i] = s[i - 1] * ds
-    res = np.zeros(nums)
-    for i in range(nums):
-        if smooth == 0 or i == 0 or i == nums - 1:
-            if dig:
-                res[i] = 0.5 * (sign(s[i] - strike) + 1)
-            else:
-                res[i] = max(0, s[i] - strike)
-        else:
-            sl = 0.5 * (s[i - 1] + s[i]);
-            su = 0.5 * (s[i] + s[i + 1]);
-            if dig:
-                res[i] = smooth_digital(sl, su, strike)
-            else:
-                res[i] = smooth_call(sl, su, strike)
 
-        if pc == PUT_CALL.PUT.value:
-            if dig:
-                res[i] = 1 - res[i]
-            else:
-                res[i] -= (s[i] - strike)
+    # Define the initial curve which will be fitted with each iteration
+    res = initial_curve(s, strike, smooth, dig, pc)
 
     # time steps
     numt = max(0, num_t)
     dt = t / max(1, numt)
 
+    # Make time series
+    r_ = np.zeros(nums) + r
+    mu_ = mu * s
+    var_ = (s * sigma) ** 2
+
+    # Make res shape correct
+    res = np.atleast_2d(res)
+
+    # Store original res if option is American
+    if ea == AMER_EURO.AMER.value:
+        res0 = copy(res)
+
     # repeat
-    res = np.array([res])
-    res0 = copy(res)
     nump = max(1, num_pr)
     for p in range(nump):
-        r_ = np.zeros(nums) + r
-        mu_ = mu * s
-        var_ = (s * sigma) ** 2
         Ai = np.array([])
         Ae = np.array([])
         for h in range(numt):
             if update or h == 0:
-                # explicit
+                # Explicit case
                 if theta != 1:
                     Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
-                # implicit
+                # Implicit case
                 if theta != 0:
                     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
             res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
             if ea == AMER_EURO.AMER.value:
-                for i in range(nums):
-                    res[0][i] = max(res[0][i], res0[0][i])
+                idx = res[0] < res0[0]
+                res[0][idx] = res0[0][idx]
 
     return res[0], res[0][nums // 2]
