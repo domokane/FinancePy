@@ -60,15 +60,15 @@ def dxx(x):
     out[0] = (0, 0, 0)
 
     # Intermediate rows
-    for i in range(1, n):
-        dxl = x[i] - x[i - 1]
-        dxu = x[i + 1] - x[i]
-
-        out[i] = (1 / dxl,
-                  -(1 / dxl + 1 / dxu),
-                  1 / dxu
-                  )
-        out[i] *= 2.0 / (dxl + dxu)
+    # Note: As first and last rows are handled separately,
+    # we can use numpy roll without worrying about the end values
+    dxl = (x - np.roll(x, 1))[1:-1]
+    dxu = (np.roll(x, -1) - x)[1:-1]
+    out[1:-1] = np.array([1 / dxl,
+              -(1 / dxl + 1 / dxu),
+              1 / dxu]
+              ).T
+    out[1: -1] *= 2.0 / np.atleast_2d(dxl + dxu).T
 
     # Last row
     out[n] = (0, 0, 0)
