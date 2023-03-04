@@ -275,16 +275,14 @@ class SwapEquityLeg:
         rows = []
         num_flows = len(self._payment_dates)
         for iFlow in range(0, num_flows):
-            rows.append(
-                [
-                    iFlow + 1,
-                    self._payment_dates[iFlow],
-                    self._startAccruedDates[iFlow],
-                    self._endAccruedDates[iFlow],
-                    self._accrued_days[iFlow],
-                    self._year_fracs[iFlow],
-                ]
-            )
+            rows.append([
+                iFlow + 1,
+                self._payment_dates[iFlow],
+                self._startAccruedDates[iFlow],
+                self._endAccruedDates[iFlow],
+                self._accrued_days[iFlow],
+                round(self._year_fracs[iFlow], 4),
+            ])
             
         table = format_table(header, rows)
         print("\nPAYMENTS SCHEDULE:")

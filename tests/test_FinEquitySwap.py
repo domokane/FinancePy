@@ -44,26 +44,26 @@ def test_equity_swap_at_inception():
     index_curve = discount_curve
 
     equity_swap = EquitySwap(effective_date,
-                                maturity_date,
-                                leg_type,
-                                freq_type,
-                                day_count_type,
-                                stock_price,
-                                stock_qty,
-                                payment_lag,
-                                return_type,
-                                freq_type,
-                                day_count_type,
-                                rate_spread,
-                                payment_lag,
-                                calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                             maturity_date,
+                             leg_type,
+                             freq_type,
+                             day_count_type,
+                             stock_price,
+                             stock_qty,
+                             payment_lag,
+                             return_type,
+                             freq_type,
+                             day_count_type,
+                             rate_spread,
+                             payment_lag,
+                             calendar_type,
+                             bus_day_adjust_type,
+                             date_gen_rule_type)
     
     value = equity_swap.value(effective_date, 
-                                discount_curve,
-                                index_curve,
-                                dividend_curve)
+                              discount_curve,
+                              index_curve,
+                              dividend_curve)
     
     assert round(value, 5) == 0.00000
 
@@ -112,21 +112,21 @@ def test_equity_swap_not_in_inception():
     stock_price = stock_strike * (1 + firstFixing * index_alpha_first)/(1 + periodFixing * index_alpha_period)
 
     equity_swap = EquitySwap(effective_date,
-                                maturity_date,
-                                leg_type,
-                                freq_type,
-                                day_count_type,
-                                stock_strike,
-                                stock_qty,
-                                payment_lag,
-                                return_type,
-                                freq_type,
-                                day_count_type,
-                                rate_spread,
-                                payment_lag,
-                                calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                             maturity_date,
+                             leg_type,
+                             freq_type,
+                             day_count_type,
+                             stock_strike,
+                             stock_qty,
+                             payment_lag,
+                             return_type,
+                             freq_type,
+                             day_count_type,
+                             rate_spread,
+                             payment_lag,
+                             calendar_type,
+                             bus_day_adjust_type,
+                             date_gen_rule_type)
     
     value = equity_swap.value(valuation_date, 
                               discount_curve,
