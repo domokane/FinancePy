@@ -164,17 +164,17 @@ def test_equity_swap_with_dividends():
     index_curve    = DiscountCurveFlat(effective_date, indexRate)
 
     equity_swap_leg = SwapEquityLeg(effective_date,
-                                maturity_date,
-                                leg_type,
-                                freq_type,
-                                day_count_type,
-                                stock_price,
-                                stock_qty,
-                                payment_lag,
-                                return_type,
-                                calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                                    maturity_date,
+                                    leg_type,
+                                    freq_type,
+                                    day_count_type,
+                                    stock_price,
+                                    stock_qty,
+                                    payment_lag,
+                                    return_type,
+                                    calendar_type,
+                                    bus_day_adjust_type,
+                                    date_gen_rule_type)
     
     value_higher_disc = equity_swap_leg.value(effective_date, 
                                               discount_curve,
