@@ -2,18 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from enum import Enum
-
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
-from ...utils.frequency import FrequencyTypes
+from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
-from ...products.rates.swap_fixed_leg import SwapFixedLeg
 from ...products.rates.swap_float_leg import SwapFloatLeg
 from ...products.equity.equity_swap_leg import SwapEquityLeg
 
@@ -23,10 +20,10 @@ class EquitySwap:
     """ Class for managing a standard Equity vs Float leg swap. This is a 
     contract in which an equity payment leg is exchanged for a series of 
     floating rates payments. There is no exchange of principal. The contract 
-    is entered into at zero initial cost. The contract lasts from a start date 
-    to a specified maturity date.
+    is entered into at zero initial cost when spreads are zero. The contract 
+    lasts from an effective date to a specified maturity date.
 
-    The equity payments are not known fully until the end of the valuation period.
+    The equity payments are not known fully until the end of the payment period.
 
     The floating rate is not known fully until the end of the preceding payment
     period. It is set in advance and paid in arrears. 
@@ -131,10 +128,8 @@ class EquitySwap:
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
-                                                        current_price)
-        
-        ## Notionals from equity leg are computed and can fill rate leg   
-        self._rate_leg._notional_array = self._equity_leg._last_notionals
+                                                        current_price)   
+        self._fill_rate_notional_array()
 
         self._rate_leg_value = self._rate_leg.value(valuation_date,
                                                     discount_curve,
@@ -142,3 +137,30 @@ class EquitySwap:
                                                     firstFixingRate)
         
         return self._equity_leg_value + self._rate_leg_value
+    
+    def _fill_rate_notional_array(self):
+        """ In an equity swap, at every equity reset, the notional
+        of the contract is updated to reflect the new underlying 
+        price. 
+        
+        This is a helper function that takes the Equity Notional list
+        from Equity Leg and convert it to a Notional array that fits 
+        the payment schedule defined for the rate leg. 
+        """
+
+        ## Assumption: Rate frequency type is a multiple of Equity's
+        eq_freq = annual_frequency(self._equity_leg._freq_type)
+        rate_freq = annual_frequency(self._rate_leg._freq_type)
+
+        multiple = int(rate_freq // eq_freq)
+        isMultiple = int(rate_freq % eq_freq) == 0
+
+        if (eq_freq is None or rate_freq is None) or (not isMultiple):
+            raise FinError("Invalid frequency type assigned!")
+        
+        self._rate_leg._notional_array = []
+        for lastNotional in self._equity_leg._last_notionals:
+            for _ in range(multiple):
+                self._rate_leg._notional_array.append(lastNotional)
+
+        

@@ -23,7 +23,6 @@ class SwapEquityLeg:
     a leg with a sequence of flows calculated according to an ISDA schedule 
     and follows the economics of a collection of equity forward contracts. 
     """
-
     def __init__(self,
                  effective_date: Date, ## Date contract starts or last Equity Reset
                  termination_date_or_tenor: (Date, str), ## Date contract ends
@@ -62,6 +61,10 @@ class SwapEquityLeg:
         
         if return_type != ReturnTypes.TOTAL_RETURN:
             raise NotImplementedError("Return Type still not implemented")
+
+        ## To generate ISDA pmnt schedule properly we can't use these types 
+        if freq_type in (FrequencyTypes.CONTINUOUS, FrequencyTypes, FrequencyTypes.SIMPLE):
+            raise FinError("Cannot generate payment schedule for this frequency!")
 
         self._effective_date = effective_date
         self._termination_date = termination_date
