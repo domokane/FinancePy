@@ -20,12 +20,16 @@ from ...products.equity.equity_swap_leg import SwapEquityLeg
 
 ###############################################################################
 class EquitySwap:
-    """ Class for managing a standard Equity vs Float leg swap. This is a contract 
-    in which an equity payment leg is exchanged for a series of either floating rates 
-    payments. There is no exchange of principal. The contract is entered into at zero 
-    initial cost. The contract lasts from a start date to a specified maturity date.
+    """ Class for managing a standard Equity vs Float leg swap. This is a 
+    contract in which an equity payment leg is exchanged for a series of 
+    floating rates payments. There is no exchange of principal. The contract 
+    is entered into at zero initial cost. The contract lasts from a start date 
+    to a specified maturity date.
 
-    The equity payments  are not known fully until the end of the valuation period. 
+    The equity payments are not known fully until the end of the valuation period.
+
+    The floating rate is not known fully until the end of the preceding payment
+    period. It is set in advance and paid in arrears. 
 
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
@@ -50,13 +54,14 @@ class EquitySwap:
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create an equity swap contract giving the contract effective
-        date, its maturity, notional based on underlying price & quantity, 
-        count convention and notional. The floating leg parameters have default
-        values that can be overwritten if needed. The start date is contractual
-        and is the same as the settlement date for a new swap. It is the date
-        on which interest starts to accrue. The end of the contract is the
-        termination date. This is not adjusted for business days. The adjusted
-        termination date is called the maturity date. This is calculated. """
+        date, its maturity, underlying price & quantity, count convention 
+        and return type and other details. The equity leg parameters have 
+        default values that can be overwritten if needed. The start date 
+        is contractual and is the same as the settlement date for a new 
+        swap. It is the date on which interest starts to accrue. The end 
+        of the contract is the termination date. This is not adjusted for 
+        business days. The adjusted termination date is called the maturity 
+        date. This is calculated. """
 
         check_argument_types(self.__init__, locals())
 

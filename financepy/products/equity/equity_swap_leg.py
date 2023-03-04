@@ -21,7 +21,7 @@ from ...market.curves.discount_curve_flat import DiscountCurveFlat
 class SwapEquityLeg:
     """ Class for managing the equity leg of an equity swap. An equity leg is 
     a leg with a sequence of flows calculated according to an ISDA schedule 
-    and follows the economics of a collection of equity forwards contracts. 
+    and follows the economics of a collection of equity forward contracts. 
     """
 
     def __init__(self,
@@ -41,7 +41,7 @@ class SwapEquityLeg:
         
         """ Create the equity leg of a swap contract giving the contract start
         date, its maturity, underlying strike price & quantity, payment frequency, 
-        day count convention and return type. """
+        day count convention, return type, and other details """
 
         check_argument_types(self.__init__, locals())
 
@@ -93,8 +93,8 @@ class SwapEquityLeg:
 
     def generate_payment_dates(self):
         """ Generate the Equity leg payment dates and accrual factors. Similar
-        to swap float leg, "coupons" can't be generated, as we do not have index 
-        curve. """
+        to swap float leg, payment values can't be generated, as we do not have 
+        index curve, dividend curve and equity price. """
 
         schedule = Schedule(self._effective_date,
                             self._maturity_date,
@@ -150,13 +150,17 @@ class SwapEquityLeg:
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
               current_price: float = None ):
-        """ Value the equity leg with payments from an equity price and qunatity, 
+        """ Value the equity leg with payments from an equity price & quantity, 
         an index curve and an [optional] dividend curve. Discounting is based on 
         a supplied discount curve as of the valuation date supplied. 
         """
 
         if discount_curve is None:
             raise FinError("Discount curve not provided!")
+        
+        if discount_curve._valuation_date != valuation_date:
+            raise FinError(
+                "Discount Curve valuation date not same as option valuation date")
 
         if index_curve is None:
             index_curve = discount_curve
@@ -166,7 +170,7 @@ class SwapEquityLeg:
             dividend_curve = DiscountCurveFlat(valuation_date, 0)
 
         ## Current price can't be different than strike at effective date
-        if (current_price is not None) and (valuation_date != self._effective_date):
+        if current_price is not None:
             self._current_price = current_price
         else:
             self._current_price = self._strike
@@ -270,7 +274,7 @@ class SwapEquityLeg:
             print("Payments Dates not calculated.")
             return
 
-        header = [ "PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS", "YEARFRAC"]
+        header = ["PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS", "YEARFRAC"]
         
         rows = []
         num_flows = len(self._payment_dates)
@@ -301,7 +305,7 @@ class SwapEquityLeg:
             print("Payments not calculated.")
             return
         
-        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL", 
+        header = ["PAY_NUM", "PAY_DATE",  "NOTIONAL", 
                   "FWD_RATE", "PMNT", "DF", "PV", "CUM_PV"]
 
         rows = []          
@@ -329,6 +333,7 @@ class SwapEquityLeg:
         s += label_to_string("EFFECTIVE DATE", self._effective_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
         s += label_to_string("SWAP TYPE", self._leg_type)
+        s += label_to_string("RETURN TYPE", self._return_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT", self._day_count_type)
         s += label_to_string("CALENDAR", self._calendar_type)
