@@ -42,7 +42,7 @@ class EquitySwap:
                  quantity: float = 1.0, ## Quantity at effective date
                  eq_payment_lag: int = 0,
                  eq_return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
-                 rate_freq_type: FrequencyTypes = FrequencyTypes.ANNUAL, 
+                 rate_freq_type: FrequencyTypes = FrequencyTypes.MONTHLY, 
                  rate_day_count_type: DayCountTypes = DayCountTypes.ACT_360,
                  rate_spread: float = 0.0, 
                  rate_payment_lag: int = 0,
