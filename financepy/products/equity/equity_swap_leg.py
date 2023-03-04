@@ -40,7 +40,7 @@ class SwapEquityLeg:
                  end_of_month: bool = False):
         
         """ Create the equity leg of a swap contract giving the contract start
-        date, its maturity, underlying strike price & quantity payment frequency, 
+        date, its maturity, underlying strike price & quantity, payment frequency, 
         day count convention and return type. """
 
         check_argument_types(self.__init__, locals())
@@ -197,7 +197,6 @@ class SwapEquityLeg:
 
             if pmntDate > valuation_date:
                 
-                ## Create fwd rates scheme
                 startAccruedDt = self._startAccruedDates[iPmnt]
                 endAccruedDt = self._endAccruedDates[iPmnt]
                 index_alpha = index_day_counter.year_frac(startAccruedDt, endAccruedDt)[0]
@@ -210,7 +209,7 @@ class SwapEquityLeg:
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                ## Equity growth rate assuming evolution given by index and div curves
+                ## Equity discount derived from index and div curves
                 eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
 
                 if firstPayment and firstFixingRate is not None:
@@ -227,8 +226,7 @@ class SwapEquityLeg:
                 ## Iterative update of the term rate
                 eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) \
                                 * (1 + eq_term_rate)  - 1
-
-                ## Create payments scheme
+                
                 nextPrice = self._current_price * (1 + eq_term_rate)
                 nextNotional = nextPrice * self._quantity                    
                 pmntAmount = nextNotional - lastNotional

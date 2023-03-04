@@ -83,33 +83,33 @@ class EquitySwap:
             rate_leg_type = SwapTypes.RECEIVE
 
         self._equity_leg = SwapEquityLeg(effective_date,
-                                            self._maturity_date,
-                                            eq_leg_type,
-                                            eq_freq_type,
-                                            eq_day_count_type,
-                                            strike,
-                                            quantity,
-                                            eq_payment_lag,
-                                            eq_return_type,
-                                            calendar_type,
-                                            bus_day_adjust_type,
-                                            date_gen_rule_type,
-                                            end_of_month)
+                                         self._maturity_date,
+                                         eq_leg_type,
+                                         eq_freq_type,
+                                         eq_day_count_type,
+                                         strike,
+                                         quantity,
+                                         eq_payment_lag,
+                                         eq_return_type,
+                                         calendar_type,
+                                         bus_day_adjust_type,
+                                         date_gen_rule_type,
+                                         end_of_month)
 
         ## Fixed Rate Leg not implemented yet
         self._rate_leg = SwapFloatLeg(effective_date,
-                                            self._maturity_date,
-                                            rate_leg_type,
-                                            rate_spread,
-                                            rate_freq_type,
-                                            rate_day_count_type,
-                                            self._equity_leg._notional,
-                                            self._principal,
-                                            rate_payment_lag,
-                                            calendar_type,
-                                            bus_day_adjust_type,
-                                            date_gen_rule_type,
-                                            end_of_month)
+                                      self._maturity_date,
+                                      rate_leg_type,
+                                      rate_spread,
+                                      rate_freq_type,
+                                      rate_day_count_type,
+                                      self._equity_leg._notional,
+                                      self._principal,
+                                      rate_payment_lag,
+                                      calendar_type,
+                                      bus_day_adjust_type,
+                                      date_gen_rule_type,
+                                      end_of_month)
 
     ###########################################################################
 
