@@ -6,6 +6,8 @@ import sys
 import numpy as np
 from numba import njit, float64
 from typing import Union
+from prettytable import PrettyTable
+
 from .date import Date
 from .global_vars import gDaysInYear, gSmall
 from .error import FinError
@@ -357,6 +359,29 @@ def table_to_string(header: str,
 
     return s[:-1]
 
+###############################################################################
+
+
+def format_table(header: (list, tuple),
+                 rows: (list, tuple)):
+    """ Format a 2D array into a table-like string. 
+    Similar to "table_to_string", but using a wrapper
+    around PrettyTable to get a nice formatting. """
+    
+    t = PrettyTable(header)
+    numRows = len(header)
+
+    if len(rows) == 0:
+        print(len(rows))
+        return ""
+
+    for row in rows:
+        if len(row) != numRows:
+            raise ValueError("Header and Row Size must match!")
+
+        t.add_row(row)
+
+    return t
 
 ###############################################################################
 

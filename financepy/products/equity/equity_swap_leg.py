@@ -10,7 +10,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import format_table, label_to_string, check_argument_types
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.discount_curve_flat import DiscountCurveFlat
@@ -21,20 +21,17 @@ from ...market.curves.discount_curve_flat import DiscountCurveFlat
 class SwapEquityLeg:
     """ Class for managing the equity leg of an equity swap. An equity leg is 
     a leg with a sequence of flows calculated according to an ISDA schedule 
-    and follows the economics of exposure to a forward equity name/index. 
-    
-    Specifics about the underlying are not necessary, because equity swap leg 
-    can be treated as a collection of equity forwards under NPV valuation. 
+    and follows the economics of a collection of equity forwards contracts. 
     """
 
     def __init__(self,
-                 effective_date: Date,  # Date equity effective starts
-                 termination_date_or_tenor: (Date, str),  #  Date contract ends
+                 effective_date: Date, ## Date contract starts or last Equity Reset
+                 termination_date_or_tenor: (Date, str), ## Date contract ends
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 underlying_strike: float,  # Price at effective date
-                 underlying_quantity: float = 1.0, # Quantity at effective date
+                 strike: float, ## Price at effective date
+                 quantity: float = 1.0, ## Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -43,8 +40,8 @@ class SwapEquityLeg:
                  end_of_month: bool = False):
         
         """ Create the equity leg of a swap contract giving the contract start
-        date, its maturity, underlying current price, payment frequency, day
-        count convention and notional. """
+        date, its maturity, underlying strike price & quantity payment frequency, 
+        day count convention and return type. """
 
         check_argument_types(self.__init__, locals())
 
@@ -59,7 +56,7 @@ class SwapEquityLeg:
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
         
-        if underlying_quantity < 0:
+        if quantity < 0:
             ## Long/Short is defined by leg_type
             raise FinError("Quantity must be non-negative")
         
@@ -71,12 +68,10 @@ class SwapEquityLeg:
         self._leg_type = leg_type
         self._freq_type = freq_type
         self._payment_lag = payment_lag
-        self._under_strike = underlying_strike
-        self._under_quantity = underlying_quantity
+        self._strike = strike
+        self._quantity = quantity
+        self._notional = strike * quantity
         self._return_type = return_type
-
-        ## Assumed to be zero
-        self._principal = 0
         
         self._day_count_type = day_count_type
         self._calendar_type = calendar_type
@@ -150,86 +145,99 @@ class SwapEquityLeg:
 ###############################################################################
 
     def value(self,
-              effective_date: Date,  # This should be the settlement date
+              valuation_date: Date, 
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
-              firstFixingRate: float = None,
-              firstFixingDivRate: float = None):
-        """ Value the equity leg with payments from an equity forwards built 
-        upon a current price, an index curve and an [optional] dividend curve.
-        Discounting is based on a supplied discount curve as of the valuation date
-        supplied. For an existing swap, the user must enter the next fixing
-        coupon. 
+              current_price: float = None,
+              firstFixingRate: float = None):
+        """ Value the equity leg with payments from an equity price and qunatity, 
+        an index curve and an [optional] dividend curve. Discounting is based on 
+        a supplied discount curve as of the valuation date supplied. For an existing 
+        swap, the user must enter the next fixing to account for rate + div. 
         """
 
         if discount_curve is None:
-            raise FinError("Discount curve is None")
+            raise FinError("Discount curve not provided!")
 
         if index_curve is None:
             index_curve = discount_curve
         
         ## Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
-            dividend_curve = DiscountCurveFlat(effective_date, 0)
+            dividend_curve = DiscountCurveFlat(valuation_date, 0)
 
-        self._rates = []
+        ## Current price can't be different than strike at effective date
+        if (current_price is not None) and (valuation_date != self._effective_date):
+            self._current_price = current_price
+        else:
+            self._current_price = self._strike
+
+        self._fwd_rates = []
+        self._div_fwd_rates = []
+        self._eq_fwd_rates = []
+        self._last_notionals = []
         self._payments = []
         self._paymentDfs = []
         self._paymentPVs = []
         self._cumulativePVs = []
 
-        notional = self._notional
-        dfValue = discount_curve.df(effective_date)
+        dfValue = discount_curve.df(valuation_date)
         legPV = 0.0
         numPayments = len(self._payment_dates)
-        firstPayment = False
+        firstPayment = True
 
         index_basis = index_curve._day_count_type
         index_day_counter = DayCount(index_basis)
 
+        eq_term_rate = 0
         for iPmnt in range(0, numPayments):
 
             pmntDate = self._payment_dates[iPmnt]
 
-            if pmntDate > effective_date:
-
+            if pmntDate > valuation_date:
+                
+                ## Create fwd rates scheme
                 startAccruedDt = self._startAccruedDates[iPmnt]
                 endAccruedDt = self._endAccruedDates[iPmnt]
-                pay_alpha = self._year_fracs[iPmnt]
+                index_alpha = index_day_counter.year_frac(startAccruedDt, endAccruedDt)[0]
 
-                (index_alpha, num, _) = index_day_counter.year_frac(startAccruedDt,
-                                                                    endAccruedDt)
+                dfStart = index_curve.df(startAccruedDt)
+                dfEnd = index_curve.df(endAccruedDt)
+                fwd_rate  = (dfStart / dfEnd - 1.0) / index_alpha
 
-                if firstPayment is False and firstFixingRate is not None:
-                    fwd_rate = firstFixingRate
-                    firstPayment = True
+                divStart = dividend_curve.df(startAccruedDt)
+                divEnd = dividend_curve.df(endAccruedDt)
+                div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                    div_rate = firstFixingDivRate
-                    if firstFixingDivRate is None:
-                        divStart = dividend_curve.df(startAccruedDt)
-                        divEnd = dividend_curve.df(endAccruedDt)
-                        div_rate = (divStart / divEnd - 1.0) / index_alpha
+                ## Equity growth rate assuming evolution given by index and div curves
+                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
 
-                else:
-                    dfStart = index_curve.df(startAccruedDt)
-                    dfEnd = index_curve.df(endAccruedDt)
-                    fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
+                if firstPayment and firstFixingRate is not None:
+                    eq_fwd_rate = firstFixingRate
 
-                    divStart = dividend_curve.df(startAccruedDt)
-                    divEnd = dividend_curve.df(endAccruedDt)
-                    div_rate = (divStart / divEnd - 1.0) / index_alpha
+                if firstPayment:
+                    lastNotional = self._notional
+                    firstPayment = False
 
-                ## Under NPV Valuation, equity swap is essentially a collection
-                ## of fwd rate trades with a notional linked to the current 
-                ## value of equity. Optionally dividend curve may be included.
-                pmntAmount = (fwd_rate + div_rate) * pay_alpha * notional
-                
+                self._fwd_rates.append(fwd_rate)
+                self._div_fwd_rates.append(div_fwd_rate)
+                self._eq_fwd_rates.append(eq_fwd_rate)
+
+                ## Iterative update of the term rate
+                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) \
+                                * (1 + eq_term_rate)  - 1
+
+                ## Create payments scheme
+                nextPrice = self._current_price * (1 + eq_term_rate)
+                nextNotional = nextPrice * self._quantity                    
+                pmntAmount = nextNotional - lastNotional
+    
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
                 legPV += pmntPV
-
-                self._rates.append(fwd_rate)
+                
+                self._last_notionals.append(lastNotional)
                 self._payments.append(pmntAmount)
                 self._paymentDfs.append(dfPmnt)
                 self._paymentPVs.append(pmntPV)
@@ -237,17 +245,16 @@ class SwapEquityLeg:
 
             else:
 
-                self._rates.append(0.0)
+                self._fwd_rates.append(0.0)
+                self._div_fwd_rates.append(0.0)
+                self._eq_fwd_rates.append(0.0)
+                self._last_notionals.append(self._notional)
                 self._payments.append(0.0)
                 self._paymentDfs.append(0.0)
                 self._paymentPVs.append(0.0)
                 self._cumulativePVs.append(legPV)
 
-        if pmntDate > effective_date:
-            paymentPV = self._principal * dfPmnt * notional
-            self._paymentPVs[-1] += paymentPV
-            legPV += paymentPV
-            self._cumulativePVs[-1] = legPV
+            lastNotional = nextNotional
 
         if self._leg_type == SwapTypes.PAY:
             legPV = legPV * (-1.0)
@@ -257,13 +264,12 @@ class SwapEquityLeg:
 ##########################################################################
 
     def print_payments(self):
-        """ Prints the fixed leg dates, accrual factors, discount factors,
+        """ Prints the payment dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
-        print("NOTIONAL", self._notional)
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
 
@@ -271,54 +277,59 @@ class SwapEquityLeg:
             print("Payments Dates not calculated.")
             return
 
-        header = "PAY_DATE     ACCR_START   ACCR_END      DAYS  YEARFRAC"
-        print(header)
-
+        header = [ "PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS", "YEARFRAC"]
+        
+        rows = []
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  " %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow]))
+            rows.append(
+                [
+                    iFlow + 1,
+                    self._payment_dates[iFlow],
+                    self._startAccruedDates[iFlow],
+                    self._endAccruedDates[iFlow],
+                    self._accrued_days[iFlow],
+                    self._year_fracs[iFlow],
+                ]
+            )
+            
+        table = format_table(header, rows)
+        print("\nPAYMENTS SCHEDULE:")
+        print(table)
 
 ###############################################################################
 
     def print_valuation(self):
-        """ Prints the equity leg dates, accrual factors, discount factors,
+        """ Prints the valuation dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        print("START DATE:", self._effective_date)
-        print("MATURITY DATE:", self._maturity_date)
-        print("NOTIONAL:", self._notional)
-        print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._day_count_type))
+        self.print_payments()
 
         if len(self._payments) == 0:
             print("Payments not calculated.")
             return
+        
+        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL", 
+                  "FWD_RATE", "PMNT", "DF", "PV", "CUM_PV"]
 
-        header = "PAY_DATE     ACCR_START   ACCR_END     DAYS  YEARFRAC"
-        header += "    IBOR      PAYMENT       DF          PV        CUM PV"
-        print(header)
-
+        rows = []          
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  %9.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow],
-                   self._rates[iFlow] * 100.0,
-                   self._payments[iFlow],
-                   self._paymentDfs[iFlow],
-                   self._paymentPVs[iFlow],
-                   self._cumulativePVs[iFlow]))
+            rows.append([
+                iFlow + 1,
+                self._payment_dates[iFlow],
+                round(self._last_notionals[iFlow], 0),
+                round(self._eq_fwd_rates[iFlow] * 100.0, 4),
+                round(self._payments[iFlow], 2),
+                round(self._paymentDfs[iFlow], 4),
+                round(self._paymentPVs[iFlow], 2),
+                round(self._cumulativePVs[iFlow], 2),
+            ])
+
+        table = format_table(header, rows)
+        print("\nPAYMENTS VALUATION:")
+        print(table)
 
 ###############################################################################
 
@@ -326,7 +337,6 @@ class SwapEquityLeg:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self._effective_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("SWAP TYPE", self._leg_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT", self._day_count_type)
@@ -335,15 +345,5 @@ class SwapEquityLeg:
         s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
         return s
 
-###############################################################################
-
-    def _print(self):
-        """ Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. """
-        print(self)
 
 ###############################################################################
-
-    @property
-    def _notional(self):
-        return self._under_strike * self._under_quantity

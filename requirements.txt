@@ -6,3 +6,4 @@ llvmlite==0.38.0
 ipython==7.34.0
 matplotlib==3.5.2
 pandas==1.1.3
+prettytable==3.6.0

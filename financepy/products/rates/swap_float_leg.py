@@ -10,7 +10,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import format_table, label_to_string, check_argument_types
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -29,7 +29,7 @@ class SwapFloatLeg:
                  spread: (float),
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 notional: float = ONE_MILLION,
+                 notional: (float, list) = ONE_MILLION,
                  principal: float = 0.0,
                  payment_lag: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -53,13 +53,19 @@ class SwapFloatLeg:
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
+        
+        if type(notional) == list:
+            self._notional_array = notional
+            self._notional = notional[0]
+        else:
+            self._notional_array = list()
+            self._notional = notional
 
         self._effective_date = effective_date
         self._end_date = end_date
         self._leg_type = leg_type
         self._freq_type = freq_type
         self._payment_lag = payment_lag
-        self._notional = notional
         self._principal = 0.0
         self._spread = spread
 
@@ -154,11 +160,13 @@ class SwapFloatLeg:
         self._paymentPVs = []
         self._cumulativePVs = []
 
-        notional = self._notional
         dfValue = discount_curve.df(valuation_date)
         legPV = 0.0
         numPayments = len(self._payment_dates)
         firstPayment = False
+
+        if not len(self._notional_array):
+            self._notional_array = [self._notional] * numPayments
 
         index_basis = index_curve._day_count_type
         index_day_counter = DayCount(index_basis)
@@ -187,7 +195,7 @@ class SwapFloatLeg:
                     dfEnd = index_curve.df(endAccruedDt)
                     fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
 
-                pmntAmount = (fwd_rate + self._spread) * pay_alpha * notional
+                pmntAmount = (fwd_rate + self._spread) * pay_alpha * self._notional_array[iPmnt]
 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
@@ -208,7 +216,7 @@ class SwapFloatLeg:
                 self._cumulativePVs.append(legPV)
 
         if pmntDate > valuation_date:
-            paymentPV = self._principal * dfPmnt * notional
+            paymentPV = self._principal * dfPmnt * self._notional_array[-1]
             self._paymentPVs[-1] += paymentPV
             legPV += paymentPV
             self._cumulativePVs[-1] = legPV
@@ -235,18 +243,25 @@ class SwapFloatLeg:
             print("Payments Dates not calculated.")
             return
 
-        header = "PAY_DATE     ACCR_START   ACCR_END      DAYS  YEARFRAC"
-        print(header)
+        header = [ "PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS", "YEARFRAC"]
 
+        rows = []
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  " %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow]))
+            rows.append(
+                [
+                    iFlow + 1,
+                    self._payment_dates[iFlow],
+                    self._startAccruedDates[iFlow],
+                    self._endAccruedDates[iFlow],
+                    self._accrued_days[iFlow],
+                    self._year_fracs[iFlow],
+                ]
+            )
+            
+        table = format_table(header, rows)
+        print("\nPAYMENTS SCHEDULE:")
+        print(table)
 
 ###############################################################################
 
@@ -261,28 +276,32 @@ class SwapFloatLeg:
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
 
+        self.print_payments()
+
         if len(self._payments) == 0:
             print("Payments not calculated.")
             return
 
-        header = "PAY_DATE     ACCR_START   ACCR_END     DAYS  YEARFRAC"
-        header += "    IBOR      PAYMENT       DF          PV        CUM PV"
-        print(header)
+        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL", 
+                  "IBOR", "PMNT", "DF", "PV", "CUM_PV"]
 
+        rows = []          
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  %9.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow],
-                   self._rates[iFlow] * 100.0,
-                   self._payments[iFlow],
-                   self._paymentDfs[iFlow],
-                   self._paymentPVs[iFlow],
-                   self._cumulativePVs[iFlow]))
+            rows.append([
+                iFlow + 1,
+                self._payment_dates[iFlow],
+                round(self._notional_array[iFlow], 0),
+                round(self._rates[iFlow] * 100.0, 4),
+                round(self._payments[iFlow], 2),
+                round(self._paymentDfs[iFlow], 4),
+                round(self._paymentPVs[iFlow], 2),
+                round(self._cumulativePVs[iFlow], 2),
+            ])
+
+        table = format_table(header, rows)
+        print("\nPAYMENTS VALUATION:")
+        print(table)
 
 ###############################################################################
 
