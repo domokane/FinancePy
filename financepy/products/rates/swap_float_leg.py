@@ -29,7 +29,7 @@ class SwapFloatLeg:
                  spread: (float),
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 notional: (float, list) = ONE_MILLION,
+                 notional: float = ONE_MILLION,
                  principal: float = 0.0,
                  payment_lag: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -53,13 +53,6 @@ class SwapFloatLeg:
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
-        
-        if type(notional) == list:
-            self._notional_array = notional
-            self._notional = notional[0]
-        else:
-            self._notional_array = list()
-            self._notional = notional
 
         self._effective_date = effective_date
         self._end_date = end_date
@@ -67,6 +60,8 @@ class SwapFloatLeg:
         self._freq_type = freq_type
         self._payment_lag = payment_lag
         self._principal = 0.0
+        self._notional = notional
+        self._notional_array = []
         self._spread = spread
 
         self._day_count_type = day_count_type
