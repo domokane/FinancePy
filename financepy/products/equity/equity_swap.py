@@ -163,4 +163,12 @@ class EquitySwap:
             for _ in range(multiple):
                 self._rate_leg._notional_array.append(lastNotional)
 
+    def __repr__(self):
+        s = "EQUITY LEG:\n"
+        s += self._equity_leg.__repr__()
+        s += "\nRATE LEG:\n"
+        s += self._rate_leg.__repr__()
+
+        return s
+
         

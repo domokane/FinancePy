@@ -188,9 +188,9 @@ class SwapEquityLeg:
         self._cumulativePVs = []
 
         dfValue = discount_curve.df(valuation_date)
-        legPV = 0.0
+        legPV, eq_term_rate = 0.0, 0.0
+        lastNotional = self._notional
         numPayments = len(self._payment_dates)
-        firstPayment = True
 
         index_basis = index_curve._day_count_type
         index_day_counter = DayCount(index_basis)
@@ -213,11 +213,6 @@ class SwapEquityLeg:
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                if firstPayment:
-                    lastNotional = self._notional
-                    eq_term_rate = 0
-                    firstPayment = False
-
                 ## Equity discount derived from index and div curves
                 eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
 
@@ -226,8 +221,7 @@ class SwapEquityLeg:
                 self._eq_fwd_rates.append(eq_fwd_rate)
 
                 ## Iterative update of the term rate
-                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) \
-                                * (1 + eq_term_rate)  - 1
+                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) * (1 + eq_term_rate)  - 1
                 
                 nextPrice = self._current_price * (1 + eq_term_rate)
                 nextNotional = nextPrice * self._quantity                    
@@ -335,6 +329,7 @@ class SwapEquityLeg:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self._effective_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("NOTIONAL", self._strike * self._quantity)
         s += label_to_string("SWAP TYPE", self._leg_type)
         s += label_to_string("RETURN TYPE", self._return_type)
         s += label_to_string("FREQUENCY", self._freq_type)
