@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (C) 2023 Dominic O'Kane
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
 from enum import Enum
@@ -126,8 +126,7 @@ class EquitySwap:
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
-                                                        current_price,
-                                                        firstFixingRate)
+                                                        current_price)
         
         ## Notionals from equity leg are computed and can fill rate leg   
         self._rate_leg._notional_array = self._equity_leg._last_notionals

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (C) 2023 Dominic O'Kane
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
 from ...utils.error import FinError
@@ -149,12 +149,10 @@ class SwapEquityLeg:
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
-              current_price: float = None,
-              firstFixingRate: float = None):
+              current_price: float = None ):
         """ Value the equity leg with payments from an equity price and qunatity, 
         an index curve and an [optional] dividend curve. Discounting is based on 
-        a supplied discount curve as of the valuation date supplied. For an existing 
-        swap, the user must enter the next fixing to account for rate + div. 
+        a supplied discount curve as of the valuation date supplied. 
         """
 
         if discount_curve is None:
@@ -190,7 +188,6 @@ class SwapEquityLeg:
         index_basis = index_curve._day_count_type
         index_day_counter = DayCount(index_basis)
 
-        eq_term_rate = 0
         for iPmnt in range(0, numPayments):
 
             pmntDate = self._payment_dates[iPmnt]
@@ -209,15 +206,13 @@ class SwapEquityLeg:
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                ## Equity discount derived from index and div curves
-                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
-
-                if firstPayment and firstFixingRate is not None:
-                    eq_fwd_rate = firstFixingRate
-
                 if firstPayment:
                     lastNotional = self._notional
+                    eq_term_rate = 0
                     firstPayment = False
+
+                ## Equity discount derived from index and div curves
+                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
