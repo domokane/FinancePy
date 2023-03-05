@@ -1,6 +1,6 @@
 from pytest import approx
 
-from financepy.models.finite_difference import black_scholes_finite_difference, PUT_CALL, AMER_EURO
+from financepy.models.finite_difference import black_scholes_finite_difference, PUT_CALL, exercise_type
 from financepy.utils.global_vars import gDaysInYear
 
 def test_black_scholes_finite_difference():
@@ -14,7 +14,7 @@ def test_black_scholes_finite_difference():
     strike = 1.025
     dig = 0
     pc = PUT_CALL.CALL.value
-    ea = AMER_EURO.EURO.value
+    ea = exercise_type.EUROPEAN.value
     smooth = 0
 
     theta = 0.5
@@ -58,7 +58,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.2139059947533305)
 
     # American put
-    ea = AMER_EURO.AMER.value
+    ea = exercise_type.AMERICAN.value
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2165916613669189)
@@ -68,7 +68,7 @@ def test_black_scholes_finite_difference():
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.10259475990431438)
-    ea = AMER_EURO.EURO.value
+    ea = exercise_type.EUROPEAN.value
 
     # wind=1
     wind = 1

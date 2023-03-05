@@ -13,9 +13,9 @@ class PUT_CALL(Enum):
     CALL = 1
 
 
-class AMER_EURO(Enum):
-    EURO = 0
-    AMER = 1
+class exercise_type(Enum):
+    EUROPEAN = 1
+    AMERICAN = 2
 
 
 def dx(x, wind=0):
@@ -253,7 +253,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expi
     var_ = (s * sigma) ** 2
 
     # Store original res if option is American
-    if exercise == AMER_EURO.AMER.value:
+    if exercise == exercise_type.AMERICAN.value:
         res0 = copy(res)
 
     # repeat
@@ -271,7 +271,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expi
                     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
             res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
-            if exercise == AMER_EURO.AMER.value:
+            if exercise == exercise_type.AMERICAN.value:
                 idx = res[0] < res0[0]
                 res[0][idx] = res0[0][idx]
 
