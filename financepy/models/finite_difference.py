@@ -90,7 +90,7 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 
     0 = dV/dt + A V
 
-    A = -r + mu d/dx + 1/2 var d^2/dx^2
+    A = -risk_free_rate + mu d/dx + 1/2 var d^2/dx^2
 
     using the theta scheme
 
@@ -188,8 +188,8 @@ def smooth_call(xl, xu, strike):
 
 
 def initial_curve(s, strike, smooth, dig, pc):
-    nums = len(s)
-    res = np.zeros(nums)
+    num_samples = len(s)
+    res = np.zeros(num_samples)
 
     # Handle first and last values separately
     res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
@@ -210,7 +210,7 @@ def initial_curve(s, strike, smooth, dig, pc):
         sl = 0.5 * (np.roll(s, 1) + s)
         su = 0.5 * (s + np.roll(s, -1))
 
-        # Define the curve, fix the strike value, and map into res
+        # Define the curve, fix the strike_price value, and map into res
         func = smooth_digital if dig else smooth_call
         func = partial(func, strike=strike)
         res[1:-1] = list(map(func, sl[1:-1], su[1:-1]))
@@ -219,41 +219,38 @@ def initial_curve(s, strike, smooth, dig, pc):
     if pc == PUT_CALL.PUT.value:
         res = 1 - res if dig else res - (s - strike)
 
-    return res
+    return np.atleast_2d(res)
 
-def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
-                                    num_std, num_t, num_s, update, num_pr):
+
+def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expiry, strike_price, dig, pc, exercise, smooth, theta, wind,
+                                    num_std, num_steps, num_samples, update, num_pr):
     t = max(0, expiry)
     std = sigma * (t ** 0.5)
     xl = -num_std * std
     xu = num_std * std
-    d_x = (xu - xl) / max(1, num_s)
-    nums = 1 if num_s <= 0 or xl == xu else num_s + 1
+    d_x = (xu - xl) / max(1, num_samples)
+    num_samples = 1 if num_samples <= 0 or xl == xu else num_samples + 1
 
     # Create sample set s
-    s = np.zeros(nums)
-    s[0] = s0 * np.exp(xl)
+    s = np.zeros(num_samples)
+    s[0] = stock_price * np.exp(xl)
     ds = np.exp(d_x)
-    for i in range(1, nums):
+    for i in range(1, num_samples):
         s[i] = s[i - 1] * ds
 
     # Define the initial curve which will be fitted with each iteration
-    res = initial_curve(s, strike, smooth, dig, pc)
+    res = initial_curve(s, strike_price, smooth, dig, pc)
 
     # time steps
-    numt = max(0, num_t)
-    dt = t / max(1, numt)
+    dt = t / max(1, num_steps)
 
     # Make time series
-    r_ = np.zeros(nums) + r
+    r_ = np.zeros(num_samples) + risk_free_rate
     mu_ = mu * s
     var_ = (s * sigma) ** 2
 
-    # Make res shape correct
-    res = np.atleast_2d(res)
-
     # Store original res if option is American
-    if ea == AMER_EURO.AMER.value:
+    if exercise == AMER_EURO.AMER.value:
         res0 = copy(res)
 
     # repeat
@@ -261,7 +258,7 @@ def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, e
     for p in range(nump):
         Ai = np.array([])
         Ae = np.array([])
-        for h in range(numt):
+        for h in range(num_steps):
             if update or h == 0:
                 # Explicit case
                 if theta != 1:
@@ -271,8 +268,8 @@ def black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, e
                     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
             res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
-            if ea == AMER_EURO.AMER.value:
+            if exercise == AMER_EURO.AMER.value:
                 idx = res[0] < res0[0]
                 res[0][idx] = res0[0][idx]
 
-    return res[0], res[0][nums // 2]
+    return res[0], res[0][num_samples // 2]
