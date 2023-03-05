@@ -5,6 +5,7 @@ from functools import partial
 import numpy as np
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
+from ..utils.global_vars import gDaysInYear
 
 
 class PUT_CALL(Enum):
@@ -222,10 +223,10 @@ def initial_curve(s, strike, smooth, dig, pc):
     return np.atleast_2d(res)
 
 
-def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expiry, strike_price, dig, pc, exercise,
+def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expiry_date, valuation_date, strike_price, dig, pc, exercise,
                                     smooth, theta, wind, num_std, num_steps, num_samples, update, num_pr):
     # TODO Get expiry from expiry and valuation date
-    # expiry = (expiry_date - valuation_date) / gDaysInYear
+    expiry = (expiry_date - valuation_date) / gDaysInYear
     t = max(0, expiry)
     std = sigma * (t ** 0.5)
     xl = -num_std * std

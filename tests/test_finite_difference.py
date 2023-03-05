@@ -1,6 +1,7 @@
 from pytest import approx
 
 from financepy.models.finite_difference import black_scholes_finite_difference, PUT_CALL, AMER_EURO
+from financepy.utils.global_vars import gDaysInYear
 
 def test_black_scholes_finite_difference():
     s0 = 1
@@ -8,7 +9,8 @@ def test_black_scholes_finite_difference():
     mu = -0.03
     sigma = 0.2
 
-    expiry = 5
+    valuation_date = Date(1, 1, 2016)
+    expiry_date = Date(30, 12, 2020)
     strike = 1.025
     dig = 0
     pc = PUT_CALL.CALL.value
@@ -24,26 +26,26 @@ def test_black_scholes_finite_difference():
     num_pr = 1
 
     # European call
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                              num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07939664662902503)
     
     # smooth
     smooth = 1
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07945913698961202)
     smooth = 0
 
     # dig
     dig = 1
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2153451094307548)
 
     #smooth dig
     smooth = 1
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.22078914857802928)
     smooth = 0
@@ -51,32 +53,32 @@ def test_black_scholes_finite_difference():
 
     # European put
     pc = PUT_CALL.PUT.value
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2139059947533305)
 
     # American put
     ea = AMER_EURO.AMER.value
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2165916613669189)
 
     # American call
     pc = PUT_CALL.CALL.value
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.10259475990431438)
     ea = AMER_EURO.EURO.value
 
     # wind=1
     wind = 1
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07834108133101789)
 
     # wind=-1
     wind = -1
-    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.08042112779963827)
     wind = 0
