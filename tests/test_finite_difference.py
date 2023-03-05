@@ -100,7 +100,7 @@ import numpy as np
 
 stock_price = 50.0
 risk_free_rate = 0.06
-dividend_yield = 0.04
+dividend_yield = 0.00
 volatility = 0.40
 
 valuation_date = Date(1, 1, 2016)
@@ -108,23 +108,23 @@ expiry_date = Date(1, 1, 2021)
 model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
 dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-
 num_steps = 100
-
 strike_price = 50.0
 
 
 
 def test_european_call():
-    # payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    payoff = PUT_CALL.CALL.value
+    payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.EUROPEAN
     params = np.array([1.0, strike_price])
 
-    #_, v = black_scholes_finite_difference(stock_price, risk_free_rate, mu, volatility**2, expiry, strike_price, dig,
-    #                                       payoff, exercise, smooth, theta, wind,
-    #                                       num_std, num_steps, num_s, update, num_pr)
-    """
+    _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
+                                           mu=0, sigma=np.sqrt(volatility),
+                                           expiry_date=expiry_date, valuation_date=valuation_date,
+                                           strike_price=strike_price, dig=0,
+                                           pc=PUT_CALL.CALL.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
+    tree = EquityBinomialTree()
     value = tree.value(
         stock_price,
         discount_curve,
@@ -136,6 +136,32 @@ def test_european_call():
         expiry_date,
         payoff,
         exercise,
-        params)
-    """
-    # assert [round(x, 4) for x in value] == [8.0175, 0.5747, 0.0187, -3.8111]  # price, delta, gamma, theta
+        params)  # price, delta, gamma, theta
+    assert v == round(value[0], 4)
+
+def test_european_put():
+    payoff = EquityTreePayoffTypes.VANILLA_OPTION
+    exercise = EquityTreeExerciseTypes.EUROPEAN
+    params = np.array([-1.0, strike_price])
+
+    _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
+                                           mu=0, sigma=np.sqrt(volatility),
+                                           expiry_date=expiry_date, valuation_date=valuation_date,
+                                           strike_price=strike_price, dig=0,
+                                           pc=PUT_CALL.PUT.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
+    tree = EquityBinomialTree()
+    value = tree.value(
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        num_steps,
+        valuation_date,
+        payoff,
+        expiry_date,
+        payoff,
+        exercise,
+        params)  # price, delta, gamma, theta
+    assert v == round(value[0], 4)
+
