@@ -102,29 +102,32 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     if theta == 0:
         raise ValueError("Theta must be non-zero")
 
-    Dxd = dx(x, -1)
-    Dxu = dx(x, 1)
+    # Calculate the finite differences for the first and second derivatives
     Dxx = dxx(x)
-    Dx = dx(x, 0)
 
-    if wind < 0:
+    if wind == 0:
+        Dx = dx(x, 0)
+    elif wind < 0:
+        Dxd = dx(x, -1)
         Dx = Dxd
     elif wind == 1:
+        Dxu = dx(x, 1)
         Dx = Dxu
+    elif wind > 1:
+        # use Dxd when mu < 0 and Dxu otherwise
+        Dxd = dx(x, -1)
+        Dxu = dx(x, 1)
+        Dx = np.zeros((len(x), 1)) + Dxu
+        Dx[mu[0] < 0] = Dxd
 
-    n = len(x)
-    m = Dx.shape[1]
-    A = np.zeros((n, m))
+    # Ensure mu and var have correct dimensions
+    mu = np.atleast_2d(mu)
+    var = np.atleast_2d(var)
 
-    mm = m // 2  # integer division
-    dtTheta = dt * theta
-    for i in range(n):
-        if wind > 1:
-            Dx = Dxd if mu[i] < 0 else Dxu
-
-        A[i] = dtTheta * (mu[i] * Dx[i] + 0.5 * var[i] * Dxx[i])
-
-        A[i, mm] += 1 - dtTheta * r[i]
+    # Calculate matrix
+    mm = Dx.shape[1] // 2  # integer division
+    A = dt * theta * (mu.T * Dx + 0.5 * var.T * Dxx)
+    A[:, mm] += 1 - dt * theta * r
 
     return A
 

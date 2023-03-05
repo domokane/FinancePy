@@ -76,9 +76,66 @@ def test_black_scholes_finite_difference():
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07834108133101789)
 
+    # wind=2
+    wind = 2
+    _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+                                           num_std, num_t, num_s, update, num_pr)
+    assert v == approx(0.08042112779963827)
+
     # wind=-1
     wind = -1
     _, v = black_scholes_finite_difference(s0, r, mu, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.08042112779963827)
     wind = 0
+
+
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.utils.date import Date
+from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
+from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
+from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
+import numpy as np
+
+stock_price = 50.0
+risk_free_rate = 0.06
+dividend_yield = 0.04
+volatility = 0.40
+
+valuation_date = Date(1, 1, 2016)
+expiry_date = Date(1, 1, 2021)
+model = BlackScholes(volatility)
+discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
+dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+
+num_steps = 100
+
+strike_price = 50.0
+
+
+
+def test_european_call():
+    # payoff = EquityTreePayoffTypes.VANILLA_OPTION
+    payoff = PUT_CALL.CALL.value
+    exercise = EquityTreeExerciseTypes.EUROPEAN
+    params = np.array([1.0, strike_price])
+
+    #_, v = black_scholes_finite_difference(stock_price, risk_free_rate, mu, volatility**2, expiry, strike_price, dig,
+    #                                       payoff, exercise, smooth, theta, wind,
+    #                                       num_std, num_steps, num_s, update, num_pr)
+    """
+    value = tree.value(
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        num_steps,
+        valuation_date,
+        payoff,
+        expiry_date,
+        payoff,
+        exercise,
+        params)
+    """
+    # assert [round(x, 4) for x in value] == [8.0175, 0.5747, 0.0187, -3.8111]  # price, delta, gamma, theta
