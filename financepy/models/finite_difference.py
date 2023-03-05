@@ -122,8 +122,7 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
         if wind > 1:
             Dx = Dxd if mu[i] < 0 else Dxu
 
-        for j in range(m):
-            A[i, j] = dtTheta * (mu[i] * Dx[i, j] + 0.5 * var[i] * Dxx[i, j])
+        A[i] = dtTheta * (mu[i] * Dx[i] + 0.5 * var[i] * Dxx[i])
 
         A[i, mm] += 1 - dtTheta * r[i]
 
