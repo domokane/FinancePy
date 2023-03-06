@@ -6,6 +6,7 @@ import numpy as np
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
 from ..utils.global_vars import gDaysInYear
+from financepy.utils.global_types import OptionTypes
 
 
 class PUT_CALL(Enum):
@@ -190,7 +191,7 @@ def smooth_call(xl, xu, strike):
         return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
 
-def initial_curve(s, strike, smooth, dig, pc):
+def initial_curve(s, strike, smooth, dig, option_type):
     num_samples = len(s)
     res = np.zeros(num_samples)
 
@@ -219,14 +220,14 @@ def initial_curve(s, strike, smooth, dig, pc):
         res[1:-1] = list(map(func, sl[1:-1], su[1:-1]))
 
     # Invert for put options
-    if pc == PUT_CALL.PUT.value:
+    if option_type in {OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT}:
         res = 1 - res if dig else res - (s - strike)
 
     return np.atleast_2d(res)
 
 
 def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield, sigma, expiry_date, valuation_date,
-                                    strike_price, digital, pc, exercise, smooth, theta, wind, num_std, num_steps,
+                                    strike_price, digital, option_type, smooth, theta, wind, num_std, num_steps,
                                     num_samples, update, num_pr):
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
     mu = risk_free_rate - dividend_yield
@@ -244,7 +245,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield,
         s[i] = s[i - 1] * ds
 
     # Define the initial curve which will be fitted with each iteration
-    res = initial_curve(s, strike_price, smooth, digital, pc)
+    res = initial_curve(s, strike_price, smooth, digital, option_type)
 
     # time steps
     dt = time_to_expiry / max(1, num_steps)
@@ -255,7 +256,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield,
     var_ = (s * sigma) ** 2
 
     # Store original res if option is American
-    if exercise == exercise_type.AMERICAN.value:
+    if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
         res0 = copy(res)
 
     # repeat
@@ -273,7 +274,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield,
                     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
             res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
-            if exercise == exercise_type.AMERICAN.value:
+            if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
                 idx = res[0] < res0[0]
                 res[0][idx] = res0[0][idx]
 

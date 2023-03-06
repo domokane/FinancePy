@@ -1,4 +1,4 @@
-from financepy.models.finite_difference import black_scholes_finite_difference, PUT_CALL, exercise_type
+from financepy.models.finite_difference import black_scholes_finite_difference
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -22,8 +22,6 @@ def test_black_scholes_finite_difference():
     expiry_date = Date(30, 12, 2020)
     strike = 1.025
     dig = 0
-    pc = PUT_CALL.CALL.value
-    ea = exercise_type.EUROPEAN.value
     smooth = 0
 
     theta = 0.5
@@ -34,66 +32,58 @@ def test_black_scholes_finite_difference():
     update = 0
     num_pr = 1
 
-    # European call
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    option_type = OptionTypes.EUROPEAN_CALL
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                              num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07939664662902503)
     
-    # smooth
-    smooth = 1
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    smooth = True
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07945913698961202)
     smooth = 0
 
-    # dig
     dig = 1
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2153451094307548)
 
     #smooth dig
     smooth = 1
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.22078914857802928)
     smooth = 0
     dig = 0
 
-    # European put
-    pc = PUT_CALL.PUT.value
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    option_type = OptionTypes.EUROPEAN_PUT
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2139059947533305)
 
-    # American put
-    ea = exercise_type.AMERICAN.value
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    option_type = OptionTypes.AMERICAN_PUT
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.2165916613669189)
 
-    # American call
-    pc = PUT_CALL.CALL.value
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    option_type = OptionTypes.AMERICAN_CALL
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.10259475990431438)
-    ea = exercise_type.EUROPEAN.value
+    option_type = OptionTypes.EUROPEAN_CALL
 
-    # wind=1
     wind = 1
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.07834108133101789)
 
-    # wind=2
     wind = 2
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.08042112779963827)
 
-    # wind=-1
     wind = -1
-    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, pc, ea, smooth, theta, wind,
+    _, v = black_scholes_finite_difference(s0, r, dividend_yield, sigma, expiry_date, valuation_date, strike, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update, num_pr)
     assert v == approx(0.08042112779963827)
     wind = 0
@@ -113,13 +103,14 @@ def test_european_call():
     strike_price = 50.0
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.EUROPEAN
+    option_type = OptionTypes.EUROPEAN_CALL
     params = np.array([1.0, strike_price])
 
     _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
                                            dividend_yield=dividend_yield, sigma=volatility,
                                            expiry_date=expiry_date, valuation_date=valuation_date,
                                            strike_price=strike_price, digital=0,
-                                           pc=PUT_CALL.CALL.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
                                            num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
     tree = EquityBinomialTree()
     value = tree.value(
@@ -151,13 +142,14 @@ def test_european_put():
     strike_price = 50.0
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.EUROPEAN
+    option_type = OptionTypes.EUROPEAN_PUT
     params = np.array([-1.0, strike_price])
 
     _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
                                            dividend_yield=dividend_yield, sigma=volatility,
                                            expiry_date=expiry_date, valuation_date=valuation_date,
                                            strike_price=strike_price, digital=0,
-                                           pc=PUT_CALL.PUT.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
                                            num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
     tree = EquityBinomialTree()
     value = tree.value(
@@ -178,8 +170,9 @@ def test_european_put():
 def test_call_option():
     expiry_date = Date(1, 7, 2015)
     strike_price = 100.0
+    option_type = OptionTypes.EUROPEAN_CALL
     call_option = EquityVanillaOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
+        expiry_date, strike_price, option_type)
 
     valuation_date = Date(1, 1, 2015)
     stock_price = 100
@@ -192,15 +185,13 @@ def test_call_option():
 
     # Call option
     v0 = call_option.value(valuation_date, stock_price,
-                          discount_curve, dividend_curve, model)
+                           discount_curve, dividend_curve, model)
 
-
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=interest_rate,
                                            dividend_yield=dividend_yield, sigma=volatility,
                                            expiry_date=expiry_date, valuation_date=valuation_date,
                                            strike_price=100.0, digital=0,
-                                           pc=PUT_CALL.CALL.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
                                            num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
     assert v == approx(v0, 1e-1)
 
@@ -208,8 +199,9 @@ def test_call_option():
 def test_put_option():
     expiry_date = Date(1, 7, 2015)
     strike_price = 100.0
+    option_type = OptionTypes.EUROPEAN_PUT
     put_option = EquityVanillaOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
+        expiry_date, strike_price, option_type)
 
     valuation_date = Date(1, 1, 2015)
     stock_price = 100
@@ -222,14 +214,13 @@ def test_put_option():
 
     # Call option
     v0 = put_option.value(valuation_date, stock_price,
-                           discount_curve, dividend_curve, model)
+                          discount_curve, dividend_curve, model)
 
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=interest_rate,
                                            dividend_yield=dividend_yield, sigma=volatility,
                                            expiry_date=expiry_date, valuation_date=valuation_date,
                                            strike_price=100.0, digital=0,
-                                           pc=PUT_CALL.PUT.value, exercise=exercise, smooth=0, theta=0.5, wind=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
                                            num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
 
     assert v == approx(v0, 1e-1)
