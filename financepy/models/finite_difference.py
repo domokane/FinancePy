@@ -225,9 +225,11 @@ def initial_curve(s, strike, smooth, dig, pc):
     return np.atleast_2d(res)
 
 
-def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expiry_date, valuation_date, strike_price,
-                                    dig, pc, exercise, smooth, theta, wind, num_std, num_steps, num_samples, update, num_pr):
+def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield, sigma, expiry_date, valuation_date,
+                                    strike_price, digital, pc, exercise, smooth, theta, wind, num_std, num_steps,
+                                    num_samples, update, num_pr):
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    mu = risk_free_rate - dividend_yield
     std = sigma * (time_to_expiry ** 0.5)
     xl = -num_std * std
     xu = num_std * std
@@ -242,7 +244,7 @@ def black_scholes_finite_difference(stock_price, risk_free_rate, mu, sigma, expi
         s[i] = s[i - 1] * ds
 
     # Define the initial curve which will be fitted with each iteration
-    res = initial_curve(s, strike_price, smooth, dig, pc)
+    res = initial_curve(s, strike_price, smooth, digital, pc)
 
     # time steps
     dt = time_to_expiry / max(1, num_steps)
