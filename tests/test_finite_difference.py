@@ -224,3 +224,81 @@ def test_put_option():
                                            num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
 
     assert v == approx(v0, 1e-1)
+
+def test_american_call():
+    stock_price = 50.0
+    risk_free_rate = 0.06
+    dividend_yield = 0.05
+    volatility = 0.40
+
+    valuation_date = Date(1, 1, 2016)
+    expiry_date = Date(1, 1, 2021)
+    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    num_steps = 100
+    strike_price = 50.0
+    payoff = EquityTreePayoffTypes.VANILLA_OPTION
+    exercise = EquityTreeExerciseTypes.AMERICAN
+    option_type = OptionTypes.AMERICAN_CALL
+    params = np.array([1.0, strike_price])
+
+    _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
+                                           dividend_yield=dividend_yield, sigma=volatility,
+                                           expiry_date=expiry_date, valuation_date=valuation_date,
+                                           strike_price=strike_price, digital=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                           num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
+    tree = EquityBinomialTree()
+    value = tree.value(
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        num_steps,
+        valuation_date,
+        payoff,
+        expiry_date,
+        payoff,
+        exercise,
+        params)  # price, delta, gamma, theta
+    assert v == approx(value[0], abs=1e-1)
+
+
+def test_american_put():
+    stock_price = 50.0
+    risk_free_rate = 0.06
+    dividend_yield = 0.05
+    volatility = 0.40
+
+    valuation_date = Date(1, 1, 2016)
+    expiry_date = Date(1, 1, 2021)
+    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    num_steps = 100
+    strike_price = 50.0
+    payoff = EquityTreePayoffTypes.VANILLA_OPTION
+    exercise = EquityTreeExerciseTypes.AMERICAN
+    option_type = OptionTypes.AMERICAN_PUT
+    params = np.array([-1.0, strike_price])
+
+    _, v = black_scholes_finite_difference(stock_price=stock_price, risk_free_rate=risk_free_rate,
+                                           dividend_yield=dividend_yield, sigma=volatility,
+                                           expiry_date=expiry_date, valuation_date=valuation_date,
+                                           strike_price=strike_price, digital=0,
+                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                           num_std=5, num_steps=50, num_samples=200, update=False, num_pr=1)
+    tree = EquityBinomialTree()
+    value = tree.value(
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        num_steps,
+        valuation_date,
+        payoff,
+        expiry_date,
+        payoff,
+        exercise,
+        params)  # price, delta, gamma, theta
+    assert v == approx(value[0], abs=1e-1)
+
