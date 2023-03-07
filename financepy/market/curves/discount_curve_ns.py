@@ -133,7 +133,10 @@ class DiscountCurveNS(DiscountCurve):
                               self._freq_type,
                               self._day_count_type)
 
-        return df
+        if isinstance(dates, Date):
+            return df[0]
+        else:
+            return df
 
     ###############################################################################
 

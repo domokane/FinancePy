@@ -98,7 +98,9 @@ class Bond:
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  face_amount: float = 100.0,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bus_day_rule_type = BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type = DateGenRuleTypes.BACKWARD):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used 
@@ -108,6 +110,12 @@ class Bond:
 
         if issue_date >= maturity_date:
             raise FinError("Issue Date must preceded maturity date.")
+
+        # If the maturity date falls on the last day of the month we assume
+        # that earlier flows also fall on month ends
+        self._end_of_month = False
+        if maturity_date.is_eom():
+            self._end_of_month = True
 
         self._issue_date = issue_date
         self._maturity_date = maturity_date
@@ -134,6 +142,9 @@ class Bond:
         self._accrued_days = 0.0
         self._alpha = 0.0
 
+        self.bus_day_rule_type = bus_day_rule_type
+        self.date_gen_rule_type = date_gen_rule_type
+
         self._calculate_coupon_dates()
         self._calculate_flows()
 
@@ -146,15 +157,16 @@ class Bond:
         """
 
         # This should only be called once from init
-        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
-        date_gen_rule_type = DateGenRuleTypes.BACKWARD
+        #bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
+        #date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._coupon_dates = Schedule(self._issue_date,
                                     self._maturity_date,
                                     self._freq_type,
                                     CalendarTypes.NONE,
-                                    bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+                                    self.bus_day_rule_type,
+                                    self.date_gen_rule_type, 
+                                    end_of_month = self._end_of_month)._generate()
 
     ###########################################################################
 
@@ -411,8 +423,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on the settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 flow = self._coupon / self._frequency
                 pv = flow * df
@@ -493,8 +505,8 @@ class Bond:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for iFlow in range(1, num_flows):
-            # coupons paid on a settlement date are paid
-            if self._coupon_dates[iFlow] >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if self._coupon_dates[iFlow] > settlement_date:
                 self._pcd = self._coupon_dates[iFlow - 1]
                 self._ncd = self._coupon_dates[iFlow]
                 break
@@ -543,8 +555,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 pvIbor += df * self._coupon / self._frequency
 
@@ -589,8 +601,8 @@ class Bond:
         pv = 0.0
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 t = (dt - settlement_date) / gDaysInYear
 
                 t = np.maximum(t, gSmall)
@@ -660,8 +672,8 @@ class Bond:
         flow_str = ""
 
         for dt in self._coupon_dates[1:-1]:
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 flow_str += ("%12s %12.2f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
@@ -706,8 +718,8 @@ class Bond:
 
         for dt in self._coupon_dates[1:]:
 
-            # coupons paid on a settlement date are included
-            if dt >= settlement_date:
+            # coupons paid on a settlement date are paid to the seller
+            if dt > settlement_date:
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 

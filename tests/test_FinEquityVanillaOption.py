@@ -12,6 +12,8 @@ from financepy.utils.date import Date
 expiryDate = Date(1, 7, 2015)
 call_option = EquityVanillaOption(
     expiryDate, 100.0, OptionTypes.EUROPEAN_CALL)
+call_option_vector = EquityVanillaOption(
+    [expiryDate] * 3, 100.0, OptionTypes.EUROPEAN_CALL)
 put_option = EquityVanillaOption(
     expiryDate, 100.0, OptionTypes.EUROPEAN_PUT)
 
@@ -28,6 +30,8 @@ dividendCurve = DiscountCurveFlat(valueDate, dividend_yield)
 def test_call_option():
     v = call_option.value(valueDate, stockPrice,
                           discountCurve, dividendCurve, model)
+    call_option_vector.value(valueDate, stockPrice,
+                             discountCurve, dividendCurve, model) == [v] * 3
     assert v.round(4) == 9.3021
 
 

@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
 import numpy as np
 from numba import njit
 
@@ -153,8 +152,11 @@ class EquityVanillaOption():
         if isinstance(valuation_date, Date) == False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
-            raise FinError("Valuation date after expiry date.")
+        if isinstance(self._expiry_date, list):
+            if any(valuation_date > self._expiry_date):
+                raise FinError(f"Valuation date after one or more expiry dates.")
+        elif valuation_date > self._expiry_date:
+            raise FinError(f"Valuation date after expiry date.")
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(

@@ -39,10 +39,18 @@ class FinInflationBond(Bond):
         the base CPI used for all coupon and principal related calculations. 
         The class inherits from Bond so has many similar functions. The YTM"""
 
+        Bond.__init__(self,issue_date, maturity_date, coupon, freq_type, accrual_type, face_amount, calendar_type)
         check_argument_types(self.__init__, locals())
 
+        
         if issue_date >= maturity_date:
             raise FinError("Issue Date must preceded maturity date.")
+
+        # If the maturity date falls on the last day of the month we assume
+        # that earlier flows also fall on month ends
+        self._end_of_month = False
+        if maturity_date.is_eom():
+            self._end_of_month = True
 
         self._issue_date = issue_date
         self._maturity_date = maturity_date

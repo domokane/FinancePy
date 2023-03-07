@@ -561,9 +561,34 @@ def test_Bond_ror():
                         simple, irr)
 
 
+###############################################################################
+
+def test_Bond_eom():
+
+    # Bonds that mature on an EOM date have flows on EOM dates    
+    issue_date = Date(30, 11, 2022)
+    settle_date = Date(6, 2, 2023)
+    maturity_date = Date(30, 11, 2024)
+    coupon = 0.045
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    face = ONE_MILLION
+
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, face)
+
+#    print(bond.coupon_dates(settle_date))
+
+    ai = bond.calc_accrued_interest(settle_date)
+    print(ai)
+    # should be 8406.59
+    
+###############################################################################
+    
 test_Bond()
 test_BondExDividend()
 test_BondPaymentDates()
 test_Bond_ror()
+test_Bond_eom()
+
 
 testCases.compareTestCases()
