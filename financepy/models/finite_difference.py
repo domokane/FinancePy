@@ -226,16 +226,26 @@ def initial_curve(s, strike, smooth, dig, option_type):
     return np.atleast_2d(res)
 
 
-def black_scholes_finite_difference(stock_price, risk_free_rate, dividend_yield, sigma, expiry_date, valuation_date,
-                                    strike_price, digital, option_type, smooth, theta, wind, num_std, num_steps,
-                                    num_samples, update, num_pr):
+def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_date,
+                                    strike_price, discount_curve, dividend_curve, digital, option_type, smooth, theta,
+                                    wind, num_std, num_steps, num_samples, update, num_pr):
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    mu = risk_free_rate - dividend_yield
     std = sigma * (time_to_expiry ** 0.5)
     xl = -num_std * std
     xu = num_std * std
     d_x = (xu - xl) / max(1, num_samples)
     num_samples = 1 if num_samples <= 0 or xl == xu else num_samples + 1
+
+    # Extract the discount. Adjust if the value date is not same as curve date
+    # I decided to put an error message - may reconsider
+    df_expiry = discount_curve.df(expiry_date)
+    # df_value = discount_curve.df(valuation_date)
+    # df = df_expiry / df_value
+    risk_free_rate = -np.log(df_expiry) / time_to_expiry
+
+    dq = dividend_curve.df(expiry_date)
+    dividend_yield = -np.log(dq) / time_to_expiry
+    mu = risk_free_rate - dividend_yield
 
     # Create sample set s
     s = np.zeros(num_samples)
