@@ -9,16 +9,6 @@ from ..utils.global_vars import gDaysInYear
 from financepy.utils.global_types import OptionTypes
 
 
-class PUT_CALL(Enum):
-    PUT = -1
-    CALL = 1
-
-
-class exercise_type(Enum):
-    EUROPEAN = 1
-    AMERICAN = 2
-
-
 def dx(x, wind=0):
     n = len(x) - 1
     out = np.zeros((n + 1, 3))
