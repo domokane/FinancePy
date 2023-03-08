@@ -1,4 +1,4 @@
-from financepy.models.finite_difference import black_scholes_finite_difference
+from financepy.models.finite_difference import black_scholes_finite_difference, dx, dxx, solve_tridiagonal_matrix
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -45,7 +45,7 @@ def test_black_scholes_finite_difference():
                                            dividend_curve, dig, option_type, smooth, theta, wind,
                                            num_std, num_t, num_s, update)
     assert v == approx(0.07939664662902503, abs=1e-3)
-    
+
     smooth = True
     _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
                                            dividend_curve, dig, option_type, smooth, theta, wind,
@@ -338,3 +338,40 @@ def test_put_option():
 
     assert v == approx(v0, 1e-1)
 
+
+def test_dx():
+    np.testing.assert_array_equal(dx([0, 1, 2, 3, 4, 5], wind=0),
+                                  np.array([[-1.,  0.,  1.],
+                                            [-0.5,  0.,  0.5],
+                                            [-0.5,  0.,  0.5],
+                                            [-0.5,  0.,  0.5],
+                                            [-0.5,  0.,  0.5],
+                                            [-1.,  1.,  0.]]))
+    np.testing.assert_array_almost_equal(dx([0, 1, 1.5, 3, 5, 10], wind=0),
+                                         np.array([[-1., 0., 1.],
+                                                   [-0.33333333, -1., 1.33333333],
+                                                   [-1.5, 1.33333333, 0.16666667],
+                                                   [-0.38095238, 0.16666667, 0.21428571],
+                                                   [-0.35714286, 0.3, 0.05714286],
+                                                   [-0.2, 0.2, 0.]]), decimal=3)
+
+
+def test_dxx():
+    np.testing.assert_array_equal(dxx([1, 1.5, 2, 2.5, 3]),
+                                  np.array([[0.,  0.,  0.],
+                                            [4., -8.,  4.],
+                                            [4., -8.,  4.],
+                                            [4., -8.,  4.],
+                                            [0.,  0.,  0.]]))
+
+def test_solve_tridiagonal_matrix():
+    M = np.array([
+        [0, 1, 1, 1],
+        [-2, -2, -2, -2],
+        [1, 1, 1, 0]]
+    ).T
+
+    r = np.array([1, 1, 1, 1]) * 0.04
+    u = solve_tridiagonal_matrix(M, r)
+
+    np.testing.assert_array_equal(u, np.array([-0.08, -0.12, -0.12, -0.08]))
