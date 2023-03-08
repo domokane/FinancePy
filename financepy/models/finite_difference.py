@@ -1,5 +1,5 @@
 from enum import Enum
-from copy import copy
+from copy import deepcopy
 from functools import partial
 
 import numpy as np
@@ -134,6 +134,7 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 
 
 def fd_roll_backwards(res, theta, Ai=np.array([]), Ae=np.array([])):
+    # TODO Test for more than one vector
     num_vectors = len(res)
     mm = 1
 
@@ -229,7 +230,10 @@ def initial_curve(s, strike, smooth, dig, option_type):
 def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_date,
                                     strike_price, discount_curve, dividend_curve, digital, option_type, smooth, theta,
                                     wind, num_std, num_steps, num_samples, update, num_pr):
+    # Time to contract expiry in years
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+
+    # Define grid
     std = sigma * (time_to_expiry ** 0.5)
     xl = -num_std * std
     xu = num_std * std
@@ -239,12 +243,13 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
     # Extract the discount. Adjust if the value date is not same as curve date
     # I decided to put an error message - may reconsider
     df_expiry = discount_curve.df(expiry_date)
-    # df_value = discount_curve.df(valuation_date)
-    # df = df_expiry / df_value
     risk_free_rate = -np.log(df_expiry) / time_to_expiry
 
+    # Extract the dividend
     dq = dividend_curve.df(expiry_date)
     dividend_yield = -np.log(dq) / time_to_expiry
+
+    # Calculate the drift
     mu = risk_free_rate - dividend_yield
 
     # Create sample set s
@@ -260,32 +265,33 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
     # time steps
     dt = time_to_expiry / max(1, num_steps)
 
-    # Make time series
+    # Make time series for interest rate, drift, and variance
     r_ = np.zeros(num_samples) + risk_free_rate
     mu_ = mu * s
     var_ = (s * sigma) ** 2
 
-    # Store original res if option is American
-    if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
-        res0 = copy(res)
+    # Store original res as res0
+    res0 = deepcopy(res)
 
     # repeat
     nump = max(1, num_pr)
-    for p in range(nump):
-        Ai = np.array([])
-        Ae = np.array([])
-        for h in range(num_steps):
-            if update or h == 0:
-                # Explicit case
-                if theta != 1:
-                    Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
-                # Implicit case
-                if theta != 0:
-                    Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
-            res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
-            if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
-                idx = res[0] < res0[0]
-                res[0][idx] = res0[0][idx]
+    Ai = np.array([])
+    Ae = np.array([])
+    res = deepcopy(res0)
+    for h in range(num_steps):
+        if update or h == 0:
+            # Explicit case
+            if theta != 1:
+                Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
+            # Implicit case
+            if theta != 0:
+                Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
+
+        res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
+
+        if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
+            idx = res[0] < res0[0]
+            res[0][idx] = res0[0][idx]
 
     return res[0], res[0][num_samples // 2]
