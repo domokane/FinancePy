@@ -229,7 +229,7 @@ def initial_curve(s, strike, smooth, dig, option_type):
 
 def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_date,
                                     strike_price, discount_curve, dividend_curve, digital, option_type, smooth, theta,
-                                    wind, num_std, num_steps, num_samples, update, num_pr):
+                                    wind, num_std, num_steps, num_samples, update):
     # Time to contract expiry in years
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
 
@@ -272,9 +272,6 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
 
     # Store original res as res0
     res0 = deepcopy(res)
-
-    # repeat
-    nump = max(1, num_pr)
 
     Ai = np.array([])
     Ae = np.array([])
