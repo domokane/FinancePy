@@ -1,8 +1,10 @@
 from enum import Enum
 from copy import deepcopy
 from functools import partial
+import math
 
 import numpy as np
+from numba import njit
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
 from ..utils.global_vars import gDaysInYear
@@ -10,24 +12,15 @@ from financepy.utils.global_types import OptionTypes
 
 
 def dx(x, wind=0):
-    n = len(x) - 1
-    out = np.zeros((n + 1, 3))
-
-    dxu = x[1] - x[0]
-
-    # First row
-    if wind >= 0:
-        out[0] = (-1, 0, 1)
-        out[0] /= dxu
-
     # Intermediate rows
-    # Note: As first and last rows are handled separately,
+    # Note: As first and last rows are handled separately
+    # (at the end of this method)
     # we can use numpy roll without worrying about the end values
-    dxl = (x - np.roll(x, 1))[1:-1]
-    dxu = (np.roll(x, -1) - x)[1:-1]
+    dxl = (x - np.roll(x, 1))
+    dxu = (np.roll(x, -1) - x)
     if wind < 0:
         # (-1/dxl, 1/dxl, 0)
-        out[1:-1] = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
+        out = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
     elif wind == 0:
         intermediate_rows = np.array(
             (- dxu / dxl,
@@ -35,43 +28,45 @@ def dx(x, wind=0):
              dxl / dxu
              )
         ) / (dxl + dxu)
-        out[1:-1] = intermediate_rows.T
+        out = intermediate_rows.T
     else:
         # (0, -1/dxu, 1/dxu)
-        out[1:-1] = np.array((np.zeros_like(dxu), -1 / dxu, 1 / dxu)).T
+        out = np.array((np.zeros_like(dxu), -1 / dxu, 1 / dxu)).T
+
+    # First row
+    if wind >= 0:
+        out[0] = (-1, 0, 1)
+        out[0] /= (x[1] - x[0])
 
     # Last row
     if wind <= 0:
-        dxl = x[n] - x[n - 1]
-        out[n] = (-1, 1, 0)
-        out[n] /= dxl
+        dxl = x[-1] - x[-2]
+        out[-1] = (-1, 1, 0)
+        out[-1] /= dxl
     else:
-        out[n] = (0, 0, 0)
+        out[-1] = (0, 0, 0)
 
     return out
 
 
 def dxx(x):
-    n = len(x) - 1
-    out = np.zeros((n + 1, 3))
-
-    # First row
-    out[0] = (0, 0, 0)
-
     # Intermediate rows
-    # Note: As first and last rows are handled separately,
+    # Note: As first and last rows are handled separately
+    # (they overwritten at end of this method),
     # we can use numpy roll without worrying about the end values
-    dxl = (x - np.roll(x, 1))[1:-1]
-    dxu = (np.roll(x, -1) - x)[1:-1]
+    dxl = (x - np.roll(x, 1))
+    dxu = (np.roll(x, -1) - x)
     intermediate_rows = np.array(
         [2 / dxl,
         -(2 / dxl + 2 / dxu),
         2 / dxu]
     ) / (dxu + dxl)
-    out[1:-1] = intermediate_rows.T
+    out = intermediate_rows.T
 
+    # First row
+    out[0] = (0, 0, 0)
     # Last row
-    out[n] = (0, 0, 0)
+    out[-1] = (0, 0, 0)
 
     return out
 
@@ -184,20 +179,15 @@ def smooth_call(xl, xu, strike):
 
 def initial_curve(s, strike, smooth, dig, option_type):
     num_samples = len(s)
-    res = np.zeros(num_samples)
 
-    # Handle first and last values separately
-    res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
-    res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
-
-    # Generate middle values (i.e. not first or last)
+    # Generate middle values (i.e. not first or last, which are overwritten later)
     if not smooth:
         if dig:
-            res[1:-1] = digital(s[1:-1], strike)
+            res = digital(s, strike)
         else:
-            res[1:-1] = s[1:-1] - strike
+            res = s - strike
             # Set negative values to zero
-            res[1:-1][res[1:-1] < 0] = 0
+            res[res < 0] = 0
     else:
         # Set lower and upper bound for s.
         # Note: As we are only interested in elements 1:-1 here,
@@ -208,7 +198,12 @@ def initial_curve(s, strike, smooth, dig, option_type):
         # Define the curve, fix the strike_price value, and map into res
         func = smooth_digital if dig else smooth_call
         func = partial(func, strike=strike)
-        res[1:-1] = list(map(func, sl[1:-1], su[1:-1]))
+        res = list(map(func, sl, su))
+
+
+    # Handle first and last values separately
+    res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
+    res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
 
     # Invert for put options
     if option_type in {OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT}:
@@ -225,29 +220,25 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
 
     # Define grid
     std = sigma * (time_to_expiry ** 0.5)
-    xl = -num_std * std
     xu = num_std * std
+    xl = -xu
     d_x = (xu - xl) / max(1, num_samples)
     num_samples = 1 if num_samples <= 0 or xl == xu else num_samples + 1
 
     # Extract the discount. Adjust if the value date is not same as curve date
     # I decided to put an error message - may reconsider
     df_expiry = discount_curve.df(expiry_date)
-    risk_free_rate = -np.log(df_expiry) / time_to_expiry
+    risk_free_rate = -math.log(df_expiry) / time_to_expiry
 
     # Extract the dividend
     dq = dividend_curve.df(expiry_date)
-    dividend_yield = -np.log(dq) / time_to_expiry
+    dividend_yield = -math.log(dq) / time_to_expiry
 
     # Calculate the drift
     mu = risk_free_rate - dividend_yield
 
     # Create sample set s
-    s = np.zeros(num_samples)
-    s[0] = stock_price * np.exp(xl)
-    ds = np.exp(d_x)
-    for i in range(1, num_samples):
-        s[i] = s[i - 1] * ds
+    s = stock_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Define the initial curve which will be fitted with each iteration
     res = initial_curve(s, strike_price, smooth, digital, option_type)
@@ -263,9 +254,9 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
     # Store original res as res0
     res0 = deepcopy(res)
 
+    # Initialise implicit and explicit matricies
     Ai = np.array([])
     Ae = np.array([])
-    res = deepcopy(res0)
     for h in range(num_steps):
         if update or h == 0:
             # Explicit case

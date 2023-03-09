@@ -684,6 +684,7 @@ def band_matrix_multiplication(A, m1, m2, b):
     return x
 
 
+@njit(fastmath=True, cache=True)
 def solve_tridiagonal_matrix(A, r):
     """
     Solve A u = r for vector u when A is tridiagonal
@@ -723,6 +724,7 @@ def solve_tridiagonal_matrix(A, r):
     return u
 
 
+@njit(fastmath=True, cache=True)
 def transpose_tridiagonal_matrix(A):
     out = np.zeros_like(A)
     out[:, 0], out[:, 1], out[:, 2] = A[:, 2], A[:, 1], A[:, 0]
