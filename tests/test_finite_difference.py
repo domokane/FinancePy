@@ -1,4 +1,5 @@
-from financepy.models.finite_difference import black_scholes_finite_difference, dx, dxx, solve_tridiagonal_matrix
+from financepy.models.finite_difference import (
+    black_scholes_finite_difference, dx, dxx, solve_tridiagonal_matrix, band_matrix_multiplication)
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -364,6 +365,7 @@ def test_dxx():
                                             [4., -8.,  4.],
                                             [0.,  0.,  0.]]))
 
+
 def test_solve_tridiagonal_matrix():
     M = np.array([
         [0, 1, 1, 1],
@@ -375,3 +377,13 @@ def test_solve_tridiagonal_matrix():
     u = solve_tridiagonal_matrix(M, r)
 
     np.testing.assert_array_equal(u, np.array([-0.08, -0.12, -0.12, -0.08]))
+
+
+def test_band_matrix_multiplication():
+    M = np.array([
+        [0, 1, 1, 1],
+        [-2, -2, -2, -2],
+        [1, 1, 1, 0]]
+    ).T
+    u = np.array([-0.08, -0.12, -0.12, -0.08])
+    np.testing.assert_array_almost_equal(band_matrix_multiplication(M, 1, 1, u), np.array([0.04] * 4))
