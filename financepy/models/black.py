@@ -13,7 +13,7 @@ from ..utils.global_vars import gSmall
 from ..utils.helpers import label_to_string
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
-
+from ..utils.solver_1d import bisection, newton
 ###############################################################################
 # TODO: Use Numba ?
 ###############################################################################
@@ -39,6 +39,72 @@ def calculate_d1_d2(f, t, k, v):
     return np.array([d1, d2])
 
 ###############################################################################
+
+
+def _f(sigma, args):
+    """ Function to price European options on futures contracts. """
+    fwd, t, k, r, call_or_put = args
+
+    d1, d2 = calculate_d1_d2(fwd, t, k, sigma)
+
+    if call_or_put == OptionTypes.EUROPEAN_CALL:
+        value = np.exp(-r*t) * (fwd * n_vect(d1) - k * n_vect(d2))
+    elif call_or_put == OptionTypes.EUROPEAN_PUT:
+        value = np.exp(-r*t) * (k * n_vect(-d2) - fwd * n_vect(-d1))
+    else:
+        raise FinError("Option type must be a European Call or Put")
+    return value
+
+
+def _fvega(sigma, args):
+    """ Function to calculate the Vega of European 
+    options on futures contracts. """
+    fwd, t, k, r, call_or_put = args
+    sqrtT = np.sqrt(t)
+    d1, _ = calculate_d1_d2(fwd, t, k, sigma)
+    if call_or_put == OptionTypes.EUROPEAN_CALL:
+        vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
+    elif call_or_put == OptionTypes.EUROPEAN_PUT:
+        vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
+    else:
+        raise FinError("Option type must be a European Call or Put")
+    return vega
+
+
+def implied_volalitity(fwd, t, r, k, price, option_type):
+    """ Calculate the Black implied volatility of a European 
+    options on futures contracts using Newton with 
+    a fallback to bisection. """
+
+    ###########################################################################
+    # Initial point of inflexion
+    # A simple approximation is used to estimate implied volatility
+    # ,which is used as the input of calibration.
+    # Reference:
+    # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
+    # TODO dividend is not adjusted
+    spot = fwd * np.exp(-r*t)
+    sigma_guess = price / (0.4 * np.sqrt(t) * spot)
+    # avoid zero division
+    if t < 1.e-2:
+        sigma_guess = 0.0
+    sigma0 = sigma_guess
+    ###########################################################################
+
+    args = fwd, t, k, r, option_type
+    tol = 1e-6
+    sigma = newton(_f, sigma0, _fvega, args, tol=tol)
+    if sigma is None:
+        sigma = bisection(_f, 1e-4, 10.0, args, xtol=tol)
+        if sigma is None:
+            method = "Failed"
+        else:
+            method = "Bisection"
+    else:
+        method = "Newton"
+    if True:
+        print("S: %7.2f K: %7.3f T:%5.3f V:%10.7f Sig0: %7.5f NW: %7.5f %10s" % (
+            fwd, k, t, price, sigma0*100.0, sigma*100.0, method))
 
 
 class Black():
