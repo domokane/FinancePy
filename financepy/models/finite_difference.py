@@ -177,7 +177,7 @@ def smooth_call(xl, xu, strike):
         return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
 
-def initial_curve(s, strike, smooth, dig, option_type):
+def option_payoff(s, strike, smooth, dig, option_type):
     num_samples = len(s)
 
     # Generate middle values (i.e. not first or last, which are overwritten later)
@@ -240,8 +240,8 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
     # Create sample set s
     s = stock_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
-    # Define the initial curve which will be fitted with each iteration
-    res = initial_curve(s, strike_price, smooth, digital, option_type)
+    # Generate the option payoff to be fitted
+    res = option_payoff(s, strike_price, smooth, digital, option_type)
 
     # time steps
     dt = time_to_expiry / max(1, num_steps)
