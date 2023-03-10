@@ -41,33 +41,23 @@ def calculate_d1_d2(f, t, k, v):
 ###############################################################################
 
 
-def _f(sigma, args):
-    """ Function to price European options on futures contracts. """
-    fwd, t, k, r, call_or_put = args
-
+def _fcall(sigma, args):
+    """Function to determine ststar for pricing 
+    European call options on future contract. """
+    fwd, t, k, r, price = args
     d1, d2 = calculate_d1_d2(fwd, t, k, sigma)
-
-    if call_or_put == OptionTypes.EUROPEAN_CALL:
-        value = np.exp(-r*t) * (fwd * n_vect(d1) - k * n_vect(d2))
-    elif call_or_put == OptionTypes.EUROPEAN_PUT:
-        value = np.exp(-r*t) * (k * n_vect(-d2) - fwd * n_vect(-d1))
-    else:
-        raise FinError("Option type must be a European Call or Put")
-    return value
+    value = np.exp(-r*t) * (fwd * n_vect(d1) - k * n_vect(d2))
+    obj = value - price
+    return obj
 
 
-def _fvega(sigma, args):
+def _fcall_vega(sigma, args):
     """ Function to calculate the Vega of European 
     options on futures contracts. """
     fwd, t, k, r, call_or_put = args
     sqrtT = np.sqrt(t)
     d1, _ = calculate_d1_d2(fwd, t, k, sigma)
-    if call_or_put == OptionTypes.EUROPEAN_CALL:
-        vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
-    elif call_or_put == OptionTypes.EUROPEAN_PUT:
-        vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
-    else:
-        raise FinError("Option type must be a European Call or Put")
+    vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
     return vega
 
 
@@ -76,24 +66,29 @@ def implied_volalitity(fwd, t, r, k, price, option_type):
     options on futures contracts using Newton with 
     a fallback to bisection. """
 
-    ###########################################################################
-    # Initial point of inflexion
-    # A simple approximation is used to estimate implied volatility
-    # ,which is used as the input of calibration.
+    # convert to call value
+    if option_type == OptionTypes.EUROPEAN_CALL:
+        pass
+    elif option_type == OptionTypes.EUROPEAN_PUT:
+        # put-call parity
+        price += np.exp(-r*t) * (fwd - k)
+    else:
+        raise FinError("Option type must be a European Call or Put")
+
+    # For faster convergence, Initial point of inflexion is
+    # roughly estimated by a simle approximation.
     # Reference:
     # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
-    # TODO dividend is not adjusted
     spot = fwd * np.exp(-r*t)
     sigma_guess = price / (0.4 * np.sqrt(t) * spot)
-    # avoid zero division
-    if t < 1.e-2:
+    if t < 1.e-2:  # avoid zero division
         sigma_guess = 0.0
     sigma0 = sigma_guess
-    ###########################################################################
 
-    args = fwd, t, k, r, option_type
+    # search implied volatility
+    args = fwd, t, k, r, price
     tol = 1e-6
-    sigma = newton(_f, sigma0, _fvega, args, tol=tol)
+    sigma = newton(_fcall, sigma0, _fcall_vega, args, tol=tol)
     if sigma is None:
         sigma = bisection(_f, 1e-4, 10.0, args, xtol=tol)
         if sigma is None:
