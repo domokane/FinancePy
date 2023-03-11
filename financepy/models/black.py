@@ -4,6 +4,7 @@
 ##############################################################################
 
 # TODO Fix this
+from enum import Enum
 
 import numpy as np
 from numba import njit, float64
@@ -29,11 +30,11 @@ class Black():
     """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. """
 
-    def __init__(self, volatility, implementation_type=BlackTypes.ANALYTICAL):
+    def __init__(self, volatility, implementation_type=BlackTypes.ANALYTICAL, num_steps=0):
         """ Create FinModel black using parameters. """
         self._volatility = volatility
         self._implementation_type = implementation_type
-        self._num_steps = 0
+        self._num_steps = num_steps
         self._seed = 0
         self._param1 = 0
         self._param2 = 0
@@ -61,8 +62,9 @@ class Black():
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            value = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type, k)
+            results = crr_tree_val_avg(
+                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+            value = results['value']
         else:
             raise FinError(
                 "Option type must be a European/American Call or Put")
@@ -90,6 +92,10 @@ class Black():
                 delta = black_delta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
+        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+            results = crr_tree_val_avg(
+                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+            delta = results['delta']
         else:
             raise FinError("Option type must be a European Call or Put")
         return delta
@@ -116,6 +122,10 @@ class Black():
                 gamma = black_gamma(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
+        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+            results = crr_tree_val_avg(
+                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+            gamma = results['gamma']
         else:
             raise FinError("Option type must be a European Call or Put")
         return gamma
@@ -142,6 +152,10 @@ class Black():
                 theta = black_theta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
+        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+            results = crr_tree_val_avg(
+                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+            theta = results['theta']
         else:
             raise FinError("Option type must be a European Call or Put")
         return theta
@@ -168,6 +182,13 @@ class Black():
                 vega = black_vega(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
+        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+            bump_size = 0.01
+            results = crr_tree_val_avg(
+                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+            results_volshfit = crr_tree_val_avg(
+                f, 0.0, 0.0, v+bump_size, self._num_steps, t, option_type.value, k)
+            vega = (results_volshfit['value'] - results['value']) / bump_size
         else:
             raise FinError("Option type must be a European Call or Put")
         return vega
@@ -198,7 +219,7 @@ def black_value(fwd, t, k, r, v, option_type):
 def black_delta(fwd, t, k, r, v, option_type):
     """Return delta of a derivative using Black model. """
     d1, _ = calculate_d1_d2(fwd, t, k, v)
-    if option_type in OptionTypes.EUROPEAN_CALL:
+    if option_type == OptionTypes.EUROPEAN_CALL:
         return np.exp(-r*t) * n_vect(d1)
     elif option_type == OptionTypes.EUROPEAN_PUT:
         return - np.exp(-r*t) * n_vect(-d1)
@@ -226,7 +247,7 @@ def black_vega(fwd, t, k, r, v, option_type):
 
 def black_theta(fwd, t, k, r, v, option_type):
     """Return theta of a derivative using Black model. """
-    d1, d2 = calculate_d1_d2(f, t, k, v)
+    d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if option_type == OptionTypes.EUROPEAN_CALL:
         return np.exp(-r*t) * (-(fwd * v * n_prime_vect(d1)) / (2 * np.sqrt(t))
                                + r * fwd * n_vect(d1) - r * k * n_vect(d2))
@@ -290,12 +311,11 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
     else:
         raise FinError("Option type must be a European Call or Put")
 
-    # For faster convergence, Initial point of inflexion is
-    # roughly estimated by a simple approximation.
-    # Reference:
+    # For faster convergence, initial point of inflexion is
+    # estimated by Brenner and Subrahmanyan (1988) and Feinstein
+    # (1988) approximation for at-the-money forward option. See Eq.(3) in
     # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
-    spot = fwd * np.exp(-r*t)
-    sigma_guess = price / (0.4 * np.sqrt(t) * spot)
+    sigma_guess = price / (0.398 * np.sqrt(t) * fwd * np.exp(-r*t))
     if t < gSmall:  # avoid zero division
         sigma_guess = 0.0
     sigma0 = sigma_guess
@@ -315,3 +335,4 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
     if debug_print:
         print("S: %7.2f K: %7.3f T:%5.3f V:%10.7f Sig0: %7.5f NW: %7.5f %10s" % (
             fwd, k, t, price, sigma0*100.0, sigma*100.0, method))
+    return sigma
