@@ -3,16 +3,19 @@
 # Guillaume Lefieux
 ###############################################################################
 
-from financepy.utils.global_types import OptionTypes
-from financepy.models.black import Black
-import sys
 import numpy as np
+
+from financepy.utils.global_types import OptionTypes
+from financepy.models.black import Black, BlackTypes, implied_volatility
+from financepy.utils.date import Date
+from financepy.utils.global_vars import gDaysInYear
 
 forward = 0.034
 strike = 0.050
 riskFreeIR = 0.00
 time_to_expiry = 2.0
 volatility = 0.20
+num_steps_per_year = 252.0
 
 call_optionType = OptionTypes.EUROPEAN_CALL
 put_optionType = OptionTypes.EUROPEAN_PUT
@@ -86,3 +89,61 @@ def test_vega():
 
     assert round(vegaCall*10, 4) == 0.0909
     assert round(vegaPut*10, 4) == 0.0909
+
+
+def test_implied_volatility():
+    # European Exercise case
+    # Input parametes are same as the Option on Treasury Futures Contract in the below link
+    # http://gouthamanbalaraman.com/blog/value-options-commodity-futures-black-formula-quantlib-python.html
+    strike = 119.0
+    forward = 126.953
+    time_to_expiry = 0.50
+    volatility = 11.567/100.
+    time_to_expiry = (Date(24, 12, 2015) - Date(1, 12, 2015)) / gDaysInYear
+    r = 0.00105
+    price = 7.968569878525531
+    df = np.exp(-r*time_to_expiry)
+    model = Black(volatility)
+    # check value just in case
+    valueCall = model.value(
+        forward, strike, time_to_expiry, df, call_optionType)
+    assert valueCall == price
+    # check implied vol
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, OptionTypes.EUROPEAN_CALL)
+    assert round(sigma, 5) == volatility
+    # AmericanOptionImpliedVolatility: Implied Volatility calculation for American Option
+    # https://rdrr.io/rforge/RQuantLib/man/AmericanOptionImpliedVolatility.html
+    ...
+
+
+def test_american_value_greeks():
+    # Just check crr_tree_val_avg can called correctly from Black model
+    strike = 100.0
+    forward = 100.0
+    time_to_expiry = 0.50
+    volatility = 0.15
+    modelTree = Black(volatility, implementation_type=BlackTypes.CRR_TREE,
+                      num_steps=num_steps_per_year)
+    expected = {
+        'value': 4.229429096724559,
+        'delta': -0.4788528545163757,
+        'gamma': 0.037634509512885564,
+        'theta': -4.233898040175347,
+        'vega': 28.167013009550956
+    }
+    valueAmericanPut = modelTree.value(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert valueAmericanPut == expected['value']
+    deltaAmericanPut = modelTree.delta(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert deltaAmericanPut == expected['delta']
+    gammaAmericanPut = modelTree.gamma(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert gammaAmericanPut == expected['gamma']
+    thetaAmericanPut = modelTree.theta(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert thetaAmericanPut == expected['theta']
+    vegaAmericanPut = modelTree.vega(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert vegaAmericanPut == expected['vega']
