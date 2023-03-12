@@ -42,8 +42,14 @@ class SwapTypes(Enum):
     PAY = 1
     RECEIVE = 2
 
+
 ###############################################################################
 
+class ReturnTypes(Enum):
+    TOTAL_RETURN = 1
+    PRICE_RETURN = 2
+
+###############################################################################
 
 class FinExerciseTypes(Enum):
     EUROPEAN = 1
