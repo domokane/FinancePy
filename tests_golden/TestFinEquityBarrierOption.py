@@ -3,17 +3,19 @@
 ###############################################################################
 
 import sys
-from financepy.models.process_simulator import ProcessTypes
-from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.models.equity_barrier_models import value_mc
-from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
-from financepy.products.equity.equity_barrier_option import EquityBarrierOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-sys.path.append("..")
+from financepy.utils.date import Date
+
+from financepy.models.black_scholes import BlackScholes
+from financepy.models.process_simulator import ProcessTypes
+from financepy.models.process_simulator import FinGBMNumericalScheme
+
+from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
+from financepy.products.equity.equity_barrier_option import EquityBarrierOption
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -62,18 +64,31 @@ def test_EquityBarrierOption():
             B = 110.0
             K = 100.0
 
-            option = EquityBarrierOption(
-                expiry_date, K, option_type, B, num_observations_per_year)
-            value = option.value(
-                valuation_date,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
+            option = EquityBarrierOption(expiry_date, 
+                                         K, 
+                                         option_type, 
+                                         B, 
+                                         num_observations_per_year)
+
+            value = option.value(valuation_date,
+                                 stock_price,
+                                 discount_curve,
+                                 dividend_curve,
+                                 model)
+            
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
-            test_value_mc = value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                                     discount_curve.cc_rate(expiry_date), process_type, model_params)
+
+            test_value_mc = option.value_mc(expiry_date, 
+                                     K, 
+                                     option_type.value, 
+                                     B, 
+                                     notional, 
+                                     valuation_date, 
+                                     stock_price,
+                                     discount_curve.cc_rate(expiry_date), 
+                                     process_type, 
+                                     model_params)
 
             end = time.time()
             time_elapsed = round(end - start, 3)
@@ -104,8 +119,17 @@ def test_EquityBarrierOption():
                 model)
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
-            test_value_mc = value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                                     discount_curve.cc_rate(expiry_date), process_type, model_params)
+
+            test_value_mc = option.value_mc(expiry_date, 
+                                     K, 
+                                     option_type.value, 
+                                     B, 
+                                     notional, 
+                                     valuation_date, 
+                                     stock_price,
+                                     discount_curve.cc_rate(expiry_date), 
+                                     process_type, 
+                                     model_params)
 
             end = time.time()
             time_elapsed = round(end - start, 3)

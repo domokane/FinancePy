@@ -5,7 +5,6 @@
 import numpy as np
 
 from ..market.curves.discount_curve import DiscountCurve
-from ..models.process_simulator import FinProcessSimulator
 from ..utils.date import Date
 from ..utils.error import FinError
 from ..utils.global_types import EquityBarrierTypes
@@ -13,7 +12,9 @@ from ..utils.global_vars import gDaysInYear
 from ..utils.math import N
 
 
-def value_one(expiry_date: Date,
+# Calculates the Barrier option price using an Analytical Approach
+# and the Black Scholes Model
+def value_bs(expiry_date: Date,
               strike_price: float,
               option_type: int,
               barrier_level: float,
@@ -203,130 +204,3 @@ def value_one(expiry_date: Date,
 
 
 ###############################################################################
-
-
-def value_mc(expiry_date: Date,
-             strike_price,
-             option_type: int,
-             barrier_level,
-             notional,
-             valuation_date: Date,
-             stock_price: float,
-             rf_rate: float,
-             process_type,
-             model_params,
-             numAnnObs: int = 252,
-             num_paths: int = 10000,
-             seed: int = 4242):
-    """ A Monte-Carlo based valuation of the barrier option which simulates
-    the evolution of the stock price of at a specified number of annual
-    observation times until expiry to examine if the barrier has been
-    crossed and the corresponding value of the final payoff, if any. It
-    assumes a GBM model for the stock price. """
-
-    texp = (expiry_date - valuation_date) / gDaysInYear
-    num_time_steps = int(texp * numAnnObs)
-    K = strike_price
-    B = barrier_level
-    option_type = option_type
-
-    process = FinProcessSimulator()
-
-    # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
-
-    r = rf_rate
-
-    #######################################################################
-
-    if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and stock_price <= B:
-        return 0.0
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and stock_price >= B:
-        return 0.0
-    elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and stock_price <= B:
-        return 0.0
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and stock_price >= B:
-        return 0.0
-
-    #######################################################################
-
-    simple_call = False
-    simple_put = False
-
-    if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and stock_price <= B:
-        simple_call = True
-    elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value and stock_price >= B:
-        simple_call = True
-    elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value and stock_price >= B:
-        simple_put = True
-    elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and stock_price <= B:
-        simple_put = True
-
-    if simple_put or simple_call:
-        Sall = process.get_process(
-            process_type, texp, model_params, 1, num_paths, seed)
-
-    if simple_call:
-        c = (np.maximum(Sall[:, -1] - K, 0.0)).mean()
-        c = c * np.exp(-r * texp)
-        return c
-
-    if simple_put:
-        p = (np.maximum(K - Sall[:, -1], 0.0)).mean()
-        p = p * np.exp(-r * texp)
-        return p
-
-    # Get full set of paths
-    Sall = process.get_process(process_type, texp, model_params, num_time_steps,
-                               num_paths, seed)
-
-    (num_paths, num_time_steps) = Sall.shape
-
-    if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value or \
-            option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value or \
-            option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value or \
-            option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-
-        barrier_crossed_from_above = [False] * num_paths
-
-        for p in range(0, num_paths):
-            barrier_crossed_from_above[p] = np.any(Sall[p] <= B)
-
-    if option_type == EquityBarrierTypes.UP_AND_IN_CALL.value or \
-            option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value or \
-            option_type == EquityBarrierTypes.UP_AND_IN_PUT.value or \
-            option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-
-        barrier_crossed_from_below = [False] * num_paths
-        for p in range(0, num_paths):
-            barrier_crossed_from_below[p] = np.any(Sall[p] >= B)
-
-    payoff = np.zeros(num_paths)
-    ones = np.ones(num_paths)
-
-    if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
-        payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
-                 (ones - barrier_crossed_from_above)
-    elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
-        payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrier_crossed_from_above
-    elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
-        payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrier_crossed_from_below
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
-        payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
-                 (ones - barrier_crossed_from_below)
-    elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
-        payoff = np.maximum(K - Sall[:, -1], 0.0) * barrier_crossed_from_below
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-        payoff = np.maximum(K - Sall[:, -1], 0.0) * \
-                 (ones - barrier_crossed_from_below)
-    elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-        payoff = np.maximum(K - Sall[:, -1], 0.0) * \
-                 (ones - barrier_crossed_from_above)
-    elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
-        payoff = np.maximum(K - Sall[:, -1], 0.0) * barrier_crossed_from_above
-    else:
-        raise FinError("Unknown barrier option type." +
-                       str(option_type))
-
-    v = payoff.mean() * np.exp(- r * texp)
-
-    return v * notional

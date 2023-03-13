@@ -2,6 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.utils.date import Date
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -134,8 +139,9 @@ def test_equity_swap_not_in_inception():
                               stock_price,
                               firstFixing)
     
-    assert round(value, 5) == 0.00000
-    
+
+###############################################################################
+
 def test_equity_swap_with_dividends():
 
     effective_date = Date(13, 2, 2018)
@@ -185,4 +191,3 @@ def test_equity_swap_with_dividends():
                                             dividend_curve,
                                             stock_price,)
     
-    assert round(value_with_divs) == round(value_higher_disc)

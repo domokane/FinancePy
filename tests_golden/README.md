@@ -1,6 +1,8 @@
 # Test Suite
 
-This folder contains the logic for performing comparison testing of code to ensure that code does not inadvertently get broken.
+This folder contains the logic for performing comparison testing of code to ensure that code does not inadvertently get broken. 
+
+The code tests here can be very broad in type. 
 
 The test is based on the prior creation of a Golden version of the file output which is stored in the Golden folder. There is a file for each test file. This is considered to be correct and any output that deviates from this is deemed to be incorrect. Creation of the Golden files is done by setting the value of the global flag as follows:
 
