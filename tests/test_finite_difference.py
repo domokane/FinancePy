@@ -148,11 +148,11 @@ def test_european_call():
     params = np.array([1.0, strike_price])
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -191,11 +191,11 @@ def test_european_put():
     params = np.array([-1.0, strike_price])
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -234,11 +234,11 @@ def test_american_call():
     params = np.array([1.0, strike_price])
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -277,11 +277,11 @@ def test_american_put():
     params = np.array([-1.0, strike_price])
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -323,11 +323,11 @@ def test_call_option():
                            discount_curve, dividend_curve, model)
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=100.0, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=100.0, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
     assert v == approx(v0, 1e-1)
 
 
@@ -356,11 +356,11 @@ def test_put_option():
                           discount_curve, dividend_curve, model)
 
     v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
-                                           time_to_expiry=time_to_expiry,
-                                           strike_price=100.0, risk_free_rate=risk_free_rate,
-                                           dividend_yield=dividend_yield, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=100.0, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
 
     assert v == approx(v0, 1e-1)
 
