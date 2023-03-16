@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from pytest import approx
+
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholesTypes
@@ -114,3 +116,31 @@ def test_bjerksund_stensland():
                                   borrow_curve, model)
         values.append(round(value, 2))
     assert values == [20.53, 12.91, 7.42, 3.93, 1.93]
+
+
+def test_black_scholes_finite_difference():
+    """
+    Assert finite difference model matches tree model to at least 1 dp
+    """
+    params = {
+        'num_samples': 200,
+        'theta': 0.5
+    }
+    model = BlackScholes(volatility,
+                         implementationType=BlackScholesTypes.FINITE_DIFFERENCE,
+                         params=params)
+
+    v = amOption.value(valuation_date, stock_price, discount_curve,
+                       dividend_curve, model)
+
+    assert v == approx(6.8391, 1e-1)
+
+    v = ameuOption.value(valuation_date, stock_price, discount_curve,
+                         dividend_curve, model)
+
+    assert v == approx(6.7510, 1e-1)
+
+    v = euOption.value(valuation_date, stock_price, discount_curve,
+                       dividend_curve, model)
+
+    assert v == approx(6.7493, 1e-1)

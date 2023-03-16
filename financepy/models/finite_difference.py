@@ -1,13 +1,9 @@
-from enum import Enum
 from copy import deepcopy
 from functools import partial
-import math
 
 import numpy as np
-from numba import njit
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
-from ..utils.global_vars import gDaysInYear
 from financepy.utils.global_types import OptionTypes
 
 
@@ -35,14 +31,15 @@ def dx(x, wind=0):
 
     # First row
     if wind >= 0:
-        out[0] = (-1, 0, 1)
+        out[0] = (0, -1, 1)
         out[0] /= (x[1] - x[0])
+    else:
+        out[0] = (0, 0, 0)
 
     # Last row
     if wind <= 0:
-        dxl = x[-1] - x[-2]
         out[-1] = (-1, 1, 0)
-        out[-1] /= dxl
+        out[-1] /= (x[-1] - x[-2])
     else:
         out[-1] = (0, 0, 0)
 
@@ -178,7 +175,8 @@ def smooth_call(xl, xu, strike):
 
 
 def option_payoff(s, strike, smooth, dig, option_type):
-    num_samples = len(s)
+    if isinstance(option_type, OptionTypes):
+        option_type = option_type.value
 
     # Generate middle values (i.e. not first or last, which are overwritten later)
     if not smooth:
@@ -206,57 +204,52 @@ def option_payoff(s, strike, smooth, dig, option_type):
     res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
 
     # Invert for put options
-    if option_type in {OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT}:
+    if option_type in {OptionTypes.AMERICAN_PUT.value, OptionTypes.EUROPEAN_PUT.value}:
         res = 1 - res if dig else res - (s - strike)
 
     return np.atleast_2d(res)
 
 
-def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_date,
-                                    strike_price, discount_curve, dividend_curve, digital, option_type, smooth, theta,
-                                    wind, num_std, num_steps, num_samples, update):
-    # Time to contract expiry in years
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
+                                    strike_price, risk_free_rate, dividend_yield, option_type,
+                                    num_steps_per_year, num_samples, num_std=5, theta=0.5, wind=0, digital=False,
+                                    smooth=False, update=False):
+    if isinstance(option_type, OptionTypes):
+        option_type = option_type.value
 
     # Define grid
-    std = sigma * (time_to_expiry ** 0.5)
+    std = volatility * (time_to_expiry ** 0.5)
     xu = num_std * std
     xl = -xu
     d_x = (xu - xl) / max(1, num_samples)
     num_samples = 1 if num_samples <= 0 or xl == xu else num_samples + 1
 
-    # Extract the discount. Adjust if the value date is not same as curve date
-    # I decided to put an error message - may reconsider
-    df_expiry = discount_curve.df(expiry_date)
-    risk_free_rate = -math.log(df_expiry) / time_to_expiry
-
-    # Extract the dividend
-    dq = dividend_curve.df(expiry_date)
-    dividend_yield = -math.log(dq) / time_to_expiry
-
     # Calculate the drift
     mu = risk_free_rate - dividend_yield
 
     # Create sample set s
-    s = stock_price * np.exp(xl + d_x * np.arange(0, num_samples))
+    s = spot_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Generate the option payoff to be fitted
-    res = option_payoff(s, strike_price, smooth, digital, option_type)
+    payoff = option_payoff(s, strike_price, smooth, digital, option_type)
 
     # time steps
+    num_steps = int(num_steps_per_year * time_to_expiry)
     dt = time_to_expiry / max(1, num_steps)
 
     # Make time series for interest rate, drift, and variance
     r_ = np.zeros(num_samples) + risk_free_rate
     mu_ = mu * s
-    var_ = (s * sigma) ** 2
+    var_ = (s * volatility) ** 2
 
-    # Store original res as res0
-    res0 = deepcopy(res)
 
     # Initialise implicit and explicit matricies
     Ai = np.array([])
     Ae = np.array([])
+
+    # Store original res as res0
+    res = deepcopy(payoff)
+
     for h in range(num_steps):
         if update or h == 0:
             # Explicit case
@@ -268,8 +261,9 @@ def black_scholes_finite_difference(stock_price, sigma, expiry_date, valuation_d
 
         res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
 
-        if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
-            idx = res[0] < res0[0]
-            res[0][idx] = res0[0][idx]
 
-    return res[0], res[0][num_samples // 2]
+        if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
+            idx = res[0] < payoff[0]
+            res[0][idx] = payoff[0][idx]
+
+    return res[0][num_samples // 2]

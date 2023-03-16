@@ -19,6 +19,7 @@ from .black_scholes_analytic import (
     baw_value,
     bjerksund_stensland_value
 )
+from .finite_difference import black_scholes_finite_difference
 
 
 from enum import Enum
@@ -31,6 +32,7 @@ class BlackScholesTypes(Enum):
     BARONE_ADESI = 3
     LSMC = 4
     Bjerksund_Stensland = 5
+    FINITE_DIFFERENCE = 6
 
 ###############################################################################
 
@@ -45,7 +47,8 @@ class BlackScholes(Model):
                  num_steps_per_year=52,
                  num_paths=10000,
                  seed=42,
-                 use_sobol=False):
+                 use_sobol=False,
+                 params=None):
 
         check_argument_types(self.__init__, locals())
 
@@ -55,6 +58,7 @@ class BlackScholes(Model):
         self._num_paths = num_paths
         self._seed = seed
         self._use_sobol = use_sobol
+        self._params = params if params else {}
 
     ###########################################################################
 
@@ -95,6 +99,19 @@ class BlackScholes(Model):
                                      option_type.value,
                                      strike_price)['value']
 
+                return v
+
+            elif self._implementationType == BlackScholesTypes.FINITE_DIFFERENCE:
+                v = black_scholes_finite_difference(spot_price=spotPrice,
+                                                    time_to_expiry=time_to_expiry,
+                                                    strike_price=strike_price,
+                                                    risk_free_rate=risk_free_rate,
+                                                    dividend_yield=dividendRate,
+                                                    volatility=self._volatility,
+                                                    option_type=option_type.value,
+                                                    num_steps_per_year=self._num_steps_per_year,
+                                                    **self._params
+                                                    )
                 return v
 
             else:
@@ -160,6 +177,19 @@ class BlackScholes(Model):
                                               dividendRate,
                                               self._volatility,
                                               option_type.value)
+                return v
+
+            elif self._implementationType == BlackScholesTypes.FINITE_DIFFERENCE:
+                v = black_scholes_finite_difference(spot_price=spotPrice,
+                                                    time_to_expiry=time_to_expiry,
+                                                    strike_price=strike_price,
+                                                    risk_free_rate=risk_free_rate,
+                                                    dividend_yield=dividendRate,
+                                                    volatility=self._volatility,
+                                                    option_type=option_type.value,
+                                                    num_steps_per_year=self._num_steps_per_year,
+                                                    **self._params
+                                                    )
                 return v
 
             else:
