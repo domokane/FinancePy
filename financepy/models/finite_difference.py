@@ -1,13 +1,9 @@
-from enum import Enum
 from copy import deepcopy
 from functools import partial
-import math
 
 import numpy as np
-from numba import njit
 
 from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
-from ..utils.global_vars import gDaysInYear
 from financepy.utils.global_types import OptionTypes
 
 
@@ -35,14 +31,15 @@ def dx(x, wind=0):
 
     # First row
     if wind >= 0:
-        out[0] = (-1, 0, 1)
+        out[0] = (0, -1, 1)
         out[0] /= (x[1] - x[0])
+    else:
+        out[0] = (0, 0, 0)
 
     # Last row
     if wind <= 0:
-        dxl = x[-1] - x[-2]
         out[-1] = (-1, 1, 0)
-        out[-1] /= dxl
+        out[-1] /= (x[-1] - x[-2])
     else:
         out[-1] = (0, 0, 0)
 
@@ -217,6 +214,9 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
                                     strike_price, risk_free_rate, dividend_yield, option_type,
                                     num_steps_per_year, num_samples, num_std=5, theta=0.5, wind=0, digital=False,
                                     smooth=False, update=False):
+    if isinstance(option_type, OptionTypes):
+        option_type = option_type.value
+
     # Define grid
     std = volatility * (time_to_expiry ** 0.5)
     xu = num_std * std
@@ -231,7 +231,7 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
     s = spot_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Generate the option payoff to be fitted
-    res = option_payoff(s, strike_price, smooth, digital, option_type)
+    payoff = option_payoff(s, strike_price, smooth, digital, option_type)
 
     # time steps
     num_steps = int(num_steps_per_year * time_to_expiry)
@@ -242,12 +242,14 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
     mu_ = mu * s
     var_ = (s * volatility) ** 2
 
-    # Store original res as res0
-    res0 = deepcopy(res)
 
     # Initialise implicit and explicit matricies
     Ai = np.array([])
     Ae = np.array([])
+
+    # Store original res as res0
+    res = deepcopy(payoff)
+
     for h in range(num_steps):
         if update or h == 0:
             # Explicit case
@@ -259,8 +261,9 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
 
         res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
 
-        if option_type in {OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT}:
-            idx = res[0] < res0[0]
-            res[0][idx] = res0[0][idx]
+
+        if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
+            idx = res[0] < payoff[0]
+            res[0][idx] = payoff[0][idx]
 
     return res[0][num_samples // 2]
