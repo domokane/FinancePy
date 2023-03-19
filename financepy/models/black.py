@@ -305,9 +305,9 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         American options on future contracts. """
         fwd, t, k, _, option_type, price = args
         num_steps = 200
-        value = crr_tree_val_avg(
+        results = crr_tree_val_avg(
             fwd, 0.0, 0.0, sigma, num_steps, t, option_type.value, k)
-        obj = value - price
+        obj = results['value'] - price
         return obj
 
     def _f_american_vega(sigma, args):
@@ -323,13 +323,13 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         vega = (results_volshift['value'] - results['value']) / bump_size
         return vega
 
-    def _estimate_volatility_from_price(fwd, t, k, option_type, european_price):
+    def _estimate_volatility_from_price(fwd, t, k, european_option_type, european_price):
         # Brenner and Subrahmanyan (1988) and Feinstein
         # (1988) approximation for at-the-money forward call option. See Eq.(3) in
         # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
-        if option_type == OptionTypes.EUROPEAN_CALL:
+        if european_option_type == OptionTypes.EUROPEAN_CALL:
             price = european_price
-        elif option_type == OptionTypes.EUROPEAN_PUT:
+        elif european_option_type == OptionTypes.EUROPEAN_PUT:
             price = european_price + np.exp(-r*t) * (fwd - k)
         else:
             raise FinError("Option type must be a European Call or Put")
@@ -341,7 +341,7 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
     # Set objective function, its first derivative, and initial point of implied volatility
     # A simple approximation is used to estimate implied volatility
     # ,which is used as the input of calibration.
-    if option_type == OptionTypes.EUROPEAN_CALL or OptionTypes.EUROPEAN_PUT:
+    if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
         _f = _f_european
         _f_vega = _f_european_vega
         sigma0 = _estimate_volatility_from_price(fwd, t, k, option_type, price)
