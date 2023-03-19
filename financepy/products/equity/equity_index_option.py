@@ -17,12 +17,12 @@ from ...models.model import Model
 from ...models.black import Black, implied_volatility
 
 
-class EquityIndexOption():
+class EquityIndexOption:
     """ Class for managing plain vanilla European/American
     calls and puts on equity indices."""
 
     def __init__(self,
-                 expiry_date: Union[Date, list[Date]],
+                 expiry_date: Union[Date, list],
                  strike_price: Union[float, np.ndarray],
                  option_type: OptionTypes,
                  num_options: Optional[float] = 1.0,
@@ -46,7 +46,7 @@ class EquityIndexOption():
 ###############################################################################
 
     def value(self,
-              valuation_date: Union[Date, list[Date]],
+              valuation_date: Union[Date, list],
               forward_price: float,
               discount_curve: DiscountCurve,
               model: Model,
