@@ -186,9 +186,9 @@ class Black():
             bump_size = 0.01
             results = crr_tree_val_avg(
                 f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
-            results_volshfit = crr_tree_val_avg(
+            results_volshift = crr_tree_val_avg(
                 f, 0.0, 0.0, v+bump_size, self._num_steps, t, option_type.value, k)
-            vega = (results_volshfit['value'] - results['value']) / bump_size
+            vega = (results_volshift['value'] - results['value']) / bump_size
         else:
             raise FinError("Option type must be a European Call or Put")
         return vega
@@ -281,49 +281,93 @@ def calculate_d1_d2(f, t, k, v):
 
 
 def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
-    """ Calculate the Black implied volatility of a European 
+    """ Calculate the Black implied volatility of a European/American 
     options on futures contracts using Newton with 
     a fallback to bisection. """
 
-    def _fcall(sigma, args):
+    def _f_european(sigma, args):
         """Function to determine ststar for pricing 
-        European call options on future contracts. """
-        fwd, t, k, r, price = args
-        d1, d2 = calculate_d1_d2(fwd, t, k, sigma)
-        value = np.exp(-r*t) * (fwd * n_vect(d1) - k * n_vect(d2))
+        European options on future contracts. """
+        fwd, t, k, r, option_type, price = args
+        value = black_value(fwd, t, k, r, sigma, option_type)
         obj = value - price
         return obj
 
-    def _fcall_vega(sigma, args):
+    def _f_european_vega(sigma, args):
         """ Function to calculate the Vega of European 
         options on future contracts. """
-        fwd, t, k, r, _ = args
-        sqrtT = np.sqrt(t)
-        d1, _ = calculate_d1_d2(fwd, t, k, sigma)
-        vega = np.exp(-r*t) * fwd * sqrtT * n_prime_vect(d1)
+        fwd, t, k, r, option_type, _ = args
+        vega = black_vega(fwd, t, k, r, sigma, option_type)
         return vega
-    # convert to call value
-    if option_type == OptionTypes.EUROPEAN_CALL:
-        pass
-    elif option_type == OptionTypes.EUROPEAN_PUT:
-        # put-call parity
-        price += np.exp(-r*t) * (fwd - k)
+
+    def _f_american(sigma, args):
+        """Function to determine ststar for pricing 
+        American options on future contracts. """
+        fwd, t, k, _, option_type, price = args
+        num_steps = 200
+        value = crr_tree_val_avg(
+            fwd, 0.0, 0.0, sigma, num_steps, t, option_type.value, k)
+        obj = value - price
+        return obj
+
+    def _f_american_vega(sigma, args):
+        """ Function to calculate the Vega of American
+        options on future contracts. """
+        fwd, t, k, _, option_type, _ = args
+        bump_size = 0.01
+        num_steps = 200
+        results = crr_tree_val_avg(
+            fwd, 0.0, 0.0, sigma, num_steps, t, option_type.value, k)
+        results_volshift = crr_tree_val_avg(
+            fwd, 0.0, 0.0, sigma+bump_size, num_steps, t, option_type.value, k)
+        vega = (results_volshift['value'] - results['value']) / bump_size
+        return vega
+
+    def _estimate_volatility_from_price(fwd, t, k, option_type, european_price):
+        # Brenner and Subrahmanyan (1988) and Feinstein
+        # (1988) approximation for at-the-money forward call option. See Eq.(3) in
+        # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
+        if option_type == OptionTypes.EUROPEAN_CALL:
+            price = european_price
+        elif option_type == OptionTypes.EUROPEAN_PUT:
+            price = european_price + np.exp(-r*t) * (fwd - k)
+        else:
+            raise FinError("Option type must be a European Call or Put")
+        sigma_guess = price / (0.398 * np.sqrt(t) * fwd * np.exp(-r*t))
+        if t < gSmall:  # avoid zero division
+            sigma_guess = 0.0
+        return sigma_guess
+
+    # Set objective function, its first derivative, and initial point of implied volatility
+    # A simple approximation is used to estimate implied volatility
+    # ,which is used as the input of calibration.
+    if option_type == OptionTypes.EUROPEAN_CALL or OptionTypes.EUROPEAN_PUT:
+        _f = _f_european
+        _f_vega = _f_european_vega
+        sigma0 = _estimate_volatility_from_price(fwd, t, k, option_type, price)
+    elif option_type == OptionTypes.AMERICAN_CALL:
+        _f = _f_american
+        _f_vega = _f_american_vega
+        # NOTE:
+        # Instead of european price, american price is
+        # passed to an approximation formula for european option.
+        # But it's just a initial point, so no affect on the calibration.
+        sigma0 = _estimate_volatility_from_price(
+            fwd, t, k, OptionTypes.EUROPEAN_CALL, price)
+    elif option_type == OptionTypes.AMERICAN_PUT:
+        _f = _f_american
+        _f_vega = _f_american_vega
+        # NOTE:
+        # Same argument as american call's case
+        sigma0 = _estimate_volatility_from_price(
+            fwd, t, k, OptionTypes.EUROPEAN_PUT, price)
     else:
         raise FinError("Option type must be a European Call or Put")
 
-    # For faster convergence, initial point of inflexion is
-    # estimated by Brenner and Subrahmanyan (1988) and Feinstein
-    # (1988) approximation for at-the-money forward option. See Eq.(3) in
-    # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
-    sigma_guess = price / (0.398 * np.sqrt(t) * fwd * np.exp(-r*t))
-    if t < gSmall:  # avoid zero division
-        sigma_guess = 0.0
-    sigma0 = sigma_guess
-
     # search implied volatility
-    args = fwd, t, k, r, price
+    args = fwd, t, k, r, option_type, price
     tol = 1e-6
-    sigma = newton(_fcall, sigma0, _fcall_vega, args, tol=tol)
+    sigma = newton(_f, sigma0, _f_vega, args, tol=tol)
     if sigma is None:
         sigma = bisection(_f, 1e-4, 10.0, args, xtol=tol)
         if sigma is None:
