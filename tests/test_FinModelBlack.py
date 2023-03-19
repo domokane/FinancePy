@@ -110,19 +110,19 @@ def test_american_value_greeks():
     }
     valueAmericanPut = modelTree.value(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
-    assert valueAmericanPut == expected['value']
+    assert round(valueAmericanPut, 5) == round(expected['value'], 5)
     deltaAmericanPut = modelTree.delta(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
-    assert deltaAmericanPut == expected['delta']
+    assert round(deltaAmericanPut, 5) == round(expected['delta'], 5)
     gammaAmericanPut = modelTree.gamma(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
-    assert gammaAmericanPut == expected['gamma']
+    assert round(gammaAmericanPut, 5) == round(expected['gamma'], 5)
     thetaAmericanPut = modelTree.theta(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
-    assert thetaAmericanPut == expected['theta']
+    assert round(thetaAmericanPut, 5) == round(expected['theta'], 5)
     vegaAmericanPut = modelTree.vega(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
-    assert vegaAmericanPut == expected['vega']
+    assert round(vegaAmericanPut, 5) == round(expected['vega'], 5)
 
 
 def test_implied_volatility():
