@@ -55,7 +55,6 @@ class Black():
         k = strike_rate
         v = self._volatility
         r = -np.log(df)/t
-
         if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 value = black_value(f, t, k, r, v, option_type)
@@ -89,16 +88,19 @@ class Black():
 
         if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
-                delta = black_delta(f, t, k, r, v, option_type)
+                return black_delta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
-            delta = results['delta']
+            if self._implementation_type == BlackTypes.CRR_TREE:
+                results = crr_tree_val_avg(
+                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                return results['delta']
+            else:
+                raise FinError("Implementation not available for this product")
         else:
-            raise FinError("Option type must be a European Call or Put")
-        return delta
+            raise FinError(
+                "Option type must be a European/American Call or Put")
 
 ###############################################################################
 
@@ -119,17 +121,19 @@ class Black():
 
         if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
-                gamma = black_gamma(f, t, k, r, v, option_type)
+                return black_gamma(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
-            gamma = results['gamma']
+            if self._implementation_type == BlackTypes.CRR_TREE:
+                results = crr_tree_val_avg(
+                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                return results['gamma']
+            else:
+                raise FinError("Implementation not available for this product")
         else:
-            raise FinError("Option type must be a European Call or Put")
-        return gamma
-
+            raise FinError(
+                "Option type must be a European/American Call or Put")
 ###############################################################################
 
     def theta(self,
@@ -153,11 +157,15 @@ class Black():
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
-            theta = results['theta']
+            if self._implementation_type == BlackTypes.CRR_TREE:
+                results = crr_tree_val_avg(
+                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                return results['theta']
+            else:
+                raise FinError("Implementation not available for this product")
         else:
-            raise FinError("Option type must be a European Call or Put")
+            raise FinError(
+                "Option type must be a European/American Call or Put")
         return theta
 
 ###############################################################################
@@ -183,14 +191,20 @@ class Black():
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            bump_size = 0.01
-            results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
-            results_volshift = crr_tree_val_avg(
-                f, 0.0, 0.0, v+bump_size, self._num_steps, t, option_type.value, k)
-            vega = (results_volshift['value'] - results['value']) / bump_size
+            if self._implementation_type == BlackTypes.CRR_TREE:
+                bump_size = 0.01
+                results = crr_tree_val_avg(
+                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                results_volshift = crr_tree_val_avg(
+                    f, 0.0, 0.0, v+bump_size, self._num_steps, t, option_type.value, k)
+                vega = (results_volshift['value'] -
+                        results['value']) / bump_size
+                return vega
+            else:
+                raise FinError("Implementation not available for this product")
         else:
-            raise FinError("Option type must be a European Call or Put")
+            raise FinError(
+                "Option type must be a European/American Call or Put")
         return vega
 
 ###############################################################################
