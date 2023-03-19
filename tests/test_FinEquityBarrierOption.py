@@ -13,14 +13,14 @@ from financepy.models.process_simulator import ProcessTypes
 
 valuation_date = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
-stock_price = 100.0
+stock_price = 80.0
 volatility = 0.20
 interest_rate = 0.05
 dividend_yield = 0.02
-stock_price = 80
 B = 110.0
 K = 100.0
 option_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+notional = 1.0
 
 drift = interest_rate - dividend_yield
 scheme = FinGBMNumericalScheme.NORMAL
@@ -47,16 +47,11 @@ def test_down_and_out_call():
         model)
 
     assert round(value, 4) == 0.0000
-
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 0.0000
+    assert round(test_value_mc, 4) == 0.0000
 
 
 def test_down_and_in_call():
@@ -74,14 +69,10 @@ def test_down_and_in_call():
     assert round(value, 4) == 1.5307
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 1.5718
+    assert round(test_value_mc, 4) == 1.5718
 
 
 def test_up_and_out_call():
@@ -99,14 +90,10 @@ def test_up_and_out_call():
     assert round(value, 4) == 0.1789
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 0.1706
+    assert round(test_value_mc, 4) == 0.1706
 
 
 def test_up_and_in_call():
@@ -124,14 +111,10 @@ def test_up_and_in_call():
     assert round(value, 4) == 1.3519
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 1.4426
+    assert round(test_value_mc, 4) == 1.4426
 
 
 def test_up_and_out_put():
@@ -149,14 +132,10 @@ def test_up_and_out_put():
     assert round(value, 4) == 18.1445
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 17.8602
+    assert round(test_value_mc, 4) == 17.8602
 
 
 def test_up_and_in_put():
@@ -174,14 +153,10 @@ def test_up_and_in_put():
     assert round(value, 4) == 0.0933
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 0.0940
+    assert round(test_value_mc, 4) == 0.0940
 
 
 def test_down_and_out_put():
@@ -199,14 +174,10 @@ def test_down_and_out_put():
     assert round(value, 4) == 0.0000
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 0.0000
+    assert round(test_value_mc, 4) == 0.0000
 
 
 def test_down_and_in_put():
@@ -224,11 +195,7 @@ def test_down_and_in_put():
     assert round(value, 4) == 18.2378
 
     model_params = (stock_price, drift, volatility, scheme)
-    value_mc = option.value_mc(valuation_date,
-                               stock_price,
-                               discount_curve,
-                               dividend_curve,
-                               process_type,
-                               model_params)
+    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
+                             discount_curve.cc_rate(expiry_date), process_type, model_params)
 
-    assert round(value_mc, 4) == 17.9996
+    assert round(test_value_mc, 4) == 17.9996
