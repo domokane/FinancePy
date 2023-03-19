@@ -6,9 +6,10 @@
 import numpy as np
 
 from financepy.utils.global_types import OptionTypes
-from financepy.models.black import Black, BlackTypes, implied_volatility
+from financepy.models.black import Black, BlackTypes, black_value, implied_volatility
 from financepy.utils.date import Date
 from financepy.utils.global_vars import gDaysInYear
+from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 forward = 0.034
 strike = 0.050
@@ -91,34 +92,9 @@ def test_vega():
     assert round(vegaPut*10, 4) == 0.0909
 
 
-def test_implied_volatility():
-    # European Exercise case
-    # Input parametes are same as the Option on Treasury Futures Contract in the below link
-    # http://gouthamanbalaraman.com/blog/value-options-commodity-futures-black-formula-quantlib-python.html
-    strike = 119.0
-    forward = 126.953
-    time_to_expiry = 0.50
-    volatility = 11.567/100.
-    time_to_expiry = (Date(24, 12, 2015) - Date(1, 12, 2015)) / gDaysInYear
-    r = 0.00105
-    price = 7.968569878525531
-    df = np.exp(-r*time_to_expiry)
-    model = Black(volatility)
-    # check value just in case
-    valueCall = model.value(
-        forward, strike, time_to_expiry, df, call_optionType)
-    assert valueCall == price
-    # check implied vol
-    sigma = implied_volatility(
-        forward, time_to_expiry, r, strike, price, OptionTypes.EUROPEAN_CALL)
-    assert round(sigma, 5) == volatility
-    # AmericanOptionImpliedVolatility: Implied Volatility calculation for American Option
-    # https://rdrr.io/rforge/RQuantLib/man/AmericanOptionImpliedVolatility.html
-    ...
-
-
 def test_american_value_greeks():
     # Just check crr_tree_val_avg can called correctly from Black model
+    # Expected result are obtained by derectly calling crr_tree_val_avg
     strike = 100.0
     forward = 100.0
     time_to_expiry = 0.50
@@ -147,3 +123,47 @@ def test_american_value_greeks():
     vegaAmericanPut = modelTree.vega(
         forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
     assert vegaAmericanPut == expected['vega']
+
+
+def test_implied_volatility():
+    # Implied Volatility calculation for European/American Call/Put Option
+    # Just check if the method can reproduce the volatility of each model
+    strike = 100.0
+    forward = 100.0
+    time_to_expiry = 0.50
+    volatility = 0.15
+    r = 0.1
+
+    # European Call
+    option_type = OptionTypes.EUROPEAN_CALL
+    price = black_value(forward, time_to_expiry, strike,
+                        r, volatility, option_type)
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # European Put
+    option_type = OptionTypes.EUROPEAN_PUT
+    price = black_value(forward, time_to_expiry, strike,
+                        r, volatility, option_type)
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # American Call
+    option_type = OptionTypes.AMERICAN_CALL
+    results = crr_tree_val_avg(forward, 0.0, 0.0, volatility,
+                               200, time_to_expiry, option_type.value, strike)
+    price = results['value']
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # American Put
+    option_type = OptionTypes.AMERICAN_PUT
+    results = crr_tree_val_avg(forward, 0.0, 0.0, volatility,
+                               200, time_to_expiry, option_type.value, strike)
+    price = results['value']
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
