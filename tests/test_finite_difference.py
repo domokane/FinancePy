@@ -152,7 +152,7 @@ def test_european_call():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -195,7 +195,7 @@ def test_european_put():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -238,7 +238,7 @@ def test_american_call():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -281,7 +281,7 @@ def test_american_put():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -327,8 +327,8 @@ def test_call_option():
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
-    assert v == approx(v0, 1e-1)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+    assert v == approx(v0, 1e-5)
 
 
 def test_put_option():
@@ -360,9 +360,9 @@ def test_put_option():
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=50, num_samples=200, update=False)
+                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
 
-    assert v == approx(v0, 1e-1)
+    assert v == approx(v0, 1e-5)
 
 
 def test_dx():
