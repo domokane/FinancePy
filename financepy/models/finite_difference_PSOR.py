@@ -23,7 +23,7 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
         option_type = option_type.value
 
     # Set default values
-    s_max = s_max or strike_price * 4
+    s_max = s_max or max(strike_price, spot_price) * 4
     num_samples = num_samples or s_max * 10
     num_steps = num_steps or int(num_samples // 2)
 
@@ -92,9 +92,6 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
             # Caluclate change compared to previous iteration
             delta = np.sum((res_kp1 - res_k) ** 2)
             res_k = deepcopy(res_kp1)
-
-        # Done with z_ip1 now
-        z = deepcopy(z_ip1)
 
         # Early exit for American options
         if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
