@@ -17,8 +17,30 @@ def calculate_fd_PSOR_matrix(x, risk_free_rate, mu, volatility, dt, theta):
 
 def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
                           strike_price, risk_free_rate, dividend_yield, option_type,
-                          num_steps=None, num_samples=None, s_max=None, theta=0.5, wind=0, digital=False,
+                          num_steps=None, num_samples=None, s_max=None, theta=0.5, digital=False,
                           smooth=False, delta_bound=1e-5, omega=0.5):
+    """
+    Solve the Black Scholes equation using the Projected Successive Over Relaxation (PSOR) method.
+    This is based on the method outlined here:
+    https://www.diva-portal.org/smash/get/diva2:620212/fulltext01.pdf
+
+    This method uses a uniform grid.
+
+    The parameters specific to this model a described below
+
+    Parameters:
+        num_steps: Number of time steps used
+        num_samples: Number of stock prices the model evalutates
+        s_max: Maximum stock price evaluated
+
+        theta: Parameter used for theta solver. Set to 0.5 for Crank Nicolson method
+
+        digital: True when payoff digital
+        smooth: True when payoff is smooth
+
+        delta_bound: PSOR with iterate until the square difference over the curve is less than this value
+        omega: Weighting parameter for PSOR, balancing previous and current iteration
+    """
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
 
@@ -89,8 +111,10 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
             res_kp1[-1] = res_k[-1]
             res_kp1 = omega * res_k + (1 - omega) * res_kp1
 
-            # Caluclate change compared to previous iteration
+            # Calculate change compared to previous iteration
             delta = np.sum((res_kp1 - res_k) ** 2)
+
+            # roll back i.e. k+1 -> k
             res_k = deepcopy(res_kp1)
 
         # Early exit for American options
