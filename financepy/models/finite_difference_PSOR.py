@@ -122,8 +122,5 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
             idx = res_k < payoff[0]
             res_k[idx] = payoff[0][idx]
 
-    # Index most closely matching spot price
-    # TODO Interpolate to get closer match
-    sample = np.argmin(np.abs(s - spot_price))
-
-    return res_k[int(sample)]
+    # Interpolate in case spot price doesn't fall exactly on grid value
+    return np.interp(spot_price, s, res_k)
