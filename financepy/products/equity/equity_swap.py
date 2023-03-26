@@ -14,8 +14,8 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.swap_float_leg import SwapFloatLeg
 from ...products.equity.equity_swap_leg import EquitySwapLeg
 
-
 ###############################################################################
+
 class EquitySwap:
     """ Class for managing a standard Equity vs Float leg swap. This is a 
     contract in which an equity payment leg is exchanged for a series of 
@@ -135,6 +135,8 @@ class EquitySwap:
                                                     firstFixingRate)
         
         return self._equity_leg_value + self._rate_leg_value
+
+    ###########################################################################
     
     def _fill_rate_notional_array(self):
         """ In an equity swap, at every equity reset, the notional
@@ -161,6 +163,8 @@ class EquitySwap:
             for _ in range(multiple):
                 self._rate_leg._notional_array.append(lastNotional)
 
+    ###########################################################################
+    
     def __repr__(self):
         s = "EQUITY LEG:\n"
         s += self._equity_leg.__repr__()
@@ -169,4 +173,5 @@ class EquitySwap:
 
         return s
 
+    ###########################################################################
         

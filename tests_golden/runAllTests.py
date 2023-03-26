@@ -10,9 +10,7 @@ import glob
 from financepy.utils.error import FinError
 from financepy.utils.date import set_date_format, DateFormatTypes
 
-
 # This only works if I have an init.py in the parent folder
-
 
 set_date_format(DateFormatTypes.UK_LONG)
 

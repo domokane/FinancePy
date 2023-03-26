@@ -576,11 +576,7 @@ def test_Bond_eom():
 
     bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, face)
 
-#    print(bond.coupon_dates(settle_date))
-
-    ai = bond.calc_accrued_interest(settle_date)
-    print(ai)
-    # should be 8406.59
+    ai = bond.calc_accrued_interest(settle_date) # should be 8406.593406
     
 ###############################################################################
     
