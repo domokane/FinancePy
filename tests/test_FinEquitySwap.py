@@ -4,7 +4,7 @@
 
 from financepy.products.equity.equity_swap import EquitySwap
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.equity.equity_swap_leg import SwapEquityLeg
+from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
@@ -163,7 +163,7 @@ def test_equity_swap_with_dividends():
     dividend_curve = DiscountCurveFlat(effective_date, dividendRate)
     index_curve    = DiscountCurveFlat(effective_date, indexRate)
 
-    equity_swap_leg = SwapEquityLeg(effective_date,
+    equity_swap_leg = EquitySwapLeg(effective_date,
                                     maturity_date,
                                     leg_type,
                                     freq_type,
