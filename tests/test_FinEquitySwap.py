@@ -2,11 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.products.equity.equity_swap import EquitySwap
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.equity.equity_swap_leg import EquitySwapLeg
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -16,6 +11,10 @@ from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.global_types import SwapTypes, ReturnTypes
 from financepy.utils.math import ONE_MILLION
 
+from financepy.products.equity.equity_swap import EquitySwap
+from financepy.products.equity.equity_swap_leg import EquitySwapLeg
+
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 def test_equity_swap_at_inception():
 
