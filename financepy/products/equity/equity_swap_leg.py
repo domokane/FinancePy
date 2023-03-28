@@ -18,7 +18,7 @@ from ...market.curves.discount_curve_flat import DiscountCurveFlat
 ##########################################################################
 
 
-class SwapEquityLeg:
+class EquitySwapLeg:
     """ Class for managing the equity leg of an equity swap. An equity leg is 
     a leg with a sequence of flows calculated according to an ISDA schedule 
     and follows the economics of a collection of equity forward contracts. 

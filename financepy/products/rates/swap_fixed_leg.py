@@ -10,7 +10,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.schedule import Schedule
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import format_table, label_to_string, check_argument_types
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -208,21 +208,26 @@ class SwapFixedLeg:
             print("Payments not calculated.")
             return
 
-        header = "PAY_DATE     ACCR_START   ACCR_END      DAYS  YEARFRAC"
-        header += "    RATE      PAYMENT "
-        print(header)
+        header = [ "PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", 
+                    "DAYS", "YEARFRAC", "RATE", "PMNT"]
 
+        rows = []
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  %8.6f  %11.2f" %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow],
-                   self._rates[iFlow] * 100.0,
-                   self._payments[iFlow]))
+            rows.append([
+                iFlow + 1,
+                self._payment_dates[iFlow],
+                self._startAccruedDates[iFlow],
+                self._endAccruedDates[iFlow],
+                self._accrued_days[iFlow],
+                round(self._year_fracs[iFlow],4),
+                round(self._rates[iFlow] * 100.0, 4),
+                round(self._payments[iFlow], 2),
+            ])
+
+        table = format_table(header, rows)
+        print("\nPAYMENTS SCHEDULE:")
+        print(table)
 
 ###############################################################################
 
@@ -241,24 +246,26 @@ class SwapFixedLeg:
             print("Payments not calculated.")
             return
 
-        header = "PAY_DATE     ACCR_START   ACCR_END     DAYS  YEARFRAC"
-        header += "    RATE      PAYMENT       DF          PV        CUM PV"
-        print(header)
+        header = [ "PAY_NUM", "PAY_DATE", "NOTIONAL", 
+                  "RATE", "PMNT", "DF", "PV", "CUM_PV"]
 
+        rows = []
         num_flows = len(self._payment_dates)
-
         for iFlow in range(0, num_flows):
-            print("%11s  %11s  %11s  %4d  %8.6f  %8.5f  % 11.2f  %10.8f  % 11.2f  % 11.2f" %
-                  (self._payment_dates[iFlow],
-                   self._startAccruedDates[iFlow],
-                   self._endAccruedDates[iFlow],
-                   self._accrued_days[iFlow],
-                   self._year_fracs[iFlow],
-                   self._rates[iFlow] * 100.0,
-                   self._payments[iFlow],
-                   self._paymentDfs[iFlow],
-                   self._paymentPVs[iFlow],
-                   self._cumulativePVs[iFlow]))
+            rows.append([
+                iFlow + 1,
+                self._payment_dates[iFlow],
+                round(self._notional, 0),
+                round(self._rates[iFlow] * 100.0, 4),
+                round(self._payments[iFlow], 2),
+                round(self._paymentDfs[iFlow], 4),
+                round(self._paymentPVs[iFlow], 2),
+                round(self._cumulativePVs[iFlow], 2),
+            ])
+
+        table = format_table(header, rows)
+        print("\nPAYMENTS VALUATION:")
+        print(table)
 
 ##########################################################################
 
