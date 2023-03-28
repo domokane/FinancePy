@@ -3,16 +3,20 @@
 # Guillaume Lefieux
 ###############################################################################
 
-from financepy.utils.global_types import OptionTypes
-from financepy.models.black import Black
-import sys
 import numpy as np
+
+from financepy.utils.global_types import OptionTypes
+from financepy.models.black import Black, BlackTypes, black_value, implied_volatility
+from financepy.utils.date import Date
+from financepy.utils.global_vars import gDaysInYear
+from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 forward = 0.034
 strike = 0.050
 riskFreeIR = 0.00
 time_to_expiry = 2.0
 volatility = 0.20
+num_steps_per_year = 252.0
 
 call_optionType = OptionTypes.EUROPEAN_CALL
 put_optionType = OptionTypes.EUROPEAN_PUT
@@ -86,3 +90,80 @@ def test_vega():
 
     assert round(vegaCall*10, 4) == 0.0909
     assert round(vegaPut*10, 4) == 0.0909
+
+
+def test_american_value_greeks():
+    # Just check crr_tree_val_avg can called correctly from Black model
+    # Expected result are obtained by derectly calling crr_tree_val_avg
+    strike = 100.0
+    forward = 100.0
+    time_to_expiry = 0.50
+    volatility = 0.15
+    modelTree = Black(volatility, implementation_type=BlackTypes.CRR_TREE,
+                      num_steps=num_steps_per_year)
+    expected = {
+        'value': 4.229429096724559,
+        'delta': -0.4788528545163757,
+        'gamma': 0.037634509512885564,
+        'theta': -4.233898040175347,
+        'vega': 28.167013009550956
+    }
+    valueAmericanPut = modelTree.value(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert round(valueAmericanPut, 5) == round(expected['value'], 5)
+    deltaAmericanPut = modelTree.delta(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert round(deltaAmericanPut, 5) == round(expected['delta'], 5)
+    gammaAmericanPut = modelTree.gamma(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert round(gammaAmericanPut, 5) == round(expected['gamma'], 5)
+    thetaAmericanPut = modelTree.theta(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert round(thetaAmericanPut, 5) == round(expected['theta'], 5)
+    vegaAmericanPut = modelTree.vega(
+        forward, strike, time_to_expiry, df, OptionTypes.AMERICAN_PUT)
+    assert round(vegaAmericanPut, 5) == round(expected['vega'], 5)
+
+
+def test_implied_volatility():
+    # Implied Volatility calculation for European/American Call/Put Option
+    # Just check if the method can reproduce the volatility of each model
+    strike = 100.0
+    forward = 100.0
+    time_to_expiry = 0.50
+    volatility = 0.15
+    r = 0.1
+
+    # European Call
+    option_type = OptionTypes.EUROPEAN_CALL
+    price = black_value(forward, time_to_expiry, strike,
+                        r, volatility, option_type)
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # European Put
+    option_type = OptionTypes.EUROPEAN_PUT
+    price = black_value(forward, time_to_expiry, strike,
+                        r, volatility, option_type)
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # American Call
+    option_type = OptionTypes.AMERICAN_CALL
+    results = crr_tree_val_avg(forward, 0.0, 0.0, volatility,
+                               200, time_to_expiry, option_type.value, strike)
+    price = results['value']
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
+
+    # American Put
+    option_type = OptionTypes.AMERICAN_PUT
+    results = crr_tree_val_avg(forward, 0.0, 0.0, volatility,
+                               200, time_to_expiry, option_type.value, strike)
+    price = results['value']
+    sigma = implied_volatility(
+        forward, time_to_expiry, r, strike, price, option_type)
+    assert round(sigma, 5) == volatility
