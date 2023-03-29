@@ -5,9 +5,6 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
-from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
-from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
 from financepy.utils.global_vars import gDaysInYear
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
