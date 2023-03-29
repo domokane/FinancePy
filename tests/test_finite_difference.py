@@ -44,7 +44,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07939664662902503, abs=1e-3)
 
     smooth = True
@@ -52,7 +52,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07945913698961202, abs=1e-3)
     smooth = 0
 
@@ -61,7 +61,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2153451094307548, abs=1e-3)
 
     #smooth dig
@@ -70,7 +70,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.22078914857802928, abs=1e-3)
     smooth = 0
     dig = 0
@@ -80,7 +80,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2139059947533305, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_PUT
@@ -88,7 +88,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2165916613669189, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_CALL
@@ -96,7 +96,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.10259475990431438, abs=1e-3)
     option_type = OptionTypes.EUROPEAN_CALL
 
@@ -105,7 +105,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07834108133101789, abs=1e-3)
 
     wind = 2
@@ -113,7 +113,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.08042112779963827, abs=1e-3)
 
     wind = -1
@@ -121,7 +121,7 @@ def test_black_scholes_finite_difference():
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
-                                        num_std=num_std, num_steps_per_year=num_t, num_samples=num_s, update=update)
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.08042112779963827, abs=1e-3)
     wind = 0
 
@@ -152,7 +152,7 @@ def test_european_call():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=5000, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -195,7 +195,7 @@ def test_european_put():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -238,7 +238,7 @@ def test_american_call():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -281,7 +281,7 @@ def test_american_put():
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
     tree = EquityBinomialTree()
     value = tree.value(
         spot_price,
@@ -327,7 +327,7 @@ def test_call_option():
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
     assert v == approx(v0, 1e-5)
 
 
@@ -360,7 +360,7 @@ def test_put_option():
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
                                         option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                        num_std=5, num_steps_per_year=2500, num_samples=10000, update=False)
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
 
     assert v == approx(v0, 1e-5)
 

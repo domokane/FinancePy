@@ -115,8 +115,10 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     return A
 
 
-def fd_roll_backwards(res, theta, Ai=np.array([]), Ae=np.array([])):
+def fd_roll_backwards(res, theta, Ai=None, Ae=None):
     # TODO Test for more than one vector
+    Ai = np.array([]) if Ai is None else Ai
+    Ae = np.array([]) if Ae is None else Ae
     num_vectors = len(res)
     mm = 1
 
@@ -133,7 +135,9 @@ def fd_roll_backwards(res, theta, Ai=np.array([]), Ae=np.array([])):
     return res
 
 
-def fd_roll_forwards(res, theta, Ai=np.array([]), Ae=np.array([])):
+def fd_roll_forwards(res, theta, Ai=None, Ae=None):
+    Ai = np.array([]) if Ai is None else Ai
+    Ae = np.array([]) if Ae is None else Ae
     num_vectors = len(res)
     mm = num_vectors // 2  # integer division
 
@@ -212,7 +216,7 @@ def option_payoff(s, strike, smooth, dig, option_type):
 
 def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
                                     strike_price, risk_free_rate, dividend_yield, option_type,
-                                    num_steps_per_year, num_samples, num_std=5, theta=0.5, wind=0, digital=False,
+                                    num_time_steps=None, num_samples=2000, num_std=5, theta=0.5, wind=0, digital=False,
                                     smooth=False, update=False):
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
@@ -234,7 +238,7 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
     payoff = option_payoff(s, strike_price, smooth, digital, option_type)
 
     # time steps
-    num_steps = int(num_steps_per_year * time_to_expiry)
+    num_steps = num_time_steps or num_samples // 2
     dt = time_to_expiry / max(1, num_steps)
 
     # Make time series for interest rate, drift, and variance

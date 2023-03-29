@@ -111,7 +111,6 @@ class BlackScholes(Model):
                                                     dividend_yield=dividendRate,
                                                     volatility=self._volatility,
                                                     option_type=option_type.value,
-                                                    num_steps_per_year=self._num_steps_per_year,
                                                     **self._params
                                                     )
                 return v
@@ -200,7 +199,6 @@ class BlackScholes(Model):
                                                     dividend_yield=dividendRate,
                                                     volatility=self._volatility,
                                                     option_type=option_type.value,
-                                                    num_steps_per_year=self._num_steps_per_year,
                                                     **self._params
                                                     )
                 return v
