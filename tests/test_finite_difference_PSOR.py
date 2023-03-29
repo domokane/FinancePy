@@ -4,12 +4,9 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
-from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
-from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
 from financepy.utils.global_vars import gDaysInYear
+from financepy.models.equity_crr_tree import crr_tree_val_avg
 
-import numpy as np
 from pytest import approx
 
 
@@ -108,35 +105,26 @@ def test_european_call():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     option_type = OptionTypes.EUROPEAN_CALL
-    num_steps_per_year = 50
-    params = np.array([1.0, strike_price])
+    num_steps_per_year = 2000
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
-                                        time_to_expiry=time_to_expiry,
-                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                        dividend_yield=dividend_yield, digital=0,
-                                        option_type=option_type, smooth=0, theta=0.5,
-                                        )
-    tree = EquityBinomialTree()
-    value = tree.value(
-        spot_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps_per_year,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+                              time_to_expiry=time_to_expiry,
+                              strike_price=strike_price, risk_free_rate=risk_free_rate,
+                              dividend_yield=dividend_yield, digital=0,
+                              option_type=option_type, smooth=0, theta=0.5,
+                              )
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
+
 
 
 def test_european_put():
@@ -151,14 +139,9 @@ def test_european_put():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps_per_year = 100
+    num_steps_per_year = 2000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     option_type = OptionTypes.EUROPEAN_PUT
-    params = np.array([-1.0, strike_price])
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
                               time_to_expiry=time_to_expiry,
@@ -166,20 +149,15 @@ def test_european_put():
                               dividend_yield=dividend_yield, digital=0,
                               option_type=option_type, smooth=0, theta=0.5,
                               )
-    tree = EquityBinomialTree()
-    value = tree.value(
-        spot_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps_per_year,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
 
 
 def test_american_call():
@@ -194,35 +172,26 @@ def test_american_call():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps_per_year = 100
+    num_steps_per_year = 2000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.AMERICAN
     option_type = OptionTypes.AMERICAN_CALL
-    params = np.array([1.0, strike_price])
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
-                                        time_to_expiry=time_to_expiry,
-                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
-                                        dividend_yield=dividend_yield, digital=0,
-                                        option_type=option_type, smooth=0, theta=0.5,
-                                        )
-    tree = EquityBinomialTree()
-    value = tree.value(
-        spot_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps_per_year,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+                              time_to_expiry=time_to_expiry,
+                              strike_price=strike_price, risk_free_rate=risk_free_rate,
+                              dividend_yield=dividend_yield, digital=0,
+                              option_type=option_type, smooth=0, theta=0.5,
+                              )
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
+
 
 
 def test_american_put():
@@ -237,14 +206,9 @@ def test_american_put():
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps_per_year = 100
+    num_steps_per_year = 2000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.AMERICAN
     option_type = OptionTypes.AMERICAN_PUT
-    params = np.array([-1.0, strike_price])
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
                               time_to_expiry=time_to_expiry,
@@ -252,20 +216,15 @@ def test_american_put():
                               dividend_yield=dividend_yield, digital=0,
                               option_type=option_type, smooth=0, theta=0.5,
                               )
-    tree = EquityBinomialTree()
-    value = tree.value(
-        spot_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps_per_year,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
 
 
 def test_call_option():

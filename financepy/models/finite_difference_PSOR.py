@@ -45,7 +45,7 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
         option_type = option_type.value
 
     # Set default values
-    s_max = s_max or max(strike_price, spot_price) * 4
+    s_max = s_max or max(strike_price, spot_price) * 10
     num_samples = num_samples or s_max * 10
     num_steps = num_steps or int(num_samples // 2)
 
