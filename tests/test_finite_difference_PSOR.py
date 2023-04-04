@@ -214,7 +214,7 @@ def test_american_put():
                               time_to_expiry=time_to_expiry,
                               strike_price=strike_price, risk_free_rate=risk_free_rate,
                               dividend_yield=dividend_yield, digital=0,
-                              option_type=option_type, smooth=0, theta=0.5,
+                              option_type=option_type, smooth=0
                               )
     value = crr_tree_val_avg(spot_price,
                              risk_free_rate,  # continuously compounded
