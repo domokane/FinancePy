@@ -73,7 +73,7 @@ def PSOR_roll_backwards(Ae, Ai, delta_bound, option_type, payoff, res_k, num_ste
 
 
 @njit(fastmath=True, cache=True)
-def PSOR(Ai, acc, omega, initial_value, z_ip1):
+def PSOR(Ai, acc, omega, initial_value, z_ip1, max_iter=1000):
     nloops = 0
     res_k = initial_value
     res_kp1 = initial_value.copy()
@@ -88,10 +88,9 @@ def PSOR(Ai, acc, omega, initial_value, z_ip1):
             res_kp1[j] = omega * res_kp1[j] + (1 - omega) * res_k[j]
 
         # Calculate change compared to previous iteration
-        delta_new = np.sum((res_kp1 - res_k) ** 2)
-        if delta_new > delta and nloops > 0:
+        delta = np.sum((res_kp1 - res_k) ** 2)
+        if nloops > max_iter:
             raise RuntimeError("Calculation is not converging")
-        delta = delta_new
 
         # roll back i.e. k+1 -> k
         res_k = res_kp1.copy()
