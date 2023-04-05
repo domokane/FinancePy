@@ -92,7 +92,6 @@ def test_black_scholes_fd_PSOR():
     option_type = OptionTypes.EUROPEAN_CALL
 
 
-
 def test_european_call():
     """
     Check finite difference method gives similar result to binomial tree
@@ -124,7 +123,6 @@ def test_european_call():
                              option_type.value,
                              strike_price)
     assert v == approx(value['value'], abs=1e-3)
-
 
 
 def test_european_put():
@@ -181,6 +179,7 @@ def test_american_call():
                               strike_price=strike_price, risk_free_rate=risk_free_rate,
                               dividend_yield=dividend_yield, digital=0,
                               option_type=option_type, smooth=0, theta=0.5,
+                              num_samples=5000
                               )
     value = crr_tree_val_avg(spot_price,
                              risk_free_rate,  # continuously compounded
@@ -191,7 +190,6 @@ def test_american_call():
                              option_type.value,
                              strike_price)
     assert v == approx(value['value'], abs=1e-3)
-
 
 
 def test_american_put():
@@ -214,7 +212,8 @@ def test_american_put():
                               time_to_expiry=time_to_expiry,
                               strike_price=strike_price, risk_free_rate=risk_free_rate,
                               dividend_yield=dividend_yield, digital=0,
-                              option_type=option_type, smooth=0
+                              option_type=option_type, smooth=0,
+                              num_samples=5000
                               )
     value = crr_tree_val_avg(spot_price,
                              risk_free_rate,  # continuously compounded
