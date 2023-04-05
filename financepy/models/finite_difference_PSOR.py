@@ -48,32 +48,31 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
     # Implicit
     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
-    res = PSOR_roll_backwards(res_k=res, payoff=payoff, option_type=option_type, delta_bound=1e-5, Ai=Ai, Ae=Ae,
-                              num_steps=num_steps)
+    # Loop backwards through timesteps
+    for _ in range(num_steps - 1, -1, -1):
+        res = PSOR_roll_backwards(res_k=res, acc=1e-5, Ai=Ai, Ae=Ae)
+
+        # Early exit for American options
+        if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
+            idx = res < payoff[0]
+            res[idx] = payoff[0][idx]
 
     return res[num_samples // 2]
 
 
 @njit(fastmath=True, cache=True)
-def PSOR_roll_backwards(Ae, Ai, delta_bound, option_type, payoff, res_k, num_steps):
-    # Loop backwards through timesteps
-    for i in range(num_steps - 1, -1, -1):
-        # Explicit step
-        z_ip1 = band_matrix_multiplication(Ae, 1, 1, res_k)
+def PSOR_roll_backwards(Ae, Ai, acc, res_k):
+    # Explicit step
+    z_ip1 = band_matrix_multiplication(Ae, 1, 1, res_k)
 
-        # PSOR - Iterate until the total change in res is less than delta_bound
-        omega = 1.9  # TODO Dynamically update omega
-        res_k = PSOR(Ai, delta_bound, omega, res_k, z_ip1)
-
-        # Early exit for American options
-        if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
-            idx = res_k < payoff[0]
-            res_k[idx] = payoff[0][idx]
+    # PSOR - Iterate until the total change in res is less than acc
+    omega = 1.9  # TODO Dynamically update omega
+    res_k = PSOR(Ai, omega, res_k, z_ip1, acc=acc)
     return res_k
 
 
 @njit(fastmath=True, cache=True)
-def PSOR(Ai, acc, omega, initial_value, z_ip1, max_iter=1000):
+def PSOR(Ai, omega, initial_value, z_ip1, max_iter=1000, acc=1e-5):
     nloops = 0
     res_k = initial_value
     res_kp1 = initial_value.copy()
@@ -85,6 +84,7 @@ def PSOR(Ai, acc, omega, initial_value, z_ip1, max_iter=1000):
         for j in range(1, len(res_k)-1):
             res_kp1[j] = (z_ip1[j] - a[j] * res_kp1[j-1] - c[j] * res_k[j+1]) / b[j]
 
+            # Over relaxation
             res_kp1[j] = omega * res_kp1[j] + (1 - omega) * res_k[j]
 
         # Calculate change compared to previous iteration
