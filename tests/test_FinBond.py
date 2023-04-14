@@ -12,6 +12,9 @@ from financepy.utils.date import Date
 from financepy.utils.math import ONE_MILLION
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import YTMCalcType, Bond
+import numpy as np
+
+
 
 
 def test_bondtutor_example():
@@ -259,5 +262,27 @@ def test_bond_cfets():
 
 
 
+def test_key_rate_durations():
+    settlement_date = Date(21, 7, 2017)
+    issue_date = Date(13, 5, 2012)
+    maturity_date = Date(13, 5, 2022)
+    coupon = 0.027
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.THIRTY_E_360_ISDA
+    face = 100.0
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, face)
 
+    yld = coupon
 
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date, yld)
+
+    assert (key_rate_tenors == np.array(
+                [0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 20, 30])).all()
+    
+    # The following test cases are rounded to 6 decimal places
+    test_case_krds = [0.00308, 0.005003, 0.022352,
+                      0.050164, 0.073384, 0.890714, 3.414422, 0.0, 0.0, 0.0, 0.0]
+    
+    for i in range(len(key_rate_durations)):
+        assert round(key_rate_durations[i], 6) == test_case_krds[i]
+        
