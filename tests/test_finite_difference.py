@@ -5,9 +5,8 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.products.equity.equity_binomial_tree import EquityTreePayoffTypes
-from financepy.products.equity.equity_binomial_tree import EquityTreeExerciseTypes
-from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
+from financepy.utils.global_vars import gDaysInYear
+from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 import numpy as np
 from pytest import approx
@@ -24,86 +23,103 @@ def test_black_scholes_finite_difference():
     s0 = 1
     r = 0.04
     dividend_yield = 0.07
-    sigma = 0.2
+    volatility = 0.2
 
-    valuation_date = Date(1, 1, 2016)
-    expiry_date = Date(30, 12, 2020)
-    discount_curve = DiscountCurveFlat(valuation_date, r)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    time_to_expiry = 5
     strike = 1.025
-    dig = 0
-    smooth = 0
+    dig = False
+    smooth = False
 
     theta = 0.5
     wind = 0
     num_std = 5
     num_t = 50
     num_s = 200
-    update = 0
+    update = False
 
     option_type = OptionTypes.EUROPEAN_CALL
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07939664662902503, abs=1e-3)
 
     smooth = True
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07945913698961202, abs=1e-3)
     smooth = 0
 
     dig = 1
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2153451094307548, abs=1e-3)
 
     #smooth dig
     smooth = 1
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.22078914857802928, abs=1e-3)
     smooth = 0
     dig = 0
 
     option_type = OptionTypes.EUROPEAN_PUT
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2139059947533305, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_PUT
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.2165916613669189, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_CALL
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.10259475990431438, abs=1e-3)
     option_type = OptionTypes.EUROPEAN_CALL
 
     wind = 1
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.07834108133101789, abs=1e-3)
 
     wind = 2
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.08042112779963827, abs=1e-3)
 
     wind = -1
-    _, v = black_scholes_finite_difference(s0, sigma, expiry_date, valuation_date, strike, discount_curve,
-                                           dividend_curve, dig, option_type, smooth, theta, wind,
-                                           num_std, num_t, num_s, update)
+    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+                                        strike_price=strike, risk_free_rate=r,
+                                        dividend_yield=dividend_yield, digital=dig, option_type=option_type,
+                                        smooth=smooth, theta=theta, wind=wind,
+                                        num_std=num_std, num_time_steps=num_t, num_samples=num_s, update=update)
     assert v == approx(0.08042112779963827, abs=1e-3)
     wind = 0
 
@@ -112,168 +128,134 @@ def test_european_call():
     """
     Check finite difference method gives similar result to binomial tree
     """
-    stock_price = 50.0
+    spot_price = 50.0
     risk_free_rate = 0.06
     dividend_yield = 0.00
     volatility = 0.40
 
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps = 100
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    num_steps_per_year = 20000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     option_type = OptionTypes.EUROPEAN_CALL
-    params = np.array([1.0, strike_price])
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=strike_price, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
-    tree = EquityBinomialTree()
-    value = tree.value(
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_time_steps=5000, num_samples=10000, update=False)
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
 
 
 def test_european_put():
     """
     Check finite difference method gives similar result to binomial tree
     """
-    stock_price = 50.0
+    spot_price = 50.0
     risk_free_rate = 0.06
     dividend_yield = 0.00
     volatility = 0.40
 
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps = 100
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    num_steps_per_year = 20000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.EUROPEAN
     option_type = OptionTypes.EUROPEAN_PUT
-    params = np.array([-1.0, strike_price])
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=strike_price, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
-    tree = EquityBinomialTree()
-    value = tree.value(
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
 
 
 def test_american_call():
     """
     Check finite difference method gives similar result to binomial tree
     """
-    stock_price = 50.0
+    spot_price = 50.0
     risk_free_rate = 0.06
     dividend_yield = 0.05
     volatility = 0.40
 
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps = 100
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    num_steps_per_year = 20000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.AMERICAN
     option_type = OptionTypes.AMERICAN_CALL
-    params = np.array([1.0, strike_price])
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=strike_price, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
-    tree = EquityBinomialTree()
-    value = tree.value(
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=6, num_time_steps=2500, num_samples=10000, update=False)
+
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
 
 
 def test_american_put():
     """
     Check finite difference method gives similar result to binomial tree
     """
-    stock_price = 50.0
+    spot_price = 50.0
     risk_free_rate = 0.06
     dividend_yield = 0.05
     volatility = 0.40
 
     valuation_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
-    num_steps = 100
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    num_steps_per_year = 20000
     strike_price = 50.0
-    payoff = EquityTreePayoffTypes.VANILLA_OPTION
-    exercise = EquityTreeExerciseTypes.AMERICAN
     option_type = OptionTypes.AMERICAN_PUT
-    params = np.array([-1.0, strike_price])
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=strike_price, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
-    tree = EquityBinomialTree()
-    value = tree.value(
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps,
-        valuation_date,
-        payoff,
-        expiry_date,
-        payoff,
-        exercise,
-        params)  # price, delta, gamma, theta
-    assert v == approx(value[0], abs=1e-1)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=strike_price, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
+    value = crr_tree_val_avg(spot_price,
+                             risk_free_rate,  # continuously compounded
+                             dividend_yield,  # continuously compounded
+                             volatility,  # Black scholes volatility
+                             num_steps_per_year,
+                             time_to_expiry,
+                             option_type.value,
+                             strike_price)
+    assert v == approx(value['value'], abs=1e-3)
+
 
 def test_call_option():
     """
@@ -286,25 +268,26 @@ def test_call_option():
         expiry_date, strike_price, option_type)
 
     valuation_date = Date(1, 1, 2015)
-    stock_price = 100
+    spot_price = 100
     volatility = 0.30
-    interest_rate = 0.05
+    risk_free_rate = 0.05
     dividend_yield = 0.01
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     # Call option
-    v0 = call_option.value(valuation_date, stock_price,
+    v0 = call_option.value(valuation_date, spot_price,
                            discount_curve, dividend_curve, model)
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=100.0, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
-    assert v == approx(v0, 1e-1)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=100.0, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
+    assert v == approx(v0, 1e-5)
 
 
 def test_put_option():
@@ -318,38 +301,39 @@ def test_put_option():
         expiry_date, strike_price, option_type)
 
     valuation_date = Date(1, 1, 2015)
-    stock_price = 100
+    spot_price = 100
     volatility = 0.30
-    interest_rate = 0.05
+    risk_free_rate = 0.05
     dividend_yield = 0.1
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
     dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
 
     # Call option
-    v0 = put_option.value(valuation_date, stock_price,
+    v0 = put_option.value(valuation_date, spot_price,
                           discount_curve, dividend_curve, model)
 
-    _, v = black_scholes_finite_difference(stock_price=stock_price, sigma=volatility,
-                                           expiry_date=expiry_date, valuation_date=valuation_date,
-                                           strike_price=100.0, discount_curve=discount_curve,
-                                           dividend_curve=dividend_curve, digital=0,
-                                           option_type=option_type, smooth=0, theta=0.5, wind=0,
-                                           num_std=5, num_steps=50, num_samples=200, update=False)
+    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+                                        time_to_expiry=time_to_expiry,
+                                        strike_price=100.0, risk_free_rate=risk_free_rate,
+                                        dividend_yield=dividend_yield, digital=0,
+                                        option_type=option_type, smooth=0, theta=0.5, wind=0,
+                                        num_std=5, num_time_steps=2500, num_samples=10000, update=False)
 
-    assert v == approx(v0, 1e-1)
+    assert v == approx(v0, 1e-5)
 
 
 def test_dx():
     np.testing.assert_array_equal(dx([0, 1, 2, 3, 4, 5], wind=0),
-                                  np.array([[-1.,  0.,  1.],
+                                  np.array([[0.,  -1.,  1.],
                                             [-0.5,  0.,  0.5],
                                             [-0.5,  0.,  0.5],
                                             [-0.5,  0.,  0.5],
                                             [-0.5,  0.,  0.5],
                                             [-1.,  1.,  0.]]))
     np.testing.assert_array_almost_equal(dx([0, 1, 1.5, 3, 5, 10], wind=0),
-                                         np.array([[-1., 0., 1.],
+                                         np.array([[0., -1, 1.],
                                                    [-0.33333333, -1., 1.33333333],
                                                    [-1.5, 1.33333333, 0.16666667],
                                                    [-0.38095238, 0.16666667, 0.21428571],

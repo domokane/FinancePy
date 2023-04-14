@@ -12,7 +12,7 @@ from ...utils.helpers import check_argument_types
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.swap_float_leg import SwapFloatLeg
-from ...products.equity.equity_swap_leg import SwapEquityLeg
+from ...products.equity.equity_swap_leg import EquitySwapLeg
 
 ###############################################################################
 
@@ -82,7 +82,7 @@ class EquitySwap:
         if eq_leg_type == SwapTypes.PAY:
             rate_leg_type = SwapTypes.RECEIVE
 
-        self._equity_leg = SwapEquityLeg(effective_date,
+        self._equity_leg = EquitySwapLeg(effective_date,
                                          self._maturity_date,
                                          eq_leg_type,
                                          eq_freq_type,

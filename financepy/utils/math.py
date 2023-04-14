@@ -666,6 +666,7 @@ def npv(irr: float, times_cfs: list):
     return _npv
 
 
+@njit(fastmath=True, cache=True)
 def band_matrix_multiplication(A, m1, m2, b):
     n = A.shape[0]
     x = np.zeros(n)
@@ -677,9 +678,9 @@ def band_matrix_multiplication(A, m1, m2, b):
     ju[ju > n - 1] = n - 1
 
     for i in range(n):
-        j = np.arange(jl[i], ju[i] + 1)
-        k = j - i + m1
-        x[i] += np.sum(A[i, k] * b[j])
+        for j in range(jl[i], ju[i] + 1):
+            k = j - i + m1
+            x[i] += A[i, k] * b[j]
 
     return x
 
