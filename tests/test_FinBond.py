@@ -301,8 +301,8 @@ def test_key_rate_durations():
 
 
 def test_key_rate_durations_Bloomberg_example():
-    accrual_type, frequencyType, settlementDays, exDiv, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES)
+    accrual_type, frequencyType, settlementDays, exDiv, calendar = \
+    get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     # interest accrues on this date. Issue date is 01/08/2022
     issue_date = Date(31, 7, 2022)
@@ -311,12 +311,12 @@ def test_key_rate_durations_Bloomberg_example():
     bond = Bond(issue_date, maturity_date, cpn, frequencyType, accrual_type)
 
     # US Government Equivalent yield on Bloomberg as of 17 March 2023
-    ytm = 3.803140/100 
+    ytm = 3.803140/100
 
     settlement_date = Date(20, 3, 2023)  # next settle date for this bond
     key_rate_tenors, key_rate_durations = bond.key_rate_durations(
         settlement_date, ytm)
-    
+
     assert (key_rate_tenors == np.array(
         [0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 20, 30])).all()
 
