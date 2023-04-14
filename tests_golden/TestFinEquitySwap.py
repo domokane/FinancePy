@@ -17,7 +17,7 @@ from financepy.utils.global_types import SwapTypes, ReturnTypes
 from financepy.utils.math import ONE_MILLION
 
 from financepy.products.equity.equity_swap import EquitySwap
-from financepy.products.equity.equity_swap_leg import SwapEquityLeg
+from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 

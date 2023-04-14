@@ -23,6 +23,7 @@ def _x(rho, z):
     b = 1.0 - rho
     return np.log(a / b)
 
+##############################################################################
 
 @njit(float64(float64[:], float64, float64, float64),
       fastmath=True, cache=True)

@@ -471,4 +471,5 @@ test_FinFXVanillaOptionWystupExample1()
 test_FinFXVanillaOptionWystupExample2()
 test_FinFXVanillaOptionBloombergExample()
 test_FinFXVanillaOptionHullExample()
+test_FinFX
 testCases.compareTestCases()
