@@ -298,11 +298,12 @@ class FXVanillaOption():
             if type(model) == BlackScholes:
                 volatility = model._volatility
             elif type(model) == SABR:
-                volatility = vol_function_sabr(model.alpha,
-                                               model.beta,
-                                               model.rho,
-                                               model.nu,
-                                               F0T, K, tdel)
+
+                print("TESTING SABR...........")
+
+                params_list = [model.alpha, model.beta, model.rho, model.nu]
+                
+                volatility = vol_function_sabr(params_list, F0T, K, tdel)
 
             if np.any(volatility < 0.0):
                 raise FinError("Volatility should not be negative.")
