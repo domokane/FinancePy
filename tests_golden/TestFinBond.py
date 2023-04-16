@@ -641,7 +641,7 @@ def test_key_rate_durations_Bloomberg_example():
                       1.497000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     print(bloomberg_krds) 
-       
+
     for i in range(len(key_rate_durations)):
         assert round(key_rate_durations[i], 6) == test_case_krds[i]
 

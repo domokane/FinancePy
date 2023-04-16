@@ -380,7 +380,7 @@ class Bond:
             the tenors from 0.25 to 30 years.
         shift : float, optional
             The shift used to calculate the key rate durations, default is None
-            which will set the shift to 0.0001.
+            in which case we will set the shift to 1 basis point i.e. 0.0001.
 
         Returns
         -------
@@ -413,6 +413,20 @@ class Bond:
 
         # Build initial flat yield curve
         rates_flat = np.ones(len(key_rate_tenors)) * ytm
+
+        ########################################################################
+        # UNDER CONSTRUCTION HERE
+        # For each payment we need to interpolate the rate
+        coupon_times = [0.0]
+        for dt in self._coupon_dates[1:]:
+            if dt > settlement_date:
+                t = (dt - settlement_date) / gDaysInYear
+                t = np.maximum(t, gSmall)
+                coupon_times.append(t)
+        
+        cpn_rates_flat = np.ones(len(coupon_times)) * ytm
+        # UNDER CONSTRUCTION TO HERE
+        ########################################################################
 
         # calculate the discount factors using rates and key_rate_tenors
         # adjust for the bond frequency
@@ -449,7 +463,7 @@ class Bond:
 
             # create a discount curve with the key rate shifted down
             # by twice the shift value.
-            rates[ind] -= shift * 2
+            rates[ind] -= shift * 2.0
 
             dfs_down = 1.0 / np.power(1.0 + rates / self._frequency,
                                       self._frequency * key_rate_tenors)
@@ -463,7 +477,6 @@ class Bond:
                                                          curve_down)
 
             # calculate the key rate duration
-            # using the formula (P_down - P_up) / (2 * shift * P_zero)
             key_rate_duration = (p_down - p_up) / (2 * shift * p_zero)
 
             # append the key rate duration to the key_rate_durations list
@@ -725,8 +738,10 @@ class Bond:
                 t = np.maximum(t, gSmall)
 
                 df = discount_curve.df(dt)
+
                 # determine the Ibor implied zero rate
                 r = f * (np.power(df, -1.0 / t / f) - 1.0)
+
                 # determine the OAS adjusted zero rate
                 df_adjusted = np.power(1.0 + (r + oas) / f, -t * f)
                 pv = pv + (c / f) * df_adjusted
@@ -791,10 +806,10 @@ class Bond:
         for dt in self._coupon_dates[1:-1]:
             # coupons paid on a settlement date are paid to the seller
             if dt > settlement_date:
-                flow_str += ("%12s %12.2f \n" % (dt, flow))
+                flow_str += ("%12s %12.5f \n" % (dt, flow))
 
         redemption_amount = self._face_amount + flow
-        flow_str += ("%12s %12.2f \n"
+        flow_str += ("%12s %12.5f \n"
                      % (self._coupon_dates[-1], redemption_amount))
 
         return flow_str
