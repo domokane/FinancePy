@@ -290,11 +290,11 @@ def test_key_rate_durations():
         settlement_date, yld)
 
     assert (key_rate_tenors == np.array(
-        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 20, 30])).all()
+        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 8, 9, 10, 20, 30])).all()
 
     # The following test cases are rounded to 6 decimal places
-    test_case_krds = [0.00308, 0.005003, 0.022352,
-                      0.050164, 0.073384, 0.890714, 3.414422, 0.0, 0.0, 0.0, 0.0]
+    test_case_krds = [0.00308, 0.005003, 0.022352, 0.050164, 0.073384, 
+                      0.890714, 3.414422, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     for i in range(len(key_rate_durations)):
         assert round(key_rate_durations[i], 6) == test_case_krds[i]
@@ -321,8 +321,8 @@ def test_key_rate_durations_Bloomberg_example():
         [0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 20, 30])).all()
 
     # The following test cases are rounded to 6 decimal places
-    test_case_krds = [0.002773, 0.005383, 0.023423, 0.051905,
-                      0.075023, 2.502754, 1.379869, 0.0, 0.0, 0.0, 0.0]
+    test_case_krds = [0.002773, 0.005383, 0.023423, 0.051905, 0.075023, 2.502754, 
+                      1.379869, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     for i in range(len(key_rate_durations)):
         assert round(key_rate_durations[i], 6) == test_case_krds[i]
