@@ -425,11 +425,12 @@ class Bond:
                 coupon_times.append(t)
         
         cpn_rates_flat = np.ones(len(coupon_times)) * ytm
+
         # UNDER CONSTRUCTION TO HERE
         ########################################################################
-
         # calculate the discount factors using rates and key_rate_tenors
         # adjust for the bond frequency
+
         dfs_flat = 1.0 / np.power(1.0 + rates_flat / self._frequency,
                                  self._frequency * key_rate_tenors)
 
