@@ -318,7 +318,7 @@ def test_key_rate_durations_Bloomberg_example():
         settlement_date, ytm)
 
     assert (key_rate_tenors == np.array(
-        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 20, 30])).all()
+        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 8, 9, 10, 20, 30])).all()
 
     # The following test cases are rounded to 6 decimal places
     test_case_krds = [0.002773, 0.005383, 0.023423, 0.051905, 0.075023, 2.502754, 
