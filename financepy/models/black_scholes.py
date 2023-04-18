@@ -177,8 +177,9 @@ class BlackScholes(Model):
                                 time_to_expiry,
                                 option_type.value,
                                 strike_price,
-                                self._seed,
-                                self._use_sobol)
+                                seed=self._seed,
+                                use_sobol=self._use_sobol,
+                                **self._params)
 
                 return v
             elif self._implementationType == BlackScholesTypes.Bjerksund_Stensland:
