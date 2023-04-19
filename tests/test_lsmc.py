@@ -27,7 +27,7 @@ def test_american_call():
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
     num_steps_per_year = 500
     num_paths = 50_000
-    poly_degree = 15
+    poly_degree = 5
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
                        time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
@@ -60,7 +60,7 @@ def test_american_put():
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
     num_steps_per_year = 500
     num_paths = 50_000
-    poly_degree = 15
+    poly_degree = 5
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
                        time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
@@ -93,7 +93,7 @@ def test_call_option():
     dividend_yield = 0.01
     num_steps_per_year = 500
     num_paths = 50_000
-    poly_degree = 15
+    poly_degree = 5
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
     discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
@@ -125,7 +125,7 @@ def test_put_option():
     dividend_yield = 0.1
     num_steps_per_year = 500
     num_paths = 50_000
-    poly_degree = 15
+    poly_degree = 5
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
     discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)

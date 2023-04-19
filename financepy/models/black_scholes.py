@@ -125,6 +125,22 @@ class BlackScholes(Model):
                                           **self._params
                                           )
                 return v
+            elif self._implementationType == BlackScholesTypes.LSMC:
+
+                v = equity_lsmc(spot_price=spotPrice,
+                                risk_free_rate=risk_free_rate,
+                                dividend_yield=dividendRate,
+                                sigma=self._volatility,
+                                num_paths=self._num_paths,
+                                num_steps_per_year=self._num_steps_per_year,
+                                time_to_expiry=time_to_expiry,
+                                option_type_value=option_type.value,
+                                strike_price=strike_price,
+                                seed=self._seed,
+                                use_sobol=self._use_sobol,
+                                **self._params)
+
+                return v
 
             else:
 
@@ -168,15 +184,15 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.LSMC:
 
-                v = equity_lsmc(spotPrice,
-                                risk_free_rate,
-                                dividendRate,
-                                self._volatility,
-                                self._num_steps_per_year,
-                                self._num_paths,
-                                time_to_expiry,
-                                option_type.value,
-                                strike_price,
+                v = equity_lsmc(spot_price=spotPrice,
+                                risk_free_rate=risk_free_rate,
+                                dividend_yield=dividendRate,
+                                sigma=self._volatility,
+                                num_paths=self._num_paths,
+                                num_steps_per_year=self._num_steps_per_year,
+                                time_to_expiry=time_to_expiry,
+                                option_type_value=option_type.value,
+                                strike_price=strike_price,
                                 seed=self._seed,
                                 use_sobol=self._use_sobol,
                                 **self._params)
