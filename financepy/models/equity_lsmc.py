@@ -101,8 +101,7 @@ def equity_lsmc(spot_price, risk_free_rate, dividend_yield, sigma, num_steps_per
             regression2 = np.polynomial.chebyshev.chebfit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.POLYNOMIAL.value:
-            vander = np.vander(st[it], poly_degree+1)
-            regression2 = np.linalg.lstsq(vander, value_matrix[it+1] * df)[0]
+            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = eval_polynomial(regression2, st[it])
         else:
             raise ValueError(f"Unknown FitType: {fit_type_value}")
