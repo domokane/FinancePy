@@ -33,14 +33,14 @@ class FIT_TYPES(Enum):
 
 
 #@njit(float64(float64, float64, float64, float64, int64, int64, float64, int64,
-#                 float64, int64, int64, int64), fastmath=True, cache=False)
+#                 float64, int64, int64, int64, int64), fastmath=True, cache=False)
 def equity_lsmc(spot_price, risk_free_rate, dividend_yield, sigma, num_steps_per_year, num_paths, time_to_expiry,
-                option_type_value, strike_price, poly_degree, fit_type, use_sobol, seed):
+                option_type_value, strike_price, poly_degree, fit_type_value, use_sobol, seed):
     
     if num_paths == 0:
         raise FinError("Num Paths is zero")
-    if fit_type is None:
-        fit_type = FIT_TYPES.LAGUERRE
+    if not fit_type_value:
+        fit_type_value = FIT_TYPES.LAGUERRE.value
     
     np.random.seed(seed)
 
@@ -85,27 +85,27 @@ def equity_lsmc(spot_price, risk_free_rate, dividend_yield, sigma, num_steps_per
 
     df = np.exp(-risk_free_rate * dt)
     for it in range(num_times-2, 0, -1):
-        if fit_type == FIT_TYPES.HERMITE_E:
+        if fit_type_value == FIT_TYPES.HERMITE_E.value:
             regression2 = np.polynomial.hermite_e.hermefit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.hermite_e.hermeval(st[it], regression2)
-        elif fit_type == FIT_TYPES.LAGUERRE:
+        elif fit_type_value == FIT_TYPES.LAGUERRE.value:
             regression2 = np.polynomial.laguerre.lagfit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.laguerre.lagval(st[it], regression2)
-        elif fit_type == FIT_TYPES.HERMITE:
+        elif fit_type_value == FIT_TYPES.HERMITE.value:
             regression2 = np.polynomial.hermite.hermfit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.hermite.hermval(st[it], regression2)
-        elif fit_type == FIT_TYPES.LEGENDRE:
+        elif fit_type_value == FIT_TYPES.LEGENDRE.value:
             regression2 = np.polynomial.legendre.legfit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.legendre.legval(st[it], regression2)
-        elif fit_type == FIT_TYPES.CHEBYCHEV:
+        elif fit_type_value == FIT_TYPES.CHEBYCHEV.value:
             regression2 = np.polynomial.chebyshev.chebfit(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
-        elif fit_type == FIT_TYPES.POLYNOMIAL:
+        elif fit_type_value == FIT_TYPES.POLYNOMIAL.value:
             vander = np.vander(st[it], poly_degree+1)
             regression2 = np.linalg.lstsq(vander, value_matrix[it+1] * df)[0]
             cont_value = eval_polynomial(regression2, st[it])
         else:
-            raise ValueError(f"Unknown FitType: {fit_type}")
+            raise ValueError(f"Unknown FitType: {fit_type_value}")
         cont_value[cont_value < 0] = 0
 
         # Should we exercise at this timestep?

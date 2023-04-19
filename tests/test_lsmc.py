@@ -30,7 +30,7 @@ def test_american_call():
     poly_degree = 5
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
-                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
+                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE.value, 0, 0)
 
     value = crr_tree_val_avg(spot_price,
                              risk_free_rate,  # continuously compounded
@@ -63,7 +63,7 @@ def test_american_put():
     poly_degree = 5
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
-                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
+                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE.value, 0, 0)
 
     value = crr_tree_val_avg(spot_price,
                              risk_free_rate,  # continuously compounded
@@ -104,7 +104,7 @@ def test_call_option():
                            discount_curve, dividend_curve, model)
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
-                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
+                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE.value, 0, 0)
     assert v_ls == approx(v0, 1e-1)
 
 
@@ -135,6 +135,6 @@ def test_put_option():
     v0 = put_option.value(valuation_date, spot_price,
                           discount_curve, dividend_curve, model)
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
-                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE, 0, 0)
+                       time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE.value, 0, 0)
 
     assert v_ls == approx(v0, 1e-1)
