@@ -107,8 +107,6 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets. """
 
-    # https://pdfs.semanticscholar.org/16ed/c0e804379e22ff36dcbab7e9bb06519faa43.pdf
-
         texp = (self._expiry_date - valuation_date) / gDaysInYear
 
         if valuation_date > self._expiry_date:

@@ -117,7 +117,7 @@ def fmin_cg(f, x0, fprime=None, fargs=(), gtol=1e-5, norm=Inf, epsilon=_epsilon,
        minimizing point, `xopt`.
     References
     ----------
-    .. [1] Wright & Nocedal, "Numerical Optimization", 1999, pp. 120-122.
+    .. [1] Wright and Nocedal, "Numerical Optimization", 1999, pp. 120-122.
     Examples
     --------
     Example 1: seek the minimum value of the expression

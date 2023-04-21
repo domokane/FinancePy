@@ -68,9 +68,9 @@ def test_equity_swap_at_inception():
 
 def test_equity_swap_not_in_inception():
 
-    ## According to http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote19.pdf
-    ## We can engineer a price to which the equity and float leg balance each other. This is
-    ## relatively easy for a single period swap.
+    # According to http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote19.pdf
+    # We can engineer a price to which the equity and float leg balance each other. This is
+    # relatively easy for a single period swap.
 
     effective_date = Date(13, 2, 2018)
     valuation_date = effective_date.add_months(6)
@@ -97,17 +97,17 @@ def test_equity_swap_not_in_inception():
     
     index_curve = discount_curve
 
-    ## Rate determined at last reset date, from that date to maturity
+    # Rate determined at last reset date, from that date to maturity
     index_curve_first = DiscountCurveFlat(effective_date, discountRate)
     index_alpha_first = DayCount(index_curve_first._day_count_type).year_frac(effective_date, maturity_date)[0]
     firstFixing = ((index_curve_first.df(effective_date) / index_curve_first.df(maturity_date))  - 1.0 ) / index_alpha_first
 
-    ## Rate between valuation date to maturity
+    # Rate between valuation date to maturity
     index_curve_period = DiscountCurveFlat(valuation_date, discountRate)
     index_alpha_period = DayCount(index_curve_period._day_count_type).year_frac(valuation_date, maturity_date)[0]
     periodFixing = ((index_curve_period.df(valuation_date) / index_curve_period.df(maturity_date))  - 1.0 ) / index_alpha_period
 
-    ## This is the price at which abs_value(equity leg) == abs_value(float leg)
+    # This is the price at which abs_value(equity leg) == abs_value(float leg)
     stock_price = stock_strike * (1 + firstFixing * index_alpha_first) / (1 + periodFixing * index_alpha_period)
 
     equity_swap = EquitySwap(effective_date,

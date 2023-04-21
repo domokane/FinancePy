@@ -33,13 +33,13 @@ class EquitySwap:
     which the implied index rates are extracted. """
 
     def __init__(self,
-                 effective_date: Date, ## Date contract starts or last Equity Reset
-                 termination_date_or_tenor: (Date, str), ## Date contract ends
+                 effective_date: Date, # Date contract starts or last Equity Reset
+                 termination_date_or_tenor: (Date, str), # Date contract ends
                  eq_leg_type: SwapTypes,
                  eq_freq_type: FrequencyTypes,
                  eq_day_count_type: DayCountTypes,
-                 strike: float, ## Price at effective date
-                 quantity: float = 1.0, ## Quantity at effective date
+                 strike: float, # Price at effective date
+                 quantity: float = 1.0, # Quantity at effective date
                  eq_payment_lag: int = 0,
                  eq_return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  rate_freq_type: FrequencyTypes = FrequencyTypes.MONTHLY, 
@@ -51,7 +51,7 @@ class EquitySwap:
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create an equity swap contract given the contract effective date, its maturity, 
-        underlying price & quantity, day count convention and return type and other details. 
+        underlying price and quantity, day count convention and return type and other details. 
         The equity leg parameters have default values that can be overwritten if needed. 
         The start date is contractual and is the same as the settlement date for a new swap. 
         It is the date on which interest starts to accrue. The end of the contract is the 
@@ -75,7 +75,7 @@ class EquitySwap:
 
         self._effective_date = effective_date
 
-        ## There is no exchange of principal
+        # There is no exchange of principal
         self._principal = 0.0
 
         rate_leg_type = SwapTypes.PAY
@@ -96,7 +96,7 @@ class EquitySwap:
                                          date_gen_rule_type,
                                          end_of_month)
 
-        ## Fixed Rate Leg not implemented yet
+        # Fixed Rate Leg not implemented yet
         self._rate_leg = SwapFloatLeg(effective_date,
                                       self._maturity_date,
                                       rate_leg_type,
@@ -148,7 +148,7 @@ class EquitySwap:
         the payment schedule defined for the rate leg. 
         """
 
-        ## Assumption: Rate frequency type is a multiple of Equity's
+        # Assumption: Rate frequency type is a multiple of Equity's
         eq_freq = annual_frequency(self._equity_leg._freq_type)
         rate_freq = annual_frequency(self._rate_leg._freq_type)
 

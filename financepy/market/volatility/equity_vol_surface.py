@@ -100,7 +100,7 @@ def _solve_to_horizon(s, t, r, q,
 
     args = (s, t, r, q, strikes, timeIndex, volatility_grid, vol_type_value)
 
-    # Nelder-Mead (both SciPy & Numba) is quicker, but occasionally fails
+    # Nelder-Mead (both SciPy and Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:

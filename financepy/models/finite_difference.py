@@ -74,7 +74,7 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 
     0 = dV/dt + A V
 
-    A = -risk_free_rate + mu d/dx + 1/2 var d^2/dx^2
+    A = -risk_free_rate + mu d/dx + 1/2 var d2/dx2
 
     using the theta scheme
 

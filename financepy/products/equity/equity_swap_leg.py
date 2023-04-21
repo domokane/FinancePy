@@ -24,13 +24,13 @@ class EquitySwapLeg:
     and follows the economics of a collection of equity forward contracts. 
     """
     def __init__(self,
-                 effective_date: Date, ## Date contract starts or last Equity Reset
-                 termination_date_or_tenor: (Date, str), ## Date contract ends
+                 effective_date: Date, # Date contract starts or last Equity Reset
+                 termination_date_or_tenor: (Date, str), # Date contract ends
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 strike: float, ## Price at effective date
-                 quantity: float = 1.0, ## Quantity at effective date
+                 strike: float, # Price at effective date
+                 quantity: float = 1.0, # Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -39,7 +39,7 @@ class EquitySwapLeg:
                  end_of_month: bool = False):
         
         """ Create the equity leg of a swap contract giving the contract start
-        date, its maturity, underlying strike price & quantity, payment frequency, 
+        date, its maturity, underlying strike price and quantity, payment frequency, 
         day count convention, return type, and other details """
 
         check_argument_types(self.__init__, locals())
@@ -56,13 +56,13 @@ class EquitySwapLeg:
             raise FinError("Effective date after maturity date")
         
         if quantity < 0:
-            ## Long/Short is defined by leg_type
+            # Long/Short is defined by leg_type
             raise FinError("Quantity must be non-negative")
         
         if return_type != ReturnTypes.TOTAL_RETURN:
             raise NotImplementedError("Return Type still not implemented")
 
-        ## To generate ISDA pmnt schedule properly we can't use these types 
+        # To generate ISDA pmnt schedule properly we can't use these types 
         if freq_type in (FrequencyTypes.CONTINUOUS, FrequencyTypes, FrequencyTypes.SIMPLE):
             raise FinError("Cannot generate payment schedule for this frequency!")
 
@@ -153,7 +153,7 @@ class EquitySwapLeg:
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
               current_price: float = None ):
-        """ Value the equity leg with payments from an equity price & quantity, 
+        """ Value the equity leg with payments from an equity price and quantity, 
         an index curve and an [optional] dividend curve. Discounting is based on 
         a supplied discount curve as of the valuation date supplied. 
         """
@@ -168,11 +168,11 @@ class EquitySwapLeg:
         if index_curve is None:
             index_curve = discount_curve
         
-        ## Assume a naive dividend curve if nothing provided
+        # Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
             dividend_curve = DiscountCurveFlat(valuation_date, 0)
 
-        ## Current price can't be different than strike at effective date
+        # Current price can't be different than strike at effective date
         if current_price is not None:
             self._current_price = current_price
         else:
@@ -213,14 +213,14 @@ class EquitySwapLeg:
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
-                ## Equity discount derived from index and div curves
+                # Equity discount derived from index and div curves
                 eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
                 self._eq_fwd_rates.append(eq_fwd_rate)
 
-                ## Iterative update of the term rate
+                # Iterative update of the term rate
                 eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) * (1 + eq_term_rate)  - 1
                 
                 nextPrice = self._current_price * (1 + eq_term_rate)
