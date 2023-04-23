@@ -38,6 +38,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes
+from .zero_curve import BondZeroCurve
 
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
@@ -356,13 +357,13 @@ class Bond:
         return md
 
     ###########################################################################
-    def key_rate_durations(self,
+
+    def key_rate_durations(bond,
                            settlement_date: Date,
                            ytm: float,
                            key_rate_tenors: list = None,
-                           shift: float = None):
-            
-        print("Warning: Under construction. Do not use this function yet")
+                           shift: float = None,
+                           rates: list = None):
 
         """
         Calculates the key rate durations for a bond.
@@ -380,7 +381,10 @@ class Bond:
             the tenors from 0.25 to 30 years.
         shift : float, optional
             The shift used to calculate the key rate durations, default is None
-            in which case we will set the shift to 1 basis point i.e. 0.0001.
+            which will set the shift to 0.0001.
+        rates: list of float, optional
+            Corresponding yield curve data in line with key_rate_tenors
+            If None, flat yield curve is used
 
         Returns
         -------
@@ -389,100 +393,102 @@ class Bond:
         """
 
         # check if key_rate_tenors is None
+        if key_rate_tenors is None:
+        # if it is None, create an array of key rates ranging from 0.5 to 30 years
+            key_rate_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10, 20, 30])
 
-        if isinstance(key_rate_tenors, list):
-            key_rate_tenors = np.array(key_rate_tenors)
-        elif isinstance(key_rate_tenors, np.ndarray):
-            pass
-        else:
-            # if it is None, create an array of key rates ranging from 
-            # 0.25 to 30 years following Bloomberg standard
-            key_rate_tenors = np.array(
-                [0.25, 0.5, 1, 2, 3, 4, 5, 7, 8, 9, 10, 20, 30])
-
-        # calculate the dates for each tenor using the settlement_date
-        #  variable and the key_rate_tenors array
-        dates = settlement_date.add_years(key_rate_tenors)
-
-        # set the shift to one basis point of yield
+        # set the shift to a small value if not give
         if not shift:
             shift = 0.0001
 
         # initialize an empty list for the key rate durations
         key_rate_durations = []
 
-        # Build initial flat yield curve
-        rates_flat = np.ones(len(key_rate_tenors)) * ytm
-
-        ########################################################################
-        # UNDER CONSTRUCTION HERE
-        # For each payment we need to interpolate the rate
-        coupon_times = [0.0]
-        for dt in self._coupon_dates[1:]:
-            if dt > settlement_date:
-                t = (dt - settlement_date) / gDaysInYear
-                t = np.maximum(t, gSmall)
-                coupon_times.append(t)
-        
-        cpn_rates_flat = np.ones(len(coupon_times)) * ytm
-
-        # UNDER CONSTRUCTION TO HERE
-        ########################################################################
-        # calculate the discount factors using rates and key_rate_tenors
-        # adjust for the bond frequency
-
-        dfs_flat = 1.0 / np.power(1.0 + rates_flat / self._frequency,
-                                 self._frequency * key_rate_tenors)
-
-        # create a discount curve using the calculated dfs
-        curve_flat = DiscountCurve(settlement_date, dates, dfs_flat,
-                                  InterpTypes.LINEAR_ZERO_RATES)
-
-        # calculate the full price of the bond using the discount curve
-        p_zero = self.full_price_from_discount_curve(settlement_date,
-                                                     curve_flat)
-
         # iterate over each key rate (tenor) and calculate the key rate duration
-        for ind, key_rate in enumerate(key_rate_tenors):
+        for ind, _ in enumerate(key_rate_tenors):
+            # if rates not given
+            # create an array of rates where each rate is equal to the ytm value
+            if rates is None:
+                rates = np.ones(len(key_rate_tenors)) * ytm
 
-            rates = rates_flat.copy()
+            #Create set of par bonds to be used in BondZeroCurve
+            # ytm and coupons are equal
+            par_bonds = []
+            for tenor, cpn in zip(key_rate_tenors, rates):
 
-            # create a discount curve with the key rate
-            # shifted up by the shift value
+                mat_date = settlement_date.add_years(tenor)
+
+                par_bond = Bond(settlement_date, mat_date, cpn,
+                                bond._freq_type, bond._accrual_type)
+
+                par_bonds.append(par_bond)
+
+            clean_prices = [par_bond.clean_price_from_ytm(
+                settlement_date, ytm, YTMCalcType.US_STREET) for par_bond, ytm in zip(par_bonds, rates)]
+
+            par_crv = BondZeroCurve(settlement_date, par_bonds,
+                                    clean_prices, InterpTypes.LINEAR_ZERO_RATES)
+
+            # calculate the full price of the bond using the discount curve
+            p_zero = bond.full_price_from_discount_curve(settlement_date, par_crv)
+
+
+            # shift up by the yield of corresponding par bond
             rates[ind] += shift
 
-            dfs_up = 1.0 / np.power(1.0 + rates / self._frequency,
-                                    self._frequency * key_rate_tenors)
+            par_bonds = []
+            for tenor, cpn in zip(key_rate_tenors, rates):
 
-            curve_up = DiscountCurve(settlement_date, dates, dfs_up, 
-                                     InterpTypes.LINEAR_ZERO_RATES)
+                mat = settlement_date.add_years(tenor)
+
+                par_bond = Bond(settlement_date, mat, cpn,
+                                bond._freq_type, bond._accrual_type)
+
+                par_bonds.append(par_bond)
+
+            clean_prices = [par_bond.clean_price_from_ytm(
+                settlement_date, ytm, YTMCalcType.US_STREET) for par_bond, ytm in zip(par_bonds, rates)]
+
+            par_crv_up = BondZeroCurve(
+                settlement_date, par_bonds, clean_prices, InterpTypes.LINEAR_ZERO_RATES)
 
             # calculate the full price of the bond
             # using the discount curve with the key rate shifted up
-            p_up = self.full_price_from_discount_curve(settlement_date, 
-                                                       curve_up)
+            p_up = bond.full_price_from_discount_curve(settlement_date, par_crv_up)
 
-            # create a discount curve with the key rate shifted down
+            # create a curve again with the key rate shifted down
             # by twice the shift value.
-            rates[ind] -= shift * 2.0
+            rates[ind] -= shift * 2
 
-            dfs_down = 1.0 / np.power(1.0 + rates / self._frequency,
-                                      self._frequency * key_rate_tenors)
+            par_bonds = []
+            for tenor, cpn in zip(key_rate_tenors, rates):
 
-            curve_down = DiscountCurve(settlement_date, dates, dfs_down, 
-                                       InterpTypes.LINEAR_ZERO_RATES)
+                mat = settlement_date.add_years(tenor)
+
+                par_bond = Bond(settlement_date, mat, cpn,
+                                bond._freq_type, bond._accrual_type)
+
+                par_bonds.append(par_bond)
+
+            clean_prices = [par_bond.clean_price_from_ytm(settlement_date, 
+                                                          ytm, 
+                                                          YTMCalcType.US_STREET) for par_bond, ytm in zip(par_bonds, rates)]
+
+            par_crv_down = BondZeroCurve(settlement_date, 
+                                         par_bonds, 
+                                         clean_prices, 
+                                         InterpTypes.LINEAR_ZERO_RATES)
 
             # calculate the full price of the bond using
-            # the discount curve with the key rate shifted down
-            p_down = self.full_price_from_discount_curve(settlement_date, 
-                                                         curve_down)
+            p_down = bond.full_price_from_discount_curve(settlement_date, par_crv_down)
 
             # calculate the key rate duration
+            # using the formula (P_down - P_up) / (2 * shift * P_zero)
             key_rate_duration = (p_down - p_up) / (2 * shift * p_zero)
 
             # append the key rate duration to the key_rate_durations list
             key_rate_durations.append(key_rate_duration)
-
+            
         return key_rate_tenors, np.array(key_rate_durations)
 
     ###########################################################################

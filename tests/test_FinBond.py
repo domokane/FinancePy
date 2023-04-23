@@ -301,6 +301,7 @@ def test_key_rate_durations():
 
 
 def test_key_rate_durations_Bloomberg_example():
+
     accrual_type, frequencyType, settlementDays, exDiv, calendar = \
     get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
@@ -308,6 +309,7 @@ def test_key_rate_durations_Bloomberg_example():
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
     cpn = 2.75/100
+
     bond = Bond(issue_date, maturity_date, cpn, frequencyType, accrual_type)
 
     # US Government Equivalent yield on Bloomberg as of 17 March 2023
