@@ -646,11 +646,7 @@ def test_key_rate_durations_Bloomberg_example():
     print(key_rate_tenors)
     print(key_rate_durations)
 
-    bbg_key_rate_durations = [-0.000, -.007, -0.016, 1.427, 2.528, 0.00, 0.00, 0.00, 0.00]
-
     # Differences due to bonds not sitting exactly on these maturity points ? Did BBG interpolate ?
-
-    print(bbg_key_rate_durations)
 
 ###############################################################################
 
