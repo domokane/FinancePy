@@ -1,7 +1,3 @@
-[![unit test action](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml/badge.svg)](https://github.com/ru-corporate/FinancePy/actions/workflows/run-unit-tests.yml)
-
-![alt text](./images/logo.jpg?raw=true)
-
 # Latest News and Versions
 
 22 Nov 22
@@ -17,7 +13,7 @@ Version 0.240 has just been released and pushed to PyPI with changes
 
 # DISCLAIMER
 
-This software is distributed FREE & WITHOUT ANY WARRANTY. 
+This software is distributed FREE AND WITHOUT ANY WARRANTY. 
 
 Report any bugs or suggestions here as an issue. 
 

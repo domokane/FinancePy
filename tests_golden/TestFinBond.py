@@ -15,12 +15,14 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.bonds.bond_market import *
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
+
 import os
 import datetime as dt
 import pandas as pd
-
+import numpy as np
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -579,12 +581,74 @@ def test_Bond_eom():
     ai = bond.calc_accrued_interest(settle_date) # should be 8406.593406
     
 ###############################################################################
-    
+
+def test_key_rate_durations():
+    settlement_date = Date(21, 7, 2017)
+    issue_date = Date(13, 5, 2012)
+    maturity_date = Date(13, 5, 2022)
+    coupon = 0.027
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.THIRTY_E_360_ISDA
+    face = 100.0
+    bond = Bond(issue_date, maturity_date, coupon,
+                freq_type, accrual_type, face)
+
+    yld = coupon
+
+    key_rate_tenors = np.array([1, 5, 10])
+
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
+        settlement_date, yld, key_rate_tenors)
+
+    print(key_rate_tenors)
+    print(key_rate_durations)
+
+################################################################################
+
+def test_key_rate_durations_Bloomberg_example():
+
+    accrual_type, frequencyType, settlementDays, exDiv, calendar = \
+    get_bond_market_conventions(BondMarkets.UNITED_STATES)
+
+    # interest accrues on this date. Issue date is 01/08/2022
+    issue_date = Date(31, 7, 2022)
+    maturity_date = Date(31, 7, 2027)
+    cpn = 2.75/100.0
+    bond = Bond(issue_date, maturity_date, cpn, frequencyType, accrual_type)
+
+    # US Government Equivalent yield on Bloomberg as of 17 March 2023
+    ytm = 3.803140/100.0
+
+    settlement_date = Date(20, 3, 2023)  # next settle date for this bond
+
+    key_rate_tenors = np.array([0.25, 0.5, 1, 2, 3, 4, 5, 7, 8,  9, 10, 20, 30])
+
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
+        settlement_date, ytm, key_rate_tenors)
+
+    print(key_rate_tenors)
+    print(key_rate_durations)
+
+    # The following test cases are rounded to 6 decimal places
+    test_case_krds = [0.002773, 0.005383, 0.023423, 0.051905, 0.075023, 2.502754, 
+                      1.379869, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    bloomberg_krds = [0.003000, -0.00400, -0.00800, -0.01800, -0.02800, 2.585000, 
+                      1.497000, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    print(bloomberg_krds) 
+
+    for i in range(len(key_rate_durations)):
+        assert round(key_rate_durations[i], 6) == test_case_krds[i]
+
+###############################################################################
+
 test_Bond()
 test_BondExDividend()
 test_BondPaymentDates()
 test_Bond_ror()
 test_Bond_eom()
-
+test_key_rate_durations()
+test_key_rate_durations_Bloomberg_example()
 
 testCases.compareTestCases()

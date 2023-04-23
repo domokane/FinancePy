@@ -838,10 +838,12 @@ if 1 == 1:
     buildChapter("..//financepy//products//rates")
     buildChapter("..//financepy//products//fx")
     buildChapter("..//financepy//models")
+
 #    buildChapter("..//financepy//portfolio")
 #    buildChapter("..//financepy//risk")
 #    buildChapter(".//financepy//tests")
 #    buildChapter(".//financepy//docs")
+    pass
 
 buildTail()
 

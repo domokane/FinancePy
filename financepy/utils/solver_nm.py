@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit
 
 ###############################################################################
-## from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/root_finding.html #####################
+# from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/root_finding.html #####################
 
 _ECONVERGED = 0
 _ECONVERR = -1
@@ -206,7 +206,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                 vertices[worst_val_idx] = x_r
                 LV_ratio *= roh
 
-        # Step 4 & 5: Contraction and Shrink
+        # Step 4 and 5: Contraction and Shrink
         else:
             # Step 4: Contraction
             # https://github.com/QuantEcon/QuantEcon.py/issues/530
