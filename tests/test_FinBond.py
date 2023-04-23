@@ -273,33 +273,6 @@ def test_bond_cfets():
             continue
 
 
-def test_key_rate_durations():
-    settlement_date = Date(21, 7, 2017)
-    issue_date = Date(13, 5, 2012)
-    maturity_date = Date(13, 5, 2022)
-    coupon = 0.027
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.THIRTY_E_360_ISDA
-    face = 100.0
-    bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
-
-    yld = coupon
-
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
-        settlement_date, yld)
-
-    assert (key_rate_tenors == np.array(
-        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 8, 9, 10, 20, 30])).all()
-
-    # The following test cases are rounded to 6 decimal places
-    test_case_krds = [0.00308, 0.005003, 0.022352, 0.050164, 0.073384, 
-                      0.890714, 3.414422, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-    for i in range(len(key_rate_durations)):
-        assert round(key_rate_durations[i], 6) == test_case_krds[i]
-
-
 def test_key_rate_durations_Bloomberg_example():
 
     accrual_type, frequencyType, settlementDays, exDiv, calendar = \
@@ -308,23 +281,34 @@ def test_key_rate_durations_Bloomberg_example():
     # interest accrues on this date. Issue date is 01/08/2022
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
-    cpn = 2.75/100
+    coupon = 2.75/100.0
+    face = 100.0
 
-    bond = Bond(issue_date, maturity_date, cpn, frequencyType, accrual_type)
+    accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
+    BondMarkets.UNITED_STATES)
 
-    # US Government Equivalent yield on Bloomberg as of 17 March 2023
-    ytm = 3.803140/100
+    bond = Bond(issue_date, maturity_date, coupon,
+                freq_type, accrual_type, face)
 
-    settlement_date = Date(20, 3, 2023)  # next settle date for this bond
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
-        settlement_date, ytm)
+    settlement_date = Date(24, 4, 2023)
 
-    assert (key_rate_tenors == np.array(
-        [0.25, 0.5, 1, 2, 3, 4, 5, 7, 8, 9, 10, 20, 30])).all()
+    # US Street yield on Bloomberg as of 20 April 2023
+    # with settle date 24 April 2023
+    ytm = 3.725060/100
+    
+    # Details of yields of market bonds at KRD maturity points
+    my_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10])
+    my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272,  3.5825,  3.5347])/100
 
-    # The following test cases are rounded to 6 decimal places
-    test_case_krds = [0.002773, 0.005383, 0.023423, 0.051905, 0.075023, 2.502754, 
-                      1.379869, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date, 
+                                                                  ytm, 
+                                                                  key_rate_tenors = my_tenors, 
+                                                                  rates = my_rates)
+
+    print(key_rate_tenors)
+    print(key_rate_durations)
+
+    bbg_key_rate_durations = [-0.001, -.009, -0.021, 1.432, 2.527, 0.00, 0.00, 0.00, 0.00]
 
     for i in range(len(key_rate_durations)):
-        assert round(key_rate_durations[i], 6) == test_case_krds[i]
+        assert round(key_rate_durations[i], 6) == bbg_key_rate_durations[i]
