@@ -308,7 +308,7 @@ def test_key_rate_durations_Bloomberg_example():
     print(key_rate_tenors)
     print(key_rate_durations)
 
-    bbg_key_rate_durations = [-0.001, -.009, -0.021, 1.432, 
+    bbg_key_rate_durations = [-0.001, -.009, -0.022, 1.432, 
                               2.527, 0.00, 0.00, 0.00, 0.00]
 
     for i in range(len(key_rate_durations)):
