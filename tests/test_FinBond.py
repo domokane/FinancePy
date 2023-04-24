@@ -312,4 +312,4 @@ def test_key_rate_durations_Bloomberg_example():
                               2.527, 0.00, 0.00, 0.00, 0.00]
 
     for i in range(len(key_rate_durations)):
-        assert round(key_rate_durations[i], 6) == bbg_key_rate_durations[i]
+        assert round(key_rate_durations[i], 3) == bbg_key_rate_durations[i]
