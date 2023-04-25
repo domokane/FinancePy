@@ -5,35 +5,26 @@
 import numpy as np
 
 from ..market.curves.discount_curve import DiscountCurve
-from ..utils.date import Date
 from ..utils.error import FinError
 from ..utils.global_types import EquityBarrierTypes
-from ..utils.global_vars import gDaysInYear
 from ..utils.math import N
 
 
 # Calculates the Barrier option price using an Analytical Approach
 # and the Black Scholes Model
-def value_bs(expiry_date: Date,
+def value_bs(time_to_expiry: float,  # time in years
               strike_price: float,
               option_type: int,
               barrier_level: float,
               num_observations,  # number of observations per year
               notional: float,
-              valuation_date: Date,
               stock_price: (float, np.ndarray),
               rf_rate: float,
               div_rate: float,
               model):
     """ This values a single option. Because of its structure it cannot
     easily be vectorised which is why it has been wrapped. """
-
-    t_exp = (expiry_date - valuation_date) / gDaysInYear
-
-    if t_exp < 0:
-        raise FinError("Option expires before value date.")
-
-    t_exp = max(t_exp, 1e-6)
+    t_exp = max(time_to_expiry, 1e-6)
 
     lnS0k = np.log(stock_price / strike_price)
     sqrtT = np.sqrt(t_exp)
