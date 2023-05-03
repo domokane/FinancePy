@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
+from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -110,6 +110,7 @@ def test_FinSchedule():
                         termination_dateAdjust)
 
     dumpSchedule("BACKWARD MONTHLY FREQUENCY", schedule)
+
 
     ###########################################################################
     # FORWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
@@ -301,6 +302,17 @@ def test_FinSchedule():
 
     dumpSchedule("END OF MONTH - EOM TERM DATE - USING MOD FOLL", schedule)
 
+    # PROBLEM WITH THIS ONE AS DATES COLLIDE BUT REMOVE FIRST ONE
+    schedule = Schedule(Date(28, 4, 2023),
+                        Date(30, 4, 2024),
+                        FrequencyTypes.ANNUAL,
+                        CalendarTypes.UNITED_STATES,
+                        BusDayAdjustTypes.MODIFIED_FOLLOWING,
+                        DateGenRuleTypes.BACKWARD)
+    
+#    print(schedule)
+#    print(schedule._adjusted_dates)
+    
 ###############################################################################
 
 

@@ -155,7 +155,6 @@ def test_backward_front_stub():
     assert len(adjusted_dates) == 9
     check_frequency(schedule, start=1)
 
-
 def test_forward_end_stub():
     # FORWARD SHORT STUB AT END
     termination_dateAdjust = True

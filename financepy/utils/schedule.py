@@ -220,7 +220,7 @@ class Schedule:
         for dt in self._adjusted_dates[1:]:
 
             if dt == prev_dt:
-                raise FinError("Two matching dates in schedule")
+                self._adjusted_dates.pop(0)
 
             if dt < prev_dt:  # Dates must be ordered
                 raise FinError("Dates are not monotonic")
