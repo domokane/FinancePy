@@ -203,6 +203,7 @@ class Schedule:
         # unless it is specified in the contract. It is standard for CDS.
         # We change it if the adjust_termination_date flag is True.
         if self._adjust_termination_date is True:
+
             self._termination_date = calendar.adjust(self._termination_date,
                                                      self._bus_day_adjust_type)
 
@@ -210,7 +211,8 @@ class Schedule:
 
         #######################################################################
         # Check the resulting schedule to ensure that no two dates are the
-        # same and that they are monotonic - this should never happen but ...
+        # same in which case we remove the duplicate and that they are  
+        # monotonic - this should never happen but ...
         #######################################################################
 
         if len(self._adjusted_dates) < 2:
@@ -219,6 +221,7 @@ class Schedule:
         prev_dt = self._adjusted_dates[0]
         for dt in self._adjusted_dates[1:]:
 
+            # if the first date lands on the effective date then remove it
             if dt == prev_dt:
                 self._adjusted_dates.pop(0)
 
