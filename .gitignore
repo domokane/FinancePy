@@ -131,3 +131,4 @@ fabric.properties
 #MacOS Files
 .DS_Store
 docs/FinancePyManual.fls
+*.dvi
