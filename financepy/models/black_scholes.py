@@ -13,7 +13,8 @@ from ..utils.helpers import check_argument_types
 
 from .model import Model
 from .equity_crr_tree import crr_tree_val_avg
-from .equity_lsmc import equity_lsmc
+from .equity_lsmc import equity_lsmc, FIT_TYPES
+
 from .black_scholes_analytic import (
     bs_value,
     baw_value,
@@ -184,6 +185,9 @@ class BlackScholes(Model):
 
             elif self._implementationType == BlackScholesTypes.LSMC:
 
+                poly_degree = 3
+                fit_type = FIT_TYPES.HERMITE_E
+
                 v = equity_lsmc(spot_price=spotPrice,
                                 risk_free_rate=risk_free_rate,
                                 dividend_yield=dividendRate,
@@ -193,6 +197,8 @@ class BlackScholes(Model):
                                 time_to_expiry=time_to_expiry,
                                 option_type_value=option_type.value,
                                 strike_price=strike_price,
+                                poly_degree = poly_degree,
+                                fit_type_value = fit_type.value,
                                 seed=self._seed,
                                 use_sobol=self._use_sobol,
                                 **self._params)

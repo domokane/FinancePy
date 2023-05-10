@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 # This is a first implementation of American Monte Carlo using the method of 
 # Longstaff and Schwartz. Work is needed to add laguerre Polynomials and 
 # other interpolation methods.
+
 class FIT_TYPES(Enum):
     HERMITE_E = auto()
     LAGUERRE = auto()
@@ -34,8 +35,10 @@ class FIT_TYPES(Enum):
 
 #@njit(float64(float64, float64, float64, float64, int64, int64, float64, int64,
 #                 float64, int64, int64, int64, int64), fastmath=True, cache=False)
-def equity_lsmc(spot_price, risk_free_rate, dividend_yield, sigma, num_steps_per_year, num_paths, time_to_expiry,
-                option_type_value, strike_price, poly_degree, fit_type_value, use_sobol, seed):
+def equity_lsmc(spot_price, risk_free_rate, dividend_yield, sigma, 
+                num_steps_per_year, num_paths, time_to_expiry,
+                option_type_value, strike_price, poly_degree, fit_type_value, 
+                use_sobol, seed):
     
     if num_paths == 0:
         raise FinError("Num Paths is zero")
