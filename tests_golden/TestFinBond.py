@@ -584,7 +584,7 @@ def test_Bond_eom():
 
 def test_key_rate_durations():
 
-    print("Complete test case logging")
+#    print("Complete test case logging")
 
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
@@ -604,14 +604,12 @@ def test_key_rate_durations():
     key_rate_tenors, key_rate_durations = bond.key_rate_durations(
         settlement_date, ytm)
 
-    print(key_rate_tenors)
-    print(key_rate_durations)
+#    print(key_rate_tenors)
+#    print(key_rate_durations)
 
 ################################################################################
 
 def test_key_rate_durations_Bloomberg_example():
-
-    print("Complete test case logging")
 
     accrual_type, frequencyType, settlementDays, exDiv, calendar = \
     get_bond_market_conventions(BondMarkets.UNITED_STATES)
@@ -643,8 +641,8 @@ def test_key_rate_durations_Bloomberg_example():
                                                                   key_rate_tenors = my_tenors, 
                                                                   rates = my_rates)
 
-    print(key_rate_tenors)
-    print(key_rate_durations)
+#    print(key_rate_tenors)
+#    print(key_rate_durations)
 
     # Differences due to bonds not sitting exactly on these maturity points ? Did BBG interpolate ?
 

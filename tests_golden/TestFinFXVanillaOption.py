@@ -10,6 +10,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
+from financepy.models.sabr import SABR
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
 import time

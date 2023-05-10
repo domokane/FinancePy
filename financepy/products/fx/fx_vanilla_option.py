@@ -299,9 +299,7 @@ class FXVanillaOption():
                 volatility = model._volatility
             elif type(model) == SABR:
 
-                print("TESTING SABR...........")
-
-                params_list = [model.alpha, model.beta, model.rho, model.nu]
+                params_list = np.array([model._alpha, model._beta, model._rho, model._nu])
                 
                 volatility = vol_function_sabr(params_list, F0T, K, tdel)
 
