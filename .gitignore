@@ -39,6 +39,7 @@ ERROR_*.ipynb
 *.idx
 *.toc
 *.bak
+*.fls
 
 TestFin*_DIFFS.testLog
 TestFin*_COMPARE.testLog
