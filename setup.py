@@ -36,7 +36,7 @@ with open('./financepy//__init__.py', 'w') as file:
 ###############################################################################
 
 setuptools.setup(
-    name="financepy", 
+    name="financepy",
     version=version_number_str,
     author="Dominic O'Kane",
     author_email="dominic.okane@edhec.edu",
