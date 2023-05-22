@@ -9,7 +9,7 @@ from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
-
+from financepy.utils.global_vars import gDaysInYear
 
 valuation_date = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
@@ -47,9 +47,10 @@ def test_down_and_out_call():
         model)
 
     assert round(value, 4) == 0.0000
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional
+                                    , stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 0.0000
 
@@ -67,10 +68,10 @@ def test_down_and_in_call():
         model)
 
     assert round(value, 4) == 1.5307
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 1.5718
 
@@ -88,10 +89,10 @@ def test_up_and_out_call():
         model)
 
     assert round(value, 4) == 0.1789
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 0.1706
 
@@ -109,10 +110,10 @@ def test_up_and_in_call():
         model)
 
     assert round(value, 4) == 1.3519
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 1.4426
 
@@ -130,10 +131,10 @@ def test_up_and_out_put():
         model)
 
     assert round(value, 4) == 18.1445
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 17.8602
 
@@ -151,10 +152,10 @@ def test_up_and_in_put():
         model)
 
     assert round(value, 4) == 0.0933
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 0.0940
 
@@ -172,10 +173,10 @@ def test_down_and_out_put():
         model)
 
     assert round(value, 4) == 0.0000
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 0.0000
 
@@ -193,9 +194,20 @@ def test_down_and_in_put():
         model)
 
     assert round(value, 4) == 18.2378
-
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     model_params = (stock_price, drift, volatility, scheme)
-    test_value_mc = option.value_mc(expiry_date, K, option_type.value, B, notional, valuation_date, stock_price,
-                             discount_curve.cc_rate(expiry_date), process_type, model_params)
+    test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
+                                    stock_price, discount_curve.cc_rate(expiry_date), process_type, model_params)
 
     assert round(test_value_mc, 4) == 17.9996
+
+
+if __name__ == '__main__':
+    test_down_and_in_put()
+    test_down_and_in_call()
+    test_up_and_in_call()
+    test_up_and_in_put()
+    test_down_and_out_put()
+    test_down_and_out_call()
+    test_up_and_out_call()
+    test_up_and_out_put()

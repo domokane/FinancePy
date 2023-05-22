@@ -3,6 +3,9 @@
 ###############################################################################
 
 import sys
+
+from financepy.utils import gDaysInYear
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -26,6 +29,7 @@ def test_EquityBarrierOption():
 
     valuation_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
+    t_exp = (expiry_date - valuation_date) / gDaysInYear
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05
@@ -79,12 +83,11 @@ def test_EquityBarrierOption():
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
 
-            test_value_mc = option.value_mc(expiry_date, 
+            test_value_mc = option.value_mc(t_exp,
                                      K, 
                                      option_type.value, 
                                      B, 
-                                     notional, 
-                                     valuation_date, 
+                                     notional,
                                      stock_price,
                                      discount_curve.cc_rate(expiry_date), 
                                      process_type, 
@@ -120,12 +123,11 @@ def test_EquityBarrierOption():
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
 
-            test_value_mc = option.value_mc(expiry_date, 
+            test_value_mc = option.value_mc(t_exp,
                                      K, 
                                      option_type.value, 
                                      B, 
-                                     notional, 
-                                     valuation_date, 
+                                     notional,
                                      stock_price,
                                      discount_curve.cc_rate(expiry_date), 
                                      process_type, 

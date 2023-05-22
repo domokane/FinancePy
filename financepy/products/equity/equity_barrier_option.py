@@ -89,15 +89,19 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
+        t_exp = (self._expiry_date - valuation_date) / gDaysInYear
+
+        if t_exp < 0:
+            raise FinError("Option expires before value date.")
+
         for stock_price in stock_prices:
 
-            v = value_bs(self._expiry_date, 
+            v = value_bs(t_exp,
                           self._strike_price, 
                           self._option_type.value, 
                           self._barrier_level,
                           self._num_observations_per_year, 
-                          self._notional, 
-                          valuation_date, 
+                          self._notional,
                           stock_price,
                           discount_curve.cc_rate(self._expiry_date),
                           dividend_curve.cc_rate(self._expiry_date), model)
@@ -112,12 +116,11 @@ class EquityBarrierOption(EquityOption):
 ###############################################################################
 
     def value_mc(self, 
-                 expiry_date: Date,
+                 time_to_expiry: float,
                  strike_price,
                  option_type: int,
                  barrier_level,
                  notional,
-                 valuation_date: Date,
                  stock_price: float,
                  rf_rate: float,
                  process_type,
@@ -130,8 +133,7 @@ class EquityBarrierOption(EquityOption):
         observation times until expiry to examine if the barrier has been
         crossed and the corresponding value of the final payoff, if any. It
         assumes a GBM model for the stock price. """
-    
-        texp = (expiry_date - valuation_date) / gDaysInYear
+        texp = max(time_to_expiry, 1e-6)
         num_time_steps = int(texp * numAnnObs)
         K = strike_price
         B = barrier_level
