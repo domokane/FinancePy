@@ -1,4 +1,6 @@
 # Latest News and Versions
+29 May 2023 - Version 0.30 released
+- Added PrettyPrint to required dependencies
 
 22 Nov 22
 Version 0.260 has been released and pushed to PyPI
