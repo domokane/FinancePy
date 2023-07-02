@@ -238,7 +238,9 @@ class CDS:
         start_date = self._step_in_date
         end_date = self._maturity_date
 
-        self._adjusted_dates = []
+        self._payment_dates = []
+        self._accrual_start_dates = []
+        self._accrual_end_dates = []
         num_months = int(12.0 / frequency)
 
         unadjusted_schedule_dates = []
@@ -246,55 +248,54 @@ class CDS:
         if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
 
             next_date = end_date
-            flow_num = 0
+            unadjusted_schedule_dates.append(next_date)
 
             while next_date > start_date:
-                unadjusted_schedule_dates.append(next_date)
                 next_date = next_date.add_months(-num_months)
-                flow_num += 1
+                unadjusted_schedule_dates.append(next_date)
 
-            # Add on the Previous Coupon Date
-            unadjusted_schedule_dates.append(next_date)
-            flow_num += 1
+            adjusted_dates = []
+            for date in reversed(unadjusted_schedule_dates):
+                adjusted = calendar.adjust(date, self._bus_day_adjust_type)
+                adjusted_dates.append(adjusted)
 
-            # reverse order
-            for i in range(0, flow_num):
-                dt = unadjusted_schedule_dates[flow_num - i - 1]
-                self._adjusted_dates.append(dt)
+            # eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
+            # Payment       = [20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009, 22-MAR-2010]
+            # Accrual Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
+            # Accrual End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
+            
+            self._payment_dates = adjusted_dates[1:]
 
-            # holiday adjust dates except last one
-            for i in range(0, flow_num - 1):
-                dt = calendar.adjust(self._adjusted_dates[i],
-                                     self._bus_day_adjust_type)
+            self._accrual_start_dates = adjusted_dates[:-1]
 
-                self._adjusted_dates[i] = dt
-
-            finalDate = self._adjusted_dates[flow_num - 1]
-
-            # Final date is moved forward by one day
-            self._adjusted_dates[flow_num - 1] = finalDate.add_days(1)
+            self._accrual_end_dates = [date.add_days(-1) for date in self._accrual_start_dates[1:]]
+            self._accrual_end_dates.append(self._maturity_date)
 
         elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             next_date = start_date
-            flow_num = 0
-
-            unadjusted_schedule_dates.append(next_date)
-            flow_num = 1
 
             while next_date < end_date:
                 unadjusted_schedule_dates.append(next_date)
                 next_date = next_date.add_months(num_months)
-                flow_num = flow_num + 1
+            unadjusted_schedule_dates.append(self._maturity_date)
+            
+            adjusted_dates = []
+            for date in unadjusted_schedule_dates:
+                adjusted = calendar.adjust(date, self._bus_day_adjust_type)
+                adjusted_dates.append(adjusted)
 
-            for i in range(1, flow_num):
-                dt = calendar.adjust(unadjusted_schedule_dates[i],
-                                     self._bus_day_adjust_type)
+            # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
+            # Payment       = [20-MAY-2009, 20-AUG-2009, 20-NOV-2009, 22-FEB-2010]
+            # Accrual Start = [20-FEB-2009, 20-MAY-2009, 20-AUG-2009, 20-NOV-2009]
+            # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
 
-                self._adjusted_dates.append(dt)
+            self._payment_dates = adjusted_dates[1:]
 
-            finalDate = end_date.add_days(1)
-            self._adjusted_dates.append(finalDate)
+            self._accrual_start_dates = adjusted_dates[:-1]
+
+            self._accrual_end_dates = [date.add_days(-1) for date in self._accrual_start_dates[1:]]
+            self._accrual_end_dates.append(self._maturity_date)
 
         else:
             raise FinError("Unknown DateGenRuleType:" +
@@ -304,21 +305,18 @@ class CDS:
 
     def _calc_flows(self):
         """ Calculate cash flow amounts on premium leg. """
-        payment_dates = self._adjusted_dates
         day_count = DayCount(self._day_count_type)
 
         self._accrual_factors = []
         self._flows = []
 
-        self._accrual_factors.append(0.0)
-        self._flows.append(0.0)
+        # self._accrual_factors.append(0.0)
+        # self._flows.append(0.0)
 
-        num_flows = len(payment_dates)
-
-        for it in range(1, num_flows):
-            t0 = payment_dates[it - 1]
-            t1 = payment_dates[it]
-            accrual_factor = day_count.year_frac(t0, t1)[0]
+        for t0, t1 in zip(self._accrual_start_dates, self._accrual_end_dates):
+            # Adding a day because `year_frac` is non-inclusive
+            # eg. 20th to 22nd should be 3 days
+            accrual_factor = day_count.year_frac(t0, t1.add_days(1))[0]
             flow = accrual_factor * self._running_coupon * self._notional
 
             self._accrual_factors.append(accrual_factor)
@@ -520,7 +518,7 @@ class CDS:
                        pv01_method=0):
         """ RiskyPV01 of the contract using the OLD method. """
 
-        payment_dates = self._adjusted_dates
+        payment_dates = self._payment_dates
         day_count = DayCount(self._day_count_type)
 
         couponAccruedIndicator = 1
@@ -530,8 +528,9 @@ class CDS:
         # through a coupon period.
 
         teff = self._step_in_date
-        pcd = payment_dates[0]  # PCD
-        ncd = payment_dates[1]  # NCD
+        # TODO: Is this correct when FORWARD?
+        pcd = self._accrual_start_dates[0]  # PCD
+        ncd = self._accrual_start_dates[1]  # NCD
 
         # The first coupon is a special case which must be handled carefully
         # taking into account what coupon has already accrued and what has not
@@ -609,8 +608,7 @@ class CDS:
         in date. """
 
         # I assume accrued runs to the effective date
-        payment_dates = self._adjusted_dates
-        pcd = payment_dates[0]
+        pcd = self._accrual_start_dates[0]
         accrued_days = (self._step_in_date - pcd)
         return accrued_days
 
@@ -621,8 +619,7 @@ class CDS:
         previous coupon date (PCD) to the step_in_date of the CDS contract. """
 
         day_count = DayCount(self._day_count_type)
-        payment_dates = self._adjusted_dates
-        pcd = payment_dates[0]
+        pcd = self._accrual_start_dates[0]
         accrual_factor = day_count.year_frac(pcd, self._step_in_date)[0]
         accrued_interest = accrual_factor * self._notional * self._running_coupon
 
@@ -671,13 +668,13 @@ class CDS:
         libor_curve = issuer_curve._libor_curve
 
         paymentTimes = []
-        for it in range(0, len(self._adjusted_dates)):
-            t = (self._adjusted_dates[it] - valuation_date) / gDaysInYear
-            paymentTimes.append(t)
+        for date in self._payment_dates:
+            t = (date - valuation_date) / gDaysInYear
+            paymentTimes.append(t) # TODO: if t>0
 
         # this is the part of the coupon accrued from the previous coupon date
         # to now
-        pcd = self._adjusted_dates[0]
+        pcd = self._accrual_start_dates[0]
         eff = self._step_in_date
         day_count = DayCount(self._day_count_type)
 
@@ -855,8 +852,14 @@ class CDS:
         s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
         s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
-        header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-        valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]
+        header = "PAYMENT_DATE, YEAR_FRAC, FLOW, ACCRUAL_START, ACCTUAL_END"
+        valueTable = [
+            self._payment_dates,
+            self._accrual_factors,
+            self._flows,
+            self._accrual_start_dates,
+            self._accrual_end_dates
+        ]
         precision = "12.6f"
 
         s += table_to_string(header, valueTable, precision)
