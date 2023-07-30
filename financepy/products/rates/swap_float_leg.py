@@ -269,14 +269,13 @@ class SwapFloatLeg:
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
 
-        self.print_payments()
-
         if len(self._payments) == 0:
             print("Payments not calculated.")
             return
 
-        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL", 
-                  "IBOR", "PMNT", "DF", "PV", "CUM_PV"]
+        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL",
+                  "DAYS", "YEARFRAC", "IBOR", "PMNT", 
+                  "DF", "PV", "CUM_PV"]
 
         rows = []          
         num_flows = len(self._payment_dates)
@@ -285,6 +284,8 @@ class SwapFloatLeg:
                 iFlow + 1,
                 self._payment_dates[iFlow],
                 round(self._notional_array[iFlow], 0),
+                self._accrued_days[iFlow],
+                round(self._year_fracs[iFlow],4),
                 round(self._rates[iFlow] * 100.0, 4),
                 round(self._payments[iFlow], 2),
                 round(self._paymentDfs[iFlow], 4),
