@@ -78,7 +78,7 @@ class FXDoubleDigitalOption:
               dom_discount_curve,
               for_discount_curve,
               model):
-        """ Valuation of a doubledigital option using Black-Scholes model. 
+        """ Valuation of a double digital option using Black-Scholes model. 
         The option pays out the notional in the premium currency if the
         fx rate is between the upper and lower strike at maturity. The
         valuation is equivalent to the valuation of the difference of
